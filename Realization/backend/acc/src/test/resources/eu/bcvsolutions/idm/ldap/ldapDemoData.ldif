@@ -1,0 +1,84 @@
+dn: dc=bcv,dc=cz
+objectclass: top
+objectclass: domain
+objectclass: extensibleObject
+dc: bcv
+
+# Organizational Units
+dn: ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+dn: ou=people,dc=bcv,dc=cz
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+
+##################### Init default user, user has member of all groups, beacause groups has mandatory memebr attribute
+dn: uid=TestUser,ou=people,dc=bcv,dc=cz
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+#userid: testuser
+userPassword: testuser
+mail: testuser@example.tld
+sn: TestUser
+cn: Test User
+
+
+############################## Groups ###############################
+# We work with group membership, but it seems that com.unboundid.ldap server implementation doesn't support 
+# direct membership control through attibutes like memberOf, ldapGroups etc....
+
+# Create Groups
+dn: cn=AD-group-all,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-all
+ou: AD-group-all
+uniqueMember: uid=TestUser,ou=people,dc=bcv,dc=cz
+
+dn: cn=AD-group-pki,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-pki
+ou: AD-group-pki
+uniqueMember:
+
+dn: cn=AD-group-department1,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-department1
+ou: AD-group-department1
+uniqueMember:
+
+dn: cn=AD-group-department2,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-department2
+ou: AD-group-department2
+uniqueMember:
+
+dn: cn=AD-group-consultant1,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-consultant1
+ou: AD-group-consultant1
+uniqueMember:
+
+dn: cn=AD-group-consultant2,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-consultant2
+ou: AD-group-consultant2
+uniqueMember:
+
+dn: cn=AD-group-director,ou=groups,dc=bcv,dc=cz
+objectclass: top
+objectclass: groupOfUniqueNames
+cn: AD-group-director
+ou: AD-group-director
+uniqueMember:

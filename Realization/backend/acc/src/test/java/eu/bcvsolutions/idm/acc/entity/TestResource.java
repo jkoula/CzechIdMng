@@ -40,6 +40,12 @@ public class TestResource {
 	private ZonedDateTime modified;
 	@Column(name = "EAV_ATTRIBUTE", length = DefaultFieldLengths.NAME)
 	private String eavAttribute;
+	@Column(name = "TITLE_BEFORE", length = DefaultFieldLengths.NAME)
+	private String titleBefore;
+	@Column(name = "TITLE_AFTER", length = DefaultFieldLengths.NAME)
+	private String titleAfter;
+	@Column(name = "PERSONAL_NUMBER", length = DefaultFieldLengths.NAME)
+	private String personalNumber;
 
 	public String getEavAttribute() {
 		return eavAttribute;
@@ -111,5 +117,29 @@ public class TestResource {
 
 	public void setModified(ZonedDateTime modified) {
 		this.modified = modified;
+	}
+
+	public String getTitleBefore() {
+		return titleBefore;
+	}
+
+	public void setTitleBefore(String titleBefore) {
+		this.titleBefore = titleBefore;
+	}
+
+	public String getTitleAfter() {
+		return titleAfter;
+	}
+
+	public void setTitleAfter(String titleAfter) {
+		this.titleAfter = titleAfter;
+	}
+
+	public String getPersonalNumber() {
+		return personalNumber;
+	}
+
+	public void setPersonalNumber(String personalNumber) {
+		this.personalNumber = personalNumber;
 	}
 }
