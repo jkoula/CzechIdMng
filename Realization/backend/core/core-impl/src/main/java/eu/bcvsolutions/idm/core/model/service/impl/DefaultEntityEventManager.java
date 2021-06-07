@@ -958,12 +958,12 @@ public class DefaultEntityEventManager implements EntityEventManager {
 	public int switchInstanceId(String previousInstanceId, String newInstanceId) {
 		Assert.hasLength(previousInstanceId, "Previous asynchronous instance is required.");
 		boolean stopProcessing = eventConfiguration.isStopProcessing();
+		String currentInstanceId = eventConfiguration.getAsynchronousInstanceId();
 		//
 		try {
-			String asynchronousInstanceId = eventConfiguration.getAsynchronousInstanceId();
 			// resolve default
 			if (StringUtils.isEmpty(newInstanceId)) {
-				newInstanceId = asynchronousInstanceId;
+				newInstanceId = currentInstanceId;
 			}
 			if (previousInstanceId.equals(newInstanceId)) {
 				LOG.info("Previous instance is same as newly used for asynchronous event processing [{}].", newInstanceId);
@@ -973,7 +973,9 @@ public class DefaultEntityEventManager implements EntityEventManager {
 			// stop event processing
 			configurationService.setBooleanValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_STOP_PROCESSING, true);
 			// set new instance id => newly created events will be on the new instance
-			configurationService.setValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_INSTANCE_ID, newInstanceId);
+			if (previousInstanceId.equals(currentInstanceId)) {
+				configurationService.setValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_INSTANCE_ID, newInstanceId);
+			}
 			// find all created events with old instance and move them to new
 			return entityEventService.switchInstanceId(previousInstanceId, newInstanceId);
 		} finally {
