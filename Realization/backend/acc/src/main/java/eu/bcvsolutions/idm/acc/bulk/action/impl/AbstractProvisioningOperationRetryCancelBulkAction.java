@@ -63,9 +63,8 @@ public abstract class AbstractProvisioningOperationRetryCancelBulkAction extends
 				if (operations.size() == 1) {
 					SysProvisioningOperationDto invalidOperation = operations.get(0);
 					if (invalidOperation.getSystemEntity() == null) {
-						// FIXME: how to delete invalid provisioning operation ... ?
 						LOG.warn("System entity for provisioning operation [{}] was already deleted. "
-								+ "Operation cannot be executed or canceled. Operation can be deleted from database only.", 
+								+ "Operation cannot be executed or canceled. Operation can be deleted only.", 
 								entityId);
 						processed = true;
 						//

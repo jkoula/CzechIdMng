@@ -5,6 +5,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.Location;
 import org.flywaydb.core.api.configuration.Configuration;
@@ -56,7 +58,18 @@ public class IdmFlywayMigrationStrategy implements FlywayMigrationStrategy {
 	 * @return
 	 */
 	public String resolveDbName(Configuration flyway) {
-		Connection connection = JdbcUtils.openConnection(flyway.getDataSource(), 1);
+		return resolveDbName(flyway.getDataSource());
+	}
+	
+	/**
+	 * Resolve dbName, which is used by {@Flyway} datasource.
+	 * 
+	 * @param dataSource sql data source
+	 * @return e.g. {@link #POSTGRESQL_DBNAME}, {@link #MSSQL_DBNAME}
+	 * @since 11.1.0
+	 */
+	public String resolveDbName(DataSource dataSource) {
+		Connection connection = JdbcUtils.openConnection(dataSource, 1);
 		//
 		try {
 			DatabaseMetaData databaseMetaData = JdbcUtils.getDatabaseMetaData(connection);

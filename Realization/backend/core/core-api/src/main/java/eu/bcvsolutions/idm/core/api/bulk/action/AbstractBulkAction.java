@@ -493,7 +493,9 @@ public abstract class AbstractBulkAction<DTO extends AbstractDto, F extends Base
 	}
 
 	/**
-	 * Check permission for given entity.Permission for check is get by service.Required permission is given by method {@link #getPermissionForEntity}
+	 * Check permission for given entity.Permission for check is get by service.
+	 * Required permission is given by method {@link #getPermissionForEntity}.
+	 * 
 	 * @param entity
 	 * @return
 	 */

@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,15 +11,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,6 +65,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBatchService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
@@ -113,6 +117,9 @@ public class DefaultSysProvisioningOperationService
 	@Autowired private SysSystemEntityService systemEntityService;
 	@Autowired private ProvisioningConfiguration provisioningConfiguration;
 	@Autowired private SysProvisioningAttributeService provisioningAttributeService;
+	@Autowired private EntityManager entityManager;
+	@Autowired private IdmFlywayMigrationStrategy flywayMigrationStrategy;
+	@Autowired private DataSource dataSource;
 
 	@Autowired
 	public DefaultSysProvisioningOperationService(SysProvisioningOperationRepository repository) {
@@ -357,8 +364,38 @@ public class DefaultSysProvisioningOperationService
 		provisioningArchiveService.archive(provisioningOperation);
 		// delete attributes
 		provisioningAttributeService.deleteAttributes(provisioningOperation);
+		
+		if (provisioningOperation.getSystemEntity() != null) {
+			super.deleteInternal(provisioningOperation);
+			//
+			return;
+		}
 		//
-		super.deleteInternal(provisioningOperation);
+		// try to resolve native query by used database
+		String dbName = flywayMigrationStrategy.resolveDbName(dataSource);
+		if (dbName.equals(IdmFlywayMigrationStrategy.POSTGRESQL_DBNAME)) {
+			// delete an invalid provisioning operation by native sql => invalid operation cannot be deleted by hibernate on postgresql
+			Query query = entityManager.createNativeQuery(
+					String.format("delete from sys_provisioning_operation where id = uuid_send('%s')", provisioningOperation.getId())
+			);
+			int result = query.executeUpdate();
+			//
+			LOG.warn("Removed [{}] row from sys_provisioning_operation table", result);
+		} else if (dbName.equals(IdmFlywayMigrationStrategy.MSSQL_DBNAME)) {
+			// delete an invalid provisioning operation by ugly native sql => invalid operation cannot be deleted by hibernate on mssql
+			Query query = entityManager.createNativeQuery(
+					String.format(
+							"delete from sys_provisioning_operation where id = 0x%s", 
+							provisioningOperation.getId().toString().toUpperCase().replaceAll("-", "")
+					)
+			);
+			int result = query.executeUpdate();
+			//
+			LOG.warn("Removed [{}] row from sys_provisioning_operation table", result);
+	    } else {
+			// try to delete invalid operation a standard way on other databases
+			super.deleteInternal(provisioningOperation);
+		}
 	}
 	
 	@Override

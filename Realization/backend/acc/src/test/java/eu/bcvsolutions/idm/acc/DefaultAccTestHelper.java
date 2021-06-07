@@ -448,7 +448,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 			return columnName;
 		}
 		//
-        String dbName = getDatabaseName()	;
+        String dbName = getDatabaseName();
         if (dbName.equals(IdmFlywayMigrationStrategy.POSTGRESQL_DBNAME)) {
 			return columnName.toLowerCase();
 		}

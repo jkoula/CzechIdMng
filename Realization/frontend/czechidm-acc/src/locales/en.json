@@ -2481,6 +2481,11 @@
             "help": "Retry all operations for selected entity by selected operations in queue. All operations for selected entities will be sent to system. Sequence sorted as per time of entering queue. Final state of entities in system will be retained. After uncheck retry only selected operation. Only selected operation will be executed regardless of other records in queue. Sequence of operations may not be followed."
           }
         }
+      },
+      "acc-provisioning-operation-delete-bulk-action": {
+        "label": "$t(action.delete.action) provisioning operations",
+        "help": "$t(action.delete.action) selected provisioning operations.",
+        "icon": "$t(action.delete.icon)"
       }
     },
     "long-running-task": {

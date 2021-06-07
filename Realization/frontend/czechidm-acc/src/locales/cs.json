@@ -2484,6 +2484,11 @@
             "help": "Opakovat všechny operace pro entity dle vybraných operací umístěných ve frontě dávkově. Budou spuštěny všechny operace pro dané entity na koncovém systému v čase, jakém byly zaznamenány do fronty. Bude zachována posloupnost operací a tím i výsledný stav entit na koncovém systému. V případě odškrtnutí bude spuštěna pouze vybraná operace bez ohledu na ostatní záznamy pro danou entitu na systému ve frontě. Nemusí být zachována posloupnost operací (některé mohou být vynechány)."
           }
         }
+      },
+      "acc-provisioning-operation-delete-bulk-action": {
+        "label": "$t(action.delete.action) operace pro provisioning",
+        "help": "Smaže vybrané operace pro provisioning.",
+        "icon": "$t(action.delete.icon)"
       }
     },
     "long-running-task": {
