@@ -36,7 +36,7 @@ public enum CoreResultCode implements ResultCode {
 	CONFLICT(HttpStatus.CONFLICT, "%s"),
 	NULL_ATTRIBUTE(HttpStatus.BAD_REQUEST, "Attribute '%s' is NULL."),
 	NOT_FOUND(HttpStatus.NOT_FOUND, "%s not found."),
-	ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "Entity type [%s] with id [%s] not found."),
+	ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "Entity type [%s] with id [%s] not found.", NotificationLevel.INFO),
 	CONTENT_DELETED(HttpStatus.CONFLICT, "Content [%s] with type [%s] was deleted. Operation cannot be executed and will be canceled."),
 	WF_WARNING(HttpStatus.BAD_REQUEST, "Warning occured during workflow execution: %s"),
 	WF_TASK_FILTER_INVOLVED_ONLY(HttpStatus.BAD_REQUEST, "Task filter 'onlyInvolved' cannot be set to FALSE via REST!"),
