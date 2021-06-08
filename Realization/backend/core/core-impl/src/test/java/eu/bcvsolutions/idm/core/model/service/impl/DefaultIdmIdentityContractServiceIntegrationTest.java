@@ -393,6 +393,7 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 	
 	@Test
 	public void testChangeContractValidityWithAssignedRoles() {
+		getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
 		prepareAutomaticRoles();
 		//
 		// prepare identity and contract
@@ -407,7 +408,7 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 		// test after create
 		List<IdmIdentityRoleDto> identityRoles = identityRoleService.findAllByContract(contract.getId());
 		assertEquals(3, identityRoles.size());
-		for(IdmIdentityRoleDto identityRole : identityRoles) {
+		for (IdmIdentityRoleDto identityRole : identityRoles) {
 			assertEquals(contract.getValidFrom(), identityRole.getValidFrom());
 			assertEquals(contract.getValidTill(), identityRole.getValidTill());
 		};
@@ -417,7 +418,7 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 		contract = service.save(contract);
 		identityRoles = identityRoleService.findAllByContract(contract.getId());
 		assertEquals(3, identityRoles.size());
-		for(IdmIdentityRoleDto identityRole : identityRoles) {
+		for (IdmIdentityRoleDto identityRole : identityRoles) {
 			assertEquals(contract.getValidFrom(), identityRole.getValidFrom());
 			assertEquals(contract.getValidTill(), identityRole.getValidTill());
 		}

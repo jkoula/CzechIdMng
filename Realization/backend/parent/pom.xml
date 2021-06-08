@@ -241,6 +241,17 @@
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-mail</artifactId>
 			<version>${camel.version}</version>
+			<exclusions>
+				<!-- jaxb comes with Java 11 -->
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
@@ -353,6 +364,13 @@
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>0.9.9-RC1</version>
+			<exclusions>
+				<!-- xml apis comes with Java 11 -->
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency> <!-- For resolve problem with loading connectors on JBoss (VFS protocol) -->
 			<groupId>org.jboss</groupId>
@@ -431,6 +449,13 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>ooxml-schemas</artifactId>
 			<version>1.1</version>
+			<exclusions>
+				<!-- stax api comes with Java 11 -->
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- CSV -->

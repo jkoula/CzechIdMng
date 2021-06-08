@@ -34,21 +34,16 @@ import eu.bcvsolutions.idm.test.api.AbstractRestTest;
 import eu.bcvsolutions.idm.test.api.TestHelper;
 
 /**
- * Tests for IdmLongRunningTaskItemController
+ * Tests for IdmLongRunningTaskItemController.
  *
  * @author Marek Klement
  */
 public class IdmLongRunningTaskItemControllerRestTest extends AbstractRestTest {
-	@Autowired
-	private IdmProcessedTaskItemService service;
-
-	@Autowired
-	private IdmIdentityService identityService;
-
-	@Autowired
-	private TestHelper helper;
-
-	private String PATH = "/long-running-task-items";
+	
+	@Autowired private IdmProcessedTaskItemService service;
+	@Autowired private IdmIdentityService identityService;
+	//
+	private static final String PATH = "/long-running-task-items";
 
 	private Authentication getAuthentication() {
 		return new IdmJwtAuthentication(identityService.getByUsername(InitTestDataProcessor.TEST_ADMIN_USERNAME), null, Lists.newArrayList(IdmAuthorityUtils.getAdminAuthority()), "test");
@@ -69,8 +64,8 @@ public class IdmLongRunningTaskItemControllerRestTest extends AbstractRestTest {
 
 	@Test
 	public void itemFoundById() throws Exception {
-		IdmScheduledTaskDto scheduledTaskDto = helper.createSchedulableTask();
-		IdmProcessedTaskItemDto taskItem = service.saveInternal(helper.prepareProcessedItem(scheduledTaskDto));
+		IdmScheduledTaskDto scheduledTaskDto = getHelper().createSchedulableTask();
+		IdmProcessedTaskItemDto taskItem = service.saveInternal(getHelper().prepareProcessedItem(scheduledTaskDto));
 		getMockMvc().perform(get(BaseController.BASE_PATH + PATH + "/" + taskItem.getId())
 				.with(authentication(getAuthentication()))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
@@ -98,8 +93,8 @@ public class IdmLongRunningTaskItemControllerRestTest extends AbstractRestTest {
 
 	@Test
 	public void deleteItem() throws Exception {
-		IdmScheduledTaskDto scheduledTaskDto = helper.createSchedulableTask();
-		IdmProcessedTaskItemDto taskItem = service.saveInternal(helper.prepareProcessedItem(scheduledTaskDto));
+		IdmScheduledTaskDto scheduledTaskDto = getHelper().createSchedulableTask();
+		IdmProcessedTaskItemDto taskItem = service.saveInternal(getHelper().prepareProcessedItem(scheduledTaskDto));
 		getMockMvc().perform(get(BaseController.BASE_PATH + PATH + "/" + taskItem.getId())
 				.with(authentication(getAuthentication()))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
@@ -114,10 +109,10 @@ public class IdmLongRunningTaskItemControllerRestTest extends AbstractRestTest {
 
 		assertEquals(403, status);
 
-		getMockMvc().perform(get(BaseController.BASE_PATH + PATH + taskItem.getId())
+		getMockMvc().perform(get(BaseController.BASE_PATH + PATH + "/" + taskItem.getId())
 				.with(authentication(getAuthentication()))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
-				.andExpect(status().isNotFound());
+				.andExpect(status().isOk());
 	}
 
 }

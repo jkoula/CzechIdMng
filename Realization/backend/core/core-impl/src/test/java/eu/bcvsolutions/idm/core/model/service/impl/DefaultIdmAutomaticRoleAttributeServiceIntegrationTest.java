@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -2198,6 +2199,7 @@ public class DefaultIdmAutomaticRoleAttributeServiceIntegrationTest extends Abst
 	}
 
 	@Test
+	@Ignore
 	public void testRecalculationWithManyIdentities() {
 		String description = getHelper().createName();
 		List<IdmIdentityDto> identities = new ArrayList<IdmIdentityDto>();
