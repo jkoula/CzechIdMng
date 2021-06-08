@@ -126,6 +126,11 @@ export class IdentityInfo extends AbstractEntityInfo {
    * @param  {object} entity
    */
   getEntityIcon(entity) {
+    const { deleted } = this.props;
+    //
+    if (deleted) {
+      return 'component:deleted-identity';
+    }
     if (this.isDisabled(entity)) {
       return 'component:disabled-identity';
     }
@@ -200,7 +205,7 @@ export class IdentityInfo extends AbstractEntityInfo {
   }
 
   _renderFull() {
-    const { className, style, _permissions } = this.props;
+    const { className, style, deleted, _permissions } = this.props;
     const { showAuditableInfo, expandInfo } = this.state;
     const _entity = this.getEntity();
     //
@@ -221,11 +226,8 @@ export class IdentityInfo extends AbstractEntityInfo {
               <Basic.ShortText value={ this.getPopoverTitle(_entity) } maxLength={ 40 } cutChar="" />
             </Basic.Div>
             <Basic.Div>
-              {
-                !this.isDisabled(_entity)
-                ||
-                <Basic.Label text={ this.i18n('label.disabled') } className="label-disabled"/>
-              }
+              <Basic.Label text={ this.i18n('label.disabled') } className="label-disabled" rendered={ !deleted && this.isDisabled(_entity) }/>
+              <Basic.Label text={ this.i18n('label.deleted') } className="label-deleted" rendered={ !!deleted }/>
               { this._renderSystemInformationIcon() }
               { this._renderSystemCollapsIcon() }
             </Basic.Div>

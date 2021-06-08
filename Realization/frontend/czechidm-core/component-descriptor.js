@@ -647,6 +647,12 @@ module.exports = {
       component: 'fa:user-slash'
     },
     {
+      id: 'deleted-identity-icon',
+      type: 'icon',
+      entityType: ['deleted-identity'],
+      component: 'fa:user-times'
+    },
+    {
       id: 'identity-projection-icon',
       type: 'icon',
       entityType: ['identity-projection'],
