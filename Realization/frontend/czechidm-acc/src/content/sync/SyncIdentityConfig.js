@@ -14,7 +14,7 @@ class SyncIdentityConfig extends Basic.AbstractContent {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      defaultRoleId: this.props.synchronizationConfig.defaultRole
+      defaultRoleId: this.props.synchronizationConfig ? this.props.synchronizationConfig.defaultRole : null
     };
   }
 
