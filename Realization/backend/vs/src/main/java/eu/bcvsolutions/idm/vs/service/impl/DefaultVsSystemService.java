@@ -1,14 +1,49 @@
 package eu.bcvsolutions.idm.vs.service.impl;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.identityconnectors.framework.common.objects.Name;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-import eu.bcvsolutions.idm.acc.domain.*;
-import eu.bcvsolutions.idm.acc.dto.*;
+import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
+import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
+import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
+import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
+import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
+import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
+import eu.bcvsolutions.idm.acc.dto.SysConnectorKeyDto;
+import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncIdentityConfigDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
-import eu.bcvsolutions.idm.acc.service.api.*;
+import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
+import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
+import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -24,7 +59,12 @@ import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
-import eu.bcvsolutions.idm.ic.api.*;
+import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
+import eu.bcvsolutions.idm.ic.api.IcConnector;
+import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
+import eu.bcvsolutions.idm.ic.api.IcConnectorInfo;
+import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
+import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import eu.bcvsolutions.idm.ic.api.annotation.IcConnectorClass;
 import eu.bcvsolutions.idm.ic.czechidm.domain.CzechIdMIcConvertUtil;
 import eu.bcvsolutions.idm.ic.czechidm.domain.IcConnectorConfigurationCzechIdMImpl;
@@ -45,23 +85,6 @@ import eu.bcvsolutions.idm.vs.exception.VsException;
 import eu.bcvsolutions.idm.vs.exception.VsResultCode;
 import eu.bcvsolutions.idm.vs.service.api.VsSystemImplementerService;
 import eu.bcvsolutions.idm.vs.service.api.VsSystemService;
-import org.identityconnectors.framework.common.objects.Name;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Service for virtual system
@@ -316,7 +339,8 @@ public class DefaultVsSystemService implements VsSystemService {
 	}
 	
 	/**
-	 * Compose VS key of form attribute
+	 * Compose VS key of form attribute.
+	 * 
 	 * @param system
 	 * @return
 	 */
@@ -590,23 +614,31 @@ public class DefaultVsSystemService implements VsSystemService {
 			BasicVirtualConfiguration virtualConfiguration) {
 		
 		IdmFormDefinitionDto definition = this.formService.getDefinition(type, key);
-		List<IdmFormAttributeDto> formAttributes = new ArrayList<>();
-		Arrays.asList(virtualConfiguration.getAttributes()).forEach(virtualAttirbute -> {
-			IdmFormAttributeDto formAttribute = formAttributeService.findAttribute(type, key, virtualAttirbute);
+		List<IdmFormAttributeDto> newFormAttributes = new ArrayList<>();
+		
+		for (String virtualAttribute : virtualConfiguration.getAttributes()) {
+			IdmFormAttributeDto formAttribute = formAttributeService.findAttribute(type, key, virtualAttribute);
 			if (formAttribute == null) {
-				formAttribute = createFromAttribute(virtualAttirbute);
+				formAttribute = createFromAttribute(virtualAttribute);
 				formAttribute.setFormDefinition(definition == null ? null : definition.getId());
-				formAttributes.add(formAttribute);
+				newFormAttributes.add(formAttribute);
 			}
-		});
+		}
 
+		String definitionName = MessageFormat.format("Virtual system for [{0}]", system.getName());
 		if (definition == null) {
-			IdmFormDefinitionDto createdDefinition = this.formService.createDefinition(type, key, VirtualSystemModuleDescriptor.MODULE_ID, formAttributes);
-			createdDefinition.setName(MessageFormat.format("Virtual system for [{0}]", system.getName()));
+			IdmFormDefinitionDto createdDefinition = this.formService.createDefinition(type, key, VirtualSystemModuleDescriptor.MODULE_ID, newFormAttributes);
+			createdDefinition.setName(definitionName);
 			createdDefinition.setUnmodifiable(true);
 			return this.formService.saveDefinition(createdDefinition);
 		} else {
-			formAttributes.forEach(formAttribute -> {
+			// update form definition name, if needed
+			if (!definition.getName().equals(definitionName)) {
+				definition.setName(definitionName);
+				definition = formService.saveDefinition(definition);
+			}
+			
+			newFormAttributes.forEach(formAttribute -> {
 				this.formService.saveAttribute(formAttribute);
 			});
 			

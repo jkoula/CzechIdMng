@@ -33,12 +33,16 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 import eu.bcvsolutions.idm.vs.TestHelper;
 import eu.bcvsolutions.idm.vs.config.domain.VsConfiguration;
 import eu.bcvsolutions.idm.vs.dto.VsSystemDto;
+import eu.bcvsolutions.idm.vs.entity.VsAccount;
 import eu.bcvsolutions.idm.vs.service.api.VsSystemImplementerService;
+import eu.bcvsolutions.idm.vs.service.api.VsSystemService;
 
 /**
  * Virtual system test
@@ -72,6 +76,10 @@ public class VsSystemServiceTest extends AbstractIntegrationTest {
 	private ConfidentialStorage confidentialStorage;
 	@Autowired
 	private SysRemoteServerService remoteServerService;
+	@Autowired
+	private FormService formService;
+	@Autowired
+	private VsSystemService vsSystemService;
 
 	@After
 	public void logout() {
@@ -107,6 +115,27 @@ public class VsSystemServiceTest extends AbstractIntegrationTest {
 		List<IdmIdentityDto> implementes = systemImplementersService.findRequestImplementers(system.getId());
 		Assert.assertEquals(1, implementes.size());
 		Assert.assertEquals(userOneName, implementes.get(0).getUsername());
+	}
+	
+	@Test
+	public void testChangeVirtualSystemName() {
+		String systemName = getHelper().createName();
+		VsSystemDto virtualSystem = new VsSystemDto();
+		virtualSystem.setName(systemName);
+		SysSystemDto system = helper.createVirtualSystem(virtualSystem);
+		Assert.assertNotNull(system);
+		Assert.assertEquals(system.getName(), systemName);
+		Assert.assertTrue(system.isVirtual());
+		
+		IdmFormDefinitionDto definition = formService.getDefinition(VsAccount.class, vsSystemService.createVsFormDefinitionKey(system));
+		Assert.assertTrue(definition.getName().contains(systemName));
+		
+		String systemNewName = getHelper().createName();
+		system.setName(systemNewName);
+		system = systemService.save(system);
+		
+		definition = formService.getDefinition(VsAccount.class, vsSystemService.createVsFormDefinitionKey(system));
+		Assert.assertTrue(definition.getName().contains(systemNewName));
 	}
 
 	@Test
