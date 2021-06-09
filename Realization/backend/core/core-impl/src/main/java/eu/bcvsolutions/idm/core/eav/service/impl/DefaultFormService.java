@@ -34,6 +34,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.plugin.core.OrderAwarePluginRegistry;
 import org.springframework.plugin.core.PluginRegistry;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,7 +151,7 @@ public class DefaultFormService implements FormService {
 		return formDefinitionService
 				.find(
 					filter,
-					PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmFormDefinition_.code.getName())),
+					getDefinitionPageable(),
 					permission)
 				.getContent();
 	}
@@ -996,7 +997,7 @@ public class DefaultFormService implements FormService {
 			formDefinitions = formDefinitionService
 					.find(
 						definitionFilter,
-						PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmFormDefinition_.code.getName())),
+						getDefinitionPageable(),
 						!PermissionUtils.isEmpty(permission) ? IdmBasePermission.AUTOCOMPLETE : null)
 					.getContent();
 		}
@@ -1460,6 +1461,15 @@ public class DefaultFormService implements FormService {
 				return rendererDto;
 			})
 			.collect(Collectors.toList());
+	}
+	
+	@Override
+	public Pageable getDefinitionPageable() {
+		return PageRequest.of(
+				0,
+				Integer.MAX_VALUE,
+				Sort.by(Lists.newArrayList(Order.asc(IdmFormDefinition_.seq.getName()), Order.desc(IdmFormDefinition_.main.getName())))
+		);
 	}
 
 	private InvalidFormAttributeDto validateAttribute(

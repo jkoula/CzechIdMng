@@ -87,6 +87,7 @@ public class FormDefinitionCache implements Serializable {
 					.map(this::clone)
 					.collect(Collectors.toList())
 		);
+		clone.setSeq(original.getSeq());
 		//
 		return clone;
 	}

@@ -35,7 +35,7 @@ import eu.bcvsolutions.idm.core.api.entity.UnmodifiableEntity;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 
 /**
- * Single attribute definition in one form definition
+ * Single attribute definition in one form definition.
  * 
  * @author Radek Tomiška
  *
@@ -139,7 +139,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 	
 	/**
-	 * Code / key - unique in one form defifinition
+	 * Code / key - unique in one form definition.
 	 */
 	public String getCode() {
 		return code;
@@ -150,7 +150,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 
 	/**
-	 * User friendly name (label)
+	 * User friendly name (label).
 	 * 
 	 * @return
 	 */
@@ -163,7 +163,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 	
 	/**
-	 * Form definition
+	 * Form definition.
 	 * 
 	 * @return
 	 */
@@ -176,7 +176,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 
 	/**
-	 * Data type
+	 * Data type.
 	 * 
 	 * @return
 	 */
@@ -189,7 +189,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 
 	/**
-	 * Multi values (list)
+	 * Multi values (list).
 	 * @return
 	 */
 	public boolean isMultiple() {
@@ -201,7 +201,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 
 	/**
-	 * Required attribute
+	 * Required attribute.
 	 * 
 	 * @return
 	 */
@@ -214,20 +214,25 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 
 	/**
-	 * Order on FE form
+	 * Order on FE form.
 	 * 
-	 * @return
+	 * @return order
 	 */
 	public Short getSeq() {
 		return seq;
 	}
 
+	/**
+	 * Order on FE form.
+	 * 
+	 * @param seq order
+	 */
 	public void setSeq(Short seq) {
 		this.seq = seq;
 	}
 
 	/**
-	 * Attribute cannot be changed by user 
+	 * Attribute cannot be changed by user.
 	 * 
 	 * @return
 	 */
@@ -240,7 +245,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}	
 
 	/**
-	 * User friendly description (tooltip)
+	 * User friendly description (tooltip).
 	 * @return
 	 */
 	public String getDescription() {
@@ -252,7 +257,8 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 
 	/**
-	 * If attribute value is secured (password, token, etc.)
+	 * If attribute value is secured (password, token, etc.).
+	 * 
 	 * @return
 	 */
 	public boolean isConfidential() {
@@ -264,7 +270,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 	
 	/**
-	 * Default value (toString)
+	 * Default value (toString).
 	 * 
 	 * @return
 	 */
@@ -277,7 +283,7 @@ public class IdmFormAttribute extends AbstractEntity implements UnmodifiableEnti
 	}
 	
 	/**
-	 * Attribute placeholder
+	 * Attribute placeholder.
 	 * 
 	 * @return
 	 */

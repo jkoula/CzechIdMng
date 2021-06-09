@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resource;
@@ -75,7 +76,7 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
 
 /**
- * EAV Form definitions
+ * EAV Form definitions.
  * 
  * @author Radek Tomiška
  *
@@ -465,7 +466,10 @@ public class IdmFormDefinitionController extends AbstractReadWriteDtoController<
 		IdmFormDefinitionFilter filter = new IdmFormDefinitionFilter();
 		filter.setType(formService.getDefaultDefinitionType(ownerType));
 		//
-		return new ResponseEntity<>(toResources(find(filter, null, permission), getDtoClass()), HttpStatus.OK);
+		// find definitions + sorted
+		Page<IdmFormDefinitionDto> definitions = find(filter, formService.getDefinitionPageable(), permission);
+		//
+		return new ResponseEntity<>(toResources(definitions, getDtoClass()), HttpStatus.OK);
 	}
 	
 	/**
@@ -490,7 +494,6 @@ public class IdmFormDefinitionController extends AbstractReadWriteDtoController<
 		//
 		return new ResponseEntity<>(toResources(find(filter, null, null), getDtoClass()), HttpStatus.OK);
 	}
-	
 	
 	/**
 	 * Returns given formDefinition or default definition for given ownerClass, if no formDefinition is given.
@@ -645,8 +648,7 @@ public class IdmFormDefinitionController extends AbstractReadWriteDtoController<
 		// publish event for save form instance
 		return new Resource<>(formService.publish(event, permission).getContent());
 	}
-	
-	
+
 	/**
 	 * Returns input stream to attachment saved in given form value.
 	 * 

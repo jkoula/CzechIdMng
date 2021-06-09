@@ -12,6 +12,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.hibernate.envers.Audited;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -19,7 +22,7 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.UnmodifiableEntity;
 
 /**
- * Form definition for different entity / object types 
+ * Form definition for different entity / object types.
  * 
  * @author Radek Tomiška
  *
@@ -71,6 +74,11 @@ public class IdmFormDefinition extends AbstractEntity implements UnmodifiableEnt
 	@NotNull
 	@Column(name = "unmodifiable", nullable = false)
 	private boolean unmodifiable = false;
+	
+	@Min(Short.MIN_VALUE)
+	@Max(Short.MAX_VALUE)
+	@Column(name = "seq")
+	private Short seq;
 
 	public IdmFormDefinition() {
 	}
@@ -152,5 +160,25 @@ public class IdmFormDefinition extends AbstractEntity implements UnmodifiableEnt
 	 */
 	public void setModule(String module) {
 		this.module = module;
+	}
+	
+	/**
+	 * Order on FE form.
+	 * 
+	 * @return order
+	 * @since 11.1.0
+	 */
+	public Short getSeq() {
+		return seq;
+	}
+
+	/**
+	 * Order on FE form.
+	 * 
+	 * @param seq order
+	 * @since 11.1.0
+	 */
+	public void setSeq(Short seq) {
+		this.seq = seq;
 	}
 }

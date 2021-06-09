@@ -32,6 +32,7 @@ Encapsulates all features from BasicTable component. All BasicTable parameters a
 | quickAccessButtonCount | number | Count of quick access buttons for bulk actions in tables - the first count of bulk actions will be shown as button - next action will be rendered in drop down select box. Bulk action icon is required for quick access button - action without icon will be rendered in select box. Bulk action can enforce showing in quick access button (by bulk action configuration). | by BE configuration property ``idm.pub.app.show.table.quickAccessButton.count=5`` |
 | draggable | bool | DnD support - table will not be orderable, pagination support will not be available. | false |
 | onDraggableStop | bool | Callback after dragable ends. Available parameters:  data - table data, startIndex - dragged row index (start from 0),  differenceIndex - index difference (+ down, - up). | Default implementation based on **entity.seq** field and **service.patch** method is provided. |
+| showDraggable | func | Show dragable column for change records order. Available parameters:  searchParameters - currently set filter, entities - rendered entities, total - count of all entites fit given filter  | Default implementation based on set **filter** and rendered entities is provided. |
 
 # AdvancedColumn Component
 

@@ -1020,4 +1020,13 @@ public interface FormService extends ScriptEnabled {
 	 * @since 10.8.0
 	 */
 	List<FormAttributeRendererDto> getSupportedAttributeRenderers();
+	
+	/**
+	 * Pabeable for find definitions used on record details and on form projections. 
+	 * All defined form definitions are returned by default sorted by order or by main definition, if order is not defined (~ fallback).
+	 * 
+	 * @return default form definition pagination + sort
+	 * @since 11.1.0
+	 */
+	Pageable getDefinitionPageable();
 }

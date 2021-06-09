@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import Joi from 'joi';
 //
 import * as Utils from '../../utils';
 import * as Basic from '../../components/basic';
@@ -39,7 +40,7 @@ class FormDefinitionDetail extends Basic.AbstractContent {
     this.context.store.dispatch(manager.fetchTypes(TYPES_UIKEY));
     if (isNew) {
       this.context.store.dispatch(manager.receiveEntity(entityId, { unmodifiable: false }, null, () => {
-        this.refs.type.focus();
+        this.refs.codeable.focus();
       }));
     } else {
       this.getLogger().debug(`[FormDetail] loading entity detail [id:${entityId}]`);
@@ -123,7 +124,9 @@ class FormDefinitionDetail extends Basic.AbstractContent {
               'no-border': !Utils.Entity.isNew(entity)
             })
           }>
-          <Basic.PanelHeader text={ Utils.Entity.isNew(entity) ? this.i18n('create.header') : this.i18n('content.formDefinitions.detail.title') } />
+          <Basic.PanelHeader
+            icon="component:form-definition"
+            text={ Utils.Entity.isNew(entity) ? this.i18n('create.header') : this.i18n('content.formDefinitions.detail.title') } />
           <Basic.PanelBody style={ Utils.Entity.isNew(entity) ? { paddingTop: 0, paddingBottom: 0 } : { padding: 0 } }>
             <Basic.AbstractForm
               ref="form"
@@ -131,22 +134,49 @@ class FormDefinitionDetail extends Basic.AbstractContent {
               data={ entity }
               rendered={ types !== undefined }
               readOnly={ !manager.canSave(entity, _permissions) }>
-              <Basic.EnumSelectBox
-                ref="type"
-                label={ this.i18n('entity.FormDefinition.type') }
-                placeholder={ this.i18n('entity.FormDefinition.type') }
-                required
-                readOnly={ !entity || entity.unmodifiable || !Utils.Entity.isNew(entity) }
-                options={ types }
-                searchable
-                clearable={ false }
-                onChange={ this.onChangeType.bind(this) }/>
 
               <Advanced.CodeableField
                 ref="codeable"
                 codeLabel={ this.i18n('entity.FormDefinition.code') }
                 nameLabel={ this.i18n('entity.FormDefinition.name') }
                 codeReadOnly={ !entity || entity.unmodifiable } />
+
+              <Basic.Row>
+                <Basic.Col lg={ 4 }>
+                  <Basic.EnumSelectBox
+                    ref="type"
+                    label={ this.i18n('entity.FormDefinition.type') }
+                    placeholder={ this.i18n('entity.FormDefinition.type') }
+                    required
+                    readOnly={ !entity || entity.unmodifiable || !Utils.Entity.isNew(entity) }
+                    options={
+                      types
+                      ?
+                      types.map(type => {
+                        return { value: type, niceLabel: Utils.Ui.getSimpleJavaType(type) };
+                      })
+                      :
+                      null
+                    }
+                    searchable
+                    clearable={ false }
+                    onChange={ this.onChangeType.bind(this) }/>
+                </Basic.Col>
+                <Basic.Col lg={ 8 }>
+                  <Basic.TextField
+                    ref="seq"
+                    label={ this.i18n('entity.FormDefinition.seq.label') }
+                    helpBlock={ this.i18n('entity.FormDefinition.seq.help') }
+                    validation={
+                      Joi
+                        .number()
+                        .allow(null)
+                        .integer()
+                        .min(-32768)
+                        .max(32767)
+                    }/>
+                </Basic.Col>
+              </Basic.Row>
 
               <Basic.TextField
                 ref="module"

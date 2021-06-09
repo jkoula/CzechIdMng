@@ -4352,6 +4352,10 @@
       "module": {
         "label": "Modul",
         "help": "Definice formuláře je učena nebo pochází z daného modulu. Modul je použit například pro definici lokalizace. Pokud není zadáno, je použit 'core' modul."
+      },
+      "seq": {
+        "label": "Pořadí",
+        "help": "Pořadí definice na detailu záznamu."
       }
     },
     "FormProjection" : {

@@ -5,7 +5,7 @@ import FormInstance from '../../domain/FormInstance';
 import * as Utils from '../../utils';
 
 /**
- * Manager for entities with eav attributes supports
+ * Manager for entities with eav attributes supports.
  *
  * @author Radek Tomiška
  */
@@ -51,7 +51,7 @@ export default class FormableEntityManager extends EntityManager {
       //
       this.getService().getFormDefinitions(id)
         .then(json => {
-          let formInstances = new Immutable.Map();
+          let formInstances = new Immutable.OrderedMap();
           // get trimmed definitions
           const formValuesPromises = [];
           json._embedded.formDefinitions.forEach(formDefinition => {

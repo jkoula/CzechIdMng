@@ -8,7 +8,8 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.hateoas.core.Relation;
 
@@ -49,6 +50,9 @@ public class IdmFormDefinitionDto extends AbstractDto implements UnmodifiableEnt
 	private boolean unmodifiable = false;
 	@Size(max = DefaultFieldLengths.NAME)
 	private String module;
+	@Min(Short.MIN_VALUE)
+	@Max(Short.MAX_VALUE)
+	private Short seq;
 	//
 	// attribute definitions cache
 	private List<IdmFormAttributeDto> formAttributes;
@@ -221,5 +225,25 @@ public class IdmFormDefinitionDto extends AbstractDto implements UnmodifiableEnt
 	@Override
 	public String getNiceLabel() {
 		return getCode();
+	}
+	
+	/**
+	 * Order on FE form.
+	 * 
+	 * @return order
+	 * @since 11.1.0
+	 */
+	public Short getSeq() {
+		return seq;
+	}
+
+	/**
+	 * Order on FE form.
+	 * 
+	 * @param seq order
+	 * @since 11.1.0
+	 */
+	public void setSeq(Short seq) {
+		this.seq = seq;
 	}
 }

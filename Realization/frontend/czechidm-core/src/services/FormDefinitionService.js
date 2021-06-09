@@ -45,7 +45,10 @@ class FormDefinitionService extends AbstractService {
    * @return {object} searchParameters
    */
   getDefaultSearchParameters() {
-    return super.getDefaultSearchParameters().setName(SearchParameters.NAME_QUICK).clearSort().setSort('created', 'desc');
+    return super.getDefaultSearchParameters()
+      .setName(SearchParameters.NAME_QUICK)
+      .clearSort()
+      .setSort('seq', 'asc');
   }
 
   getDefinitionTypesSearchParameters() {

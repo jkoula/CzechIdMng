@@ -4299,6 +4299,10 @@
       "module": {
         "label": "Module",
         "help": "Module is defined or used in given module. Module is used for example for resolving the localization. 'core' module is used as default."
+      },
+      "seq": {
+        "label": "Order",
+        "help": "Definition order on record detail."
       }
     },
     "FormProjection" : {

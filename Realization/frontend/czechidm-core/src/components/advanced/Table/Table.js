@@ -839,6 +839,43 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
   }
 
+  /**
+   * Show dragable column for change records order.
+   *
+   * @param  {SearchParameters} _searchParameters filter
+   * @param  {arrayOf[dto]} _entities             fetched entities
+   * @param  {number} total                       count of all entites fit given filter
+   * @return {bool}
+   * @since 11.1.0
+   */
+  showDraggable(searchParameters) {
+    const { showDraggable, draggable, forceSearchParameters, _entities, _total } = this.props;
+    //
+    // external callback -the highest priority
+    if (showDraggable) {
+      return showDraggable({ searchParameters, entities: _entities, total: _total });
+    }
+    //
+    if (!draggable) {
+      // dragable is not enabled
+      return false;
+    }
+    if (!_entities || _entities.length === 0) {
+      // entities are not given
+      return false;
+    }
+    if (!Domain.SearchParameters.isEmptyFilter(searchParameters, forceSearchParameters)) {
+      // filter is defined => order cannot be changed on sub group
+      return false;
+    }
+    if (_total > _entities.length) {
+      // pagiantioni is set  => order cannot be changed on sub group
+      return false;
+    }
+    //
+    return true;
+  }
+
   _renderPrevalidateMessages(backendBulkAction) {
     if (!backendBulkAction.prevalidateResult) {
       return null;
@@ -1045,7 +1082,6 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       hover,
       sizeOptions,
       quickButtonCount,
-      draggable,
       noHeader
     } = this.props;
     const {
@@ -1101,7 +1137,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         columnHeader = (
           <Basic.BasicTable.SortHeaderCell
             header={ columnHeader }
-            sortHandler={ draggable ? null : this._handleSort.bind(this) }
+            sortHandler={ this.showDraggable(_searchParameters) ? null : this._handleSort.bind(this) }
             sortProperty={ column.props.sortProperty || column.props.property }
             searchParameters={ _searchParameters }
             className={ commonProps.className }
@@ -1358,7 +1394,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                   :
                   <Basic.Div
                     className={ _actionClassName }
-                    style={ (draggable && _entities && _entities.length > 0) ? { paddingLeft: 19 } : {} }
+                    style={ this.showDraggable(_searchParameters) ? { paddingLeft: 19 } : {} }
                     rendered={ _actions.length > 0 && showRowSelection }>
                     {
                       buttonActions.map(action => {
@@ -1517,7 +1553,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               selectRowCb={ manager.supportsBulkAction() ? this.selectRowForBulkAction.bind(this) : null }
               isRowSelectedCb={ manager.supportsBulkAction() ? this.isRowSelected.bind(this) : null }
               isAllRowsSelectedCb={ manager.supportsBulkAction() ? this.isAllRowSelected.bind(this) : null }
-              draggable={ draggable && Domain.SearchParameters.isEmptyFilter(_searchParameters, forceSearchParameters)}
+              draggable={ this.showDraggable(_searchParameters) }
               onDraggableStop={ this._onDraggableStop.bind(this) }
               noHeader={ noHeader }>
 
@@ -1611,7 +1647,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             <Basic.BasicTable.Pagination
               ref="pagination"
               showPageSize={ showPageSize }
-              paginationHandler={ pagination && !draggable ? this._handlePagination.bind(this) : null }
+              paginationHandler={ pagination && !this.showDraggable(_searchParameters) ? this._handlePagination.bind(this) : null }
               total={ pagination ? _total : _entities.length }
               sizeOptions={ sizeOptions }
               { ...range } />
@@ -1790,6 +1826,15 @@ AdvancedTable.propTypes = {
    * @since 10.7.0
    */
   onDraggableStop: PropTypes.func,
+  /**
+   * Show dragable column for change records order. Available parameters:
+   * - searchParameters - currently set filter
+   * - entities - rendered entities
+   * - total - count of all entites fit given filter
+   *
+   * @since 11.1.0
+   */
+  showDraggable: PropTypes.func,
   //
   // Private properties, which are used internally for async data fetching
   //
