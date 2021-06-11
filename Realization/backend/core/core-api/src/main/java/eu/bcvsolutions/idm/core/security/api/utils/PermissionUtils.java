@@ -95,6 +95,9 @@ public abstract class PermissionUtils {
 		Set<BasePermission> result = new HashSet<>(authorities.size());
 		for (String authority : authorities) {
 			BasePermission permission = toPermission(authority);
+			if (permission == null) {
+				continue;
+			}
 			String permissionName = permission.getName();
 			if (resolvedPermissions.contains(permissionName)) {
 				continue;

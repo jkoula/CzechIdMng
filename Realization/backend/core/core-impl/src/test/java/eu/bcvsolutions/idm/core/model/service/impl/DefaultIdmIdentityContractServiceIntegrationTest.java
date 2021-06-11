@@ -51,6 +51,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityEventFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityStateFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.PermissionContext;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.exception.AcceptedException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -82,6 +83,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.scheduler.task.impl.ProcessAutomaticRoleByTreeTaskExecutor;
 import eu.bcvsolutions.idm.core.scheduler.task.impl.ProcessSkippedAutomaticRoleByTreeForContractTaskExecutor;
 import eu.bcvsolutions.idm.core.scheduler.task.impl.RemoveAutomaticRoleTaskExecutor;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
@@ -1712,6 +1714,57 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 		assignedRoles = identityRoleService.findAllByIdentity(identity.getId());
 		Assert.assertTrue(assignedRoles.isEmpty());
 	}
+	
+	@Test
+	public void testFindContractByOrPermissions() {
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmIdentityContractDto contractOne = getHelper().createContract(identity);
+		IdmIdentityContractDto contractTwo = getHelper().createContract(identity);
+		getHelper().createContract(identity);// other - without permission
+		//
+		IdmRoleDto role = getHelper().createRole();
+		getHelper().createUuidPolicy(role, contractOne, ContractBasePermission.CANBEREQUESTED);
+		getHelper().createUuidPolicy(role, contractTwo, ContractBasePermission.CHANGEPERMISSION);
+		//
+		IdmIdentityDto manager = getHelper().createIdentity();
+		getHelper().createIdentityRole(manager, role);
+		//
+		IdmIdentityContractFilter filter = new IdmIdentityContractFilter();
+		filter.setIdentity(identity.getId());
+		filter.setEvaluatePermissionOperator(PermissionContext.OPERATOR_OR);
+		//
+		// without login => empty
+		List<IdmIdentityContractDto> contracts = service.find(filter, null, ContractBasePermission.CANBEREQUESTED, ContractBasePermission.CHANGEPERMISSION).getContent();
+		Assert.assertTrue(contracts.isEmpty());
+		//
+		try {
+			getHelper().login(manager);
+			//
+			contracts = service.find(filter, null, ContractBasePermission.CANBEREQUESTED, ContractBasePermission.CHANGEPERMISSION).getContent();
+			Assert.assertEquals(2, contracts.size());
+			Assert.assertTrue(contracts.stream().anyMatch(c -> c.getId().equals(contractOne.getId())));
+			Assert.assertTrue(contracts.stream().anyMatch(c -> c.getId().equals(contractTwo.getId())));
+			//
+			contracts = service.find(filter, null, ContractBasePermission.CANBEREQUESTED).getContent();
+			Assert.assertEquals(1, contracts.size());
+			Assert.assertTrue(contracts.stream().anyMatch(c -> c.getId().equals(contractOne.getId())));
+			//
+			contracts = service.find(filter, null, ContractBasePermission.CHANGEPERMISSION).getContent();
+			Assert.assertEquals(1, contracts.size());
+			Assert.assertTrue(contracts.stream().anyMatch(c -> c.getId().equals(contractTwo.getId())));
+			//
+			filter.setEvaluatePermissionOperator(null);
+			contracts = service.find(filter, null, ContractBasePermission.CANBEREQUESTED, ContractBasePermission.CHANGEPERMISSION).getContent();
+			Assert.assertTrue(contracts.isEmpty());
+			//
+			filter.setEvaluatePermissionOperator(PermissionContext.OPERATOR_AND);
+			contracts = service.find(filter, null, ContractBasePermission.CANBEREQUESTED, ContractBasePermission.CHANGEPERMISSION).getContent();
+			Assert.assertTrue(contracts.isEmpty());
+		} finally {
+			getHelper().logout();
+		}
+	}
+	
 	
 	@Test(expected = AcceptedException.class)
 	public void testPreventToDeleteCurrentlyDeletedRole() {

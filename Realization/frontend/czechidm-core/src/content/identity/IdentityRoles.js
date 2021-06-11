@@ -198,7 +198,8 @@ class IdentityRoles extends Basic.AbstractContent {
       return false;
     }
     // can change permission for  at least one contract
-    return _contracts.some(c => Utils.Permission.hasPermission(c._permissions, 'CHANGEPERMISSION'));
+    return _contracts.some(c => Utils.Permission.hasPermission(c._permissions, 'CHANGEPERMISSION')
+      || Utils.Permission.hasPermission(c._permissions, 'CANBEREQUESTED'));
   }
 
   _isLongPollingEnabled() {
@@ -268,7 +269,7 @@ class IdentityRoles extends Basic.AbstractContent {
     data[`automaticRefreshSwitch-${key}`] = automaticRefreshOn && longPollingEnabled;
     return (
       <Basic.Toolbar>
-        <div className="pull-left">
+        <Basic.Div className="pull-left">
           <Basic.AbstractForm
             ref={`automaticRefreshForm-${key}`}
             readOnly={!longPollingEnabled}
@@ -280,8 +281,8 @@ class IdentityRoles extends Basic.AbstractContent {
               onChange={this._toggleAutomaticRefresh.bind(this, key)}
             />
           </Basic.AbstractForm>
-        </div>
-        <div className="pull-right">
+        </Basic.Div>
+        <Basic.Div className="pull-right">
           <Basic.Button
             level="warning"
             className="btn-xs"
@@ -296,7 +297,7 @@ class IdentityRoles extends Basic.AbstractContent {
           <Advanced.RefreshButton
             rendered={ !automaticRefreshOn || !longPollingEnabled }
             onClick={ this._refreshAll.bind(this) }/>
-        </div>
+        </Basic.Div>
       </Basic.Toolbar>
     );
   }

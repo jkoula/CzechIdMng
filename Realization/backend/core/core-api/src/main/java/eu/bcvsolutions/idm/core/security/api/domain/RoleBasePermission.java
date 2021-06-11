@@ -8,7 +8,8 @@ package eu.bcvsolutions.idm.core.security.api.domain;
  */
 public enum RoleBasePermission implements BasePermission {
 	
-	CANBEREQUESTED; // role can be requested.
+	CANBEREQUESTED, // role can be requested.
+	CHANGEPERMISSION; // @since 11.1.0 - create role request for changing identity permissions on related role.
 	
 	@Override
 	public String getName() {

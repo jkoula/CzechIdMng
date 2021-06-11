@@ -243,7 +243,8 @@ export class RoleConceptDetail extends Basic.AbstractContent {
             new SearchParameters()
               .setFilter('identity', identityUsername)
               .setFilter('validNowOrInFuture', true)
-              .setFilter('_permission', 'CHANGEPERMISSION')
+              .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
+              .setFilter('_permission_operator', 'or')
           }
           defaultSearchParameters={
             new SearchParameters().clearSort()

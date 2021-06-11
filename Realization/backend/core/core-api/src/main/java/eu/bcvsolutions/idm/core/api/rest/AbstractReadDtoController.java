@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.api.rest;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -203,7 +204,12 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	public Resources<?> find(
 			@RequestParam(required = false) MultiValueMap<String, Object> parameters,
 			@PageableDefault Pageable pageable) {
-		return toResources(find(toFilter(parameters), pageable, evaluatePermission(parameters, IdmBasePermission.READ)), getDtoClass());
+		BasePermission[] evaluatePermissions = evaluatePermissions(parameters, IdmBasePermission.READ);
+		if (evaluatePermissions.length > 1) {
+			return toResources(findWithOperator(toFilter(parameters), pageable, evaluatePermissions), getDtoClass());
+		}
+		//
+		return toResources(find(toFilter(parameters), pageable, evaluatePermissions[0]), getDtoClass());
 	}
 	
 	/**
@@ -259,7 +265,12 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	public Resources<?> autocomplete(
 			@RequestParam(required = false) MultiValueMap<String, Object> parameters,
 			@PageableDefault Pageable pageable) {
-		return toResources(find(toFilter(parameters), pageable, evaluatePermission(parameters, IdmBasePermission.AUTOCOMPLETE)), getDtoClass());
+		BasePermission[] evaluatePermissions = evaluatePermissions(parameters, IdmBasePermission.AUTOCOMPLETE);
+		if (evaluatePermissions.length > 1) {
+			return toResources(findWithOperator(toFilter(parameters), pageable, evaluatePermissions), getDtoClass());
+		}
+		//
+		return toResources(find(toFilter(parameters), pageable, evaluatePermissions[0]), getDtoClass());
 	}
 	
 	/**
@@ -274,7 +285,12 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 			@Authorization(SwaggerConfig.AUTHENTICATION_CIDMST)
 			})
 	public long count(@RequestParam(required = false) MultiValueMap<String, Object> parameters) {
-		return count(toFilter(parameters), evaluatePermission(parameters, IdmBasePermission.COUNT));
+		BasePermission[] evaluatePermissions = evaluatePermissions(parameters, IdmBasePermission.COUNT);
+		if (evaluatePermissions.length > 1) {
+			return countWithOperator(toFilter(parameters), evaluatePermissions);
+		}
+		//
+		return count(toFilter(parameters), evaluatePermissions[0]);
 	}
 
 	/**
@@ -282,10 +298,23 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	 * 
 	 * @param filter
 	 * @param pageable
-	 * @param permission base permissions to evaluate (AND)
+	 * @param permission base permission to evaluate
 	 * @return
 	 */
 	public Page<DTO> find(F filter, Pageable pageable, BasePermission permission) {
+		return findWithOperator(filter, pageable, permission);
+	}
+	
+	/**
+	 * Quick search - finds DTOs by given filter and pageable
+	 * 
+	 * @param filter
+	 * @param pageable
+	 * @param permission base permissions to evaluate (AND / OR by permission operation in filter)
+	 * @return
+	 * @since 11.1.0
+	 */
+	protected Page<DTO> findWithOperator(F filter, Pageable pageable, BasePermission... permission) {
 		return getService().find(filter, pageable, permission);
 	}
 	
@@ -297,6 +326,18 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	 * @return
 	 */
 	public long count(F filter, BasePermission permission) {
+		return countWithOperator(filter, permission);
+	}
+	
+	/**
+	 * The number of entities that match the filter.
+	 * 
+	 * @param filter
+	 * @param permission base permissions to evaluate (AND / OR by permission operation in filter)
+	 * @return
+	 * @since 11.1.0
+	 */
+	protected long countWithOperator(F filter, BasePermission... permission) {
 		return getService().count(filter, permission);
 	}
 	
@@ -429,13 +470,30 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 		return getService().checkAccess(dto, permission);
 	}
 	
+	/**
+	 * @deprecated @since 11.1.0 - multiple permissions are supported - use {@link #evaluatePermissions(MultiValueMap, BasePermission)}
+	 */
+	@Deprecated
 	protected BasePermission evaluatePermission(MultiValueMap<String, Object> parameters, BasePermission originalPermission) {
-		// We need to use raw parameters => data filter (~PermissionContext instance) is not required now.
-		BasePermission permission = PermissionUtils.toPermission(
-				getParameterConverter().toString(parameters, PermissionContext.PARAMETER_EVALUATE_PERMISSION)
-		);
+		BasePermission[] evaluatePermissions = evaluatePermissions(parameters, originalPermission);
 		//
-		return permission == null ? originalPermission : permission;
+		return evaluatePermissions[0];
+	}
+	
+	/**
+	 * Multiple permissions are supported.
+	 * 
+	 * @param parameters filter parameters
+	 * @param originalPermission default permission
+	 * @return evaluate permissions
+	 * @since 11.1.0
+	 */
+	protected BasePermission[] evaluatePermissions(MultiValueMap<String, Object> parameters, BasePermission defaultPermission) {
+		// We need to use raw parameters => data filter (~ PermissionContext instance) is not required now.
+		List<String> rawPermissions = getParameterConverter().toStrings(parameters, PermissionContext.PARAMETER_EVALUATE_PERMISSION);
+    	Collection<BasePermission> permissions = PermissionUtils.toPermissions(rawPermissions);
+		//
+		return permissions.isEmpty() ? new BasePermission[] { defaultPermission } : permissions.stream().toArray(BasePermission[]::new);
 	}
 	
 	/**

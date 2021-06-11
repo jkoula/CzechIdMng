@@ -11,12 +11,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.core.Ordered;
+import org.springframework.util.Assert;
+
+import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.Configurable;
 import eu.bcvsolutions.idm.core.security.api.domain.AuthorizationPolicy;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 
 /**
  * Authorization policy evaluator. Ensures data security.
@@ -74,6 +78,41 @@ public interface AuthorizationEvaluator<E extends Identifiable> extends Ordered,
 	 * @return predicate with "exists" subquery is recommended
 	 */
 	Predicate getPredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, AuthorizationPolicy policy, BasePermission... permission);
+	
+	/**
+	 * Returns jpa criteria predicate for given policy and any permissions, which can be used in queries - adds security on entities. 
+	 * Predicate with "exist" subquery is recommended. 
+	 * Could return {@code null}, if evaluator doesn't want to append a predicate.
+	 * 
+	 * @param root evaluated {@link BaseEntity} type root 
+	 * @param query
+	 * @param builder
+	 * @param policy
+	 * @param permission permissions to evaluate (OR)
+	 * @return predicate with "exists" subquery is recommended
+	 * @since 11.1.0
+	 */
+	default Predicate getOrPredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, AuthorizationPolicy policy, BasePermission... permission) {
+		Assert.notNull(permission, "Permission is required");
+		//
+		final List<Predicate> predicates = Lists.newArrayList(); // no data by default
+		//
+		for (BasePermission singlePermission : PermissionUtils.trimNull(permission)) {
+			Predicate predicate = getPredicate(root, query, builder, policy, singlePermission);
+			if (predicate != null) {
+				predicates.add(predicate);
+			}
+		}
+		// predicate will be not applied
+		if (predicates.isEmpty()) {
+			return null;
+		}
+		if (predicates.size() == 1) {
+			return predicates.get(0); // or is not needed
+		}
+		//
+		return builder.or(predicates.toArray(new Predicate[predicates.size()]));
+	}
 	
 	/**
 	 * Returns base permissions - what logged user could do with given authorizable object by given policy

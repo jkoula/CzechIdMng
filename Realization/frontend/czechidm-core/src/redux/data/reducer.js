@@ -117,6 +117,10 @@ export default function reduce(state = INITIAL_STATE, action) {
         ids.push(entity.id);
         if (entity._trimmed === true) {
           isTrimmed = true;
+          // try to preserve fetched permissions on trimmed entity
+          if (!entity._permissions && trimmed.has(entity.id)) {
+            entity._permissions = trimmed.get(entity.id)._permissions;
+          }
           trimmed = trimmed.set(entity.id, entity);
         } else if (entities.has(entity.id)) { // check modified date ... only newer
           // check trimmed and modified date

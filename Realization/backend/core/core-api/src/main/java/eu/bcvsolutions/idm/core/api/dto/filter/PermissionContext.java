@@ -1,5 +1,10 @@
 package eu.bcvsolutions.idm.core.api.dto.filter;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 
@@ -22,6 +27,15 @@ public interface PermissionContext extends BaseDataFilter {
 	 * @since 10.3.0
 	 */
 	String PARAMETER_EVALUATE_PERMISSION = "_permission";
+	/**
+	 * Operator (AND / OR) to evaluate permission, when DTO is loaded.
+	 * Parameter name can be given in url parameters together with filter parameters.
+	 * 
+	 * @since 11.1.0
+	 */
+	String PARAMETER_EVALUATE_PERMISSSION_OPERATOR = "_permission_operator";
+	String OPERATOR_AND = "AND";
+	String OPERATOR_OR = "OR";
 	
 	/**
 	 * Load permission together with loaded dto.
@@ -63,5 +77,62 @@ public interface PermissionContext extends BaseDataFilter {
      */
     default void setEvaluatePermission(BasePermission permission) {
     	set(PARAMETER_EVALUATE_PERMISSION, permission);
+    }
+    
+    /**
+     * Evaluate permissions, when DTO is loaded.
+	 * Parameter name can be given in url parameters together with filter parameters.
+	 * 
+     * @return base permission to evaluate
+     * @since 11.1.0
+     */
+    default List<BasePermission> getEvaluatePermissions() {
+    	List<String> rawPermissions = getParameterConverter().toStrings(getData(), PARAMETER_EVALUATE_PERMISSION);
+    	//
+    	return Lists.newArrayList(PermissionUtils.toPermissions(rawPermissions));
+    }
+
+    /**
+     * Evaluate permission, when DTO is loaded.
+	 * Parameter name can be given in url parameters together with filter parameters.
+	 * 
+     * @param base permission to evaluate
+     * @since 11.1.0
+     */
+    default void setEvaluatePermissions(List<BasePermission> permissions) {
+    	put(PARAMETER_EVALUATE_PERMISSION, permissions);
+    }
+    
+    /**
+     * Operator (AND / OR) to evaluate permission, when DTO is loaded.
+	 * Parameter name can be given in url parameters together with filter parameters.
+	 * 
+     * @return operator AND / OR
+     * @since 11.1.0
+     */
+    default String getEvaluatePermissionOperator() {
+		return getParameterConverter().toString(getData(), PARAMETER_EVALUATE_PERMISSSION_OPERATOR);
+	}
+	
+    /**
+     * Operator (AND / OR) to evaluate permission, when DTO is loaded.
+	 * Parameter name can be given in url parameters together with filter parameters.
+	 * 
+     * @param operator operator AND / OR - AND operator will be used as default and as a fallback
+     * @since 11.1.0
+     */
+    default void setEvaluatePermissionOperator(String operator) {
+		set(PARAMETER_EVALUATE_PERMISSSION_OPERATOR, operator);
+	}
+    
+    /**
+     * Use OR operator to evaluate permission, when DTO is loaded.
+	 * 
+     * @return true - OR, false - AND
+     * @since 11.1.0
+     */
+    @JsonIgnore
+    default boolean usePermissionOperatorOr() {
+    	return OPERATOR_OR.equals(getEvaluatePermissionOperator());
     }
 }

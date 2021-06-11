@@ -26,7 +26,8 @@ class ChangePermissionDashboardButton extends Advanced.AbstractIdentityDashboard
           new SearchParameters(SearchParameters.NAME_AUTOCOMPLETE)
             .setFilter('identity', identity.id)
             .setFilter('validNowOrInFuture', true)
-            .setFilter('_permission', 'CHANGEPERMISSION'),
+            .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
+            .setFilter('_permission_operator', 'or'),
           `role-identity-contracts-${ identity.id }`
         )
       );

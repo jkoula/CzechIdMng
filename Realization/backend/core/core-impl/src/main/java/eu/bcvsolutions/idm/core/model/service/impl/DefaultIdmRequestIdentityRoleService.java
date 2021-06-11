@@ -3,10 +3,12 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -25,6 +28,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
@@ -34,6 +38,8 @@ import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRequestIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
@@ -42,6 +48,9 @@ import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.rest.AbstractBaseDtoService;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
+import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 
 /**
@@ -56,6 +65,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory
 			.getLogger(DefaultIdmRequestIdentityRoleService.class);
+
 	@Autowired
 	private IdmConceptRoleRequestService conceptRoleService;
 	@Autowired
@@ -70,6 +80,10 @@ public class DefaultIdmRequestIdentityRoleService extends
 	private FormService formService;
 	@Autowired
 	private WorkflowProcessInstanceService workflowProcessInstanceService;
+	@Autowired
+	private LookupService lookupService;
+	@Autowired
+	private IdmRoleService roleService;
 
 	@Override
 	public Page<IdmRequestIdentityRoleDto> find(IdmRequestIdentityRoleFilter filter, Pageable pageable,
@@ -283,7 +297,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	}
 	
     /**
-     * Convert request-identity-role-filter to identity-role-filter
+     * Convert request-identity-role-filter to identity-role-filter.
      * 
      * @param filter
      * @return
@@ -295,6 +309,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 		identityRoleFilter.setIdentityId(filter.getIdentityId());
 		identityRoleFilter.setRoleId(filter.getRoleId());
 		identityRoleFilter.setRoleEnvironments(filter.getRoleEnvironments());
+		identityRoleFilter.setAddPermissions(true); // permissions are required
 		
 		return identityRoleFilter;
 	}
@@ -378,7 +393,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 							&& requestIdentityRole.getId().equals(requestIdentityRole.getIdentityRole()))
 						.findFirst() //
 						.orElse(null); //
-				if(requestIdentityRoleWithConcept != null) {
+				if (requestIdentityRoleWithConcept != null) {
 					requestIdentityRoleWithConcept.setOperation(concept.getOperation());
 					requestIdentityRoleWithConcept.setId(concept.getId());
 					requestIdentityRoleWithConcept.setValidFrom(concept.getValidFrom());
@@ -461,7 +476,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	}
 
 	/**
-	 * Converts concept to the request-identity-roles
+	 * Converts concept to the request-identity-roles.
 	 * 
 	 * @param concept
 	 * @param filter
@@ -470,12 +485,42 @@ public class DefaultIdmRequestIdentityRoleService extends
 	private IdmRequestIdentityRoleDto conceptToRequestIdentityRole(IdmConceptRoleRequestDto concept,
 			IdmRequestIdentityRoleFilter filter) {
 		IdmRequestIdentityRoleDto requestIdentityRoleDto = modelMapper.map(concept, IdmRequestIdentityRoleDto.class);
+		// load permission from related contract or role (OR)
+		if (filter != null // from find method only
+				&& ConceptRoleRequestOperation.ADD == concept.getOperation() // newly requested role only
+				&& !concept.getState().isTerminatedState()) { // not terminated concepts
+			// by related contract (backward compatible)
+			IdmIdentityContractDto contract = lookupService.lookupEmbeddedDto(concept, IdmConceptRoleRequest_.identityContract);
+			Set<String> contractPermissions = identityContractService.getPermissions(contract);
+
+			if (PermissionUtils.hasPermission(contractPermissions, ContractBasePermission.CHANGEPERMISSION)) {
+				Set<String> permissions = requestIdentityRoleDto.getPermissions();
+				if (permissions == null) {
+					permissions = new HashSet<>();
+				}
+				permissions.add(ContractBasePermission.CHANGEPERMISSION.getName());
+				requestIdentityRoleDto.setPermissions(permissions);
+			} else {
+				// by related role
+				IdmRoleDto role = lookupService.lookupEmbeddedDto(concept, IdmConceptRoleRequest_.role);
+				Set<String> rolePermissions = roleService.getPermissions(role);
+				
+				if (PermissionUtils.hasPermission(rolePermissions, RoleBasePermission.CHANGEPERMISSION)) {
+					Set<String> permissions = requestIdentityRoleDto.getPermissions();
+					if (permissions == null) {
+						permissions = new HashSet<>();
+					}
+					permissions.add(RoleBasePermission.CHANGEPERMISSION.getName());
+					requestIdentityRoleDto.setPermissions(permissions);
+				}
+			}
+		}
 		
 		if (filter != null && filter.isIncludeEav()) {
 			IdmFormInstanceDto formInstanceDto;
 			if (ConceptRoleRequestOperation.REMOVE == concept.getOperation()) {
 				IdmIdentityRoleDto identityRole = DtoUtils.getEmbedded(concept,
-						IdmConceptRoleRequest_.identityRole.getName(), IdmIdentityRoleDto.class,
+						IdmConceptRoleRequest_.identityRole, IdmIdentityRoleDto.class,
 						(IdmIdentityRoleDto) null);
 				if (identityRole == null) { 
 					// Identity-role was not found, remove concept was executed (identity-role was removed).
@@ -538,6 +583,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 					identityRole.getEmbedded().get(IdmIdentityRole_.role.getName()));
 			request.getEmbedded().put(IdmIdentityRole_.identityContract.getName(),
 					identityRole.getEmbedded().get(IdmIdentityRole_.identityContract.getName()));
+			request.setPermissions(identityRole.getPermissions());
 			
 			if (filter.isIncludeEav()) {
 				IdmFormInstanceDto formInstanceDto  = identityRoleService.getRoleAttributeValues(identityRole);
@@ -548,6 +594,5 @@ public class DefaultIdmRequestIdentityRoleService extends
 		});
 		
 		return concepts;
-	} 
-
+	}
 }

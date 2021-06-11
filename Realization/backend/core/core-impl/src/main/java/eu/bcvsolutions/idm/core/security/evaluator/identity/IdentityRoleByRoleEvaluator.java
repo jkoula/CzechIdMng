@@ -86,10 +86,13 @@ public class IdentityRoleByRoleEvaluator extends AbstractTransitiveEvaluator<Idm
 		if (!isCanBeRequestedOnly(policy)) {
 			return super.getPermissions(entity, policy);
 		}
-		// return can be requested permission only
+		// return role request related permissions only
 		Set<String> result = new HashSet<>();
 		if (PermissionUtils.hasPermission(permissions, RoleBasePermission.CANBEREQUESTED)) {
 			result.add(RoleBasePermission.CANBEREQUESTED.getName());
+		}
+		if (PermissionUtils.hasPermission(permissions, RoleBasePermission.CHANGEPERMISSION)) {
+			result.add(RoleBasePermission.CHANGEPERMISSION.getName());
 		}
 		return result;
 	}

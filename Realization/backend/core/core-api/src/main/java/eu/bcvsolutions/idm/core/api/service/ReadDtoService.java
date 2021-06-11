@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.PermissionContext;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -79,7 +80,7 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 * Never throws {@link ForbiddenEntityException} - returning available dtos by given permissions (AND).
 	 * 
 	 * @param pageable
-	 * @param permission permissions to evaluate
+	 * @param permission permissions to evaluate (AND / OR by {@link PermissionContext})
 	 * @return
 	 */
 	Page<DTO> find(Pageable pageable, BasePermission... permission);
@@ -90,7 +91,7 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 * 
 	 * @param filter
 	 * @param pageable
-	 * @param permission base permissions to evaluate (AND)
+	 * @param permission base permissions to evaluate  (AND / OR by {@link PermissionContext})
 	 * @return
 	 */
 	Page<DTO> find(F filter, Pageable pageable, BasePermission... permission);
@@ -100,7 +101,7 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 * but returns only ID's. The behavior with ID is useful for quick receive result.
 	 *
 	 * @param pageable
-	 * @param permission
+	 * @param permission base permissions to evaluate  (AND)
 	 * @return
 	 */
 	Page<UUID> findIds(Pageable pageable, BasePermission... permission);
@@ -112,7 +113,7 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 *
 	 * @param filter
 	 * @param pageable
-	 * @param permission
+	 * @param permission base permissions to evaluate  (AND / OR by {@link PermissionContext})
 	 * @return
 	 */
 	Page<UUID> findIds(F filter, Pageable pageable, BasePermission... permission);
@@ -122,7 +123,7 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 * Never throws {@link ForbiddenEntityException} - returning available dtos by given permissions (AND).
 	 * 
 	 * @param filter
-	 * @param permission base permissions to evaluate (AND)
+	 * @param permission base permissions to evaluate (AND / OR by {@link PermissionContext})
 	 * @return
 	 */
 	long count(F filter, BasePermission... permission);
@@ -155,13 +156,12 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 * Evaluates authorization permission on given dto.
 	 *  
 	 * @param dto
-	 * @param permission base permissions to evaluate (all permission needed)
+	 * @param permission base permissions to evaluate (AND => all permission needed)
 	 * @return
 	 * @throws ForbiddenEntityException if authorization policies doesn't met
 	 */
 	DTO checkAccess(DTO dto, BasePermission... permission);
 
-	
 	/**
 	 * Exports DTO. DTO will be added to the given batch. 
 	 * 

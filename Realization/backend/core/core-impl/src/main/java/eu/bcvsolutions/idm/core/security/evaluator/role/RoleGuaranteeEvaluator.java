@@ -39,7 +39,7 @@ import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import eu.bcvsolutions.idm.core.security.evaluator.AbstractAuthorizationEvaluator;
 
 /**
- * Returns roles, where logged user is in role guarantees (by identity or by role)
+ * Returns roles, where logged user is in role guarantees (by identity or by role).
  * 
  * TODO: rename evaluator to RoleByGuaranteeEvaluator (change script needed ...)
  * 

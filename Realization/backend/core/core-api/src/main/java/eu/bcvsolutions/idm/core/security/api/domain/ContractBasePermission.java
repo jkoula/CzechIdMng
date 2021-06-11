@@ -8,7 +8,8 @@ package eu.bcvsolutions.idm.core.security.api.domain;
  */
 public enum ContractBasePermission implements BasePermission {
 	
-	CHANGEPERMISSION; // create role request for changing identity permissions on related contract.
+	CANBEREQUESTED, // @since 11.1.0 create role request for changing (ADD only) identity permissions on related contract.
+	CHANGEPERMISSION; // createrole request for changing (CUD) identity permissions on related contract.
 	
 	@Override
 	public String getName() {

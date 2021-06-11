@@ -48,11 +48,38 @@ public interface AuthorizationManager {
 	 * @param root evaluated {@link BaseEntity} type root
 	 * @param query
 	 * @param builder
-	 * @param permission permissions to evaluate (and)
+	 * @param permission permissions to evaluate (AND)
 	 * @return Never returns {@code null}.
+	 * @see #getPredicateAnd(Root, CriteriaQuery, CriteriaBuilder, BasePermission...)
 	 */
 	<E extends Identifiable> Predicate getPredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, BasePermission... permission);
 	
+	/**
+	 * Return security predicate for given permissions and root by {@link BaseEntity} type.
+	 * Calls all registered and enabled {@link AuthorizationEvaluator} which support {@link BaseEntity} type.
+	 * 
+	 * @param root evaluated {@link BaseEntity} type root
+	 * @param query
+	 * @param builder
+	 * @param permission permissions to evaluate (AND)
+	 * @return Never returns {@code null}.
+	 * @since 11.1.0
+	 */
+	<E extends Identifiable> Predicate getPredicateAnd(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, BasePermission... permission);
+	
+	/**
+	 * Return security predicate for given permissions and root by {@link BaseEntity} type.
+	 * Calls all registered and enabled {@link AuthorizationEvaluator} which support {@link BaseEntity} type.
+	 * 
+	 * @param root evaluated {@link BaseEntity} type root
+	 * @param query
+	 * @param builder
+	 * @param permission permissions to evaluate (OR)
+	 * @return Never returns {@code null}.
+	 * @since 11.1.0
+	 */
+	<E extends Identifiable> Predicate getPredicateOr(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, BasePermission... permission);
+
 	/**
 	 * Returns, what logged user could do with given entity
 	 * 

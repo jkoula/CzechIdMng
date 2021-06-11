@@ -43,6 +43,8 @@ import io.swagger.annotations.AuthorizationScope;
 
 /**
  * Controller for show and processing wish on assigned identity roles.
+ * 
+ * @author Vít Švanda
  */
 @RestController
 @RequestMapping(value = BaseDtoController.BASE_PATH + "/request-identity-roles")
@@ -190,6 +192,7 @@ public class IdmRequestIdentityRoleController
 		filter.setState(getParameterConverter().toEnum(parameters, "state", RoleRequestState.class));
 		filter.setOnlyChanges(getParameterConverter().toBoolean(parameters, "onlyChanges", false));
 		filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));
+		
 		return filter;
 	}
 }

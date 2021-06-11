@@ -52,30 +52,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     };
   }
 
-  componentDidMount() {
-    super.componentDidMount();
-    // load contracts for evaluate assigned roles permisions
-    const { identityId } = this.props;
-    this.context.store.dispatch(
-      identityContractManager.fetchEntities(
-        new SearchParameters(SearchParameters.NAME_AUTOCOMPLETE)
-          .setFilter('identity', identityId)
-          .setFilter('validNowOrInFuture', true)
-          .setFilter('addPermissions', true),
-        `role-identity-contracts-${ identityId }`,
-        (contracts, error) => {
-          if (error) {
-            this.addError(error);
-          } else {
-            this.setState({
-              _contracts: contracts._embedded[identityContractManager.getCollectionType()]
-            });
-          }
-        }
-      )
-    );
-  }
-
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {request} = nextProps;
@@ -355,14 +331,28 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
   /**
    * We cannot show delete action for automatic and business roles
    */
-  _showRowSelection({rowIndex, data}) {
-    if (data && rowIndex >= 0) {
-      const request = data[rowIndex];
-      if (request && (request.directRole || request.automaticRole)) {
-        return false;
-      }
+  _showRowSelection({ rowIndex, data }) {
+    if (!data || rowIndex < 0) {
+      return true;
     }
-    return true;
+    const request = data[rowIndex];
+    if (request.directRole) {
+      // sub role cannot be changed / removed
+      return false;
+    }
+    if (request.automaticRole) {
+      // automatic role cannot be changed / removed
+      return false;
+    }
+    // concept cannot be changed / removed
+    return this._canChangePermissions(request);
+  }
+
+  _canChangePermissions(request) {
+    if (!request) {
+      return false;
+    }
+    return Utils.Permission.hasPermission(request._permissions, 'CHANGEPERMISSION');
   }
 
   /**
@@ -383,7 +373,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
         onClick={ this._showDetail.bind(
           this,
           requestIdentityRole,
-          operation !== 'REMOVE' && this._canChangePermissions(this.state._contracts, requestIdentityRole.identityContract),
+          operation !== 'REMOVE' && this._canChangePermissions(requestIdentityRole),
           false
         )}/>
     );
@@ -408,8 +398,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
    * Generate cell with actions (buttons)
    */
   renderConceptActionsCell({rowIndex, data}) {
-    const {readOnly} = this.props;
-    const { showLoadingActions, _contracts } = this.state;
+    const { readOnly } = this.props;
+    const { showLoadingActions } = this.state;
 
     const actions = [];
     const value = data[rowIndex];
@@ -421,7 +411,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
         level="danger"
         onClick={ this._internalDelete.bind(this, data[rowIndex]) }
         className="btn-xs"
-        disabled={ readOnly || !manualRole || !this._canChangePermissions(_contracts, value.identityContract) }
+        disabled={ readOnly || !manualRole || !this._canChangePermissions(value) }
         showLoading={ showLoadingActions }
         role="group"
         title={ this.i18n('button.delete') }
@@ -440,7 +430,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               || !manualRole
               || !value.role
               || !value.identityContract
-              || !this._canChangePermissions(_contracts, value.identityContract)
+              || !this._canChangePermissions(value)
           }
           role="group"
           title={ this.i18n('button.edit') }
@@ -453,13 +443,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
         { actions }
       </div>
     );
-  }
-
-  _canChangePermissions(contracts, contractId) {
-    if (!contracts || contracts.length === 0 || !contractId) {
-      return false;
-    }
-    return contracts.some(c => c.id === contractId && Utils.Permission.hasPermission(c._permissions, 'CHANGEPERMISSION'));
   }
 
   renderConceptAttributesCell({rowIndex, data}) {
@@ -521,12 +504,12 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);
     //
     return (
-      <div>
+      <Basic.Div>
         <Basic.Panel rendered={ request !== null}>
           <Basic.Confirm ref="confirm-delete" level="danger"/>
           <Basic.Toolbar>
-            <div>
-              <div className="pull-left">
+            <Basic.Div>
+              <Basic.Div className="pull-left">
                 <Basic.AbstractForm
                   ref="formShowChangesOnly"
                   style={{padding: '0px'}}
@@ -537,7 +520,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                     onChange={this._toggleShowChangesOnly.bind(this)}
                   />
                 </Basic.AbstractForm>
-              </div>
+              </Basic.Div>
               <Basic.Div
                 className="pull-right"
                 rendered={ SecurityManager.hasAuthority('ROLE_CANBEREQUESTED') }>
@@ -559,15 +542,15 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                   text={ this.i18n('addByIdentity.header') }
                   style={{ marginLeft: 3 }}/>
               </Basic.Div>
-            </div>
+            </Basic.Div>
           </Basic.Toolbar>
           <Advanced.Table
             ref="table"
             uiKey="request-identity-role-table"
             hover={ false }
-            manager={requestIdentityRoleManager}
+            manager={ requestIdentityRoleManager }
             showLoading={showLoading}
-            showRowSelection={ showRowSelection ? this._showRowSelection.bind(this) : false}
+            showRowSelection={ showRowSelection ? this._showRowSelection.bind(this) : false }
             actions={
               [{
                 value: 'delete',
@@ -848,7 +831,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
             </Basic.Button>
           </Basic.Modal.Footer>
         </Basic.Modal>
-      </div>
+      </Basic.Div>
     );
   }
 }

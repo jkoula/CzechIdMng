@@ -432,12 +432,22 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 					predicates.addAll(AbstractReadDtoService.this.toPredicates(root, query, builder, filter));
 				}
 				//
-				// permisions are not evaluated, if no permission was given or authorizable type is null (=> authorization policies are not supported)
+				// permissions are not evaluated, if no permission was given 
+				// or authorizable type is null (=> authorization policies are not supported)
 				BasePermission[] permissions = PermissionUtils.trimNull(permission);
 				if (!ObjectUtils.isEmpty(permissions) && (AbstractReadDtoService.this instanceof AuthorizableService)) {
 					AuthorizableType authorizableType = ((AuthorizableService<?>) AbstractReadDtoService.this).getAuthorizableType();
 					if (authorizableType != null && authorizableType.getType() != null) {
-						predicates.add(getAuthorizationManager().getPredicate(root, query, builder, permissions));
+						boolean usePermissionOperatorOr = false;
+						if (filter instanceof PermissionContext) {
+							PermissionContext permissionContext = (PermissionContext) filter;
+							usePermissionOperatorOr = permissionContext.usePermissionOperatorOr();
+						}
+						if (usePermissionOperatorOr) {
+							predicates.add(getAuthorizationManager().getPredicateOr(root, query, builder, permissions));
+						} else {
+							predicates.add(getAuthorizationManager().getPredicate(root, query, builder, permissions));
+						}						
 					}
 				}
 				//

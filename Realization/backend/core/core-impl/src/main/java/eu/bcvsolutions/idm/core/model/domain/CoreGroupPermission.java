@@ -65,6 +65,7 @@ public enum CoreGroupPermission implements GroupPermission {
 			IdmBasePermission.CREATE,
 			IdmBasePermission.UPDATE,
 			IdmBasePermission.DELETE,
+			ContractBasePermission.CANBEREQUESTED,
 			ContractBasePermission.CHANGEPERMISSION),
 	CONTRACTSLICE(
 			IdmBasePermission.ADMIN,
@@ -91,7 +92,8 @@ public enum CoreGroupPermission implements GroupPermission {
 			IdmBasePermission.CREATE, 
 			IdmBasePermission.UPDATE, 
 			IdmBasePermission.DELETE,
-			RoleBasePermission.CANBEREQUESTED),
+			RoleBasePermission.CANBEREQUESTED,
+			RoleBasePermission.CHANGEPERMISSION),
 	ROLECATALOGUE(
 			IdmBasePermission.ADMIN, 
 			IdmBasePermission.COUNT, 

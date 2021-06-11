@@ -80,31 +80,19 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
 	
 	@Override
 	public <E extends Identifiable> Predicate getPredicate(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, BasePermission... permission) {
-		Assert.notNull(permission, "Permission is required");
-		//
-		// check super admin
-		if (securityService.isAdmin()) {
-			LOG.debug("Logged as admin [{}], authorization granted", securityService.getCurrentUsername());
-			return builder.conjunction();
-		}
-		//
-		final List<Predicate> predicates = Lists.newArrayList(); // no data by default
-		//
-		getEnabledDistinctPolicies(securityService.getCurrentId(), root.getJavaType()).forEach(policy -> {
-			AuthorizationEvaluator<E> evaluator = getEvaluator(policy);
-			if (evaluator != null && evaluator.supports(root.getJavaType())) {
-				Predicate predicate = evaluator.getPredicate(root, query, builder, policy, PermissionUtils.trimNull(permission));
-				if (predicate != null) {
-					predicates.add(predicate);
-				}
-			}
-		});
-		if (predicates.isEmpty()) {
-			return builder.disjunction(); // no data by default
-		}
-		return builder.or(predicates.toArray(new Predicate[predicates.size()]));
+		return getPredicateAnd(root, query, builder, permission);
 	}
-
+	
+	@Override
+	public <E extends Identifiable> Predicate getPredicateAnd(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, BasePermission... permission) {
+		return getPredicate(root, query, builder, false, permission);
+	}
+	
+	@Override
+	public <E extends Identifiable> Predicate getPredicateOr(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, BasePermission... permission) {
+		return getPredicate(root, query, builder, true, permission);
+	}
+	
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <E extends Identifiable> Set<String> getPermissions(E entity) {
@@ -457,5 +445,41 @@ public class DefaultAuthorizationManager implements AuthorizationManager {
 		cacheManager.cacheValue(AUTHORIZATION_POLICY_DEFINITION_CACHE_NAME, policyId, policy);
 		//
 		return policy;
+	}
+	
+	private <E extends Identifiable> Predicate getPredicate(
+			Root<E> root, 
+			CriteriaQuery<?> query, 
+			CriteriaBuilder builder, 
+			boolean usePermissionOperatorOr,
+			BasePermission... permission) {
+		Assert.notNull(permission, "Permission is required");
+		//
+		// check super admin
+		if (securityService.isAdmin()) {
+			LOG.debug("Logged as admin [{}], authorization granted", securityService.getCurrentUsername());
+			return builder.conjunction();
+		}
+		//
+		final List<Predicate> predicates = Lists.newArrayList(); // no data by default
+		//
+		getEnabledDistinctPolicies(securityService.getCurrentId(), root.getJavaType()).forEach(policy -> {
+			AuthorizationEvaluator<E> evaluator = getEvaluator(policy);
+			if (evaluator != null && evaluator.supports(root.getJavaType())) {
+				Predicate predicate;
+				if (usePermissionOperatorOr) {
+					predicate = evaluator.getOrPredicate(root, query, builder, policy, PermissionUtils.trimNull(permission));
+				} else {
+					predicate = evaluator.getPredicate(root, query, builder, policy, PermissionUtils.trimNull(permission));
+				}
+				if (predicate != null) {
+					predicates.add(predicate);
+				}
+			}
+		});
+		if (predicates.isEmpty()) {
+			return builder.disjunction(); // no data by default
+		}
+		return builder.or(predicates.toArray(new Predicate[predicates.size()]));
 	}
 }

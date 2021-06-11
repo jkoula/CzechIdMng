@@ -25,7 +25,7 @@ import eu.bcvsolutions.idm.core.security.api.service.LoginService;
 import eu.bcvsolutions.idm.test.api.AbstractEvaluatorIntegrationTest;
 
 /**
- * Test permissions for role requests by identity 
+ * Test permissions for role requests by identity.
  * 
  * @author Radek Tomiška
  *
