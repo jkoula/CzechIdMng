@@ -57,12 +57,14 @@ import eu.bcvsolutions.idm.core.security.api.utils.IdmAuthorityUtils;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowFilterDto;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowTaskInstanceDto;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowTaskInstanceService;
+import eu.bcvsolutions.idm.test.api.TestHelper;
 
 /**
  * Test for change automatic role via request.
  * 
  * @author svandav
  * @author Radek Tomiška
+ * @author Ondrej Husnik
  */
 public class DefaultIdmAutomaticRoleRequestServiceIntegrationTest extends AbstractCoreWorkflowIntegrationTest {
 
@@ -92,6 +94,7 @@ public class DefaultIdmAutomaticRoleRequestServiceIntegrationTest extends Abstra
 	private IdmTreeNodeService treeNodeService;
 
 	private static final String APPROVE_ROLE_BY_GUARANTEE_KEY = "approve-role-by-guarantee";
+	private static final String APPROVE_ROLE_BY_GUARANTEE_AND_SECURITY_KEY = "approve-role-by-guarantee-security";
 	private static final int APPROVE_ROLE_BY_GUARANTEE_PRIORITY = 100;
 
 	@Before
@@ -696,6 +699,105 @@ public class DefaultIdmAutomaticRoleRequestServiceIntegrationTest extends Abstra
 			Assert.assertEquals(nodeOne.getId(), treeAutomaticRole.getTreeNode());
 			Assert.assertEquals(role.getId(), treeAutomaticRole.getRole());
 			return;
+		}
+		fail("Automatic role request have to be approving by gurantee!");
+	}
+	
+	
+	/**
+	 * Tests aimed on approve-role-by-guarantee-security WF
+	 * 
+	 */
+	@Test
+	public void testTreeAutomaticRoleApprovalWithSecurityWF() {
+		IdmRoleDto role = prepareRole();
+		configurationService.setValue(IdmRoleService.WF_BY_ROLE_PRIORITY_PREFIX + role.getPriority(),
+				APPROVE_ROLE_BY_GUARANTEE_AND_SECURITY_KEY);
+		
+		IdmTreeNodeDto nodeOne = getHelper().createTreeNode();
+		IdmIdentityDto guaranteeIdentity = getHelper().createIdentity();
+		getHelper().createRoleGuarantee(role, guaranteeIdentity);
+
+		IdmRoleTreeNodeDto automaticRole = new IdmRoleTreeNodeDto();
+		automaticRole.setRole(role.getId());
+		automaticRole.setName(role.getCode());
+		automaticRole.setTreeNode(nodeOne.getId());
+
+		// Create automatic role via manager
+		try {
+			automaticRole = automaticRoleManager.createAutomaticRoleByTree(automaticRole, false);
+		} catch (AcceptedException ex) {
+			// The request is in approval
+			Assert.assertNotNull(ex.getIdentifier());
+			UUID requestId = UUID.fromString(ex.getIdentifier());
+			loginAsNoAdmin(guaranteeIdentity.getUsername());
+			try {
+				// by guarantor
+				completeTasksFromUsers(guaranteeIdentity.getUsername(), "approve");
+				// by security
+				loginAsAdmin();
+				completeTasksFromUsers(TestHelper.ADMIN_USERNAME, "approve");
+			} catch (ResultCodeException e) {
+				fail("User has permission to approve task. Error message: " + e.getLocalizedMessage());
+			} catch (Exception e) {
+				fail("Some problem: " + e.getLocalizedMessage());
+			}
+
+			IdmAutomaticRoleRequestDto request = roleRequestService.get(requestId);
+			Assert.assertEquals(RequestState.EXECUTED, request.getState());
+			Assert.assertNotNull(request.getAutomaticRole());
+
+			IdmRoleTreeNodeDto treeAutomaticRole = roleTreeNodeService.get(request.getAutomaticRole());
+			Assert.assertNotNull(treeAutomaticRole);
+			Assert.assertEquals(nodeOne.getId(), treeAutomaticRole.getTreeNode());
+			Assert.assertEquals(role.getId(), treeAutomaticRole.getRole());
+			return;
+		} finally {
+			configurationService.setValue(IdmRoleService.WF_BY_ROLE_PRIORITY_PREFIX + role.getPriority(),
+					APPROVE_ROLE_BY_GUARANTEE_KEY);
+		}
+		fail("Automatic role request have to be approving by gurantee!");
+	}
+	
+	@Test
+	public void testTreeAutomaticRoleDisapprovalWithSecurityWF() {
+		IdmRoleDto role = prepareRole();
+		configurationService.setValue(IdmRoleService.WF_BY_ROLE_PRIORITY_PREFIX + role.getPriority(),
+				APPROVE_ROLE_BY_GUARANTEE_AND_SECURITY_KEY);
+		
+		IdmTreeNodeDto nodeOne = getHelper().createTreeNode();
+		IdmIdentityDto guaranteeIdentity = getHelper().createIdentity();
+		getHelper().createRoleGuarantee(role, guaranteeIdentity);
+
+		IdmRoleTreeNodeDto automaticRole = new IdmRoleTreeNodeDto();
+		automaticRole.setRole(role.getId());
+		automaticRole.setName(role.getCode());
+		automaticRole.setTreeNode(nodeOne.getId());
+
+		// Create automatic role via manager
+		try {
+			automaticRole = automaticRoleManager.createAutomaticRoleByTree(automaticRole, false);
+		} catch (AcceptedException ex) {
+			// The request is in approval
+			Assert.assertNotNull(ex.getIdentifier());
+			UUID requestId = UUID.fromString(ex.getIdentifier());
+			loginAsNoAdmin(guaranteeIdentity.getUsername());
+			try {
+				// by guarantor
+				completeTasksFromUsers(guaranteeIdentity.getUsername(), "disapprove");
+			} catch (ResultCodeException e) {
+				fail("User has permission to approve task. Error message: " + e.getLocalizedMessage());
+			} catch (Exception e) {
+				fail("Some problem: " + e.getLocalizedMessage());
+			}
+
+			IdmAutomaticRoleRequestDto request = roleRequestService.get(requestId);
+			Assert.assertEquals(RequestState.DISAPPROVED, request.getState());
+			Assert.assertNull(request.getAutomaticRole());
+			return;
+		} finally {
+			configurationService.setValue(IdmRoleService.WF_BY_ROLE_PRIORITY_PREFIX + role.getPriority(),
+					APPROVE_ROLE_BY_GUARANTEE_KEY);
 		}
 		fail("Automatic role request have to be approving by gurantee!");
 	}

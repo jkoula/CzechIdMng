@@ -336,12 +336,12 @@ if(!skip){
     </userTask>
     <sequenceFlow id="flow59" sourceRef="scripttask16" targetRef="approveAutomaticRole"></sequenceFlow>
     <scriptTask id="scripttask17" name="Set DISAPPROVED state to concept" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+      <script>import eu.bcvsolutions.idm.core.api.domain.RequestState;
  
 // Set and save state DISAPPROVED to concept
-def conceptDto = conceptRoleRequestService.get(conceptRole.id,null);
-conceptDto.setState(RoleRequestState.DISAPPROVED);
-conceptRoleRequestService.save(conceptDto);</script>
+def requestDto = automaticRoleRequestService.get(entityEvent.content.id,null);
+requestDto.setState(RequestState.DISAPPROVED);
+automaticRoleRequestService.save(requestDto);</script>
     </scriptTask>
     <endEvent id="endevent7" name="End"></endEvent>
     <sequenceFlow id="flow61" sourceRef="scripttask17" targetRef="endevent7"></sequenceFlow>
