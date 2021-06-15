@@ -497,7 +497,7 @@ public class DefaultEntityEventManager implements EntityEventManager {
 	 */
 	protected int processCreated() {
 		// calculate events to process
-		String instanceId = eventConfiguration.getAsynchronousInstanceId();
+		String instanceId = configurationService.getInstanceId(); // lookout: server instance => process, not put into queue
 		List<IdmEntityEventDto> events = getCreatedEvents(instanceId);
 		LOG.trace("Events to process [{}] on instance [{}].", events.size(), instanceId);
 		for (IdmEntityEventDto event : events) {
