@@ -485,7 +485,7 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 			List<UUID> roleCatalogsFromTransformationUUIDs = roleCataloguesFromTransformation.stream()
 					.map(AbstractDto::getId)
 					.collect(Collectors.toList());
-			List<UUID> currentUseRoleCatalogueRoleIds = Lists.newArrayList();
+			List<UUID> currentUseRoleCatalogueRoleIds = Lists.newArrayListWithExpectedSize(10);
 			for (UUID roleCatalogueId : roleCatalogsFromTransformationUUIDs) {
 				Assert.notNull(roleCatalogueId, "Role catalogue ID cannot be null here!");
 				IdmRoleCatalogueRoleFilter roleCatalogueRoleFilter = new IdmRoleCatalogueRoleFilter();
@@ -781,7 +781,7 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 			IdmRoleRequestDto roleRequest = roleRequestService.createRequest(primeContract);
 			roleRequest.setState(RoleRequestState.CONCEPT);
 			OperationResultDto systemResult = new OperationResultDto.Builder(OperationState.NOT_EXECUTED)
-					.setModel(new DefaultResultModel(AccResultCode.SYNC_OF_ROLES_COMMON_ROLE_REQUEST))
+					.setModel(new DefaultResultModel(AccResultCode.SYNC_OF_ROLES_COMMON_ROLE_REQUEST, ImmutableMap.of("system", syncContext.getSystem().getCode())))
 					.build();
 			roleRequest.setSystemState(systemResult);
 			roleRequest.addToLog(MessageFormat.format("Role-request created from ROLE sync with ID [{0}] on the system [{1}].", config.getId(), syncContext.getSystem().getCode()));

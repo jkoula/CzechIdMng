@@ -1,7 +1,7 @@
-import { Basic, Managers } from 'czechidm-core';
+import {Basic, Managers} from 'czechidm-core';
 import React from 'react';
 import _ from 'lodash';
-import { SystemManager } from '../../../redux';
+import {SystemManager} from '../../../redux';
 import AbstractWizardStep from '../AbstractWizardStep';
 import SystemEntityTypeEnum from '../../../domain/SystemEntityTypeEnum';
 
@@ -205,7 +205,26 @@ export default class DefaultSystemWizard extends Basic.AbstractContextComponent 
       })[0];
 
     // Final summary step.
-    const summary = {
+    const summary = this.getSummaryStep();
+
+    // If is sync already created, then last step will be detail of the sync instead the new sync.
+    let stepSyncResult = stepSyncNew;
+    if (context && context.wizardContext && context.wizardContext.syncConfig) {
+      stepSyncResult = stepSyncDetail;
+    }
+    // Sync step is show only if exists mapping with operation type set to the synchronization.
+    if (context.wizardContext.mapping && context.wizardContext.mapping.operationType === 'SYNCHRONIZATION') {
+      return [stepSystemResult, stepConnector, stepSchemaResult, stepMappingResult, stepMappingAttributesResult, stepSyncResult, summary];
+    }
+
+    return [stepSystemResult, stepConnector, stepSchemaResult, stepMappingResult, stepMappingAttributesResult, summary];
+  }
+
+  /**
+   * Final summary step.
+   */
+  getSummaryStep() {
+    return {
       id: 'summary',
       wizardId: 'create-system',
       getComponent: () => {
@@ -219,18 +238,6 @@ export default class DefaultSystemWizard extends Basic.AbstractContextComponent 
         );
       }
     };
-
-    // If is sync already created, then last step will be detail of the sync instead the new sync.
-    let stepSyncResult = stepSyncNew;
-    if (context && context.wizardContext && context.wizardContext.syncConfig) {
-      stepSyncResult = stepSyncDetail;
-    }
-    // Sync step is show only if exists mapping with operation type set to the synchronization.
-    if (context.wizardContext.mapping && context.wizardContext.mapping.operationType === 'SYNCHRONIZATION') {
-      return [stepSystemResult, stepConnector, stepSchemaResult, stepMappingResult, stepMappingAttributesResult, stepSyncResult, summary];
-    }
-
-    return [stepSystemResult, stepConnector, stepSchemaResult, stepMappingResult, stepMappingAttributesResult, summary];
   }
 
   /**

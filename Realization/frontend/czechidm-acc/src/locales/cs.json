@@ -253,7 +253,7 @@
           },
           "mainCatalogueRoleNode": {
             "label": "Hlavní položka katalogu",
-            "helpBlock": "Pokud bude vybrána nějaká položka katalogu, pak budou celý katalog rolí z této synchronizace vkládán po ní."
+            "helpBlock": "Pokud bude vybrána nějaká položka katalogu, pak budou celý katalog rolí z této synchronizace vkládán pod ní."
           },
           "removeCatalogueRoleParentNode": {
             "label": "Uzel pro správu odebírání položek katalogu",
@@ -303,6 +303,10 @@
               "title": "Atribut v mapování není nastaven!",
               "text": "Pro správnou funkci, musí být v tomto systému nejdříve namapován atribut vracející 'Identifikátory uživatelů/členů role'!"
             }
+          },
+          "assignRoleAndDiffSyncWarning": {
+            "title": "Rozdílová synchronizace bude vypnuta!",
+            "text": "Funkce přiřazování rolí uživatelům nepodporuje rozdílovou synchornizaci. Rozdílová synchronizace bude deaktivována."
           },
           "mappedAttribute": "Atribut v mapování",
           "membershipHeader": "Členství v rolích (skupinách)",
@@ -2774,6 +2778,10 @@
       "name": "MS AD (WinRM) - Uživatelé",
       "description": "Umožňuje spravování uživatelů v MS Active Directory."
     },
+    "ad-group-winrm-connector-type": {
+      "name": "MS AD (WinRM) - Skupiny",
+      "description": "Umožňuje načítat skupiny z MS Active Directory."
+    },
     "ad-connector-type": {
       "name": "MS AD - Uživatelé",
       "description": "Umožňuje spravování uživatelů v MS Active Directory.",
@@ -2915,6 +2923,84 @@
           },
           "newRoleWithSystem": {
             "label": "Vytvořit výchozí roli synchronizace"
+          },
+          "regenerateSchemaSwitch": {
+            "label": "Přegenerovat schéma",
+            "help":  "Znovu vygenerovat schéma systému, dle aktuálního nastavení konektoru."
+          }
+        }
+      }
+    },
+    "ad-group-connector-type": {
+      "name": "MS AD - Skupiny",
+      "description": "Umožňuje načítat skupiny z MS Active Directory.",
+      "steps": {
+        "stepOne": {
+          "name": "Připojení k AD",
+          "help": "V tomto kroku <strong>zvolte název systému</strong> tak, jak chcete aby se zobrazoval v IdM. Dále zadejte údaje pro přístup k připojovanému Active Directory. Pokud máte již systém spravující uživatele v MS AD, tak jej můžete použít jako předlohu.",
+          "systemName": "Název systému v IdM",
+          "memberSystemMapping": {
+            "label": "Vyberte systém spravujicí uživatele",
+            "help": "Pokud máte již systém spravující uživatele v MS AD, tak jej můžete použít jako předlohu."
+          },
+          "host": {
+            "label": "Host",
+            "help": "Zadejte doménu připojovaného Active Directory.",
+            "placeholder": ""
+          },
+          "port": {
+            "label": "Port",
+            "help": "Číslo portu TCP.",
+            "placeholder": ""
+          },
+          "user": {
+            "label": "Uživatel",
+            "help": "DN uživatele s oprávněním pracovat v Active Directory.",
+            "placeholder": ""
+          },
+          "password": {
+            "label": "Heslo",
+            "help": "Heslo uživatele s oprávněním pracovat v Active Directory.",
+            "placeholder": ""
+          },
+          "sslSwitch": {
+            "label": "Použít LDAPS",
+            "help": "Pro komunikaci s AD použít zabezpečenou SSL komunikaci."
+          },
+          "sslOffAlert": {
+            "title": "Nemáte povolenou komunikaci přes SSL.",
+            "text": "Nepoužití zabezpečené komunikace LDAPS (SSL), může mít funkční dopady (např. nemožnost vytvoření hesla uživateli)!"
+          }
+        },
+        "stepThree": {
+          "name": "Oprávnění",
+          "help": "V tomto kroku se pokusíme ověřit, zdali má Vámi zadaný uživatel na AD dostatečná oprávnění."
+        },
+        "stepTwo": {
+          "name": "Certifikát"
+        },
+        "stepFour": {
+          "name": "Kontejner se skupinami",
+          "help": "V tomto kroku <strong>zvolte kontejner</strong>, který na Active Directory objsahuje skupiny, které chcete správovat v IdM. Dále můžete aktiovat <strong>pokročilé funkce</strong> synchronizace rolí.",
+          "groupContainer": {
+            "label": "Vyplňte kontejner se skupinami",
+            "help": "Vyplňte AD kontejner, obsahující skupiny, které budou načteny do IdM."
+          },
+          "mainRoleCatalog": {
+            "label": "Hlavní katalog",
+            "help":  "Celý katalog rolí, bude vkládán pod tuto položku."
+          },
+          "newRoleCatalog": {
+            "label": "Nový katalog",
+            "help":  "Vytvoří novou položku katalogu, pod kterou bude zařazen celý katalog rolí tohoto systému."
+          },
+          "regenerateSchemaSwitch": {
+            "label": "Přegenerovat schéma",
+            "help":  "Znovu vygenerovat schéma systému, dle aktuálního nastavení konektoru."
+          },
+          "memberSystemMapping": {
+            "label": "Vyberte systém spravujicí uživatele",
+            "help": ""
           }
         }
       }
@@ -3460,6 +3546,14 @@
     "CONNECTOR_TEST_FAILED": {
       "title": "Test konektoru selhal",
       "message": "Test konektoru na systému [{{system}}] vrátil chybu [{{ex}}]"
+    },
+    "SYNC_OF_ROLES_COMMON_ROLE_REQUEST": {
+      "title": "Synchronizace skupin",
+      "message": "Žádost byla vytvořena v rámci synchronizace skupin na systému [{{system}}]."
+    },
+    "WIZARD_AD_GROUP_WRONG_MEMBER_CONNECTOR_TYPE": {
+      "title": "Špatný typ konektoru",
+      "message": "Vybraný systém nepoužívá MS AD konektor!"
     }
   },
   "processor": {

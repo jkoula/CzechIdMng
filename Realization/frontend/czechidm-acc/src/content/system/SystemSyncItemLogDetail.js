@@ -78,7 +78,7 @@ class SystemSyncItemLogDetail extends Advanced.AbstractTableContent {
               label={this.i18n('acc:entity.SyncItemLog.identification')}/>
             <Basic.ScriptArea
               ref="log"
-              mode="sqlserver"
+              mode="ruby"
               height="35em"
               label={this.i18n('acc:entity.SyncItemLog.log')}/>
           </Basic.AbstractForm>
@@ -96,7 +96,6 @@ class SystemSyncItemLogDetail extends Advanced.AbstractTableContent {
     );
   }
 }
-
 
 SystemSyncItemLogDetail.propTypes = {
   _showLoading: PropTypes.bool,

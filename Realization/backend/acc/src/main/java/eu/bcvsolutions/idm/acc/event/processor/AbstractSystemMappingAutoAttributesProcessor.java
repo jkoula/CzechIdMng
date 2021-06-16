@@ -97,7 +97,7 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 
 		return systemAttributeMappingService.save(mappingAttribute);
 	}
-	
+
 	/**
 	 * Specific method for password attribute mapping  
 	 */
@@ -106,7 +106,7 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 			return IcAttributeInfo.PASSWORD.equals(attr.getName())
 					&& GuardedString.class.getCanonicalName().equals(attr.getClassType());
 		}).findFirst().orElse(null);
-		
+
 		SysSystemAttributeMappingDto mappingAttribute = null;
 		if (passwordSchemaAttr != null) {
 			mappingAttribute = createAttributeMappingBySchemaAttribute(dto, passwordSchemaAttr, null, false);
@@ -120,10 +120,25 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 	 * Create and save mapped attribute by schema attribute and given script to system.
 	 */
 	protected SysSystemAttributeMappingDto createAttributeMappingByScriptToResource(SysSystemMappingDto dto, SysSchemaAttributeDto schemaAttribute, String script) {
+		return createAttributeMappingByScriptToResource(dto, schemaAttribute, script, true);
+	}
+
+	/**
+	 * Create and save mapped attribute by schema attribute and given script to system.
+	 */
+	protected SysSystemAttributeMappingDto createAttributeMappingByScriptToResource(
+			SysSystemMappingDto dto,
+			SysSchemaAttributeDto schemaAttribute,
+			String script,
+			boolean toResource) {
 		SysSystemAttributeMappingDto mappingAttribute = new SysSystemAttributeMappingDto();
 		mappingAttribute.setSchemaAttribute(schemaAttribute.getId());
 		mappingAttribute.setUid(false);
-		mappingAttribute.setTransformToResourceScript(script);
+		if (toResource) {
+			mappingAttribute.setTransformToResourceScript(script);
+		}else {
+			mappingAttribute.setTransformFromResourceScript(script);
+		}
 		mappingAttribute.setSystemMapping(dto.getId());
 		mappingAttribute.setCached(true);
 		mappingAttribute.setEntityAttribute(false);
@@ -144,19 +159,33 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 
 	abstract SystemEntityType getSystemEntityType();
 
+	/**
+	 * Attributes will be generated only for defined operation type.
+	 */
+	protected SystemOperationType getSystemOperationType() {
+		return SystemOperationType.PROVISIONING;
+	}
+
+	/**
+	 * Attributes will be generated only for defined schema type.
+	 */
+	protected String getSchemaType() {
+		return IcObjectClassInfo.ACCOUNT;
+	}
+
 	@Override
 	public boolean conditional(EntityEvent<SysSystemMappingDto> event) {
 		SysSystemMappingDto systemMappingDto = event.getContent();
 		if (getSystemEntityType() != systemMappingDto.getEntityType()) {
 			return false;
 		}
-		// Attributes will be generated only for provisioning.
-		if (SystemOperationType.PROVISIONING != systemMappingDto.getOperationType()) {
+		// Attributes will be generated only for defined operation type.
+		if (getSystemOperationType() != systemMappingDto.getOperationType()) {
 			return false;
 		}
-		// Attributes will be generated only for __ACCOUNT__ schema.
+		// Attributes will be generated only for defined schema.
 		SysSchemaObjectClassDto objectClassDto = lookupService.lookupEmbeddedDto(systemMappingDto, SysSystemMapping_.objectClass.getName());
-		if (!IcObjectClassInfo.ACCOUNT.equals(objectClassDto.getObjectClassName())) {
+		if (!getSchemaType().equals(objectClassDto.getObjectClassName())) {
 			return false;
 		}
 		if (event.getBooleanProperty(SysSystemMappingService.ENABLE_AUTOMATIC_CREATION_OF_MAPPING)) {

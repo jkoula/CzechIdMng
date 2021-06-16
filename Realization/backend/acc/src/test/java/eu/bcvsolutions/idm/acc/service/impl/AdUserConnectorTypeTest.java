@@ -52,7 +52,7 @@ import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Tests for CSV connector type.
+ * Tests for AD User connector type.
  *
  * @author Vít Švanda
  */

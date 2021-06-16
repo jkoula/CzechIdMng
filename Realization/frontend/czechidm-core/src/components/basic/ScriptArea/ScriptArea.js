@@ -139,7 +139,7 @@ class ScriptArea extends AbstractFormComponent {
         enableBasicAutocompletion
         enableLiveAutocompletion
         wrapEnabled={false}
-        theme="github"
+        theme="tomorrow"
         onChange={this.onChange}
         value={this.state.value || ''}
         tabSize={4}
@@ -192,7 +192,9 @@ class ScriptArea extends AbstractFormComponent {
     require('brace/mode/groovy');
     require('brace/mode/json');
     require('brace/mode/sqlserver');
+    require('brace/mode/ruby');
     require('brace/theme/github');
+    require('brace/theme/tomorrow');
     require('brace/ext/language_tools');
     const AceEditorInstance = this._getAceEditor(AceEditor, mode, className, height, showModalEditor);
     return (

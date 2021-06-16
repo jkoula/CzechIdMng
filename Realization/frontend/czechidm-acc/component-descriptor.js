@@ -1,4 +1,3 @@
-
 module.exports = {
   id: 'acc',
   name: 'Account managment',
@@ -124,6 +123,12 @@ module.exports = {
       component: require('./src/components/AdConnectorIcon/AdConnectorIcon')
     },
     {
+      id: 'ad-group-connector-icon',
+      type: 'icon',
+      entityType: ['ad', 'ad-group-connector-icon'],
+      component: require('./src/components/AdGroupConnectorIcon/AdGroupConnectorIcon')
+    },
+    {
       id: 'ldap-connector-icon',
       type: 'icon',
       entityType: ['ldap', 'ldap-connector-icon'],
@@ -194,6 +199,18 @@ module.exports = {
       type: 'connector-type',
       entityType: ['ad-winrm-connector-type'],
       component: require('./src/content/wizard/connectorType/AdUserSystemWizard/AdUserSystemWizard')
+    },
+    {
+      id: 'ad-group-winrm-connector-type',
+      type: 'connector-type',
+      entityType: ['ad-group-winrm-connector-type'],
+      component: require('./src/content/wizard/connectorType/AdGroupSystemWizard/AdGroupSystemWizard')
+    },
+    {
+      id: 'ad-group-connector-type',
+      type: 'connector-type',
+      entityType: ['ad-group-connector-type'],
+      component: require('./src/content/wizard/connectorType/AdGroupSystemWizard/AdGroupSystemWizard')
     },
     {
       id: 'remote-server-icon',

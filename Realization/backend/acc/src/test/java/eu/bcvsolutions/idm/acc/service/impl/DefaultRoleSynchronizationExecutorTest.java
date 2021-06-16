@@ -33,6 +33,7 @@ import eu.bcvsolutions.idm.acc.entity.SysSyncConfig_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.entity.TestRoleResource;
+import eu.bcvsolutions.idm.acc.event.processor.MsAdSyncMappingRoleAutoAttributesProcessor;
 import eu.bcvsolutions.idm.acc.service.api.AccRoleAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
@@ -781,6 +782,146 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
+	
+	@Test
+	public void testSyncUpdateRolesMembershipDiffSync() {
+		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
+		// Enable a diff sync.
+		syncConfigCustom.setDifferentialSync(true);
+		syncConfigCustom = syncConfigService.save(syncConfigCustom);
+		
+		SysSystemDto userSystem = helper.createTestResourceSystem(true);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		Assert.assertNotNull(userSystemMappings);
+		Assert.assertEquals(1, userSystemMappings.size());
+		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
+		// Switch to the sync.
+		userMappingDto.setOperationType(SystemOperationType.SYNCHRONIZATION);
+		userMappingDto = systemMappingService.save(userMappingDto);
+
+		List<SysSystemAttributeMappingDto> attributeMappingDtos = schemaAttributeMappingService.findBySystemMapping(userMappingDto);
+		SysSystemAttributeMappingDto userEmailAttribute = attributeMappingDtos.stream()
+				.filter(attribute -> attribute.getName().equalsIgnoreCase(TestHelper.ATTRIBUTE_MAPPING_EMAIL))
+				.findFirst()
+				.orElse(null);
+		Assert.assertNotNull(userEmailAttribute);
+
+		Assert.assertFalse(syncConfigService.isRunning(syncConfigCustom));
+		Assert.assertTrue(syncConfigCustom instanceof SysSyncRoleConfigDto);
+		SysSyncRoleConfigDto roleConfigDto = (SysSyncRoleConfigDto) syncConfigCustom;
+
+		SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(syncConfigCustom, SysSyncConfig_.systemMapping, SysSystemMappingDto.class);
+		SysSchemaObjectClassDto schemaObjectClassDto = DtoUtils.getEmbedded(systemMappingDto, SysSystemMapping_.objectClass, SysSchemaObjectClassDto.class);
+		UUID roleSystemId = schemaObjectClassDto.getSystem();
+		Assert.assertNotNull(roleSystemId);
+		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
+		schemaAttributeFilter.setSystemId(roleSystemId);
+		schemaAttributeFilter.setObjectClassId(schemaObjectClassDto.getId());
+
+		SysSchemaAttributeDto schemaAttributeDto = schemaAttributeService.find(schemaAttributeFilter, null).getContent().stream()
+				.filter(attribute -> attribute.getName().equalsIgnoreCase("name"))
+				.findFirst()
+				.orElse(null);
+		Assert.assertNotNull(schemaAttributeDto);
+
+		SysSystemDto roleSystemDto = new SysSystemDto();
+		roleSystemDto.setId(roleSystemId);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		Assert.assertNotNull(roleSystemMappings);
+		Assert.assertEquals(1, roleSystemMappings.size());
+		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
+		// Create mapping attribute for get ID of role.
+		SysSystemAttributeMappingDto roleIdAttribute = new SysSystemAttributeMappingDto();
+		roleIdAttribute.setEntityAttribute(true);
+		roleIdAttribute.setUid(false);
+		roleIdAttribute.setSystemMapping(roleMappingDto.getId());
+		roleIdAttribute.setExtendedAttribute(false);
+		roleIdAttribute.setIdmPropertyName(RoleSynchronizationExecutor.ROLE_MEMBERSHIP_ID_FIELD);
+		roleIdAttribute.setSchemaAttribute(schemaAttributeDto.getId());
+		roleIdAttribute.setName(helper.createName());
+		roleIdAttribute = attributeMappingService.save(roleIdAttribute);
+
+		// Enable membership and use the user system.
+		roleConfigDto.setMembershipSwitch(true);
+		roleConfigDto.setMemberSystemMapping(userMappingDto.getId());
+		roleConfigDto.setMemberOfAttribute(userEmailAttribute.getId());
+		syncConfigCustom = syncConfigService.save(roleConfigDto);
+		//
+		helper.startSynchronization(syncConfigCustom);
+		//		
+		SysSyncLogFilter logFilter = new SysSyncLogFilter();
+		logFilter.setSynchronizationConfigId(syncConfigCustom.getId());
+		List<SysSyncLogDto> logs = syncLogService.find(logFilter, null).getContent();
+		Assert.assertEquals(1, logs.size());
+		SysSyncLogDto log = logs.get(0);
+		Assert.assertFalse(log.isRunning());
+		Assert.assertFalse(log.isContainsError());
+
+		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 5, OperationResultType.SUCCESS);
+		AccRoleAccountFilter roleAccountFilter = new AccRoleAccountFilter();
+		roleAccountFilter.setSystemId(roleSystemId);
+		List<AccRoleAccountDto> roleAccountDtos = roleAccountService.find(roleAccountFilter, null).getContent();
+		Assert.assertEquals(5, roleAccountDtos.size());
+
+		// Delete the log.
+		syncLogService.delete(log);
+
+		// Transformation will return new random value -> memberships should be updated.
+		String updatedScriptValue = getHelper().createName();
+		roleIdAttribute.setTransformFromResourceScript("return '" + updatedScriptValue + "';");
+		attributeMappingService.save(roleIdAttribute);
+
+		// Start sync again - for update.
+		helper.startSynchronization(syncConfigCustom);
+		//		
+		logFilter = new SysSyncLogFilter();
+		logFilter.setSynchronizationConfigId(syncConfigCustom.getId());
+		logs = syncLogService.find(logFilter, null).getContent();
+		Assert.assertEquals(1, logs.size());
+		log = logs.get(0);
+		Assert.assertFalse(log.isRunning());
+		Assert.assertFalse(log.isContainsError());
+
+		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 5, OperationResultType.SUCCESS);
+		roleAccountFilter = new AccRoleAccountFilter();
+		roleAccountFilter.setSystemId(roleSystemId);
+		roleAccountDtos = roleAccountService.find(roleAccountFilter, null).getContent();
+		Assert.assertEquals(5, roleAccountDtos.size());
+
+		roleAccountDtos.forEach(roleAccountDto -> {
+			SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
+			roleSystemFilter.setRoleId(roleAccountDto.getRole());
+			List<SysRoleSystemDto> roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
+			Assert.assertEquals(1, roleSystemDtos.size());
+			SysRoleSystemDto roleSystem = roleSystemDtos.get(0);
+			// Check mapping attribute (should be email).
+			SysRoleSystemAttributeFilter roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
+			roleSystemAttributeFilter.setRoleSystemId(roleSystem.getId());
+			List<SysRoleSystemAttributeDto> roleSystemAttributeDtos = roleSystemAttributeService.find(roleSystemAttributeFilter, null).getContent();
+			Assert.assertEquals(1, roleSystemAttributeDtos.size());
+			Assert.assertEquals(userEmailAttribute.getId(), roleSystemAttributeDtos.get(0).getSystemAttributeMapping());
+
+			String transformScript = roleSystemAttributeDtos.get(0).getTransformScript();
+			Assert.assertTrue(transformScript.contains(updatedScriptValue));
+		});
+
+		// Delete old log.
+		syncLogService.delete(log);
+		// Run sync again. Sync has enabled diff feature -> all changes should be ignored.
+		helper.startSynchronization(syncConfigCustom);
+		//		
+		logFilter = new SysSyncLogFilter();
+		logFilter.setSynchronizationConfigId(syncConfigCustom.getId());
+		logs = syncLogService.find(logFilter, null).getContent();
+		Assert.assertEquals(1, logs.size());
+		log = logs.get(0);
+		Assert.assertFalse(log.isRunning());
+		Assert.assertFalse(log.isContainsError());
+
+		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 5, OperationResultType.IGNORE);
+
+		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+	}
 
 	@Test
 	public void testSyncRolesAssignToUsers() {
@@ -1197,7 +1338,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		// Use ACC script "resolveRoleCatalogueUnderMainCatalogue".
 		IdmScriptFilter scriptFilter = new IdmScriptFilter();
-		scriptFilter.setCode("resolveRoleCatalogueUnderMainCatalogue");
+		scriptFilter.setCode(MsAdSyncMappingRoleAutoAttributesProcessor.RESOLVE_ROLE_CATALOG_UNDER_MAIN_SCRIPT);
 		scriptFilter.setCategory(IdmScriptCategory.TRANSFORM_FROM);
 
 		String catalogTransformationScript = null;
@@ -1313,7 +1454,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		// Use ACC script "resolveRoleCatalogueByDn".
 		IdmScriptFilter scriptFilter = new IdmScriptFilter();
-		scriptFilter.setCode("resolveRoleCatalogueByDn");
+		scriptFilter.setCode(MsAdSyncMappingRoleAutoAttributesProcessor.RESOLVE_ROLE_CATALOG_BY_DN_SCRIPT);
 		scriptFilter.setCategory(IdmScriptCategory.TRANSFORM_FROM);
 
 		String catalogTransformationScript = null;
