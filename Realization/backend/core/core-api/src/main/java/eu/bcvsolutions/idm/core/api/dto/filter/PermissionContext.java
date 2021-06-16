@@ -2,6 +2,8 @@ package eu.bcvsolutions.idm.core.api.dto.filter;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 
@@ -133,6 +135,11 @@ public interface PermissionContext extends BaseDataFilter {
      */
     @JsonIgnore
     default boolean usePermissionOperatorOr() {
-    	return OPERATOR_OR.equals(getEvaluatePermissionOperator());
+    	String evaluatePermissionOperator = getEvaluatePermissionOperator();
+    	if (StringUtils.isEmpty(evaluatePermissionOperator)) {
+    		return false;
+    	}
+    	//
+    	return OPERATOR_OR.equals(evaluatePermissionOperator.toUpperCase());
     }
 }
