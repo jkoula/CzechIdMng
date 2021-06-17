@@ -1923,6 +1923,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		// Create default synchronization config
 		AbstractSysSyncConfigDto syncConfigCustom = new SysSyncRoleConfigDto();
 		syncConfigCustom.setReconciliation(true);
+		syncConfigCustom.setDifferentialSync(false);
 		syncConfigCustom.setCustomFilter(false);
 		syncConfigCustom.setSystemMapping(mapping.getId());
 		syncConfigCustom.setCorrelationAttribute(uidAttribute.getId());
