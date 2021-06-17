@@ -9,20 +9,15 @@ import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
-import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.impl.RoleSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
-import eu.bcvsolutions.idm.core.api.service.IdmScriptService;
-import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
-import eu.bcvsolutions.idm.core.script.evaluator.AbstractScriptEvaluator;
 import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import java.util.List;
@@ -30,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
-import org.springframework.plugin.core.PluginRegistry;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,20 +43,9 @@ public class MsAdSyncMappingRoleAutoAttributesProcessor extends MsAdMappingIdent
 	public static final String MEMBER_ATTR_CODE = "member";
 
 	@Autowired
-	private LookupService lookupService;
-	@Autowired
-	private IdmScriptService scriptService;
-	@Autowired
-	private ConnectorManager connectorManager;
-	@Autowired
 	private SysSystemAttributeMappingService systemAttributeMappingService;
 	@Autowired
-	private SysSystemMappingService systemMappingService;
-	@Autowired
 	private SysSchemaAttributeService schemaAttributeService;
-	@Autowired
-	private List<AbstractScriptEvaluator> evaluators;
-	private PluginRegistry<AbstractScriptEvaluator, IdmScriptCategory> pluginExecutors;
 
 	@Override
 	public String getName() {

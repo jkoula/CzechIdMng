@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
 import com.google.common.collect.Lists;
+import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.connector.AdGroupConnectorType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -18,7 +19,6 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSyncRoleConfig_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemMapping;
 import eu.bcvsolutions.idm.acc.event.processor.MsAdSyncMappingRoleAutoAttributesProcessor;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
@@ -33,7 +33,9 @@ import eu.bcvsolutions.idm.acc.service.impl.mock.MockAdUserConnectorType;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmEntityStateService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
@@ -42,11 +44,9 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.logging.log4j.util.Strings;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -85,7 +85,11 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 	private SysSystemMappingService mappingService;
 	@Autowired
 	private SysSyncConfigService syncConfigService;
-	
+	@Autowired
+	private TestHelper helper;
+	@Autowired
+	private IdmRoleCatalogueService roleCatalogueService;
+
 
 	@Before
 	public void init() {
@@ -96,7 +100,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 	public void logout() {
 		super.logout();
 	}
-	
+
 	@Test
 	public void testStepOne() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -105,7 +109,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testStepOneByMemberSystem() {
 		// Create system with members.
@@ -119,13 +123,13 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 				.findFirst()
 				.orElse(null);
 		assertNotNull(mappingDto);
-		
+
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		connectorTypeDto.setReopened(false);
 		connectorManager.load(connectorTypeDto);
 		assertNotNull(connectorTypeDto);
-		
+
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_NAME, this.getHelper().createName());
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MEMBER_SYSTEM_MAPPING, mappingDto.getId().toString());
 		connectorTypeDto.setWizardStepName(MockAdGroupConnectorType.STEP_ONE);
@@ -138,6 +142,40 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		assertNotNull(system);
 		// Clean
 		systemService.delete((SysSystemDto) systemDto);
+		systemService.delete(memberSystemDto);
+	}
+
+	@Test(expected = ResultCodeException.class)
+	public void testStepOneBySystemWithWrongConnector() {
+		// Create system with table connector -> should cause an exception!
+		SysSystemDto tableSystem = helper.createTestResourceSystem(true);
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(tableSystem.getId());
+		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
+		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
+				.stream()
+				.findFirst()
+				.orElse(null);
+		assertNotNull(mappingDto);
+
+		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDto.setReopened(false);
+		connectorManager.load(connectorTypeDto);
+		assertNotNull(connectorTypeDto);
+
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_NAME, this.getHelper().createName());
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MEMBER_SYSTEM_MAPPING, mappingDto.getId().toString());
+		connectorTypeDto.setWizardStepName(MockAdGroupConnectorType.STEP_ONE);
+
+		// Execute the first step.
+		try {
+			connectorManager.execute(connectorTypeDto);
+		} finally {
+			// Clean
+			systemService.delete(tableSystem);
+		}
 	}
 
 	@Test
@@ -157,11 +195,11 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		String createdTestUserName = stepExecutedResult.getMetadata().get(MockAdGroupConnectorType.TEST_CREATED_USER_DN_KEY);
 		assertNotNull(createdTestUserName);
 		assertEquals(testUserName, createdTestUserName);
-		
+
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testDeleteUser() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -183,11 +221,11 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		connectorManager.execute(connectorTypeDto);
 		entityStateDto = entityStateService.get(UUID.fromString(entityStateId));
 		assertNull(entityStateDto);
-		
+
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testAssignUserToGroup() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -209,12 +247,12 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		connectorManager.execute(connectorTypeDto);
 		entityStateDto = entityStateService.get(UUID.fromString(entityStateId));
 		assertNotNull(entityStateDto);
-		
+
 		// Clean
 		entityStateService.delete(entityStateDto);
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testStepFour() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -226,7 +264,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		sb.append(this.getHelper().createName());
 		sb.append(AdGroupConnectorType.LINE_SEPARATOR);
 		sb.append(this.getHelper().createName());
-		
+
 		String groupContainersMock = sb.toString();
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.GROUP_CONTAINER_KEY, groupContainersMock);
 		connectorTypeDto.setWizardStepName(MockAdGroupConnectorType.STEP_FOUR);
@@ -251,11 +289,11 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		assertTrue(attributeMappingDtos.stream().anyMatch(attribute -> RoleSynchronizationExecutor.ROLE_FORWARD_ACM_FIELD.equals(attribute.getIdmPropertyName())));
 		assertTrue(attributeMappingDtos.stream().anyMatch(attribute -> RoleSynchronizationExecutor.ROLE_SKIP_VALUE_IF_EXCLUDED_FIELD.equals(attribute.getIdmPropertyName())));
 		assertTrue(attributeMappingDtos.stream().anyMatch(attribute -> RoleSynchronizationExecutor.ROLE_CATALOGUE_FIELD.equals(attribute.getIdmPropertyName())));
-		
+
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testOfDefaultSync() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -267,7 +305,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		sb.append(this.getHelper().createName());
 		sb.append(AdGroupConnectorType.LINE_SEPARATOR);
 		sb.append(this.getHelper().createName());
-		
+
 		String groupContainersMock = sb.toString();
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.GROUP_CONTAINER_KEY, groupContainersMock);
 		connectorTypeDto.setWizardStepName(MockAdGroupConnectorType.STEP_FOUR);
@@ -282,13 +320,13 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		AbstractSysSyncConfigDto syncConfigDto = syncConfigService.find(syncConfigFilter, null).getContent().stream().findFirst().orElse(null);
 		assertTrue(syncConfigDto instanceof SysSyncRoleConfigDto);
 		SysSyncRoleConfigDto syncRoleConfigDto = (SysSyncRoleConfigDto) syncConfigDto;
-		
+
 		assertFalse(syncRoleConfigDto.isMembershipSwitch());
 		assertFalse(syncRoleConfigDto.isAssignRoleSwitch());
 		assertFalse(syncRoleConfigDto.isAssignCatalogueSwitch());
 		assertFalse(syncRoleConfigDto.isForwardAcmSwitch());
 		assertFalse(syncRoleConfigDto.isSkipValueIfExcludedSwitch());
-		
+
 		assertNotNull(syncRoleConfigDto.getAssignCatalogueMappingAttribute());
 		assertNotNull(syncRoleConfigDto.getSkipValueIfExcludedMappingAttribute());
 		assertNotNull(syncRoleConfigDto.getForwardAcmMappingAttribute());
@@ -300,7 +338,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testOfFullSync() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -324,7 +362,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		sb.append(this.getHelper().createName());
 		sb.append(AdGroupConnectorType.LINE_SEPARATOR);
 		sb.append(this.getHelper().createName());
-		
+
 		String groupContainersMock = sb.toString();
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.GROUP_CONTAINER_KEY, groupContainersMock);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MEMBER_SYSTEM_MAPPING, mappingDto.getId().toString());
@@ -342,7 +380,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignRoleRemoveSwitch.getName(), Boolean.TRUE.toString());
 		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.removeCatalogueRoleSwitch.getName(), Boolean.TRUE.toString());
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MAIN_ROLE_CATALOG, mainCatalog.getId().toString());
-		
+
 		//  Execute step four.
 		connectorManager.execute(connectorTypeDto);
 
@@ -351,13 +389,13 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		AbstractSysSyncConfigDto syncConfigDto = syncConfigService.find(syncConfigFilter, null).getContent().stream().findFirst().orElse(null);
 		assertTrue(syncConfigDto instanceof SysSyncRoleConfigDto);
 		SysSyncRoleConfigDto syncRoleConfigDto = (SysSyncRoleConfigDto) syncConfigDto;
-		
+
 		assertTrue(syncRoleConfigDto.isMembershipSwitch());
 		assertTrue(syncRoleConfigDto.isRemoveCatalogueRoleSwitch());
 		assertTrue(syncRoleConfigDto.isAssignRoleRemoveSwitch());
 		assertTrue(syncRoleConfigDto.isAssignRoleSwitch());
 		assertTrue(syncRoleConfigDto.isAssignCatalogueSwitch());
-		
+
 		assertNotNull(syncRoleConfigDto.getAssignCatalogueMappingAttribute());
 		assertNotNull(syncRoleConfigDto.getSkipValueIfExcludedMappingAttribute());
 		assertNotNull(syncRoleConfigDto.getForwardAcmMappingAttribute());
@@ -368,8 +406,140 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 		// Clean
 		systemService.delete(systemDto);
+		systemService.delete(memberSystemDto);
 	}
 	
+	@Test
+	public void testReuseNewCatalog() {
+		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
+
+		// Create system with members.
+		SysSystemDto memberSystemDto = createMemberSystem();
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(memberSystemDto.getId());
+		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
+		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
+				.stream()
+				.findFirst()
+				.orElse(null);
+		assertNotNull(mappingDto);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.getHelper().createName());
+		sb.append(AdGroupConnectorType.LINE_SEPARATOR);
+		sb.append(this.getHelper().createName());
+
+		String groupContainersMock = sb.toString();
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.GROUP_CONTAINER_KEY, groupContainersMock);
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MEMBER_SYSTEM_MAPPING, mappingDto.getId().toString());
+		connectorTypeDto.setWizardStepName(MockAdGroupConnectorType.STEP_FOUR);
+
+		// Generate mock schema.
+		generateMockSchema(systemDto);
+
+		IdmRoleCatalogueDto mainCatalog = getHelper().createRoleCatalogue(getHelper().createName());
+
+		// Enable wizard switches.
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.membershipSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignCatalogueSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignRoleSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignRoleRemoveSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.removeCatalogueRoleSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.NEW_ROLE_CATALOG, mainCatalog.getCode());
+
+		//  Execute step four.
+		connectorManager.execute(connectorTypeDto);
+
+		SysSyncConfigFilter syncConfigFilter = new SysSyncConfigFilter();
+		syncConfigFilter.setSystemId(systemDto.getId());
+		AbstractSysSyncConfigDto syncConfigDto = syncConfigService.find(syncConfigFilter, null).getContent().stream().findFirst().orElse(null);
+		assertTrue(syncConfigDto instanceof SysSyncRoleConfigDto);
+		SysSyncRoleConfigDto syncRoleConfigDto = (SysSyncRoleConfigDto) syncConfigDto;
+		
+		assertTrue(syncRoleConfigDto.isRemoveCatalogueRoleSwitch());
+		assertTrue(syncRoleConfigDto.isAssignCatalogueSwitch());
+
+		UUID mainCatalogueRoleNode = syncRoleConfigDto.getMainCatalogueRoleNode();
+		assertEquals(mainCatalog.getId(), mainCatalogueRoleNode);
+		UUID removeCatalogueRoleParentNode = syncRoleConfigDto.getRemoveCatalogueRoleParentNode();
+		assertEquals(mainCatalog.getId(), removeCatalogueRoleParentNode);
+
+		// Clean
+		systemService.delete(systemDto);
+		systemService.delete(memberSystemDto);
+	}
+	
+	@Test
+	public void testCreateNewCatalog() {
+		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
+
+		// Create system with members.
+		SysSystemDto memberSystemDto = createMemberSystem();
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(memberSystemDto.getId());
+		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
+		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
+				.stream()
+				.findFirst()
+				.orElse(null);
+		assertNotNull(mappingDto);
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.getHelper().createName());
+		sb.append(AdGroupConnectorType.LINE_SEPARATOR);
+		sb.append(this.getHelper().createName());
+
+		String groupContainersMock = sb.toString();
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.GROUP_CONTAINER_KEY, groupContainersMock);
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MEMBER_SYSTEM_MAPPING, mappingDto.getId().toString());
+		connectorTypeDto.setWizardStepName(MockAdGroupConnectorType.STEP_FOUR);
+
+		// Generate mock schema.
+		generateMockSchema(systemDto);
+
+		String mainCatalog = getHelper().createName();
+
+		// Enable wizard switches.
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.membershipSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignCatalogueSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignRoleSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignRoleRemoveSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.removeCatalogueRoleSwitch.getName(), Boolean.TRUE.toString());
+		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.NEW_ROLE_CATALOG, mainCatalog);
+
+		//  Execute step four.
+		connectorManager.execute(connectorTypeDto);
+
+		SysSyncConfigFilter syncConfigFilter = new SysSyncConfigFilter();
+		syncConfigFilter.setSystemId(systemDto.getId());
+		AbstractSysSyncConfigDto syncConfigDto = syncConfigService.find(syncConfigFilter, null).getContent().stream().findFirst().orElse(null);
+		assertTrue(syncConfigDto instanceof SysSyncRoleConfigDto);
+		SysSyncRoleConfigDto syncRoleConfigDto = (SysSyncRoleConfigDto) syncConfigDto;
+		
+		assertTrue(syncRoleConfigDto.isRemoveCatalogueRoleSwitch());
+		assertTrue(syncRoleConfigDto.isAssignCatalogueSwitch());
+
+		IdmRoleCatalogueDto roleCatalogueDto = roleCatalogueService.getByCode(mainCatalog);
+		assertNotNull(roleCatalogueDto);
+
+		UUID mainCatalogueRoleNode = syncRoleConfigDto.getMainCatalogueRoleNode();
+		assertEquals(roleCatalogueDto.getId(), mainCatalogueRoleNode);
+		UUID removeCatalogueRoleParentNode = syncRoleConfigDto.getRemoveCatalogueRoleParentNode();
+		assertEquals(roleCatalogueDto.getId(), removeCatalogueRoleParentNode);
+
+		// Clean
+		systemService.delete(systemDto);
+		systemService.delete(memberSystemDto);
+	}
+
 	@Test
 	public void testReopenSystem() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -398,7 +568,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.assignRoleRemoveSwitch.getName(), Boolean.TRUE.toString());
 		connectorTypeDto.getMetadata().put(SysSyncRoleConfig_.removeCatalogueRoleSwitch.getName(), Boolean.TRUE.toString());
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.MAIN_ROLE_CATALOG, mainCatalog.getId().toString());
-		
+
 		//  Execute step four. 
 		connectorManager.execute(connectorTypeDto);
 
@@ -421,11 +591,11 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		assertTrue(Boolean.parseBoolean(loadedConnectorTypeDto.getMetadata().get(SysSyncRoleConfig_.assignRoleRemoveSwitch.getName())));
 		assertTrue(Boolean.parseBoolean(loadedConnectorTypeDto.getMetadata().get(SysSyncRoleConfig_.removeCatalogueRoleSwitch.getName())));
 		assertNull(loadedConnectorTypeDto.getMetadata().get(MockAdGroupConnectorType.MEMBER_SYSTEM_MAPPING));
-		
+
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 	@Test
 	public void testReopenSystemWithoutOptionsAttributes() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
@@ -448,11 +618,11 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
 		ConnectorTypeDto loadedConnectorTypeDto = connectorManager.load(connectorTypeDto);
 		assertNotNull(loadedConnectorTypeDto);
-		
+
 		// Clean
 		systemService.delete(systemDto);
 	}
-	
+
 
 	private void generateMockSchema(SysSystemDto systemDto) {
 		SysSchemaObjectClassDto schemaAccount = new SysSchemaObjectClassDto();
@@ -529,8 +699,8 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		assertNotNull(system);
 		return system;
 	}
-	
-	private SysSystemDto createMemberSystem(){
+
+	private SysSystemDto createMemberSystem() {
 		ConnectorType connectorType = connectorManager.getConnectorType(MockAdUserConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
@@ -586,7 +756,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 				MockAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE.equals(attribute.getName())
 						&& AttributeMappingStrategyType.MERGE == attribute.getStrategyType()));
 		assertTrue(attributeMappingDtos.stream().anyMatch(attribute -> MockAdUserConnectorType.SAM_ACCOUNT_NAME_ATTRIBUTE.equals(attribute.getName())));
-		
+
 		return systemDto;
 	}
 
@@ -663,16 +833,4 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		});
 		return sb.toString();
 	}
-
-	/**
-	 * Converts list of containers to the string, separated by line separator.
-	 */
-	private List<String> stringToContainers(String strContainers) {
-		if (Strings.isBlank(strContainers)){
-			return Lists.newArrayList();
-		}
-		return Arrays.stream(strContainers.split(AdGroupConnectorType.LINE_SEPARATOR))
-				.collect(Collectors.toList());
-	}
-
 }

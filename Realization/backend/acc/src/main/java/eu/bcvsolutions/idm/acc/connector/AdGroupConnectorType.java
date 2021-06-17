@@ -74,15 +74,16 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 	public static final String OBJECT_GUID_ATTRIBUTE = "objectGUID";
 	private static final String UID_FOR_GROUP_ATTRIBUTE = "gidAttribute";
 	public static final String MAIN_ROLE_CATALOG = "mainRoleCatalog";
-	private static final String NEW_ROLE_CATALOG = "newRoleCatalog";
+	public static final String NEW_ROLE_CATALOG = "newRoleCatalog";
 	public static final String BASE_CONTEXT_GROUP_KEY = "groupBaseContexts";
 
 	// Default values
-	protected static final String[] ENTRY_OBJECT_CLASSES_DEFAULT_VALUES = {"top", "group"};
+	protected static final String ENTRY_OBJECT_CLASS_GROUP = "group";
+	protected static final String[] ENTRY_OBJECT_CLASSES_DEFAULT_VALUES = {"top", ENTRY_OBJECT_CLASS_GROUP};
 	private static final int PAGE_SIZE_DEFAULT_VALUE = 100;
 	private static final String CN_VALUE = "cn";
 	private static final String GROUP_SYNC_NAME = "Group sync";
-	public static final String LINE_SEPARATOR = "\n"; //System independent line separator.
+	public static final char LINE_SEPARATOR = '\n'; //System independent line separator.
 
 	// Connector type ID.
 	public static final String NAME = "ad-group-connector-type";
@@ -246,7 +247,7 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 				List<IdmFormValueDto> values = getFormService().getValues(systemDto, attribute, IdmBasePermission.READ);
 				if (values != null) {
 					return values.stream()
-							.anyMatch(value -> AdGroupConnectorType.ENTRY_OBJECT_CLASSES_DEFAULT_VALUES[1].equals(value.getValue()));
+							.anyMatch(value -> AdGroupConnectorType.ENTRY_OBJECT_CLASS_GROUP.equals(value.getValue()));
 				}
 			}
 		} catch (IllegalStateException ex) {
@@ -340,7 +341,7 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 		if (Strings.isBlank(strContainers)){
 			return Lists.newArrayList();
 		}
-		return Arrays.stream(strContainers.split(LINE_SEPARATOR))
+		return Arrays.stream(strContainers.split(String.valueOf(LINE_SEPARATOR)))
 				.collect(Collectors.toList());
 	}
 
@@ -591,6 +592,6 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 
 		// Enable connector pooling.
 		IdmFormDefinitionDto poolingConnectorFormDefinition = getSystemService().getPoolingConnectorFormDefinition(systemDto);
-		this.setValueToConnectorInstance(SysSystemService.POOLING_SUPPORTED_PROPERTY, true, systemDto, poolingConnectorFormDefinition);
+		this.setValueToConnectorInstance(SysSystemService.POOLING_SUPPORTED_PROPERTY, Boolean.TRUE, systemDto, poolingConnectorFormDefinition);
 	}
 }
