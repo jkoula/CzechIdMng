@@ -146,6 +146,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	@Before
 	public void init() {
 		loginAsAdmin();
+		
 	}
 
 	@After
@@ -1756,30 +1757,34 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		// Delete roles.
 		roleAccountDtos.forEach(roleAccountDto -> {
 			IdmRoleDto role = roleService.get(roleAccountDto.getRole());
-			// remove role async
-			try {
-				getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
-
-				Map<String, Object> properties = new HashMap<>();
-				properties.put(RoleProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE);
-				// Delete by bulk action.
-				IdmBulkActionDto bulkAction = this.findBulkAction(IdmRole.class, RoleDeleteBulkAction.NAME);
-				bulkAction.setIdentifiers(Sets.newHashSet(role.getId()));
-				bulkAction.setProperties(properties);
-				bulkActionManager.processAction(bulkAction);
-
-				getHelper().waitForResult(res -> {
-					return roleService.get(role) != null;
-				});
-				Assert.assertNull(roleService.get(role));
-			} finally {
-				getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
-			}
+			forceRoleDelete(role);
 		});
 		// Delete sync.
 		syncConfigService.delete(syncConfigCustom);
 		// Delete system.
 		systemService.delete(systemService.get(roleSystemId));
+	}
+
+	private void forceRoleDelete(IdmRoleDto role) {
+		// remove role async
+		try {
+			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+
+			Map<String, Object> properties = new HashMap<>();
+			properties.put(RoleProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE);
+			// Delete by bulk action.
+			IdmBulkActionDto bulkAction = this.findBulkAction(IdmRole.class, RoleDeleteBulkAction.NAME);
+			bulkAction.setIdentifiers(Sets.newHashSet(role.getId()));
+			bulkAction.setProperties(properties);
+			bulkActionManager.processAction(bulkAction);
+
+			getHelper().waitForResult(res -> {
+				return roleService.get(role) != null;
+			});
+			Assert.assertNull(roleService.get(role));
+		} finally {
+			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+		}
 	}
 
 	@Transactional
@@ -1848,6 +1853,10 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	}
 
 	private TestRoleResource createRole(String code, String type, ZonedDateTime changed, int priority) {
+		IdmRoleDto roleDto = roleService.getByCode(code);
+		if (roleDto != null) {
+			this.forceRoleDelete(roleDto);
+		}
 		TestRoleResource role = new TestRoleResource();
 		role.setType(type);
 		role.setName(code);
