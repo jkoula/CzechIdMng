@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.connector;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
@@ -301,6 +302,17 @@ public abstract class AbstractConnectorType implements
 		return null;
 	}
 	
+	protected List<String> getValuesFromConnectorInstance(String attributeCode, SysSystemDto systemDto, IdmFormDefinitionDto connectorFormDef) {
+		IdmFormAttributeDto attribute = connectorFormDef.getMappedAttributeByCode(attributeCode);
+		if (attribute != null) {
+			List<IdmFormValueDto> values = formService.getValues(systemDto, attribute, IdmBasePermission.READ);
+			return values.stream()
+					.map(IdmFormValueDto::getStringValue)
+					.collect(Collectors.toList());
+		}
+		return Lists.newArrayList();
+	}
+	
 	protected String getConfidentialValueFromConnectorInstance(String attributeCode, SysSystemDto systemDto, IdmFormDefinitionDto connectorFormDef) {
 		IdmFormAttributeDto attribute = connectorFormDef.getMappedAttributeByCode(attributeCode);
 		if (attribute == null) {
@@ -337,6 +349,10 @@ public abstract class AbstractConnectorType implements
 
 	@Override
 	public boolean supportsSystem(SysSystemDto systemDto) {
+		return supportsSystemByConnector(systemDto);
+	}
+	
+	protected boolean supportsSystemByConnector(SysSystemDto systemDto) {
 		if (systemDto.getConnectorKey() == null) {
 			return false;
 		}

@@ -1,17 +1,17 @@
 import React from 'react';
 import DefaultSystemWizard from '../DefaultSystemWizard';
 import StepOne from './StepOne';
-import StepCrt from './StepCrt';
-import StepCheckPermission from './StepCheckPermission';
+import StepCrt from '../AdUserSystemWizard/StepCrt';
+import StepCheckPermission from '../AdUserSystemWizard/StepCheckPermission';
 import StepFour from './StepFour';
 
 /**
- * Wizard for create a system for administration users from a MS AD.
+ * Wizard for create a system for administration groups from a MS AD.
  *
  * @author Vít Švanda
- * @since 10.8.0
+ * @since 11.1.0
  */
-export default class AdUserSystemWizard extends DefaultSystemWizard {
+export default class AdGroupSystemWizard extends DefaultSystemWizard {
 
   constructor(props, context) {
     super(props, context);
@@ -20,7 +20,7 @@ export default class AdUserSystemWizard extends DefaultSystemWizard {
   }
 
   getWizardId() {
-    return 'ad-connector-type';
+    return 'ad-group-connector-type';
   }
 
   getModule() {
@@ -28,10 +28,6 @@ export default class AdUserSystemWizard extends DefaultSystemWizard {
   }
 
   getWizardSteps(props, context) {
-    const stepsDefault = super.getWizardSteps(props, context);
-    // Remove name, connector, schema, mapping steps.
-    stepsDefault.splice(0, 4);
-
     const steps = [];
     const stepOneId = 'stepOne';
     // Replace first step.
@@ -63,7 +59,7 @@ export default class AdUserSystemWizard extends DefaultSystemWizard {
             wizardStepId={stepTwoId}
             connectorType={connectorType}
             apiPath={this.getApiPath()}
-            baseLocKey={this.getBaseLocKey()}
+            baseLocKey={`${this.getModule()}:wizard.ad-connector-type`}
           />
         );
       }
@@ -92,7 +88,7 @@ export default class AdUserSystemWizard extends DefaultSystemWizard {
             wizardStepId={stepThreeId}
             connectorType={connectorType}
             apiPath={this.getApiPath()}
-            baseLocKey={this.getBaseLocKey()}
+            baseLocKey={`${this.getModule()}:wizard.ad-connector-type`}
           />
         );
       }
@@ -118,7 +114,20 @@ export default class AdUserSystemWizard extends DefaultSystemWizard {
     };
     steps.splice(3, 0, stepFour);
 
-    steps.splice(steps.length, 0, ...stepsDefault);
+    let activeStep = null;
+    if (context && context.wizardContext) {
+      activeStep = context.wizardContext.activeStep;
+    }
+    const routesSystem = this.generateRouteComponents({path: '/system/:entityId/'}, {});
+
+    // Final component for attribute mapping step.
+    const stepMappingAttributesResult = this.getMappingAttributeStep(routesSystem, activeStep, context);
+    steps.splice(4, 0, stepMappingAttributesResult);
+
+    // Final summary step.
+    const summary = super.getSummaryStep();
+    steps.splice(5, 0, summary);
+
     return [...steps];
   }
 }

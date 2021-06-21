@@ -238,7 +238,7 @@ public class DefaultIdmRoleCatalogueService
 	}
 
 	private IdmRoleCatalogueDto resolveRoleCatalogueTree(List<String> orgUnites, UUID mainCatalogueId) {
-		List<IdmRoleCatalogueDto> parents = Lists.newArrayList();
+		List<IdmRoleCatalogueDto> parents = Lists.newArrayListWithExpectedSize(10);
 
 		for (int i = 0; i < orgUnites.size(); i++) {
 			String parentCode = join(orgUnites.subList(0, i + 1));

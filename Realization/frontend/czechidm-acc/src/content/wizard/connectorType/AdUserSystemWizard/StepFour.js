@@ -20,6 +20,11 @@ export default class StepFour extends AbstractWizardStep {
       && wizardContext.connectorType.metadata.protectedModeSwitch) {
       this.state.protectedModeSwitch = wizardContext.connectorType.metadata.protectedModeSwitch === 'true';
     }
+    if (wizardContext.connectorType
+      && wizardContext.connectorType.metadata) {
+      this.state.regenerateSchemaSwitch = wizardContext.connectorType.metadata.regenerateSchemaSwitch === 'true';
+      this.state.schemaId = wizardContext.connectorType.metadata.schemaId;
+    }
     this.state.newRoleWithSystem = wizardContext.entity ? `${wizardContext.entity.name}-users` : null;
   }
 
@@ -49,6 +54,7 @@ export default class StepFour extends AbstractWizardStep {
     metadata.deleteUserContainer = protectedMode ? formData.deleteUserContainer : null;
     metadata.protectedModeSwitch = protectedMode;
     metadata.domainContainer = formData.domainContainer;
+    metadata.regenerateSchemaSwitch = formData.regenerateSchemaSwitch;
     // formPairingSync
     metadata.pairingSyncSwitch = formPairingSync.pairingSyncSwitch;
     metadata.newRoleWithSystemCode = formPairingSync.newRoleWithSystem;
@@ -90,13 +96,22 @@ export default class StepFour extends AbstractWizardStep {
     });
   }
 
+  _toggleSwitch(key) {
+    const state = {};
+    state[key] = !this.state[key];
+    this.setState(state);
+  }
+
   render() {
-    const {connectorType, reopened} = this.props;
+    const {connectorType} = this.props;
     const {showLoading,
       pairingSyncSwitch,
       newRoleWithSystem,
       roleWithSystem,
-      protectedModeSwitch} = this.state;
+      protectedModeSwitch,
+      regenerateSchemaSwitch,
+      schemaId
+    } = this.state;
 
     const _connectorType = this.state.connectorType ? this.state.connectorType : connectorType;
     const formData = {};
@@ -106,6 +121,7 @@ export default class StepFour extends AbstractWizardStep {
       formData.searchUserContainer = metadata.searchUserContainer ? metadata.searchUserContainer : metadata.userContainer;
       formData.deleteUserContainer = metadata.deleteUserContainer && protectedModeSwitch ? metadata.deleteUserContainer : null;
       formData.domainContainer = metadata.domainContainer;
+      formData.regenerateSchemaSwitch = regenerateSchemaSwitch;
     }
     const hasPairingSync = _connectorType && _connectorType.metadata && !!_connectorType.metadata.pairingSyncId;
     const formDataPairingSync = {};
@@ -158,6 +174,14 @@ export default class StepFour extends AbstractWizardStep {
             helpBlock={this.i18n(`${locKey}.domainContainer.help`)}
             required
             max={255}/>
+          <Basic.Div style={{flex: 1}}>
+            <Basic.ToggleSwitch
+              ref="regenerateSchemaSwitch"
+              rendered={!!schemaId}
+              onChange={this._toggleSwitch.bind(this, 'regenerateSchemaSwitch')}
+              label={this.i18n(`${locKey}.regenerateSchemaSwitch.label`)}
+              helpBlock={this.i18n(`${locKey}.regenerateSchemaSwitch.help`)}/>
+          </Basic.Div>
         </Basic.AbstractForm>
         <Basic.AbstractForm
           ref="formPairingSync"
