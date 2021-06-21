@@ -180,7 +180,8 @@ class AbstractFormComponent extends AbstractContextComponent {
   }
 
   /**
-   * Localization validation errors
+   * Localization validation errors.
+   *
    * @param  {string} type   type of validation
    * @param  {json} params (key-value of validation params)
    * @return {string}        localized message
@@ -245,25 +246,21 @@ class AbstractFormComponent extends AbstractContextComponent {
     let message = null;
     let key;
     const params = {};
-    if (result.error.message) { // fully localized message
-      message = result.error.message;
+    if (result.error.key) {
+      key = result.error.key;
     } else {
-      if (result.error.key) {
-        key = result.error.key;
-      } else {
-        const detail = result.error.details[0];
-        key = detail.type;
-        const limit = detail.context.limit;
-        if (limit) {
-          merge(params, {count: limit});
-        }
-        const valids = detail.context.valids;
-        if (valids) {
-          merge(params, {valids});
-        }
+      const detail = result.error.details[0];
+      key = detail.type;
+      const limit = detail.context.limit;
+      if (limit) {
+        merge(params, {count: limit});
       }
-      message = this._localizationValidation(key, params);
+      const valids = detail.context.valids;
+      if (valids) {
+        merge(params, {valids});
+      }
     }
+    message = this._localizationValidation(key, params);
     //
     this.setState({
       validationResult: {
