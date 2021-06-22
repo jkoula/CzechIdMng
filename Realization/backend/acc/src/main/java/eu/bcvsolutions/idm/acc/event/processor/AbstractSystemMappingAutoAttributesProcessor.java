@@ -160,10 +160,10 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 	abstract SystemEntityType getSystemEntityType();
 
 	/**
-	 * Attributes will be generated only for defined operation type.
+	 * Attributes will be generated only for defined operation type. By default (null) for all (provisioning and sync).
 	 */
 	protected SystemOperationType getSystemOperationType() {
-		return SystemOperationType.PROVISIONING;
+		return null;
 	}
 
 	/**
@@ -179,8 +179,9 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 		if (getSystemEntityType() != systemMappingDto.getEntityType()) {
 			return false;
 		}
-		// Attributes will be generated only for defined operation type.
-		if (getSystemOperationType() != systemMappingDto.getOperationType()) {
+		// Attributes will be generated only for defined operation type. Or for all if is null.
+		SystemOperationType operationType = getSystemOperationType();
+		if (operationType != null && operationType != systemMappingDto.getOperationType()) {
 			return false;
 		}
 		// Attributes will be generated only for defined schema.

@@ -1,5 +1,13 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import com.google.common.collect.ImmutableMap;
+import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
+import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
+import eu.bcvsolutions.idm.acc.event.SystemMappingEvent;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -55,6 +63,10 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 	private ConnectorManager connectorManager;
 	@Autowired
 	private SysRoleSystemService roleSystemService;
+	@Autowired
+	private SysSystemAttributeMappingService attributeMappingService;
+	@Autowired
+	private SysSystemMappingService mappingService;
 
 	@Before
 	public void init() {
@@ -150,7 +162,166 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		// Two mappings have to exists now.
 		moreMappings = connectorTypeDtoAfterMappingStep.getMetadata().get(AbstractConnectorType.ALERT_MORE_MAPPINGS);
 		Assert.assertEquals(Boolean.TRUE.toString(), moreMappings);
+	}
+	
+	@Test
+	public void testAutoSyncMappingInWizard() {
 
+		SysSystemDto systemDto = helper.createTestResourceSystem(true);
+		ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(systemDto);
+		Assert.assertEquals(DefaultConnectorType.NAME, connectorType.getConnectorName());
+
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(systemDto.getId());
+		SysSystemMappingDto sysSystemMappingDto = mappingService.find(mappingFilter, null).getContent().stream().findFirst().orElse(null);
+		Assert.assertNotNull(sysSystemMappingDto);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.SCHEMA_ID, (sysSystemMappingDto).getObjectClass().toString());
+		// Delete a created mapping.
+		mappingService.delete(sysSystemMappingDto);
+
+		connectorTypeDto.getEmbedded().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto);
+		connectorTypeDto.setReopened(true);
+		connectorTypeDto = connectorManager.load(connectorTypeDto);
+
+		// Execute mapping step.
+		connectorTypeDto.setReopened(false);
+		connectorTypeDto.setWizardStepName(AbstractConnectorType.STEP_MAPPING);
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.OPERATION_TYPE, SystemOperationType.SYNCHRONIZATION.name());
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.ENTITY_TYPE, SystemEntityType.IDENTITY.name());
+		systemController.executeConnectorType(connectorTypeDto);
+
+		ConnectorTypeDto connectorTypeDtoAfterMappingStep = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDtoAfterMappingStep.getEmbedded().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto);
+		connectorTypeDtoAfterMappingStep.setReopened(true);
+		connectorTypeDtoAfterMappingStep = connectorManager.load(connectorTypeDtoAfterMappingStep);
+		// Sync mapping must exist.
+		BaseDto mapping = connectorTypeDtoAfterMappingStep.getEmbedded().get(AbstractConnectorType.MAPPING_DTO_KEY);
+		Assert.assertTrue(mapping instanceof SysSystemMappingDto);
+		SysSystemMappingDto syncMapping = (SysSystemMappingDto) mapping;
+		Assert.assertSame(SystemOperationType.SYNCHRONIZATION, syncMapping.getOperationType());
+
+		// Attributes had to be created.
+		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
+		attributeMappingFilter.setSystemMappingId(syncMapping.getId());
+		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
+		Assert.assertEquals(5, attributeMappingDtos.size());
+	}
+	
+	@Test
+	public void testAutoSyncMappingOutsideWizard() {
+
+		SysSystemDto systemDto = helper.createTestResourceSystem(true);
+		ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(systemDto);
+		Assert.assertEquals(DefaultConnectorType.NAME, connectorType.getConnectorName());
+
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(systemDto.getId());
+		SysSystemMappingDto sysSystemMappingDto = mappingService.find(mappingFilter, null).getContent().stream().findFirst().orElse(null);
+		Assert.assertNotNull(sysSystemMappingDto);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.SCHEMA_ID, (sysSystemMappingDto).getObjectClass().toString());
+		// Delete a created mapping.
+		mappingService.delete(sysSystemMappingDto);
+
+		SysSystemMappingDto syncMapping = new SysSystemMappingDto();
+		syncMapping.setObjectClass(sysSystemMappingDto.getObjectClass());
+		syncMapping.setName("Mapping");
+		syncMapping.setEntityType(SystemEntityType.IDENTITY);
+		syncMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
+		syncMapping = mappingService.publish(
+				new SystemMappingEvent(
+						SystemMappingEvent.SystemMappingEventType.CREATE,
+						syncMapping,
+						ImmutableMap.of(SysSystemMappingService.ENABLE_AUTOMATIC_CREATION_OF_MAPPING, true)))
+				.getContent();
+
+		// Attributes had to be created.
+		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
+		attributeMappingFilter.setSystemMappingId(syncMapping.getId());
+		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
+		Assert.assertEquals(5, attributeMappingDtos.size());
+	}
+	
+	@Test
+	public void testAutoProvisioningMappingOutsideWizard() {
+
+		SysSystemDto systemDto = helper.createTestResourceSystem(true);
+		ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(systemDto);
+		Assert.assertEquals(DefaultConnectorType.NAME, connectorType.getConnectorName());
+
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(systemDto.getId());
+		SysSystemMappingDto sysSystemMappingDto = mappingService.find(mappingFilter, null).getContent().stream().findFirst().orElse(null);
+		Assert.assertNotNull(sysSystemMappingDto);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.SCHEMA_ID, (sysSystemMappingDto).getObjectClass().toString());
+		// Delete a created mapping.
+		mappingService.delete(sysSystemMappingDto);
+
+		SysSystemMappingDto mappingDto = new SysSystemMappingDto();
+		mappingDto.setObjectClass(sysSystemMappingDto.getObjectClass());
+		mappingDto.setName("Mapping");
+		mappingDto.setEntityType(SystemEntityType.IDENTITY);
+		mappingDto.setOperationType(SystemOperationType.PROVISIONING);
+		mappingDto = mappingService.publish(
+				new SystemMappingEvent(
+						SystemMappingEvent.SystemMappingEventType.CREATE,
+						mappingDto,
+						ImmutableMap.of(SysSystemMappingService.ENABLE_AUTOMATIC_CREATION_OF_MAPPING, true)))
+				.getContent();
+
+		// Attributes had to be created.
+		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
+		attributeMappingFilter.setSystemMappingId(mappingDto.getId());
+		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
+		Assert.assertEquals(5, attributeMappingDtos.size());
+	}
+	
+	@Test
+	public void testAutoProvisioningMappingInWizard() {
+
+		SysSystemDto systemDto = helper.createTestResourceSystem(true);
+		ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(systemDto);
+		Assert.assertEquals(DefaultConnectorType.NAME, connectorType.getConnectorName());
+
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(systemDto.getId());
+		SysSystemMappingDto sysSystemMappingDto = mappingService.find(mappingFilter, null).getContent().stream().findFirst().orElse(null);
+		Assert.assertNotNull(sysSystemMappingDto);
+		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.SCHEMA_ID, (sysSystemMappingDto).getObjectClass().toString());
+		// Delete a created mapping.
+		mappingService.delete(sysSystemMappingDto);
+
+		connectorTypeDto.getEmbedded().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto);
+		connectorTypeDto.setReopened(true);
+		connectorTypeDto = connectorManager.load(connectorTypeDto);
+
+		// Execute mapping step.
+		connectorTypeDto.setReopened(false);
+		connectorTypeDto.setWizardStepName(AbstractConnectorType.STEP_MAPPING);
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.OPERATION_TYPE, SystemOperationType.PROVISIONING.name());
+		connectorTypeDto.getMetadata().put(AbstractConnectorType.ENTITY_TYPE, SystemEntityType.IDENTITY.name());
+		systemController.executeConnectorType(connectorTypeDto);
+
+		ConnectorTypeDto connectorTypeDtoAfterMappingStep = connectorManager.convertTypeToDto(connectorType);
+		connectorTypeDtoAfterMappingStep.getEmbedded().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto);
+		connectorTypeDtoAfterMappingStep.setReopened(true);
+		connectorTypeDtoAfterMappingStep = connectorManager.load(connectorTypeDtoAfterMappingStep);
+		// Sync mapping must exist.
+		BaseDto mapping = connectorTypeDtoAfterMappingStep.getEmbedded().get(AbstractConnectorType.MAPPING_DTO_KEY);
+		Assert.assertTrue(mapping instanceof SysSystemMappingDto);
+		SysSystemMappingDto syncMapping = (SysSystemMappingDto) mapping;
+		Assert.assertSame(SystemOperationType.PROVISIONING, syncMapping.getOperationType());
+
+		// Attributes had to be created.
+		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
+		attributeMappingFilter.setSystemMappingId(syncMapping.getId());
+		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
+		Assert.assertEquals(5, attributeMappingDtos.size());
 	}
 
 	@Test

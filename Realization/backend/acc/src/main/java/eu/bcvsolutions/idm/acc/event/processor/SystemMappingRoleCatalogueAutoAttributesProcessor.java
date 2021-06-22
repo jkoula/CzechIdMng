@@ -26,7 +26,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogue_;
  * @author Vít Švanda
  */
 @Component("accSystemMappingRoleCatalogueAutoAttributesProcessor")
-@Description("Processor for automatic creation of identity mapped attributes by common schema attributes.")
+@Description("Processor for automatic creation of role catalogue mapped attributes by common schema attributes.")
 public class SystemMappingRoleCatalogueAutoAttributesProcessor extends AbstractSystemMappingAutoAttributesProcessor {
 
 	private static final String PROCESSOR_NAME = "system-mapping-auto-role-catalogue-attributes-processor";
