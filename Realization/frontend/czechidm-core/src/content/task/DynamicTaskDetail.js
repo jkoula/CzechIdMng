@@ -119,16 +119,17 @@ class DynamicTaskDetail extends Basic.AbstractContent {
       }
     }
     if (decision.showWarning || decision.reasonRequired) {
-      this.setState({reasonRequired: decision.reasonRequired});
-      this.refs.confirm.show(
-        this.i18n(decision.warningMessage ? decision.warningMessage : 'completeTaskConfirmDetail'),
-        this.i18n('completeTaskConfirmTitle'), this.validateDecisionReason.bind(this, decision)
-      )
-        .then(() => {
-          this._completeTask(decision);
-        }, () => {
-          // Rejected
-        });
+      this.setState({reasonRequired: decision.reasonRequired}, () => {
+        this.refs.confirm.show(
+          this.i18n(decision.warningMessage ? decision.warningMessage : 'completeTaskConfirmDetail'),
+          this.i18n('completeTaskConfirmTitle'), this.validateDecisionReason.bind(this, decision)
+        )
+          .then(() => {
+            this._completeTask(decision);
+          }, () => {
+            // Rejected
+          });
+      });
     } else {
       this._completeTask(decision);
     }
