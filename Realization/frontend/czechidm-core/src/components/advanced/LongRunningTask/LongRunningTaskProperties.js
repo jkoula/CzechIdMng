@@ -20,7 +20,7 @@ export default class LongRunningTaskProperties extends Basic.AbstractContextComp
     if (!entity) {
       return null;
     }
-    return entity.taskProperties || entity.parameters;
+    return entity.taskProperties || entity.evaluatorProperties || entity.parameters;
   }
 
   render() {
@@ -44,6 +44,12 @@ export default class LongRunningTaskProperties extends Basic.AbstractContextComp
     let formInstance = new Domain.FormInstance({});
     if (supportedTasks && supportedTasks.has(entity.taskType)) {
       _taskType = supportedTasks.get(entity.taskType);
+      //
+      if (_taskType.formDefinition) {
+        formInstance = new Domain.FormInstance(_taskType.formDefinition).setProperties(entityProperties);
+      }
+    } else if (supportedTasks && supportedTasks.has(entity.evaluatorType)) {
+      _taskType = supportedTasks.get(entity.evaluatorType);
       //
       if (_taskType.formDefinition) {
         formInstance = new Domain.FormInstance(_taskType.formDefinition).setProperties(entityProperties);

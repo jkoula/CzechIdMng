@@ -41,6 +41,7 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Vít Švanda
  *
  */
+@Deprecated(since = "11.1.0")
 public class MonitoringIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired

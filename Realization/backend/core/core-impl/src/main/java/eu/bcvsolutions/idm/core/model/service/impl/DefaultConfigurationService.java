@@ -242,7 +242,7 @@ public class DefaultConfigurationService
 		LOG.debug("Reading configuration for key [{}]", key);
 		String value = null;
 		boolean confidential = true;
-		// idm configuration has higher priority than property file
+		// IdM configuration has higher priority than property file.
 		IdmConfigurationDto config = getByCode(key);
 		if (config != null) {
 			if (config.isConfidential()) {
@@ -259,7 +259,7 @@ public class DefaultConfigurationService
 			confidential = shouldBeConfidential(key);
 		}
 		// fill default value
-		if (value == null) {
+		if (value == null) { // TODO: null vs. isEmpty?
 			value = defaultValue;
 		}	
 		LOG.debug("Resolved configuration value for key [{}] is [{}].", key, confidential ? GuardedString.SECRED_PROXY_STRING : value);

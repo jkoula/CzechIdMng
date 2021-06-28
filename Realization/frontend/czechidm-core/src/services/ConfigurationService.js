@@ -90,6 +90,7 @@ export default class ConfigurationService extends AbstractService {
    * Return monitoring results for given type.
    *
    * @return Promise
+   * @deprecated since 11.1.0
    */
   getMonitoringType(monitoringType) {
     return RestApiService
@@ -152,6 +153,26 @@ export default class ConfigurationService extends AbstractService {
           throw Utils.Response.getFirstInfo(jsonResponse);
         }
         return jsonResponse;
+      });
+  }
+
+  /**
+   * Loads all registered read dto services.
+   *
+   * @return {promise}
+   * @since 11.1.0
+   */
+  getReadDtoServices() {
+    return RestApiService
+      .get(`${ this.getApiPath() }/search/read-dto-services`)
+      .then(response => {
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        return json;
       });
   }
 }

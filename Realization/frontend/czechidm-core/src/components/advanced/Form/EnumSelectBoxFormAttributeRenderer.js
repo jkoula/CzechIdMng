@@ -117,7 +117,8 @@ export default class EnumSelectBoxFormAttributeRenderer extends ShortTextFormAtt
           ?
           this.toInputValue(showOriginalValue ? originalValues : values)
           :
-          this.toInputValues(showOriginalValue ? originalValues : values) }
+          this.toInputValues(showOriginalValue ? originalValues : values)
+        }
         helpBlock={ this.getHelpBlock() }
         readOnly={ showOriginalValue ? true : this.isReadOnly() }
         required={ this.isRequired() }

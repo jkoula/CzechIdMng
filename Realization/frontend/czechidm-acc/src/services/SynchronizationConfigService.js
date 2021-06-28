@@ -1,11 +1,9 @@
-import { Services } from 'czechidm-core';
-import { Domain, Utils} from 'czechidm-core';
+import { Domain, Utils, Services } from 'czechidm-core';
 
+/**
+ * @author Vít Švanda
+ */
 export default class SynchronizationConfigService extends Services.AbstractService {
-
-  constructor() {
-    super();
-  }
 
   // dto
   supportsPatch() {

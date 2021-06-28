@@ -96,13 +96,13 @@ public class DefaultManagersFilter
                 		wp.in(subqueryWp),
                 		// by tree type structure
                 		filter.getManagersByTreeType() != null
-                			?
-                    		builder.equal(
-                    				wp.get(IdmTreeNode_.treeType).get(IdmTreeType_.id), 
-        							filter.getManagersByTreeType())
-                    		:
-                    		builder.conjunction()
-                		)
+            			?
+                		builder.equal(
+                				wp.get(IdmTreeNode_.treeType).get(IdmTreeType_.id), 
+    							filter.getManagersByTreeType())
+                		:
+                		builder.conjunction()
+                )
         );		
 		subquery.where(builder.and(
 				//
@@ -121,7 +121,7 @@ public class DefaultManagersFilter
 				//
         		builder.equal(subRoot.get(IdmIdentityContract_.identity), root), // correlation attr
         		builder.or(subPredicates.toArray(new Predicate[subPredicates.size()]))
-        		));
+        ));
 		//
 		return builder.exists(subquery);
 	}

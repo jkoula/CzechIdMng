@@ -44,10 +44,14 @@ class Button extends AbstractComponent {
     if (!rendered) {
       return null;
     }
+    let _level = level;
+    if (_level) {
+      _level = _level.toLowerCase();
+    }
     //
     const classNames = classnames(
       'btn',
-      `btn-${ (level === 'error' ? 'danger' : level) }`,
+      `btn-${ (_level === 'error' ? 'danger' : _level) }`,
       { [`btn-${ buttonSize }`]: buttonSize !== 'default' },
       { hidden },
       className

@@ -54,10 +54,17 @@ module.exports = {
     {
       id: 'sync-config-info',
       type: 'entity-info',
-      entityType: ['SysSyncIdentityConfig', 'SysSyncIdentityConfigDto',
+      entityType: ['syncConfig', 'SysSyncIdentityConfig', 'SysSyncIdentityConfigDto',
         'SysSyncConfig', 'SysSyncConfigDto', 'SysSyncContractConfig', 'SysSyncContractConfigDto'],
       component: require('./src/components/SyncConfigInfo/SyncConfigInfo').default,
       manager: require('./src/redux').SynchronizationConfigManager
+    },
+    {
+      id: 'sync-log-info',
+      type: 'entity-info',
+      entityType: ['SysSyncLog', 'SysSyncLogDto'],
+      component: require('./src/components/SyncLogInfo/SyncLogInfo').default,
+      manager: require('./src/redux').SynchronizationLogManager
     },
     {
       id: 'break-config-info',

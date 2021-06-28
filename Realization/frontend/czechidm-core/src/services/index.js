@@ -90,6 +90,8 @@ import DelegationService from './DelegationService';
 import BulkActionService from './BulkActionService';
 import NotificationAttachmentService from './NotificationAttachmentService';
 import TokenService from './TokenService';
+import MonitoringService from './MonitoringService';
+import MonitoringResultService from './MonitoringResultService';
 
 const ServiceRoot = {
   RestApiService,
@@ -176,8 +178,10 @@ const ServiceRoot = {
   DelegationDefinitionService,
   DelegationService,
   BulkActionService,
-  TokenService
+  TokenService,
+  MonitoringService,
+  MonitoringResultService
 };
 
-ServiceRoot.version = '10.8.0';
+ServiceRoot.version = '11.1.0';
 module.exports = ServiceRoot;

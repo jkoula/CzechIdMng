@@ -374,7 +374,11 @@
       },
       "messages": "Hlášení",
       "configuration": "Konfigurace aplikace",
-      "monitoring": "Monitoring",
+      "monitoring": {
+        "label": "Monitoring",
+        "header": "Monitoring",
+        "title": "Monitoring"
+      },
       "userLabel": "{{loggedUsername}}",
       "login": "$t(content.login.header)",
       "logout": "Odhlásit",
@@ -663,7 +667,8 @@
           "AUTOMATIC-ROLE-ATTRIBUTE-SELECT": "Výběr automatické role dle atributu (SelectBox)",
           "BASE-PERMISSION-ENUM": "Základní oprávnění v IdM",
           "OPERATION-STATE-ENUM": "Stav operace",
-          "WORKFLOW-DEFINITION-SELECT": "Výběr definice workflow (SelectBox)"
+          "WORKFLOW-DEFINITION-SELECT": "Výběr definice workflow (SelectBox)",
+          "READ-DTO-SERVICE-SELECT": "Výběr registrovaných služeb pro čtení záznamů (SelectBox)"
         },
         "attributes": {
           "empty": "Definice dalších atributů byla nalezena, ale neobsahuje žádné položky, které by bylo možné číst či editovat.",
@@ -731,6 +736,14 @@
           "foundMore": {
             "title": "Nalezeno více záznamů",
             "message": "Bylo nalezeno více záznamů [{{counter}}] dle zadaného textu [{{text}}]. Rozšiřte zadaný text pro zobrazení detailu záznamu."
+          }
+        }
+      },
+      "NavigationMonitoring": {
+        "noData": "Monitoring nehlásí žádná varování.",
+        "link": {
+          "all": {
+            "label": "Zobrazit všechny výsledky monitoringu ..."
           }
         }
       }
@@ -1222,7 +1235,9 @@
       "EXPORTIMPORT": "Export/Import",
       "DELEGATIONDEFINITION": "Delegace",
       "ENTITYEVENT": "Události",
-      "ENTITYSTATE": "Stavy entit"
+      "ENTITYSTATE": "Stavy entit",
+      "MONITORING": "Monitoring - nastavení",
+      "MONITORINGRESULT": "Monitoring - výsledky"
     }
   },
   "content": {
@@ -1518,15 +1533,42 @@
         "message": "Konfigurovatelná položka [<strong>{{name}}</strong>] již existuje s hodnotou [<strong>{{value}}</strong>]. Chcete ji přepsat?"
       }
     },
-    "monitoring": {
-      "header": "Monitoring",
-      "title": "Monitoring",
-      "type": {
-        "monitoring-database": {
-          "name": "Počet záznamů ve vybraných databázových tabulkách"
-          }
+    "monitorings": {
+      "header": "Nastavení",
+      "title": "Nastavení monitoringu",
+      "filter": {
+        "text": {
+          "placeholder": "Typ vyhodnocení či popis"
         }
       },
+      "edit": {
+        "header": "{{name}} <small>detail konfigurace monitoringu</small>"
+      },
+      "create": {
+        "header": "Nová konfigurace monitoringu"
+      },
+      "save": {
+        "success": "Konfigurace monitoringu [{{name}}] byla úspěšně uložena"
+      },
+      "tabs": {
+        "basic": "Základní informace"
+      }
+    },
+    "monitoring-results": {
+      "header": "Výsledky",
+      "title": "Výsledky monitoringu",
+      "filter": {
+        "text": {
+          "placeholder": "Typ vyhodnocení či popis"
+        }
+      },
+      "edit": {
+        "header": "Detail výsledku monitoringu"
+      },
+      "tabs": {
+        "basic": "Základní informace"
+      }
+    },
     "tasks-summary": {
       "summary": "Přehled úkolů",
       "approvalTasks": "Schvalované úkoly",
@@ -5046,13 +5088,83 @@
       "public": "Veřejné",
       "confidential": "Tajné"
     },
-    "IdmMonitoringType": {
-      "_type": "Monitoring",
-      "name": "Název",
-      "value": "Hodnota",
-      "module": "Modul",
-      "level": "Stav",
-      "threshold": "Limitní hodnota"
+    "Monitoring": {
+      "_type": "Monitoring - nastavení",
+      "disabled": {
+        "label": "Neaktivní",
+        "help": "Neaktivní monitoring nebude spouštěn"
+      },
+      "instanceId": {
+        "label": "$t(entity.LongRunningTask.instanceId.label)",
+        "help": "$t(entity.LongRunningTask.instanceId.help)"
+      },
+      "description": {
+        "label": "Popis"
+      },
+      "seq": {
+        "label": "Pořadí",
+        "help": "Pořadí je použito při vyhodnocování monitoringu."
+      },
+      "evaluatorType": {
+        "label": "Typ vyhodnocení"
+      },
+      "evaluatorProperties": {
+        "label": "Nastavení",
+        "title": "Nastavení monitoringu"
+      },
+      "checkPeriod": {
+        "label": "Interval spouštění [s]",
+        "help": "Interval spouštění - prodleva v sekundách mezi jednotlivými spuštěními. <strong>0</strong> - monitoring bude spuštěn pouze při startu instance serveru nebo pokud neexistuje jiný výsledek (po vytvoření nebo aktivování monitoringu)."
+      },
+      "executeDate": {
+        "label": "Platné od",
+        "help": "Nastaví první spuštění úlohy dle zadaného data."
+      }
+    },
+    "MonitoringResult": {
+      "_type": "Monitoring - výsledek",
+      "evaluatorType": {
+        "label": "Typ vyhodnocení"
+      },
+      "evaluatorProperties": {
+        "label": "Nastavení",
+        "title": "Nastavení monitoringu"
+      },
+      "created": {
+        "label": "$t(entity.created)"
+      },
+      "monitoringStarted": {
+        "label": "Spuštěno"
+      },
+      "duration": {
+        "label": "Trvání vyhodnocení monitoringu"
+      },
+      "level": {
+        "label": "Level"
+      },
+      "result": {
+        "label": "Výsledek"
+      },
+      "instanceId": {
+        "label": "$t(entity.LongRunningTask.instanceId.label)",
+        "help": "$t(entity.LongRunningTask.instanceId.help)"
+      },
+      "processedOrder": {
+        "label": "Zpracované pořadí"
+      },
+      "value": {
+        "label": "Hodnota"
+      },
+      "owner": {
+        "label": "Monitorovaný záznam",
+        "help": "Odkaz na monitorovaný záznam."
+      },
+      "ownerType": {
+        "label": "Typ monitorovaného záznamu"
+      },
+      "ownerId": {
+        "label": "Identifikátor monitorovaného záznamu"
+      }
     },
     "Audit": {
       "label": "Audit",
@@ -6443,6 +6555,31 @@
         "label": "Zneplatnit tokeny",
         "help": "Vybrané tokeny budou zneplatněny.",
         "icon": "fa:ban"
+      },
+      "core-monitoring-run-bulk-action": {
+        "label": "Spustit monitoring",
+        "help": "Spustí vybraná nastavení monitoringu.",
+        "icon": "play"
+      },
+      "core-monitoring-delete-bulk-action": {
+        "label": "$t(action.delete.action) nastavení monitoringu",
+        "help": "Smaže vybraná nastavení monitoringu.",
+        "icon": "$t(action.delete.icon)"
+      },
+      "core-monitoring-result-delete-bulk-action": {
+        "label": "$t(action.delete.action) výsledky monitoringu",
+        "help": "Smaže vybrané výsledky monitoringu.",
+        "icon": "$t(action.delete.icon)"
+      },
+      "core-monitoring-disable-bulk-action": {
+        "label": "Deaktivovat nastavení monitoringu",
+        "help": "Deaktivuje vybraná nastavení monitoringu",
+        "icon": "fa:ban"
+      },
+      "core-monitoring-enable-bulk-action": {
+        "label": "Aktivovat nastavení monitoringu",
+        "help": "Aktivuje vybraná nastavení monitoringu.",
+        "icon": "fa:check-square-o"
       }
     },
     "authorization-evaluator": {
@@ -7025,6 +7162,30 @@
           "set-contract-guarantee": {
             "label": "Nastavit přímého vedoucího pro nový kontrakt",
             "help": "Nastavit aktuálně přihlášeného uživatele jako přímého vedoucího pro nově vytvářený kontrakt."
+          }
+        }
+      }
+    },
+    "monitoring-evaluator": {
+      "core-h-2-database-monitoring-evaluator": {
+        "label": "Kontrola použití H2 databáze",
+        "help": "Varování při použití H2 databáze. Použití H2 databáze není vhodné pro testovací i produkční prostředí."
+      },
+      "core-demo-admin-monitoring-evaluator": {
+        "label": "Kontrola použití demo administrátora",
+        "help": "Varování při použití demo prihlašovacích údajů pro admin uživatele."
+      },
+      "core-database-table-monitoring-evaluator": {
+        "label": "Kontrola počtu záznamů v databázové tabulce",
+        "help": "Varování o překročení počtu záznamů v databázové tabulce.",
+        "attributes": {
+          "threshold": {
+            "label": "Počet záznamů",
+            "help": "Varování bude zobrazeno, pokud počet záznamů v databázové tabulce překročí zadaný počet."
+          },
+          "service-bean-name": {
+            "label": "Databázová tabulka",
+            "help": "Kontrolovaná databázová tabulka (kontrolovaný typ záznamu)."
           }
         }
       }
@@ -8248,6 +8409,26 @@
     "IDENTITY_UNIFORM_PASSWORD": {
       "title": "Jednotné heslo.",
       "message": "Jednotné heslo pro [{{entity}}]."
+    },
+    "MONITORING_DATABASE_TABLE": {
+      "title": "Počet záznamů v databázové tabulce",
+      "message": "Databázová tabulka [{{tableName}}] ([{{dtoName}}]) obsahuje [{{count}}] záznamů."
+    },
+    "MONITORING_DEMO_ADMIN_WARNING": {
+      "title": "Používá se demo admin uživatel",
+      "message": "Používají se přihlašovací údaje demo [admin] uživatele. Změňte heslo pro [admin] uživatele."
+    },
+    "MONITORING_H2_DATABASE_ERROR": {
+      "title": "Používá se H2 databáze",
+      "message": "Na instanci serveru [{{instanceId}}] se používá H2 databáze. H2 databáze není určena pro použití na produkčním prostředí."
+    },
+    "MONITORING_H2_DATABASE_WARNING": {
+      "title": "Používá se H2 databáze",
+      "message": "Na instanci serveru [{{instanceId}}] se používá H2 databáze."
+    },
+    "MONITORING_H2_DATABASE_SUCCESS": {
+      "title": "H2 databáze není použita",
+      "message": "Na instanci serveru [{{instanceId}}] není použita H2 databáze. Používá se databáze [{{databaseName}}]."
     }
   },
   "validationError": {
@@ -8337,6 +8518,9 @@
     },
     "transaction-event-cache": {
       "description": "Cache pro ukládání běžících asynchronních událostí. Cache je vyprázdněna automaticky pro každou ukončenou asynchronní událost."
+    },
+    "monitoring-last-result-cache": {
+      "description": "Cache pro ukládání posledních výsledků monitoringu."
     }
   }
 }

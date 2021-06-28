@@ -1306,6 +1306,7 @@
       }
     },
     "SynchronizationLog": {
+      "_type": "Synchronization - log",
       "running": "Running",
       "started": "Started",
       "ended": "Finished",
@@ -2578,6 +2579,19 @@
         "help": "Retry failed operations in provisioning queue. Failed provisioning operations are automatically scheduled. This task runs such operations at scheduled time.",
         "icon": "component:scheduled-task"
       }
+    },
+    "monitoring-evaluator": {
+      "acc-synchronization-monitoring-evaluator": {
+        "label": "Synchronization monitoring",
+        "help": "Check synchronization execution.",
+        "attributes": {
+          "synchronization": {
+            "label": "Synchronization",
+            "placeholder": "Select synchronization ...",
+            "help": "Checked synchronization."
+          }
+        }
+      }
     }
   },
   "wizard": {
@@ -3552,6 +3566,22 @@
     "WIZARD_AD_GROUP_WRONG_MEMBER_CONNECTOR_TYPE": {
       "title": "Wrong connector type",
       "message": "The selected system does not use the MS AD connector!"
+    },
+    "MONITORING_SYNCHRONIZATION_DISABLED": {
+      "title": "Synchronization is disabled",
+      "message": "Synchronization [{{synchronizationName}}] on system [{{systemName}}] is disabled."
+    },
+    "MONITORING_SYNCHRONIZATION_NOT_EXECUTED": {
+      "title": "Synchronization not executed",
+      "message": "Synchronization [{{synchronizationName}}] on system [{{systemName}}] was not executed yet."
+    },
+    "MONITORING_SYNCHRONIZATION_OK": {
+      "title": "Synchronization is ok",
+      "message": "Synchronization [{{synchronizationName}}] on system [{{systemName}}] doesn't contain errors. Number of processed items [{{count}}]."
+    },
+    "MONITORING_SYNCHRONIZATION_CONTAINS_ERROR": {
+      "title": "Synchronization contains errors",
+      "message": "Synchronization [{{synchronizationName}}] on system [{{systemName}}] contains errors [{{count}}]."
     }
   },
   "processor": {

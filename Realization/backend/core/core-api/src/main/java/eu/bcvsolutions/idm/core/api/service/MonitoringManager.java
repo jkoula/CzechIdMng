@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.api.service;
 
-import com.google.common.annotations.Beta;
 import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringTypeDto;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
@@ -9,8 +8,9 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
  * 
  * @author Vít Švanda
  * @since 10.3.0
+ * @deprecated monitoring refactored from scratch in 11.2.0
  */
-@Beta
+@Deprecated(since ="11.2.0")
 public interface MonitoringManager {
 	
 	public IdmMonitoringTypeDto check(String monitoringType, BasePermission... permission);

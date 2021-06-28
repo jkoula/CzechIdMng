@@ -34,6 +34,15 @@ export class FormAttributeInfo extends AbstractEntityInfo {
   }
 
   /**
+   * Returns entity icon (null by default - icon will not be rendered).
+   *
+   * @param  {object} entity
+   */
+  getEntityIcon() {
+    return 'component:form-attribute';
+  }
+
+  /**
    * Returns popover info content
    *
    * @param  {array} table data

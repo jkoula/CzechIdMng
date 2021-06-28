@@ -135,7 +135,9 @@ export default class FlashMessagesManager {
     //
     const levelStatusCode = parseInt(resultModel.statusCode, 10);
     let level; // 4xx - warning message, 5xx - error message
-    if (levelStatusCode >= 500) {
+    if (resultModel.level) {
+      level = resultModel.level.toLowerCase();
+    } else if (levelStatusCode >= 500) {
       level = 'error';
     } else if (levelStatusCode >= 200 && levelStatusCode < 300) {
       if (levelStatusCode === 202) {

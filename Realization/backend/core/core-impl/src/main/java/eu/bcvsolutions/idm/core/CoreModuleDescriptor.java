@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.domain.PropertyModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.domain.ResultCode;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.event.processor.identity.IdentityMonitoredFieldsProcessor;
+import eu.bcvsolutions.idm.core.monitoring.api.domain.MonitoringGroupPermission;
 import eu.bcvsolutions.idm.core.notification.api.dto.NotificationConfigurationDto;
 import eu.bcvsolutions.idm.core.notification.domain.NotificationGroupPermission;
 import eu.bcvsolutions.idm.core.notification.entity.IdmConsoleLog;
@@ -55,6 +56,8 @@ public class CoreModuleDescriptor extends PropertyModuleDescriptor implements Co
 		groupPermissions.addAll(Arrays.asList(IdmGroupPermission.values()));
 		groupPermissions.addAll(Arrays.asList(CoreGroupPermission.values()));
 		groupPermissions.addAll(Arrays.asList(NotificationGroupPermission.values()));
+		groupPermissions.addAll(Arrays.asList(MonitoringGroupPermission.values()));
+		//
 		return groupPermissions;
 	}
 	

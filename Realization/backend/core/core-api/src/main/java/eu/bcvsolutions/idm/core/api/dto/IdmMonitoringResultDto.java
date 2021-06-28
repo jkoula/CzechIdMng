@@ -1,19 +1,19 @@
 package eu.bcvsolutions.idm.core.api.dto;
 
-import com.google.common.annotations.Beta;
+import java.util.UUID;
+
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
-import java.util.UUID;
 
 /**
  * Monitoring DTO
  *
  * @author Vít Švanda
  * @since 10.4.0
- *
+ * @deprecated @since 11.1.0 use {@link eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto}
  */
-@Beta
+@Deprecated(since = "11.1.0")
 @Relation(collectionRelation = "monitorings")
 public class IdmMonitoringResultDto extends AbstractDto {
 

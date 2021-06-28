@@ -28,6 +28,7 @@ public class IdmFlywayMigrationStrategy implements FlywayMigrationStrategy {
 	public static final String WILDCARD_DBNAME = "${dbName}";
 	public static final String POSTGRESQL_DBNAME = "postgresql";
 	public static final String MSSQL_DBNAME = "sqlserver";
+	public static final String H2_DBNAME = "h2"; // @since 11.1.0
 	
 	/**
 	 * {@inheritDoc}

@@ -145,7 +145,7 @@ export class App extends Basic.AbstractContent {
   }
 
   render() {
-    const { userContext, bulk, appReady, navigationCollapsed, hideFooter } = this.props;
+    const { userContext, bulk, appReady, navigationCollapsed, hideFooter, location } = this.props;
     const { isLogout } = this.state;
     const showTwoFactor = this.state.showTwoFactor || userContext.twoFactorToken !== null;
     const titleTemplate = `%s | ${ this.i18n('app.name') }`;
@@ -165,7 +165,7 @@ export class App extends Basic.AbstractContent {
           :
           <Basic.Div>
             <Helmet title={ this.i18n('navigation.menu.home') } titleTemplate={ titleTemplate } />
-            <Advanced.Navigation />
+            <Advanced.Navigation location={ location } />
             <div id="content-container" className={ classnames }>
               {
                 userContext.isExpired

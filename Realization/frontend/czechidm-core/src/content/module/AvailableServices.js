@@ -75,7 +75,6 @@ class AvailableServices extends Advanced.AbstractTableContent {
     this.context.store.dispatch(this.getManager().fetchEntities(searchParameters, UIKEY));
   }
 
-
   render() {
     const { availableServices, showLoading, _searchParameters } = this.props;
     const { filterOpened } = this.state;

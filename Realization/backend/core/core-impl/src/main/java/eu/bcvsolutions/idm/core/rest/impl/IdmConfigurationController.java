@@ -1,19 +1,20 @@
 package eu.bcvsolutions.idm.core.rest.impl;
 
-import com.google.common.annotations.Beta;
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
@@ -32,10 +33,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.comparator.CodeableComparator;
+import eu.bcvsolutions.idm.core.api.dto.AvailableServiceDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringTypeDto;
@@ -48,6 +52,9 @@ import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.LoggerManager;
 import eu.bcvsolutions.idm.core.api.service.MonitoringManager;
+import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
+import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
+import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
@@ -56,16 +63,15 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
-import java.util.Comparator;
 
 /**
- * Configuration controller - add custom methods to configuration repository
+ * Configuration controller - add custom methods to configuration repository.
  * 
  * @author Radek Tomiška
  * @author Ondrej Husnik 
- *
  */
 @RestController
+@SuppressWarnings("deprecation")
 @RequestMapping(value = BaseDtoController.BASE_PATH + "/configurations")
 @Api(
 		value = IdmConfigurationController.TAG, 
@@ -78,7 +84,9 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 	protected static final String TAG = "Configuration";
 	private final IdmConfigurationService configurationService;
 	//
+	@Autowired private ApplicationContext context;
 	@Autowired private LoggerManager loggerManager;
+	@Deprecated(since = "11.1.0")
 	@Autowired private MonitoringManager monitoringManager;
 	
 	@Autowired
@@ -300,8 +308,9 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 	 * 
 	 * @param monitoringType
 	 * @return
+	 * @deprecated monitoring refactored from scratch in 11.2.0
 	 */
-	@Beta
+	@Deprecated(since = "11.1.0")
 	@ResponseBody
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.CONFIGURATION_READ + "')")
 	@RequestMapping(path = "/monitoring-types/{monitoringType}", method = RequestMethod.GET)
@@ -315,7 +324,6 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
 						@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_READ, description = "") })
 				})
-	
 	public ResponseEntity<IdmMonitoringTypeDto> getMonitoringType(@PathVariable @NotNull String monitoringType) {
 
 		IdmMonitoringTypeDto dto = monitoringManager.check(monitoringType);
@@ -459,6 +467,57 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 				})
 	public ResponseEntity<ResultModels> prevalidateBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
 		return super.prevalidateBulkAction(bulkAction);
+	}
+	
+	/**
+	 * Returns all registered read dto services.
+	 * 
+	 * @return registered read dto services
+	 * @since 11.1.0
+	 */
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.GET, value = "/search/read-dto-services")
+	@ApiOperation(
+			value = "Get all registered read dto services", 
+			nickname = "getRegisteredReadDtoServices", 
+			tags = { IdmConfigurationController.TAG },
+			notes = "Returns all registered read dto services."
+	)
+	public Resources<AvailableServiceDto> getRegisteredReadDtoServices() {
+		List<AvailableServiceDto> results = context
+			.getBeansOfType(ReadDtoService.class)
+			.entrySet()
+			.stream()
+			.map(entry -> {
+				ReadDtoService<?, ?> service = entry.getValue();
+				Class<?> clazz = AutowireHelper.getTargetClass(service);
+				String className = clazz.getSimpleName();
+				//
+				AvailableServiceDto dto = new  AvailableServiceDto();
+				dto.setId(entry.getKey());
+				dto.setModule(EntityUtils.getModule(clazz));
+				dto.setServiceName(className);
+				dto.setPackageName(clazz.getCanonicalName());
+				// resolve table name
+				Class<?> entityClass = service.getEntityClass();
+				if (entityClass != null) {
+					dto.setEntityClass(entityClass.getCanonicalName());
+					Table table = entityClass.getAnnotation(Table.class);
+					if (table != null) {
+						dto.setTableName(table.name());
+					}
+				}
+				// resolve dto class
+				Class<?> dtoClass = service.getDtoClass();
+				if (dtoClass != null) {
+					dto.setDtoClass(dtoClass.getCanonicalName());
+				}
+				//
+				return dto;
+			})
+			.collect(Collectors.toList());
+		//
+		return new Resources<>(results);
 	}
 
 	@Override

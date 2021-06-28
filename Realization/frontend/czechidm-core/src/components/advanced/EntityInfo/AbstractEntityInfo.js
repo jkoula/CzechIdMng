@@ -542,7 +542,7 @@ AbstractEntityInfo.propTypes = {
   /**
    * Decorator
    */
-  face: PropTypes.oneOf(['text', 'link', 'popover', 'full']),
+  face: PropTypes.oneOf(['text', 'link', 'link-detail', 'popover', 'full']),
   /**
    * Shows link to full identity detail (if currently logged user has appropriate permission)
    */

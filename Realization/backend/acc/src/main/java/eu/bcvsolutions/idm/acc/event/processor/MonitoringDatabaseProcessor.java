@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.core.model.event.MonitoringEvent;
  * @author Vít Švanda
  *
  */
+@Deprecated(since = "11.1.0")
 @Component(MonitoringDatabaseProcessor.PROCESSOR_NAME)
 @Description("Monitoring of ACC database processor (count).")
 public class MonitoringDatabaseProcessor

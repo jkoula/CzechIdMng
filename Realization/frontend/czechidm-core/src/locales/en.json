@@ -342,7 +342,11 @@
       },
       "messages": "Messages history",
       "configuration": "Configuration",
-      "monitoring": "Monitoring",
+      "monitoring": {
+        "label": "Monitoring",
+        "header": "Monitoring",
+        "title": "Monitoring"
+      },
       "userLabel": "{{loggedUsername}}",
       "login": "$t(content.login.header)",
       "logout": "Log Out",
@@ -630,7 +634,8 @@
           "AUTOMATIC-ROLE-ATTRIBUTE-SELECT": "Select automatic role by attribute (SelectBox)",
           "BASE-PERMISSION-ENUM": "Base IdM permission",
           "OPERATION-STATE-ENUM": "Operation state",
-          "WORKFLOW-DEFINITION-SELECT": "Select workflow definition (SelectBox)"
+          "WORKFLOW-DEFINITION-SELECT": "Select workflow definition (SelectBox)",
+          "READ-DTO-SERVICE-SELECT": "Select registered service (SelectBox)"
         },
         "attributes": {
           "empty": "Form definition was found, but doesn't contain editable attributes.",
@@ -698,6 +703,14 @@
           "foundMore": {
             "title": "More records found",
             "message": "More records [{{counter}}] by given text [{{text}}] found. Expand the entered text to show record detail."
+          }
+        }
+      },
+      "NavigationMonitoring": {
+        "noData": "Monitoring does not report any warnings.",
+        "link": {
+          "all": {
+            "label": "Show all monitoring results ..."
           }
         }
       }
@@ -1189,7 +1202,9 @@
       "EXPORTIMPORT": "Export/Import",
       "DELEGATIONDEFINITION": "Delegation",
       "ENTITYEVENT": "Entity events",
-      "ENTITYSTATE": "Entity states"
+      "ENTITYSTATE": "Entity states",
+      "MONITORING": "Monitoring - settings",
+      "MONITORINGRESULT": "Monitoring - results"
     }
   },
   "content": {
@@ -1478,15 +1493,42 @@
         "message": "Configurable item [<strong>{{name}}</strong>] is already existing with value [<strong>{{value}}</strong>]. Do you want to overwrite it?"
       }
     },
-    "monitoring": {
-      "header": "Monitoring",
-      "title": "Monitoring",
-      "type": {
-        "monitoring-database": {
-          "name": "Number of records in selected database tables"
-          }
+    "monitorings": {
+      "header": "Settings",
+      "title": "Monitoring settings",
+      "filter": {
+        "text": {
+          "placeholder": "Evaluator type or description"
         }
       },
+      "edit": {
+        "header": "{{name}} <small> monitoring detail</small>"
+      },
+      "create": {
+        "header": "New monitoring setting"
+      },
+      "save": {
+        "success": "Monitoring setting  [{{name}}] successfully saved"
+      },
+      "tabs": {
+        "basic": "Basic information"
+      }
+    },
+    "monitoring-results": {
+      "header": "Results",
+      "title": "Monitoring results",
+      "filter": {
+        "text": {
+          "placeholder": "Evaluator type or description"
+        }
+      },
+      "edit": {
+        "header": "Monitoring result detail"
+      },
+      "tabs": {
+        "basic": "Basic information"
+      }
+    },
     "tasks-summary": {
       "summary": "Tasks list",
       "approvalTasks": "Approved tasks",
@@ -4994,13 +5036,83 @@
       "public": "Public",
       "confidential": "Confidential"
     },
-    "IdmMonitoringType": {
-      "_type": "Monitoring",
-      "name": "Name",
-      "value": "Value",
-      "module": "Module",
-      "level": "State",
-      "threshold": "Threshold value"
+    "Monitoring": {
+      "_type": "Monitoring setting",
+      "disabled": {
+        "label": "$t(label.disabled)",
+        "help": "Inactive monitoring will not be executed"
+      },
+      "instanceId": {
+        "label": "$t(entity.LongRunningTask.instanceId.label)",
+        "help": "$t(entity.LongRunningTask.instanceId.help)"
+      },
+      "description": {
+        "label": "Description"
+      },
+      "seq": {
+        "label": "Order",
+        "help": "Order is used in monitoring evaluation."
+      },
+      "evaluatorType": {
+        "label": "Evaluator type"
+      },
+      "evaluatorProperties": {
+        "label": "Configuration",
+        "title": "Evaluator configuration"
+      },
+      "checkPeriod": {
+        "label": "Delay [s].",
+        "help": "Delay in seconds between new monitoring evaluation. <strong>0s</strong> - monitoring will be evaluated, when server instance is started only or no other monitoring result is found (after monitoring is created / enabled)."
+      },
+      "executeDate": {
+        "label": "Valid from",
+        "help": "First fire time will be related to given date."
+      }
+    },
+    "MonitoringResult": {
+      "_type": "Monitoring result",
+      "evaluatorType": {
+        "label": "Evaluator type"
+      },
+      "evaluatorProperties": {
+        "label": "Configuration",
+        "title": "Evaluator configuration"
+      },
+      "created": {
+        "label": "$t(entity.created)"
+      },
+      "monitoringStarted": {
+        "label": "Started"
+      },
+      "duration": {
+        "label": "Monitoring duration"
+      },
+      "level": {
+        "label": "Level"
+      },
+      "result": {
+        "label": "Result"
+      },
+      "instanceId": {
+        "label": "$t(entity.LongRunningTask.instanceId.label)",
+        "help": "$t(entity.LongRunningTask.instanceId.help)"
+      },
+      "processedOrder": {
+        "label": "Processed order"
+      },
+      "value": {
+        "label": "Value"
+      },
+      "owner": {
+        "label": "Monitored record",
+        "help": "Link to monitored record."
+      },
+      "ownerType": {
+        "label": "Monitored record type"
+      },
+      "ownerId": {
+        "label": "Monitored record identifier"
+      }
     },
     "Audit": {
       "label": "Audit",
@@ -6391,6 +6503,31 @@
         "label": "Disable tokens",
         "help": "Disable selected tokens.",
         "icon": "fa:ban"
+      },
+      "core-monitoring-run-bulk-action": {
+        "label": "Run monitoring",
+        "help": "Execute selected monitoring settings.",
+        "icon": "play"
+      },
+      "core-monitoring-delete-bulk-action": {
+        "label": "$t(action.delete.action) monitoring settings",
+        "help": "$t(action.delete.action) selected monitoring settings.",
+        "icon": "$t(action.delete.icon)"
+      },
+      "core-monitoring-result-delete-bulk-action": {
+        "label": "$t(action.delete.action) monitoring results",
+        "help": "$t(action.delete.action) selected monitoring results.",
+        "icon": "$t(action.delete.icon)"
+      },
+      "core-monitoring-disable-bulk-action": {
+        "label": "Deactivate monitoring settings",
+        "help": "Deactivate selected monitoring settings",
+        "icon": "fa:ban"
+      },
+      "core-monitoring-enable-bulk-action": {
+        "label": "Activate monitoring settings",
+        "help": "Activate selected monitoring settings.",
+        "icon": "fa:check-square-o"
       }
     },
     "authorization-evaluator": {
@@ -6973,6 +7110,30 @@
           "set-contract-guarantee": {
             "label": "Set direct guarantee for new contract",
             "help": "Set currently logged user as direct guarantee for newly created contract."
+          }
+        }
+      }
+    },
+    "monitoring-evaluator": {
+      "core-h-2-database-monitoring-evaluator": {
+        "label": "Check H2 database usage",
+        "help": "Warning about H2 database usage. H2 database is not supposed to be used for test or production environment."
+      },
+      "core-demo-admin-monitoring-evaluator": {
+        "label": "Check demo admin credentials",
+        "help": "Warning about demo admin credentials are used."
+      },
+      "core-database-table-monitoring-evaluator": {
+        "label": "Check number of records in database table",
+        "help": "Warning about too many records in database table.",
+        "attributes": {
+          "threshold": {
+            "label": "Threshold",
+            "help": "Warning will be shown, when number of records in database table will be higher."
+          },
+          "service-bean-name": {
+            "label": "Database table",
+            "help": "Checked database table (checked type of record)."
           }
         }
       }
@@ -8196,6 +8357,26 @@
     "IDENTITY_UNIFORM_PASSWORD": {
       "title": "Uniform password.",
       "message": "Uniform password for [{{entity}}]."
+    },
+    "MONITORING_DATABASE_TABLE": {
+      "title": "Number of records in database table",
+      "message": "Database table [{{tableName}}] ([{{dtoName}}]) contains [{{count}}] records."
+    },
+    "MONITORING_DEMO_ADMIN_WARNING": {
+      "title": "Demo admin user is used",
+      "message": "Demo [admin] credentials are used. Change password for [admin] user."
+    },
+    "MONITORING_H2_DATABASE_ERROR": {
+      "title": "H2 database is used",
+      "message": "H2 database is used on server instance [{{instanceId}}]. H2 database is not supposed to be used for production environment."
+    },
+    "MONITORING_H2_DATABASE_WARNING": {
+      "title": "H2 database is used",
+      "message": "H2 database is used on server instance [{{instanceId}}]."
+    },
+    "MONITORING_H2_DATABASE_SUCCESS": {
+      "title": "H2 database is not used",
+      "message": "H2 database is not used on server instance [{{instanceId}}]. Used database [{{databaseName}}]."
     }
   },
   "validationError": {
@@ -8282,6 +8463,9 @@
     },
     "transaction-event-cache": {
       "description": "Cache for running asynchronous events. Cache is evicted automatically, when asynchronous event ends."
+    },
+    "monitoring-last-result-cache": {
+      "description": "Cache for last monitoring results."
     }
   }
 }

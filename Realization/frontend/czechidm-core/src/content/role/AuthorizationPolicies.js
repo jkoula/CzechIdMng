@@ -5,7 +5,7 @@ import SearchParameters from '../../domain/SearchParameters';
 import AuthorizationPolicyTable from './AuthorizationPolicyTable';
 
 /**
- * Automatic roles - tab on role detail.
+ * COnfigured authorization policies
  *
  * @author Radek Tomiška
  */

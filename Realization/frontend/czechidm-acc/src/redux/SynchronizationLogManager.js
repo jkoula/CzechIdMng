@@ -3,12 +3,10 @@ import { SynchronizationLogService } from '../services';
 
 const service = new SynchronizationLogService();
 
-export default class SynchronizationLogManager
- extends Managers.EntityManager {
-
-  constructor() {
-    super();
-  }
+/**
+ * @author Vít Švanda
+ */
+export default class SynchronizationLogManager extends Managers.EntityManager {
 
   getService() {
     return service;

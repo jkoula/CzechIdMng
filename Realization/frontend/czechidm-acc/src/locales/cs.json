@@ -1307,6 +1307,7 @@
       }
     },
     "SynchronizationLog": {
+      "_type": "Synchronizace - log",
       "running": "Spuštěna",
       "started": "Zahájena",
       "ended": "Ukončena",
@@ -1668,7 +1669,7 @@
         "URL_TITLE": ""
       }
     },
-    
+
     "RoleAttributeEnum": {
       "NAME": "Název (String)",
       "BASE_CODE": "Kód (String)",
@@ -2580,6 +2581,19 @@
         "label": "Opakovat provisioning operace (retry)",
         "help": "Opakovat neprovedené operace uložené ve frontě provisioningu (retry mechanismus). Při selhání provisioning operace se automaticky naplánuje čas dalšího pokusu. Tato úloha spustí operace v naplánovaném časem dalšího pokusu.",
         "icon": "component:scheduled-task"
+      }
+    },
+    "monitoring-evaluator": {
+      "acc-synchronization-monitoring-evaluator": {
+        "label": "Monitoring synchronizace",
+        "help": "Kontrola běhu synchronizace.",
+        "attributes": {
+          "synchronization": {
+            "label": "Synchronizace",
+            "placeholder": "Vyberte synchronizaci ...",
+            "help": "Kontrolovaná synchronizace."
+          }
+        }
       }
     }
   },
@@ -3554,6 +3568,22 @@
     "WIZARD_AD_GROUP_WRONG_MEMBER_CONNECTOR_TYPE": {
       "title": "Špatný typ konektoru",
       "message": "Vybraný systém nepoužívá MS AD konektor!"
+    },
+    "MONITORING_SYNCHRONIZATION_DISABLED": {
+      "title": "Synchronizace není aktivní",
+      "message": "Synchronizace [{{synchronizationName}}] na systému [{{systemName}}] není aktivní."
+    },
+    "MONITORING_SYNCHRONIZATION_NOT_EXECUTED": {
+      "title": "Synchronizace ještě neproběhla",
+      "message": "Synchronizace [{{synchronizationName}}] na systému [{{systemName}}] ještě nebyla spuštěna."
+    },
+    "MONITORING_SYNCHRONIZATION_OK": {
+      "title": "Synchronizace neobsahuje chyby",
+      "message": "Synchronizace [{{synchronizationName}}] na systému [{{systemName}}] neobsahuje chyby. Počet zpracovaných položek [{{count}}]."
+    },
+    "MONITORING_SYNCHRONIZATION_CONTAINS_ERROR": {
+      "title": "Synchronizace obsahuje chyby",
+      "message": "Synchronizace [{{synchronizationName}}] na systému [{{systemName}}] obsahuje chyby [{{count}}]."
     }
   },
   "processor": {

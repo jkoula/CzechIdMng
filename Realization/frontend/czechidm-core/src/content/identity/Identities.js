@@ -5,7 +5,7 @@ import { IdentityManager } from '../../redux';
 import IdentityTable from './IdentityTable';
 
 /**
- * List of identities
+ * List of identities.
  *
  * @author Radek Tomiška
  */
@@ -31,7 +31,7 @@ class Identities extends Basic.AbstractContent {
         { this.renderPageHeader() }
         <Basic.Panel>
           <IdentityTable
-            history={this.context.history}
+            history={ this.context.history }
             uiKey="identity-table"
             identityManager={ this.identityManager }
             filterOpened

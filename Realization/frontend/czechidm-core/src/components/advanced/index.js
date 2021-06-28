@@ -71,6 +71,7 @@ import AuditableInfo from './EntityInfo/AuditableInfo';
 import DetailHeader from './Content/DetailHeader';
 import CronGenerator from './CronGenerator/CronGenerator';
 import CodeableField from './CodeableField/CodeableField';
+import ReadDtoServiceSelect from './ReadDtoServiceSelect/ReadDtoServiceSelect';
 
 const Components = {
   Table,
@@ -147,7 +148,8 @@ const Components = {
   DetailHeader,
   CronGenerator,
   ScriptInfo,
-  CodeableField
+  CodeableField,
+  ReadDtoServiceSelect
 };
 
 Components.version = '11.1.0';
