@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -90,6 +91,11 @@ public class MsAdMappingIdentityAutoAttributesProcessor extends AbstractSystemMa
 	@Override
 	SystemEntityType getSystemEntityType() {
 		return SystemEntityType.IDENTITY;
+	}
+
+	@Override
+	protected SystemOperationType getSystemOperationType() {
+		return null;
 	}
 
 	@Override
