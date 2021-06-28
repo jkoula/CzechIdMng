@@ -1208,7 +1208,7 @@
         },
         "transformationUidScript": {
           "label": "Transformační skript identifikátoru ze systému",
-          "help": "Skript hledá dle identifikátoru zaslaného z password filtru odpovídající identitu v IdM. Výstup skriptu musí být IdmIdentityDto. Skriptu jsou předány následující parametry: 'system' systém ze kterého přišel požadavek na změnu hesla, 'username' identifikátor zaslaný z koncového systému, 'logIdentifier' identifikátor pomocí kterého jsou spojeny požadavky ze systému do IdM a 'systemAttributeMapping' který obsahuje mapování atributu ve kterém je difinované nastavení password filteru v IdM."
+          "help": "Skript hledá dle identifikátoru zaslaného z password filtru odpovídající identitu v IdM. Výstup skriptu musí být IdmIdentityDto. Skriptu jsou předány následující parametry: 'system' systém ze kterého přišel požadavek na změnu hesla, 'username' identifikátor zaslaný z koncového systému, 'logIdentifier' identifikátor pomocí kterého jsou spojeny požadavky ze systému do IdM a 'systemAttributeMapping' který obsahuje mapování atributu ve kterém je definované nastavení password filteru v IdM."
         }
       }
     },
