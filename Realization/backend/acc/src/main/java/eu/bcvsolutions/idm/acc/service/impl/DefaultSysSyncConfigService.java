@@ -51,11 +51,12 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ExportDescriptorDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
+import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
+import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 
 /**
- * Default synchronization config service
+ * Default synchronization config service.
  * 
  * @author svandav
  * @author Radek Tomiška
@@ -63,7 +64,7 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
  */
 @Service
 public class DefaultSysSyncConfigService
-		extends AbstractReadWriteDtoService<AbstractSysSyncConfigDto, SysSyncConfig, SysSyncConfigFilter>
+		extends AbstractEventableDtoService<AbstractSysSyncConfigDto, SysSyncConfig, SysSyncConfigFilter>
 		implements SysSyncConfigService {
 
 	private final SysSyncConfigRepository repository;
@@ -72,8 +73,11 @@ public class DefaultSysSyncConfigService
 	private SysSystemAttributeMappingService systemAttributeMappingService;
 
 	@Autowired
-	public DefaultSysSyncConfigService(SysSyncConfigRepository repository, SysSyncLogService synchronizationLogService) {
-		super(repository);
+	public DefaultSysSyncConfigService(
+			SysSyncConfigRepository repository,
+			SysSyncLogService synchronizationLogService,
+			EntityEventManager entityEventManager) {
+		super(repository, entityEventManager);
 		//
 		Assert.notNull(synchronizationLogService, "Service is required.");
 		//

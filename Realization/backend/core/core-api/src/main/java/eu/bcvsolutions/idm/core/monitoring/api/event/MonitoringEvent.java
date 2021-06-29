@@ -18,7 +18,7 @@ public class MonitoringEvent extends CoreEvent<IdmMonitoringDto> {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Supported event types
+	 * Supported event types.
 	 */
 	public enum MonitoringEventType implements EventType {
 		CREATE, UPDATE, DELETE, EXECUTE

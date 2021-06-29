@@ -64,6 +64,11 @@ public class DefaultIdmMonitoringService
 			predicates.add(builder.equal(root.get(IdmMonitoring_.instanceId), instanceId));
 		}
 		//
+		String evaluatorType = filter.getEvaluatorType();
+		if (StringUtils.isNotEmpty(evaluatorType)) {
+			predicates.add(builder.equal(root.get(IdmMonitoring_.evaluatorType), evaluatorType));
+		}
+		//
 		return predicates;
 	}
 }
