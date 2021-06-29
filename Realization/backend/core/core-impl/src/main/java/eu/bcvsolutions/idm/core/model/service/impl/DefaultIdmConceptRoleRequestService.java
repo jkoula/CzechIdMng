@@ -267,7 +267,9 @@ public class DefaultIdmConceptRoleRequestService extends
 		IdmConceptRoleRequestDto savedDto = super.saveInternal(dto);
 		if (dto != null && dto.getRole() != null) {
 			// TODO: concept role request hasn't events, after implement events for the dto, please remove this.
+			boolean isNew = false;
 			if (isNew(dto)) {
+				isNew = true;
 				dto = valueGeneratorManager.generate(dto);
 			}
 
@@ -279,6 +281,13 @@ public class DefaultIdmConceptRoleRequestService extends
 			List<IdmFormValueDto> attributeValues = dto.getEavs().size() == 1 && dto.getEavs().get(0) != null
 					? dto.getEavs().get(0).getValues()
 					: null;
+			// If concept is new, then we have to clear id of EAV values (new one have to be generated for this case).
+			if (isNew && attributeValues != null) {
+				attributeValues.forEach(value -> {
+					DtoUtils.clearAuditFields(value);
+					value.setId(null);
+				});
+			}
 					
 			// Load sub definition by role
 			IdmFormDefinitionDto formDefinitionDto = roleService.getFormAttributeSubdefinition(roleDto);
