@@ -5,9 +5,8 @@ import * as Utils from '../../utils';
 
 const formAttributeManager = new FormAttributeManager();
 
-
 /**
- * Long tunning task administration
+ * Long tunning task administration.
  *
  * @author Radek Tomiška
  */

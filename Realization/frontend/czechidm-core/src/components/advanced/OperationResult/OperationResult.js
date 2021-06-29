@@ -135,7 +135,7 @@ export default class OperationResult extends Basic.AbstractContextComponent {
           <Basic.Div style={{ float: 'left' }}>
             <Basic.EnumValue
               level={ message ? message.level : null }
-              value={value.state}
+              value={ value.state }
               enum={ OperationStateEnum }
               label={ stateLabel || (message && message.level === 'info' && value.state === 'EXCEPTION' ? this.i18n('label.warning') : null) }/>
           </Basic.Div>

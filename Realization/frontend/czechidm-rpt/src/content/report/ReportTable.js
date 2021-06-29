@@ -370,8 +370,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
               ({ rowIndex, data }) => {
                 return (
                   <Advanced.DetailButton
-                    title={this.i18n('button.detail')}
-                    onClick={this.loadDetail.bind(this, data[rowIndex])}/>
+                    title={ this.i18n('button.detail') }
+                    onClick={ this.loadDetail.bind(this, data[rowIndex]) }/>
                 );
               }
             }/>

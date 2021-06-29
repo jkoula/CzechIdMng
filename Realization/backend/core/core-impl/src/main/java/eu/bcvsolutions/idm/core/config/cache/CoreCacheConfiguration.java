@@ -20,6 +20,8 @@ import eu.bcvsolutions.idm.core.eav.api.domain.FormDefinitionCache;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultConfigurationService;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultGroovyScriptService;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
+import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizationManager;
 import eu.bcvsolutions.idm.core.security.api.service.TokenManager;
 import groovy.lang.Script;
@@ -173,6 +175,21 @@ public class CoreCacheConfiguration {
 			.withName(EntityEventManager.TRANSACTION_EVENT_CACHE_NAME)
 				.withKeyType(UUID.class) // user transaction id
 				.withValueType(HashSet.class) // unprocessed events
+				.build();
+	}
+	
+	/**
+	 * Define distributed cache for {@link MonitoringManager} - last monitoring results - results are evaluated on different instances, so synchronized cache is needed.
+	 *
+	 * @return last monitoring results (by monitoring evaluator identifier)
+	 * @since 11.1.0
+	 */
+	@Bean
+	public IdMCacheConfiguration monitoringLastResultCacheConfiguration() {
+		return DistributedIdMCacheConfiguration.<UUID, IdmMonitoringResultDto> builder()
+			.withName(MonitoringManager.LAST_RESULT_CACHE_NAME)
+				.withKeyType(UUID.class)
+				.withValueType(IdmMonitoringResultDto.class)
 				.build();
 	}
 }

@@ -116,7 +116,7 @@ public class DefaultIdmAuthorizationPolicyService
 					builder.like(builder.lower(root.get(IdmAuthorizationPolicy_.groupPermission)), "%" + text + "%"),
 					builder.like(builder.lower(root.get(IdmAuthorizationPolicy_.evaluatorType)), "%" + text + "%"),
 					builder.like(builder.lower(root.get(IdmAuthorizationPolicy_.description)), "%" + text + "%")
-					));
+			));
 		}
 		// role id
 		if (filter.getRoleId() != null) {
@@ -133,7 +133,7 @@ public class DefaultIdmAuthorizationPolicyService
 							builder.isNull(root.get(IdmAuthorizationPolicy_.groupPermission))
 							),
 					builder.equal(root.get(IdmAuthorizationPolicy_.authorizableType), filter.getAuthorizableType())
-					));
+			));
 		}
 		String groupPermission = filter.getGroupPermission();
 		if (StringUtils.isNotEmpty(groupPermission)) {

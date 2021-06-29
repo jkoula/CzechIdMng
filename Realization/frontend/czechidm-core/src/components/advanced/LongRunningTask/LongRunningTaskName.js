@@ -17,7 +17,7 @@ const formAttributeManager = new FormAttributeManager();
 export default class LongRunningTaskName extends Basic.AbstractContextComponent {
 
   render() {
-    const { rendered, showLoading, entity, supportedTasks, showTaskType, className, style, face } = this.props;
+    const { rendered, showLoading, entity, supportedTasks, showTaskType, showIcon, className, style, face } = this.props;
     //
     if (!rendered) {
       return null;
@@ -31,11 +31,13 @@ export default class LongRunningTaskName extends Basic.AbstractContextComponent 
     if (!entity) {
       return null;
     }
-    const simpleTaskType = Utils.Ui.getSimpleJavaType(entity.taskType);
+    const simpleTaskType = Utils.Ui.getSimpleJavaType(entity.taskType || entity.evaluatorType);
     //
     let _taskType;
     if (supportedTasks && supportedTasks.has(entity.taskType)) {
       _taskType = supportedTasks.get(entity.taskType);
+    } else if (supportedTasks && supportedTasks.has(entity.evaluatorType)) {
+      _taskType = supportedTasks.get(entity.evaluatorType);
     } else if (entity.taskProperties) {
       const bulkAction = entity.taskProperties['core:bulkAction'];
       // try to find form attributes from form definition
@@ -62,7 +64,8 @@ export default class LongRunningTaskName extends Basic.AbstractContextComponent 
             entity={ entity }
             supportedTasks={ supportedTasks }
             showLoading={ showLoading }
-            style={{ marginRight: 3 }}/>
+            style={{ marginRight: 3 }}
+            rendered={ showIcon }/>
           {
             showTaskType
             ?
@@ -114,6 +117,12 @@ LongRunningTaskName.propTypes = {
    */
   showTaskType: PropTypes.bool,
   /**
+   * Shows task icon.
+   *
+   * @since 11.1.0
+   */
+  showIcon: PropTypes.bool,
+  /**
    * Decorator
    */
   face: PropTypes.oneOf(['text', 'full'])
@@ -121,5 +130,6 @@ LongRunningTaskName.propTypes = {
 LongRunningTaskName.defaultProps = {
   ...Basic.AbstractContextComponent.defaultProps,
   showTaskType: true,
-  face: 'full'
+  face: 'full',
+  showIcon: true
 };

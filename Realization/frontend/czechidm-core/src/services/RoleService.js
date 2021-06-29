@@ -4,7 +4,7 @@ import SearchParameters from '../domain/SearchParameters';
 import * as Utils from '../utils';
 
 /**
- * Role's endpoint
+ * Role's endpoint.
  *
  * @author Radek Tomiška
  */
@@ -42,7 +42,7 @@ export default class RoleService extends AbstractRequestFormableService {
     if (!code) {
       return role.name;
     }
-    return `${role.name} (${code})`;
+    return `${ role.name } (${ code })`;
   }
 
   supportsAuthorization() {
@@ -67,7 +67,11 @@ export default class RoleService extends AbstractRequestFormableService {
    * @return {object} searchParameters
    */
   getDefaultSearchParameters() {
-    return super.getDefaultSearchParameters().setName(SearchParameters.NAME_QUICK).clearSort().setSort('name').setSort('environment');
+    return super.getDefaultSearchParameters()
+      .setName(SearchParameters.NAME_QUICK)
+      .clearSort()
+      .setSort('name')
+      .setSort('environment');
   }
 
   /**
@@ -75,7 +79,13 @@ export default class RoleService extends AbstractRequestFormableService {
    */
   getRootSearchParameters() {
     // root search - all roles can be roots
-    return this.getDefaultSearchParameters().setName(SearchParameters.NAME_AUTOCOMPLETE).clearSort().setSort('childrenCount', 'desc').setSort('name').setSort('environment').setSize(50);
+    return this.getDefaultSearchParameters()
+      .setName(SearchParameters.NAME_AUTOCOMPLETE)
+      .clearSort()
+      .setSort('childrenCount', 'desc')
+      .setSort('name')
+      .setSort('environment')
+      .setSize(50);
   }
 
   /**

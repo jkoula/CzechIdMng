@@ -17,7 +17,6 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
-
 @Relation(collectionRelation = "synchronizationLogs")
 public class SysSyncLogDto extends AbstractDto implements Loggable {
 

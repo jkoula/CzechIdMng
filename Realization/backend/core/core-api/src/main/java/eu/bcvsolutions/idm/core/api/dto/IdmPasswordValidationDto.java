@@ -74,7 +74,7 @@ public class IdmPasswordValidationDto implements Serializable {
     
     /**
      * Validation to check minimum days, before password can be changed again will be enforced, 
-     * even when password is changed under different identity (e.g. from password filter).
+     * even when password is changed under different identity except admin (e.g. from password filter).
      * 
      * @return true => validated
      * @since 11.0.0
@@ -85,7 +85,7 @@ public class IdmPasswordValidationDto implements Serializable {
     
     /**
      * Validation to check minimum days, before password can be changed again will be enforced, 
-     * even when password is changed under different identity (e.g. from password filter).
+     * even when password is changed under different identity except admin (e.g. from password filter).
      * 
      * @param enforceMinPasswordAgeValidation true => validated
      * @since 11.0.0

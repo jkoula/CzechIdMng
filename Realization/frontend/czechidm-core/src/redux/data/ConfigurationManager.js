@@ -155,6 +155,39 @@ export default class ConfigurationManager extends EntityManager {
   }
 
   /**
+   * Loads all registered read dto services.
+   *
+   * @return {action}
+   */
+  fetchReadDtoServices(cb = null) {
+    const uiKey = ConfigurationManager.UI_KEY_SUPPORTED_READ_DTO_SERVICES;
+    //
+    return (dispatch, getState) => {
+      const loaded = DataManager.getData(getState(), uiKey);
+      if (loaded) {
+        // we dont need to load them again - change depends on BE restart
+        if (cb) {
+          cb(loaded);
+        }
+      } else {
+        dispatch(this.dataManager.requestData(uiKey));
+        this.getService().getReadDtoServices()
+          .then(json => {
+            let services = null;
+            if (json._embedded && json._embedded.availableServices) {
+              services = json._embedded.availableServices;
+            }
+            dispatch(this.dataManager.receiveData(uiKey, services, cb));
+          })
+          .catch(error => {
+            // TODO: data uiKey
+            dispatch(this.dataManager.receiveError(null, uiKey, error, cb));
+          });
+      }
+    };
+  }
+
+  /**
    * Returns public setting value
    *
    * @deprecated @since 9.2.2 use getValue
@@ -335,3 +368,4 @@ ConfigurationManager.PUBLIC_CONFIGURATIONS = 'public-configurations'; // ui key 
 ConfigurationManager.ENVIRONMENT_CONFIGURATIONS = 'environment-configurations'; // ui key to data redux
 ConfigurationManager.FILE_CONFIGURATIONS = 'file-configurations'; // ui key to data redux
 ConfigurationManager.GUARDED_PROPERTY_NAMES = ['password', 'token', 'secret']; // automatically guarded property names
+ConfigurationManager.UI_KEY_SUPPORTED_READ_DTO_SERVICES = 'read-dto-services';

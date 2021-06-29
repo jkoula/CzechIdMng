@@ -77,5 +77,4 @@ EnumValue.defaultProps = {
   label: null
 };
 
-
 export default EnumValue;

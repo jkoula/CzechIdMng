@@ -53,12 +53,12 @@ export class FormDefinitionInfo extends AbstractEntityInfo {
   }
 
   /**
-   * Returns entity icon (null by default - icon will not be rendered)
+   * Returns entity icon (null by default - icon will not be rendered).
    *
    * @param  {object} entity
    */
   getEntityIcon() {
-    return 'fa:circle-o';
+    return 'component:form-definition';
   }
 }
 

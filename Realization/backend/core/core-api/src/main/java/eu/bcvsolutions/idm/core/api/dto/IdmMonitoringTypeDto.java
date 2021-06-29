@@ -1,9 +1,10 @@
 package eu.bcvsolutions.idm.core.api.dto;
 
-import com.google.common.annotations.Beta;
-import com.google.common.collect.Lists;
 import java.util.List;
+
 import org.springframework.hateoas.core.Relation;
+
+import com.google.common.collect.Lists;
 
 
 /**
@@ -11,9 +12,9 @@ import org.springframework.hateoas.core.Relation;
  *
  * @author Vít Švanda
  * @since 10.4.0
- *
+ * @deprecated monitoring refactored from scratch in 11.2.0
  */
-@Beta
+@Deprecated(since = "11.1.0")
 @Relation(collectionRelation = "monitoringTypes")
 public class IdmMonitoringTypeDto extends AbstractDto {
 

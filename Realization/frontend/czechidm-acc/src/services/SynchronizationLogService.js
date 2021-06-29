@@ -1,13 +1,19 @@
-import { Services } from 'czechidm-core';
-import { Domain } from 'czechidm-core';
+import { Domain, Services } from 'czechidm-core';
+import SynchronizationConfigService from './SynchronizationConfigService';
 
+/**
+ * Synchronizatin log service.
+ *
+ * @author Vít Švanda
+ * @Author Radek Tomiška
+ */
 export default class SynchronizationLogService extends Services.AbstractService {
 
   constructor() {
     super();
+    this.synchronizationConfigService = new SynchronizationConfigService();
   }
 
-  // dto
   supportsPatch() {
     return false;
   }
@@ -15,6 +21,11 @@ export default class SynchronizationLogService extends Services.AbstractService 
   getNiceLabel(entity) {
     if (!entity) {
       return '';
+    }
+    if (entity
+      && entity._embedded
+      && entity._embedded.synchronizationConfig) {
+      return this.synchronizationConfigService.getNiceLabel(entity._embedded.synchronizationConfig);
     }
     return entity.started;
   }

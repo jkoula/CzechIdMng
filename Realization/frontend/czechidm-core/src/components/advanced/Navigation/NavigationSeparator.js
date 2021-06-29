@@ -4,14 +4,18 @@ import PropTypes from 'prop-types';
 import * as Basic from '../../basic';
 
 /**
- * "<hr>" in navigation
+ * "<hr/>" in navigation.
  *
  * @author Radek Tomiška
  */
-export default class NavigationSeperator extends Basic.AbstractContextComponent {
+export default class NavigationSeparator extends Basic.AbstractContextComponent {
 
   render() {
-    const { text } = this.props;
+    const { text, rendered } = this.props;
+    //
+    if (!rendered) {
+      return null;
+    }
     //
     return (
       <li className="nav-separator divider" role="separator">
@@ -21,7 +25,8 @@ export default class NavigationSeperator extends Basic.AbstractContextComponent 
   }
 }
 
-NavigationSeperator.propTypes = {
+NavigationSeparator.propTypes = {
+  rendered: PropTypes.bool,
   text: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.node,
@@ -29,6 +34,7 @@ NavigationSeperator.propTypes = {
   ])
 };
 
-NavigationSeperator.defaultProps = {
+NavigationSeparator.defaultProps = {
+  rendered: true,
   text: null
 };

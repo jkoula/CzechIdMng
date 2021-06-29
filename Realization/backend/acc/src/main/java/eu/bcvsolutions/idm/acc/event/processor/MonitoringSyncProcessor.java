@@ -29,6 +29,7 @@ import java.text.MessageFormat;
  * @author Vít Švanda
  *
  */
+@Deprecated(since = "11.1.0")
 @Component(MonitoringSyncProcessor.PROCESSOR_NAME)
 @Description("Monitoring of ACC sync - processor.")
 public class MonitoringSyncProcessor

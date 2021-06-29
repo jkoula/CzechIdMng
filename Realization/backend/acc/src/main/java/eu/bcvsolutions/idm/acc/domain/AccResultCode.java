@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.domain.ResultCode;
+import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 
 /**
  * Enum class for formatting response messages (mainly errors).
@@ -186,14 +187,25 @@ public enum AccResultCode implements ResultCode {
 	SYNC_OF_ROLES_COMMON_ROLE_REQUEST(HttpStatus.CONTINUE, "Sync of roles - a common role request."),
 	SYNC_OF_ROLES_CATALOGUE_EXT_ID_IS_NULL(HttpStatus.BAD_REQUEST, "Sync of roles - Catalog cannot be created. External ID in the catalogue with code [%s] cannot be null!"),
 	SYNC_OF_ROLES_CATALOGUE_NAME_IS_NULL(HttpStatus.BAD_REQUEST, "Sync of roles - Catalog cannot be created. Name in a catalogue cannot be null!"),
-	SYNC_OF_ROLES_MAPPING_ATTRIBUTE_MISSING(HttpStatus.BAD_REQUEST, "Sync of roles - Mapping attribute [%s] missing!");
-
+	SYNC_OF_ROLES_MAPPING_ATTRIBUTE_MISSING(HttpStatus.BAD_REQUEST, "Sync of roles - Mapping attribute [%s] missing!"),
+	// Monitoring
+	MONITORING_SYNCHRONIZATION_DISABLED(HttpStatus.OK, "Synchronization [%s] on system [%s] is disabled", NotificationLevel.INFO),
+	MONITORING_SYNCHRONIZATION_NOT_EXECUTED(HttpStatus.OK, "Synchronization [%s] on system [%s] was not executed yet.", NotificationLevel.INFO),
+	MONITORING_SYNCHRONIZATION_OK(HttpStatus.OK, "Synchronization [%s] on system [%s] is ok. Count of processed items [%s].", NotificationLevel.SUCCESS),
+	MONITORING_SYNCHRONIZATION_CONTAINS_ERROR(HttpStatus.CONFLICT, "Synchronization [%s] on system [%s] contains error. Count of processed items [%s].", NotificationLevel.ERROR);
+	
 	private final HttpStatus status;
 	private final String message;
+	private final NotificationLevel level;
 
 	private AccResultCode(HttpStatus status, String message) {
+		this(status, message, null);
+	}
+	
+	private AccResultCode(HttpStatus status, String message, NotificationLevel level) {
 		this.message = message;
 		this.status = status;
+		this.level = level;
 	}
 
 	public String getCode() {
@@ -210,5 +222,10 @@ public enum AccResultCode implements ResultCode {
 
 	public String getMessage() {
 		return message;
+	}
+	
+	@Override
+	public NotificationLevel getLevel() {
+		return level;
 	}
 }

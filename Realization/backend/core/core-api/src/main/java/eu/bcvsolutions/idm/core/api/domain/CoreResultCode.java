@@ -396,7 +396,14 @@ public enum CoreResultCode implements ResultCode {
 	MANUAL_TASK_DELEGATION_DELEGATOR_MISSING(HttpStatus.BAD_REQUEST, "Delegator not found. You must apply a filter by delegator (assigned user)!"),
 	MANUAL_TASK_DELEGATION_DELEGATOR_IS_NOT_CANDIDATE(HttpStatus.BAD_REQUEST, "Delegator [%s] isn't candidate of the task [%s]!"),
 	// Uniform password
-	IDENTITY_UNIFORM_PASSWORD(HttpStatus.ACCEPTED, "Identity uniform password.");
+	IDENTITY_UNIFORM_PASSWORD(HttpStatus.ACCEPTED, "Identity uniform password."),
+	// Monitoring
+	MONITORING_DATABASE_TABLE(HttpStatus.FOUND, "Table [%s]([%s]) contains [%s] records.", NotificationLevel.SUCCESS),
+	MONITORING_H2_DATABASE_ERROR(HttpStatus.BAD_REQUEST, "H2 database is used on server instance [%s]. H2 database is not supposed to be used for production environment.", NotificationLevel.ERROR),
+	MONITORING_H2_DATABASE_WARNING(HttpStatus.BAD_REQUEST, "H2 database is used on server instance [%s] for [%s] environment.", NotificationLevel.WARNING),
+	MONITORING_H2_DATABASE_SUCCESS(HttpStatus.OK, "H2 database is not used on server instance [%s]. Used database [%s].", NotificationLevel.SUCCESS),
+	MONITORING_DEMO_ADMIN_WARNING(HttpStatus.BAD_REQUEST, "Demo admin credentials are used. Change admin user password.", NotificationLevel.WARNING),
+	MONITORING_DEMO_ADMIN_NOT_FOUND(HttpStatus.OK, "Demo admin user not found.", NotificationLevel.SUCCESS);
 	
 	private final HttpStatus status;
 	private final String message;

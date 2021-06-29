@@ -1,13 +1,13 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.google.common.annotations.Beta;
+
 import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringTypeDto;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.model.event.MonitoringEvent;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Monitoring manager
@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Vít Švanda
  * 
  * @since 10.3.0
- *
+ * @deprecated monitoring refactored from scratch in 11.2.0
  */
-@Beta
-@Service("monitoringManager")
+@Deprecated(since = "11.1.0")
+@Service("deprecatedMonitoringManager")
 public class DefaultMonitoringManager implements MonitoringManager {
 	
 	@Autowired

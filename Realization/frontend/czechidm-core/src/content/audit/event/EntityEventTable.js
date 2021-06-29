@@ -284,7 +284,7 @@ export class EntityEventTable extends Advanced.AbstractTableContent {
             }/>
           <Advanced.Column
             property="result"
-            width={75}
+            width={ 75 }
             cell={
               ({ rowIndex, data }) => {
                 const entity = data[rowIndex];
@@ -303,7 +303,7 @@ export class EntityEventTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             property="superOwnerId"
             header={ this.i18n('entity.EntityEvent.superOwnerId.label') }
-            rendered={_.includes(columns, 'superOwnerId')}
+            rendered={ _.includes(columns, 'superOwnerId') }
             cell={
               ({ rowIndex, data, property }) => {
                 // TODO: add owner type int persistent entity

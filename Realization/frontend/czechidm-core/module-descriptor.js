@@ -1139,7 +1139,7 @@ module.exports = {
             authorities: [
               'CONFIGURATION_READ', 'MODULE_READ', 'GENERATEVALUE_READ',
               'SCHEDULER_READ', 'FORMDEFINITION_READ', 'FORMPROJECTION_READ', 'PASSWORDPOLICY_READ', 'SCRIPT_READ',
-              'CONFIDENTIALSTORAGEVALUE_READ', 'CODELIST_READ', 'EXPORTIMPORT_READ'
+              'CONFIDENTIALSTORAGEVALUE_READ', 'CODELIST_READ', 'EXPORTIMPORT_READ', 'MONITORING_READ', 'MONITORINGRESULT_READ'
             ]
           }
         ],
@@ -1154,11 +1154,33 @@ module.exports = {
           },
           {
             id: 'monitoring',
-            labelKey: 'navigation.menu.monitoring',
-            icon: 'fa:heartbeat',
+            labelKey: 'navigation.menu.monitoring.label',
+            icon: 'component:monitoring',
             order: 120,
-            path: '/monitorings',
-            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['CONFIGURATION_READ'] } ]
+            path: '/monitoring/monitoring-results',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ', 'MONITORINGRESULT_READ'] } ],
+            items: [
+              {
+                id: 'monitoring-results',
+                labelKey: 'content.monitoring-results.header',
+                titleKey: 'content.monitoring-results.title',
+                icon: 'component:monitoring-results',
+                order: 10,
+                path: '/monitoring/monitoring-results',
+                type: 'TAB',
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORINGRESULT_READ'] } ]
+              },
+              {
+                id: 'monitorings',
+                labelKey: 'content.monitorings.header',
+                titleKey: 'content.monitorings.title',
+                icon: 'component:monitoring',
+                order: 420,
+                path: '/monitoring/monitorings',
+                type: 'TAB',
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ]
+              }
+            ]
           },
           {
             id: 'modules',

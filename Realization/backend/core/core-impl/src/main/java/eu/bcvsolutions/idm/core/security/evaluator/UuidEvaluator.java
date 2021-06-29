@@ -9,13 +9,13 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 
 /**
- * Share entity with uuid
+ * Share entity with uuid.
  * 
  * @author Radek Tomiška
  *
  */
 @Component
-@Description("Share entity by uuid")
+@Description("Share entity by uuid.")
 public class UuidEvaluator extends AbstractUuidEvaluator<Identifiable> {
 	
 	@Override

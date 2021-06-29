@@ -4,7 +4,7 @@ import DataManager from './DataManager';
 import IncompatibleRoleManager from './IncompatibleRoleManager';
 
 /**
- * Operations with RoleService
+ * Operations with RoleService.
  *
  * @author Radek Tomiška
  */
@@ -108,13 +108,13 @@ export default class RoleManager extends AbstractRequestFormableManager {
       dispatch(this.dataManager.requestData(uiKey));
       //
       this.getService().getAttributeFormDefinition(id)
-      .then(json => {
-        dispatch(this.dataManager.receiveData(uiKey, json));
-      })
-      .catch(error => {
-        // TODO: data uiKey
-        dispatch(this.receiveError(null, uiKey, error));
-      });
+        .then(json => {
+          dispatch(this.dataManager.receiveData(uiKey, json));
+        })
+        .catch(error => {
+          // TODO: data uiKey
+          dispatch(this.receiveError(null, uiKey, error));
+        });
     };
   }
 

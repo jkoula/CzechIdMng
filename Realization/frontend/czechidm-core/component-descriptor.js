@@ -871,6 +871,33 @@ module.exports = {
       type: 'icon',
       entityType: ['localization'],
       component: 'fa:language'
+    },
+    {
+      id: 'monitoring-icon',
+      type: 'icon',
+      entityType: ['monitoring'],
+      component: 'fa:heartbeat'
+    },
+    {
+      id: 'monitoring-result-icon',
+      type: 'icon',
+      entityType: ['monitoringResult', 'monitoring-result', 'monitoring-results'],
+      component: require('./src/components/advanced/Icon/MonitoringIcon')
+    },
+    {
+      id: 'monitoring-info',
+      type: 'entity-info',
+      entityType: ['monitoring', 'IdmMonitoringDto', 'IdmMonitoring'],
+      component: require('./src/components/advanced/MonitoringInfo/MonitoringInfo').default,
+      manager: require('./src/redux').MonitoringManager
+    },
+    {
+      id: 'read-dto-service-form-value',
+      type: 'form-attribute-renderer',
+      persistentType: 'TEXT',
+      faceType: 'READ-DTO-SERVICE-SELECT',
+      component: require('./src/components/advanced/Form/ReadDtoServiceSelectFormAttributeRenderer'),
+      labelKey: 'core:component.advanced.EavForm.faceType.READ-DTO-SERVICE-SELECT'
     }
   ]
 };

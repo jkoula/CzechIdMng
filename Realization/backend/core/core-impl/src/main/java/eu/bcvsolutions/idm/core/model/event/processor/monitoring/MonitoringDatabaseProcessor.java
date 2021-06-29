@@ -23,6 +23,7 @@ import java.text.MessageFormat;
  * @author Vít Švanda
  *
  */
+@Deprecated(since = "11.1.0")
 @Component(MonitoringDatabaseProcessor.PROCESSOR_NAME)
 @Description("Monitoring of core database processor (count).")
 public class MonitoringDatabaseProcessor

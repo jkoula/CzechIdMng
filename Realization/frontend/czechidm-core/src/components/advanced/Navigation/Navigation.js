@@ -26,13 +26,14 @@ import {
 import NavigationItem from './NavigationItem';
 import NavigationSeparator from './NavigationSeparator';
 import NavigationSearch from './NavigationSearch';
-
+import NavigationMonitoring from './NavigationMonitoring';
+//
 const componentService = new ComponentService();
 const identityManager = new IdentityManager();
 const securityManager = new SecurityManager();
 
 /**
- * Top navigation
+ * Top navigation.
  *
  * @author Radek Tomiška
  */
@@ -76,7 +77,7 @@ export class Navigation extends Basic.AbstractContent {
 
     if (item.labelKey) {
       return (
-        <span>{this.i18n(item.labelKey, labelParams)}</span>
+        <span>{ this.i18n(item.labelKey, labelParams) }</span>
       );
     }
     if (item.label) {
@@ -389,10 +390,17 @@ export class Navigation extends Basic.AbstractContent {
   }
 
   render() {
-    const { environment, userContext, navigationCollapsed, rendered, i18nReady } = this.props;
+    const {
+      environment,
+      userContext,
+      navigationCollapsed,
+      rendered,
+      i18nReady,
+      location
+    } = this.props;
     const { collapsed } = this.state;
     //
-    if (!rendered) { 
+    if (!rendered) {
       return false;
     }
 
@@ -623,6 +631,11 @@ export class Navigation extends Basic.AbstractContent {
                     identityMenu
                   }
                   {
+                    !SecurityManager.hasAuthority('MONITORINGRESULT_READ')
+                    ||
+                    <NavigationMonitoring location={ location }/>
+                  }
+                  {
                     userContext.isExpired
                     ||
                     systemItems
@@ -681,8 +694,8 @@ function select(state) {
     userContext: state.security.userContext,
     i18nReady: state.config.get('i18nReady'),
     identity: identityManager.getEntity(state, identifier),
-    _imageUrl: profile ? profile.imageUrl : null,
-    searchShowLoading: DataManager.isShowLoading(state, 'search') || DataManager.isShowLoading(state, 'search2')
+    searchShowLoading: DataManager.isShowLoading(state, 'search') || DataManager.isShowLoading(state, 'search2'),
+    _imageUrl: profile ? profile.imageUrl : null
   };
 }
 

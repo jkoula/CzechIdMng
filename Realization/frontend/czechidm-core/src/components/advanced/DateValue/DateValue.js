@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Basic from '../../basic';
 
 /**
- * Simple date formatter with default format from localization
+ * Simple date formatter with default format from localization.
  *
  * @author Radek Tomiška
  */
@@ -26,7 +26,7 @@ class DateValue extends Basic.AbstractContextComponent {
     }
 
     return (
-      <Basic.DateValue format={_format} {...others}/>
+      <Basic.DateValue format={ _format } { ...others }/>
     );
   }
 }
@@ -43,6 +43,5 @@ DateValue.defaultProps = {
   ...Basic.DateValue.defaultProps,
   showTime: false
 };
-
 
 export default DateValue;

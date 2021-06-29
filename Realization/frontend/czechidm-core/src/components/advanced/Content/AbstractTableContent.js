@@ -82,13 +82,13 @@ export default class AbstractTableContent extends Basic.AbstractContent {
   /**
    * Close modal detail
    */
-  closeDetail() {
+  closeDetail(cb = null) {
     this.setState({
       detail: {
         show: false,
         entity: {}
       }
-    });
+    }, cb);
   }
 
   getFormComponent() {

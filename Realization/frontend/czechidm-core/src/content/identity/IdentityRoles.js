@@ -19,8 +19,8 @@ import {
   RoleRequestManager,
   CodeListManager,
   ConfigurationManager,
-  LongPollingManager}
-  from '../../redux';
+  LongPollingManager
+} from '../../redux';
 import RoleRequestTable from '../requestrole/RoleRequestTable';
 import IdentityRoleTableComponent, { IdentityRoleTable } from './IdentityRoleTable';
 import IdentitiesInfo from './IdentitiesInfo';

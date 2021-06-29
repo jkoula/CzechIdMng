@@ -48,6 +48,7 @@ import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmEntityEventService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.ecm.api.entity.AttachableEntity;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
@@ -383,7 +384,7 @@ public class IdmEntityEventController extends AbstractEventableDtoController<Idm
 					LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getOwnerType(), ex);
 				}
 			}
-			dto.getEmbedded().put("ownerId", loadedDtos.get(ownerId));
+			dto.getEmbedded().put(AttachableEntity.PARAMETER_OWNER_ID, loadedDtos.get(ownerId));
 		});
 		return results;
 	}

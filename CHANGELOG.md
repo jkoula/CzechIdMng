@@ -1,12 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [11.0.0]
+## [11.1.0]
 
 ### Administrator
 
-- 🟢 [#2815](https://redmine.czechidm.com/issues/2815) -  Role catalogue item code is hidden in role catalogue tree by default (in role select and agendas). Set application property ``idm.pub.app.show.roleCatalogue.tree.code=true``, then code will be shown in tree again.
+- 🟢 [#2815](https://redmine.czechidm.com/issues/2815) - Role catalogue item code is hidden in role catalogue tree by default (in role select and agendas). Set application property ``idm.pub.app.show.roleCatalogue.tree.code=true``, then code will be shown in tree again.
 
+### Developer
+
+- 🟢 [#1865](https://redmine.czechidm.com/issues/1865) - Monitoring agenda was redesigned. Monitoring evaluators can be registered from custom module now.
 
 ## [11.0.0]
 

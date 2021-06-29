@@ -5,8 +5,6 @@ import org.springframework.http.HttpStatus;
 /**
  * Common notification / operation / action level.
  * 
- * TODO: rename, move to core package level is used throuh application, not just for notification.
- * 
  * @author Radek Tomiška
  */
 public enum NotificationLevel {

@@ -1,4 +1,3 @@
-
 /**
  * Long polling service
  *

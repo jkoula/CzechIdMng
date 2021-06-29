@@ -1,6 +1,9 @@
 package eu.bcvsolutions.idm.core.api.event.processor;
 
-import com.google.common.annotations.Beta;
+import java.text.MessageFormat;
+
+import javax.persistence.Table;
+
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
@@ -8,16 +11,15 @@ import eu.bcvsolutions.idm.core.api.event.EventType;
 import eu.bcvsolutions.idm.core.api.service.BaseDtoService;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
-import java.text.MessageFormat;
-import javax.persistence.Table;
 
 /**
  * Abstract processor for databe monitoring
  *
  * @author Vít Švanda
  * @param <DTO>
+ * @deprecated @since 11.1.0 monitoring refactored from scratch.
  */
-@Beta
+@Deprecated
 public abstract class AbstractMonitoringDatabaseProcessor<DTO extends AbstractDto> extends CoreEventProcessor<DTO> {
 	
 	public static String MONITORING_TYPE_DATABASE = "monitoring-database";

@@ -19,6 +19,7 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Vít Švanda
  *
  */
+@SuppressWarnings("deprecation")
 public class MonitoringIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired
@@ -39,6 +40,7 @@ public class MonitoringIntegrationTest extends AbstractIntegrationTest {
 	 * Green line test for DB count.
 	 */
 	@Test
+	@Deprecated
 	public void testDatabaseCount() {
 		IdmMonitoringTypeDto monitoringType = monitoringManager.check(AbstractMonitoringDatabaseProcessor.MONITORING_TYPE_DATABASE);
 		Assert.assertNotNull(monitoringType);
