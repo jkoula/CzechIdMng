@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.domain.RequestState;
+import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -419,6 +421,10 @@ public class DefaultIdmRequestIdentityRoleService extends
 		if (formInstanceDto != null) {
 			concept.getEavs().clear();
 			concept.getEavs().add(formInstanceDto);
+			// If concept is in the terminated state, then we need to skip validation (because for example, for unique can be false positive).
+			if (concept.getState() != null && concept.getState().isTerminatedState()){
+				return;
+			}
 			// Validate the concept
 			List<InvalidFormAttributeDto> validationResults = formService.validate(formInstanceDto);
 			formInstanceDto.setValidationErrors(formService.validate(formInstanceDto));
