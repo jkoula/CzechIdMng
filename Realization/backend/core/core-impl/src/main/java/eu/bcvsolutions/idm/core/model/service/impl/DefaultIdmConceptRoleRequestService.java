@@ -1,15 +1,19 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.exception.InvalidFormException;
+import eu.bcvsolutions.idm.core.api.service.ContractSliceManager;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+import java.util.stream.Collectors;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -277,10 +281,17 @@ public class DefaultIdmConceptRoleRequestService extends
 			if (roleDto == null) {
 				throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", dto.getRole()));
 			}
+			
+			List<InvalidFormAttributeDto> validationErrors = validateFormAttributes(dto);
+			
+			if (validationErrors != null && !validationErrors.isEmpty()) {
+				throw new InvalidFormException(validationErrors);
+			}
 
 			List<IdmFormValueDto> attributeValues = dto.getEavs().size() == 1 && dto.getEavs().get(0) != null
 					? dto.getEavs().get(0).getValues()
 					: null;
+			
 			// If concept is new, then we have to clear id of EAV values (new one have to be generated for this case).
 			if (isNew && attributeValues != null) {
 				attributeValues.forEach(value -> {
@@ -292,8 +303,8 @@ public class DefaultIdmConceptRoleRequestService extends
 			// Load sub definition by role
 			IdmFormDefinitionDto formDefinitionDto = roleService.getFormAttributeSubdefinition(roleDto);
 			if (formDefinitionDto != null) {
-				// Save form values for sub-definition
-				List<IdmFormValueDto> savedValues = formService.saveValues(savedDto, formDefinitionDto, attributeValues);
+				// Save form values for sub-definition. Validation is skipped. Was made before in this method, because now can be id of values null.
+				List<IdmFormValueDto> savedValues = formService.saveFormInstance(savedDto, formDefinitionDto, attributeValues, false).getValues();
 				IdmFormInstanceDto formInstance = new IdmFormInstanceDto();
 				formInstance.setValues(savedValues);
 				savedDto.getEavs().clear();
@@ -475,6 +486,52 @@ public class DefaultIdmConceptRoleRequestService extends
 		}
 		IdmFormInstanceDto formInstanceDto = this.getRoleAttributeValues(concept, false);
 		if (formInstanceDto != null) {
+			
+			UUID identityRoleId = null;
+			IdmIdentityRoleDto identityRoleDto = DtoUtils.getEmbedded(concept, IdmConceptRoleRequest_.identityRole,
+					IdmIdentityRoleDto.class, null);
+			if(identityRoleDto == null) {
+				identityRoleId = concept.getIdentityRole();
+			} else {
+				identityRoleId = identityRoleDto.getId();
+			}
+			
+			if (identityRoleId != null && ConceptRoleRequestOperation.UPDATE == concept.getOperation()) {
+
+				// Cache for save original ID of concepts.
+				// Id will be replaced by identity-role id and have to be returned after 
+				// validation back, because formInstance is not immutable.
+				Map<UUID, UUID> identityRoleConceptValueMap = new HashMap<>();
+
+				// Find identity role value for concept value and change ID of value (because validation have to be made via identityRole).	
+				UUID finalIdentityRoleId = identityRoleId;
+				formInstanceDto.getValues().forEach(value -> {
+					IdmFormAttributeDto formAttributeDto = new IdmFormAttributeDto();
+					formAttributeDto.setId(value.getFormAttribute());
+					formAttributeDto.setFormDefinition(formInstanceDto.getFormDefinition().getId());
+
+					IdmFormValueDto identityRoleValueDto = formService.getValues(new IdmIdentityRoleDto(finalIdentityRoleId), formAttributeDto)
+							.stream()
+							.filter(identityRoleValue -> identityRoleValue.getSeq() == value.getSeq())
+							.findFirst()
+							.orElse(null);
+					
+					// Replace concept IDs by identity-role IDs.
+					if (identityRoleValueDto != null) {
+						identityRoleConceptValueMap.put(identityRoleValueDto.getId(), value.getId());
+						value.setId(identityRoleValueDto.getId());
+					}
+				});
+				List<InvalidFormAttributeDto> validationErrors = formService.validate(formInstanceDto);
+
+				// Set IDs of concept back to values (formInstance is not immutable).
+				formInstanceDto.getValues().forEach(value -> {
+					if (identityRoleConceptValueMap.containsKey(value.getId())) {
+						value.setId(identityRoleConceptValueMap.get(value.getId()));
+					}
+				});
+				return validationErrors;
+			}
 			return formService.validate(formInstanceDto);
 		}
 		return null;
