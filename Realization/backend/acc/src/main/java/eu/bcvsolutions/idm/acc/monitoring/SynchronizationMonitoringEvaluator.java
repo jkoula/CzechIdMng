@@ -45,8 +45,8 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
  * @author Radek Tomiška
  * @since 11.1.0
  */
-@Component(SynchronizationMonitoringEvaluator.NAME)
 @Enabled(AccModuleDescriptor.MODULE_ID)
+@Component(SynchronizationMonitoringEvaluator.NAME)
 @Description("Synchronization monitoring.")
 public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvaluator {
 	

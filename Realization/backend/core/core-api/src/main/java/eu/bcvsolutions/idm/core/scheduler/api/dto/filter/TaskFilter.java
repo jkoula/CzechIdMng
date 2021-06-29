@@ -16,6 +16,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.Task;
 public class TaskFilter extends DataFilter {
 
 	public static final String PARAMETER_INSTANCE_ID = IdmLongRunningTaskFilter.PARAMETER_INSTANCE_ID;
+	public static final String PARAMETER_TASK_TYPE = IdmLongRunningTaskFilter.PARAMETER_TASK_TYPE;
 	
     public TaskFilter() {
         this(new LinkedMultiValueMap<>());
@@ -47,5 +48,25 @@ public class TaskFilter extends DataFilter {
      */
 	public void setInstanceId(String instanceId) {
 		set(PARAMETER_INSTANCE_ID, instanceId);
+	}
+	
+	/**
+	 * Scheduled task by task executor canonical name (equals).
+	 * 
+	 * @return canonical class name
+	 * @since 11.1.0
+	 */
+	public String getTaskType() {
+		return getParameterConverter().toString(getData(), PARAMETER_TASK_TYPE);
+	}
+
+	/**
+	 * Scheduled task by task executor canonical name (equals).
+	 * 
+	 * @param taskType canonical class name
+	 * @since 11.1.0
+	 */
+	public void setTaskType(String taskType) {
+		set(PARAMETER_TASK_TYPE, taskType);
 	}
 }

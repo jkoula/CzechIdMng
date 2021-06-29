@@ -9,7 +9,15 @@ import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
 import * as Domain from '../../domain';
 //
-import { MonitoringManager, MonitoringResultManager, DataManager, FormAttributeManager, ConfigurationManager } from '../../redux';
+import {
+  MonitoringManager,
+  MonitoringResultManager,
+  DataManager,
+  FormAttributeManager,
+  ConfigurationManager,
+  SecurityManager
+} from '../../redux';
+import MonitoringResultTable from './MonitoringResultTable';
 //
 const formAttributeManager = new FormAttributeManager();
 // default manager
@@ -167,7 +175,9 @@ export class MonitoringTable extends Advanced.AbstractTableContent {
 
   afterSave(entity, error) {
     if (!error) {
-      this.addMessage({ message: this.i18n('save.success', { count: 1, record: this.getManager().getNiceLabel(entity) }) });
+      this.addMessage({
+        message: this.i18n('save.success', { count: 1, name: this.getManager().getNiceLabel(entity, this.props.supportedEvaluators) })
+      });
       // TODO: trimmed vs. not trimmed view ...
       this.refs.table.reload();
       this.context.store.dispatch(monitoringResultManager.fetchLastMonitoringResults());
@@ -226,6 +236,11 @@ export class MonitoringTable extends Advanced.AbstractTableContent {
     }
     //
     const _supportedEvaluators = this._getSupportedEvaluators();
+    //
+    let resultForceSearchParameters = new Domain.SearchParameters();
+    if (detail.entity) {
+      resultForceSearchParameters = resultForceSearchParameters.setFilter('monitoring', detail.entity.id);
+    }
     //
     return (
       <Basic.Div>
@@ -419,6 +434,31 @@ export class MonitoringTable extends Advanced.AbstractTableContent {
                   helpBlock={ this.i18n('entity.Monitoring.disabled.help') }/>
 
               </Basic.AbstractForm>
+
+              {
+                !SecurityManager.hasAuthority('MONITORINGRESULT_READ')
+                ||
+                <Basic.Div>
+                  <Basic.ContentHeader
+                    text={ this.i18n('content.monitoring-results.header') }
+                    style={{ marginBottom: 0 }}
+                    rendered={ !Utils.Entity.isNew(detail.entity) } />
+
+                  <MonitoringResultTable
+                    ref="monitoringResultTable"
+                    showFilter={ false }
+                    showToolbar
+                    showRowSelection={ false }
+                    history={ this.context.history }
+                    location={ this.props.location }
+                    columns={ ['result', 'created', 'owner', 'value', 'instanceId'] }
+                    match={ this.props.match }
+                    uiKey={ `monitoring-monitoring-result-table-${ detail.entity.id }` }
+                    rendered={ !Utils.Entity.isNew(detail.entity) }
+                    forceSearchParameters={ resultForceSearchParameters }
+                    className="no-margin"/>
+                </Basic.Div>
+              }
             </Basic.Modal.Body>
 
             <Basic.Modal.Footer>

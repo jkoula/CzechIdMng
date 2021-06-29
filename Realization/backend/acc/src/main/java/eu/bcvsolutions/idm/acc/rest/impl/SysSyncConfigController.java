@@ -34,7 +34,7 @@ import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
-import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
+import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -46,7 +46,7 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;;
 
 /**
- * System synchronization configurations
+ * System synchronization configurations.
  * 
  * @author svandav
  *
@@ -59,7 +59,7 @@ import io.swagger.annotations.AuthorizationScope;;
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE, //
 		consumes = MediaType.APPLICATION_JSON_VALUE)
 public class SysSyncConfigController
-		extends AbstractReadWriteDtoController<AbstractSysSyncConfigDto, SysSyncConfigFilter> {
+		extends AbstractEventableDtoController<AbstractSysSyncConfigDto, SysSyncConfigFilter> {
 
 	protected static final String TAG = "Synchronization - configurations";
 	//

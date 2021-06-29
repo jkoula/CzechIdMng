@@ -1,21 +1,25 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
+import java.util.List;
+import java.util.UUID;
+
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.api.service.CloneableService;
-import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
-import java.util.List;
-import java.util.UUID;
+import eu.bcvsolutions.idm.core.api.service.EventableDtoService;
 
 /**
- * Synchronization config service
+ * Synchronization config service.
  * 
  * @author Vít Švanda
  *
  */
-public interface SysSyncConfigService extends ReadWriteDtoService<AbstractSysSyncConfigDto, SysSyncConfigFilter>, CloneableService<AbstractSysSyncConfigDto>, ScriptEnabled {
+public interface SysSyncConfigService extends 
+		EventableDtoService<AbstractSysSyncConfigDto, SysSyncConfigFilter>, 
+		CloneableService<AbstractSysSyncConfigDto>, 
+		ScriptEnabled {
 
 	/**
 	 * Method check if synchronization with given config running.

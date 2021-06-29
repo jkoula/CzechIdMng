@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 public class IdmMonitoringFilter extends DataFilter implements DisableableFilter {
 	
 	public static final String PARAMETER_INSTANCE_ID = ConfigurationService.PROPERTY_INSTANCE_ID;
+	public static final String PARAMETER_EVALUATOR_TYPE = "evaluatorType";
 	
 	public IdmMonitoringFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -49,4 +50,21 @@ public class IdmMonitoringFilter extends DataFilter implements DisableableFilter
 		set(PARAMETER_INSTANCE_ID, instanceId);
 	}
 
+	/**
+	 * Monitoring evaluator type (canonical class name, equals).
+	 * 
+	 * @return canonical class name
+	 */
+	public String getEvaluatorType() {
+		return getParameterConverter().toString(getData(), PARAMETER_EVALUATOR_TYPE);
+	}
+
+	/**
+	 * Monitoring evaluator type (canonical class name, equals).
+	 * 
+	 * @param evaluatorType canonical class name
+	 */
+	public void setEvaluatorType(String evaluatorType) {
+		set(PARAMETER_EVALUATOR_TYPE, evaluatorType);
+	}
 }

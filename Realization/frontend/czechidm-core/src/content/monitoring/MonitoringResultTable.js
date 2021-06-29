@@ -127,7 +127,11 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
 
   closeDetail() {
     super.closeDetail(() => {
-      this.context.history.replace('/monitoring/monitoring-results');
+      const { forceSearchParameters } = this.props;
+      //
+      if (!forceSearchParameters || !forceSearchParameters.getFilters().has('monitoring')) {
+        this.context.history.replace('/monitoring/monitoring-results');
+      }
     });
   }
 
@@ -137,6 +141,10 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
       rendered,
       className,
       supportedEvaluators,
+      forceSearchParameters,
+      showFilter,
+      showToolbar,
+      showRowSelection,
       _showLoading
     } = this.props;
     const { filterOpened, detail } = this.state;
@@ -205,13 +213,16 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
               return Utils.Ui.getDisabledRowClass(entity);
             }
           }
-          showRowSelection
+          showRowSelection={ showRowSelection }
+          showFilter={ showFilter }
+          showToolbar={ showToolbar }
           className={ className }
           afterBulkAction={
             () => {
               this.context.store.dispatch(this.getManager().fetchLastMonitoringResults());
             }
           }
+          forceSearchParameters={ forceSearchParameters }
           _searchParameters={ this.getSearchParameters() }>
           <Advanced.Column
             property=""
@@ -242,6 +253,11 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
               }
             }
             rendered={ _.includes(columns, 'result') }/>
+          <Advanced.Column
+            property="created"
+            sort
+            face="datetime"
+            rendered={ _.includes(columns, 'created') }/>
           <Advanced.Column
             property="evaluatorType"
             header={ this.i18n('entity.MonitoringResult.evaluatorType.label') }
@@ -307,11 +323,6 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             property="value"
             rendered={ _.includes(columns, 'value') }/>
-          <Advanced.Column
-            property="created"
-            sort
-            face="datetime"
-            rendered={ _.includes(columns, 'created') }/>
         </Advanced.Table>
 
         <Basic.Modal
@@ -437,13 +448,18 @@ MonitoringResultTable.propTypes = {
   /**
    * Rendered
    */
-  rendered: PropTypes.bool
+  rendered: PropTypes.bool,
+  /**
+   * "Hard filters"
+   */
+  forceSearchParameters: PropTypes.object
 };
 
 MonitoringResultTable.defaultProps = {
-  columns: ['result', 'evaluatorType', 'evaluatorProperties', 'owner', 'value', 'created', 'instanceId'],
+  columns: ['result', 'created', 'evaluatorType', 'evaluatorProperties', 'owner', 'value', 'instanceId'],
   filterOpened: false,
   rendered: true,
+  showRowSelection: true
 };
 
 function select(state, component) {

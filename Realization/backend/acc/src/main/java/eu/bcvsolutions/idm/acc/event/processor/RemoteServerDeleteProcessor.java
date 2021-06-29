@@ -64,7 +64,7 @@ public class RemoteServerDeleteProcessor extends CoreEventProcessor<SysConnector
 		// deletes all confidential values
 		confidentialStorage.deleteAll(remoteServerId, SysRemoteServer.class);
 		//
-		// deletes identity
+		// deletes server
 		service.deleteInternal(remoteServer);
 		//
 		return new DefaultEventResult<>(event, this);

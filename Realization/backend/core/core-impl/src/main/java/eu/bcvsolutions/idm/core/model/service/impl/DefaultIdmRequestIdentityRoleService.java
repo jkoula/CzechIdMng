@@ -1,7 +1,5 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import eu.bcvsolutions.idm.core.api.domain.RequestState;
-import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;

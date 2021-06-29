@@ -67,7 +67,6 @@ import org.springframework.util.Assert;
 @Component(AdGroupConnectorType.NAME)
 public class AdGroupConnectorType extends AdUserConnectorType {
 
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AdGroupConnectorType.class);
 	public static final String MEMBER_SYSTEM_MAPPING = "memberSystemMappingId";
 	public static final String GROUP_SYNC_ID = "groupSyncId";
 	public static final String GROUP_CONTAINER_KEY = "groupContainer";
