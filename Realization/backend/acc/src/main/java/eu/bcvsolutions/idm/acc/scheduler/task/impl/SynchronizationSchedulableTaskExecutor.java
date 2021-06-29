@@ -25,7 +25,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExe
 import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
 
 /**
- * Synchronization schedule task
+ * Synchronization schedule task.
  * 
  * @author Radek Tomiška
  * @author svandav

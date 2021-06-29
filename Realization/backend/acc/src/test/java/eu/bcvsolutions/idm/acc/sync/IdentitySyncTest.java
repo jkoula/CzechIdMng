@@ -111,7 +111,7 @@ import eu.bcvsolutions.idm.core.scheduler.ObserveLongRunningTaskEndProcessor;
 import eu.bcvsolutions.idm.core.scheduler.api.config.SchedulerConfiguration;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.DependentTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.Task;
-import eu.bcvsolutions.idm.core.scheduler.service.impl.DefaultSchedulerManager;
+import eu.bcvsolutions.idm.core.scheduler.api.service.SchedulerManager;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
@@ -180,7 +180,7 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 	@Autowired
 	private FormService formService;
 	@Autowired
-	private DefaultSchedulerManager manager;
+	private SchedulerManager manager;
 	@Autowired
 	private ConfigurationService configurationService;
 	@Autowired

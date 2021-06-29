@@ -590,6 +590,12 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				return false;
 			}
 		}
+		String taskType = filter.getTaskType();
+		if (StringUtils.isNotEmpty(taskType)) {
+			if (!StringUtils.equals(taskType, task.getTaskType().getCanonicalName())) {
+				return false;
+			}
+		}
 		//
 		return true;
 	}
