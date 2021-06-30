@@ -29,7 +29,7 @@ import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Monitoring evaluator unit tests.
+ * Monitoring evaluator tests.
  * 
  * @author Radek Tomiška
  *

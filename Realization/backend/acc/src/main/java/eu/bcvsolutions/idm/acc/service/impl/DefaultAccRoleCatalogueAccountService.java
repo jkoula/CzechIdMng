@@ -9,6 +9,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -33,7 +34,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
- * Role catalogue accounts on target system
+ * Role catalogue accounts on target system.
  * 
  * @author Svanda
  *
@@ -43,16 +44,11 @@ public class DefaultAccRoleCatalogueAccountService
 		extends AbstractReadWriteDtoService<AccRoleCatalogueAccountDto, AccRoleCatalogueAccount, AccRoleCatalogueAccountFilter>
 		implements AccRoleCatalogueAccountService {
 
-	private final AccAccountService accountService;
+	@Autowired @Lazy private AccAccountService accountService;
 
 	@Autowired
-	public DefaultAccRoleCatalogueAccountService(AccRoleCatalogueAccountRepository repository,
-			AccAccountService accountService) {
+	public DefaultAccRoleCatalogueAccountService(AccRoleCatalogueAccountRepository repository) {
 		super(repository);
-		//
-		Assert.notNull(accountService, "Service is required.");
-		//
-		this.accountService = accountService;
 	}
 	
 	@Override

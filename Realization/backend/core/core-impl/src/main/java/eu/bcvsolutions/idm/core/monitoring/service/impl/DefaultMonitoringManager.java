@@ -87,13 +87,6 @@ public class DefaultMonitoringManager implements MonitoringManager {
 		filter.setDisabled(Boolean.FALSE);
 		filter.setInstanceId(instanceId);
 		for (IdmMonitoringDto monitoring : monitoringService.find(filter, PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmMonitoring_.seq.getName())))) {
-			MonitoringEvaluator evaluator = getEvaluator(monitoring);
-			if (evaluator == null) {
-				LOG.warn("Monitoring evaluator for motitoring configuration [{}] not exists.", monitoring.getId());
-				continue;
-			}
-			
-			//
 			if (getLastResult(monitoring.getId()) != null) {
 				counter++;
 			}

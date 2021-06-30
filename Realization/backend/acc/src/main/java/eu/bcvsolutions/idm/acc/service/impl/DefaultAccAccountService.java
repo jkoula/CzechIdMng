@@ -85,7 +85,7 @@ import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
 
 /**
- * Accounts on target system
+ * Accounts on target system.
  *
  * @author Radek Tomiška
  * @author svandav

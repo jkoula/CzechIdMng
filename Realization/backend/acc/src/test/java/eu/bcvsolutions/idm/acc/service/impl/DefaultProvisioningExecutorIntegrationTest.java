@@ -520,7 +520,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 			// retry - expected success now
 			testProvisioningExceptionProcessor.setDisabled(true);
 			retryProvisioningTaskExecutor = new RetryProvisioningTaskExecutor();
-			longRunningTaskManager.execute(retryProvisioningTaskExecutor); // async way, but turned off
+			longRunningTaskManager.executeSync(retryProvisioningTaskExecutor);
 			//
 			systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
 			Assert.assertFalse(systemEntity.isWish());

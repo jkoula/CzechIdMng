@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableMap;
@@ -53,8 +54,8 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 	public static final String NAME = "acc-synchronization-monitoring-evaluator";
 	public static final String PARAMETER_SYNCHRONIZATION = "synchronization";
 	//
-	@Autowired private SysSyncConfigService syncConfigService;
-	@Autowired private SysSystemService systemService;
+	@Autowired @Lazy private SysSyncConfigService syncConfigService;
+	@Autowired @Lazy private SysSystemService systemService;
 	
 	@Override
 	public String getName() {
