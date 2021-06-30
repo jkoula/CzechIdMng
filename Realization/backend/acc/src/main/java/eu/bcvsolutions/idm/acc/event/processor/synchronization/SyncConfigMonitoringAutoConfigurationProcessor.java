@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
+import eu.bcvsolutions.idm.core.model.event.processor.module.InitMonitoringProcessor;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
@@ -58,43 +59,81 @@ public class SyncConfigMonitoringAutoConfigurationProcessor
 		UUID synchronizationId = event.getContent().getId();
 		Assert.notNull(synchronizationId, "Synchronization identifier is required.");
 		//
-		// find already registered monitoring evaluator with synchronization identifier
+		if (event.hasType(SyncConfigEventType.CREATE)) {
+			configureMonitoring(synchronizationId);
+		} else { // delete
+			deleteMonitoring(synchronizationId);
+		}
+		//
+		return new DefaultEventResult<>(event, this);
+	}
+	
+	/**
+	 * Configure monitoring evaluator for given synchronization configuration, if monitoring evaluator is not already configured.
+	 * 
+	 * @param synchronizationId synchronization configuration identifier
+	 * @return configured monitoring evaluator 
+	 */
+	public IdmMonitoringDto configureMonitoring(UUID synchronizationId) {
+		IdmMonitoringDto monitoring = findMonitoring(synchronizationId);
+		if (monitoring != null) {
+			return monitoring;
+		}
+		//
+		monitoring = new IdmMonitoringDto();
+		monitoring.setCheckPeriod(3600L); // once per hour
+		monitoring.setEvaluatorType(AutowireHelper.getTargetType(synchronizationMonitoringEvaluator));
+		monitoring.getEvaluatorProperties().put(
+				SynchronizationMonitoringEvaluator.PARAMETER_SYNCHRONIZATION, 
+				synchronizationId
+		);
+		monitoring.setInstanceId(configurationService.getInstanceId());
+		monitoring.setDescription(InitMonitoringProcessor.PRODUCT_PROVIDED_MONITORING_DESCRIPTION);
+		//
+		monitoring = monitoringService.save(monitoring);
+		LOG.info("Monitoring [{}] configured automatically for synchronization configuration [{}]",
+				monitoring.getId(), synchronizationId);
+		//
+		return monitoring;
+	}
+	
+	/**
+	 * Delete configured monitoring evaluator for given synchronization configuration, if monitoring evaluator is configured.
+	 * 
+	 * @param synchronizationId synchronization configuration identifier
+	 */
+	public void deleteMonitoring(UUID synchronizationId) {
+		IdmMonitoringDto monitoring = findMonitoring(synchronizationId);
+		if (monitoring == null) {
+			return; // nothing to remove
+		}
+		//
+		monitoringService.delete(monitoring);
+		LOG.info("Monitoring [{}] deleted automatically for deteled synchronization configuration [{}]",
+				monitoring.getId(), synchronizationId);
+	}
+	
+	/**
+	 * find already registered monitoring evaluator with synchronization identifier
+	 * 
+	 * @return
+	 */
+	protected IdmMonitoringDto findMonitoring(UUID synchronizationId) {
 		String evaluatorType = AutowireHelper.getTargetType(synchronizationMonitoringEvaluator);
 		IdmMonitoringFilter filter = new IdmMonitoringFilter();
 		filter.setEvaluatorType(evaluatorType);
-		IdmMonitoringDto monitoring = monitoringService
+		//
+		return monitoringService
 				.find(filter, null)
 				.stream()
 				.filter(m -> {
+					// lookout - FE raw string properties can be given
 					return synchronizationId.equals(
-							m.getEvaluatorProperties().get(SynchronizationMonitoringEvaluator.PARAMETER_SYNCHRONIZATION)
+							getParameterConverter().toUuid(m.getEvaluatorProperties(), SynchronizationMonitoringEvaluator.PARAMETER_SYNCHRONIZATION)
 					);
 				})
 				.findFirst()
 				.orElse(null);
-		if (event.hasType(SyncConfigEventType.CREATE)) {
-			if (monitoring == null) { // create
-				monitoring = new IdmMonitoringDto();
-				monitoring.setCheckPeriod(3600L); // once per hour
-				monitoring.setEvaluatorType(evaluatorType);
-				monitoring.getEvaluatorProperties().put(
-						SynchronizationMonitoringEvaluator.PARAMETER_SYNCHRONIZATION, 
-						synchronizationId
-				);
-				monitoring.setInstanceId(configurationService.getInstanceId());
-				monitoring.setDescription("Monitoring configured automatically.");
-				//
-				monitoring = monitoringService.save(monitoring);
-				LOG.info("Monitoring [{}] configured automatically for synchronization configuration [{}]",
-						monitoring.getId(), synchronizationId);
-			}
-		} else if (monitoring != null) { // delete
-			monitoringService.delete(monitoring);
-			LOG.info("Monitoring [{}] deleted automatically for deteled synchronization configuration [{}]",
-					monitoring.getId(), synchronizationId);
-		}
-		//
-		return new DefaultEventResult<>(event, this);
 	}
 	
 	@Override

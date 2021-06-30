@@ -105,7 +105,7 @@ public class DefaultMonitoringManager implements MonitoringManager {
 	/**
 	 * Spring schedule run all registered monitoring evaluators
 	 */
-	@Scheduled(fixedDelay = 10000, initialDelay = 20000)
+	@Scheduled(fixedDelay = 10000)
 	public void scheduleExecute() {
 		String instanceId = configurationService.getInstanceId();
 		LOG.debug("Processing monitoring evaluators on instance id [{}]", instanceId);
@@ -185,7 +185,7 @@ public class DefaultMonitoringManager implements MonitoringManager {
 			result = new IdmMonitoringResultDto(
 					new OperationResultDto.Builder(OperationState.RUNNING).setException(ex).build()
 			);
-			result.setLevel(NotificationLevel.ERROR);
+			result.setLevel(NotificationLevel.INFO);
 		} catch (ResultCodeException ex) {
 			result = new IdmMonitoringResultDto(
 					new OperationResultDto.Builder(OperationState.EXCEPTION).setException(ex).build()

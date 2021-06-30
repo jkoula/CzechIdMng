@@ -133,6 +133,7 @@ class NavigationMonitoring extends Basic.AbstractContent {
                 //
                 return (
                   <Basic.FlashMessage
+                    className="monitoring-result-message"
                     message={ message }
                     buttons={
                       [

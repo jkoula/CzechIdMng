@@ -41,7 +41,7 @@ public class DatabaseTableMonitoringEvaluator extends AbstractMonitoringEvaluato
 	
 	public static final String NAME = "core-database-table-monitoring-evaluator";
 	public static final String PARAMETER_THRESHOLD = "threshold";
-	public static final long DEFAULT_TRESHOLD = 500000L;
+	public static final long DEFAULT_THRESHOLD = 500000L;
 	public static final String PARAMETER_READ_SERVICE_BEAN_NAME = "service-bean-name"; // read dto service bean name
 	//
 	@Autowired private ApplicationContext context;
@@ -65,7 +65,7 @@ public class DatabaseTableMonitoringEvaluator extends AbstractMonitoringEvaluato
 		}
 		//
 		ReadDtoService<?, ?> readService = (ReadDtoService<?, ?>) bean;
-		long treshold = getParameterConverter().toLong(monitoring.getEvaluatorProperties(), PARAMETER_THRESHOLD, DEFAULT_TRESHOLD);
+		long treshold = getParameterConverter().toLong(monitoring.getEvaluatorProperties(), PARAMETER_THRESHOLD, DEFAULT_THRESHOLD);
 		long count = readService.count(null);
 		ResultModel resultModel = new DefaultResultModel(
 				CoreResultCode.MONITORING_DATABASE_TABLE,
@@ -97,7 +97,7 @@ public class DatabaseTableMonitoringEvaluator extends AbstractMonitoringEvaluato
 	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
 		IdmFormAttributeDto treshold = new IdmFormAttributeDto(PARAMETER_THRESHOLD, PARAMETER_THRESHOLD, PersistentType.LONG);
-		treshold.setDefaultValue(Long.toString(DEFAULT_TRESHOLD));
+		treshold.setDefaultValue(Long.toString(DEFAULT_THRESHOLD));
 		treshold.setRequired(true);
 		//
 		IdmFormAttributeDto serviceName = new IdmFormAttributeDto(PARAMETER_READ_SERVICE_BEAN_NAME, PARAMETER_READ_SERVICE_BEAN_NAME, PersistentType.TEXT);

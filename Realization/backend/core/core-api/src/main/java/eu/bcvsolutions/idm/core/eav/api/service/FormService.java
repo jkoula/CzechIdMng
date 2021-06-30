@@ -35,7 +35,6 @@ import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.eav.api.event.processor.FormInstanceProcessor;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Work with form definitions, attributes and their values => eav, extended attributes and their values to given owner ({@link FormableEntity}).

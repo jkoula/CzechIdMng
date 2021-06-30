@@ -53,7 +53,7 @@ class Alert extends AbstractComponent {
     }
 
     return (
-      <div className={classNames} style={style}>
+      <div className={ classNames } style={ style }>
         {
           !onClose
           ||

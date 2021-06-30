@@ -35,7 +35,7 @@ public class DatabaseTableMonitoringEvaluatorUnitTest extends AbstractUnitTest {
 	@Test
 	public void testSuccess() {
 		Mockito.when(context.getBean("mock")).thenReturn(identityService);
-		Mockito.when(identityService.count(ArgumentMatchers.any())).thenReturn(DatabaseTableMonitoringEvaluator.DEFAULT_TRESHOLD);
+		Mockito.when(identityService.count(ArgumentMatchers.any())).thenReturn(DatabaseTableMonitoringEvaluator.DEFAULT_THRESHOLD);
 		//
 		IdmMonitoringDto monitoring = new IdmMonitoringDto();
 		monitoring.setInstanceId("mock");
@@ -44,13 +44,13 @@ public class DatabaseTableMonitoringEvaluatorUnitTest extends AbstractUnitTest {
 		//
 		Assert.assertEquals(CoreResultCode.MONITORING_DATABASE_TABLE.getCode(), result.getResult().getCode());
 		Assert.assertNull(result.getLevel());
-		Assert.assertEquals(String.valueOf(DatabaseTableMonitoringEvaluator.DEFAULT_TRESHOLD), result.getValue());
+		Assert.assertEquals(String.valueOf(DatabaseTableMonitoringEvaluator.DEFAULT_THRESHOLD), result.getValue());
 	}
 	
 	@Test
 	public void testWarning() {
 		Mockito.when(context.getBean("mock")).thenReturn(identityService);
-		Mockito.when(identityService.count(ArgumentMatchers.any())).thenReturn(DatabaseTableMonitoringEvaluator.DEFAULT_TRESHOLD + 1);
+		Mockito.when(identityService.count(ArgumentMatchers.any())).thenReturn(DatabaseTableMonitoringEvaluator.DEFAULT_THRESHOLD + 1);
 		Mockito.when(identityService.getEntityClass()).thenReturn(IdmIdentity.class);
 		Mockito.when(identityService.getDtoClass()).thenReturn(IdmIdentityDto.class);
 		//
@@ -61,7 +61,7 @@ public class DatabaseTableMonitoringEvaluatorUnitTest extends AbstractUnitTest {
 		//
 		Assert.assertEquals(CoreResultCode.MONITORING_DATABASE_TABLE.getCode(), result.getResult().getCode());
 		Assert.assertEquals(NotificationLevel.WARNING, result.getLevel());
-		Assert.assertEquals(String.valueOf(DatabaseTableMonitoringEvaluator.DEFAULT_TRESHOLD + 1), result.getValue());
+		Assert.assertEquals(String.valueOf(DatabaseTableMonitoringEvaluator.DEFAULT_THRESHOLD + 1), result.getValue());
 	}
 	
 	@Test(expected = ResultCodeException.class)

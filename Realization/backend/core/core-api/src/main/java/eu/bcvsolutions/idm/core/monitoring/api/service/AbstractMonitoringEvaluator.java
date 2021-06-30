@@ -63,7 +63,4 @@ public abstract class AbstractMonitoringEvaluator implements
 		}
 		return parameterConverter;
 	}
-	
-	
-	
 }

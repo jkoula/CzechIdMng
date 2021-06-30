@@ -37,7 +37,9 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
+import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
 
 /**
@@ -55,13 +57,16 @@ public abstract class AbstractEntityEventProcessor<E extends Serializable> imple
 		BeanNameAware {
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AbstractEntityEventProcessor.class);
-	private final Class<E> entityClass;
-	private final Set<String> types = new HashSet<>();
-	private String beanName; // spring bean name - used as processor id
 	//
 	@Autowired private EntityEventManager entityEventManager;
 	@Autowired private EnabledEvaluator enabledEvaluator;
 	@Autowired private ConfigurationService configurationService;
+	@Autowired private LookupService lookupService;
+	//
+	private final Class<E> entityClass;
+	private final Set<String> types = new HashSet<>();
+	private String beanName; // spring bean name - used as processor id
+	private ParameterConverter parameterConverter;	
 	
 	@SuppressWarnings({"unchecked"})
 	public AbstractEntityEventProcessor(EventType... types) {
@@ -419,6 +424,29 @@ public abstract class AbstractEntityEventProcessor<E extends Serializable> imple
 	 */
 	protected EntityEventManager getEntityEventManager() {
 		return entityEventManager;
+	}
+	
+	/**
+	 * Configured lookup service.
+	 * 
+	 * @return configured lookup service
+	 * @since 11.1.0
+	 */
+	protected LookupService getLookupService() {
+		return lookupService;
+	}
+	
+	/**
+	 * Return parameter converter helper.
+	 * 
+	 * @return configured parameter converter
+	 * @since 11.1.0
+	 */
+	protected ParameterConverter getParameterConverter() {
+		if (parameterConverter == null) {
+			parameterConverter = new ParameterConverter(getLookupService());
+		}
+		return parameterConverter;
 	}
 	
 }
