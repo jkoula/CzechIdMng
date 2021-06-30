@@ -22,10 +22,11 @@ import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 public class EmbeddedDto implements BaseDto {
 
 	private static final long serialVersionUID = 1L;
+	public static final String PROPERTY_EMBEDDED = "_embedded"; // @since 11.1.0
 
 	@JsonDeserialize(as = UUID.class)
 	private UUID id;
-	@JsonProperty(value = "_embedded")
+	@JsonProperty(value = PROPERTY_EMBEDDED)
 	private Map<String, JsonNode> embedded;
 
 	@Override

@@ -49,6 +49,7 @@ import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -1358,7 +1359,7 @@ public abstract class AbstractReadWriteDtoControllerRestTest<DTO extends Abstrac
 	protected List<IdmFormDefinitionDto> toFormDefinitions(String response) {
 		try {
 			JsonNode json = getMapper().readTree(response);
-			JsonNode jsonEmbedded = json.get("_embedded"); // by convention
+			JsonNode jsonEmbedded = json.get(EmbeddedDto.PROPERTY_EMBEDDED); // by convention
 			JsonNode jsonResources = jsonEmbedded.get(getResourcesName(IdmFormDefinitionDto.class));
 			//
 			// convert embedded object to target DTO classes

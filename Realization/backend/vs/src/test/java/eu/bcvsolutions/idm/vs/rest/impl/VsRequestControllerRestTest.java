@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
@@ -92,7 +93,7 @@ public class VsRequestControllerRestTest extends AbstractRestTest {
 		String contentAsString = andExpect.andReturn().getResponse().getContentAsString();
 		
 		JSONObject tObject = new JSONObject(contentAsString);
-		String embeddedString = tObject.get("_embedded").toString();
+		String embeddedString = tObject.get(EmbeddedDto.PROPERTY_EMBEDDED).toString();
 		tObject = new JSONObject(embeddedString);
 		String requestAsString = tObject.get(IdmConceptRoleRequestService.ROLE_REQUEST_FIELD).toString();
 		assertNotNull(requestAsString);
@@ -139,7 +140,7 @@ public class VsRequestControllerRestTest extends AbstractRestTest {
 		String contentAsString = andExpect.andReturn().getResponse().getContentAsString();
 		
 		JSONObject tObject = new JSONObject(contentAsString);
-		String embeddedString = tObject.get("_embedded").toString();
+		String embeddedString = tObject.get(EmbeddedDto.PROPERTY_EMBEDDED).toString();
 		tObject = new JSONObject(embeddedString);
 		try {
 			tObject.get(IdmConceptRoleRequestService.ROLE_REQUEST_FIELD).toString();
@@ -180,7 +181,7 @@ public class VsRequestControllerRestTest extends AbstractRestTest {
 		String contentAsString = andExpect.andReturn().getResponse().getContentAsString();
 		
 		JSONObject tObject = new JSONObject(contentAsString);
-		String embeddedString = tObject.get("_embedded").toString();
+		String embeddedString = tObject.get(EmbeddedDto.PROPERTY_EMBEDDED).toString();
 		tObject = new JSONObject(embeddedString);
 		try {
 			tObject.get(IdmConceptRoleRequestService.ROLE_REQUEST_FIELD).toString();

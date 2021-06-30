@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.core.rest.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,16 +32,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.common.collect.Lists;
-
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.comparator.CodeableComparator;
 import eu.bcvsolutions.idm.core.api.dto.AvailableServiceDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringResultDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmMonitoringTypeDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -51,7 +46,6 @@ import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.LoggerManager;
-import eu.bcvsolutions.idm.core.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
@@ -71,7 +65,6 @@ import io.swagger.annotations.AuthorizationScope;
  * @author Ondrej Husnik 
  */
 @RestController
-@SuppressWarnings("deprecation")
 @RequestMapping(value = BaseDtoController.BASE_PATH + "/configurations")
 @Api(
 		value = IdmConfigurationController.TAG, 
@@ -86,8 +79,6 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 	//
 	@Autowired private ApplicationContext context;
 	@Autowired private LoggerManager loggerManager;
-	@Deprecated(since = "11.1.0")
-	@Autowired private MonitoringManager monitoringManager;
 	
 	@Autowired
 	public IdmConfigurationController(IdmConfigurationService configurationService) {
@@ -299,43 +290,6 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 				.stream()
 				.sorted(new CodeableComparator())
 				.collect(Collectors.toList());
-	}
-	
-	/**
-	 * Returns monitoring results - BETA.
-	 * 
-	 * TODO: Will be removed from this controller.
-	 * 
-	 * @param monitoringType
-	 * @return
-	 * @deprecated monitoring refactored from scratch in 11.2.0
-	 */
-	@Deprecated(since = "11.1.0")
-	@ResponseBody
-	@PreAuthorize("hasAuthority('" + CoreGroupPermission.CONFIGURATION_READ + "')")
-	@RequestMapping(path = "/monitoring-types/{monitoringType}", method = RequestMethod.GET)
-	@ApiOperation(
-			value = "Get monitoring results by monitoring type", 
-			nickname = "getMonitoringType", 
-			tags = { IdmConfigurationController.TAG }, 
-			authorizations = { 
-				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
-						@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_READ, description = "") }),
-				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
-						@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_READ, description = "") })
-				})
-	public ResponseEntity<IdmMonitoringTypeDto> getMonitoringType(@PathVariable @NotNull String monitoringType) {
-
-		IdmMonitoringTypeDto dto = monitoringManager.check(monitoringType);
-		if (dto == null) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		}
-		List<IdmMonitoringResultDto> results = dto.getResults().stream()
-				.sorted(Comparator.comparing(IdmMonitoringResultDto::getLevel))
-				.collect(Collectors.toList());
-		dto.setResults(Lists.reverse(results));
-
-		return new ResponseEntity<>(dto, HttpStatus.OK);
 	}
 	
 	/**

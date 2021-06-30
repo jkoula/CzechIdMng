@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
 
@@ -64,7 +65,7 @@ public class IdmAuditDto implements BaseDto {
 	
 	private String subOwnerType;
 	
-	@JsonProperty(value = "_embedded", access = Access.READ_ONLY)
+	@JsonProperty(value = EmbeddedDto.PROPERTY_EMBEDDED, access = Access.READ_ONLY)
 	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private Map<String, BaseDto> embedded;
 	

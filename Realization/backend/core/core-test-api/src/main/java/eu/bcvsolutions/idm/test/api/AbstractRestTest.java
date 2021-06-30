@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
@@ -84,7 +85,7 @@ public abstract class AbstractRestTest extends AbstractIntegrationTest {
 
 	public List<LinkedHashMap<String, Object>> getEmbeddedList(String nameEmbeddedList, String json) throws IOException {
 		JSONObject tObject = new JSONObject(json);
-		String embeddedString = tObject.get("_embedded").toString();
+		String embeddedString = tObject.get(EmbeddedDto.PROPERTY_EMBEDDED).toString();
 		tObject = new JSONObject(embeddedString);
 		// get embedded list
 		String listString = tObject.get(nameEmbeddedList).toString();
@@ -220,7 +221,7 @@ public abstract class AbstractRestTest extends AbstractIntegrationTest {
 	protected <T extends BaseDto> List<T> toDtos(String listResponse, Class<T> dtoClass) {
 		try {
 			JsonNode json = getMapper().readTree(listResponse);
-			JsonNode jsonEmbedded = json.get("_embedded"); // by convention
+			JsonNode jsonEmbedded = json.get(EmbeddedDto.PROPERTY_EMBEDDED); // by convention
 			JsonNode jsonResources = jsonEmbedded.get(getResourcesName(dtoClass));
 			//
 			// convert embedded object to target DTO classes

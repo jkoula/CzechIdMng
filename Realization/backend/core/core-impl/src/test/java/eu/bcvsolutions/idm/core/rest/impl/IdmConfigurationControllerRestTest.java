@@ -4,6 +4,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -11,13 +12,17 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import eu.bcvsolutions.idm.core.api.dto.AvailableServiceDto;
+import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoControllerRestTest;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.model.service.impl.DefaultIdmIdentityService;
 import eu.bcvsolutions.idm.core.model.service.impl.LogbackLoggerManagerIntegrationTest;
 import eu.bcvsolutions.idm.core.security.api.authentication.AuthenticationManager;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
@@ -119,5 +124,30 @@ public class IdmConfigurationControllerRestTest extends AbstractReadWriteDtoCont
 		List<IdmConfigurationDto> dtos = getMapper().readValue(response, new TypeReference<List<IdmConfigurationDto>>() {});
 		Assert.assertFalse(dtos.isEmpty());
 		Assert.assertTrue(dtos.stream().anyMatch(c -> c.getName().equals("idm.pub.core.public-setting")));
+	}
+	
+	@Test
+	public void testGetRegisteredReadDtoServices() throws Exception {
+		// configuration from files and logback logger
+		String response = getMockMvc().perform(get(getBaseUrl() + "/search/read-dto-services")
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+		//
+		JsonNode json = getMapper().readTree(response);
+		JsonNode jsonEmbedded = json.get(EmbeddedDto.PROPERTY_EMBEDDED); // by convention
+		JsonNode jsonResources = jsonEmbedded.get(getResourcesName(AvailableServiceDto.class));
+		//
+		// convert embedded object to target DTO classes
+		List<AvailableServiceDto> dtos = new ArrayList<>();
+		jsonResources.forEach(jsonResource -> {
+			dtos.add(getMapper().convertValue(jsonResource, AvailableServiceDto.class));
+		});
+		//
+		Assert.assertFalse(dtos.isEmpty());
+		Assert.assertTrue(dtos.stream().anyMatch(c -> c.getServiceName().equals(DefaultIdmIdentityService.class.getSimpleName())));
 	}
 }

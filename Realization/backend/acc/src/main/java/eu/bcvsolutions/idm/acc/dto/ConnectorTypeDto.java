@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractComponentDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
 
@@ -29,7 +30,7 @@ public class ConnectorTypeDto extends AbstractComponentDto {
 	private String connectorName;
 	private String wizardStepName;
 	private Map<String, String> metadata;
-	@JsonProperty(value = "_embedded", access = Access.READ_ONLY)
+	@JsonProperty(value = EmbeddedDto.PROPERTY_EMBEDDED, access = Access.READ_ONLY)
 	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private Map<String, BaseDto> embedded;
 	// Version of current found connector.
