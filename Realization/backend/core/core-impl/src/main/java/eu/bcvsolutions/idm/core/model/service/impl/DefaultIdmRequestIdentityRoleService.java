@@ -402,7 +402,8 @@ public class DefaultIdmRequestIdentityRoleService extends
 					IdmFormInstanceDto formInstanceDto;
 					// For updated identity-role replace EAVs from the concept
 					if (ConceptRoleRequestOperation.UPDATE == concept.getOperation()) {
-						formInstanceDto  = conceptRoleService.getRoleAttributeValues(concept, true);
+						// Check on change of values is made only on ended request! 'Original' value is current value and in audit it was confusing (only 'new' value is show now).
+						formInstanceDto = conceptRoleService.getRoleAttributeValues(concept, !concept.getState().isTerminatedState());
 						this.addEav(requestIdentityRoleWithConcept, formInstanceDto);
 					}
 				}
@@ -424,8 +425,8 @@ public class DefaultIdmRequestIdentityRoleService extends
 				return;
 			}
 			// Validate the concept
-			List<InvalidFormAttributeDto> validationResults = formService.validate(formInstanceDto);
-			formInstanceDto.setValidationErrors(formService.validate(formInstanceDto));
+			List<InvalidFormAttributeDto> validationResults = conceptRoleService.validateFormAttributes(concept);
+			formInstanceDto.setValidationErrors(validationResults);
 			if (!validationResults.isEmpty()) {
 				// Concept is not valid (no other metadata for validation problem is not
 				// necessary now).
@@ -532,7 +533,8 @@ public class DefaultIdmRequestIdentityRoleService extends
 				}
 				formInstanceDto  = identityRoleService.getRoleAttributeValues(identityRole);
 			} else {
-				formInstanceDto  = conceptRoleService.getRoleAttributeValues(concept, true);
+				// Check on change of values is made only on ended request! 'Original' value is current value and in audit it was confusing (only 'new' value is show now).
+				formInstanceDto = conceptRoleService.getRoleAttributeValues(concept, !concept.getState().isTerminatedState());
 			}
 			addEav(requestIdentityRoleDto, formInstanceDto);
 		}

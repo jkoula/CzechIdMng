@@ -35,6 +35,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.eav.api.event.processor.FormInstanceProcessor;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Work with form definitions, attributes and their values => eav, extended attributes and their values to given owner ({@link FormableEntity}).
@@ -76,6 +77,12 @@ public interface FormService extends ScriptEnabled {
 	 * @since 11.0.0
 	 */
 	String FORM_DEFINITION_CODE_BASIC_FIELDS = "idm:basic-fields";
+	
+	/**
+	 * Skip validation for EAV values.
+	 * @since  11.1.0
+	 */
+	String SKIP_EAV_VALIDATION = "idm:skip-eav-validation";
 	
 	/**
 	 * Returns true, when given owner type support eav forms. If {@link AbstractDto} owner type is given, 
@@ -391,6 +398,17 @@ public interface FormService extends ScriptEnabled {
 			IdmFormDefinitionDto formDefinition,
 			List<IdmFormValueDto> values,
 			BasePermission... permission);
+
+	/**
+	 * Saves form values to given owner and form definition. Only given form attributes by the given values will be saved ("PATCH").
+	 * 'EAV_SAVE' event <strong>is</strong> published for value owner after values are saved.
+	 */
+	IdmFormInstanceDto saveFormInstance(
+			Identifiable owner,
+			IdmFormDefinitionDto formDefinition,
+			List<IdmFormValueDto> newValues,
+			boolean validate,
+			BasePermission... permission);
 	
 	/**
 	 * Saves form values to given owner and form definition. Only given form attributes by the given values will be saved ("PATCH").
@@ -405,7 +423,7 @@ public interface FormService extends ScriptEnabled {
 	 * @throws ForbiddenEntityException if authorization policies doesn't met (event permissions are evaluated)
 	 */
 	IdmFormInstanceDto saveFormInstance(EntityEvent<IdmFormInstanceDto> event);
-	
+
 	/**
 	 * Publish event. Event must have not null content (instance of E).
 	 * Before publish do permission check (by given event content).
@@ -969,7 +987,6 @@ public interface FormService extends ScriptEnabled {
 	 * @param batch
 	 */
 	void export(IdmFormInstanceDto formInstanceDto, IdmExportImportDto batch);
-	
 	
 	/**
 	 * Prepares new owner instance by form definition type.

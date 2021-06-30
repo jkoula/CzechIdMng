@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.eav.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ public class IdmFormInstanceDto implements BaseDto {
 	@NotNull
 	private Class<? extends Identifiable> ownerType;
 	private List<IdmFormValueDto> values;
+	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
+	@ApiModelProperty(accessMode = ApiModelProperty.AccessMode.READ_ONLY)
 	private List<InvalidFormAttributeDto> validationErrors;
 	
 	public IdmFormInstanceDto() {
