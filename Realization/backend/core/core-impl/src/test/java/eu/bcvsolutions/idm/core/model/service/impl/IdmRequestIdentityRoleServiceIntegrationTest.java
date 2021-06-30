@@ -496,7 +496,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 	public void testFindAddingConceptWithEAVs() {
 
 		// Create role with attribute (include the sub-definition)
-		IdmRoleDto role = createRoleWithAttributes();
+		IdmRoleDto role = createRoleWithAttributes(false);
 		IdmRoleFormAttributeFilter filter = new IdmRoleFormAttributeFilter();
 		filter.setRole(role.getId());
 		List<IdmRoleFormAttributeDto> list = roleFormAttributeService.find(filter, null).getContent();
@@ -565,8 +565,101 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Serializable value = requestIdentityRoles.get(0).getEavs().get(0).getValues().get(0).getValue();
 		Assert.assertEquals(BigDecimal.TEN.longValue(), ((BigDecimal)value).longValue());
 	}
+	
+	@Test
+	public void testUniqueValidation() {
+		// Create role with attribute (include the sub-definition)
+		IdmRoleDto role = createRoleWithAttributes(true);
+		IdmRoleFormAttributeFilter filter = new IdmRoleFormAttributeFilter();
+		filter.setRole(role.getId());
+		List<IdmRoleFormAttributeDto> list = roleFormAttributeService.find(filter, null).getContent();
+		Assert.assertEquals(2, list.size());
 
-	private IdmRoleDto createRoleWithAttributes() {
+		IdmFormDefinitionDto formAttributeSubdefinition = roleService.getFormAttributeSubdefinition(role);
+		Assert.assertEquals(2, formAttributeSubdefinition.getFormAttributes().size());
+
+		// Delete IP attribute from the sub-definition
+		list.stream().filter(roleFormAttributeDto -> {
+			IdmFormAttributeDto formAttributeDto = DtoUtils.getEmbedded(roleFormAttributeDto,
+					IdmRoleFormAttribute_.formAttribute.getName(), IdmFormAttributeDto.class);
+			return formAttributeDto.getCode().equals(IP);
+		}).forEach(roleFormAttributeDto -> roleFormAttributeService.delete(roleFormAttributeDto));
+
+		formAttributeSubdefinition = roleService.getFormAttributeSubdefinition(role);
+		Assert.assertEquals(1, formAttributeSubdefinition.getFormAttributes().size());
+		Assert.assertEquals(NUMBER_OF_FINGERS, formAttributeSubdefinition.getFormAttributes().get(0).getCode());
+
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmIdentityContractDto contract = getHelper().getPrimeContract(identity);
+		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		identityRoleFilter.setIdentityContractId(contract.getId());
+
+		List<IdmIdentityRoleDto> identityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
+		assertEquals(0, identityRoles.size());
+
+		// Create request identity-role
+		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
+		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		// Change the valid from
+		createdRequestIdentityRole.setValidFrom(LocalDate.now());
+		createdRequestIdentityRole.setRole(role.getId());
+
+		// Create role attribute value in concept
+		IdmFormDefinitionDto formDefinitionDto = roleService.getFormAttributeSubdefinition(role);
+		IdmFormInstanceDto formInstanceDto = new IdmFormInstanceDto();
+
+		IdmFormAttributeDto attribute = formDefinitionDto.getMappedAttributeByCode(NUMBER_OF_FINGERS);
+		IdmFormValueDto formValueDto = new IdmFormValueDto(attribute);
+		formValueDto.setValue(5);
+		List<IdmFormValueDto> values = Lists.newArrayList(formValueDto);
+		formInstanceDto.setValues(values);
+		List<IdmFormInstanceDto> forms = Lists.newArrayList(formInstanceDto);
+		createdRequestIdentityRole.setEavs(forms);
+		createdRequestIdentityRole = requestIdentityRoleService.save(createdRequestIdentityRole);
+
+		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
+				new IdmRoleRequestFilter(true));
+		Assert.assertNotNull(request);
+		// Execute a role-request.
+		getHelper().executeRequest(request, false, true);
+
+		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
+		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setRoleRequestId(request.getId());
+		// Include EAV attributes
+		filterRequestIdentityRole.setIncludeEav(true);
+
+		// Check EAV value in the request-identity-role
+		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService
+				.find(filterRequestIdentityRole, null).getContent();
+		Assert.assertEquals(1, requestIdentityRoles.size());
+		Assert.assertEquals(role.getId(), requestIdentityRoles.get(0).getRole());
+		Assert.assertEquals(1, requestIdentityRoles.get(0).getEavs().size());
+		IdmFormInstanceDto formInstance = requestIdentityRoles.get(0).getEavs().get(0);
+		Assert.assertEquals(1, formInstance.getValues().size());
+		IdmFormValueDto formValue = formInstance.getValues().get(0);
+		Serializable value = formValue.getValue();
+		Assert.assertEquals(((BigDecimal)formValueDto.getValue()).longValue(), ((BigDecimal)value).longValue());
+		IdmFormAttributeDto mappedAttribute = formInstance.getMappedAttribute(formValue.getFormAttribute());
+		Assert.assertNotNull(mappedAttribute);
+		Assert.assertNull(formInstance.getValidationErrors());
+
+		identityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
+		assertEquals(1, identityRoles.size());
+
+		// Create request for change an identity-role
+		IdmRequestIdentityRoleDto changeRequestIdentityRole = new IdmRequestIdentityRoleDto();
+		changeRequestIdentityRole.setId(identityRoles.get(0).getId());
+		changeRequestIdentityRole.setIdentityContract(contract.getId());
+		// Change the valid from
+		changeRequestIdentityRole.setValidFrom(LocalDate.now());
+		changeRequestIdentityRole.setIdentityRole(identityRoles.get(0).getId());
+		changeRequestIdentityRole.setEavs(forms);
+		requestIdentityRoleService.save(changeRequestIdentityRole);
+
+	}
+
+	private IdmRoleDto createRoleWithAttributes(boolean unique) {
 		IdmRoleDto role = getHelper().createRole();
 		assertNull(role.getIdentityRoleAttributeDefinition());
 
@@ -578,6 +671,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmFormAttributeDto numberOfFingersAttribute = new IdmFormAttributeDto(NUMBER_OF_FINGERS);
 		numberOfFingersAttribute.setPersistentType(PersistentType.DOUBLE);
 		numberOfFingersAttribute.setRequired(false);
+		numberOfFingersAttribute.setUnique(unique);
 		numberOfFingersAttribute.setMax(BigDecimal.TEN);
 
 		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, getHelper().createName(),

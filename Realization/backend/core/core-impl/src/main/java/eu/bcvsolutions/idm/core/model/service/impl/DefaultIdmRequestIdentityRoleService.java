@@ -427,7 +427,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 			// Validate the concept
 			List<InvalidFormAttributeDto> validationResults = conceptRoleService.validateFormAttributes(concept);
 			formInstanceDto.setValidationErrors(validationResults);
-			if (!validationResults.isEmpty()) {
+			if (validationResults != null && !validationResults.isEmpty()) {
 				// Concept is not valid (no other metadata for validation problem is not
 				// necessary now).
 				concept.setValid(false);
