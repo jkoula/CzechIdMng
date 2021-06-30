@@ -1,5 +1,9 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmRequestIdentityRoleService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -100,6 +104,8 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 	private IdmRoleFormAttributeService roleFormAttributeService;
 	@Autowired
 	private AttachmentManager attachmentManager;
+	@Autowired
+	private IdmRequestIdentityRoleService requestIdentityRoleService;
 	@Autowired
 	@Qualifier(SchedulerConfiguration.TASK_EXECUTOR_NAME)
 	private Executor executor;
@@ -954,6 +960,154 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 			getHelper().deleteRole(role.getId());
 			formService.deleteDefinition(definition);
 		}
+	}
+
+	@Test
+	/**
+	 * If EAV value of concept is send with ID (from FE), then have to be cleared for new concept!
+	 */
+	public void testClearIdOfAttributeValue() {
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityContractDto identityContact = getHelper().createContract(identity);
+		IdmRoleDto role = createRoleWithAttributes(true);
+		IdmFormDefinitionDto definition = formService.getDefinition(role.getIdentityRoleAttributeDefinition());
+		IdmFormAttributeDto ipAttributeDto = definition.getFormAttributes().stream() //
+				.filter(attribute -> IP.equals(attribute.getCode())) //
+				.findFirst() //
+				.get(); //
+		//
+
+		// Add value
+		String valueOne = getHelper().createName();
+		IdmFormValueDto formValue = new IdmFormValueDto(ipAttributeDto);
+		// Set ID = simulation sending ID from FE.
+		formValue.setId(UUID.randomUUID());
+
+		formValue.setStringValue(valueOne);
+		formValue.setPersistentType(PersistentType.TEXT);
+		formValue.setFormAttribute(ipAttributeDto.getId());
+
+		IdmFormInstanceDto formInstance = new IdmFormInstanceDto();
+		formInstance.setFormDefinition(definition);
+		formInstance.getValues().add(formValue);
+		// Create requestTwo
+		IdmRoleRequestDto request = new IdmRoleRequestDto();
+		request.setApplicant(identity.getId());
+		request.setRequestedByType(RoleRequestedByType.MANUALLY);
+		request.setExecuteImmediately(true);
+		request = roleRequestService.save(request);
+		// Create concept
+		IdmConceptRoleRequestDto conceptRole = new IdmConceptRoleRequestDto();
+		conceptRole.setIdentityContract(identityContact.getId());
+		conceptRole.setRole(role.getId());
+		conceptRole.setOperation(ConceptRoleRequestOperation.ADD);
+		conceptRole.setRoleRequest(request.getId());
+		conceptRole.getEavs().add(formInstance);
+		conceptRole = conceptRoleRequestService.save(conceptRole);
+
+		// Start requestOne
+		Map<String, Serializable> variables = new HashMap<>();
+		variables.put(RoleRequestApprovalProcessor.CHECK_RIGHT_PROPERTY, Boolean.FALSE);
+		RoleRequestEvent event = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, request, variables);
+		event.setPriority(PriorityType.HIGH);
+		//
+		request = roleRequestService.startRequest(event);
+
+		IdmRoleRequestDto roleRequestDtoOne = roleRequestService.get(request);
+		assertEquals(RoleRequestState.EXECUTED, roleRequestDtoOne.getState());
+
+		conceptRole = conceptRoleRequestService.get(conceptRole.getId());
+		assertEquals(RoleRequestState.EXECUTED, conceptRole.getState());
+
+		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
+		requestIdentityRoleFilter.setIncludeEav(true);
+		requestIdentityRoleFilter.setOnlyChanges(true);
+		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setRoleRequestId(roleRequestDtoOne.getId());
+
+		List<IdmRequestIdentityRoleDto> requestIdentityRoleDtos = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
+		assertEquals(1, requestIdentityRoleDtos.size());
+		IdmRequestIdentityRoleDto requestIdentityRoleDto = requestIdentityRoleDtos.get(0);
+
+		assertEquals(1, requestIdentityRoleDto.getEavs().size());
+		assertEquals(1, requestIdentityRoleDto.getEavs().get(0).getValues().size());
+		assertEquals(valueOne, requestIdentityRoleDto.getEavs().get(0).getValues().get(0).getValue());
+
+		// Create second request for same role with EAV value with same ID.
+		String valueTwo = getHelper().createName();
+		IdmFormValueDto formValueTwo = new IdmFormValueDto(ipAttributeDto);
+		// Set ID = simulation sending same ID from FE.
+		formValueTwo.setId(formValue.getId());
+
+		formValueTwo.setStringValue(valueTwo);
+		formValueTwo.setPersistentType(PersistentType.TEXT);
+		formValueTwo.setFormAttribute(ipAttributeDto.getId());
+
+		IdmFormInstanceDto formInstanceTwo = new IdmFormInstanceDto();
+		formInstanceTwo.setFormDefinition(definition);
+		formInstanceTwo.getValues().add(formValueTwo);
+		// Create requestTwo
+		IdmRoleRequestDto requestTwo = new IdmRoleRequestDto();
+		requestTwo.setApplicant(identity.getId());
+		requestTwo.setRequestedByType(RoleRequestedByType.MANUALLY);
+		requestTwo.setExecuteImmediately(true);
+		requestTwo = roleRequestService.save(requestTwo);
+		// Create concept
+		IdmConceptRoleRequestDto conceptRoleTwo = new IdmConceptRoleRequestDto();
+		conceptRoleTwo.setIdentityContract(identityContact.getId());
+		conceptRoleTwo.setRole(role.getId());
+		conceptRoleTwo.setOperation(ConceptRoleRequestOperation.ADD);
+		conceptRoleTwo.setRoleRequest(requestTwo.getId());
+		conceptRoleTwo.getEavs().add(formInstanceTwo);
+		conceptRoleTwo = conceptRoleRequestService.save(conceptRoleTwo);
+
+		// Start requestTwo
+		variables = new HashMap<>();
+		variables.put(RoleRequestApprovalProcessor.CHECK_RIGHT_PROPERTY, Boolean.FALSE);
+		event = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, requestTwo, variables);
+		event.setPriority(PriorityType.HIGH);
+		//
+		requestTwo = roleRequestService.startRequest(event);
+
+		IdmRoleRequestDto roleRequestDtoTwo = roleRequestService.get(requestTwo);
+		assertEquals(RoleRequestState.EXECUTED, roleRequestDtoTwo.getState());
+
+		conceptRoleTwo = conceptRoleRequestService.get(conceptRoleTwo.getId());
+		assertEquals(RoleRequestState.EXECUTED, conceptRoleTwo.getState());
+
+		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
+		requestIdentityRoleFilter.setIncludeEav(true);
+		requestIdentityRoleFilter.setOnlyChanges(true);
+		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setRoleRequestId(roleRequestDtoTwo.getId());
+
+		requestIdentityRoleDtos = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
+		assertEquals(1, requestIdentityRoleDtos.size());
+		requestIdentityRoleDto = requestIdentityRoleDtos.get(0);
+
+		assertEquals(1, requestIdentityRoleDto.getEavs().size());
+		assertEquals(1, requestIdentityRoleDto.getEavs().get(0).getValues().size());
+		assertEquals(valueTwo, requestIdentityRoleDto.getEavs().get(0).getValues().get(0).getValue());
+
+		// Check again requestOne!
+		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
+		requestIdentityRoleFilter.setIncludeEav(true);
+		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setOnlyChanges(true);
+		requestIdentityRoleFilter.setRoleRequestId(roleRequestDtoOne.getId());
+
+		requestIdentityRoleDtos = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
+		assertEquals(1, requestIdentityRoleDtos.size());
+		requestIdentityRoleDto = requestIdentityRoleDtos.get(0);
+
+		assertEquals(1, requestIdentityRoleDto.getEavs().size());
+		assertEquals(1, requestIdentityRoleDto.getEavs().get(0).getValues().size());
+		assertEquals(valueOne, requestIdentityRoleDto.getEavs().get(0).getValues().get(0).getValue());
+		
+		// cleanup form definition
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		formService.deleteDefinition(definition);
 	}
 
 	private IdmAttachmentDto prepareAttachment(String content) {
