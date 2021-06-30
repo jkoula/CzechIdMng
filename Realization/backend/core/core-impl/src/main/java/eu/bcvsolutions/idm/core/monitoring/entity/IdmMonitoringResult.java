@@ -19,7 +19,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.Audited;
 
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -43,7 +42,6 @@ public class IdmMonitoringResult extends AbstractEntity {
 	
 	private static final long serialVersionUID = 1L;
 
-	@Audited
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "monitoring_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
