@@ -107,8 +107,8 @@ public class SystemExportBulkAction extends AbstractExportBulkAction<SysSystemDt
 		exportOperationOption(system);
 		// Export role systems
 		exportRoleSystems(systemId);
-		// Export VS specific definition
-		exportVsDefinition(system, getBatch());
+		// export processor event emitting
+		emitExportEvent(system, getBatch());
 	}
 	
 	private void exportRemoteSystem(SysSystemDto system) {
@@ -216,10 +216,7 @@ public class SystemExportBulkAction extends AbstractExportBulkAction<SysSystemDt
 	 * @param system
 	 * @param batch
 	 */
-	private void exportVsDefinition(SysSystemDto system, IdmExportImportDto batch) {
-		if (!system.isVirtual()) {
-			return;
-		}
+	private void emitExportEvent(SysSystemDto system, IdmExportImportDto batch) {
 		SystemEvent event = new SystemEvent(SystemEventType.EXPORT, system);
 		event.getProperties().put(SystemProcessor.EXPORT_BATCH_PROPERTY, batch);
 		systemService.publish(event, IdmBasePermission.READ);
