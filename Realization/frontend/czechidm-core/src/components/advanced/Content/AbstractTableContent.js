@@ -2,7 +2,7 @@ import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
 
 /**
-* Advance table content with entity CRUD methods id modal
+* Advance table content with entity CRUD methods id modal.
 *
 * @author Radek Tomiška
 */
@@ -82,13 +82,13 @@ export default class AbstractTableContent extends Basic.AbstractContent {
   /**
    * Close modal detail
    */
-  closeDetail(cb = null) {
+  closeDetail() {
     this.setState({
       detail: {
         show: false,
         entity: {}
       }
-    }, cb);
+    });
   }
 
   getFormComponent() {

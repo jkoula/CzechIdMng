@@ -107,7 +107,6 @@ export default class AbstractFormAttributeRenderer extends Basic.AbstractContext
     return filledFormValues.pop();
   }
 
-
   /**
    * Input value is valid
    *

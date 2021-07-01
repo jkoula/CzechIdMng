@@ -126,7 +126,12 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
   }
 
   closeDetail() {
-    super.closeDetail(() => {
+    this.setState({
+      detail: {
+        show: false,
+        entity: {}
+      }
+    }, () => {
       const { forceSearchParameters } = this.props;
       //
       if (!forceSearchParameters || !forceSearchParameters.getFilters().has('monitoring')) {

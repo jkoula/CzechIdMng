@@ -260,7 +260,7 @@ class EavContent extends Basic.AbstractContent {
       content = [..._formInstances.map(_formInstance => {
         const definitionCode = _formInstance.getDefinition().code;
         if (definitionCode === 'idm:basic-fields') {
-          return;
+          return null;
         }
         //
         let _showSaveButton = false; // some attribute is editable
