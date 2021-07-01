@@ -479,7 +479,10 @@ public class DefaultIdmConceptRoleRequestService extends
 	
 	@Override
 	public List<InvalidFormAttributeDto> validateFormAttributes(IdmConceptRoleRequestDto concept) {
-		if(concept == null || ConceptRoleRequestOperation.REMOVE == concept.getOperation()) {
+		if(concept == null 
+				|| ConceptRoleRequestOperation.REMOVE == concept.getOperation()
+				|| concept.getState() == null
+				|| concept.getState().isTerminatedState()) {
 			return null;
 		}
 		IdmFormInstanceDto formInstanceDto = this.getRoleAttributeValues(concept, false);
