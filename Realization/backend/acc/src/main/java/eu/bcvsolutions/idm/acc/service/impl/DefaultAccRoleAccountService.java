@@ -9,6 +9,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -45,15 +46,11 @@ public class DefaultAccRoleAccountService
 		extends AbstractReadWriteDtoService<AccRoleAccountDto, AccRoleAccount, AccRoleAccountFilter>
 		implements AccRoleAccountService {
 
-	private final AccAccountService accountService;
+	@Autowired @Lazy private AccAccountService accountService;
 
 	@Autowired
-	public DefaultAccRoleAccountService(AccRoleAccountRepository repository, AccAccountService accountService) {
+	public DefaultAccRoleAccountService(AccRoleAccountRepository repository) {
 		super(repository);
-		//
-		Assert.notNull(accountService, "Service is required.");
-		//
-		this.accountService = accountService;
 	}
 
 	@Override

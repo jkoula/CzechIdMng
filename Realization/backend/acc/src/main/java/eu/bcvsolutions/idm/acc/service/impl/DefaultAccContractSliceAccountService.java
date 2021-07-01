@@ -33,7 +33,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
- * ContractSlice-slice-accounts on target system
+ * ContractSlice-slice-accounts on target system.
  * 
  * @author Svanda
  *
