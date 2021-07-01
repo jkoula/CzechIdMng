@@ -24,7 +24,7 @@ import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
  *
  */
 @Component(RoleRequestDeleteBulkAction.NAME)
-@Description("Delete given roles.")
+@Description("Delete given role requests.")
 public class RoleRequestDeleteBulkAction extends AbstractRemoveBulkAction<IdmRoleRequestDto, IdmRoleRequestFilter> {
 
 	public static final String NAME = "role-request-delete-bulk-action";
