@@ -74,13 +74,23 @@ public abstract class AbstractIntegrationTest {
 	    Assume.assumeFalse(documentationOnly);
 	}
 	
+	/**
+	 * Before method starts.
+	 * 
+	 * @since 11.1.0
+	 */
 	@Before
-	public void init() {
+	public void startup() {
 		TransactionContextHolder.setContext(TransactionContextHolder.createEmptyContext()); // start transaction for each test method
 	}
 	
+	/**
+	 * After method ends.
+	 * 
+	 * @since 11.1.0
+	 */
 	@After
-	public void after() {
+	public void cleanup() {
 		evictCaches();
 		//
 		// delete all related long running tasks

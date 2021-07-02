@@ -146,7 +146,6 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void init() {
 		loginAsAdmin();
 		//
-		super.init();
 		getHelper().disableAsynchronousProcessing();
 	}
 

@@ -66,12 +66,10 @@ public abstract class AbstractHrProcessIntegrationTest<E extends AbstractDto> ex
 	}
 	
 	@After
-	@Override
 	public void after() {
 		enableAllProcessors();
 		//
 		super.logout();
-		super.after();
 	}
 	
 	protected void enableAllProcessors() {
