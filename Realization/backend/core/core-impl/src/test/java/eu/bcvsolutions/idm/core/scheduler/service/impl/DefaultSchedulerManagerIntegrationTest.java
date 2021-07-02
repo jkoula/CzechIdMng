@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
@@ -425,8 +426,10 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 	@Test
 	public void testMisfireHandlingPolicy() {
 		IdmIdentityDto identityOne = getHelper().createIdentity((GuardedString) null);
-		identityOne = identityService.get(identityOne);
-		Assert.assertNotEquals(identityOne.getUsername(), identityOne.getLastName());
+		UUID identityId = identityOne.getId();
+		String identityUsername = identityOne.getUsername();
+		identityOne = identityService.get(identityId);
+		Assert.assertNotEquals(identityUsername, identityOne.getLastName());
 		//
 		Task createTask = new Task();
 		//
@@ -437,10 +440,6 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		//
 		Task taskOne = manager.createTask(createTask);
 		Task task = manager.getTask(taskOne.getId());
-		
-		Function<String, Boolean> continueFunction = res -> {
-			return !manager.getTask(task.getId()).getTriggers().isEmpty();
-		};
 		//
 		// without misfire handling configuration
 		try {
@@ -458,10 +457,9 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		} catch (org.quartz.SchedulerException ex) {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_CREATE_TRIGGER_FAILED, ex);
 		}
-		getHelper().waitForResult(continueFunction);
 		//
 		identityOne = identityService.get(identityOne);
-		Assert.assertNotEquals(identityOne.getUsername(), identityOne.getLastName());
+		Assert.assertNotEquals(identityUsername, identityOne.getLastName());
 		//
 		// correct misfire handling configuration
 		try {
@@ -479,10 +477,13 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		} catch (org.quartz.SchedulerException ex) {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_CREATE_TRIGGER_FAILED, ex);
 		}
-		getHelper().waitForResult(continueFunction);
 		//
-		identityOne = identityService.get(identityOne);
-		Assert.assertEquals(identityOne.getUsername(), identityOne.getLastName());
+		getHelper().waitForResult(res -> {
+			return !identityService.get(identityId).getLastName().equals(identityUsername);
+		});
+		//
+		identityOne = identityService.get(identityId);
+		Assert.assertEquals(identityUsername, identityOne.getLastName());
 	}
 	
 	@Test
