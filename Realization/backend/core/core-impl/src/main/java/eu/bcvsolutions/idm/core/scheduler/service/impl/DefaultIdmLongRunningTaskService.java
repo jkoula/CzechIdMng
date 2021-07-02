@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.scheduler.service.impl;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,7 +11,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.StringUtils;
-import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,9 +116,9 @@ public class DefaultIdmLongRunningTaskService
 		if (till != null) {
 			predicates.add(builder.lessThanOrEqualTo(root.get(IdmLongRunningTask_.created), till));
 		}
-		OperationState operationState = filter.getOperationState();
-		if (operationState != null) {
-			predicates.add(builder.equal(root.get(IdmLongRunningTask_.result).get(OperationResult_.state), operationState));
+		List<OperationState> states = filter.getOperationStates();
+		if (!states.isEmpty()) {
+			predicates.add(root.get(IdmLongRunningTask_.result).get(OperationResult_.state).in(states));
 		}
 		Boolean running = filter.getRunning();
 		if (running != null) {

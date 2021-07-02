@@ -1,9 +1,9 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,11 +19,11 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
-import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -50,7 +50,7 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  *
  */
 public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends AbstractIntegrationTest{
-
+	
 	@Autowired private IdmIdentityRoleService identityRoleService;
 	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
 	@Autowired private IdmRoleRequestService roleRequestService;
@@ -59,18 +59,11 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 	@Autowired private IdmEntityEventService entityEventService;
 	@Autowired private SysSystemMappingService systemMappingService;
 	@Autowired private IdmRoleCompositionService roleCompositionService;
-
-	@Before
-	public void init() {
-		// Workaround ... manual delete of all automatic roles, sync, mappings ... Because previous tests didn't make a delete well.
-		// Sometime is necessary, some time not :-(.
-		// helper.cleaner();
-	}
 	
 	@Test
 	public void testAssignSubRolesByRequestAsync() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			// prepare role composition
 			IdmRoleDto superior = getHelper().createRole();
 			IdmRoleDto subOne = getHelper().createRole();
@@ -99,7 +92,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			getHelper().executeRequest(roleRequestOne, false);
 			//
 			// wait for executed events
-			final IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
+			IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
 			eventFilter.setOwnerId(roleRequestOne.getId());
 			eventFilter.setStates(Lists.newArrayList(OperationState.RUNNING, OperationState.CREATED));
 			getHelper().waitForResult(res -> {
@@ -128,11 +121,11 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			//
 			// remove one role and add other
 			IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
-			final IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
+			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setApplicant(identity.getId());
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setExecuteImmediately(true);
-			final IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);
+			IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);
 			// remove
 			IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
 			conceptRoleRequest.setRoleRequest(roleRequestTwo.getId());
@@ -174,7 +167,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 //			Assert.assertTrue(executedOperations.stream().anyMatch(o -> o.getOperationType() == ProvisioningEventType.CREATE));
 //			Assert.assertTrue(executedOperations.stream().anyMatch(o -> o.getOperationType() == ProvisioningEventType.UPDATE));
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 	
@@ -184,7 +177,10 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 	@Test
 	public void testAssignSubRolesAfterCompositionIsCreatedAsync() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			UUID transactionId = TransactionContextHolder.getContext().getTransactionId();
+			Assert.assertNotNull(transactionId);
+			//
+			getHelper().enableAsynchronousProcessing();
 			// prepare role composition
 			IdmRoleDto superior = getHelper().createRole();
 			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
@@ -202,7 +198,8 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			IdmRoleCompositionDto compositionWithSystem = getHelper().createRoleComposition(subOne, subTwo);
 			
 			IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
-			eventFilter.setSuperOwnerId(identity.getId());
+			eventFilter.setTransactionId(transactionId);
+			eventFilter.setStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
 			getHelper().waitForResult(res -> {
 				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0;
 			});
@@ -226,7 +223,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			// and account deleted
 			Assert.assertNull(accountService.getAccount(identity.getUsername(), system.getId()));
 			//
-			// create composition again nad remove assigned role by standard request
+			// create composition again and remove assigned role by standard request
 			getHelper().createRoleComposition(subOne, subTwo);
 			getHelper().waitForResult(res -> {
 				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0;
@@ -247,7 +244,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			Assert.assertTrue(assignedRoles.isEmpty());
 			Assert.assertNull(accountService.getAccount(identity.getUsername(), system.getId()));
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 	
@@ -347,7 +344,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 	@Test
 	public void testAssignSubRolesByRequestImmediate() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			// prepare role composition
 			IdmRoleDto superior = getHelper().createRole();
 			IdmRoleDto subOne = getHelper().createRole();
@@ -430,14 +427,14 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			Assert.assertEquals(account.getCreated(), updatedAccount.getCreated());
 			Assert.assertEquals(account.getRealUid(), updatedAccount.getRealUid());
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 	
 	@Test
 	public void testRoleRequestAsyncWithException() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			// prepare role composition
 			IdmRoleDto superior = getHelper().createRole();
 			String exceptionMessage = getHelper().createName();
@@ -474,7 +471,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			Assert.assertTrue(roleRequest.getLog().contains(exceptionMessage));
 			
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 

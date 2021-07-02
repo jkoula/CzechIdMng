@@ -23,6 +23,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.testng.collections.Lists;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -56,21 +57,21 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
-import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityEventFilter;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.api.service.IdmEntityEventService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.scheduler.api.config.SchedulerConfiguration;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.CronTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.Task;
@@ -112,6 +113,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 	@Autowired private FormService formService;
 	@Autowired private DataSource dataSource;
 	@Autowired private EntityEventManager entityEventManager;
+	@Autowired private IdmEntityEventService entityEventService;
 	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
 	@Autowired private ConfigurationService configurationService;
 	@Autowired private SchedulerManager schedulerManager;
@@ -703,8 +705,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		schedulerManager.createTrigger(task.getId(), trigger);
 		//
 		// turn on async processing
-		getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
-		getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, true);
+		getHelper().enableAsynchronousProcessing();
 		//
 		try {
 			int count = 50;
@@ -724,22 +725,23 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 				Thread.sleep(25);
 			}
 			//
-			SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
-			filter.setEntityIdentifier(identity.getId());
-			//
-			// wait for the active operations are processed
+			IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
+			eventFilter.setOwnerId(identity.getId());
+			eventFilter.setTransactionId(identity.getTransactionId());
+			eventFilter.setStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
 			getHelper().waitForResult(res -> {
-				List<SysProvisioningArchiveDto> executedOperations = provisioningArchiveService.find(filter, null).getContent();
-				//
-				return executedOperations.size() != count + 1;
+				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0;
 			});
 			//
 			// check archive is executed
-			Assert.assertTrue(provisioningArchiveService.find(filter, null).getContent().stream().allMatch(a -> a.getResultState().isSuccessful()));
+			SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
+			filter.setEntityIdentifier(identity.getId());
+			List<SysProvisioningArchiveDto> archives = provisioningArchiveService.find(filter, null).getContent();
+			Assert.assertFalse(archives.isEmpty());
+			Assert.assertTrue(archives.stream().allMatch(a -> a.getResultState().isSuccessful()));
 		} finally {
 			schedulerManager.deleteTask(task.getId());
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
-			getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 	

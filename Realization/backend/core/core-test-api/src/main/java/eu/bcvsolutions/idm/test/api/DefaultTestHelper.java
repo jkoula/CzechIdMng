@@ -21,6 +21,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
@@ -109,6 +110,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
+import eu.bcvsolutions.idm.core.scheduler.api.config.SchedulerConfiguration;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmProcessedTaskItemDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmScheduledTaskDto;
@@ -131,8 +133,7 @@ import eu.bcvsolutions.idm.core.security.api.service.LoginService;
 @Component("testHelper")
 public class DefaultTestHelper implements TestHelper {
 
-	@Autowired
-	private ApplicationContext context;
+	@Autowired private ApplicationContext context;
 	@Autowired private DataSource dataSource;
 	@Autowired private ConfigurationService configurationService;
 	@Autowired private IdmTreeNodeService treeNodeService;
@@ -378,22 +379,25 @@ public class DefaultTestHelper implements TestHelper {
 		IdmRoleCompositionDto roleComposition = new IdmRoleCompositionDto();
 		roleComposition.setSuperior(superior.getId());
 		roleComposition.setSub(sub.getId());
-		//
+		// create role composition
 		roleComposition = roleCompositionService.save(roleComposition);
-		// wait for role composition is processed
+		// wait for role composition is completely processed
 		if (entityEventManager.isAsynchronous()) {
+			UUID transactionId = roleComposition.getTransactionId();
+			//
 			waitForResult(res -> {
 				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-				filter.setOperationState(OperationState.CREATED);
+				filter.setOperationStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
+				filter.setTransactionId(transactionId);
 				//
-				return taskManager.findLongRunningTasks(filter, null).getTotalElements() != 0;
-			}, 500, 10);
-			waitForResult(res -> {
-				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-				filter.setOperationState(OperationState.RUNNING);
+				List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
+				// use this to debug, if needed ...
+				tasks.forEach(task -> {
+				 	System.out.println("Task: " + task.getTaskType() + ", " + task.getResultState() + ", TID: " + transactionId + " ~ " + task.getTransactionId());
+				});
 				//
-				return taskManager.findLongRunningTasks(filter, null).getTotalElements() != 0;
-			}, 500, 10);
+				return !tasks.isEmpty();
+			}, 500, 80); // ~ 40s max
 		}
 		//
 		return roleComposition;
@@ -472,18 +476,21 @@ public class DefaultTestHelper implements TestHelper {
 		roleTreeNode = roleTreeNodeService.save(roleTreeNode);
 		// wait for automatic role is processed.
 		if (entityEventManager.isAsynchronous()) {
+			UUID transactionId = roleTreeNode.getTransactionId();
+			//
 			waitForResult(res -> {
 				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-				filter.setOperationState(OperationState.CREATED);
+				filter.setTransactionId(transactionId);
+				filter.setOperationStates(Lists.newArrayList(OperationState.CREATED , OperationState.RUNNING));
 				//
-				return taskManager.findLongRunningTasks(filter, null).getTotalElements() != 0;
-			}, 500, 10);
-			waitForResult(res -> {
-				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-				filter.setOperationState(OperationState.RUNNING);
+				List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
+				// use this to debug, if needed ...
+				tasks.forEach(task -> {
+				 	System.out.println("Task: " + task.getTaskType() + ", " + task.getResultState() + ", TID: " + transactionId + " ~ " + task.getTransactionId());
+				});
 				//
-				return taskManager.findLongRunningTasks(filter, null).getTotalElements() != 0;
-			}, 500, 10);
+				return !tasks.isEmpty();
+			}, 500, 80); // ~ 40s max
 		}
 		//
 		return roleTreeNode;
@@ -603,6 +610,7 @@ public class DefaultTestHelper implements TestHelper {
 		identityRole.setRole(role.getId());
 		identityRole.setValidFrom(validFrom);
 		identityRole.setValidTill(validTill);
+		//
 		return identityRoleService.save(identityRole);
 	}
 	
@@ -909,6 +917,18 @@ public class DefaultTestHelper implements TestHelper {
 		//
 		configurationService.setValue(configurationPropertyName, value);
 	}
+	
+	@Override
+	public void enableAsynchronousProcessing() {
+		setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+		setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, true);
+	}
+	
+	@Override
+	public void disableAsynchronousProcessing() {
+		setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+		setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+	}
 
 	@Override
 	public void waitForResult(Function<String, Boolean> continueFunction) {
@@ -929,6 +949,10 @@ public class DefaultTestHelper implements TestHelper {
 				throw new CoreException(ex);
 			}
 		};
+		//
+		if (continueFunction != null && continueFunction.apply(null)) {
+			throw new IllegalStateException("Continue function is defined and timeout exceeded before function returned false (~ before complete).");
+		}
 	}
 
 	private void enableProcessor(Class<? extends EntityEventProcessor<?>> processorType, boolean enabled) {

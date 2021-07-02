@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Assume;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import eu.bcvsolutions.idm.IdmApplication;
+import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
@@ -67,6 +69,11 @@ public abstract class AbstractIntegrationTest {
 		// and we want build artifact without waiting (e.q. when hotfix needs to be released).
 	    Boolean documentationOnly = Boolean.valueOf(System.getProperty("documentationOnly", "false"));
 	    Assume.assumeFalse(documentationOnly);
+	}
+	
+	@Before
+	public void init() {
+		TransactionContextHolder.setContext(TransactionContextHolder.createEmptyContext()); // start transaction for each test method
 	}
 	
 	/**

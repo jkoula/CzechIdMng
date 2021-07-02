@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.scheduler.api.dto.filter;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.util.LinkedMultiValueMap;
@@ -48,6 +49,26 @@ public class IdmLongRunningTaskFilter extends DataFilter {
 	
 	public void setOperationState(OperationState operationState) {
 		set(PARAMETER_OPERATION_STATE, operationState);
+	}
+	
+	/**
+	 * Operation result state - IN.
+	 * 
+	 * @return states
+	 * @since 11.1.0
+	 */
+	public List<OperationState> getOperationStates() {
+		return getParameterConverter().toEnums(getData(), PARAMETER_OPERATION_STATE, OperationState.class);
+	}
+	
+	/**
+	 * Operation result state - IN.
+	 * 
+	 * @param states states
+	 * @since 11.1.0
+	 */
+	public void setOperationStates(List<OperationState> states) {
+		put(PARAMETER_OPERATION_STATE, states);
 	}
 
 	public String getTaskType() {

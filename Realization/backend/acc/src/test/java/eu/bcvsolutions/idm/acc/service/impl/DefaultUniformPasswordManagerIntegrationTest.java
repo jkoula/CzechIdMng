@@ -186,8 +186,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 	public void testCreateEntityState() {
 		try {
 			// Turn on an async execution.
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
-			getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 
 			SysSystemDto system = initData();
 			Assert.assertNotNull(system);
@@ -276,8 +275,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 			identityService.delete(ownerTwo);
 		} finally {
 			// Turn off an async execution.
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
-			getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 
@@ -728,8 +726,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 	public void testDisableUniformPassword() {
 		try {
 			// Turn on an async execution.
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
-			getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			// Create password generate policy if missing.
 			createGeneratePolicy();
 
@@ -857,8 +854,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 			uniformPasswordService.delete(uniformPasswordDef);
 		} finally {
 			// Turn off an async execution.
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
-			getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 

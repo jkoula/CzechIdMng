@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
@@ -51,6 +52,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.LongRunningFutureTask;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.SimpleTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.Task;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
+import eu.bcvsolutions.idm.core.scheduler.api.service.SchedulableTaskExecutor;
 import eu.bcvsolutions.idm.core.scheduler.api.service.SchedulerManager;
 import eu.bcvsolutions.idm.rpt.RptModuleDescriptor;
 import eu.bcvsolutions.idm.rpt.api.dto.RptRenderedReportDto;
@@ -247,11 +249,12 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 	}
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testScheduleReport() throws Exception {
 		String testPropagateParameterValue = getHelper().createName();
 		Task task = new Task();
 		task.setInstanceId(configurationService.getInstanceId());
-		task.setTaskType(testFilterReportExecutor.getClass());
+		task.setTaskType((Class<? extends SchedulableTaskExecutor<?>>) AutowireHelper.getTargetClass(testFilterReportExecutor));
 		task.setDescription("test report");
 		task.getParameters().put(IdmIdentity_.username.getName(), testPropagateParameterValue);
 		//

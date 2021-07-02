@@ -870,6 +870,20 @@ public interface TestHelper {
 	 * @param value
 	 */
 	void setConfigurationValue(String configurationPropertyName, String value);
+	
+	/**
+	 * Enable long running task and event asynchronous processing.
+	 * 
+	 * @since 11.1.0
+	 */
+	void enableAsynchronousProcessing();
+	
+	/**
+	 * Disable long running task and event asynchronous processing => synchronous processing.
+	 * 
+	 * @since 11.1.0
+	 */
+	void disableAsynchronousProcessing();
 
 	/**
 	 * Enables given processor
@@ -941,6 +955,7 @@ public interface TestHelper {
 	 * @param continueFunction [optional] continue by default, until iterationCount is complete. If continueFunction is given, then is iterated while function returns true.
 	 * @param interationWaitMilis [optional] default 300ms
 	 * @param iterationCount [optional] default 50 => max wait 300ms x 50 = 15s. Maximum is 300.
+	 * @throws IllegalStateException if continue function is defined and timeout exceeds before function returns false (~ before complete)
 	 */
 	void waitForResult(Function<String, Boolean> continueFunction, Integer interationWaitMilis, Integer iterationCount);
 
