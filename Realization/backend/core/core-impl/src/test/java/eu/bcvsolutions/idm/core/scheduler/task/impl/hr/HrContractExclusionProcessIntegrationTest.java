@@ -4,10 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.spy;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
-import java.time.LocalDate;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -36,11 +35,6 @@ public class HrContractExclusionProcessIntegrationTest extends AbstractHrProcess
 		executor.setLongRunningTaskId(lrt.getId());
 	}
 
-	@After
-	public void logout() {
-		super.after();
-	}
-	
 	/**
 	 * One contract to be disabled with manually added roles attached.
 	 * The end of contract process must disable the identity and remove

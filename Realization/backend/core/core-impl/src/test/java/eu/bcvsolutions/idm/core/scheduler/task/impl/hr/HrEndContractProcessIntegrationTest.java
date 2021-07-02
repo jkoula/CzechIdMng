@@ -4,10 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.spy;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
-import java.time.LocalDate;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +41,6 @@ public class HrEndContractProcessIntegrationTest extends AbstractHrProcessIntegr
 		scheduledTask = createIdmScheduledTask(UUID.randomUUID().toString());
 		lrt = createIdmLongRunningTask(scheduledTask, HrEndContractProcess.class);
 		executor.setLongRunningTaskId(lrt.getId());
-	}
-	
-	@After
-	public void logout() {
-		super.after();
 	}
 	
 	@Test

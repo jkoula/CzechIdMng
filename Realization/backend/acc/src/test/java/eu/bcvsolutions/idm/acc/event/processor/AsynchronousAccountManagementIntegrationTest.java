@@ -19,14 +19,12 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
-import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityEventFilter;
-import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmEntityEventService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
@@ -41,41 +39,45 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  */
 public class AsynchronousAccountManagementIntegrationTest extends AbstractIntegrationTest {
 
-	@Autowired private TestHelper helper;
 	@Autowired private IdmIdentityService identityService;
 	@Autowired private AccAccountService accountService;
 	@Autowired private SysSystemService systemService;
 	@Autowired private SysSystemAttributeMappingService schemaAttributeHandlingService;
 	@Autowired private IdmEntityEventService entityEventService;
-	@Autowired private ConfigurationService configurationService;
 	
 	@Before
 	public void init() {
 		loginAsAdmin();
-		helper.setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+		//
+		getHelper().enableAsynchronousProcessing();
 	}
 
 	@After
 	public void logout() {
-		helper.setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+		getHelper().disableAsynchronousProcessing();
+		//
 		super.logout();
 	}
 	
 	@Test
 	public void testAsynchronousAccountManagementGreenLine() {
-		IdmIdentityDto identity = helper.createIdentity();
-		SysSystemDto system = helper.createTestResourceSystem(true);
-		IdmRoleDto role = helper.createRole();
-		helper.createRoleSystem(role, system);
-		helper.createIdentityRole(identity, role);
+		IdmIdentityDto identity = getHelper().createIdentity();
+		SysSystemDto system = getHelper().createTestResourceSystem(true);
+		IdmRoleDto role = getHelper().createRole();
+		getHelper().createRoleSystem(role, system);
+		getHelper().createIdentityRole(identity, role);
+		//
 		try {			
-			helper.waitForResult(res -> {
-				return !(entityEventService.findByState(configurationService.getInstanceId(), OperationState.CREATED).isEmpty()
-						&& entityEventService.findByState(configurationService.getInstanceId(), OperationState.RUNNING).isEmpty());
+			getHelper().waitForResult(res -> {
+				IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
+				eventFilter.setTransactionId(role.getTransactionId());
+				eventFilter.setStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
+				//
+				return entityEventService.count(eventFilter) != 0;
 			});
 			AccAccountDto account = accountService.getAccount(identity.getUsername(), system.getId());
 			Assert.assertNotNull(account);
-			Assert.assertNotNull(helper.findResource(account.getRealUid()));
+			Assert.assertNotNull(getHelper().findResource(account.getRealUid()));
 		} finally {
 			identityService.delete(identity);
 			systemService.delete(system);
@@ -85,22 +87,25 @@ public class AsynchronousAccountManagementIntegrationTest extends AbstractIntegr
 	@Test
 	public void testAsynchronousAccountManagementError() {
 		// add error to some script
-		SysSystemDto system = helper.createTestResourceSystem(true);
-		SysSystemMappingDto mapping = helper.getDefaultMapping(system);
+		SysSystemDto system = getHelper().createTestResourceSystem(true);
+		SysSystemMappingDto mapping = getHelper().getDefaultMapping(system);
 		SysSystemAttributeMappingDto attributeHandlingUserName = schemaAttributeHandlingService
 				.findBySystemMappingAndName(mapping.getId(), TestHelper.ATTRIBUTE_MAPPING_NAME);
 		// username is transformed with error
 		attributeHandlingUserName.setTransformToResourceScript("returan \"" + "error" + "\";");
 		attributeHandlingUserName = schemaAttributeHandlingService.save(attributeHandlingUserName);
 		
-		IdmIdentityDto identity = helper.createIdentity();
-		IdmRoleDto role = helper.createRole();
-		helper.createRoleSystem(role, system);
-		IdmIdentityRoleDto identityRole = helper.createIdentityRole(identity, role);
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmRoleDto role = getHelper().createRole();
+		getHelper().createRoleSystem(role, system);
+		IdmIdentityRoleDto identityRole = getHelper().createIdentityRole(identity, role);
 		try {
-			helper.waitForResult(res -> {
-				return !(entityEventService.findByState(configurationService.getInstanceId(), OperationState.CREATED).isEmpty()
-						&& entityEventService.findByState(configurationService.getInstanceId(), OperationState.RUNNING).isEmpty());
+			getHelper().waitForResult(res -> {
+				IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
+				eventFilter.setTransactionId(identityRole.getTransactionId());
+				eventFilter.setStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
+				//
+				return entityEventService.count(eventFilter) != 0;
 			});
 			
 			AccAccountDto account = accountService.getAccount(identity.getUsername(), system.getId());
@@ -119,5 +124,10 @@ public class AsynchronousAccountManagementIntegrationTest extends AbstractIntegr
 			identityService.delete(identity);
 			systemService.delete(system);
 		}
-	}	
+	}
+	
+	@Override
+	protected TestHelper getHelper() {
+		return (TestHelper) super.getHelper();
+	}
 }

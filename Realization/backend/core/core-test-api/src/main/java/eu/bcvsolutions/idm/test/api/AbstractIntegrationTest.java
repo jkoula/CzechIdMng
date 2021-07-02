@@ -32,6 +32,8 @@ import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ModuleService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
+import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
+import eu.bcvsolutions.idm.core.scheduler.api.service.IdmLongRunningTaskService;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmJwtAuthentication;
 import eu.bcvsolutions.idm.core.security.api.utils.IdmAuthorityUtils;
@@ -57,6 +59,7 @@ public abstract class AbstractIntegrationTest {
 	@Autowired private LookupService lookupService;
 	@Autowired private ModuleService moduleService;
 	@Autowired private IdmCacheManager cacheManager;
+	@Autowired private IdmLongRunningTaskService longRunningTaskService;
 	//
 	private TransactionTemplate template;
 
@@ -76,10 +79,24 @@ public abstract class AbstractIntegrationTest {
 		TransactionContextHolder.setContext(TransactionContextHolder.createEmptyContext()); // start transaction for each test method
 	}
 	
+	@After
+	public void after() {
+		evictCaches();
+		//
+		// delete all related long running tasks
+		IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
+		filter.setTransactionId(TransactionContextHolder.getContext().getTransactionId());
+		// clean up method created long running tasks
+		longRunningTaskService
+			.find(filter, null)
+			.forEach(task -> {
+				longRunningTaskService.delete(task);
+			});
+	}
+	
 	/**
 	 * Evict all caches after @Transactional + @Rollback(true) test ends.
 	 */
-	@After
 	public void evictCaches() {
 		Transactional transactional = this.getClass().getAnnotation(Transactional.class);
 		if (transactional == null) {

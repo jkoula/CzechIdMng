@@ -201,7 +201,8 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			eventFilter.setTransactionId(transactionId);
 			eventFilter.setStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
 			getHelper().waitForResult(res -> {
-				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0;
+				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0
+						|| identityRoleService.findAllByIdentity(identity.getId()).size() != 3;
 			});
 			//
 			// sub roles will be assigned
@@ -226,7 +227,8 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			// create composition again and remove assigned role by standard request
 			getHelper().createRoleComposition(subOne, subTwo);
 			getHelper().waitForResult(res -> {
-				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0;
+				return entityEventService.find(eventFilter, PageRequest.of(0, 1)).getTotalElements() != 0
+						|| identityRoleService.findAllByIdentity(identity.getId()).size() != 3;
 			});
 			//
 			assignedRoles = identityRoleService.findAllByIdentity(identity.getId());

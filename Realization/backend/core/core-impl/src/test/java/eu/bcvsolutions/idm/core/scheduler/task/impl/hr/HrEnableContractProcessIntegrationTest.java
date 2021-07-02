@@ -5,10 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.spy;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
-import java.time.LocalDate;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,11 +38,6 @@ public class HrEnableContractProcessIntegrationTest extends AbstractHrProcessInt
 		scheduledTask = createIdmScheduledTask(UUID.randomUUID().toString());
 		lrt = createIdmLongRunningTask(scheduledTask, HrEnableContractProcess.class);
 		executor.setLongRunningTaskId(lrt.getId());
-	}
-	
-	@After
-	public void logout() {
-		super.after();
 	}
 	
 	/**
