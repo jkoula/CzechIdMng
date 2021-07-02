@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.scheduler.task.impl.hr;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -64,10 +65,13 @@ public abstract class AbstractHrProcessIntegrationTest<E extends AbstractDto> ex
 		getHelper().disable(IdentityContractExclusionProcessor.class);
 	}
 	
-	protected void after() {
+	@After
+	@Override
+	public void after() {
 		enableAllProcessors();
 		//
 		super.logout();
+		super.after();
 	}
 	
 	protected void enableAllProcessors() {

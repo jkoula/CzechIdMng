@@ -142,11 +142,12 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	private List<AbstractScriptEvaluator> evaluators;
 	private PluginRegistry<AbstractScriptEvaluator, IdmScriptCategory> pluginExecutors;
 
-
 	@Before
 	public void init() {
 		loginAsAdmin();
-		
+		//
+		super.init();
+		getHelper().disableAsynchronousProcessing();
 	}
 
 	@After

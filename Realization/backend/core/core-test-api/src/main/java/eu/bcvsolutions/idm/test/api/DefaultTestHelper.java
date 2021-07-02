@@ -382,23 +382,21 @@ public class DefaultTestHelper implements TestHelper {
 		// create role composition
 		roleComposition = roleCompositionService.save(roleComposition);
 		// wait for role composition is completely processed
-		if (entityEventManager.isAsynchronous()) {
-			UUID transactionId = roleComposition.getTransactionId();
+		UUID transactionId = roleComposition.getTransactionId();
+		//
+		waitForResult(res -> {
+			IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
+			filter.setOperationStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
+			filter.setTransactionId(transactionId);
 			//
-			waitForResult(res -> {
-				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-				filter.setOperationStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
-				filter.setTransactionId(transactionId);
-				//
-				List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
-				// use this to debug, if needed ...
-				tasks.forEach(task -> {
-				 	System.out.println("Task: " + task.getTaskType() + ", " + task.getResultState() + ", TID: " + transactionId + " ~ " + task.getTransactionId());
-				});
-				//
-				return !tasks.isEmpty();
-			}, 500, 80); // ~ 40s max
-		}
+			List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
+			// use this to debug, if needed ...
+			tasks.forEach(task -> {
+			 	System.out.println("Task: " + task.getTaskType() + ", " + task.getResultState() + ", TID: " + transactionId + " ~ " + task.getTransactionId());
+			});
+			//
+			return !tasks.isEmpty();
+		}, 500, 80); // ~ 40s max
 		//
 		return roleComposition;
 	}
@@ -475,23 +473,21 @@ public class DefaultTestHelper implements TestHelper {
 		}
 		roleTreeNode = roleTreeNodeService.save(roleTreeNode);
 		// wait for automatic role is processed.
-		if (entityEventManager.isAsynchronous()) {
-			UUID transactionId = roleTreeNode.getTransactionId();
+		UUID transactionId = roleTreeNode.getTransactionId();
+		//
+		waitForResult(res -> {
+			IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
+			filter.setTransactionId(transactionId);
+			filter.setOperationStates(Lists.newArrayList(OperationState.CREATED , OperationState.RUNNING));
 			//
-			waitForResult(res -> {
-				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-				filter.setTransactionId(transactionId);
-				filter.setOperationStates(Lists.newArrayList(OperationState.CREATED , OperationState.RUNNING));
-				//
-				List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
-				// use this to debug, if needed ...
-				tasks.forEach(task -> {
-				 	System.out.println("Task: " + task.getTaskType() + ", " + task.getResultState() + ", TID: " + transactionId + " ~ " + task.getTransactionId());
-				});
-				//
-				return !tasks.isEmpty();
-			}, 500, 80); // ~ 40s max
-		}
+			List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
+			// use this to debug, if needed ...
+			tasks.forEach(task -> {
+			 	System.out.println("Task: " + task.getTaskType() + ", " + task.getResultState() + ", TID: " + transactionId + " ~ " + task.getTransactionId());
+			});
+			//
+			return !tasks.isEmpty();
+		}, 500, 80); // ~ 40s max
 		//
 		return roleTreeNode;
 	}
