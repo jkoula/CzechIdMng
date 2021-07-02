@@ -206,7 +206,7 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
 		attributeMappingFilter.setSystemMappingId(syncMapping.getId());
 		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
-		Assert.assertEquals(5, attributeMappingDtos.size());
+		Assert.assertEquals(7, attributeMappingDtos.size());
 	}
 	
 	@Test
@@ -241,7 +241,7 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
 		attributeMappingFilter.setSystemMappingId(syncMapping.getId());
 		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
-		Assert.assertEquals(5, attributeMappingDtos.size());
+		Assert.assertEquals(7, attributeMappingDtos.size());
 	}
 	
 	@Test
@@ -276,7 +276,7 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
 		attributeMappingFilter.setSystemMappingId(mappingDto.getId());
 		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
-		Assert.assertEquals(5, attributeMappingDtos.size());
+		Assert.assertEquals(7, attributeMappingDtos.size());
 	}
 	
 	@Test
@@ -321,7 +321,7 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
 		attributeMappingFilter.setSystemMappingId(syncMapping.getId());
 		List<SysSystemAttributeMappingDto> attributeMappingDtos = attributeMappingService.find(attributeMappingFilter, null).getContent();
-		Assert.assertEquals(5, attributeMappingDtos.size());
+		Assert.assertEquals(7, attributeMappingDtos.size());
 	}
 
 	@Test
