@@ -1,9 +1,11 @@
 --
--- CzechIdM 8 Flyway script 
+-- CzechIdM 11 Flyway script 
 -- BCV solutions s.r.o.
 --
+-- Script fixing wrong V8_02_003__role-guarantee-by-role.sql where was used public schema. That script was removed and replaced by this one.
+--
 -- Role guarantee by role
-CREATE TABLE idm_role_guarantee_role (
+CREATE TABLE IF NOT EXISTS idm_role_guarantee_role (
 	id bytea NOT NULL,
 	created timestamp NOT NULL,
 	creator varchar(255) NOT NULL,
@@ -21,11 +23,11 @@ CREATE TABLE idm_role_guarantee_role (
 	role_id bytea NOT NULL,
 	CONSTRAINT idm_role_guarantee_role_pkey PRIMARY KEY (id)
 );
-CREATE INDEX idx_idm_role_g_r_g_role ON idm_role_guarantee_role USING btree (guarantee_role_id);
-CREATE INDEX idx_idm_role_g_r_role ON idm_role_guarantee_role USING btree (role_id);
+CREATE INDEX IF NOT EXISTS idx_idm_role_g_r_g_role ON idm_role_guarantee_role USING btree (guarantee_role_id);
+CREATE INDEX IF NOT EXISTS idx_idm_role_g_r_role ON idm_role_guarantee_role USING btree (role_id);
 
 -- audit
-CREATE TABLE public.idm_role_guarantee_role_a (
+CREATE TABLE IF NOT EXISTS idm_role_guarantee_role_a (
 	id bytea NOT NULL,
 	rev int8 NOT NULL,
 	revtype int2 NULL,
