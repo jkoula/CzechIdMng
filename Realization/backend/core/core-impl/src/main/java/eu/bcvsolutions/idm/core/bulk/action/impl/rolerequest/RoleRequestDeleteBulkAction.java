@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.bulk.action.impl.rolerequest;
 
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ public class RoleRequestDeleteBulkAction extends AbstractRemoveBulkAction<IdmRol
 	
 	@Override
 	protected OperationResult processDto(IdmRoleRequestDto dto) {
+		// Check delete permission.
+		getService().checkAccess(dto, IdmBasePermission.DELETE);
 		// Request in Executed state can not be delete or change
 		OperationResultDto systemState = dto.getSystemState();
 		if (RoleRequestState.EXECUTED == dto.getState() && systemState != null
