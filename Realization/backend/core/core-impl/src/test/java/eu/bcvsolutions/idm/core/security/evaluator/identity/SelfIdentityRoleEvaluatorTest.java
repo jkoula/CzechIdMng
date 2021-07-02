@@ -7,10 +7,9 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;

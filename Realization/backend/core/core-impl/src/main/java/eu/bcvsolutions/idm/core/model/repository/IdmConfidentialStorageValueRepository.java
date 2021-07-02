@@ -2,7 +2,7 @@ package eu.bcvsolutions.idm.core.model.repository;
 
 import java.util.UUID;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
 import eu.bcvsolutions.idm.core.model.entity.IdmConfidentialStorageValue;

@@ -370,8 +370,10 @@ public class DefaultFormService implements FormService {
 				formAttribute.setFormDefinition(definitionId);
 				formAttribute = formAttributeService.save(formAttribute, permission);
 			}
-			formDefinition = getCachedDefinition(definitionId);
 		}
+		// fill whole cache again (cache is evicted, after definition or attribute is saved)
+		formDefinition = getCachedDefinitions(formDefinition.getType()).getById(definitionId);
+		//
 		return formDefinition;
 	}
 
@@ -1858,8 +1860,9 @@ public class DefaultFormService implements FormService {
 			definition.setTrimmed(false);
 			definition.setFormAttributes(
 					formAttributeService
-					.find(attributeFilter, PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmFormAttribute_.seq.getName(), IdmFormAttribute_.name.getName())))
-					.getContent());
+						.find(attributeFilter, PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmFormAttribute_.seq.getName(), IdmFormAttribute_.name.getName())))
+						.getContent()
+			);
 			//
 			FormDefinitionCache cachedDefinition = new FormDefinitionCache();
 			cachedDefinition.putDefinition(definition);

@@ -482,7 +482,7 @@ public class DefaultSysSystemService
 		Assert.notNull(connectorInstance, "Connector instance is required to create connector form definition.");
 		Assert.notNull(connectorInstance.getConnectorKey(), "Connector key is required to create connector form definition.");
 		//
-		IdmFormDefinitionDto formDefinition = getFormService().getDefinition(SysSystem.class.getName(),
+		IdmFormDefinitionDto formDefinition = getFormService().getDefinition(SysSystem.class,
 				connectorInstance.getConnectorKey().getFullName());
 		//
 		formDefinition = resolveConnectorFormDefinition(formDefinition, connectorInstance);
@@ -505,7 +505,7 @@ public class DefaultSysSystemService
 		Assert.notNull(connectorInstance, "Connector instance is required.");
 		Assert.notNull(connectorInstance.getConnectorKey(), "Connector key is required.");
 
-		IdmFormDefinitionDto formDefinitionPooling = getFormService().getDefinition(SysSystem.class.getName(),
+		IdmFormDefinitionDto formDefinitionPooling = getFormService().getDefinition(SysSystem.class,
 				getPoolingFormDefinitionCode(connectorInstance));
 
 		if (formDefinitionPooling == null) {
@@ -528,7 +528,7 @@ public class DefaultSysSystemService
 		Assert.notNull(connectorInstance, "Connector instance is required.");
 		Assert.notNull(connectorInstance.getConnectorKey(), "Connector key is required.");
 
-		IdmFormDefinitionDto formDefinition = getFormService().getDefinition(SysSystem.class.getName(),
+		IdmFormDefinitionDto formDefinition = getFormService().getDefinition(SysSystem.class,
 				getOperationOptionsFormDefinitionCode(connectorInstance.getConnectorKey()));
 
 		if (formDefinition == null) {
@@ -829,8 +829,11 @@ public class DefaultSysSystemService
 				attribute.setSeq(seq);
 				formAttributes.add(attribute);
 			}
-			formDefinition = getFormService().createDefinition(SysSystem.class,
-					connectorInstance.getConnectorKey().getFullName(), formAttributes);
+			formDefinition = getFormService().createDefinition(
+					SysSystem.class,
+					connectorInstance.getConnectorKey().getFullName(),
+					formAttributes
+			);
 		} else {
 			// check attributes / attribute can be added into form definition
 			// update attribute is not supported now

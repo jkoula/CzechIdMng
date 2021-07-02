@@ -16,15 +16,15 @@ import eu.bcvsolutions.idm.core.api.event.EntityEventLock;
 @Component("entityEventLock")
 public class DefaultEntityEventLock implements EntityEventLock {
 
-	private static final ReentrantLock lock = new ReentrantLock(); // multi method synchronization
+	private static final ReentrantLock LOCK = new ReentrantLock(); // multi method synchronization
 	
 	@Override
 	public void unlock() {
-		lock.unlock();
+		LOCK.unlock();
 	}
 	
 	@Override
 	public void lock() {
-		lock.lock();
+		LOCK.lock();
 	}	
 }

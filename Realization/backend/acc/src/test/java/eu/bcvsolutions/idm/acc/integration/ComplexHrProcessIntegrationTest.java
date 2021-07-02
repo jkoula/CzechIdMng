@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.transaction.Transactional;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -1400,7 +1400,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 				values.add(formVal);
 			}
 		}
-		formService.saveValues(system, formDefinition, values);
+		formService.saveValues(system, formDefinition, values);		
 		return system;
 	}
 	
