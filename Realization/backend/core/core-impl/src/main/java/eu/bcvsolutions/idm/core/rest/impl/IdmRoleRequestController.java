@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.rest.impl;
 
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -37,11 +38,9 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
-import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestByIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResolvedIncompatibleRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
@@ -54,6 +53,7 @@ import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
+import eu.bcvsolutions.idm.core.bulk.action.impl.rolerequest.RoleRequestDeleteBulkAction;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
@@ -266,42 +266,20 @@ public class IdmRoleRequestController extends AbstractReadWriteDtoController<Idm
 							@AuthorizationScope(scope = CoreGroupPermission.ROLE_REQUEST_DELETE, description = "") }) })
 	public ResponseEntity<?> delete(
 			@ApiParam(value = "Role request's uuid identifier.", required = true) @PathVariable @NotNull String backendId) {
-		IdmRoleRequestService service = ((IdmRoleRequestService) this.getService());
 		IdmRoleRequestDto dto = getDto(backendId);
 		if (dto == null) {
 			throw new EntityNotFoundException(getService().getEntityClass(), backendId);
 		}
-		//
+
 		checkAccess(dto, IdmBasePermission.DELETE);
-		// Request in Executed state can not be delete or change
-		OperationResultDto systemState = dto.getSystemState();
-		if (RoleRequestState.EXECUTED == dto.getState() && systemState != null
-				&& OperationState.EXECUTED != systemState.getState()
-				&& OperationState.CANCELED != systemState.getState()) {
-			// Request was executed in IdM, but system state is not canceled -> we will change the system state to CANCELED.
-			OperationResultDto systemResult = new OperationResultDto.Builder(OperationState.CANCELED)
-					.setModel(new DefaultResultModel(CoreResultCode.ROLE_REQUEST_SYSTEM_STATE_CANCELED,
-							ImmutableMap.of("state", systemState != null ? systemState.getState().name() : "")))
-					.build();
-			dto.setSystemState(systemResult);
-			service.save(dto);
-			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
-		}
+		IdmBulkActionDto deleteAction = getAvailableBulkActions()
+				.stream()
+				.filter(action -> {return RoleRequestDeleteBulkAction.NAME.equals(action.getName());})
+				.findFirst()
+				.get();
+		deleteAction.setIdentifiers(Set.of(dto.getId()));
+		bulkAction(deleteAction);
 		
-		// Request in Executed state can not be delete or change
-		if (RoleRequestState.EXECUTED == dto.getState()) {
-			throw new RoleRequestException(CoreResultCode.ROLE_REQUEST_EXECUTED_CANNOT_DELETE,
-					ImmutableMap.of("request", dto));
-		}
-
-		// Only request in Concept state, can be deleted. In others states, will be
-		// Request set to Canceled state and save.
-		if (RoleRequestState.CONCEPT == dto.getState()) {
-			service.delete(dto);
-		} else {
-			service.cancel(dto);
-		}
-
 		return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
 	}
 

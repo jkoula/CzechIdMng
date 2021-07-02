@@ -1,10 +1,11 @@
 --
--- CzechIdM 10 Flyway script 
+-- CzechIdM 11 Flyway script 
 -- BCV solutions s.r.o.
---
+-- 
+-- Script fixing wrong V10_04_004__delegations.sql where was used public schema. That script was removed and replaced by this one.
 -- Delegations
 
-CREATE TABLE idm_delegation (
+CREATE TABLE IF NOT EXISTS idm_delegation (
 	id bytea NOT NULL,
 	created timestamp NOT NULL,
 	creator varchar(255) NOT NULL,
@@ -27,11 +28,11 @@ CREATE TABLE idm_delegation (
 	result_state varchar(45) NULL,
 	CONSTRAINT idm_delegation_pkey PRIMARY KEY (id)
 );
-CREATE INDEX idx_i_del_definition_id ON public.idm_delegation USING btree (definition_id);
-CREATE INDEX idx_i_del_owner_id ON public.idm_delegation USING btree (owner_id);
-CREATE INDEX idx_i_del_owner_type ON public.idm_delegation USING btree (owner_type);
+CREATE INDEX IF NOT EXISTS idx_i_del_definition_id ON idm_delegation USING btree (definition_id);
+CREATE INDEX IF NOT EXISTS idx_i_del_owner_id ON idm_delegation USING btree (owner_id);
+CREATE INDEX IF NOT EXISTS idx_i_del_owner_type ON idm_delegation USING btree (owner_type);
 
-CREATE TABLE idm_delegation_a (
+CREATE TABLE IF NOT EXISTS idm_delegation_a (
 	id bytea NOT NULL,
 	rev int8 NOT NULL,
 	revtype int2 NULL,
@@ -65,7 +66,7 @@ CREATE TABLE idm_delegation_a (
 	CONSTRAINT fk8yeyrfs1hoy93tpwtr2twgxxk FOREIGN KEY (rev) REFERENCES idm_audit(id)
 );
 
-CREATE TABLE idm_delegation_def (
+CREATE TABLE IF NOT EXISTS idm_delegation_def (
 	id bytea NOT NULL,
 	created timestamp NOT NULL,
 	creator varchar(255) NOT NULL,
@@ -88,14 +89,14 @@ CREATE TABLE idm_delegation_def (
 	delegator_id bytea NOT NULL,
 	CONSTRAINT idm_delegation_def_pkey PRIMARY KEY (id)
 );
-CREATE INDEX idx_i_del_def_del_cont_id ON public.idm_delegation_def USING btree (delegator_contract_id);
-CREATE INDEX idx_i_del_def_delegate_id ON public.idm_delegation_def USING btree (delegate_id);
-CREATE INDEX idx_i_del_def_delegator_id ON public.idm_delegation_def USING btree (delegator_id);
-CREATE INDEX idx_i_del_def_type ON public.idm_delegation_def USING btree (type);
-CREATE INDEX idx_i_del_def_valid_from ON public.idm_delegation_def USING btree (valid_from);
-CREATE INDEX idx_i_del_def_valid_till ON public.idm_delegation_def USING btree (valid_till);
+CREATE INDEX IF NOT EXISTS idx_i_del_def_del_cont_id ON idm_delegation_def USING btree (delegator_contract_id);
+CREATE INDEX IF NOT EXISTS idx_i_del_def_delegate_id ON idm_delegation_def USING btree (delegate_id);
+CREATE INDEX IF NOT EXISTS idx_i_del_def_delegator_id ON idm_delegation_def USING btree (delegator_id);
+CREATE INDEX IF NOT EXISTS idx_i_del_def_type ON idm_delegation_def USING btree (type);
+CREATE INDEX IF NOT EXISTS idx_i_del_def_valid_from ON idm_delegation_def USING btree (valid_from);
+CREATE INDEX IF NOT EXISTS idx_i_del_def_valid_till ON idm_delegation_def USING btree (valid_till);
 
-CREATE TABLE idm_delegation_def_a (
+CREATE TABLE IF NOT EXISTS idm_delegation_def_a (
 	id bytea NOT NULL,
 	rev int8 NOT NULL,
 	revtype int2 NULL,
