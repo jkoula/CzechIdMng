@@ -79,7 +79,7 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 	 * @param evaluatorProperties optional
 	 * @return configured monitoring, if exists.
 	 */
-	protected IdmMonitoringDto findMonitoring(String evaluatorType, String instanceId, ConfigurationMap evaluatorProperties) {
+	public IdmMonitoringDto findMonitoring(String evaluatorType, String instanceId, ConfigurationMap evaluatorProperties) {
 		IdmMonitoringFilter filter = new IdmMonitoringFilter();
 		filter.setEvaluatorType(evaluatorType);
 		filter.setInstanceId(instanceId);

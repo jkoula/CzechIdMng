@@ -100,6 +100,10 @@ public abstract class AbstractIntegrationTest {
 		longRunningTaskService
 			.find(filter, null)
 			.forEach(task -> {
+				if (task.isRunning()) {
+					task.setRunning(false);
+					task = longRunningTaskService.save(task);
+				}
 				longRunningTaskService.delete(task);
 			});
 	}
