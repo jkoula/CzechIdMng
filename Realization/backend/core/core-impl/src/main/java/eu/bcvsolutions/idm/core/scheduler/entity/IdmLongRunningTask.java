@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.envers.Audited;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -38,7 +39,7 @@ import eu.bcvsolutions.idm.core.ecm.api.entity.AttachableEntity;
 		@Index(name = "idx_idm_long_r_t_type", columnList = "task_type"),
 		@Index(name = "idx_idm_long_r_t_s_task", columnList = "scheduled_task_id")
 		})
-public class IdmLongRunningTask extends AbstractEntity implements AttachableEntity {
+public class IdmLongRunningTask extends AbstractEntity implements AttachableEntity, InstanceIdentifiable {
 
 	private static final long serialVersionUID = -4665452018920201474L;
 
@@ -181,10 +182,12 @@ public class IdmLongRunningTask extends AbstractEntity implements AttachableEnti
 		this.threadId = threadId;
 	}
 
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}
 
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}

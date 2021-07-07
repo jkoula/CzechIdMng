@@ -22,6 +22,7 @@ import org.hibernate.annotations.Type;
 
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
@@ -38,7 +39,7 @@ import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 		@Index(name = "idx_idm_monitoring_r_e_type", columnList = "evaluator_type"),
 		@Index(name = "idx_idm_monitoring_r_inst", columnList = "instance_id")
 })
-public class IdmMonitoringResult extends AbstractEntity {
+public class IdmMonitoringResult extends AbstractEntity implements InstanceIdentifiable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -150,10 +151,12 @@ public class IdmMonitoringResult extends AbstractEntity {
 		this.evaluatorProperties = evaluatorProperties;
 	}
 
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

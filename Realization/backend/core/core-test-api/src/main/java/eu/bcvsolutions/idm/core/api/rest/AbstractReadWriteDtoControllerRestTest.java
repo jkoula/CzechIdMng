@@ -47,6 +47,7 @@ import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.ExternalCodeable;
 import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
@@ -359,6 +360,51 @@ public abstract class AbstractReadWriteDtoControllerRestTest<DTO extends Abstrac
 		//
 		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
 		parameters.set(ExternalIdentifiable.PROPERTY_EXTERNAL_ID, externalIdentifiableDto.getExternalId());
+		//
+		List<DTO> results = find(parameters);
+		//
+		Assert.assertEquals(1, results.size());
+		Assert.assertEquals(createdDto.getId(), results.get(0).getId());
+		//
+		if (supportsAutocomplete()) {
+			results = autocomplete(parameters);
+			//
+			Assert.assertEquals(1, results.size());
+			Assert.assertEquals(createdDto.getId(), results.get(0).getId());
+		} else {
+			LOG.info("Controller [{}] doesn't support autocomplete method. Method will not be tested.", getController().getClass());
+		}
+		//
+		Assert.assertEquals(1, count(parameters));
+	}
+	
+	/**
+	 * Test search by instance identifier, if DTO implements {@link InstanceIdentifiable}.
+	 * 
+	 * @throws Exception
+	 * @since 11.1.0
+	 */
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testFindByInstanceId() {
+		DTO dto = prepareDto();
+		if (!(dto instanceof InstanceIdentifiable)) {
+			// ignore test
+			return;
+		}
+		//
+		InstanceIdentifiable instanceIdentifiableDto = (InstanceIdentifiable) dto;
+		instanceIdentifiableDto.setInstanceId(getHelper().createName());
+		//
+		DTO createdDto = createDto(dto);
+		//
+		// create another mock dto
+		InstanceIdentifiable dtoTwo = (InstanceIdentifiable) prepareDto();
+		dtoTwo.setInstanceId(getHelper().createName());
+		createDto((DTO) dtoTwo);
+		//
+		MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+		parameters.set(InstanceIdentifiable.PROPERTY_INSTANCE_ID, instanceIdentifiableDto.getInstanceId());
 		//
 		List<DTO> results = find(parameters);
 		//

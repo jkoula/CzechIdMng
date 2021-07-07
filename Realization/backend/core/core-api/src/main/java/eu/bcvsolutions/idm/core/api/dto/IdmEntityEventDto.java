@@ -13,6 +13,7 @@ import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 
 /**
@@ -22,7 +23,7 @@ import eu.bcvsolutions.idm.core.api.domain.PriorityType;
  * @since 8.0.0
  */
 @Relation(collectionRelation = "entityEvents")
-public class IdmEntityEventDto extends AbstractDto {
+public class IdmEntityEventDto extends AbstractDto implements InstanceIdentifiable {
 
 	private static final long serialVersionUID = 1L;
 	//
@@ -173,10 +174,12 @@ public class IdmEntityEventDto extends AbstractDto {
 		this.suspended = suspended;
 	}
 	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 	
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

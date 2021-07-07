@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -42,7 +43,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 		@Index(name = "idx_idm_entity_event_inst", columnList = "instance_id"),
 		@Index(name = "idx_idm_entity_event_root", columnList = "root_id"),
 		@Index(name = "idx_idm_entity_event_trans_id", columnList = "transaction_id")})
-public class IdmEntityEvent extends AbstractEntity {
+public class IdmEntityEvent extends AbstractEntity implements InstanceIdentifiable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -229,10 +230,12 @@ public class IdmEntityEvent extends AbstractEntity {
 		this.suspended = suspended;
 	}
 	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 	
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

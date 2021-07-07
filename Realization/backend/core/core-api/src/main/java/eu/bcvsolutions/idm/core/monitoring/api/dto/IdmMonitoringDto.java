@@ -14,6 +14,7 @@ import org.springframework.hateoas.core.Relation;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Disableable;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 
 /**
@@ -23,7 +24,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
  * @since 11.1.0
  */
 @Relation(collectionRelation = "monitorings")
-public class IdmMonitoringDto extends AbstractDto implements Disableable {
+public class IdmMonitoringDto extends AbstractDto implements Disableable, InstanceIdentifiable {
 
 	private static final long serialVersionUID = 1L;
 	//
@@ -95,10 +96,12 @@ public class IdmMonitoringDto extends AbstractDto implements Disableable {
 		return evaluatorProperties;
 	}
 	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 	
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

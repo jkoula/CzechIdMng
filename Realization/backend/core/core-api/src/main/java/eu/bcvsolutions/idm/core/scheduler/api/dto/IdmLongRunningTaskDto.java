@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -22,7 +23,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
  * @author Radek Tomiška
  */
 @Relation(collectionRelation = "longRunningTasks")
-public class IdmLongRunningTaskDto extends AbstractDto {
+public class IdmLongRunningTaskDto extends AbstractDto implements InstanceIdentifiable {
 
 	private static final long serialVersionUID = 1L;
 	//
@@ -108,10 +109,12 @@ public class IdmLongRunningTaskDto extends AbstractDto {
 		this.running = running;
 	}
 
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

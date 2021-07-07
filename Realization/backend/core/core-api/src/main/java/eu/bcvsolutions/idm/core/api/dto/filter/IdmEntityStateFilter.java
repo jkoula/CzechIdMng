@@ -16,7 +16,7 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
  * @author Radek Tomiška
  *
  */
-public class IdmEntityStateFilter extends DataFilter {
+public class IdmEntityStateFilter extends DataFilter implements InstanceIdentifiableFilter {
 	
 	public static final String PARAMETER_OWNER_TYPE = "ownerType";
 	public static final String PARAMETER_OWNER_ID = "ownerId";

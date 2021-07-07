@@ -17,6 +17,7 @@ import org.hibernate.envers.Audited;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Disableable;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 
 /**
@@ -31,7 +32,7 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 		@Index(name = "idx_idm_monitoring_e_type", columnList = "evaluator_type"),
 		@Index(name = "idx_idm_monitoring_inst", columnList = "instance_id")
 })
-public class IdmMonitoring extends AbstractEntity implements Disableable {
+public class IdmMonitoring extends AbstractEntity implements Disableable, InstanceIdentifiable {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -110,10 +111,12 @@ public class IdmMonitoring extends AbstractEntity implements Disableable {
 		this.evaluatorProperties = evaluatorProperties;
 	}
 
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

@@ -10,6 +10,7 @@ import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 
 /**
  * Persists entity states, when entity is changed (e.g. by event processing). One entity change can have
@@ -19,7 +20,7 @@ import eu.bcvsolutions.idm.core.api.domain.Embedded;
  * @since 8.0.0
  */
 @Relation(collectionRelation = "entityStates")
-public class IdmEntityStateDto extends AbstractDto {
+public class IdmEntityStateDto extends AbstractDto implements InstanceIdentifiable {
 
 	private static final long serialVersionUID = 1L;
 	//
@@ -144,10 +145,12 @@ public class IdmEntityStateDto extends AbstractDto {
 		this.suspended = suspended;
 	}
 
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

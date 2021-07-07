@@ -9,7 +9,7 @@ import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
-import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.api.dto.filter.InstanceIdentifiableFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 
@@ -19,7 +19,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
  * @author Radek Tomiška
  *
  */
-public class IdmLongRunningTaskFilter extends DataFilter {
+public class IdmLongRunningTaskFilter extends DataFilter implements InstanceIdentifiableFilter {
 
 	public static final String PARAMETER_OPERATION_STATE = "operationState";
 	public static final String PARAMETER_TASK_TYPE = "taskType";
@@ -27,7 +27,7 @@ public class IdmLongRunningTaskFilter extends DataFilter {
 	public static final String PARAMETER_TILL = "till"; // => created till
 	public static final String PARAMETER_RUNNING = "running";
 	public static final String PARAMETER_STATEFUL = "stateful";
-	public static final String PARAMETER_INSTANCE_ID = ConfigurationService.PROPERTY_INSTANCE_ID;
+	public static final String PARAMETER_INSTANCE_ID = PROPERTY_INSTANCE_ID;
 	public static final String PARAMETER_CREATOR_ID = "creatorId";
 	public static final String PARAMETER_INCLUDE_ITEM_COUNTS = "includeItemCounts"; // success, failed and warning count will be loaded.
 	
@@ -109,24 +109,6 @@ public class IdmLongRunningTaskFilter extends DataFilter {
 	
 	public Boolean getStateful() {
 		return getParameterConverter().toBoolean(getData(), PARAMETER_STATEFUL);
-	}
-	
-	/**
-	 * Filter by server instance identifier.
-	 *  
-	 * @return server instance identifier
-	 */
-	public String getInstanceId() {
-		return getParameterConverter().toString(getData(), PARAMETER_INSTANCE_ID);
-	}
-	
-	/**
-	 * Filter by server instance identifier.
-	 * 
-	 * @param instanceId server instance identifier
-	 */
-	public void setInstanceId(String instanceId) {
-		set(PARAMETER_INSTANCE_ID, instanceId);
 	}
 
 	public UUID getCreatorId() {

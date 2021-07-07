@@ -100,10 +100,6 @@ public class DefaultIdmLongRunningTaskService
 					builder.like(builder.lower(root.get(IdmLongRunningTask_.taskDescription)), "%" + text + "%")					
 					));
 		}
-		String instanceId = filter.getInstanceId();
-		if (StringUtils.isNotEmpty(instanceId)) {
-			predicates.add(builder.equal(root.get(IdmLongRunningTask_.instanceId), instanceId));
-		}
 		String taskType = filter.getTaskType();
 		if (StringUtils.isNotEmpty(taskType)) {
 			predicates.add(builder.equal(root.get(IdmLongRunningTask_.taskType), taskType));

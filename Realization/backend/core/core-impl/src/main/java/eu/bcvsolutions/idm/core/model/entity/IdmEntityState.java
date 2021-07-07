@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 
@@ -35,7 +36,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 		@Index(name = "idx_idm_entity_state_so_id", columnList = "super_owner_id"),
 		@Index(name = "idx_idm_entity_state_o_type", columnList = "owner_type"),
 		@Index(name = "idx_idm_entity_state_event", columnList = "event_id")})
-public class IdmEntityState extends AbstractEntity {
+public class IdmEntityState extends AbstractEntity implements InstanceIdentifiable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -173,10 +174,12 @@ public class IdmEntityState extends AbstractEntity {
 		this.suspended = suspended;
 	}
 	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 	
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

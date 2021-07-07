@@ -14,6 +14,7 @@ import org.springframework.hateoas.core.Relation;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
+import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
@@ -25,7 +26,7 @@ import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
  * @since 11.1.0
  */
 @Relation(collectionRelation = "monitoringResults")
-public class IdmMonitoringResultDto  extends AbstractDto {
+public class IdmMonitoringResultDto  extends AbstractDto implements InstanceIdentifiable {
 	
 	private static final long serialVersionUID = 1L;
 	//
@@ -123,10 +124,12 @@ public class IdmMonitoringResultDto  extends AbstractDto {
 		return evaluatorProperties;
 	}
 	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
 	
+	@Override
 	public void setInstanceId(String instanceId) {
 		this.instanceId = instanceId;
 	}

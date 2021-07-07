@@ -17,7 +17,7 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
  * @author Radek Tomiška
  *
  */
-public class IdmEntityEventFilter extends DataFilter {
+public class IdmEntityEventFilter extends DataFilter implements InstanceIdentifiableFilter {
 	
 	public static final String PARAMETER_ROOT_ID = "rootId";
 	public static final String PARAMETER_PARENT_ID = "parentId";

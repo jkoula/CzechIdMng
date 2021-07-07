@@ -7,6 +7,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.InstanceIdentifiableFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
@@ -17,7 +18,7 @@ import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
  * @author Radek Tomiška
  * @since 11.1.0
  */
-public class IdmMonitoringResultFilter extends DataFilter {
+public class IdmMonitoringResultFilter extends DataFilter implements InstanceIdentifiableFilter {
 	
 	public static final String PARAMETER_MONITORING = "monitoring";
 	public static final String PARAMETER_LEVEL = "level";

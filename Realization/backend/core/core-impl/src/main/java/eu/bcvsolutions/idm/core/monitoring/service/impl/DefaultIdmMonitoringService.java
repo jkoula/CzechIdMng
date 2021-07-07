@@ -59,10 +59,6 @@ public class DefaultIdmMonitoringService
 					builder.like(builder.lower(root.get(IdmMonitoring_.description)), "%" + text + "%")
 			));
 		}
-		String instanceId = filter.getInstanceId();
-		if (StringUtils.isNotEmpty(instanceId)) {
-			predicates.add(builder.equal(root.get(IdmMonitoring_.instanceId), instanceId));
-		}
 		//
 		String evaluatorType = filter.getEvaluatorType();
 		if (StringUtils.isNotEmpty(evaluatorType)) {
