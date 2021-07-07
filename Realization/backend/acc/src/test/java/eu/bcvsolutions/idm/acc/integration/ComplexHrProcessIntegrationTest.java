@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -84,6 +85,7 @@ import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
@@ -91,6 +93,7 @@ import eu.bcvsolutions.idm.core.api.domain.RecursionType;
 import eu.bcvsolutions.idm.core.api.domain.ScriptAuthorityType;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeRuleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmGenerateValueDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -104,12 +107,17 @@ import eu.bcvsolutions.idm.core.api.dto.IdmScriptAuthorityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmScriptDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
+import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmGenerateValueFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleCatalogueFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmTreeNodeFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmTreeTypeFilter;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.event.EntityEventProcessor;
+import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeRuleService;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmGenerateValueService;
@@ -138,6 +146,8 @@ import eu.bcvsolutions.idm.core.generator.identity.IdentityEmailGenerator;
 import eu.bcvsolutions.idm.core.generator.identity.IdentityUsernameGenerator;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.model.event.RoleEvent;
+import eu.bcvsolutions.idm.core.model.event.RoleEvent.RoleEventType;
 import eu.bcvsolutions.idm.core.scheduler.api.config.SchedulerConfiguration;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.LongRunningFutureTask;
@@ -253,16 +263,18 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	@Autowired private FormService formService;
 	@Autowired private LongRunningTaskManager longRunningTaskManager;
 	@Autowired private IdmLongRunningTaskService longRunningTaskService;
+	@Autowired private EntityStateManager entityStateManager;
 
 	@Before
 	public void init() {
 		createUniqueNames();
 		disableAsyncProcessing();
+		testEnvironmentInitialization();
 	}
 	
 	@After
 	public void cleanUp() {
-		
+		testEnvironmentCleanup();
 	}
 	
 	
@@ -279,8 +291,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	 */
 	@Test
 	public void tc01NewEmploymentCommencing() {
-		testEnvironmentInitialization();
-		
+		// test case data preparation
 		Map<String,String> identityPattern = getIdentityPattern(dvorakUsername);
 		Map<String,String> contractPattern = getContractPattern(dvorakContractId0, LocalDate.now().minusDays(2).toString(), LocalDate.now().plusDays(2).toString());
 		List<String> expectedRoleGroups = Arrays.asList(adGroupDep1Role, adGroupAllRole, adGroupPkiRole, adGroupCons1Role, adGroupCons2Role);
@@ -308,14 +319,6 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		// provisioning evaluation
 		Map<String, Object> expectedValues = getLdapProvisioningValues(identityPattern, expectedRoleGroups);
 		checkProvisioningQueue(targetAdSystem, expectedValues);
-		
-		// cleanup section
-		clearProvisioningQueue(targetAdSystem);
-		getBean().deleteAllResourceData(TestResource.TABLE_NAME);
-		getBean().deleteAllResourceData(TestContractResource.TABLE_NAME);
-		
-		// tets environment cleanup methods
-		stopLdapTestServer();
 	}
 	
 	
@@ -385,6 +388,16 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		createHrContractSystem();
 		// target systems
 		initLdapDestinationSystem();
+	}
+	
+	private void testEnvironmentCleanup() {
+		disableAsyncProcessing();	
+		identityCleanup();		
+		roleCleanup();
+		roleCatalogueCleanup();
+		otherStuffClenaup();
+		organizationStructureCleanup();
+		systemCleanup();
 	}
 	
 	/**
@@ -734,6 +747,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	/************ SOURCE HR Identity and Contract systems ***************/
 	
 	private void createHrIdentitySystem() {
+		getBean().deleteAllResourceData(TestResource.TABLE_NAME);
 		// create new system
 		SysSystemDto system =  accTestHelper.createSystem(TestResource.TABLE_NAME, identitySysName, null, "NAME");
 		system.setReadonly(true);
@@ -824,6 +838,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	
 	
 	private void createHrContractSystem() {
+		getBean().deleteAllResourceData(TestContractResource.TABLE_NAME);
 		// create new system
 		SysSystemDto system =  accTestHelper.createSystem(TestContractResource.TABLE_NAME, contractSysName, null, "ID");
 		system.setReadonly(true);
@@ -1568,7 +1583,128 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		.put("mail",identity.get("email"))
 		.put("initials", Lists.newArrayList(roles))
 		.build();
+	}
+	
+	
+	
+	/****************** Cleanup methods **********************/
+	
+	private void roleCleanup() {
+		Set<String> roleNames = Set.of(adGroupAllRole, adGroupPkiRole, adGroupDep1Role,
+				adGroupDep2Role, adGroupCons1Role, adGroupCons2Role,
+				adGroupDirectorRole, consultantBusinessRole, allBusinessRole,
+				adUsersRole, system2ManualRole);
+		
+		List<IdmRoleDto> roles = new ArrayList<IdmRoleDto>(roleNames.size());
+		for (String name : roleNames) {
+			IdmRoleDto dto = roleService.getByCode(name);
+			if (dto != null) {
+				roles.add(dto);
+			}	
 		}
+
+		// sync role force deletion
+		Map<String,Serializable> properties = ImmutableMap.of(EntityEventProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE);
+		for (IdmRoleDto role : roles) {
+			EntityEvent<IdmRoleDto> event = new RoleEvent(RoleEventType.DELETE, role, properties);
+			roleService.publish(event);
+		}
+		
+		// performing delete operation on all items marked in entity state as to delete 
+		for (IdmRoleDto role : roles) {
+			List<IdmEntityStateDto> entityStates = entityStateManager.findStates(role, null).getContent();
+			OperationResultDto result = entityStates.get(0).getResult();
+			if (OperationState.RUNNING.equals(result.getState()) && 
+					CoreResultCode.DELETED.getCode().equals(result.getModel().getStatusEnum())) {
+				roleService.delete(role);
+			}
+		}
+		
+		// check proper deletion
+		for (String name : roleNames) {
+			Assert.assertNull(roleService.getByCode(name));
+		}
+	}
+	
+	private void roleCatalogueCleanup() {
+		IdmRoleCatalogueFilter catalogueFilter = new IdmRoleCatalogueFilter();
+		catalogueFilter.setCode(adGroupCat);
+		List<IdmRoleCatalogueDto> catalogues = roleCatalogueService.find(catalogueFilter, null).getContent();
+		catalogues.forEach(catalogue -> roleCatalogueService.delete(catalogue));
+		
+		catalogueFilter.setCode(businessRoleCat);
+		catalogues = roleCatalogueService.find(catalogueFilter, null).getContent();
+		catalogues.forEach(catalogue -> roleCatalogueService.delete(catalogue));
+	}
+	
+	private void otherStuffClenaup() {
+		// script cleanup
+		IdmScriptDto dto = scriptService.getByCode(stringToLocalDateScript);
+		scriptService.delete(dto);
+		dto = scriptService.getByCode(getIdentityUuidByPersonalNumScript);
+		scriptService.delete(dto);
+		
+		// generator setting removal
+		IdmGenerateValueFilter generatorFilter = new IdmGenerateValueFilter();
+		generatorFilter.setDtoType(IdmIdentityDto.class.getCanonicalName());
+		generatedAttributeService.find(generatorFilter,null)
+			.getContent()
+			.stream()
+			.filter(gen -> IdentityUsernameGenerator.class.getCanonicalName().equals(gen.getGeneratorType()))
+			.forEach(gen -> {
+				generatedAttributeService.delete(gen);
+			});
+		
+		generatedAttributeService.find(generatorFilter,null)
+			.getContent()
+			.stream()
+			.filter(gen -> IdentityEmailGenerator.class.getCanonicalName().equals(gen.getGeneratorType()))
+			.forEach(gen -> {
+				generatedAttributeService.delete(gen);
+			});
+		
+		// identity EAV
+		IdmFormAttributeFilter formAttrFilt = new IdmFormAttributeFilter();
+		formAttrFilt.setCode(eavAutoRoleAttrName);
+		List<IdmFormAttributeDto> attrs = formAttrService.find(formAttrFilt, null).getContent();
+		attrs.forEach(attr -> {
+			// if deleted after identity is deleted, no value remains	
+			formService.deleteAttribute(attr);
+			});
+	}
+	
+	private void identityCleanup() {
+		IdmIdentityDto dto = identityService.getByUsername(dvorakUsername);
+		if (dto!= null) {
+			identityService.delete(dto);
+		}
+		dto = identityService.getByUsername(novakUsername);
+		if (dto!= null) {
+			identityService.delete(dto);
+		}
+	}
+	
+	private void organizationStructureCleanup() {
+		IdmTreeNodeFilter filter = new IdmTreeNodeFilter();
+		filter.setCode(dep1NodeName);
+		treeNodeService.find(filter,null).getContent().forEach(node -> treeNodeService.delete(node)); 
+		filter.setCode(dep2NodeName);
+		treeNodeService.find(filter,null).getContent().forEach(node -> treeNodeService.delete(node));
+		}
+	
+	private void systemCleanup() {
+		stopLdapTestServer();
+		clearProvisioningQueue(targetAdSystem);
+		SysSystemDto system = systemService.getByCode(identitySysName);
+		systemService.delete(system);
+		system = systemService.getByCode(contractSysName);
+		systemService.delete(system);
+		system = systemService.getByCode(targetAdSystem);
+		systemService.delete(system);
+		
+		getBean().deleteAllResourceData(TestResource.TABLE_NAME);
+		getBean().deleteAllResourceData(TestContractResource.TABLE_NAME);
+	}
 	
 	/******************** Test evaluation tools ****************/
 	
