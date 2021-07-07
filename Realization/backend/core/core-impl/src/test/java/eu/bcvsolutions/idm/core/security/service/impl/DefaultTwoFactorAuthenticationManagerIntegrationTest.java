@@ -44,13 +44,11 @@ public class DefaultTwoFactorAuthenticationManagerIntegrationTest extends Abstra
 	@Autowired private AuthenticationManager authenticationManager;
 	@Autowired private IdmPasswordService passwordService;
 	@Autowired private JwtAuthenticationMapper jwtAuthenticationMapper;
-	@Autowired private ApplicationConfiguration applicationConfiguration;
 	//
 	private DefaultTwoFactorAuthenticationManager manager;
 	
 	@Before
 	public void init() {
-		System.out.println("..." + applicationConfiguration.getConfigurationPropertyName("stage"));
 		manager = context.getAutowireCapableBeanFactory().createBean(DefaultTwoFactorAuthenticationManager.class);
 		getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_STAGE, ApplicationConfiguration.STAGE_DEVELOPMENT);
 	}
