@@ -16,6 +16,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.plugin.core.PluginRegistry;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.ContractSliceConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.TreeConfiguration;
@@ -60,6 +61,7 @@ import eu.bcvsolutions.idm.core.api.service.LoggerManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ModuleService;
 import eu.bcvsolutions.idm.core.api.service.thin.IdmIdentityRoleThinService;
+import eu.bcvsolutions.idm.core.config.domain.DefaultApplicationConfiguration;
 import eu.bcvsolutions.idm.core.config.domain.DefaultContractSliceConfiguration;
 import eu.bcvsolutions.idm.core.config.domain.DefaultRoleConfiguration;
 import eu.bcvsolutions.idm.core.config.domain.DefaultTreeConfiguration;
@@ -465,6 +467,18 @@ public class IdmServiceConfiguration {
 	@ConditionalOnMissingBean(FormService.class)
 	public FormService formService() {
 		return new DefaultFormService(formValueServices);
+	}
+	
+	/**
+	 * Common application configuration.
+	 * 
+	 * @return
+	 * @since 11.1.0
+	 */
+	@Bean
+	@ConditionalOnMissingBean(ApplicationConfiguration.class)
+	public ApplicationConfiguration applicationConfiguration() {
+		return new DefaultApplicationConfiguration();
 	}
 
 	/**

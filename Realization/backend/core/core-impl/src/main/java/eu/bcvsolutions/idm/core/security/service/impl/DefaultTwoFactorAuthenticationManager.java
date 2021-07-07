@@ -64,7 +64,7 @@ public class DefaultTwoFactorAuthenticationManager implements TwoFactorAuthentic
 	@Autowired private IdmProfileService profileService;
 	// notification / configuration
 	@Autowired private NotificationManager notificationManager;
-	// @Autowired private ConfigurationService configurationService;
+	// @Autowired private ApplicationConfiguration applicationConfiguration;
 	// token services
 	@Autowired private TokenManager tokenManager;
 	@Autowired private JwtAuthenticationMapper jwtAuthenticationMapper;
@@ -109,8 +109,7 @@ public class DefaultTwoFactorAuthenticationManager implements TwoFactorAuthentic
 		} else { // NOTIFICATION
 			sendVerificationCode(identity, generateCode(new GuardedString(secret)));
 		}
-		// TODO: ApplicationConfiguration - stage development
-//		if ("development".equals(configurationService.getValue("idm.pub.app.stage"))) {
+//		if (applicationConfiguration.isDevelopment()) {
 //			LOG.warn("Development - verification code [{}].", generateCode(new GuardedString(secret)).asString());
 //		}
 		//
@@ -220,8 +219,7 @@ public class DefaultTwoFactorAuthenticationManager implements TwoFactorAuthentic
 					generateCode(new GuardedString(password.getVerificationSecret()))
 			);
 		}
-		// TODO: ApplicationConfiguration - stage development
-//		if ("development".equals(configurationService.getValue("idm.pub.app.stage"))) {
+//		if (applicationConfiguration.isDevelopment()) {
 //			LOG.warn("Development - verification code [{}].", 
 //					generateCode(new GuardedString(passwordService.findOneByIdentity(identityId).getVerificationSecret())).asString());
 //		}

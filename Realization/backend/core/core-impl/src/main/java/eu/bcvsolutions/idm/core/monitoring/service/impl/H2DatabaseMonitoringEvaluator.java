@@ -2,20 +2,19 @@ package eu.bcvsolutions.idm.core.monitoring.service.impl;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModel;
-import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.service.AbstractMonitoringEvaluator;
@@ -37,7 +36,7 @@ public class H2DatabaseMonitoringEvaluator extends AbstractMonitoringEvaluator {
 	public static final String NAME = "core-h-2-database-monitoring-evaluator";
 	@Autowired private DataSource dataSource;
 	@Autowired private IdmFlywayMigrationStrategy flywayMigrationStrategy;
-	@Autowired private ConfigurationService configurationService;
+	@Autowired private ApplicationConfiguration applicationConfiguration;
 	
 	@Override
 	public String getName() {
@@ -50,10 +49,7 @@ public class H2DatabaseMonitoringEvaluator extends AbstractMonitoringEvaluator {
 		//
 		String resolvedDbName = flywayMigrationStrategy.resolveDbName(dataSource);
 		if (IdmFlywayMigrationStrategy.H2_DBNAME.equals(resolvedDbName)) {
-			// TODO: ApplicationConfiguration - stage development
-			String stage = configurationService.getValue("idm.pub.app.stage");
-			// stage = "production";
-			if (StringUtils.isBlank(stage) || "production".equalsIgnoreCase(stage)) {
+			if (applicationConfiguration.isProduction()) {
 				resultModel = new DefaultResultModel(
 						CoreResultCode.MONITORING_H2_DATABASE_ERROR,
 						ImmutableMap.of(
@@ -65,7 +61,7 @@ public class H2DatabaseMonitoringEvaluator extends AbstractMonitoringEvaluator {
 						CoreResultCode.MONITORING_H2_DATABASE_WARNING,
 						ImmutableMap.of(
 								"instanceId", monitoring.getInstanceId(),
-								"stage", stage
+								"stage", applicationConfiguration.getStage()
 						)
 				);
 			}

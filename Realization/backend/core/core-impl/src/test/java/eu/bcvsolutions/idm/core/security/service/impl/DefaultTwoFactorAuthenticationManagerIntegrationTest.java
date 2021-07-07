@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmPasswordDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
@@ -43,18 +44,20 @@ public class DefaultTwoFactorAuthenticationManagerIntegrationTest extends Abstra
 	@Autowired private AuthenticationManager authenticationManager;
 	@Autowired private IdmPasswordService passwordService;
 	@Autowired private JwtAuthenticationMapper jwtAuthenticationMapper;
+	@Autowired private ApplicationConfiguration applicationConfiguration;
 	//
 	private DefaultTwoFactorAuthenticationManager manager;
 	
 	@Before
-	public void init() {		
+	public void init() {
+		System.out.println("..." + applicationConfiguration.getConfigurationPropertyName("stage"));
 		manager = context.getAutowireCapableBeanFactory().createBean(DefaultTwoFactorAuthenticationManager.class);
-		getHelper().setConfigurationValue("idm.pub.app.stage", "development");
+		getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_STAGE, ApplicationConfiguration.STAGE_DEVELOPMENT);
 	}
 	
 	@After
 	public void after() {
-		getHelper().setConfigurationValue("idm.pub.app.stage", null);
+		getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_STAGE, null);
 	}
 	
 	@Test

@@ -19,7 +19,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Integration test for IdentityRoleExpirationTaskExecutor
+ * Integration test for IdentityRoleExpirationTaskExecutor.
  * 
  * @author Filip Mestanek
  * @author Radek Tomiška

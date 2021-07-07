@@ -7,9 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.event.processor.module.InitAdminIdentityProcessor;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
@@ -27,14 +27,14 @@ import eu.bcvsolutions.idm.test.api.AbstractUnitTest;
 public class DemoAdminMonitoringEvaluatorUnitTest extends AbstractUnitTest {
 
 	@Mock private AuthenticationManager authenticationManager;
-	@Mock private ConfigurationService configurationService;
+	@Mock private ApplicationConfiguration applicationConfiguration;
 	@Mock private LookupService lookupService;
 	//
 	@InjectMocks private DemoAdminMonitoringEvaluator evaluator;
 	
 	@Test
 	public void testDevelopmentWithDemoAdmin() {
-		Mockito.when(configurationService.getValue("idm.pub.app.stage")).thenReturn("development");
+		Mockito.when(applicationConfiguration.isDevelopment()).thenReturn(true);
 		Mockito.when(lookupService.lookupDto(IdmIdentityDto.class, InitAdminIdentityProcessor.ADMIN_USERNAME)).thenReturn(new IdmIdentityDto(InitAdminIdentityProcessor.ADMIN_USERNAME));
 		Mockito.when(authenticationManager.validate(ArgumentMatchers.any())).thenReturn(true);
 		//
@@ -48,7 +48,7 @@ public class DemoAdminMonitoringEvaluatorUnitTest extends AbstractUnitTest {
 	
 	@Test
 	public void testProductionWithDemoAdmin() {
-		Mockito.when(configurationService.getValue("idm.pub.app.stage")).thenReturn("production");
+		Mockito.when(applicationConfiguration.isDevelopment()).thenReturn(false);
 		Mockito.when(lookupService.lookupDto(IdmIdentityDto.class, InitAdminIdentityProcessor.ADMIN_USERNAME)).thenReturn(new IdmIdentityDto(InitAdminIdentityProcessor.ADMIN_USERNAME));
 		Mockito.when(authenticationManager.validate(ArgumentMatchers.any())).thenReturn(true);
 		//

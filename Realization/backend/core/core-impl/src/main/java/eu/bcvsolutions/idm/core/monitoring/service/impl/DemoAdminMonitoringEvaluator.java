@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModel;
-import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.model.event.processor.module.InitAdminIdentityProcessor;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
@@ -36,7 +36,7 @@ public class DemoAdminMonitoringEvaluator extends AbstractMonitoringEvaluator {
 	public static final String NAME = "core-demo-admin-monitoring-evaluator";
 	//
 	@Autowired private AuthenticationManager authenticationManager;
-	@Autowired private ConfigurationService configurationService;
+	@Autowired private ApplicationConfiguration applicationConfiguration;
 	
 	@Override
 	public String getName() {
@@ -61,9 +61,8 @@ public class DemoAdminMonitoringEvaluator extends AbstractMonitoringEvaluator {
 			//
 			if (authenticationManager.validate(loginDto)) {
 				resultModel = new DefaultResultModel(CoreResultCode.MONITORING_DEMO_ADMIN_WARNING);
-				// TODO: ApplicationConfiguration - stage development
-				String stage = configurationService.getValue("idm.pub.app.stage");
-				if (!"development".equalsIgnoreCase(stage)) {
+				//
+				if (!applicationConfiguration.isDevelopment()) {
 					result.setLevel(NotificationLevel.ERROR);
 				}
 			} else {
