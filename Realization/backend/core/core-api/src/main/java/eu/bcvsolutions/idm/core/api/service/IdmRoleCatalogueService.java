@@ -12,7 +12,7 @@ import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 
 /**
- * Role could be in one catalogue (simply roles folder)
+ * Role could be in one catalogue (simply roles folder).
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
@@ -43,7 +43,7 @@ public interface IdmRoleCatalogueService extends
 	 * 
 	 * @return
 	 */
-	 Page<IdmRoleCatalogueDto> findRoots(Pageable pageable);
+	Page<IdmRoleCatalogueDto> findRoots(Pageable pageable);
 	 
 	 /**
 	 * Method returns direct children by parent id
@@ -78,13 +78,17 @@ public interface IdmRoleCatalogueService extends
 	
 	/**
 	 * Find by external ID.
+	 * 
+	 * @since 11.1.0
 	 */
-	IdmRoleCatalogueDto findByExternalId(String catalogCode);
+	IdmRoleCatalogueDto findByExternalId(String externalId);
 
 	/**
 	 * Resolve role catalogue by DN.
 	 * Returns catalog where can be embedded data for parent catalog. That catalogs don't have to be saved.
 	 * This method was designed for sync of role and is called from a script!
+	 * 
+	 * @since 11.1.0
 	 */
 	IdmRoleCatalogueDto resolveRoleCatalogueByDn(String roleDn, UUID mainCatalogueId);
 }

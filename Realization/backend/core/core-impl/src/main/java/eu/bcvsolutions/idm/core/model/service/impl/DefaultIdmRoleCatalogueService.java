@@ -193,9 +193,9 @@ public class DefaultIdmRoleCatalogueService
 	}
 
 	@Override
-	public IdmRoleCatalogueDto findByExternalId(String catalogCode) {
+	public IdmRoleCatalogueDto findByExternalId(String externalId) {
 		IdmRoleCatalogueFilter catalogueFilter = new IdmRoleCatalogueFilter();
-		catalogueFilter.setExternalId(catalogCode);
+		catalogueFilter.setExternalId(externalId);
 		return this.find(catalogueFilter, null)
 				.getContent()
 				.stream()

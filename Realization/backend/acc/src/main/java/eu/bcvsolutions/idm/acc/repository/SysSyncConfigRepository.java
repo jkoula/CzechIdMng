@@ -78,7 +78,7 @@ public interface SysSyncConfigRepository extends AbstractEntityRepository<SysSyn
 	/**
 	 * Find role configs by member system mapping ID.
 	 * 
-	 * @since 11.0.1
+	 * @since 11.1.0
 	 */
 	@Query("select e from SysSyncRoleConfig e where e.memberSystemMapping.id = :memberSystemMapping")
 	List<SysSyncRoleConfig> findRoleConfigBySystemMapping(@Param("memberSystemMapping") UUID memberSystemMapping);
@@ -86,7 +86,7 @@ public interface SysSyncConfigRepository extends AbstractEntityRepository<SysSyn
 	/**
 	 * Find role configs by system member-of attribute ID.
 	 * 
-	 * @since 11.0.1
+	 * @since 11.1.0
 	 */
 	@Query("select e from SysSyncRoleConfig e where e.memberOfAttribute.id = :attributeMapping")
 	List<SysSyncRoleConfig> findRoleConfigByMemberOfAttribute(@Param("attributeMapping") UUID attributeMapping);
@@ -94,7 +94,7 @@ public interface SysSyncConfigRepository extends AbstractEntityRepository<SysSyn
 	/**
 	 * Find role configs by system member identifier attribute ID.
 	 * 
-	 * @since 11.0.1
+	 * @since 11.1.0
 	 */
 	@Query("select e from SysSyncRoleConfig e where e.memberIdentifierAttribute.id = :memberIdentifierAttribute")
 	List<SysSyncRoleConfig> findRoleConfigByMemberIdentifierAttribute(@Param("memberIdentifierAttribute") UUID memberIdentifierAttribute);
@@ -102,7 +102,7 @@ public interface SysSyncConfigRepository extends AbstractEntityRepository<SysSyn
 	/**
 	 * Find role configs by role catalog node ID.
 	 * 
-	 * @since 11.0.1
+	 * @since 11.1.0
 	 */
 	@Query("select e from SysSyncRoleConfig e where e.mainCatalogueRoleNode.id = :mainCatalogueRoleNode")
 	List<SysSyncRoleConfig> findRoleConfigByMainCatalogueRoleNode(@Param("mainCatalogueRoleNode") UUID mainCatalogueRoleNode);
@@ -110,7 +110,7 @@ public interface SysSyncConfigRepository extends AbstractEntityRepository<SysSyn
 	/**
 	 * Find role configs by role catalog node ID.
 	 * 
-	 * @since 11.0.1
+	 * @since 11.1.0
 	 */
 	@Query("select e from SysSyncRoleConfig e where e.removeCatalogueRoleParentNode.id = :removeCatalogueRoleParentNode")
 	List<SysSyncRoleConfig> findRoleConfigByRemoveCatalogueRoleParentNode(@Param("removeCatalogueRoleParentNode") UUID removeCatalogueRoleParentNode);

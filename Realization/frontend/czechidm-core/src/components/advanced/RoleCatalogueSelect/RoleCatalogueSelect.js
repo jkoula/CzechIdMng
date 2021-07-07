@@ -10,7 +10,7 @@ import Tree from '../Tree/Tree';
 const roleCatalogueManager = new RoleCatalogueManager(); // default manager in manager in props is not given
 
 /**
- * Select role catalogue
+ * Select role catalogue.
  *
  * TODO: multi select (see role select)
  *
@@ -241,15 +241,15 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
     //
     return (
       <Basic.Div>
-        <Basic.LabelWrapper label={this.getLabel() ? (<span style={{visibility: 'hidden'}}>T</span>) : null}>
+        <Basic.LabelWrapper label={ this.getLabel() ? (<span style={{ visibility: 'hidden' }}>T</span>) : null }>
           <Basic.Button
             level="default"
             icon="fa:folder-open"
-            style={{marginLeft: 5}}
-            onClick={this.showTree.bind(this)}
-            title={this.i18n('showTree.link.title')}
+            style={{ marginLeft: 5 }}
+            onClick={ this.showTree.bind(this) }
+            title={ this.i18n('showTree.link.title') }
             titlePlacement="bottom"
-            disabled={readOnly}/>
+            disabled={ readOnly }/>
         </Basic.LabelWrapper>
       </Basic.Div>
     );
@@ -282,62 +282,62 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
     //
     return (
       <span>
-        <Basic.Div style={{display: 'flex'}}>
-          <Basic.Div style={{flex: 1}}>
+        <Basic.Div style={{ display: 'flex' }}>
+          <Basic.Div style={{ flex: 1 }}>
             <EntitySelectBox
               entityType="roleCatalogue"
               ref="roleCatalogue"
-              manager={this.getManager()}
-              label={this.getLabel()}
-              placeholder={this.getPlaceholder()}
-              helpBlock={this.getHelpBlock()}
-              readOnly={readOnly || readOnlySelectBox}
-              required={required}
-              validationErrors={validationErrors}
-              validationMessage={validationMessage}
-              value={value}
-              multiSelect={multiSelect}
-              onChange={onChange}
-              niceLabel={(entity) => this.getManager().getNiceLabel(entity, showRoleCatalogueCode)}
-              additionalOptions={additionalOptions}/>
+              manager={ this.getManager() }
+              label={ this.getLabel() }
+              placeholder={ this.getPlaceholder() }
+              helpBlock={ this.getHelpBlock() }
+              readOnly={ readOnly || readOnlySelectBox }
+              required={ required }
+              validationErrors={ validationErrors }
+              validationMessage={ validationMessage }
+              value={ value }
+              multiSelect={ multiSelect }
+              onChange={ onChange }
+              niceLabel={ (entity) => this.getManager().getNiceLabel(entity, showRoleCatalogueCode) }
+              additionalOptions={ additionalOptions }/>
           </Basic.Div>
-          {this._renderShowTreeIcon()}
+          { this._renderShowTreeIcon() }
         </Basic.Div>
 
         <Basic.Modal
-          show={showTree}
-          onHide={this.hideTree.bind(this)}
+          show={ showTree }
+          onHide={ this.hideTree.bind(this) }
           backdrop="static"
           keyboard>
-          <Basic.Modal.Header text={this.getHeader()} closeButton/>
-          <Basic.Modal.Body style={{padding: 0}}>
+          <Basic.Modal.Header text={ this.getHeader() } closeButton/>
+          <Basic.Modal.Body style={{ padding: 0 }}>
             <Tree
               ref="roleCatalogueTree"
-              uiKey={this.getUiKey()}
-              manager={this.getManager()}
-              onChange={this.onModalSelect.bind(this)}
-              onDoubleClick={(nodeId) => this.onSelect(nodeId)}
-              clearable={false}
-              multiSelect={multiSelect}
-              selected={!selected || _.isArray(selected) ? selected : [selected]}
-              paginationRootSize={treePaginationRootSize}
-              paginationNodeSize={treePaginationNodeSize}
-              nodeNiceLabel={(node) => this.getManager().getNiceLabel(node, showRoleCatalogueCode)}
+              uiKey={ this.getUiKey() }
+              manager={ this.getManager() }
+              onChange={ this.onModalSelect.bind(this) }
+              onDoubleClick={ (nodeId) => this.onSelect(nodeId) }
+              clearable={ false }
+              multiSelect={ multiSelect }
+              selected={ !selected || _.isArray(selected) ? selected : [selected] }
+              paginationRootSize={ treePaginationRootSize }
+              paginationNodeSize={ treePaginationNodeSize }
+              nodeNiceLabel={ (node) => this.getManager().getNiceLabel(node, showRoleCatalogueCode) }
             />
           </Basic.Modal.Body>
           <Basic.Modal.Footer>
             <Basic.Button
               level="link"
-              onClick={this.hideTree.bind(this)}>
-              {this.i18n('button.cancel')}
+              onClick={ this.hideTree.bind(this) }>
+              { this.i18n('button.cancel') }
             </Basic.Button>
 
             <Basic.Button
               level="success"
               showLoadingIcon
-              onClick={this.onSelect.bind(this, null)}
-              disabled={!!(!selected || (_.isArray(selected) && selected.length === 0))}>
-              {this.i18n('button.select')}
+              onClick={ this.onSelect.bind(this, null) }
+              disabled={ !!(!selected || (_.isArray(selected) && selected.length === 0)) }>
+              { this.i18n('button.select') }
             </Basic.Button>
           </Basic.Modal.Footer>
         </Basic.Modal>

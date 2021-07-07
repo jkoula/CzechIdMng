@@ -38,7 +38,7 @@ import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 
 /**
- * Form instance values
+ * Form instance value.
  * 
  * @author Radek Tomiška
  */
