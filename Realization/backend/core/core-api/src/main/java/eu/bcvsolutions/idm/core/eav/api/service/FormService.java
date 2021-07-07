@@ -79,6 +79,7 @@ public interface FormService extends ScriptEnabled {
 	
 	/**
 	 * Skip validation for EAV values.
+	 * 
 	 * @since  11.1.0
 	 */
 	String SKIP_EAV_VALIDATION = "idm:skip-eav-validation";
@@ -401,10 +402,19 @@ public interface FormService extends ScriptEnabled {
 	/**
 	 * Saves form values to given owner and form definition. Only given form attributes by the given values will be saved ("PATCH").
 	 * 'EAV_SAVE' event <strong>is</strong> published for value owner after values are saved.
+	 * 
+	 * @param owner
+	 * @param formDefinition  [optional] if not specified, then main will be used.
+	 * @param newValues
+	 * @param validate
+	 * @param permission base permissions to evaluate (AND)
+	 * @return
+	 * @throws ForbiddenEntityException if authorization policies doesn't met (event permissions are evaluated)
+	 * @since 11.1.0
 	 */
 	IdmFormInstanceDto saveFormInstance(
 			Identifiable owner,
-			IdmFormDefinitionDto formDefinition,
+			IdmFormDefinitionDto formDefinition, 
 			List<IdmFormValueDto> newValues,
 			boolean validate,
 			BasePermission... permission);

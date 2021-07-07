@@ -52,6 +52,18 @@ public class FormInstanceValidateProcessor
 	public String getName() {
 		return PROCESSOR_NAME;
 	}
+	
+	@Override
+	public boolean conditional(EntityEvent<IdmFormInstanceDto> event) {
+		if (!super.conditional(event)) {
+			return false;
+		}
+		// Check if property for skip validation is sets to true.
+		if (getBooleanProperty(FormService.SKIP_EAV_VALIDATION, event.getProperties())) {
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	public EventResult<IdmFormInstanceDto> process(EntityEvent<IdmFormInstanceDto> event) {
@@ -93,15 +105,6 @@ public class FormInstanceValidateProcessor
 		}
 		//
 		return new DefaultEventResult<>(event, this);
-	}
-
-	@Override
-	public boolean conditional(EntityEvent<IdmFormInstanceDto> event) {
-		// Check if property for skip validation is sets to true.
-		if(getBooleanProperty(FormService.SKIP_EAV_VALIDATION, event.getProperties())){
-			return false;
-		}
-		return super.conditional(event);
 	}
 
 	/**
