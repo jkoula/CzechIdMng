@@ -37,7 +37,8 @@ import eu.bcvsolutions.idm.core.api.exception.CoreException;
 @Entity
 @Table(name = "idm_processed_task_item", indexes = {
 	@Index(name = "idm_processed_t_i_l_r_t", columnList = "long_running_task"),
-	@Index(name = "idm_processed_t_i_q_o", columnList = "scheduled_task_queue_owner")
+	@Index(name = "idm_processed_t_i_q_o", columnList = "scheduled_task_queue_owner"),
+	@Index(name = "idm_processed_t_i_r_e", columnList = "referenced_entity_id")
 })
 public class IdmProcessedTaskItem extends AbstractEntity {
 

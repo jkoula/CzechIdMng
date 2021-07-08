@@ -22,12 +22,12 @@ public interface ApplicationConfiguration extends Configurable {
 	/**
 	 * Application stage.
 	 */
-	String PROPERTY_STAGE = ConfigurationService.IDM_PRIVATE_PROPERTY_PREFIX + "app.stage";
+	String PROPERTY_STAGE = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.stage";
 	String DEFAULT_STAGE = STAGE_PRODUCTION;
 	
 	@Override
 	default String getConfigurableType() {
-		return null;
+		return AppModule.MODULE_ID;
 	}
 	
 	@Override
