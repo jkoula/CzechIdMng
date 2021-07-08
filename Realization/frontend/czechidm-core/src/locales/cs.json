@@ -6305,7 +6305,7 @@
         "attributes": {
           "force-delete": {
             "label": "Smazat i navázané záznamy (force delete)",
-            "help": "Smazat roli včetně oderání všech přiřazených rolí uživatelům, atomatických i business rolí a všech dalších navázaných záznamů."
+            "help": "Smazat roli včetně odebrání všech přiřazených rolí uživatelům, automatických i business rolí a všech dalších navázaných záznamů."
           }
         }
       },
