@@ -264,8 +264,7 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
       value,
       multiSelect,
       onChange,
-      additionalOptions,
-      readOnlySelectBox
+      additionalOptions
     } = this.props;
     const {
       showTree,
@@ -291,7 +290,7 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
               label={ this.getLabel() }
               placeholder={ this.getPlaceholder() }
               helpBlock={ this.getHelpBlock() }
-              readOnly={ readOnly || readOnlySelectBox }
+              readOnly={ readOnly }
               required={ required }
               validationErrors={ validationErrors }
               validationMessage={ validationMessage }
@@ -361,10 +360,6 @@ RoleCatalogueSelect.propTypes = {
    */
   multiSelect: PropTypes.bool,
   /**
-   * Make select box component read-only.
-   */
-  readOnlySelectBox: PropTypes.bool,
-  /**
    * Role catalogue selectbox label
    */
   label: PropTypes.string,
@@ -389,6 +384,5 @@ RoleCatalogueSelect.defaultProps = {
   ...Basic.AbstractFormComponent.defaultProps,
   uiKey: 'role-catalogue-tree',
   manager: roleCatalogueManager,
-  multiSelect: false,
-  readOnlySelectBox: false
+  multiSelect: false
 };

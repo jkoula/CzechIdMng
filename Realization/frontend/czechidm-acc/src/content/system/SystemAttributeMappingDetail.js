@@ -603,8 +603,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
                     required/>
                   <Advanced.ScriptArea
                     ref="transformationUidScript"
-                    scriptCategory={[Enums.ScriptCategoryEnum.findKeyBySymbol(Enums.ScriptCategoryEnum.SYSTEM),
-                      Enums.ScriptCategoryEnum.findKeyBySymbol(Enums.ScriptCategoryEnum.SYSTEM)]}
+                    scriptCategory={Enums.ScriptCategoryEnum.findKeyBySymbol(Enums.ScriptCategoryEnum.TRANSFORM_FROM)}
                     headerText={this.i18n('acc:entity.SystemAttributeMapping.passwordFilter.transformationUidScript.label')}
                     helpBlock={this.i18n('acc:entity.SystemAttributeMapping.passwordFilter.transformationUidScript.help')}
                     label={this.i18n('acc:entity.SystemAttributeMapping.passwordFilter.transformationUidScript.label')}

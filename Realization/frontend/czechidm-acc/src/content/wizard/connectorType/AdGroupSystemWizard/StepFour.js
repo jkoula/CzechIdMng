@@ -186,7 +186,6 @@ export default class StepFour extends AbstractWizardStep {
                 <Basic.Div style={{flex: 1}}>
                   <Advanced.RoleCatalogueSelect
                     ref="mainRoleCatalog"
-                    readOnlySelectBox
                     readOnly={!assignCatalogueSwitch}
                     required={!!removeCatalogueRoleSwitch && !newRoleCatalog}
                     onChange={this._onChangeMainRoleCatalog.bind(this)}
