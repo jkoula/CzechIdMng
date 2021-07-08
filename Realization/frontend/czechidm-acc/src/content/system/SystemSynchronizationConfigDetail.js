@@ -15,7 +15,7 @@ import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import SyncIdentityConfig from '../sync/SyncIdentityConfig';
 import SyncContractConfig from '../sync/SyncContractConfig';
 import SyncTreeConfig from '../sync/SyncTreeConfig';
-import SyncRoleConfig from "../sync/SyncRoleConfig";
+import SyncRoleConfig from '../sync/SyncRoleConfig';
 import SyncStatistic from '../sync/SyncStatistic';
 import SyncResult from '../sync/SyncResult';
 
@@ -571,6 +571,9 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
 
   render() {
     const {_showLoading, _synchronizationConfig} = this.props;
+    if (!_synchronizationConfig) {
+      return null;
+    }
     const {systemMappingId, showLoading, activeKey, entityType, enabled} = this.state;
     const isNew = this._getIsNew();
     const innerShowLoading = _showLoading || showLoading;

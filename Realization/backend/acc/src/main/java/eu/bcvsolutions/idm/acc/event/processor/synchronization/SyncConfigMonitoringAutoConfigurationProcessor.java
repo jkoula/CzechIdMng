@@ -41,6 +41,7 @@ public class SyncConfigMonitoringAutoConfigurationProcessor
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SyncConfigMonitoringAutoConfigurationProcessor.class);
 	public static final String PROCESSOR_NAME = "acc-sync-config-monitoring-auto-configuration-processor";
 	//
+	// @Autowired private MonitoringManager monitoringManager;
 	@Autowired private IdmMonitoringService monitoringService;
 	@Autowired private SynchronizationMonitoringEvaluator synchronizationMonitoringEvaluator;
 	@Autowired private ConfigurationService configurationService;
@@ -61,6 +62,21 @@ public class SyncConfigMonitoringAutoConfigurationProcessor
 		//
 		if (event.hasType(SyncConfigEventType.CREATE)) {
 			configureMonitoring(synchronizationId);
+	    /**
+		} else if (event.hasType(SyncConfigEventType.UPDATE)) {
+			// run monitoring after synchronization is enabled / disabled
+			// TODO: token is updated for each item, when sync is running => token should be moved into different entity (~ instance of sync
+			
+			AbstractSysSyncConfigDto syncConfig = event.getContent();
+			AbstractSysSyncConfigDto originalSource = event.getOriginalSource();
+			if (originalSource != null && originalSource.isEnabled() != syncConfig.isEnabled()) {
+				// execute monitoring, if is configured
+				IdmMonitoringDto monitoring = findMonitoring(synchronizationId);
+				if (monitoring != null) {
+					monitoringManager.execute(monitoring);
+				}
+			}
+		*/
 		} else { // delete
 			deleteMonitoring(synchronizationId);
 		}

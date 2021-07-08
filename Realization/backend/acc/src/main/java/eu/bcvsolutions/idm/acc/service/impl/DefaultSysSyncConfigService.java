@@ -50,10 +50,13 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ExportDescriptorDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
 /**
  * Default synchronization config service.
@@ -83,6 +86,21 @@ public class DefaultSysSyncConfigService
 		//
 		this.repository = repository;
 		this.syncLogService = synchronizationLogService;
+	}
+	
+	@Override
+	public EventContext<AbstractSysSyncConfigDto> publish(EntityEvent<AbstractSysSyncConfigDto> event, EntityEvent<?> parentEvent, BasePermission... permission) {
+		Assert.notNull(event, "Event must be not null!");
+		AbstractSysSyncConfigDto content = event.getContent();
+		Assert.notNull(content, "Content (dto) in event must be not null!");
+		// 
+		// load original source - abstract entity cannot be found by lookup
+		// TODO: token is updated for each item, when sync is running => token should be moved into different entity (~ instance of sync)
+		/**
+		if (!isNew(content)) {
+			event.setOriginalSource(get(content.getId()));
+		}*/
+		return super.publish(event, parentEvent, permission);
 	}
 
 	@Override
