@@ -47,6 +47,7 @@ import eu.bcvsolutions.idm.acc.repository.SysSyncConfigRepository;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ExportDescriptorDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
@@ -95,11 +96,11 @@ public class DefaultSysSyncConfigService
 		Assert.notNull(content, "Content (dto) in event must be not null!");
 		// 
 		// load original source - abstract entity cannot be found by lookup
-		// TODO: token is updated for each item, when sync is running => token should be moved into different entity (~ instance of sync)
-		/**
-		if (!isNew(content)) {
+		// TODO: token is updated for each item, when sync is running => token should be moved into different entity (~ instance of sync) 
+		// => HIGH priority from FE is reused as workaround for now.
+		if (!isNew(content) && event.hasPriority(PriorityType.HIGH)) {
 			event.setOriginalSource(get(content.getId()));
-		}*/
+		}
 		return super.publish(event, parentEvent, permission);
 	}
 

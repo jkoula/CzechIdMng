@@ -12,10 +12,12 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -37,7 +39,7 @@ import eu.bcvsolutions.idm.core.model.event.RoleEvent.RoleEventType;
 import eu.bcvsolutions.idm.test.api.AbstractVerifiableUnitTest;
 
 /**
- * Event processing tests
+ * Event processing tests.
  * 
  * @author Radek Tomiška
  *
@@ -96,8 +98,17 @@ public class EntityEventProcessorUnitTest extends AbstractVerifiableUnitTest {
 	public void testHasEventType() {
 		EntityEvent<IdmIdentityDto> event = new IdentityEvent(IdentityEventType.UPDATE, new IdmIdentityDto());
 		//
-		assertTrue(event.hasType(IdentityEventType.UPDATE));
-		assertFalse(event.hasType(IdentityEventType.CREATE));
+		Assert.assertTrue(event.hasType(IdentityEventType.UPDATE));
+		Assert.assertFalse(event.hasType(IdentityEventType.CREATE));
+		Assert.assertNull(event.getPriority());
+		Assert.assertFalse(event.hasPriority(PriorityType.NORMAL));
+		Assert.assertFalse(event.hasPriority(PriorityType.HIGH));
+		Assert.assertFalse(event.hasPriority(PriorityType.IMMEDIATE));
+		//
+		event.setPriority(PriorityType.HIGH);
+		Assert.assertFalse(event.hasPriority(PriorityType.NORMAL));
+		Assert.assertTrue(event.hasPriority(PriorityType.HIGH));
+		Assert.assertFalse(event.hasPriority(PriorityType.IMMEDIATE));
 	}
 
 	@Test

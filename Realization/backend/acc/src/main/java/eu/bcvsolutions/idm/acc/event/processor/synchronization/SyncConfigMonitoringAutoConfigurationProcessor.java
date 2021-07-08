@@ -11,6 +11,7 @@ import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.event.SyncConfigEvent.SyncConfigEventType;
 import eu.bcvsolutions.idm.acc.monitoring.SynchronizationMonitoringEvaluator;
+import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -22,6 +23,7 @@ import eu.bcvsolutions.idm.core.model.event.processor.module.InitMonitoringProce
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
+import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 
 /**
@@ -41,13 +43,13 @@ public class SyncConfigMonitoringAutoConfigurationProcessor
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SyncConfigMonitoringAutoConfigurationProcessor.class);
 	public static final String PROCESSOR_NAME = "acc-sync-config-monitoring-auto-configuration-processor";
 	//
-	// @Autowired private MonitoringManager monitoringManager;
+	@Autowired private MonitoringManager monitoringManager;
 	@Autowired private IdmMonitoringService monitoringService;
 	@Autowired private SynchronizationMonitoringEvaluator synchronizationMonitoringEvaluator;
 	@Autowired private ConfigurationService configurationService;
 	
 	public SyncConfigMonitoringAutoConfigurationProcessor() {
-		super(SyncConfigEventType.CREATE, SyncConfigEventType.DELETE);
+		super(SyncConfigEventType.CREATE, SyncConfigEventType.UPDATE, SyncConfigEventType.DELETE);
 	}
 
 	@Override
@@ -62,21 +64,21 @@ public class SyncConfigMonitoringAutoConfigurationProcessor
 		//
 		if (event.hasType(SyncConfigEventType.CREATE)) {
 			configureMonitoring(synchronizationId);
-	    /**
 		} else if (event.hasType(SyncConfigEventType.UPDATE)) {
 			// run monitoring after synchronization is enabled / disabled
-			// TODO: token is updated for each item, when sync is running => token should be moved into different entity (~ instance of sync
-			
-			AbstractSysSyncConfigDto syncConfig = event.getContent();
-			AbstractSysSyncConfigDto originalSource = event.getOriginalSource();
-			if (originalSource != null && originalSource.isEnabled() != syncConfig.isEnabled()) {
-				// execute monitoring, if is configured
-				IdmMonitoringDto monitoring = findMonitoring(synchronizationId);
-				if (monitoring != null) {
-					monitoringManager.execute(monitoring);
+			// TODO: token is updated for each item, when sync is running => token should be moved into different entity (~ instance of sync)
+			// => HIGH priority from FE is reused as workaround for now.
+			if (event.hasPriority(PriorityType.HIGH)) {			
+				AbstractSysSyncConfigDto syncConfig = event.getContent();
+				AbstractSysSyncConfigDto originalSource = event.getOriginalSource();
+				if (originalSource != null && originalSource.isEnabled() != syncConfig.isEnabled()) {
+					// execute monitoring, if is configured
+					IdmMonitoringDto monitoring = findMonitoring(synchronizationId);
+					if (monitoring != null) {
+						monitoringManager.execute(monitoring);
+					}
 				}
 			}
-		*/
 		} else { // delete
 			deleteMonitoring(synchronizationId);
 		}

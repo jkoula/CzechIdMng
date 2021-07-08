@@ -225,14 +225,26 @@ public interface EntityEvent<E extends Serializable> extends ResolvableTypeProvi
 	/**
 	 * Returns true, if event's type equals given eventType.
 	 * 
-	 * @param event
 	 * @param eventType
-	 * @return
+	 * @return true - event has the same type
 	 */
 	default boolean hasType(EventType eventType) {
 		Assert.notNull(eventType, "Event type is required to compare.");
 		//
 		return eventType.name().equals(getType().name());
+	}
+	
+	/**
+	 * Returns true, if event's priority equals given priority.
+	 * 
+	 * @param priority priority type
+	 * @return true - event has the same priority
+	 * @since 11.1.0
+	 */
+	default boolean hasPriority(PriorityType priority) {
+		Assert.notNull(priority, "Priority type is required to compare.");
+		//
+		return priority == getPriority();
 	}
 
 	/**
