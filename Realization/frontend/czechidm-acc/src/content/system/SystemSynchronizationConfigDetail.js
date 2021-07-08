@@ -571,11 +571,11 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
 
   render() {
     const {_showLoading, _synchronizationConfig} = this.props;
-    if (!_synchronizationConfig) {
+    const isNew = this._getIsNew();
+    if (!isNew && !_synchronizationConfig) {
       return null;
     }
     const {systemMappingId, showLoading, activeKey, entityType, enabled} = this.state;
-    const isNew = this._getIsNew();
     const innerShowLoading = _showLoading || showLoading;
     const systemId = this.props.match.params.entityId;
     const forceSearchParameters = new Domain.SearchParameters()
