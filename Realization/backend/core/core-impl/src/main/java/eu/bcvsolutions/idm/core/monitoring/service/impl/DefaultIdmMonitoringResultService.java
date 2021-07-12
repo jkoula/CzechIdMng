@@ -12,6 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -37,16 +38,26 @@ public class DefaultIdmMonitoringResultService
 		extends AbstractEventableDtoService<IdmMonitoringResultDto, IdmMonitoringResult, IdmMonitoringResultFilter> 
 		implements IdmMonitoringResultService {
 	
+	private final IdmMonitoringResultRepository repository;
+	
 	@Autowired
 	public DefaultIdmMonitoringResultService(
 			IdmMonitoringResultRepository repository,
 			EntityEventManager entityEventManager) {
 		super(repository, entityEventManager);
+		//
+		this.repository = repository;
 	}
 	
 	@Override
 	public AuthorizableType getAuthorizableType() {
 		return new AuthorizableType(MonitoringGroupPermission.MONITORINGRESULT, getEntityClass());
+	}
+	
+	@Override
+	@Transactional
+	public int resetLastResult(UUID monitoringId) {
+		return repository.resetLastResult(monitoringId, false);
 	}
 	
 	@Override
@@ -71,6 +82,10 @@ public class DefaultIdmMonitoringResultService
 		List<NotificationLevel> levels = filter.getLevels();
 		if (CollectionUtils.isNotEmpty(levels)) {
 			predicates.add(root.get(IdmMonitoringResult_.level).in(levels));
+		}
+		//
+		if (filter.isLastResult()) {
+			predicates.add(builder.isTrue(root.get(IdmMonitoringResult_.lastResult)));
 		}
 		//
 		return predicates;

@@ -1560,6 +1560,11 @@
       "filter": {
         "text": {
           "placeholder": "Typ vyhodnocení či popis"
+        },
+        "lastResult": {
+          "placeholder": "Všechny výsledky monitoringu ...",
+          "yes": "Poslední výsledky monitoringu",
+          "no": "Všechny výsledky monitoringu"
         }
       },
       "edit": {

@@ -286,7 +286,8 @@ export class MonitoringTable extends Advanced.AbstractTableContent {
             () => {
               this.context.store.dispatch(monitoringResultManager.fetchLastMonitoringResults());
             }
-          }>
+          }
+          _searchParameters={ this.getSearchParameters() }>
 
           <Advanced.Column
             header=""
@@ -517,6 +518,7 @@ function select(state, component) {
     supportedEvaluators: DataManager.getData(state, MonitoringManager.UI_KEY_SUPPORTED_EVALUATORS),
     _showLoading: Utils.Ui.isShowLoading(state, `${ component.uiKey }-detail`)
       || Utils.Ui.isShowLoading(state, MonitoringManager.UI_KEY_SUPPORTED_EVALUATORS),
+    _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey),
     _permissions: Utils.Permission.getPermissions(state, `${ component.uiKey }-detail`)
   };
 }

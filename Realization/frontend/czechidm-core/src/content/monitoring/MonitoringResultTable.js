@@ -44,6 +44,8 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
         this.loadDetail({
           id: entityId
         });
+      } else if (this.refs.text) {
+        this.refs.text.focus();
       }
     }));
   }
@@ -70,6 +72,10 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
     return this.props.uiKey;
   }
 
+  getDefaultSearchParameters() {
+    return this.props.defaultSearchParameters || this.getManager().getDefaultSearchParameters();
+  }
+
   useFilter(event) {
     if (event) {
       event.preventDefault();
@@ -88,7 +94,13 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.cancelFilter(this.refs.filterForm);
+    if (this.refs.lastResult) {
+      this.refs.lastResult.setValue(null, () => {
+        this.refs.table.cancelFilter(this.refs.filterForm);
+      });
+    } else {
+      this.refs.table.cancelFilter(this.refs.filterForm);
+    }
   }
 
   _toEvaluatorOption(evaluator) {
@@ -146,6 +158,7 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
       rendered,
       className,
       supportedEvaluators,
+      defaultSearchParameters,
       forceSearchParameters,
       showFilter,
       showToolbar,
@@ -188,6 +201,12 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                   </Basic.Col>
                 </Basic.Row>
                 <Basic.Row className="last">
+                  <Basic.Col lg={ 6 }>
+                    <Advanced.Filter.TextField
+                      ref="text"
+                      placeholder={ this.i18n('filter.text.placeholder') }
+                      help={ Advanced.Filter.getTextHelp() }/>
+                  </Basic.Col>
                   <Basic.Col lg={ 3 }>
                     <Advanced.Filter.EnumSelectBox
                       ref="level"
@@ -195,13 +214,16 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                       enum={ NotificationLevelEnum }
                       multiSelect/>
                   </Basic.Col>
-                  <Basic.Col lg={ 6 }>
-                    <Advanced.Filter.TextField
-                      ref="text"
-                      placeholder={ this.i18n('content.monitoring-results.filter.text.placeholder') }
-                      help={ Advanced.Filter.getTextHelp() }/>
+                  <Basic.Col lg={ 3 }>
+                    <Advanced.Filter.BooleanSelectBox
+                      ref="lastResult"
+                      placeholder={ this.i18n('filter.lastResult.placeholder') }
+                      options={ [
+                        { value: 'true', niceLabel: this.i18n('filter.lastResult.yes') },
+                        { value: 'false', niceLabel: this.i18n('filter.lastResult.no') }
+                      ]}
+                      clearable={ false }/>
                   </Basic.Col>
-                  <Basic.Col lg={ 3 }/>
                 </Basic.Row>
               </Basic.AbstractForm>
             </Advanced.Filter>
@@ -227,6 +249,7 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
               this.context.store.dispatch(this.getManager().fetchLastMonitoringResults());
             }
           }
+          defaultSearchParameters={ defaultSearchParameters }
           forceSearchParameters={ forceSearchParameters }
           _searchParameters={ this.getSearchParameters() }>
           <Advanced.Column
@@ -454,6 +477,10 @@ MonitoringResultTable.propTypes = {
    * Rendered
    */
   rendered: PropTypes.bool,
+  /**
+   * "Default filters"
+   */
+  defaultSearchParameters: PropTypes.object,
   /**
    * "Hard filters"
    */

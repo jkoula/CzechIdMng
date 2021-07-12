@@ -87,6 +87,10 @@ public class IdmMonitoringResult extends AbstractEntity implements InstanceIdent
 	@Column(name = "monitoring_ended")
 	private ZonedDateTime monitoringEnded;
 	
+	@NotNull
+	@Column(name = "last_result", nullable = false)
+	private boolean lastResult;
+	
 	public IdmMonitoring getMonitoring() {
 		return monitoring;
 	}
@@ -193,5 +197,25 @@ public class IdmMonitoringResult extends AbstractEntity implements InstanceIdent
 
 	public void setMonitoringEnded(ZonedDateTime monitoringEnded) {
 		this.monitoringEnded = monitoringEnded;
+	}
+	
+	/**
+	 * Last result flag.
+	 * 
+	 * @return true - last result
+	 * @since 11.2.0
+	 */
+	public boolean isLastResult() {
+		return lastResult;
+	}
+	
+	/**
+	 * Last result flag.
+	 * 
+	 * @param lastResult true - last result
+	 * @since 11.2.0
+	 */
+	public void setLastResult(boolean lastResult) {
+		this.lastResult = lastResult;
 	}
 }

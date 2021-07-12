@@ -37,7 +37,7 @@ public interface MonitoringManager {
 	
 	/**
 	 * Evaluate ~ process monitoring.
-	 * Use {@link #execute(IdmMonitoringDto, BasePermission...) instead to call all registered processors
+	 * Lookout: Use {@link #execute(IdmMonitoringDto, BasePermission...)} instead to call all registered processors
 	 * 
 	 * @param monitoring monitoring configuration
 	 * @return monitoring result

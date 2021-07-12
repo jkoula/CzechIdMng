@@ -45,16 +45,16 @@ class EnumSelectBox extends SelectBox {
     }
   }
 
-  setValue(value) {
+  setValue(value, cb = null) {
     if (this.props.useObject) {
       const options = this.getOptions();
       let option = null;
       if (options) {
         option = this.getOptions().find(o => { return o.value === value; });
       }
-      super.setValue(option || this.normalizeValue(value));
+      super.setValue(option || this.normalizeValue(value), cb);
     } else {
-      super.setValue(value);
+      super.setValue(value, cb);
     }
   }
 

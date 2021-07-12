@@ -21,8 +21,21 @@ public interface IdmMonitoringResultRepository extends AbstractEntityRepository<
 	 * Delete results by monitoring evaluator.
 	 * 
 	 * @param monitoringId monitoring evaluator identifier
+	 * @return count of deleted records
 	 */
 	@Modifying
 	@Query("delete from #{#entityName} e where e.monitoring.id = :monitoringId")
 	int deleteByMonitoring(@Param("monitoringId") UUID monitoringId);
+	
+	/**
+	 * Reset last monitoring result flag to given value.
+	 * 
+	 * @param monitoringId monitoring evaluator identifier
+	 * @param lastResult last result value - mainly false
+	 * @return count of updated records
+	 * @since 11.2.0
+	 */
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
+	@Query("update #{#entityName} e set e.lastResult = :lastResult where e.monitoring.id = :monitoringId")
+	int resetLastResult(@Param("monitoringId") UUID monitoringId, @Param("lastResult") boolean lastResult);
 }

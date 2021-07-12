@@ -41,7 +41,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
+import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
@@ -72,7 +72,7 @@ import io.swagger.annotations.AuthorizationScope;
 		tags = { IdmConfigurationController.TAG }, 
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE,
 		consumes = MediaType.APPLICATION_JSON_VALUE)
-public class IdmConfigurationController extends AbstractReadWriteDtoController<IdmConfigurationDto, DataFilter> {
+public class IdmConfigurationController extends AbstractEventableDtoController<IdmConfigurationDto, DataFilter> {
 	
 	protected static final String TAG = "Configuration";
 	private final IdmConfigurationService configurationService;
@@ -81,7 +81,8 @@ public class IdmConfigurationController extends AbstractReadWriteDtoController<I
 	@Autowired private LoggerManager loggerManager;
 	
 	@Autowired
-	public IdmConfigurationController(IdmConfigurationService configurationService) {
+	public IdmConfigurationController(
+			IdmConfigurationService configurationService) {
 		super(configurationService);
 		//
 		this.configurationService = configurationService;

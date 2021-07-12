@@ -22,6 +22,7 @@ public class IdmMonitoringResultFilter extends DataFilter implements InstanceIde
 	
 	public static final String PARAMETER_MONITORING = "monitoring";
 	public static final String PARAMETER_LEVEL = "level";
+	public static final String PARAMETER_LAST_RESULT = "lastResult"; // false - all results, true - last results only
 	
 	public IdmMonitoringResultFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -49,6 +50,26 @@ public class IdmMonitoringResultFilter extends DataFilter implements InstanceIde
 	
 	public void setLevels(List<NotificationLevel> levels) {
 		put(PARAMETER_LEVEL, levels);
+	}
+	
+	/**
+	 * Last result flag.
+	 * 
+	 * @return true - last result
+	 * @since 11.2.0
+	 */
+	public boolean isLastResult() {
+		return getParameterConverter().toBoolean(getData(), PARAMETER_LAST_RESULT, false); // false - all results
+	}
+
+	/**
+	 * Last result flag.
+	 * 
+	 * @param lastResult true - last result
+	 * @since 11.2.0
+	 */
+	public void setLastResult(boolean lastResult) {
+		set(PARAMETER_LAST_RESULT, lastResult);
 	}
 
 }

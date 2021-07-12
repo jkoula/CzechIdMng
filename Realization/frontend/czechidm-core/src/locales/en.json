@@ -1520,6 +1520,11 @@
       "filter": {
         "text": {
           "placeholder": "Evaluator type or description"
+        },
+        "lastResult": {
+          "placeholder": "All monitoring results ...",
+          "yes": "Last monitoring results",
+          "no": "All monitoring results"
         }
       },
       "edit": {

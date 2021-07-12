@@ -49,6 +49,7 @@ public class IdmMonitoringResultDto  extends AbstractDto implements InstanceIden
 	private String instanceId;
 	private ZonedDateTime monitoringStarted;
 	private ZonedDateTime monitoringEnded;
+	private boolean lastResult;
 	
 	public IdmMonitoringResultDto() {
 	}
@@ -166,5 +167,25 @@ public class IdmMonitoringResultDto  extends AbstractDto implements InstanceIden
 
 	public void setMonitoringEnded(ZonedDateTime monitoringEnded) {
 		this.monitoringEnded = monitoringEnded;
+	}
+	
+	/**
+	 * Last result flag.
+	 * 
+	 * @return true - last result
+	 * @since 11.2.0
+	 */
+	public boolean isLastResult() {
+		return lastResult;
+	}
+	
+	/**
+	 * Last result flag.
+	 * 
+	 * @param lastResult true - last result
+	 * @since 11.2.0
+	 */
+	public void setLastResult(boolean lastResult) {
+		this.lastResult = lastResult;
 	}
 }

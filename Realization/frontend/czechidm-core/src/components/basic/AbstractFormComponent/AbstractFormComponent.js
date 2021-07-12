@@ -285,7 +285,7 @@ class AbstractFormComponent extends AbstractContextComponent {
     return this.state.value;
   }
 
-  setValue(value, cb) {
+  setValue(value, cb = null) {
     this.setState({
       value
     }, this.validate.bind(this, false, cb));

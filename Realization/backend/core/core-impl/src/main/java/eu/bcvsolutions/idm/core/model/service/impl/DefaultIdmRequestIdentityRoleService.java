@@ -43,7 +43,6 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
-import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.rest.AbstractBaseDtoService;
@@ -76,8 +75,6 @@ public class DefaultIdmRequestIdentityRoleService extends
 	private IdmIdentityContractService identityContractService;
 	@Autowired
 	private ModelMapper modelMapper;
-	@Autowired
-	private FormService formService;
 	@Autowired
 	private WorkflowProcessInstanceService workflowProcessInstanceService;
 	@Autowired

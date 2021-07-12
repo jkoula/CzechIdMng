@@ -219,7 +219,10 @@ public class DefaultMonitoringManager implements MonitoringManager {
 			//
 			result.setMonitoringStarted(monitoringStarted);
 			result.setMonitoringEnded(ZonedDateTime.now());
-			//
+			result.setLastResult(true);
+			// reset last result flag
+			monitoringResultService.resetLastResult(monitoringId);
+			// save new last result
 			result = monitoringResultService.save(result);
 			//
 			cacheManager.cacheValue(LAST_RESULT_CACHE_NAME, monitoringId, result);

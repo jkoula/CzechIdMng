@@ -19,7 +19,7 @@ import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
  * @author Radek Tomiška
  * @since 11.1.0
  */
-@Component
+@Component(MonitoringSaveProcessor.PROCESSOR_NAME)
 @Description("Persists configured monitoring evaluator.")
 public class MonitoringSaveProcessor
 		extends CoreEventProcessor<IdmMonitoringDto>

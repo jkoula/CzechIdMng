@@ -5,7 +5,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 
 /**
- * Provides configuration through application
+ * Provides configuration through application.
  * 
  * @author Radek Tomiška 
  * 
@@ -13,7 +13,7 @@ import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
  *
  */
 public interface IdmConfigurationService extends 
-		ReadWriteDtoService<IdmConfigurationDto, DataFilter>, 
+		EventableDtoService<IdmConfigurationDto, DataFilter>, 
 		AuthorizableService<IdmConfigurationDto>,
 		CodeableService<IdmConfigurationDto>, 
 		ConfigurationService {
