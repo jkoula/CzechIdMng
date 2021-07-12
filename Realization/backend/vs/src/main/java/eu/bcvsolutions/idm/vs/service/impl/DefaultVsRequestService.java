@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.vs.service.impl;
 
+import eu.bcvsolutions.idm.core.model.entity.IdmRoleRequest_;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -299,6 +300,7 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 	/**
 	 * Find target entity for given request.
 	 * For loading a target entity is using sync executor.
+	 * If ID of a role request exists, then load applicant from it.
 	 *
 	 * @param dto
 	 * @return
@@ -306,6 +308,17 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 	private AbstractDto findTargetEntity(VsRequestDto dto) {
 		if (dto.getUid() == null || dto.getSystem() == null) {
 			return null;
+		}
+		// If ID of a role request exists, then load applicant from it.
+		UUID roleRequestId = dto.getRoleRequestId();
+		if (roleRequestId != null) {
+			IdmRoleRequestDto roleRequestDto = roleRequestService.get(roleRequestId);
+			if (roleRequestDto != null && roleRequestDto.getApplicant() != null) {
+				IdmIdentityDto applicant = DtoUtils.getEmbedded(roleRequestDto, IdmRoleRequest_.applicant, IdmIdentityDto.class, null);
+				if (applicant != null) {
+					return applicant;
+				}
+			}
 		}
 		AccAccountDto account = accAccountService.getAccount(dto.getUid(), dto.getSystem());
 		if (account != null) {
