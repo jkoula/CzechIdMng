@@ -7651,6 +7651,14 @@
       "title": "Uživatel není deaktivován manuálně",
       "message": "Uživatel [{{username}}] nemůže být manuálně aktivován. Manuálně aktivovat lze pouze manuálně deaktivované uživatele."
     },
+    "IDENTITY_PROFILE_IMAGE_WRONG_CONTENT_TYPE": {
+      "title": "Profilová fotka má špatný formát",
+      "message": "Profilová fotka ve formátu [{{contentType}}] není podporovaná. Použite některý z [image/*] podporovaných formatů."
+    },
+    "IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE_EXCEEDED": {
+      "title": "Profilová fotka je příliš veliká",
+      "message": "Maximální možná velikost profilové fotky je [{{maxFileSize}}]. Profilová fotka má velikost [{{fileSize}}]."
+    },
     "DRY_RUN": {
       "title": "Zkušební běh",
       "message": "Zkušební běh (dry run)."

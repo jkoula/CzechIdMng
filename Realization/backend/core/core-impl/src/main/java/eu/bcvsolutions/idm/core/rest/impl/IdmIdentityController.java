@@ -1028,7 +1028,7 @@ public class IdmIdentityController extends AbstractFormableDtoController<IdmIden
 			nickname = "postProfilePicture", 
 			tags = {
 			IdmProfileController.TAG }, 
-			notes = "Upload new profile image", 
+			notes = "Upload new profile image",
 			authorizations = {
 					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
 							@AuthorizationScope(scope = CoreGroupPermission.PROFILE_UPDATE, description = "") }),

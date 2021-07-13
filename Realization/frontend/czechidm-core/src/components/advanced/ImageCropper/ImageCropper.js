@@ -6,7 +6,7 @@ import * as Basic from '../../basic';
 import Well from '../../basic/Well/Well';
 
 /**
-* Component for image crop
+* Component for image crop.
 *
 * @author Petr Hanák
 */
@@ -81,23 +81,23 @@ class ImageCropper extends Basic.AbstractContextComponent {
     }
     //
     return (
-      <div>
+      <Basic.Div>
         <Cropper
           ref="cropper"
-          src={src}
-          viewMode={3}
+          src={ src }
+          viewMode={ 3 }
           dragMode="move"
-          style={{maxHeight: '568px'}}
-          autoCropArea={0.6}
-          aspectRatio={1 / 1} />
+          style={{ maxHeight: 568 }}
+          autoCropArea={ 0.6 }
+          aspectRatio={ 1 / 1 } />
 
-        <div
+        <Basic.Div
           className="btn-group"
           role="group"
           style={{
-            padding: '10px',
+            padding: 10,
             position: 'absolute',
-            bottom: '20px',
+            bottom: 20,
             left: '50%',
             transform: 'translateX(-50%)'
           }} >
@@ -150,8 +150,8 @@ class ImageCropper extends Basic.AbstractContextComponent {
             className="btn-sm" >
             <Basic.Icon type="fa" icon="reply-all" />
           </Basic.Button>
-        </div>
-      </div>
+        </Basic.Div>
+      </Basic.Div>
     );
   }
 }

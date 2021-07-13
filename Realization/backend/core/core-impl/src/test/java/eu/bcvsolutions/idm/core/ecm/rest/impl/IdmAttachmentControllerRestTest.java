@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
@@ -54,7 +55,7 @@ public class IdmAttachmentControllerRestTest extends AbstractReadWriteDtoControl
 		String fileName = "file.txt";
 		String content = "some text content";
 		String response = getMockMvc().perform(MockMvcRequestBuilders.multipart(getBaseUrl() + "/upload")
-				.file("data", IOUtils.toByteArray(IOUtils.toInputStream(content)))
+				.file(new MockMultipartFile("data", fileName, "text/plain", IOUtils.toByteArray(IOUtils.toInputStream(content))))
         		.param("fileName", fileName)
         		.with(authentication(getAdminAuthentication())))
 				.andExpect(status().isCreated())
