@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -112,7 +114,7 @@ public class IdmIdentityControllerRestTest extends AbstractReadWriteDtoControlle
 	}
 	
 	@Test
-    public void userNotFound() throws Exception {
+    public void testUserNotFound() throws Exception {
 		getMockMvc().perform(get(getDetailUrl("n_a_user"))
         		.with(authentication(getAdminAuthentication()))
                 .contentType(TestHelper.HAL_CONTENT_TYPE))
@@ -120,7 +122,7 @@ public class IdmIdentityControllerRestTest extends AbstractReadWriteDtoControlle
     }
 	
 	@Test
-    public void userFoundByUsername() throws Exception {
+    public void testUserFoundByUsername() throws Exception {
 		getMockMvc().perform(get(getDetailUrl(TestHelper.ADMIN_USERNAME))
         		.with(authentication(getAdminAuthentication()))
                 .contentType(TestHelper.HAL_CONTENT_TYPE))
@@ -495,7 +497,7 @@ public class IdmIdentityControllerRestTest extends AbstractReadWriteDtoControlle
 		String fileName = "file.png";
 		String content = "some image";
 		String response = getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
-				.file("data", IOUtils.toByteArray(IOUtils.toInputStream(content)))
+				.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
         		.param("fileName", fileName)
         		.with(authentication(getAdminAuthentication())))
 				.andExpect(status().isOk())
@@ -579,6 +581,107 @@ public class IdmIdentityControllerRestTest extends AbstractReadWriteDtoControlle
 		// attachment is deleted
 		Assert.assertNull(attachmentManager.get(image));
 		Assert.assertNull(profileService.get(createdProfile));
+	}
+	
+	@Test
+	public void testUploadProfile() throws UnsupportedEncodingException, IOException, Exception {
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
+		//
+		String fileName = "file.png";
+		String content = "some image";
+		String response = getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+				.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+        		.param("fileName", fileName)
+        		.with(authentication(getAdminAuthentication())))
+				.andExpect(status().isOk())
+                .andExpect(content().contentType(TestHelper.HAL_CONTENT_TYPE))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+		IdmProfileDto createdProfile = (IdmProfileDto) getMapper().readValue(response, IdmProfileDto.class);
+		//
+		Assert.assertNotNull(createdProfile);
+		Assert.assertNotNull(createdProfile.getId());
+		Assert.assertNotNull(createdProfile.getImage());
+		IdmAttachmentDto image = attachmentManager.get(createdProfile.getImage());
+		Assert.assertEquals(content.length(), image.getFilesize().intValue());
+		Assert.assertEquals(createdProfile.getId(), image.getOwnerId());
+		Assert.assertEquals(attachmentManager.getOwnerType(createdProfile), image.getOwnerType());
+		Assert.assertEquals(fileName, image.getName());
+		InputStream is = attachmentManager.getAttachmentData(image.getId());
+		try {
+			Assert.assertEquals(content, IOUtils.toString(is));
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+	
+	@Test
+	public void testUploadProfileWrongContentType() throws UnsupportedEncodingException, IOException, Exception {
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
+		//
+		String fileName = "file.txt";
+		String content = "some text";
+		getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+				.file(new MockMultipartFile("data", fileName, "plain/text", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+        		.param("fileName", fileName)
+        		.with(authentication(getAdminAuthentication())))
+				.andExpect(status().isBadRequest());
+	}
+	
+	@Test
+	public void testUploadProfileWithoutContentType() throws UnsupportedEncodingException, IOException, Exception {
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
+		getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE, "1");
+		//
+		try {
+			String fileName = "file.png";
+			String content = "some image";
+			getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+					.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+	        		.param("fileName", fileName)
+	        		.with(authentication(getAdminAuthentication())))
+					.andExpect(status().isBadRequest());
+			//
+			getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE, "11");
+			getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+					.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+	        		.param("fileName", fileName)
+	        		.with(authentication(getAdminAuthentication())))
+					.andExpect(status().isOk());
+			//
+			getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE, "11B");
+			getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+					.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+	        		.param("fileName", fileName)
+	        		.with(authentication(getAdminAuthentication())))
+					.andExpect(status().isOk());
+			//
+			getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE, "11KB");
+			getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+					.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+	        		.param("fileName", fileName)
+	        		.with(authentication(getAdminAuthentication())))
+					.andExpect(status().isOk());		
+		} finally {
+			getHelper().setConfigurationValue(
+					PrivateIdentityConfiguration.PROPERTY_IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE,
+					PrivateIdentityConfiguration.DEFAULT_IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE
+			);
+		}
+	}
+	
+	@Test
+	public void testUploadProfileMaxFileSizeExceeded() throws UnsupportedEncodingException, IOException, Exception {
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
+		//
+		String fileName = "file.txt";
+		String content = "some text";
+		getMockMvc().perform(MockMvcRequestBuilders.multipart(getDetailUrl(owner.getId()) + "/profile/image")
+				.file("data", IOUtils.toByteArray(IOUtils.toInputStream(content)))
+        		.param("fileName", fileName)
+        		.with(authentication(getAdminAuthentication())))
+				.andExpect(status().isBadRequest());
 	}
 	
 	@Test

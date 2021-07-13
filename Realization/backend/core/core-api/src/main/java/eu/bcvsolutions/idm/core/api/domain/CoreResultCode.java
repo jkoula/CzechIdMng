@@ -84,6 +84,8 @@ public enum CoreResultCode implements ResultCode {
 	IDENTITY_USERNAME_EXIST(HttpStatus.CONFLICT, "Username [%s] already exists!"),
 	IDENTITY_UNABLE_GENERATE_UNIQUE_USERNAME(HttpStatus.CONFLICT, "Unable to generate unique username. All numbers from set range have been used!"),
 	IDENTITY_DELETE_FAILED_HAS_CONTRACTS(HttpStatus.CONFLICT, "Identity [%s] cannot be deleted - have assigned contracts."),
+	IDENTITY_PROFILE_IMAGE_WRONG_CONTENT_TYPE(HttpStatus.BAD_REQUEST, "Profile image has wrong content type [%s]. Image content types (image/*) are supported only."),
+	IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "Profile image file size [%s] exceeded maximum [%s]."),
 	// password change
 	PASSWORD_CHANGE_NO_SYSTEM(HttpStatus.BAD_REQUEST, "No system selected."),
 	PASSWORD_CHANGE_CURRENT_FAILED_IDM(HttpStatus.BAD_REQUEST, "Given current password doesn't match to current idm password."),

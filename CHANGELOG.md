@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [11.2.0]
+
+### Administrator
+
+- 🟢 [#2815](https://redmine.czechidm.com/issues/2815) - Profile image is validated now:
+  - default maximum image file size is ``512KB``. Change configuration property ``idm.sec.core.identity.profile.image.max-file-size`` if needed.
+_Example ``idm.sec.core.identity.profile.image.max-file-size=200KB``._
+
+### Developer
+
+- 🟢 [#2815](https://redmine.czechidm.com/issues/2815) - Profile image is validated now:
+  - ``image/*`` content types are supported only. Content type is required now, when images are uploaded by rest endpoint.
+
 ## [11.1.0]
 
 ### Administrator

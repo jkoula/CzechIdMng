@@ -10,6 +10,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
@@ -39,7 +41,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
- * Operations with profiles
+ * Operations with profiles.
  * 
  * @author Radek Tomiška
  * @since 9.0.0
@@ -50,7 +52,8 @@ public class DefaultIdmProfileService
 	
 	@Autowired private LookupService lookupService;
 	@Autowired private AttachmentManager attachmentManager;
-
+	@Autowired private PrivateIdentityConfiguration identityConfiguration;
+	
 	@Autowired
 	public DefaultIdmProfileService(
 			IdmProfileRepository repository,
@@ -104,6 +107,27 @@ public class DefaultIdmProfileService
 		IdmAttachmentDto attachment = new IdmAttachmentDto();
 		attachment.setName(fileName);
 		attachment.setMimetype(StringUtils.isBlank(data.getContentType()) ? AttachableEntity.DEFAULT_MIMETYPE : data.getContentType());
+		//
+		// check required image content type
+		String contentType = data.getContentType();
+		if (StringUtils.isBlank(contentType) || !contentType.toLowerCase().startsWith("image/")) {
+			throw new ResultCodeException(
+					CoreResultCode.IDENTITY_PROFILE_IMAGE_WRONG_CONTENT_TYPE, 
+					ImmutableMap.of("contentType", String.valueOf(contentType))
+			);
+		}
+		// check maximum image size
+		long fileSize = data.getSize();
+		long profileImageMaxFileSize = identityConfiguration.getProfileImageMaxFileSize();
+		if (fileSize > profileImageMaxFileSize) {
+			throw new ResultCodeException(
+					CoreResultCode.IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE_EXCEEDED, 
+					ImmutableMap.of(
+							"fileSize", FileUtils.byteCountToDisplaySize(fileSize),
+							"maxFileSize", FileUtils.byteCountToDisplaySize(profileImageMaxFileSize)
+					)
+			);
+		}
 		//
 		try {
 			attachment.setInputData(data.getInputStream());

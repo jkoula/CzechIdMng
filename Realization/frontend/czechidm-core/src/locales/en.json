@@ -7599,6 +7599,14 @@
       "title": "User is not deactivated manually",
       "message": "User [{{username}}] cannot be activated manually. Only manually deactivated user can be activated."
     },
+    "IDENTITY_PROFILE_IMAGE_WRONG_CONTENT_TYPE": {
+      "title": "Profile image has wrong content type",
+      "message": "Profile image with content type [{{contentType}}] is not supported. One of image content types [image/*] is supported only."
+    },
+    "IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE_EXCEEDED": {
+      "title": "Profile image size exceeded limit",
+      "message": "Profile image size [{{fileSize}}] exceeded limit [{{maxFileSize}}]."
+    },
     "DRY_RUN": {
       "title": "Dry run",
       "message": "Demo process."
