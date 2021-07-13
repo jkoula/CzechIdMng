@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [11.1.0]
+## [11.2.0]
 
 ### Administrator
 
