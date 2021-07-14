@@ -42,13 +42,13 @@ public class DefaultPrivateIdentityConfiguration extends AbstractConfiguration i
 		// new configuration - higher priority
 		String newConfiguration = getConfigurationService().getValue(PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
 		if (StringUtils.isNotBlank(newConfiguration)) {
-			return Boolean.valueOf(newConfiguration);
+			return Boolean.parseBoolean(newConfiguration);
 		}
 		// backward compatible
 		@SuppressWarnings("deprecation")
 		String previousConfiguration = getConfigurationService().getValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT);
 		if (StringUtils.isNotBlank(previousConfiguration)) {
-			return Boolean.valueOf(previousConfiguration);
+			return Boolean.parseBoolean(previousConfiguration);
 		}
 		// default (same as previous)
 		return DEFAULT_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED;
