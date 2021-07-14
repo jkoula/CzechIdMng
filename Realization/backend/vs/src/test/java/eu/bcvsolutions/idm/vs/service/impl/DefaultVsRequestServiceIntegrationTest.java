@@ -1,25 +1,7 @@
 package eu.bcvsolutions.idm.vs.service.impl;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -37,11 +19,15 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
@@ -82,6 +68,21 @@ import eu.bcvsolutions.idm.vs.evaluator.VsRequestByImplementerEvaluator;
 import eu.bcvsolutions.idm.vs.service.api.VsAccountService;
 import eu.bcvsolutions.idm.vs.service.api.VsRequestService;
 import eu.bcvsolutions.idm.vs.service.api.VsSystemImplementerService;
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import org.junit.After;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Virtual system request test
@@ -134,6 +135,10 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 	private VsSystemImplementerService systemImplementerService;
 	@Autowired
 	private AccAccountService accAccountService;
+	@Autowired
+	private IdmIdentityRoleService identityRoleService;
+	@Autowired
+	private IdmRoleRequestService roleRequestService;
 
 	@Before
 	public void init() {
@@ -450,7 +455,87 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 		boolean foundNotRealized = requests.stream().filter(req -> VsRequestState.REALIZED != req.getState())
 				.findFirst().isPresent();
 		Assert.assertTrue("Found not realized requests!", !foundNotRealized);
+		
+		//Delete
+		identityService.delete(userTwo);
+	}
+	
+	
+	/**
+	 * Relation on identity (target entity) after delete account must exists in vs-request.
+	 */
+	@Test
+	public void realizeRequestOwnereRelationAfterDeleteTest() {
+		String changed = "changed";
 
+		SysSystemDto system = this.createVirtualSystem(USER_IMPLEMENTER_NAME, null);
+		this.assignRoleSystem(system, helper.createIdentity(USER_ONE_NAME), ROLE_ONE_NAME);
+		// Find created requests
+		VsRequestFilter requestFilter = new VsRequestFilter();
+		requestFilter.setSystemId(system.getId());
+		requestFilter.setUid(USER_ONE_NAME);
+		requestFilter.setIncludeOwner(true);
+		
+		List<VsRequestDto> requests = requestService.find(requestFilter, null).getContent();
+		assertEquals(1, requests.size());
+		VsRequestDto request = requests.get(0);
+		assertEquals(USER_ONE_NAME, request.getUid());
+		assertEquals(VsOperationType.CREATE, request.getOperationType());
+		assertEquals(VsRequestState.IN_PROGRESS, request.getState());
+
+		VsAccountDto account = accountService.findByUidSystem(USER_ONE_NAME, system.getId());
+		Assert.assertNull("Account must be null, because request was not realized yet!", account);
+
+		IdmIdentityDto userOne = identityService.getByUsername(USER_ONE_NAME);
+		userOne.setFirstName(changed);
+		userOne.setLastName(changed);
+		identityService.save(userOne);
+		
+		// Delete identity roles for userOne.
+		IdmRoleRequestDto roleRequestDelete = roleRequestService.createRequest(helper.getPrimeContract(userOne.getId()));
+		identityRoleService.findAllByIdentity(userOne.getId()).forEach(identityRole -> {
+			roleRequestService.createConcept(roleRequestDelete, 
+					helper.getPrimeContract(userOne.getId()), identityRole.getId(), identityRole.getRole(), ConceptRoleRequestOperation.REMOVE);
+		});
+		this.getHelper().executeRequest(roleRequestDelete, false, true);
+		
+		requests = requestService.find(requestFilter, null, IdmBasePermission.READ).getContent();
+		assertEquals(3, requests.size());
+		VsRequestDto changeRequest = requests.stream().filter(
+				req -> VsRequestState.IN_PROGRESS == req.getState() && VsOperationType.UPDATE == req.getOperationType())
+				.findFirst().orElse(null);
+		assertNotNull("Request with change not found!", changeRequest);
+		VsRequestDto deleteRequest = requests.stream().filter(
+				req -> VsRequestState.IN_PROGRESS == req.getState() && VsOperationType.DELETE == req.getOperationType())
+				.findFirst().orElse(null);
+		assertNotNull("Request with delete not found!", deleteRequest);
+		
+		VsRequestDto createRequest = requests.stream().filter(
+				req -> VsRequestState.IN_PROGRESS == req.getState() && VsOperationType.CREATE == req.getOperationType())
+				.findFirst().orElse(null);
+		assertNotNull("Request with create not found!", createRequest);
+		
+		// Target entity must exists.
+		assertNotNull(deleteRequest.getTargetEntity());
+		assertNotNull(deleteRequest.getTargetEntityType());
+		assertEquals(userOne.getId(), deleteRequest.getTargetEntity().getId());
+
+		// Realize create request
+		request = requestService.realize(createRequest);
+		// Realize update request
+		request = requestService.realize(changeRequest);
+		// Realize delete request
+		request = requestService.realize(deleteRequest);
+
+		// Find only archived
+		requestFilter.setOnlyArchived(Boolean.TRUE);
+		requests = requestService.find(requestFilter, null).getContent();
+		Assert.assertEquals(3, requests.size());
+		boolean foundNotRealized = requests.stream().anyMatch(req -> VsRequestState.REALIZED != req.getState());
+		Assert.assertFalse("Found not realized requests!", foundNotRealized);
+
+		//Delete
+		identityService.delete(userOne);
 	}
 
 	@Test
