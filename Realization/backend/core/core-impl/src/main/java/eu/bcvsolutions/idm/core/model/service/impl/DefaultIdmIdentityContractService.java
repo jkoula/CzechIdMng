@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.TreeConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.domain.RecursionType;
@@ -71,6 +72,7 @@ public class DefaultIdmIdentityContractService
 	//
 	@Autowired private TreeConfiguration treeConfiguration;
 	@Autowired private IdmContractSliceService contractSliceService;
+	@Autowired private PrivateIdentityConfiguration identityConfiguration;
 	
 	@Autowired
 	public DefaultIdmIdentityContractService(
@@ -313,14 +315,14 @@ public class DefaultIdmIdentityContractService
 		contract.setMain(true);
 		//
 		// set default contract name
-		// TODO: add boolean attribute
-		contract.setPosition(DEFAULT_POSITION_NAME);
+		contract.setPosition(identityConfiguration.getCreateDefaultContractPosition());
 		//
 		// set working position
 		IdmTreeNodeDto defaultTreeNode = treeConfiguration.getDefaultNode();
 		if (defaultTreeNode != null) {
 			contract.setWorkPosition(defaultTreeNode.getId());
 		}
+		//
 		return contract;
 	}
 	

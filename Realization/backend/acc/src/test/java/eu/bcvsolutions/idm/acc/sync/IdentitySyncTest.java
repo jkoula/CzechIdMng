@@ -76,7 +76,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.impl.DefaultSynchronizationServiceTest;
 import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
-import eu.bcvsolutions.idm.core.api.config.domain.IdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
@@ -186,7 +186,7 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 	@Autowired
 	private SynchronizationService synchronizationService;
 	@Autowired
-	private IdentityConfiguration identityConfiguration;
+	private PrivateIdentityConfiguration identityConfiguration;
 	@Autowired
 	private ProcessEngine processEngine;
 	@Autowired
@@ -1624,119 +1624,125 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 	@Test
 	public void syncIdentityWithDefaultContract() {
 		// application property for creating default contract is allowed and also is allowed create 
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
-
-		SysSystemDto system = initData();
-		this.getBean().deleteAllResourceData();
-		
-		String usernameOne = getHelper().createName();
-		this.getBean().setTestData(usernameOne, getHelper().createName(), getHelper().createName());
-		
-		String usernameTwo = getHelper().createName();
-		this.getBean().setTestData(usernameTwo, getHelper().createName(), getHelper().createName());
-
-		SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
-		config.setCreateDefaultContract(true);
-		config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
-		
-		assertTrue(identityConfiguration.isCreateDefaultContractEnabled());
-		
-		helper.startSynchronization(config);
-		
-		SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.CREATE_ENTITY, 2,
-				OperationResultType.SUCCESS);
-		
-		Assert.assertFalse(log.isRunning());
-		Assert.assertFalse(log.isContainsError());
-		
-		IdmIdentityDto identityOne = identityService.getByUsername(usernameOne);
-		assertNotNull(identityOne);
-		List<IdmIdentityContractDto> allByIdentity = contractService.findAllByIdentity(identityOne.getId());
-		assertEquals(1, allByIdentity.size());
-
-		IdmIdentityDto identityTwo = identityService.getByUsername(usernameTwo);
-		assertNotNull(identityTwo);
-		allByIdentity = contractService.findAllByIdentity(identityTwo.getId());
-		assertEquals(1, allByIdentity.size());
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.TRUE);
+		try {
+			SysSystemDto system = initData();
+			this.getBean().deleteAllResourceData();
+			
+			String usernameOne = getHelper().createName();
+			this.getBean().setTestData(usernameOne, getHelper().createName(), getHelper().createName());
+			
+			String usernameTwo = getHelper().createName();
+			this.getBean().setTestData(usernameTwo, getHelper().createName(), getHelper().createName());
+	
+			SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
+			config.setCreateDefaultContract(true);
+			config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
+			
+			assertTrue(identityConfiguration.isCreateDefaultContractEnabled());
+			
+			helper.startSynchronization(config);
+			
+			SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.CREATE_ENTITY, 2,
+					OperationResultType.SUCCESS);
+			
+			Assert.assertFalse(log.isRunning());
+			Assert.assertFalse(log.isContainsError());
+			
+			IdmIdentityDto identityOne = identityService.getByUsername(usernameOne);
+			assertNotNull(identityOne);
+			List<IdmIdentityContractDto> allByIdentity = contractService.findAllByIdentity(identityOne.getId());
+			assertEquals(1, allByIdentity.size());
+	
+			IdmIdentityDto identityTwo = identityService.getByUsername(usernameTwo);
+			assertNotNull(identityTwo);
+			allByIdentity = contractService.findAllByIdentity(identityTwo.getId());
+			assertEquals(1, allByIdentity.size());
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 	}
 
 	@Test
 	public void syncIdentityWithoutDefaultContract() {
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
-
-		SysSystemDto system = initData();
-		this.getBean().deleteAllResourceData();
-		
-		String usernameOne = getHelper().createName();
-		this.getBean().setTestData(usernameOne, getHelper().createName(), getHelper().createName());
-		
-		String usernameTwo = getHelper().createName();
-		this.getBean().setTestData(usernameTwo, getHelper().createName(), getHelper().createName());
-
-		SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
-		config.setCreateDefaultContract(false);
-		config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
-		
-		assertTrue(identityConfiguration.isCreateDefaultContractEnabled());
-		
-		helper.startSynchronization(config);
-		
-		SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.CREATE_ENTITY, 2,
-				OperationResultType.SUCCESS);
-		
-		Assert.assertFalse(log.isRunning());
-		Assert.assertFalse(log.isContainsError());
-		
-		IdmIdentityDto identityOne = identityService.getByUsername(usernameOne);
-		assertNotNull(identityOne);
-		List<IdmIdentityContractDto> allByIdentity = contractService.findAllByIdentity(identityOne.getId());
-		assertEquals(0, allByIdentity.size());
-
-		IdmIdentityDto identityTwo = identityService.getByUsername(usernameTwo);
-		assertNotNull(identityTwo);
-		allByIdentity = contractService.findAllByIdentity(identityTwo.getId());
-		assertEquals(0, allByIdentity.size());
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.TRUE);
+		try {
+			SysSystemDto system = initData();
+			this.getBean().deleteAllResourceData();
+			
+			String usernameOne = getHelper().createName();
+			this.getBean().setTestData(usernameOne, getHelper().createName(), getHelper().createName());
+			
+			String usernameTwo = getHelper().createName();
+			this.getBean().setTestData(usernameTwo, getHelper().createName(), getHelper().createName());
+	
+			SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
+			config.setCreateDefaultContract(false);
+			config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
+			
+			assertTrue(identityConfiguration.isCreateDefaultContractEnabled());
+			
+			helper.startSynchronization(config);
+			
+			SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.CREATE_ENTITY, 2,
+					OperationResultType.SUCCESS);
+			
+			Assert.assertFalse(log.isRunning());
+			Assert.assertFalse(log.isContainsError());
+			
+			IdmIdentityDto identityOne = identityService.getByUsername(usernameOne);
+			assertNotNull(identityOne);
+			List<IdmIdentityContractDto> allByIdentity = contractService.findAllByIdentity(identityOne.getId());
+			assertEquals(0, allByIdentity.size());
+	
+			IdmIdentityDto identityTwo = identityService.getByUsername(usernameTwo);
+			assertNotNull(identityTwo);
+			allByIdentity = contractService.findAllByIdentity(identityTwo.getId());
+			assertEquals(0, allByIdentity.size());
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 	}
 
 	@Test
 	public void syncIdentityWithDefaultContractDisableByProperty() {
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.FALSE);
-
-		SysSystemDto system = initData();
-		this.getBean().deleteAllResourceData();
-		
-		String usernameOne = getHelper().createName();
-		this.getBean().setTestData(usernameOne, getHelper().createName(), getHelper().createName());
-		
-		String usernameTwo = getHelper().createName();
-		this.getBean().setTestData(usernameTwo, getHelper().createName(), getHelper().createName());
-
-		SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
-		config.setCreateDefaultContract(true);
-		config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
-		
-		assertFalse(identityConfiguration.isCreateDefaultContractEnabled());
-		
-		helper.startSynchronization(config);
-		
-		SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.CREATE_ENTITY, 2,
-				OperationResultType.SUCCESS);
-		
-		Assert.assertFalse(log.isRunning());
-		Assert.assertFalse(log.isContainsError());
-		
-		IdmIdentityDto identityOne = identityService.getByUsername(usernameOne);
-		assertNotNull(identityOne);
-		List<IdmIdentityContractDto> allByIdentity = contractService.findAllByIdentity(identityOne.getId());
-		assertEquals(0, allByIdentity.size());
-
-		IdmIdentityDto identityTwo = identityService.getByUsername(usernameTwo);
-		assertNotNull(identityTwo);
-		allByIdentity = contractService.findAllByIdentity(identityTwo.getId());
-		assertEquals(0, allByIdentity.size());
-		
-		// Set default
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.FALSE);
+		try {
+			SysSystemDto system = initData();
+			this.getBean().deleteAllResourceData();
+			
+			String usernameOne = getHelper().createName();
+			this.getBean().setTestData(usernameOne, getHelper().createName(), getHelper().createName());
+			
+			String usernameTwo = getHelper().createName();
+			this.getBean().setTestData(usernameTwo, getHelper().createName(), getHelper().createName());
+	
+			SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
+			config.setCreateDefaultContract(true);
+			config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
+			
+			assertFalse(identityConfiguration.isCreateDefaultContractEnabled());
+			
+			helper.startSynchronization(config);
+			
+			SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.CREATE_ENTITY, 2,
+					OperationResultType.SUCCESS);
+			
+			Assert.assertFalse(log.isRunning());
+			Assert.assertFalse(log.isContainsError());
+			
+			IdmIdentityDto identityOne = identityService.getByUsername(usernameOne);
+			assertNotNull(identityOne);
+			List<IdmIdentityContractDto> allByIdentity = contractService.findAllByIdentity(identityOne.getId());
+			assertEquals(0, allByIdentity.size());
+	
+			IdmIdentityDto identityTwo = identityService.getByUsername(usernameTwo);
+			assertNotNull(identityTwo);
+			allByIdentity = contractService.findAllByIdentity(identityTwo.getId());
+			assertEquals(0, allByIdentity.size());
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 	}
 	
 	//-------------------------------------- Inactive owner behavior tests --------------------------------------------------------
@@ -2373,10 +2379,13 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
 
 		// create identity without contract
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.FALSE);
-		IdmIdentityDto identity = helper.createIdentity(IDENTITY_ONE);
-		// Set default
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
+		IdmIdentityDto identity;
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.FALSE);
+		try {
+			identity = helper.createIdentity(IDENTITY_ONE);
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 		IdmIdentityContractDto primeContract = contractService.getPrimeContract(identity.getId());
 		Assert.assertNull(primeContract);
 
@@ -2426,10 +2435,13 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(primeContract);
 
 		// create identity without contract
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.FALSE);
-		IdmIdentityDto identity = helper.createIdentity(IDENTITY_ONE);
-		// Set default
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.FALSE);
+		IdmIdentityDto identity;
+		try {
+			identity = helper.createIdentity(IDENTITY_ONE);
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 		primeContract = contractService.getPrimeContract(identity.getId());
 		Assert.assertNull(primeContract);
 
@@ -2474,10 +2486,13 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		helper.createRoleSystem(defaultRole, system);
 
 		// create identity without contract
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.FALSE);
-		IdmIdentityDto identity = helper.createIdentity(IDENTITY_ONE);
-		// Set default
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.FALSE);
+		IdmIdentityDto identity;
+		try {
+			identity = helper.createIdentity(IDENTITY_ONE);
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 		IdmIdentityContractDto primeContract = contractService.getPrimeContract(identity.getId());
 		Assert.assertNull(primeContract);
 
@@ -2533,12 +2548,13 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(primeContract);
 
 		// create identity without contract
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT,
-				Boolean.FALSE);
-		IdmIdentityDto identity = helper.createIdentity(IDENTITY_ONE);
-		// Set default
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT,
-				Boolean.TRUE);
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, false);
+		IdmIdentityDto identity;
+		try {
+			identity = helper.createIdentity(IDENTITY_ONE);
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 		primeContract = contractService.getPrimeContract(identity.getId());
 		Assert.assertNull(primeContract);
 
@@ -2589,10 +2605,13 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		helper.createRoleSystem(defaultRole, system);
 
 		// create identity without contract
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.FALSE);
-		IdmIdentityDto identity = helper.createIdentity(IDENTITY_ONE);
-		// Set default
-		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, false);
+		IdmIdentityDto identity;
+		try {
+			identity = helper.createIdentity(IDENTITY_ONE);
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
+		}
 		IdmIdentityContractDto primeContract = contractService.getPrimeContract(identity.getId());
 		Assert.assertNull(primeContract);
 

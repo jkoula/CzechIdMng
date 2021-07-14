@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-import eu.bcvsolutions.idm.core.api.config.domain.IdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -46,7 +46,7 @@ public class IdmIdentityContractControllerRestTest extends AbstractReadWriteDtoC
 	public void setup() throws Exception {
 		super.setup();
 		//
-		getHelper().setConfigurationValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.FALSE);
+		getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, Boolean.FALSE);
 	}
 
 	@After
@@ -54,7 +54,7 @@ public class IdmIdentityContractControllerRestTest extends AbstractReadWriteDtoC
 	public void logout() {
 		super.logout();
 		//
-		getHelper().setConfigurationValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, Boolean.TRUE);
+		getHelper().deleteConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
 	}
 	
 	@Override

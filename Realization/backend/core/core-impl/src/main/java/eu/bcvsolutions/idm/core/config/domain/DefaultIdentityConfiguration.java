@@ -18,6 +18,7 @@ public class DefaultIdentityConfiguration extends AbstractConfiguration implemen
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultIdentityConfiguration.class);
 	
 	@Override
+	@Deprecated(since = "11.2.0")
 	public boolean isCreateDefaultContractEnabled() {
 		return getConfigurationService().getBooleanValue(PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, DEFAULT_IDENTITY_CREATE_DEFAULT_CONTRACT);
 	}

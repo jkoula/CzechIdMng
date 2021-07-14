@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
@@ -67,9 +68,10 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdentityBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.service.TokenManager;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import eu.bcvsolutions.idm.test.api.TestHelper;
 
 /**
- * Basic identity service operations
+ * Basic identity service operations.
  * 
  * @author Radek Tomiška
  *
@@ -198,20 +200,56 @@ public class DefaultIdmIdentityServiceIntegrationTest extends AbstractIntegratio
 	@Transactional
 	public void testCreateDefaultContract() {
 		IdmIdentityDto identity = new IdmIdentityDto();
-		String username = "contract_test_" + System.currentTimeMillis();
+		String username = getHelper().createName();
 		identity.setUsername(username);
-		identity.setPassword(new GuardedString("heslo")); // confidential storage
+		identity.setPassword(new GuardedString(TestHelper.DEFAULT_PASSWORD)); // confidential storage
 		identity.setFirstName("Test");
 		identity.setLastName("Identity");
 		identity = identityService.save(identity);
 		//
 		List<IdmIdentityContractDto> contracts = identityContractService.findAllByIdentity(identity.getId());
-		assertEquals(1, contracts.size());
+		Assert.assertEquals(1, contracts.size());
 		//
 		IdmIdentityContractDto defaultContract = identityContractService.prepareMainContract(identity.getId());
-		assertEquals(defaultContract.getIdentity(), contracts.get(0).getIdentity());
-		assertEquals(defaultContract.getPosition(), contracts.get(0).getPosition());
-		assertEquals(defaultContract.getWorkPosition(), contracts.get(0).getWorkPosition());
+		Assert.assertEquals(defaultContract.getIdentity(), contracts.get(0).getIdentity());
+		Assert.assertEquals(defaultContract.getPosition(), contracts.get(0).getPosition()); // ~  Default
+		Assert.assertNull(defaultContract.getValidTill());
+		Assert.assertNull(contracts.get(0).getValidTill());
+		Assert.assertNull(defaultContract.getState());
+		Assert.assertNull(contracts.get(0).getState());
+		Assert.assertEquals(defaultContract.getWorkPosition(), contracts.get(0).getWorkPosition());
+	}
+	
+	@Test
+	@Transactional
+	public void testCreateDefaultContractWithConfiguration() {
+		String positionName = getHelper().createName();
+		getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_POSITION, positionName);
+		getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_EXPIRATION, "365");
+		getHelper().setConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_STATE, "excluded");
+		LocalDate validTill = LocalDate.now().plusDays(365);
+		//
+		try {
+			IdmIdentityDto identity = new IdmIdentityDto();
+			String username = getHelper().createName();
+			identity.setUsername(username);
+			identity.setPassword(new GuardedString(TestHelper.DEFAULT_PASSWORD)); // confidential storage
+			identity.setFirstName("Test");
+			identity.setLastName("Identity");
+			identity = identityService.save(identity);
+			//
+			List<IdmIdentityContractDto> contracts = identityContractService.findAllByIdentity(identity.getId());
+			Assert.assertEquals(1, contracts.size());
+			//
+			IdmIdentityContractDto defaultContract = contracts.get(0);
+			Assert.assertEquals(positionName, defaultContract.getPosition());
+			Assert.assertEquals(ContractState.EXCLUDED, defaultContract.getState());
+			Assert.assertFalse(defaultContract.getValidTill().isBefore(validTill));
+		} finally {
+			getHelper().deleteConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_POSITION);
+			getHelper().deleteConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_EXPIRATION);
+			getHelper().deleteConfigurationValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_STATE);
+		}
 	}
 	
 	/**
@@ -223,9 +261,9 @@ public class DefaultIdmIdentityServiceIntegrationTest extends AbstractIntegratio
 	@Transactional
 	public void testSkipDefaultContract() {
 		IdmIdentityDto identity = new IdmIdentityDto();
-		String username = "contract_test_" + System.currentTimeMillis();
+		String username = getHelper().createName();
 		identity.setUsername(username);
-		identity.setPassword(new GuardedString("heslo")); // confidential storage
+		identity.setPassword(new GuardedString(TestHelper.DEFAULT_PASSWORD)); // confidential storage
 		identity.setFirstName("Test");
 		identity.setLastName("Identity");
 

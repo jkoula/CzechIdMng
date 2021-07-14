@@ -1,11 +1,14 @@
 package eu.bcvsolutions.idm.core.model.event.processor.identity;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import eu.bcvsolutions.idm.core.api.config.domain.IdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
@@ -34,14 +37,14 @@ public class IdentitySaveProcessor
 	private final IdmIdentityService service;
 	private final IdentityPasswordProcessor passwordProcessor;
 	private final IdmIdentityContractService identityContractService;
-	private final IdentityConfiguration identityConfiguration;
+	private final PrivateIdentityConfiguration identityConfiguration;
 	
 	@Autowired
 	public IdentitySaveProcessor(
 			IdmIdentityService service,
 			IdentityPasswordProcessor passwordProcessor,
 			IdmIdentityContractService identityContractService,
-			IdentityConfiguration identityConfiguration) {
+			PrivateIdentityConfiguration identityConfiguration) {
 		super(IdentityEventType.UPDATE, IdentityEventType.CREATE);
 		//
 		Assert.notNull(service, "Service is required.");
@@ -82,8 +85,16 @@ public class IdentitySaveProcessor
 		
 		if (!skipCreationDefaultContract && IdentityEventType.CREATE.name() == event.getType().name()
 				&& identityConfiguration.isCreateDefaultContractEnabled()) {
-			// TODO: skip publish event? But contract is created properly ... 
-			identityContractService.save(identityContractService.prepareMainContract(identity.getId()));
+			IdmIdentityContractDto defaultContract = identityContractService.prepareMainContract(identity.getId());
+			// set contract state
+			defaultContract.setState(identityConfiguration.getCreateDefaultContractState());
+			// set contract valid till
+			Long expiration = identityConfiguration.getCreateDefaultContractExpiration();
+			if (expiration != null) {
+				defaultContract.setValidTill(LocalDate.now().plusDays(expiration));
+			}
+			//
+			identityContractService.save(defaultContract);
 		}
 		//
 		return new DefaultEventResult<>(event, this);

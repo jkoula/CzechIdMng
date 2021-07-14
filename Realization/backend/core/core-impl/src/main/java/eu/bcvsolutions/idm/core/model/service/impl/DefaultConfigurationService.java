@@ -323,7 +323,8 @@ public class DefaultConfigurationService
 	@Transactional(readOnly = true)
 	public Long getLongValue(String key) {
 		String value = getValue(key);
-		return value == null ? null : Long.valueOf(value);
+		//
+		return StringUtils.isBlank(value) ? null : Long.valueOf(value);
 	}
 	
 	@Override

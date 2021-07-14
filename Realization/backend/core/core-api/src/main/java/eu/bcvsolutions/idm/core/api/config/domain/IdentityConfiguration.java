@@ -20,10 +20,10 @@ public interface IdentityConfiguration extends Configurable {
 	 * 
 	 * @deprecated @since 10.6.0 - action can be disabled by bulk action configurable api - use 'idm.sec.core.bulk-action.identity-delete-bulk-action.enabled=false'.
 	 */
-	@Deprecated
+	@Deprecated(since = "10.6.0")
 	String PROPERTY_IDENTITY_DELETE = 
 			ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "core.identity.delete";
-	@Deprecated
+	@Deprecated(since = "10.6.0")
 	boolean DEFAULT_IDENTITY_DELETE = true;
 	
 	/**
@@ -50,13 +50,15 @@ public interface IdentityConfiguration extends Configurable {
 	boolean DEFAULT_PUBLIC_CHANGE_PASSWORD_FOR_IDM_ENABLED = true;
 	
 	/**
-	 * Creates default identity's contract, when new identity is created
+	 * Creates default identity's contract, when new identity is created.
 	 * 
-	 * TODO: move to private #813
+	 * @deprecated @since 11.2.0. use {@link PrivateIdentityConfiguration#isCreateDefaultContractEnabled()}
 	 */
+	@Deprecated(since = "11.2.0")
 	String PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT = 
 			ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "core.identity.create.defaultContract.enabled";
-	boolean DEFAULT_IDENTITY_CREATE_DEFAULT_CONTRACT = true;
+	@Deprecated(since = "11.2.0")
+	boolean DEFAULT_IDENTITY_CREATE_DEFAULT_CONTRACT = PrivateIdentityConfiguration.DEFAULT_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED;
 	
 	/**
 	 * Skip identity dashboard => full detail is shown without dashboard.
@@ -94,10 +96,9 @@ public interface IdentityConfiguration extends Configurable {
 	/**
 	 * Returns true, when default contract will be created with new identity
 	 * 
-	 * TODO: move to private #813
-	 * 
-	 * @return
+	 * @deprecated @since 11.2.0. use {@link PrivateIdentityConfiguration#isCreateDefaultContractEnabled()}
 	 */
+	@Deprecated(since = "11.2.0")
 	boolean isCreateDefaultContractEnabled();
 	
 	/**

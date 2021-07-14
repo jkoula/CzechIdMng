@@ -102,6 +102,8 @@ public class InitAdminIdentityProcessor extends AbstractInitApplicationProcessor
 		IdmIdentityContractDto contract = identityContractService.getPrimeContract(identityAdmin.getId());
 		if (contract == null) {
 			contract = identityContractService.prepareMainContract(identityAdmin.getId());
+			contract.setValidFrom(null);
+			contract.setValidTill(null);
 			contract = identityContractService.save(contract);
 		}
 		//

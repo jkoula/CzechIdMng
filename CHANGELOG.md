@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - 🟢 [#2815](https://redmine.czechidm.com/issues/2815) - Profile image is validated now:
   - default maximum image file size is ``512KB``. Change configuration property ``idm.sec.core.identity.profile.image.max-file-size`` if needed.
 _Example ``idm.sec.core.identity.profile.image.max-file-size=200KB``._
+- 🟢 [#813](https://redmine.czechidm.com/issues/813) - Configuration property ``idm.pub.core.identity.create.defaultContract.enabled`` for enable / disable creating default contract for newly created identity is deprecated and will be removed in future releases. Use new configuration property ``idm.sec.core.identity.create.defaultContract.enabled=false`` (property name changed only).
 
 ### Developer
 

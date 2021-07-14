@@ -864,12 +864,20 @@ public interface TestHelper {
 	void setConfigurationValue(String configurationPropertyName, boolean value);
 	
 	/**
-	 * Sets configuration value
+	 * Sets configuration value.
 	 * 
 	 * @param configurationPropertyName
 	 * @param value
 	 */
 	void setConfigurationValue(String configurationPropertyName, String value);
+	
+	/**
+	 * Delete configuration value.
+	 * 
+	 * @param configurationPropertyName
+	 * @since 11.2.0
+	 */
+	void deleteConfigurationValue(String configurationPropertyName);
 	
 	/**
 	 * Enable long running task and event asynchronous processing.

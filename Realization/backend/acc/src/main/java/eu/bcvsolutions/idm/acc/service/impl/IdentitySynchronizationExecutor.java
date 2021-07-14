@@ -42,7 +42,7 @@ import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.EntityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationEntityExecutor;
-import eu.bcvsolutions.idm.core.api.config.domain.IdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
@@ -101,7 +101,7 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 	@Autowired
 	private LongRunningTaskManager longRunningTaskManager;
 	@Autowired
-	private IdentityConfiguration identityConfiguration;
+	private PrivateIdentityConfiguration identityConfiguration;
 	@Autowired
 	private IdmFormProjectionService formProjectionService;
 

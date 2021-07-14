@@ -3,7 +3,6 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -24,6 +23,7 @@ import org.testng.collections.Lists;
 
 import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.IdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
@@ -928,14 +928,27 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 	}
 	
 	@Test
+	@SuppressWarnings("deprecation")
 	public void testDontCreateContractByConfiguration() {
 		configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, false);
 		//
 		try {
 			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
-			assertNull(service.getPrimeContract(identity.getId()));
+			Assert.assertNull(service.getPrimeContract(identity.getId()));
 		} finally {
 			configurationService.setBooleanValue(IdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT, true);
+		}		
+	}
+	
+	@Test
+	public void testDontCreateContractByPrivateConfiguration() {
+		configurationService.setBooleanValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED, false);
+		//
+		try {
+			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+			Assert.assertNull(service.getPrimeContract(identity.getId()));
+		} finally {
+			configurationService.deleteValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_ENABLED);
 		}		
 	}
 	

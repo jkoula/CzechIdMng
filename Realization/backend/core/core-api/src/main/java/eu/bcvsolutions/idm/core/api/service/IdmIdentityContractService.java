@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.RecursionType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -16,7 +17,7 @@ import eu.bcvsolutions.idm.core.eav.api.service.FormableDtoService;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 
 /**
- * Operations with working positions
+ * Operations with contracts.
  * 
  * @author Radek Tomiška
  *
@@ -26,7 +27,11 @@ public interface IdmIdentityContractService extends
 		AuthorizableService<IdmIdentityContractDto>,
 		ScriptEnabled {
 	
-	String DEFAULT_POSITION_NAME = "Default"; // TODO: to configuration manager?
+	/**
+	 * @deprecated @since 11.2.0 use {@link PrivateIdentityConfiguration#getCreateDefaultContractPosition()}
+	 */
+	@Deprecated(since = "11.2.0")
+	String DEFAULT_POSITION_NAME = PrivateIdentityConfiguration.DEFAULT_IDENTITY_CREATE_DEFAULT_CONTRACT_POSITION;
 	
 	/**
 	 * Property in event. If is value TRUE, then will be creation of the default position skipped.

@@ -8,7 +8,7 @@ package eu.bcvsolutions.idm.core.api.domain;
  */
 public enum IdentityState {
 
-	CREATED(false), 			// new identity - enabled by default (default contract can be disabled, and for backward compatibility)
+	CREATED(false), 			// mainly for new identity - enabled by default (default contract can be disabled)
 	NO_CONTRACT(true), 			// identity doesn't have a contract
 	FUTURE_CONTRACT(true),		// identity has future contract only
 	VALID(false), 				// the only valid state - valid contracts

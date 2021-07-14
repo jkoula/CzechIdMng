@@ -915,6 +915,13 @@ public class DefaultTestHelper implements TestHelper {
 	}
 	
 	@Override
+	public void deleteConfigurationValue(String configurationPropertyName) {
+		Assert.notNull(configurationPropertyName, "Configuration property name is required to set its value.");
+		//
+		configurationService.deleteValue(configurationPropertyName);
+	}
+	
+	@Override
 	public void enableAsynchronousProcessing() {
 		setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
 		setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, true);
