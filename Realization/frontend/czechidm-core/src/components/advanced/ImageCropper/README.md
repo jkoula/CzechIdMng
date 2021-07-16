@@ -2,7 +2,8 @@
 
 > JavaScript image cropper.
 
-Based on https://github.com/react-cropper/react-cropper
+Based on: https://github.com/react-cropper/react-cropper
+Doc: https://github.com/fengyuanchen/cropperjs
 
 ## Parameters
 

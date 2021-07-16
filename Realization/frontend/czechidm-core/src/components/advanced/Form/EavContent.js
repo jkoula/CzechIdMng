@@ -387,7 +387,7 @@ class EavContent extends Basic.AbstractContent {
     }
 
     return (
-      <Basic.Div>
+      <Basic.Div className="eav-content">
         { content }
       </Basic.Div>
     );
