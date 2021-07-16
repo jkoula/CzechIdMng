@@ -171,6 +171,8 @@ public enum AccResultCode implements ResultCode {
 	// CSV wizard
 	WIZARD_CSV_CONNECTOR_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "CSV file cannot be uploaded!"),
 	WIZARD_CSV_CONNECTOR_CSV_FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "CSV file was not found [%s]!"),
+	// MSSQL wizard
+	WIZARD_MSSQL_CONNECTOR_LIB_MISSING(HttpStatus.BAD_REQUEST, "Library for Windows authentication missing [%s]!"),
 	// AD wizard
 	WIZARD_AD_CONNECTOR_CRT_NOT_TRUSTED(HttpStatus.BAD_REQUEST, "Certificate [%s] is not trusted!"),
 	WIZARD_AD_CONTAINER_NOT_FOUND(HttpStatus.NOT_FOUND, "The container [%s] wasn't found!"),

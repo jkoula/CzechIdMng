@@ -187,7 +187,7 @@ module.exports = {
       id: 'mssql-connector-type',
       type: 'connector-type',
       entityType: ['mssql-connector-type'],
-      component: require('./src/content/wizard/connectorType/JdbcSqlSystemWizard')
+      component: require('./src/content/wizard/connectorType/MsSqlSystemWizard')
     },
     {
       id: 'mysql-connector-type',

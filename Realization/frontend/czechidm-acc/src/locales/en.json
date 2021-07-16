@@ -1702,6 +1702,10 @@
       "EMPTY": "Empty provisioning only (without atributes)",
       "NON_EMPTY": "Non-empty provisioning (with attributes)",
       "NOT_PROCESSED": "Not calculated yet (attributes are not calculated)"
+    },
+    "MsSqlAuthenticationTypeEnum": {
+      "WINDOWS_AUTHENTICATION": "Windows authentication",
+      "SQL_SERVER_AUTHENTICATION": "SQL Server authentication"
     }
   },
   "permission": {
@@ -3008,13 +3012,45 @@
         }
       }
     },
+    "mssql-connector-type": {
+      "name": "Microsoft SQL Server",
+      "description": "Allows connecting one table in an MS-SQL database.",
+      "steps": {
+        "jdbcStepOne": {
+          "name": "Database connection",
+          "help": "In this step, <strong> select the system name </strong> as you want it to appear in the IdM. Next, enter the data to access your chosen database table and select its primary column.",
+          "systemName": "System name in IdM",
+          "authenticationType": {
+            "label": "Authentication type",
+            "help": "Select the type of authentication you want to use against the MS-SQL server.",
+            "placeholder": ""
+          },
+          "domain": {
+            "label": "Domain",
+            "help": "Fill in the domain on the MS-SQL server (optional)",
+            "placeholder": ""
+          },
+          "instanceName": {
+            "label": "Instance",
+            "help": "Fill in the instance name on the MS-SQL server (optional)",
+            "placeholder": ""
+          },
+          "trustServerCertificate": {
+            "label": "Trust certificate on server",
+            "help": "Certificate trust checking on MS-SQL server will be skipped (not recommended).",
+            "placeholder": ""
+          },
+          "ntlm": {
+            "label": "Use NTLM protocol",
+            "help": "Use NTLM protocol for authentication (not recommended).",
+            "placeholder": ""
+          }
+        }
+      }
+    },
     "postgresql-connector-type": {
       "name": "PostgreSQL database",
       "description": "Allows managing a single table in a PostgreSQL database."
-    },
-    "mssql-connector-type": {
-      "name": "Microsoft SQL Server",
-      "description": "Allows managing a single table in a MS SQL database."
     },
     "mysql-connector-type": {
       "name": "MySQL database",
@@ -3596,6 +3632,10 @@
     "MONITORING_PROVISIONING_OPERATION_ERROR": {
       "title": "Error in provisioning queue",
       "message": "Provisioning queue contains errors [{{count}}]."
+    },
+    "WIZARD_MSSQL_CONNECTOR_LIB_MISSING": {
+      "title": "Connection to MS-SQL server failed (missing library)!",
+      "message": "To use Windows authentication, the specific library must be installed: [{{text}}]."
     }
   },
   "processor": {

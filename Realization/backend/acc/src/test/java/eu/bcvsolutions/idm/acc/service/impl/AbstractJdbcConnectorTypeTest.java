@@ -35,9 +35,9 @@ public abstract class AbstractJdbcConnectorTypeTest extends AbstractIntegrationT
 	@Autowired
 	protected Environment env;
 	@Autowired
-	private ConnectorManager connectorManager;
+	protected ConnectorManager connectorManager;
 	@Autowired
-	private SysSystemService systemService;
+	protected SysSystemService systemService;
 	@Autowired
 	private FormService formService;
 

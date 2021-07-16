@@ -139,7 +139,7 @@ public abstract class AbstractJdbcConnectorType extends DefaultConnectorType {
 	 *
 	 * @param connectorType
 	 */
-	private void executeStepOne(ConnectorTypeDto connectorType) {
+	protected void executeStepOne(ConnectorTypeDto connectorType) {
 		String port = connectorType.getMetadata().get(PORT);
 		Assert.notNull(port, "Port cannot be null!");
 		String host = connectorType.getMetadata().get(HOST);

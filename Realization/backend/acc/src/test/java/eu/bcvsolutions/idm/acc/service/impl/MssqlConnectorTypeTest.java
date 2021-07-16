@@ -1,6 +1,18 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import eu.bcvsolutions.idm.acc.connector.AbstractJdbcConnectorType;
 import eu.bcvsolutions.idm.acc.connector.MsSqlConnectorType;
+import eu.bcvsolutions.idm.acc.connector.PostgresqlConnectorType;
+import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
+import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +36,155 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 	@Override
 	public void testReopenSystemInWizard() {
 		super.testReopenSystemInWizard();
+	}
+
+	@Test
+	public void testAdditionalMSSQLAttributes() {
+		// Check if current running environment use driver same as this test.
+		// If not, whole test will be skipped.
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			// Skip test.
+			return;
+		}
+		ConnectorTypeDto mockPostgresqlConnectorTypeDto = new ConnectorTypeDto();
+		mockPostgresqlConnectorTypeDto.setReopened(false);
+		mockPostgresqlConnectorTypeDto.setId(this.getJdbcConnectorType());
+
+		ConnectorTypeDto jdbcConnectorTypeDto = connectorManager.load(mockPostgresqlConnectorTypeDto);
+		assertNotNull(jdbcConnectorTypeDto);
+
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.HOST, this.getHost());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.PORT, this.getPort());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.DATABASE, this.getDatabase());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.USER, this.getUsername());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.PASSWORD, this.getPassword());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.TABLE, "idm_identity");
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.KEY_COLUMN, "username");
+		jdbcConnectorTypeDto.setWizardStepName(AbstractJdbcConnectorType.STEP_ONE_CREATE_SYSTEM);
+
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.AUTHENTICATION_TYPE_KEY, MsSqlConnectorType.WINDOWS_AUTHENTICATION_TYPE);
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.TRUST_SERVER_CRT_SWITCH, Boolean.TRUE.toString());
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.NTLM_SWITCH, Boolean.TRUE.toString());
+		String domain = getHelper().createName();
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.DOMAIN_KEY, domain);
+		String instanceName = getHelper().createName();
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.INSTANCE_NAME_KEY, instanceName);
+
+		// Execute the first step.
+		ConnectorTypeDto stepExecutedResult = connectorManager.execute(jdbcConnectorTypeDto);
+
+		// The system had to be created.
+		BaseDto system = stepExecutedResult.getEmbedded().get(AbstractJdbcConnectorType.SYSTEM_DTO_KEY);
+		assertTrue(system instanceof SysSystemDto);
+		SysSystemDto systemDto = systemService.get(system.getId());
+		assertNotNull(systemDto);
+
+		// Load connector properties from created system.
+		IcConnectorInstance connectorInstance = systemService.getConnectorInstance(systemDto);
+		assertEquals("net.tirasa.connid.bundles.db.table.DatabaseTableConnector",
+				connectorInstance.getConnectorKey().getConnectorName());
+
+		IdmFormDefinitionDto connectorFormDef = this.systemService.getConnectorFormDefinition(systemDto);
+		String jdbcUrlTemplate = getValueFromConnectorInstance(AbstractJdbcConnectorType.JDBC_URL_TEMPLATE, systemDto, connectorFormDef);
+		// Check Windows auth.
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.WINDOWS_AUTHENTICATION_TYPE_TEMPLATE));
+		// Check trust CRT.
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.TRUST_SERVER_CRT_TEMPLATE));
+		// Check NTLM.
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.NTLM_TEMPLATE));
+		// Check Domain.
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + domain));
+		// Check instance name.
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + instanceName));
+
+		// Delete created system.
+		systemService.delete(systemDto);
+	}
+
+	@Test
+	public void testUpdateAdditionalMSSQLAttributes() {
+		// Check if current running environment use driver same as this test.
+		// If not, whole test will be skipped.
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			// Skip test.
+			return;
+		}
+		ConnectorTypeDto mockPostgresqlConnectorTypeDto = new ConnectorTypeDto();
+		mockPostgresqlConnectorTypeDto.setReopened(false);
+		mockPostgresqlConnectorTypeDto.setId(this.getJdbcConnectorType());
+
+		ConnectorTypeDto jdbcConnectorTypeDto = connectorManager.load(mockPostgresqlConnectorTypeDto);
+		assertNotNull(jdbcConnectorTypeDto);
+
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.HOST, this.getHost());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.PORT, this.getPort());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.DATABASE, this.getDatabase());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.USER, this.getUsername());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.PASSWORD, this.getPassword());
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.TABLE, "idm_identity");
+		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.KEY_COLUMN, "username");
+		jdbcConnectorTypeDto.setWizardStepName(AbstractJdbcConnectorType.STEP_ONE_CREATE_SYSTEM);
+
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.AUTHENTICATION_TYPE_KEY, MsSqlConnectorType.WINDOWS_AUTHENTICATION_TYPE);
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.TRUST_SERVER_CRT_SWITCH, Boolean.TRUE.toString());
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.NTLM_SWITCH, Boolean.TRUE.toString());
+		String domain = getHelper().createName();
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.DOMAIN_KEY, domain);
+		String instanceName = getHelper().createName();
+		jdbcConnectorTypeDto.getMetadata().put(MsSqlConnectorType.INSTANCE_NAME_KEY, instanceName);
+
+		// Execute the first step.
+		ConnectorTypeDto stepExecutedResult = connectorManager.execute(jdbcConnectorTypeDto);
+
+		// The system had to be created.
+		BaseDto system = stepExecutedResult.getEmbedded().get(AbstractJdbcConnectorType.SYSTEM_DTO_KEY);
+		assertTrue(system instanceof SysSystemDto);
+		SysSystemDto systemDto = systemService.get(system.getId());
+		assertNotNull(systemDto);
+
+		ConnectorType connectorTypeBySystem = connectorManager.findConnectorTypeBySystem(systemDto);
+		ConnectorTypeDto reopenSystem = new ConnectorTypeDto();
+		reopenSystem.setReopened(true);
+		reopenSystem.setId(connectorTypeBySystem.getId());
+		reopenSystem.getEmbedded().put(PostgresqlConnectorType.SYSTEM_DTO_KEY, systemDto);
+		reopenSystem = connectorManager.load(reopenSystem);
+		assertNotNull(reopenSystem);
+		reopenSystem.setWizardStepName(AbstractJdbcConnectorType.STEP_ONE_CREATE_SYSTEM);
+
+		// Change addition attributes
+		reopenSystem.getMetadata().put(MsSqlConnectorType.AUTHENTICATION_TYPE_KEY, MsSqlConnectorType.SQL_SERVER_AUTHENTICATION_TYPE);
+		reopenSystem.getMetadata().put(MsSqlConnectorType.TRUST_SERVER_CRT_SWITCH, Boolean.FALSE.toString());
+		reopenSystem.getMetadata().put(MsSqlConnectorType.NTLM_SWITCH, Boolean.FALSE.toString());
+		String domainTwo = getHelper().createName();
+		reopenSystem.getMetadata().put(MsSqlConnectorType.DOMAIN_KEY, domainTwo);
+		String instanceNameTwo = getHelper().createName();
+		reopenSystem.getMetadata().put(MsSqlConnectorType.INSTANCE_NAME_KEY, instanceNameTwo);
+
+		// Execute the first step again.
+		connectorManager.execute(reopenSystem);
+
+		// Load connector properties from created system.
+		IcConnectorInstance connectorInstance = systemService.getConnectorInstance(systemDto);
+		assertEquals("net.tirasa.connid.bundles.db.table.DatabaseTableConnector",
+				connectorInstance.getConnectorKey().getConnectorName());
+
+		IdmFormDefinitionDto connectorFormDef = this.systemService.getConnectorFormDefinition(systemDto);
+		String jdbcUrlTemplate = getValueFromConnectorInstance(AbstractJdbcConnectorType.JDBC_URL_TEMPLATE, systemDto, connectorFormDef);
+		// Check Windows auth.
+		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.WINDOWS_AUTHENTICATION_TYPE_TEMPLATE));
+		// Check trust CRT.
+		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.TRUST_SERVER_CRT_TEMPLATE));
+		// Check NTLM.
+		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.NTLM_TEMPLATE));
+		// Check Domain.
+		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + domain));
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + domainTwo));
+		// Check instance name.
+		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + instanceName));
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + instanceNameTwo));
+		
+		// Delete created system.
+		systemService.delete(systemDto);
 	}
 
 	protected String getHost() {

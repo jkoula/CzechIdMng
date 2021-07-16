@@ -1704,6 +1704,10 @@
       "EMPTY": "Pouze prázdný provisioning (bez atributů)",
       "NON_EMPTY": "Bez prázdného provisioningu (s atributy)",
       "NOT_PROCESSED": "Atributy nejsou ještě vyhodnoceny"
+    },
+    "MsSqlAuthenticationTypeEnum": {
+      "WINDOWS_AUTHENTICATION": "Windows autentizace",
+      "SQL_SERVER_AUTHENTICATION": "SQL Server autentizace"
     }
   },
   "permission": {
@@ -2779,13 +2783,45 @@
         }
       }
     },
+    "mssql-connector-type": {
+      "name": "Microsoft SQL Server",
+      "description": "Umožňuje napojení jedné tabulky v MS-SQL databázi.",
+      "steps": {
+        "jdbcStepOne":{
+          "name": "Připojení k databázi",
+          "help": "V tomto kroku <strong>zvolte název systému</strong> tak, jak chcete aby se zobrazoval v IdM. Dále zadejte údaje pro přístup k Vámi zvolené databázové tabulce a vyberte její primární sloupec.",
+          "systemName": "Název systému v IdM",
+          "authenticationType": {
+            "label": "Typ autentizace",
+            "help": "Vyberte typ autentizace, který chcete použít proti MS-SQL serveru.",
+            "placeholder": ""
+          },
+          "domain": {
+            "label": "Doména",
+            "help": "Vyplňte doménu na MS-SQL serveru (nepovinné)",
+            "placeholder": ""
+          },
+          "instanceName": {
+            "label": "Instance",
+            "help": "Vyplňte název instance MS-SQL serveru (nepovinné)",
+            "placeholder": ""
+          },
+          "trustServerCertificate": {
+            "label": "Důvěřovat certifikátu na serveru",
+            "help": "Kontrola důvěryhodnosti certifikátu na MS-SQL serveru bude přeskočena (nedoporučuje se).",
+            "placeholder": ""
+          },
+          "ntlm": {
+            "label": "Použít NTLM protokol",
+            "help": "Pro autentizaci použít NTLM protokol (nedoporučuje se).",
+            "placeholder": ""
+          }
+        }
+      }
+    },
     "postgresql-connector-type": {
       "name": "PostgreSQL databáze",
       "description": "Umožňuje napojení jedné tabulky v PostgreSQL databázi."
-    },
-    "mssql-connector-type": {
-      "name": "Microsoft SQL Server",
-      "description": "Umožňuje napojení jedné tabulky v MS SQL databázi."
     },
     "mysql-connector-type": {
       "name": "MySQL databáze",
@@ -3598,6 +3634,10 @@
     "MONITORING_PROVISIONING_OPERATION_ERROR": {
       "title": "Chyba ve frontě pro provisioning",
       "message": "Ve frontě pro provisioning se vyskytují chyby [{{count}}]."
+    },
+    "WIZARD_MSSQL_CONNECTOR_LIB_MISSING": {
+      "title": "Připojení k MS-SQL serveru se nezdařilo (chybí knihovna)!",
+      "message": "Pro použití Windows authentizace, musí být nainstalována specifická knihovna: [{{text}}]."
     }
   },
   "processor": {
