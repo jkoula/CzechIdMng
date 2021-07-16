@@ -91,7 +91,7 @@ export default class ImageCropper extends Basic.AbstractContextComponent {
         <Cropper
           ref={ this.cropperRef }
           src={ src }
-          viewMode={ 3 }
+          viewMode={ 2 }
           dragMode="move"
           style={{ maxHeight: 568 }}
           autoCropArea={ 0.6 }
