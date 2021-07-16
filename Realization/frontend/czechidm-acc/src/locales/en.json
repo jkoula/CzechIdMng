@@ -2591,6 +2591,16 @@
             "help": "Checked synchronization."
           }
         }
+      },
+      "acc-provisioning-operation-monitoring-evaluator": {
+        "label": "Check errors in provisioning queue",
+        "help": "Warning about errors in provisioning queue.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Number of days",
+            "help": "Errors not older than given number of days."
+          }
+        }
       }
     }
   },
@@ -3582,6 +3592,10 @@
     "MONITORING_SYNCHRONIZATION_CONTAINS_ERROR": {
       "title": "Synchronization contains errors",
       "message": "Synchronization [{{synchronizationName}}] on system [{{systemName}}] contains errors [{{count}}]."
+    },
+    "MONITORING_PROVISIONING_OPERATION_ERROR": {
+      "title": "Error in provisioning queue",
+      "message": "Provisioning queue contains errors [{{count}}]."
     }
   },
   "processor": {

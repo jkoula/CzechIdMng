@@ -25,7 +25,10 @@ import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.DatabaseTableMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.DemoAdminMonitoringEvaluator;
+import eu.bcvsolutions.idm.core.monitoring.service.impl.EntityEventMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.H2DatabaseMonitoringEvaluator;
+import eu.bcvsolutions.idm.core.monitoring.service.impl.LoggingEventMonitoringEvaluator;
+import eu.bcvsolutions.idm.core.monitoring.service.impl.LongRunningTaskMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowHistoricProcessInstanceService;
 
 /**
@@ -48,6 +51,9 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 	@Autowired private DatabaseTableMonitoringEvaluator databaseTableMonitoringEvaluator;
 	@Autowired private H2DatabaseMonitoringEvaluator h2DatabaseMonitoringEvaluator;
 	@Autowired private DemoAdminMonitoringEvaluator demoAdminMonitoringEvaluator;
+	@Autowired private EntityEventMonitoringEvaluator entityEventMonitoringEvaluator;
+	@Autowired private LongRunningTaskMonitoringEvaluator longRunningTaskMonitoringEvaluator;
+	@Autowired private LoggingEventMonitoringEvaluator loggingEventMonitoringEvaluator;
 	
 	@Override
 	public String getName() {
@@ -68,6 +74,15 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 		initDatabaseTableMonitoring(IdmEntityEventService.class);
 		initDatabaseTableMonitoring(IdmRoleRequestService.class);
 		initDatabaseTableMonitoring(IdmIdentityRoleService.class);
+		//
+		// errors is entity event queue
+		initEntityEventMonitoring();
+		//
+		// errors is long running task queue
+		initLongRunningTaskMonitoring();
+		//
+		// errors is logging events
+		initLoggingEventMonitoring();
 		//
 		return new DefaultEventResult<>(event, this);
 	}
@@ -178,6 +193,78 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 			//
 			monitoring = monitoringService.save(monitoring);
 			LOG.info("Databate table monitoring for service bean name [{}] configured automatically.", serviceBeanName);
+		}
+		//
+		return monitoring;
+	}
+	
+	protected IdmMonitoringDto initEntityEventMonitoring() {
+		String evaluatorType = AutowireHelper.getTargetType(entityEventMonitoringEvaluator);
+		IdmMonitoringDto monitoring = findMonitoring(evaluatorType, null, null);
+		if (monitoring == null) {
+			monitoring = new IdmMonitoringDto();
+			monitoring.setEvaluatorType(evaluatorType);
+			monitoring.setInstanceId(configurationService.getInstanceId());
+			monitoring.setCheckPeriod(3600L); // ~ per hour
+			monitoring.setSeq((short) 0); // ~ quick
+			monitoring.setDescription(PRODUCT_PROVIDED_MONITORING_DESCRIPTION);
+			ConfigurationMap evaluatorProperties = new ConfigurationMap();
+			evaluatorProperties.put(
+					EntityEventMonitoringEvaluator.PARAMETER_NUMBER_OF_DAYS, 
+					EntityEventMonitoringEvaluator.DEFAULT_NUMBER_OF_DAYS
+			);
+			monitoring.setEvaluatorProperties(evaluatorProperties);
+			//
+			monitoring = monitoringService.save(monitoring);
+			LOG.info("Entity event monitoring configured automatically.");
+		}
+		//
+		return monitoring;
+	}
+	
+	protected IdmMonitoringDto initLongRunningTaskMonitoring() {
+		String evaluatorType = AutowireHelper.getTargetType(longRunningTaskMonitoringEvaluator);
+		IdmMonitoringDto monitoring = findMonitoring(evaluatorType, null, null);
+		if (monitoring == null) {
+			monitoring = new IdmMonitoringDto();
+			monitoring.setEvaluatorType(evaluatorType);
+			monitoring.setInstanceId(configurationService.getInstanceId());
+			monitoring.setCheckPeriod(3600L); // ~ per hour
+			monitoring.setSeq((short) 0); // ~ quick
+			monitoring.setDescription(PRODUCT_PROVIDED_MONITORING_DESCRIPTION);
+			ConfigurationMap evaluatorProperties = new ConfigurationMap();
+			evaluatorProperties.put(
+					LongRunningTaskMonitoringEvaluator.PARAMETER_NUMBER_OF_DAYS, 
+					LongRunningTaskMonitoringEvaluator.DEFAULT_NUMBER_OF_DAYS
+			);
+			monitoring.setEvaluatorProperties(evaluatorProperties);
+			//
+			monitoring = monitoringService.save(monitoring);
+			LOG.info("Long running task monitoring configured automatically.");
+		}
+		//
+		return monitoring;
+	}
+	
+	protected IdmMonitoringDto initLoggingEventMonitoring() {
+		String evaluatorType = AutowireHelper.getTargetType(loggingEventMonitoringEvaluator);
+		IdmMonitoringDto monitoring = findMonitoring(evaluatorType, null, null);
+		if (monitoring == null) {
+			monitoring = new IdmMonitoringDto();
+			monitoring.setEvaluatorType(evaluatorType);
+			monitoring.setInstanceId(configurationService.getInstanceId());
+			monitoring.setCheckPeriod(3600L); // ~ per hour
+			monitoring.setSeq((short) 0); // ~ quick
+			monitoring.setDescription(PRODUCT_PROVIDED_MONITORING_DESCRIPTION);
+			ConfigurationMap evaluatorProperties = new ConfigurationMap();
+			evaluatorProperties.put(
+					LongRunningTaskMonitoringEvaluator.PARAMETER_NUMBER_OF_DAYS, 
+					LongRunningTaskMonitoringEvaluator.DEFAULT_NUMBER_OF_DAYS
+			);
+			monitoring.setEvaluatorProperties(evaluatorProperties);
+			//
+			monitoring = monitoringService.save(monitoring);
+			LOG.info("Logging events monitoring configured automatically.");
 		}
 		//
 		return monitoring;

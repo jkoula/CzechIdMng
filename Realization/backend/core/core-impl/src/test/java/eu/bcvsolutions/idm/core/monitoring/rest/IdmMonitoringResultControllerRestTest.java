@@ -160,7 +160,6 @@ public class IdmMonitoringResultControllerRestTest extends AbstractReadWriteDtoC
 		//
 		IdmMonitoringResultFilter filter = new IdmMonitoringResultFilter();
 		filter.setMonitoring(monitoring.getId());
-		filter.setLastResult(true);
 		// workaround: result model cannot be deserialized automatically from json
 		monitoringResultService.find(filter, null).forEach(result -> {
 			result.setResult(new OperationResultDto(OperationState.EXECUTED));
@@ -168,6 +167,7 @@ public class IdmMonitoringResultControllerRestTest extends AbstractReadWriteDtoC
 		});
 		cacheManager.evictCache(MonitoringManager.LAST_RESULT_CACHE_NAME);
 		//
+		filter.setLastResult(true);
 		List<IdmMonitoringResultDto> lastResults = find(filter);
 		List<IdmMonitoringResultDto> results = find("last-results", filter);
 		//

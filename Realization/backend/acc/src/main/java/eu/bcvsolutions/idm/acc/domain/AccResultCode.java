@@ -192,7 +192,8 @@ public enum AccResultCode implements ResultCode {
 	MONITORING_SYNCHRONIZATION_DISABLED(HttpStatus.OK, "Synchronization [%s] on system [%s] is disabled", NotificationLevel.INFO),
 	MONITORING_SYNCHRONIZATION_NOT_EXECUTED(HttpStatus.OK, "Synchronization [%s] on system [%s] was not executed yet.", NotificationLevel.INFO),
 	MONITORING_SYNCHRONIZATION_OK(HttpStatus.OK, "Synchronization [%s] on system [%s] is ok. Count of processed items [%s].", NotificationLevel.SUCCESS),
-	MONITORING_SYNCHRONIZATION_CONTAINS_ERROR(HttpStatus.CONFLICT, "Synchronization [%s] on system [%s] contains error. Count of processed items [%s].", NotificationLevel.ERROR);
+	MONITORING_SYNCHRONIZATION_CONTAINS_ERROR(HttpStatus.CONFLICT, "Synchronization [%s] on system [%s] contains error. Count of processed items [%s].", NotificationLevel.ERROR),
+	MONITORING_PROVISIONING_OPERATION_ERROR(HttpStatus.CONFLICT, "Provisioning queue contains [%s] errors.", NotificationLevel.ERROR);
 	
 	private final HttpStatus status;
 	private final String message;

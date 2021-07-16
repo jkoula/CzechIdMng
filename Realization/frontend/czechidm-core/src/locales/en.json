@@ -7141,6 +7141,36 @@
             "help": "Checked database table (checked type of record)."
           }
         }
+      },
+      "core-entity-event-monitoring-evaluator": {
+        "label": "Check errors in event queue",
+        "help": "Warning about errors in event queue.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Number of days",
+            "help": "Errors not older than given number of days."
+          }
+        }
+      },
+      "core-long-running-task-monitoring-evaluator": {
+        "label": "Check errors in long running tasks",
+        "help": "Warning about errors in executed long running tasks.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Number of days",
+            "help": "Errors not older than given number of days."
+          }
+        }
+      },
+      "core-logging-event-monitoring-evaluator": {
+        "label": "Check errors in logging events",
+        "help": "Warning about errors in logging events.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Number of days",
+            "help": "Errors not older than given number of days."
+          }
+        }
       }
     }
   },
@@ -8390,6 +8420,18 @@
     "MONITORING_H2_DATABASE_SUCCESS": {
       "title": "H2 database is not used",
       "message": "H2 database is not used on server instance [{{instanceId}}]. Used database [{{databaseName}}]."
+    },
+    "MONITORING_ENTITY_EVENT_ERROR": {
+      "title": "Error in event queue",
+      "message": "Event queue contains errors [{{count}}]."
+    },
+    "MONITORING_LONG_RUNNING_TASK_ERROR": {
+      "title": "Error in long running tasks",
+      "message": "Long running task queue contains errors [{{count}}]."
+    },
+    "MONITORING_LOGGING_EVENT_ERROR": {
+      "title": "Error in logging events",
+      "message": "Logging events contains errors [{{count}}]."
     }
   },
   "validationError": {

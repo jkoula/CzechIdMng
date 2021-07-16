@@ -278,7 +278,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 	public void testMultiThreadEventProcessing() {
 		List<IdmEntityEventDto> events = new ArrayList<>();
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 			int count = 250; // 15s 
 			//
 			// create events
@@ -303,7 +303,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertEquals(count, entityEventService.find(filter, PageRequest.of(0, 1)).getTotalElements());
 			//
 			// execute
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			//
 			// wait for executed events
 			getHelper().waitForResult(res -> {
@@ -314,8 +314,8 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			filter.setStates(Lists.newArrayList(OperationState.EXECUTED));
 			Assert.assertEquals(count, entityEventService.find(filter, PageRequest.of(0, 1)).getTotalElements());			
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
-			events.forEach(e -> entityEventService.delete(e));
+			getHelper().disableAsynchronousProcessing();
+			events.forEach(manager::deleteEvent);
 		}
 	}
 	
@@ -599,10 +599,10 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 	
 	@Test
 	public void testRemoveRunningEvent() {
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		//
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
-			
-			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+			getHelper().enableAsynchronousProcessing();
 			Assert.assertFalse(manager.isRunningOwner(identity.getId()));
 			//
 			// publish never ends event
@@ -634,7 +634,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			// just for sure
 			Assert.assertFalse(manager.isRunningOwner(identity.getId()));
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 			manager.deleteAllEvents();
 		}
 	}
@@ -654,7 +654,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 	@Test
 	public void testDeleteAll() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			//
 			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
 			Assert.assertFalse(manager.isRunningOwner(identity.getId()));
@@ -686,8 +686,8 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertFalse(manager.isRunningOwner(identity.getId()));
 			Assert.assertEquals(0, entityEventService.find(null).getTotalElements());
 		} finally {
+			getHelper().disableAsynchronousProcessing();
 			manager.deleteAllEvents();
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
 		}
 	}
 	
@@ -700,7 +700,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertEquals(identity.getUsername(), securityService.getCurrentUsername());
 			IdmRoleDto role = getHelper().createRole();
 			//
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			//
 			IdmRoleRequestDto request = getHelper().createRoleRequest(getHelper().getPrimeContract(identity), role);
 			getHelper().executeRequest(request, false, false);
@@ -716,7 +716,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertEquals(identity.getId(), roles.get(0).getCreatorId());
 		} finally {
 			logout();
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 			manager.deleteAllEvents();
 		}
 	}
@@ -735,7 +735,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			IdmRoleRequestDto request = getHelper().createRoleRequest(getHelper().getPrimeContract(identity), role);
 			Assert.assertEquals(transactionId, request.getTransactionId());
 			//
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			getHelper().executeRequest(request, true, false);
 			
 			getHelper().waitForResult(res -> {
@@ -761,7 +761,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertEquals(transactionId, events.get(0).getTransactionId());
 			Assert.assertEquals(identity.getId(), events.get(0).getSuperOwnerId());
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 			manager.deleteAllEvents();
 		}
 	}
@@ -769,7 +769,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 	@Test
 	public void testAcceptedException() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			//
 			IdmEntityEventDto event = new IdmEntityEventDto();
 			AcceptedContent content = new AcceptedContent();
@@ -807,7 +807,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 					));
 			
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 }

@@ -7193,6 +7193,36 @@
             "help": "Kontrolovaná databázová tabulka (kontrolovaný typ záznamu)."
           }
         }
+      },
+      "core-entity-event-monitoring-evaluator": {
+        "label": "Kontrola chyb ve frontě událostí",
+        "help": "Zobrazí varování, pokud se ve frontě událostí vyskytuje chyba.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Počet dní",
+            "help": "Chyby, které nejsou starší, než-li zadaný počet dní."
+          }
+        }
+      },
+      "core-long-running-task-monitoring-evaluator": {
+        "label": "Kontrola chyb v agendě dlouhotrvajích úloh",
+        "help": "Zobrazí varování, pokud se v provedených dlouhotrvajích úlohách vyskytuje chyba.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Počet dní",
+            "help": "Chyby, které nejsou starší, než-li zadaný počet dní."
+          }
+        }
+      },
+      "core-logging-event-monitoring-evaluator": {
+        "label": "Kontrola chyb v logovaných událostech",
+        "help": "Zobrazí varování, pokud se v logovaných událostech vyskytuje chyba.",
+        "attributes": {
+          "numberofdays": {
+            "label": "Počet dní",
+            "help": "Chyby, které nejsou starší, než-li zadaný počet dní."
+          }
+        }
       }
     }
   },
@@ -8442,6 +8472,18 @@
     "MONITORING_H2_DATABASE_SUCCESS": {
       "title": "H2 databáze není použita",
       "message": "Na instanci serveru [{{instanceId}}] není použita H2 databáze. Používá se databáze [{{databaseName}}]."
+    },
+    "MONITORING_ENTITY_EVENT_ERROR": {
+      "title": "Chyba ve frontě událostí",
+      "message": "Ve frontě událostí se vyskytují chyby [{{count}}]."
+    },
+    "MONITORING_LONG_RUNNING_TASK_ERROR": {
+      "title": "Chyba ve frontě dlouhotrvajících úloh",
+      "message": "Ve frontě dlouhotrvajících úloh se vyskytují chyby [{{count}}]."
+    },
+    "MONITORING_LOGGING_EVENT_ERROR": {
+      "title": "Chyba v logovaných událostech",
+      "message": "V logovaných událostech se vyskytují chyby [{{count}}]."
     }
   },
   "validationError": {

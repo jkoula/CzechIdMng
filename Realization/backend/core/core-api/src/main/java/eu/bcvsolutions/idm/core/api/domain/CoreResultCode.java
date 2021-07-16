@@ -405,7 +405,10 @@ public enum CoreResultCode implements ResultCode {
 	MONITORING_H2_DATABASE_WARNING(HttpStatus.BAD_REQUEST, "H2 database is used on server instance [%s] for [%s] environment.", NotificationLevel.WARNING),
 	MONITORING_H2_DATABASE_SUCCESS(HttpStatus.OK, "H2 database is not used on server instance [%s]. Used database [%s].", NotificationLevel.SUCCESS),
 	MONITORING_DEMO_ADMIN_WARNING(HttpStatus.BAD_REQUEST, "Demo admin credentials are used. Change admin user password.", NotificationLevel.WARNING),
-	MONITORING_DEMO_ADMIN_NOT_FOUND(HttpStatus.OK, "Demo admin user not found.", NotificationLevel.SUCCESS);
+	MONITORING_DEMO_ADMIN_NOT_FOUND(HttpStatus.OK, "Demo admin user not found.", NotificationLevel.SUCCESS),
+	MONITORING_ENTITY_EVENT_ERROR(HttpStatus.CONFLICT, "Entity event queue contains [%s] errors.", NotificationLevel.ERROR),
+	MONITORING_LONG_RUNNING_TASK_ERROR(HttpStatus.CONFLICT, "Long running task queue contains [%s] errors.", NotificationLevel.ERROR),
+	MONITORING_LOGGING_EVENT_ERROR(HttpStatus.CONFLICT, "Logging events contains [%s] errors.", NotificationLevel.ERROR);
 	
 	private final HttpStatus status;
 	private final String message;
