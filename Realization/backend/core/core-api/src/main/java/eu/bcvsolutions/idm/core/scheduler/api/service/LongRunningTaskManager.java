@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.exception.EntityNotFoundException;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.LongRunningFutureTask;
@@ -207,4 +208,14 @@ public interface LongRunningTaskManager {
 	 * @since 11.1.0
 	 */
 	int switchInstanceId(String previousInstanceId, String newInstanceId);
+	
+	/**
+	 * Initialize form instance for given task properties.
+	 * Returns {@code null}, if no eav form instance is required for task properties.
+	 * 
+	 * @param longRunningTask persisted task
+	 * @return form instance or {@code null}
+	 * @since 11.2.0
+	 */
+	IdmFormInstanceDto getTaskFormInstance(IdmLongRunningTaskDto longRunningTask);
 }

@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
@@ -28,6 +29,8 @@ import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
 
@@ -199,6 +202,29 @@ public class ProcessAutomaticRoleByAttributeTaskExecutor extends AbstractAutomat
 		automaticRoleAttribute.setRequired(true);
 		//
 		return Lists.newArrayList(automaticRoleAttribute);
+	}
+	
+	@Override
+	public IdmFormInstanceDto getFormInstance(ConfigurationMap properties) {
+		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(getFormDefinition());
+		//
+		UUID automaticRoleId = getParameterConverter().toUuid(properties, PARAMETER_ROLE_TREE_NODE);
+		if (automaticRoleId == null) {
+			return null;
+		}
+	
+		IdmFormValueDto value = new IdmFormValueDto(formInstance.getMappedAttributeByCode(AbstractAutomaticRoleTaskExecutor.PARAMETER_ROLE_TREE_NODE));
+		value.setUuidValue(automaticRoleId);
+		IdmAutomaticRoleAttributeDto automaticRole = automaticRoleAttributeService.get(automaticRoleId);
+		if (automaticRole == null) {
+			// id only => prevent to load on UI
+			// TODO: load from audit => #978 required
+			automaticRole = new IdmAutomaticRoleAttributeDto(automaticRoleId);
+		}
+		value.getEmbedded().put(IdmFormValueDto.PROPERTY_UUID_VALUE, automaticRole);
+		formInstance.getValues().add(value);
+		//
+		return formInstance;
 	}
 	
 	@Override

@@ -47,6 +47,7 @@ public class IdmFormValueDto extends AbstractDto implements Requestable {
 
 	private static final long serialVersionUID = 1L;
 	public static final String PROPERTY_FORM_ATTRIBUTE = "formAttribute";
+	public static final String PROPERTY_UUID_VALUE = "uuidValue";
 	//
 	@JsonProperty(access = Access.READ_ONLY)
 	private Serializable ownerId;

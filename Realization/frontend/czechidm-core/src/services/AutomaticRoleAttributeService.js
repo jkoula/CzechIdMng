@@ -5,11 +5,11 @@ import RoleService from './RoleService';
 import * as Utils from '../utils';
 
 /**
- * Automatic roles service
+ * Automatic roles service.
  *
  * @author Ondrej Kopr
+ * @author Radek Tomiška
  */
-
 const REACALCULATE_PATH = '/recalculate';
 
 export default class AutomaticRoleAttributeService extends AbstractService {
@@ -24,10 +24,25 @@ export default class AutomaticRoleAttributeService extends AbstractService {
   }
 
   getNiceLabel(entity) {
-    if (!entity || !entity._embedded) {
+    if (!entity) {
       return '';
     }
-    return `${ this.roleService.getNiceLabel(entity._embedded.role) } - ${ entity.name }`;
+    if (!entity._embedded) {
+      if (entity.name) {
+        return entity.name;
+      }
+      return entity.id;
+    }
+    let label = '';
+    if (entity._embedded.role) {
+      label = `${ this.roleService.getNiceLabel(entity._embedded.role) }`;
+    }
+    if (label !== '') {
+      label += ' - ';
+    }
+    label += `${ entity.name ? entity.name : entity.id }`;
+    //
+    return label;
   }
 
   supportsPatch() {

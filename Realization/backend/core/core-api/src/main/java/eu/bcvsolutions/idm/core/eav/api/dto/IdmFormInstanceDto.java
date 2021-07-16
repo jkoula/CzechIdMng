@@ -35,6 +35,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class IdmFormInstanceDto implements BaseDto {
 	
 	private static final long serialVersionUID = 1L;
+	public static final String PROPERTY_FORM_INSTANCE = "formInstance";
 	//
 	@JsonDeserialize(as = UUID.class)
 	@ApiModelProperty(required = true, notes = "Unique uuid identifier. It's ID of FormDefinition here.", dataType = "java.util.UUID")
@@ -57,18 +58,23 @@ public class IdmFormInstanceDto implements BaseDto {
 		this.id = id;
 	}
 	
-	public IdmFormInstanceDto(Identifiable owner, IdmFormDefinitionDto formDefinition, List<IdmFormValueDto> values) {
-		Assert.notNull(owner, "Owner is required for form instance.");
-		Assert.notNull(formDefinition, "Form definition is required for form instance.");
-		//
-		this.ownerId = owner.getId();
-		this.ownerType = owner.getClass();
-		this.formDefinition = formDefinition;
-		this.values = values;
+	public IdmFormInstanceDto(IdmFormDefinitionDto formDefinition) {
+		this(null, formDefinition, (List<IdmFormValueDto>) null);
 	}
 	
 	public IdmFormInstanceDto(Identifiable owner, IdmFormDefinitionDto formDefinition, IdmFormDto form) {
 		this(owner, formDefinition, form == null ? null : form.getValues());
+	}
+	
+	public IdmFormInstanceDto(Identifiable owner, IdmFormDefinitionDto formDefinition, List<IdmFormValueDto> values) {
+		Assert.notNull(formDefinition, "Form definition is required for form instance.");
+		//
+		if (owner != null) {
+			this.ownerId = owner.getId();
+			this.ownerType = owner.getClass();
+		}
+		this.formDefinition = formDefinition;
+		this.values = values;
 	}
 
 	public IdmFormDefinitionDto getFormDefinition() {

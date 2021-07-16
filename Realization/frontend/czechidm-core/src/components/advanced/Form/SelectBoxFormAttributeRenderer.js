@@ -54,6 +54,11 @@ export default class SelectBoxFormAttributeRenderer extends UuidFormAttributeRen
    * @return {object} value by persistent type
    */
   getInputValue(formValue) {
+    // ~ preloaded object
+    if (formValue._embedded && formValue._embedded.uuidValue) {
+      return formValue._embedded.uuidValue;
+    }
+    // ~ identifier only
     return formValue.uuidValue ? formValue.uuidValue : formValue.value;
   }
 

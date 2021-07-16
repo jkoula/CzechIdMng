@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.testng.collections.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoControllerRestTest;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringResultFilter;
@@ -21,7 +23,9 @@ import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringResultServic
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.H2DatabaseMonitoringEvaluator;
+import eu.bcvsolutions.idm.core.monitoring.service.impl.TestMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 
 /**
  * Controller tests
@@ -69,15 +73,19 @@ public class IdmMonitoringResultControllerRestTest extends AbstractReadWriteDtoC
 		monitoringOne.setInstanceId("mock");
 		monitoringOne = monitoringService.save(monitoringOne);
 		result.setMonitoring(monitoringOne.getId());
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
+		result.setOwnerId(owner.getId());
+		result.setOwnerType(IdmIdentity.class.getCanonicalName());
 		IdmMonitoringResultDto resultOne = createDto(result);
 		//
 		result = prepareDto();
 		IdmMonitoringDto monitoringTwo = new IdmMonitoringDto();
-		monitoringTwo.setEvaluatorType("mock");
+		monitoringTwo.setEvaluatorType(TestMonitoringEvaluator.class.getCanonicalName());
 		monitoringTwo.setDescription(monitoringOne.getEvaluatorType());
 		monitoringTwo.setInstanceId("mock");
 		monitoringTwo = monitoringService.save(monitoringTwo);
 		result.setMonitoring(monitoringTwo.getId());
+		result.setEvaluatorType(TestMonitoringEvaluator.class.getCanonicalName());
 		IdmMonitoringResultDto resultTwo = createDto(result);
 		//
 		createDto(); // other

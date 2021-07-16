@@ -36,8 +36,7 @@ public interface MonitoringEvaluator extends Ordered, Configurable {
 	default List<String> getPropertyNames() {
 		return new ArrayList<>();
 	}
-	
-	
+
 	/**
 	 * Evaluate monitoring result by given configuration.
 	 * 

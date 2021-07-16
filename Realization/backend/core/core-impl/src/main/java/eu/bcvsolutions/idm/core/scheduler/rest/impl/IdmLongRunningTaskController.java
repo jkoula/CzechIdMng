@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
@@ -35,6 +36,7 @@ import eu.bcvsolutions.idm.core.api.exception.EntityNotFoundException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -42,6 +44,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
 import eu.bcvsolutions.idm.core.scheduler.api.service.IdmLongRunningTaskService;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -188,7 +191,13 @@ public class IdmLongRunningTaskController
 		// FIXME: Propagate filter in GET method (in AbstractReadDto controller => requires lookup api improvement).
 		IdmLongRunningTaskFilter filter = toFilter(null);
 		//
-		return getService().get(backendId, filter, IdmBasePermission.READ);
+		IdmLongRunningTaskDto dto =  getService().get(backendId, filter, IdmBasePermission.READ);
+		if (dto == null) {
+			return null;
+		}
+		dto.getEmbedded().put(IdmFormInstanceDto.PROPERTY_FORM_INSTANCE, longRunningTaskManager.getTaskFormInstance(dto));
+		//
+		return dto;
 	}
 	
 	@Override
@@ -458,6 +467,18 @@ public class IdmLongRunningTaskController
 		longRunningTaskManager.recover(backendId);
 		//
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+	
+	@Override
+	public Page<IdmLongRunningTaskDto> find(IdmLongRunningTaskFilter filter, Pageable pageable, BasePermission permission) {
+		Page<IdmLongRunningTaskDto> results = super.find(filter, pageable, permission);
+		results
+			.stream()
+			.forEach(dto -> {
+				dto.getEmbedded().put(IdmFormInstanceDto.PROPERTY_FORM_INSTANCE, longRunningTaskManager.getTaskFormInstance(dto));
+			});
+		//
+		return results;
 	}
 	
 	@Override

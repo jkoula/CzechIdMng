@@ -138,15 +138,16 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 	public void init() {
 		service = context.getAutowireCapableBeanFactory().createBean(DefaultIdmIdentityContractService.class);
 		prepareTreeStructureAndRoles();
+		getHelper().disableAsynchronousProcessing();
 	}
 	
 	@After 
 	public void after() {
 		// delete this test automatic roles only	
-		if(automaticRoleA != null) try { deleteAutomaticRole(automaticRoleA); } catch (EmptyResultDataAccessException ex) {} ;
-		if(automaticRoleD != null) try { deleteAutomaticRole(automaticRoleD); } catch (EmptyResultDataAccessException ex) {} ;
-		if(automaticRoleE != null) try { deleteAutomaticRole(automaticRoleE); } catch (EmptyResultDataAccessException ex) {} ;
-		if(automaticRoleF != null) try { deleteAutomaticRole(automaticRoleF); } catch (EmptyResultDataAccessException ex) {} ;
+		if (automaticRoleA != null) try { deleteAutomaticRole(automaticRoleA); } catch (EmptyResultDataAccessException ex) {} ;
+		if (automaticRoleD != null) try { deleteAutomaticRole(automaticRoleD); } catch (EmptyResultDataAccessException ex) {} ;
+		if (automaticRoleE != null) try { deleteAutomaticRole(automaticRoleE); } catch (EmptyResultDataAccessException ex) {} ;
+		if (automaticRoleF != null) try { deleteAutomaticRole(automaticRoleF); } catch (EmptyResultDataAccessException ex) {} ;
 	}	
 	
 	private void prepareTreeStructureAndRoles() {
@@ -1631,6 +1632,7 @@ public class DefaultIdmIdentityContractServiceIntegrationTest extends AbstractIn
 		filter.setResultCode(CoreResultCode.AUTOMATIC_ROLE_SKIPPED.getCode());
 		filter.setOwnerType(entityStateManager.getOwnerType(IdmIdentityContractDto.class));
 		List<IdmEntityStateDto> skippedStates = entityStateManager.findStates(filter, null).getContent();
+		Assert.assertFalse(skippedStates.isEmpty());
 		Assert.assertTrue(skippedStates.stream().anyMatch(s -> s.getOwnerId().equals(contractId)));
 		//
 		assignedRoles = identityRoleService.findAllByIdentity(identity.getId());

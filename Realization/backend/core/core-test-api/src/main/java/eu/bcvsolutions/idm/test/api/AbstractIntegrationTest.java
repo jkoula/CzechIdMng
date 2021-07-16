@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.test.api;
 
 import java.util.Collection;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.junit.After;
@@ -12,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Rollback;
@@ -26,14 +28,18 @@ import eu.bcvsolutions.idm.IdmApplication;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityEventFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
+import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ModuleService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
 import eu.bcvsolutions.idm.core.scheduler.api.service.IdmLongRunningTaskService;
+import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmJwtAuthentication;
 import eu.bcvsolutions.idm.core.security.api.utils.IdmAuthorityUtils;
@@ -60,6 +66,8 @@ public abstract class AbstractIntegrationTest {
 	@Autowired private ModuleService moduleService;
 	@Autowired private IdmCacheManager cacheManager;
 	@Autowired private IdmLongRunningTaskService longRunningTaskService;
+	@Autowired private LongRunningTaskManager longRunningTaskManager;
+	@Autowired private EntityEventManager entityEventManager;
 	//
 	private TransactionTemplate template;
 
@@ -94,15 +102,40 @@ public abstract class AbstractIntegrationTest {
 		evictCaches();
 		//
 		// delete all related long running tasks
-		IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
-		filter.setTransactionId(TransactionContextHolder.getContext().getTransactionId());
-		// clean up method created long running tasks
+		UUID transactionId = TransactionContextHolder.getContext().getTransactionId();
+		//
+		// clean up created events
+		IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
+		eventFilter.setTransactionId(transactionId);
+		entityEventManager
+			.findEvents(eventFilter, null)
+			.forEach(event -> {
+				try {
+					entityEventManager.deleteEvent(event);
+				} catch (EmptyResultDataAccessException ex) {
+					// ok - already deleted asynchronously
+				} catch (Exception ex) {
+					LOG.error("Event [{}] cannot be deleted.", event.getId(), ex);
+				}
+			});
+		// clean up created long running tasks by executed method
+		//
+		IdmLongRunningTaskFilter taskFilter = new IdmLongRunningTaskFilter();
+		taskFilter.setTransactionId(transactionId);
 		longRunningTaskService
-			.find(filter, null)
+			.find(taskFilter, null)
 			.forEach(task -> {
 				if (task.isRunning()) {
-					task.setRunning(false);
-					task = longRunningTaskService.save(task);
+					try {
+						longRunningTaskManager.interrupt(task.getId());
+						task = longRunningTaskService.get(task);
+					} catch(ResultCodeException ex) {
+						LOG.error("Task [{}] cannot be interrupted.", task.getId(), ex);
+					}
+					if (task.isRunning()) {
+						task.setRunning(false);
+						task = longRunningTaskService.save(task);
+					}
 				}
 				longRunningTaskService.delete(task);
 			});

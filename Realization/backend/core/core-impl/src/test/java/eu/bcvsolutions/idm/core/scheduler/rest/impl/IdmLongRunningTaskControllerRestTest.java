@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.scheduler.rest.impl;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,6 +17,8 @@ import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoControllerRestTest;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
+import eu.bcvsolutions.idm.core.scheduler.task.impl.AbstractAutomaticRoleTaskExecutor;
+import eu.bcvsolutions.idm.core.scheduler.task.impl.ProcessAutomaticRoleByTreeTaskExecutor;
 import eu.bcvsolutions.idm.core.scheduler.task.impl.TestTaskExecutor;
 
 /**
@@ -77,6 +80,8 @@ public class IdmLongRunningTaskControllerRestTest extends AbstractReadWriteDtoCo
 	public void testFindByCreated() {
 		String mockInstanceId = getHelper().createName();
 		IdmLongRunningTaskDto task = prepareDto();
+		task.setTaskType(ProcessAutomaticRoleByTreeTaskExecutor.class.getCanonicalName());
+		task.getTaskProperties().put(AbstractAutomaticRoleTaskExecutor.PARAMETER_ROLE_TREE_NODE, UUID.randomUUID());
 		task.setInstanceId(mockInstanceId);
 		IdmLongRunningTaskDto taskOne = createDto(task);
 		//

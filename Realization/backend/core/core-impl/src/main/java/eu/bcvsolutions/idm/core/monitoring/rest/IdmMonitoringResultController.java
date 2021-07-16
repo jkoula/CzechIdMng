@@ -42,6 +42,7 @@ import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.ecm.api.entity.AttachableEntity;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.service.api.CheckLongPollingResult;
@@ -404,18 +405,20 @@ public class IdmMonitoringResultController extends AbstractEventableDtoControlle
 		Map<UUID, BaseDto> loadedDtos = new HashMap<>();
 		results
 			.stream()
-			.filter(dto -> dto.getOwnerId() != null)
-			.filter(dto -> !StringUtils.isEmpty(dto.getOwnerType()))
 			.forEach(dto -> {
 				UUID ownerId = dto.getOwnerId();
-				if (!loadedDtos.containsKey(ownerId)) {
-					try {
-						loadedDtos.put(ownerId, getLookupService().lookupDto(dto.getOwnerType(), ownerId));
-					} catch (IllegalArgumentException ex) {
-						LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getOwnerType(), ex);
+				String ownerType = dto.getOwnerType();
+				if (ownerId != null && StringUtils.isNotEmpty(ownerType)) {
+					if (!loadedDtos.containsKey(ownerId)) {
+						try {
+							loadedDtos.put(ownerId, getLookupService().lookupDto(ownerType, ownerId));
+						} catch (IllegalArgumentException ex) {
+							LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", ownerType, ex);
+						}
 					}
+					dto.getEmbedded().put(AttachableEntity.PARAMETER_OWNER_ID, loadedDtos.get(ownerId));
 				}
-				dto.getEmbedded().put(AttachableEntity.PARAMETER_OWNER_ID, loadedDtos.get(ownerId));
+				dto.getEmbedded().put(IdmFormInstanceDto.PROPERTY_FORM_INSTANCE, monitoringManager.getEvaluatorFormInstance(dto));
 			});
 		return results;
 	}

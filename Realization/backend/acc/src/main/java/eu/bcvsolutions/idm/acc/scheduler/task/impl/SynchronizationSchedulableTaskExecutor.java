@@ -14,15 +14,19 @@ import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.eav.domain.AccFaceType;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
+import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExecutor;
-import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
 
 /**
  * Synchronization schedule task.
@@ -138,6 +142,29 @@ public class SynchronizationSchedulableTaskExecutor extends AbstractSchedulableT
 		synchronizationAttribute.setRequired(true);
 		//
 		return Lists.newArrayList(synchronizationAttribute);
+	}
+	
+	@Override
+	public IdmFormInstanceDto getFormInstance(ConfigurationMap properties) {
+		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(getFormDefinition());
+		//
+		UUID synchronizationId = getParameterConverter().toUuid(properties, SynchronizationService.PARAMETER_SYNCHRONIZATION_ID);
+		if (synchronizationId == null) {
+			return null;
+		}
+		IdmFormValueDto value = new IdmFormValueDto(formInstance.getMappedAttributeByCode(SynchronizationService.PARAMETER_SYNCHRONIZATION_ID));
+		value.setUuidValue(synchronizationId);
+		//
+		AbstractSysSyncConfigDto sync = service.get(synchronizationId);
+		if (sync == null) {
+			// id only => prevent to load on UI
+			// TODO: load from audit => #978 required
+			sync = new SysSyncConfigDto(synchronizationId);
+		}
+		value.getEmbedded().put(IdmFormValueDto.PROPERTY_UUID_VALUE, sync);
+		formInstance.getValues().add(value);
+		//
+		return formInstance;
 	}
 	
 	@Override

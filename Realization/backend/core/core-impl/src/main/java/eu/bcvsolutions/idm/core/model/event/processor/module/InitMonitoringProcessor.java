@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.model.event.processor.module;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Description;
@@ -159,7 +160,10 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 			monitoring.setEvaluatorType(evaluatorType);
 			monitoring.setInstanceId(configurationService.getInstanceId());
 			monitoring.setCheckPeriod(3600L); // ~ per hour
-			monitoring.setDescription(PRODUCT_PROVIDED_MONITORING_DESCRIPTION);
+			// FIXME: dto mapper to get AvailableServiceDto with table => #978
+			monitoring.setDescription(
+					String.format("%s for service [%s].", StringUtils.substring(PRODUCT_PROVIDED_MONITORING_DESCRIPTION, 0, -1), serviceBeanName)
+			);
 			ConfigurationMap evaluatorProperties = new ConfigurationMap();
 			evaluatorProperties.put(
 					DatabaseTableMonitoringEvaluator.PARAMETER_READ_SERVICE_BEAN_NAME, 

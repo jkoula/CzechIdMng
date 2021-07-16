@@ -1,11 +1,13 @@
 package eu.bcvsolutions.idm.core.api.dto;
 
+import java.util.UUID;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.hateoas.core.Relation;
 
 /**
- * Automatic role attribute dto
+ * Automatic role attribute dto.
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @since 7.7.0
@@ -18,6 +20,13 @@ public class IdmAutomaticRoleAttributeDto extends AbstractIdmAutomaticRoleDto {
 
 	@NotNull
 	private boolean concept;
+	
+	public IdmAutomaticRoleAttributeDto() {
+	}
+	
+	public IdmAutomaticRoleAttributeDto(UUID id) {
+		super(id);
+	}
 
 	public boolean isConcept() {
 		return concept;

@@ -77,6 +77,13 @@ public abstract class AbstractSysSyncConfigDto extends AbstractDto {
 	 */
 	private SysSyncLogDto lastSyncLog;
 	
+	public AbstractSysSyncConfigDto() {
+	}
+	
+	public AbstractSysSyncConfigDto(UUID id) {
+		super(id);
+	}
+	
 	public boolean isEnabled() {
 		return enabled;
 	}

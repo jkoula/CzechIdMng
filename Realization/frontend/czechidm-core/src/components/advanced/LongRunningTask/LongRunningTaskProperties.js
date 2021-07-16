@@ -45,13 +45,17 @@ export default class LongRunningTaskProperties extends Basic.AbstractContextComp
     if (supportedTasks && supportedTasks.has(entity.taskType)) {
       _taskType = supportedTasks.get(entity.taskType);
       //
-      if (_taskType.formDefinition) {
+      if (entity._embedded && entity._embedded.formInstance) {
+        formInstance = new Domain.FormInstance(entity._embedded.formInstance);
+      } else if (_taskType.formDefinition) {
         formInstance = new Domain.FormInstance(_taskType.formDefinition).setProperties(entityProperties);
       }
     } else if (supportedTasks && supportedTasks.has(entity.evaluatorType)) {
       _taskType = supportedTasks.get(entity.evaluatorType);
       //
-      if (_taskType.formDefinition) {
+      if (entity._embedded && entity._embedded.formInstance) {
+        formInstance = new Domain.FormInstance(entity._embedded.formInstance);
+      } else if (_taskType.formDefinition) {
         formInstance = new Domain.FormInstance(_taskType.formDefinition).setProperties(entityProperties);
       }
     } else if (entityProperties) {

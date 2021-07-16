@@ -113,8 +113,22 @@ class SelectBox extends AbstractFormComponent {
   }
 
   getOptions(input, forceSearchParameters, useFirst = false, addToEnd = false, useFirstIfOne) {
-    const { manager, clearable, multiSelect, emptyOptionLabel, additionalOptions, required } = this.props;
+    const {
+      manager,
+      clearable,
+      multiSelect,
+      emptyOptionLabel,
+      additionalOptions,
+      required,
+      readOnly,
+      rendered
+    } = this.props;
     const { options } = this.state;
+    //
+    if (!rendered || readOnly) {
+      return;
+    }
+    //
     const searchParameters = this._createSearchParameters(input, forceSearchParameters);
     const timeInMs = Date.now();
     // We create unique key for this call and save it to component state

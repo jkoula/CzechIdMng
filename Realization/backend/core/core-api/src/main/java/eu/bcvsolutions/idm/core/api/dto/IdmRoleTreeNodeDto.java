@@ -22,6 +22,13 @@ public class IdmRoleTreeNodeDto extends AbstractIdmAutomaticRoleDto {
     private UUID treeNode;
     @NotNull
     private RecursionType recursionType = RecursionType.NO;
+    
+    public IdmRoleTreeNodeDto() {
+	}
+    
+    public IdmRoleTreeNodeDto(UUID id) {
+    	super(id);
+	}
 
     public UUID getTreeNode() {
         return treeNode;

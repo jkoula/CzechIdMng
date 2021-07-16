@@ -22,8 +22,11 @@ import eu.bcvsolutions.idm.acc.entity.SysSyncConfig_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.exception.EntityNotFoundException;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
@@ -205,5 +208,36 @@ public class SynchronizationMonitoringEvaluatorIntegrationTest extends AbstractI
 		//
 		Assert.assertEquals(AccResultCode.MONITORING_SYNCHRONIZATION_CONTAINS_ERROR.getCode(), result.getResult().getCode());
 		Assert.assertEquals(String.valueOf(0), result.getValue()); // ~ flag only
+	}
+	
+	@Test
+	public void testFormInstance() {
+		ConfigurationMap properties = new ConfigurationMap();
+		//
+		Assert.assertNull(evaluator.getFormInstance(properties));
+		//
+		UUID synchronizationId = UUID.randomUUID();
+		properties.put(SynchronizationMonitoringEvaluator.PARAMETER_SYNCHRONIZATION, synchronizationId);
+		//
+		IdmFormInstanceDto formInstance = evaluator.getFormInstance(properties);
+		Assert.assertNotNull(formInstance);
+		Assert.assertNotNull(formInstance
+				.getValues()
+				.stream()
+				.anyMatch(
+						v -> v.getUuidValue().equals(synchronizationId) 
+							&& v.getEmbedded().get(IdmFormValueDto.PROPERTY_UUID_VALUE) != null)
+				);
+		//
+		Mockito.when(syncConfigService.get(synchronizationId)).thenReturn(new SysSyncConfigDto(synchronizationId));
+		formInstance = evaluator.getFormInstance(properties);
+		Assert.assertNotNull(formInstance);
+		Assert.assertNotNull(formInstance
+				.getValues()
+				.stream()
+				.anyMatch(
+						v -> v.getUuidValue().equals(synchronizationId) 
+							&& v.getEmbedded().get(IdmFormValueDto.PROPERTY_UUID_VALUE) != null)
+				);
 	}
 }

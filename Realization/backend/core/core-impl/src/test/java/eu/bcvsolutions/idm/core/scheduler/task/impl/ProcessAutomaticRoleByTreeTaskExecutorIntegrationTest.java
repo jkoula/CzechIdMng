@@ -1,14 +1,17 @@
 package eu.bcvsolutions.idm.core.scheduler.task.impl;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
@@ -17,9 +20,12 @@ import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
@@ -33,6 +39,8 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  */
 public class ProcessAutomaticRoleByTreeTaskExecutorIntegrationTest extends AbstractIntegrationTest {
 	
+	@Autowired @Qualifier(ProcessAutomaticRoleByTreeTaskExecutor.TASK_NAME)
+	private ProcessAutomaticRoleByTreeTaskExecutor executor;
 	@Autowired private IdmRoleRequestService roleRequestService;
 	@Autowired private IdmConceptRoleRequestService conceptRoleRequestService;
 	@Autowired private LongRunningTaskManager longRunningTaskManager;
@@ -73,7 +81,39 @@ public class ProcessAutomaticRoleByTreeTaskExecutorIntegrationTest extends Abstr
 		Assert.assertFalse(lrt.isRunning());
 		Assert.assertEquals(OperationState.EXCEPTION, lrt.getResultState());
 		Assert.assertEquals(CoreResultCode.AUTOMATIC_ROLE_ASSIGN_NOT_COMPLETE.name(), lrt.getResult().getCode());
-		
+	}
+	
+	@Test
+	public void testFormInstance() {
+		ConfigurationMap properties = new ConfigurationMap();
+		//
+		Assert.assertNull(executor.getFormInstance(properties));
+		//
+		UUID automaticRoleId = UUID.randomUUID();
+		properties.put(AbstractAutomaticRoleTaskExecutor.PARAMETER_ROLE_TREE_NODE, automaticRoleId);
+		//
+		IdmFormInstanceDto formInstance = executor.getFormInstance(properties);
+		Assert.assertNotNull(formInstance);
+		Assert.assertNotNull(formInstance
+				.getValues()
+				.stream()
+				.anyMatch(
+						v -> v.getUuidValue().equals(automaticRoleId) 
+							&& v.getEmbedded().get(IdmFormValueDto.PROPERTY_UUID_VALUE) != null)
+				);
+		//
+		IdmRoleTreeNodeDto automaticRole = getHelper().createRoleTreeNode(getHelper().createRole(), getHelper().createTreeNode(), true);
+		properties.put(AbstractAutomaticRoleTaskExecutor.PARAMETER_ROLE_TREE_NODE, automaticRole.getId());
+		//
+		formInstance = executor.getFormInstance(properties);
+		Assert.assertNotNull(formInstance);
+		Assert.assertNotNull(formInstance
+				.getValues()
+				.stream()
+				.anyMatch(
+						v -> v.getUuidValue().equals(automaticRole.getId())
+							&& v.getEmbedded().get(IdmFormValueDto.PROPERTY_UUID_VALUE) != null)
+				);
 	}
 	
 }

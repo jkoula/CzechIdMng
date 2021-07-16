@@ -7,12 +7,11 @@ import javax.validation.constraints.NotNull;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 
 /**
- * DTO for automatic roles
+ * DTO for automatic roles.
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
-
 public abstract class AbstractIdmAutomaticRoleDto extends AbstractDto {
 
 	private static final long serialVersionUID = -5520693984256464570L;
@@ -23,6 +22,13 @@ public abstract class AbstractIdmAutomaticRoleDto extends AbstractDto {
 	@NotNull
 	@Embedded(dtoClass = IdmRoleDto.class)
     private UUID role;
+	
+	public AbstractIdmAutomaticRoleDto() {
+	}
+	
+	public AbstractIdmAutomaticRoleDto(UUID id) {
+		super(id);
+	}
 
 	public UUID getRole() {
 		return role;

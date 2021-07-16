@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.acc.scheduler.task.impl;
 
 import java.time.ZonedDateTime;
-import java.util.Map;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.slf4j.Logger;
@@ -31,7 +30,6 @@ public class AccountProtectionExpirationTaskExecutor extends AbstractSchedulable
 	
 	public static final String TASK_NAME = "acc-account-protection-expiration-long-running-task";
 	private static final Logger LOG = LoggerFactory.getLogger(AccountProtectionExpirationTaskExecutor.class);
-	private static final String PARAMETER_EXPIRATION = "expiration";
 	//
 	@Autowired private AccAccountService service;
 	//
@@ -79,13 +77,6 @@ public class AccountProtectionExpirationTaskExecutor extends AbstractSchedulable
 		}
 		LOG.info("End: Remove accounts with expired protection for expiration less than [{}]", expiration);
 		return Boolean.TRUE;
-	}
-	
-	@Override
-	public Map<String, Object> getProperties() {
-		Map<String, Object> properties = super.getProperties();
-		properties.put(PARAMETER_EXPIRATION, expiration);
-		return properties;
 	}
 	
 	@Override

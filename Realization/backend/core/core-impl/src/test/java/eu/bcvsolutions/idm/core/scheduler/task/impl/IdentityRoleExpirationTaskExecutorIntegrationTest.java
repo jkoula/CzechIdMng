@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -112,7 +111,7 @@ public class IdentityRoleExpirationTaskExecutorIntegrationTest extends AbstractI
 	@Test
 	public void testExpiredRoleAsync() {
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);	
+			getHelper().enableAsynchronousProcessing();	
 			IdmRoleDto role = getHelper().createRole();
 			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
 			IdmIdentityContractDto contract = getHelper().createContract(identity);
@@ -140,7 +139,7 @@ public class IdentityRoleExpirationTaskExecutorIntegrationTest extends AbstractI
 			assignedRoles = identityRoleService.findAllByIdentity(identity.getId());
 			Assert.assertTrue(assignedRoles.isEmpty());
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 }

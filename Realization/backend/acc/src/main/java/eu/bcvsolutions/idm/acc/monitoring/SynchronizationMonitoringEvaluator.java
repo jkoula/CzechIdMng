@@ -17,6 +17,7 @@ import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncActionLogDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncLogDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
@@ -27,6 +28,7 @@ import eu.bcvsolutions.idm.acc.entity.SysSyncConfig_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
@@ -35,6 +37,8 @@ import eu.bcvsolutions.idm.core.api.exception.EntityNotFoundException;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.service.AbstractMonitoringEvaluator;
@@ -63,7 +67,7 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 	}
 	
 	@Override
-	public IdmMonitoringResultDto evaluate(IdmMonitoringDto monitoring) {	
+	public IdmMonitoringResultDto evaluate(IdmMonitoringDto monitoring) {
 		SysSyncConfigFilter context = new SysSyncConfigFilter();
 		context.setIncludeLastLog(Boolean.TRUE);
 		UUID synchronizationId = getParameterConverter().toUuid(monitoring.getEvaluatorProperties(), PARAMETER_SYNCHRONIZATION);
@@ -156,12 +160,39 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 	
 	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
+		return Lists.newArrayList(
+				getSynchronizationAttribute()
+		);
+	}
+	
+	private IdmFormAttributeDto getSynchronizationAttribute() {
 		IdmFormAttributeDto synchronization = new IdmFormAttributeDto(PARAMETER_SYNCHRONIZATION, PARAMETER_SYNCHRONIZATION, PersistentType.UUID);
 		synchronization.setFaceType(AccFaceType.SYNCHRONIZATION_CONFIG_SELECT);
 		synchronization.setRequired(true);
 		//
-		return Lists.newArrayList(
-				synchronization
-		);
+		return synchronization;
+	}
+	
+	@Override
+	public IdmFormInstanceDto getFormInstance(ConfigurationMap evaluatorProperties) {
+		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(getFormDefinition());
+		//
+		UUID synchronizationId = getParameterConverter().toUuid(evaluatorProperties, PARAMETER_SYNCHRONIZATION);
+		if (synchronizationId == null) {
+			return null;
+		}
+		IdmFormValueDto value = new IdmFormValueDto(getSynchronizationAttribute());
+		value.setUuidValue(synchronizationId);
+		//
+		AbstractSysSyncConfigDto sync = syncConfigService.get(synchronizationId);
+		if (sync == null) {
+			// id only => prevent to load on UI
+			// TODO: load from audit => #978 required
+			sync = new SysSyncConfigDto(synchronizationId);
+		}
+		value.getEmbedded().put(IdmFormValueDto.PROPERTY_UUID_VALUE, sync);
+		formInstance.getValues().add(value);
+		//
+		return formInstance;
 	}
 }

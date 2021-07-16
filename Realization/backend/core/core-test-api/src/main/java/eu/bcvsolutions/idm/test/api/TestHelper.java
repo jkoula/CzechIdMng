@@ -961,8 +961,8 @@ public interface TestHelper {
 	 * Wait for result - usable for asynchronous tests
 	 * 
 	 * @param continueFunction [optional] continue by default, until iterationCount is complete. If continueFunction is given, then is iterated while function returns true.
-	 * @param interationWaitMilis [optional] default 300ms
-	 * @param iterationCount [optional] default 50 => max wait 300ms x 50 = 15s. Maximum is 300.
+	 * @param interationWaitMilis [optional] default 500ms
+	 * @param iterationCount [optional] default 50 => max wait 500ms x 50 = 25s. Maximum is 300.
 	 * @throws IllegalStateException if continue function is defined and timeout exceeds before function returns false (~ before complete)
 	 */
 	void waitForResult(Function<String, Boolean> continueFunction, Integer interationWaitMilis, Integer iterationCount);

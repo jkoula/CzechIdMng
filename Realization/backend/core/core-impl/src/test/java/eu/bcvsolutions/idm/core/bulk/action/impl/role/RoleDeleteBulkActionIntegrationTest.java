@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
-import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -318,7 +317,7 @@ public class RoleDeleteBulkActionIntegrationTest extends AbstractBulkActionTest 
 		Assert.assertEquals(24, identityRoleService.findAllByIdentity(identityTwo.getId()).size());
 		// remove role async
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			
 			Map<String, Object> properties = new HashMap<>();
 			properties.put(RoleProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE);
@@ -347,7 +346,7 @@ public class RoleDeleteBulkActionIntegrationTest extends AbstractBulkActionTest 
 			Assert.assertNotNull(roleService.get(roleSubTwo));
 			Assert.assertNotNull(roleService.get(roleSubSubOne));
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 		}
 	}
 }

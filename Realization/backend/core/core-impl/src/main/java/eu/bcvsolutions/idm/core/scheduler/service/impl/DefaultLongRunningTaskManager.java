@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.DisallowConcurrentExecution;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import org.springframework.util.ObjectUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
@@ -45,6 +47,7 @@ import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.ecm.entity.IdmAttachment;
@@ -60,6 +63,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.scheduler.entity.IdmLongRunningTask;
 import eu.bcvsolutions.idm.core.scheduler.exception.TaskNotRecoverableException;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
 import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 
@@ -79,6 +83,7 @@ public class DefaultLongRunningTaskManager implements LongRunningTaskManager {
 	private final EntityEventManager entityEventManager;
 	private final Set<UUID> failedLoggedTask = new HashSet<>();
 	//
+	@Autowired private EnabledEvaluator enabledEvaluator;
 	@Autowired private AttachmentManager attachmentManager;
 
 	@Autowired
@@ -639,6 +644,32 @@ public class DefaultLongRunningTaskManager implements LongRunningTaskManager {
 		} finally {
 			// start asynchronous task processing
 			configurationService.setBooleanValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_STOP_PROCESSING, stopProcessing);	
+		}
+	}
+	
+	@Override
+	public IdmFormInstanceDto getTaskFormInstance(IdmLongRunningTaskDto longRunningTask) {
+		String taskType = longRunningTask.getTaskType();
+		//
+		try {
+			LongRunningTaskExecutor<?> executor = (LongRunningTaskExecutor<?>) AutowireHelper.createBean(Class.forName(taskType));
+			if (executor.isDisabled() || !enabledEvaluator.isEnabled(executor)) {
+				LOG.info("Task executor [{}] is disabled - form instance will not be created.", taskType);
+				return null;
+			}
+			IdmFormInstanceDto formInstance = executor.getFormInstance(new ConfigurationMap(longRunningTask.getTaskProperties()));
+			if (formInstance == null) {
+				return null;
+			}
+			//
+			formInstance.setOwnerId(longRunningTask.getId());
+			formInstance.setOwnerType(longRunningTask.getClass());
+			//
+			return formInstance;
+		} catch (ClassNotFoundException | NoSuchBeanDefinitionException ex) {
+			// disable or removed evaluator classes
+			LOG.warn("Task executor [{}] not found.", taskType);
+			return null;
 		}
 	}
 	

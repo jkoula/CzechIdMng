@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import eu.bcvsolutions.idm.core.api.CoreModule;
 import eu.bcvsolutions.idm.core.api.dto.filter.PermissionContext;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.MonitoringEvaluatorDto;
@@ -61,4 +62,24 @@ public interface MonitoringManager {
 	 * @return
 	 */
 	Page<IdmMonitoringResultDto> getLastResults(IdmMonitoringResultFilter filter, Pageable pageable, BasePermission... permission);
+	
+	/**
+	 * Initialize form instance for configured evaluator properties.
+	 * Returns {@code null}, if no eav form instance is required for evaluator properties.
+	 * 
+	 * @param monitoringResult monitoring result
+	 * @return form instance or {@code null}
+	 * @since 11.2.0
+	 */
+	IdmFormInstanceDto getEvaluatorFormInstance(IdmMonitoringResultDto monitoringResult);
+	
+	/**
+	 * Initialize form instance for configured evaluator properties.
+	 * Returns {@code null}, if no eav form instance is required for evaluator properties.
+	 * 
+	 * @param monitoringResult monitoring
+	 * @return form instance or {@code null}
+	 * @since 11.2.0
+	 */
+	IdmFormInstanceDto getEvaluatorFormInstance(IdmMonitoringDto monitoring);
 }

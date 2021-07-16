@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
@@ -30,12 +31,14 @@ import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.monitoring.api.domain.MonitoringGroupPermission;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.MonitoringEvaluatorDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -355,6 +358,18 @@ public class IdmMonitoringController extends AbstractEventableDtoController<IdmM
 				})
 	public Resources<MonitoringEvaluatorDto> getSupportedEvaluators() {
 		return new Resources<>(monitoringManager.getSupportedEvaluators());
+	}
+	
+	@Override
+	public Page<IdmMonitoringDto> find(IdmMonitoringFilter filter, Pageable pageable, BasePermission permission) {
+		Page<IdmMonitoringDto> results = super.find(filter, pageable, permission);
+		results
+			.stream()
+			.forEach(dto -> {
+				dto.getEmbedded().put(IdmFormInstanceDto.PROPERTY_FORM_INSTANCE, monitoringManager.getEvaluatorFormInstance(dto));
+			});
+		//
+		return results;
 	}
 
 	@Override

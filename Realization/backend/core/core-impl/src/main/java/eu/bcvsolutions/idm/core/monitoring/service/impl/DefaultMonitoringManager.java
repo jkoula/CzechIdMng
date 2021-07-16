@@ -34,6 +34,7 @@ import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.MonitoringEvaluatorDto;
@@ -316,22 +317,67 @@ public class DefaultMonitoringManager implements MonitoringManager {
 		//
 		return new PageImpl<>(page, internalPageable, results.size());
 	}
+	
+	@Override
+	public IdmFormInstanceDto getEvaluatorFormInstance(IdmMonitoringResultDto monitoringResult) {
+		MonitoringEvaluator evaluator = getEvaluator(monitoringResult.getEvaluatorType());
+		if (evaluator == null) {
+			return null;
+		}
+		IdmFormInstanceDto formInstance = evaluator.getFormInstance(monitoringResult.getEvaluatorProperties());
+		if (formInstance == null) {
+			return null;
+		}
+		//
+		formInstance.setOwnerId(monitoringResult.getId());
+		formInstance.setOwnerType(monitoringResult.getClass());
+		//
+		return formInstance;
+	}
+	
+	@Override
+	public IdmFormInstanceDto getEvaluatorFormInstance(IdmMonitoringDto monitoring) {
+		MonitoringEvaluator evaluator = getEvaluator(monitoring.getEvaluatorType());
+		if (evaluator == null) {
+			return null;
+		}
+		IdmFormInstanceDto formInstance = evaluator.getFormInstance(monitoring.getEvaluatorProperties());
+		if (formInstance == null) {
+			return null;
+		}
+		//
+		formInstance.setOwnerId(monitoring.getId());
+		formInstance.setOwnerType(monitoring.getClass());
+		//
+		return formInstance;
+	}
 
 	private MonitoringEvaluator getEvaluator(IdmMonitoringDto monitoring) {
 		String evaluatorType = monitoring.getEvaluatorType();
+		MonitoringEvaluator evaluator = getEvaluator(evaluatorType);
+		//
+		if (evaluator == null) {
+			LOG.info("Evaluator type [{}] for monitoring [{}] not found - monitoring will not be evaluated.", evaluatorType, monitoring.getId());
+		}
+		//
+		return evaluator;
+	}
+	
+	private MonitoringEvaluator getEvaluator(String evaluatorType) {
 		if (!evaluators.containsKey(evaluatorType)) {
 			try {
 				evaluators.put(evaluatorType, (MonitoringEvaluator) context.getBean(Class.forName(evaluatorType)));
 			} catch (ClassNotFoundException | NoSuchBeanDefinitionException ex) {
-				// disable removed evaluator classes
-				LOG.warn("Evaluator type [{}] for monitoring [{}] not found. Monitoring is ignored but should be disabled or removed.",
-						evaluatorType, monitoring.getId());
+				// disable or removed evaluator classes
+				LOG.warn("Evaluator type [{}] not found. Monitoring is ignored but should be disabled or removed.", evaluatorType);
 				return null;
 			}
 		}
+		//
 		MonitoringEvaluator evaluator = evaluators.get(evaluatorType);
+		//
 		if (evaluator.isDisabled() || !enabledEvaluator.isEnabled(evaluator)) {
-			LOG.info("Evaluator type [{}] for monitoring [{}] is disabled - monitoring will not be evaluated.", evaluatorType, monitoring.getId());
+			LOG.info("Evaluator type [{}] is disabled - monitoring will not be evaluated.", evaluatorType);
 			return null;
 		}
 		//

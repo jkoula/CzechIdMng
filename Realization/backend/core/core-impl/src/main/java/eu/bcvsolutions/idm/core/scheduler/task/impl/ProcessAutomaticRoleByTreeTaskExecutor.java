@@ -35,6 +35,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -66,6 +67,8 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.model.entity.IdmContractPosition_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
@@ -701,6 +704,32 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 		automaticRoleAttribute.setMultiple(true);
 		//
 		return Lists.newArrayList(automaticRoleAttribute);
+	}
+	
+	@Override
+	public IdmFormInstanceDto getFormInstance(ConfigurationMap properties) {
+		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(getFormDefinition());
+		//
+		List<UUID> automaticRoles = getAutomaticRoles(properties);
+		if (CollectionUtils.isEmpty(automaticRoles)) {
+			return null;
+		}
+		automaticRoles.forEach(automaticRoleId -> {
+			IdmFormValueDto value = new IdmFormValueDto(
+					formInstance.getMappedAttributeByCode(AbstractAutomaticRoleTaskExecutor.PARAMETER_ROLE_TREE_NODE)
+			);
+			value.setUuidValue(automaticRoleId);
+			IdmRoleTreeNodeDto automaticRole = roleTreeNodeService.get(automaticRoleId);
+			if (automaticRole == null) {
+				// id only => prevent to load on UI
+				// TODO: load from audit => #978 required
+				automaticRole = new IdmRoleTreeNodeDto(automaticRoleId);
+			}
+			value.getEmbedded().put(IdmFormValueDto.PROPERTY_UUID_VALUE, automaticRole);
+			formInstance.getValues().add(value);
+		});
+		//
+		return formInstance;
 	}
 	
 	public void setAutomaticRoles(List<UUID> automaticRoles) {

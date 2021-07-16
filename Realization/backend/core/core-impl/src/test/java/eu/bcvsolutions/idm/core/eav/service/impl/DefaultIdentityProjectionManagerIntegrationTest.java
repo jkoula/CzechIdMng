@@ -1147,7 +1147,7 @@ public class DefaultIdentityProjectionManagerIntegrationTest extends AbstractRes
 	public void testAssignAutomaticRoleIdentityEav() throws Exception {
 		UUID identityId = null;
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			// create form definition, roles, automatic role etc.
 			IdmRoleDto role = getHelper().createRole();
 			IdmRoleDto subRole = getHelper().createRole();
@@ -1226,7 +1226,7 @@ public class DefaultIdentityProjectionManagerIntegrationTest extends AbstractRes
 			identityRoles =  Lists.newArrayList(identityRoleService.find(filter, null).getContent());
 			Assert.assertTrue(identityRoles.isEmpty());
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 			getHelper().deleteIdentity(identityId);
 		}
 	}
@@ -1235,7 +1235,7 @@ public class DefaultIdentityProjectionManagerIntegrationTest extends AbstractRes
 	public void testAssignAutomaticRoleIdentityAndContractEav() throws Exception {
 		UUID identityId = null;
 		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+			getHelper().enableAsynchronousProcessing();
 			// create form definition, roles, automatic role etc.
 			IdmRoleDto role = getHelper().createRole();
 			IdmRoleDto subRole = getHelper().createRole();
@@ -1360,7 +1360,7 @@ public class DefaultIdentityProjectionManagerIntegrationTest extends AbstractRes
 			Assert.assertEquals(1, identityRoles.stream().filter(ir -> ir.getRole().equals(roleContract.getId())).count());
 			Assert.assertEquals(1, identityRoles.stream().filter(ir -> ir.getRole().equals(subRoleContract.getId())).count());			
 		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
+			getHelper().disableAsynchronousProcessing();
 			getHelper().deleteIdentity(identityId);
 		}
 	}

@@ -12,6 +12,7 @@ import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.api.utils.SpinalCase;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 
 /**
  * Configurable object by {@link ConfigurationService}.
@@ -270,7 +271,22 @@ public interface Configurable {
 		formDefinition.setModule(getModule());
 		formDefinition.setDescription(getDescription());
 		formDefinition.setFormAttributes(getFormAttributes());
+		//
 		return formDefinition;
+	}
+	
+	/**
+	 * Initialize form instance for configured properties.
+	 * Returns {@code null}, if no eav form instance is required for properties.
+	 * Returns {@code null} by default, override if needed.
+	 * 
+	 * @param evaluatorProperties configured properties
+	 * @return form instance
+	 * @since 11.2.0
+	 * @see Configurable#getFormDefinition()
+	 */
+	default IdmFormInstanceDto getFormInstance(ConfigurationMap properties) {
+		return null;
 	}
 	
 	/**

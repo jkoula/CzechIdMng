@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
@@ -51,6 +52,8 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleTreeNode_;
@@ -72,8 +75,8 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 	
 	public static final String TASK_NAME = "core-remove-automatic-role-long-running-task";
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(RemoveAutomaticRoleTaskExecutor.class);
-	private static final String PARAMETER_AUTOMATIC_ROLE_TREE = "automaticRoleTree";
-	private static final String PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE = "automaticRoleAttribute";
+	protected static final String PARAMETER_AUTOMATIC_ROLE_TREE = "automaticRoleTree";
+	protected static final String PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE = "automaticRoleAttribute";
 	//
 	@Autowired private IdmIdentityRoleService identityRoleService;
 	@Autowired private IdmRoleTreeNodeService roleTreeNodeService;
@@ -411,6 +414,34 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 				BaseFaceType.AUTOMATIC_ROLE_ATTRIBUTE_SELECT);
 		//
 		return Lists.newArrayList(automaticRoleAttributeByTree, automaticRoleAttributeByAttribute);
+	}
+	
+	@Override
+	public IdmFormInstanceDto getFormInstance(ConfigurationMap properties) {
+		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(getFormDefinition());
+		//
+		IdmFormValueDto value = null;
+		UUID automaticRoleTreeId = getParameterConverter().toUuid(properties, PARAMETER_AUTOMATIC_ROLE_TREE);
+		UUID automaticRoleAttributeId = getParameterConverter().toUuid(properties, PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE);
+		if (automaticRoleTreeId != null) {
+			automaticRoleId = automaticRoleTreeId;
+			value = new IdmFormValueDto(formInstance.getMappedAttributeByCode(PARAMETER_AUTOMATIC_ROLE_TREE));
+		} else if (automaticRoleAttributeId != null) {
+			automaticRoleId = automaticRoleAttributeId;
+			value = new IdmFormValueDto(formInstance.getMappedAttributeByCode(PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE));
+		}
+		if (value == null) {
+			return null;
+		}
+		//
+		value.setUuidValue(automaticRoleId);
+		// id only => prevent to load on UI => value is already removed in most of cases
+		// TODO: load from audit => #978 required
+		automaticRole = new IdmAutomaticRoleAttributeDto(automaticRoleId);
+		value.getEmbedded().put(IdmFormValueDto.PROPERTY_UUID_VALUE, automaticRole);
+		formInstance.getValues().add(value);
+		//
+		return formInstance;
 	}
 	
 	@Override
