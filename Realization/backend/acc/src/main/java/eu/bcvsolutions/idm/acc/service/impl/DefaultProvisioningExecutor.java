@@ -108,6 +108,12 @@ public class DefaultProvisioningExecutor implements ProvisioningExecutor {
 	@Override
 	@Transactional
 	public synchronized void execute(SysProvisioningOperationDto provisioningOperation) {
+		execute(provisioningOperation, false);
+	}
+	
+	@Override
+	@Transactional
+	public synchronized SysProvisioningOperationDto execute(SysProvisioningOperationDto provisioningOperation, boolean isDryRun) {
 		// execute - after original transaction is commited
 		// only if system supports synchronous processing
 		SysSystemDto system = DtoUtils.getEmbedded(provisioningOperation, SysProvisioningOperation_.system.getName(), SysSystemDto.class, null);
@@ -115,7 +121,7 @@ public class DefaultProvisioningExecutor implements ProvisioningExecutor {
 			system = systemService.get(provisioningOperation.getSystem());
 		}
 		Assert.notNull(system, "System is required.");
-		if (!system.isQueue()) {
+		if (!system.isQueue() || isDryRun) {
 			if (provisioningOperationService.isNew(provisioningOperation)) {
 				// In sync mode, we need to save operation now (for request and system state)
 				provisioningOperation = persistOperation(provisioningOperation);
@@ -133,13 +139,13 @@ public class DefaultProvisioningExecutor implements ProvisioningExecutor {
 			entityEvent = entityEventManager.createManualEvent(entityEvent);
 			
 			provisioningOperation.setManualEventId(entityEvent.getId());
-			return;
+			return provisioningOperation;
 		}
 		// put to queue
 		if (provisioningOperationService.isNew(provisioningOperation)) {
 			provisioningOperation = persistOperation(provisioningOperation);
 		}
-
+		return null;
 	}
 
 	/**
@@ -359,7 +365,14 @@ public class DefaultProvisioningExecutor implements ProvisioningExecutor {
 		}
 		Assert.notNull(system, "System is required.");
 		provisioningOperation.getEmbedded().put(SysProvisioningOperation_.system.getName(), system); // make sure system will be in embedded - optimize
-		//
+		// dryRun provisioning - skip SysProvisioningOperationDto saving
+		if(provisioningOperation.isDryRun()) {
+			if(provisioningOperation.getId() == null) {
+				provisioningOperation.setId(UUID.randomUUID()); // FAKE UUID - we don't want to save provisioningOperation but its UUID must not be null
+			}
+			provisioningOperation.setResult(new OperationResult.Builder(OperationState.CREATED).build());
+			return provisioningOperation;
+		}
 		// save new operation to provisioning log / queue
 		String uid = systemEntityService.getByProvisioningOperation(provisioningOperation).getUid();
 		// look out - system entity uid can be changed - we need to use system entity id

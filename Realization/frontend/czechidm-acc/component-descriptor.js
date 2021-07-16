@@ -112,6 +112,15 @@ module.exports = {
       manager: require('./src/redux').SynchronizationConfigManager
     },
     {
+      id: 'system-mapping-attribute-filtered-select-form-value',
+      type: 'form-attribute-renderer',
+      persistentType: 'TEXT',
+      faceType: 'SYSTEM-MAPPING-ATTRIBUTE-FILTERED-SELECT',
+      component: require('./src/components/SystemMappingAttribute/SystemMappingAttributeFilteredRenderer'),
+      labelKey: 'acc:component.advanced.EavForm.faceType.SYSTEM-MAPPING-ATTRIBUTE-FILTERED-SELECT',
+      manager: require('./src/redux').SystemAttributeMappingManager
+    },
+    {
       id: 'synchronization-icon',
       type: 'icon',
       entityType: ['synchronization', 'synchronizations'],

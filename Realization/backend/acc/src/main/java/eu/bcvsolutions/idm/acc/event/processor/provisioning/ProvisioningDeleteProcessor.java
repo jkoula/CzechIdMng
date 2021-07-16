@@ -11,6 +11,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
 import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
@@ -49,6 +50,11 @@ public class ProvisioningDeleteProcessor extends AbstractProvisioningProcessor {
 	@Override
 	public String getName() {
 		return PROCESSOR_NAME;
+	}
+	
+	@Override
+	public boolean conditional(EntityEvent<SysProvisioningOperationDto> event) {
+		return !event.getContent().isDryRun();
 	}
 
 	@Override

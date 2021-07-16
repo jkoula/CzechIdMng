@@ -17,8 +17,8 @@ public enum RptResultCode implements ResultCode {
 	REPORT_GENERATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Report [%s] generation failed."),
 	REPORT_RENDER_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Report [%s] rendering failed."),
 	REPORT_WRONG_DEFINITION(HttpStatus.BAD_REQUEST, "Report type [%s] is wrong. Should be [%s]."),
-	REPORT_NO_FORM_ATTRIBUTE(HttpStatus.BAD_REQUEST, "No form attribute with name [%s] found!");
-	
+	REPORT_NO_FORM_ATTRIBUTE(HttpStatus.BAD_REQUEST, "No form attribute with name [%s] found!"),
+	REPORT_WRONG_CONFIGURATION(HttpStatus.BAD_REQUEST, "Report configuration failed. Failed while reading [%s] property.");
 	
 	private final HttpStatus status;
 	private final String message;

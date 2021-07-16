@@ -1,11 +1,13 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,6 +22,7 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -28,8 +31,10 @@ import eu.bcvsolutions.idm.acc.service.api.ProvisioningEntityExecutor;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 
@@ -74,12 +79,26 @@ public class DefaultProvisioningService implements ProvisioningService {
 		Assert.notNull(entity, "Entity is required.");
 		this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doProvisioning(account, entity);
 	}
-	
+
+	@Override
+	public EventContext<AccAccountDto> doProvisioning(AccAccountDto account, AbstractDto entity, Map<String,Serializable> properties) {
+		Assert.notNull(account, "Account is required.");
+		Assert.notNull(entity, "Entity is required.");
+		return this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doProvisioning(account, entity, properties);
+	}
+
 	@Override
 	public void doInternalProvisioning(AccAccountDto account, AbstractDto entity) {
 		Assert.notNull(account, "Account is required.");
 		Assert.notNull(entity, "Entity is required.");
 		this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doInternalProvisioning(account, entity);
+	}
+	
+	@Override
+	public SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, AbstractDto entity, boolean isDryRun) {
+		Assert.notNull(account, "Account is required.");
+		Assert.notNull(entity, "Entity is required.");
+		return this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doInternalProvisioning(account, entity, isDryRun);
 	}
 
 	@Override

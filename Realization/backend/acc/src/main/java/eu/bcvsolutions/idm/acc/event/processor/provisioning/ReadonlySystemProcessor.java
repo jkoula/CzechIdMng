@@ -65,6 +65,11 @@ public class ReadonlySystemProcessor extends AbstractEntityEventProcessor<SysPro
 	}
 	
 	@Override
+	public boolean conditional(EntityEvent<SysProvisioningOperationDto> event) {
+		return !event.getContent().isDryRun();
+	}
+	
+	@Override
 	public EventResult<SysProvisioningOperationDto> process(EntityEvent<SysProvisioningOperationDto> event) {
 		SysProvisioningOperationDto provisioningOperation = event.getContent();
 		SysSystemDto system = systemService.get(provisioningOperation.getSystem());
