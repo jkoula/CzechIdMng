@@ -9,46 +9,48 @@ import Well from '../../basic/Well/Well';
 * Component for image crop.
 *
 * @author Petr Hanák
+* @author Radek Tomiška
 */
-class ImageCropper extends Basic.AbstractContextComponent {
+export default class ImageCropper extends Basic.AbstractContextComponent {
 
   constructor(props, context) {
     super(props, context);
     this.state = {
       src: null
     };
+    this.cropperRef = React.createRef();
   }
 
   setDragMode(option) {
-    this.refs.cropper.setDragMode(option);
+    this._getCropper().setDragMode(option);
   }
 
   reset() {
-    this.refs.cropper.reset();
+    this._getCropper().reset();
   }
 
   clear() {
-    this.refs.cropper.clear();
+    this._getCropper().clear();
   }
 
   rotateLeft() {
-    this.refs.cropper.rotate(-90);
+    this._getCropper().rotate(-90);
   }
 
   rotateRight() {
-    this.refs.cropper.rotate(90);
+    this._getCropper().rotate(90);
   }
 
   zoomIn() {
-    this.refs.cropper.zoom(0.1);
+    this._getCropper().zoom(0.1);
   }
 
   zoomOut() {
-    this.refs.cropper.zoom(-0.1);
+    this._getCropper().zoom(-0.1);
   }
 
   crop(cb) {
-    const canvas = this.refs.cropper.getCroppedCanvas({
+    const canvas = this._getCropper().getCroppedCanvas({
       width: 300, height: 300
     });
     //
@@ -70,6 +72,10 @@ class ImageCropper extends Basic.AbstractContextComponent {
     }
   }
 
+  _getCropper() {
+    return this.cropperRef.current.cropper;
+  }
+
   render() {
     const { showLoading, rendered, src } = this.props;
     //
@@ -83,7 +89,7 @@ class ImageCropper extends Basic.AbstractContextComponent {
     return (
       <Basic.Div>
         <Cropper
-          ref="cropper"
+          ref={ this.cropperRef }
           src={ src }
           viewMode={ 3 }
           dragMode="move"
@@ -104,49 +110,49 @@ class ImageCropper extends Basic.AbstractContextComponent {
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.setDragMode.bind(this, 'move')}
+            onClick={ this.setDragMode.bind(this, 'move') }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="arrows" />
           </Basic.Button>
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.setDragMode.bind(this, 'crop')}
+            onClick={ this.setDragMode.bind(this, 'crop') }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="crop" />
           </Basic.Button>
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.zoomIn.bind(this)}
+            onClick={ this.zoomIn.bind(this) }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="search-plus" />
           </Basic.Button>
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.zoomOut.bind(this)}
+            onClick={ this.zoomOut.bind(this) }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="search-minus" />
           </Basic.Button>
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.rotateLeft.bind(this)}
+            onClick={ this.rotateLeft.bind(this) }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="rotate-left" />
           </Basic.Button>
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.rotateRight.bind(this)}
+            onClick={ this.rotateRight.bind(this) }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="rotate-right" />
           </Basic.Button>
           <Basic.Button
             type="button"
             level="info"
-            onClick={this.reset.bind(this)}
+            onClick={ this.reset.bind(this) }
             className="btn-sm" >
             <Basic.Icon type="fa" icon="reply-all" />
           </Basic.Button>
@@ -171,5 +177,3 @@ ImageCropper.defaultProps = {
   rendered: true,
   showLoading: false,
 };
-
-export default ImageCropper;
