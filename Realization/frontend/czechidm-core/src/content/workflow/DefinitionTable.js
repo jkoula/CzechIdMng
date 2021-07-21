@@ -127,6 +127,7 @@ export class DefinitionTable extends Advanced.AbstractTableContent {
                     href={ this.getManager().getService().getProcessDefinitionUrl(rowData.id) }
                     target="_blank"
                     rel="noopener noreferrer"
+                    download
                     className="btn btn-primary btn-xs"
                     style={{ color: 'white' }}
                     title={ this.i18n('label.download') }>

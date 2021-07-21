@@ -251,6 +251,9 @@ export class ReportTable extends Advanced.AbstractTableContent {
               <a
                 key={ `rep-${renderer.id}-${entity.id}` }
                 href={ this.getManager().getService().getDownloadUrl(entity.id, renderer.name) }
+                target="_blank"
+                rel="noopener noreferrer"
+                download
                 title={ this.i18n('action.download.title', { report: entity.name, renderer: renderer.description }) }
                 className={ `btn btn-primary ${className}` }
                 style={{ color: 'white', marginLeft: 3 }}>
