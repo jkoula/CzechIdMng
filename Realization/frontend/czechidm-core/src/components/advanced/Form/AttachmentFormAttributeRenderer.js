@@ -236,6 +236,7 @@ export default class AttachmentFormAttributeRenderer extends UuidFormAttributeRe
                 href={ downloadUrl }
                 target="_blank"
                 rel="noreferrer noopener"
+                download
                 onClick={ e => e.stopPropagation() }>
                 <Basic.Div
                   rendered={ previewUrl === false }
