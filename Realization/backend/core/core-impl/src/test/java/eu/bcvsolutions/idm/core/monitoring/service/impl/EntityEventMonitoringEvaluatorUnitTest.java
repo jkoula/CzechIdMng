@@ -36,4 +36,29 @@ public class EntityEventMonitoringEvaluatorUnitTest extends AbstractUnitTest {
 		Assert.assertEquals(CoreResultCode.MONITORING_ENTITY_EVENT_ERROR.getCode(), result.getResult().getCode());
 		Assert.assertNull(result.getLevel());
 	}
+	
+	@Test
+	public void testErrorWithNumberOfDays() {
+		Mockito.when(entityEventService.count(ArgumentMatchers.any())).thenReturn(10L);
+		//
+		IdmMonitoringDto monitoring = new IdmMonitoringDto();
+		monitoring.setInstanceId("mock");
+		monitoring.getEvaluatorProperties().put(AbstractDailyMonitoringEvaluator.PARAMETER_NUMBER_OF_DAYS, 2);
+		IdmMonitoringResultDto result = evaluator.evaluate(monitoring);
+		//
+		Assert.assertEquals(CoreResultCode.MONITORING_ENTITY_EVENT_ERROR.getCode(), result.getResult().getCode());
+		Assert.assertNull(result.getLevel());
+	}
+	
+	@Test
+	public void testOk() {
+		Mockito.when(entityEventService.count(ArgumentMatchers.any())).thenReturn(0L);
+		//
+		IdmMonitoringDto monitoring = new IdmMonitoringDto();
+		monitoring.setInstanceId("mock");
+		monitoring.getEvaluatorProperties().put(AbstractDailyMonitoringEvaluator.PARAMETER_NUMBER_OF_DAYS, 2);
+		IdmMonitoringResultDto result = evaluator.evaluate(monitoring);
+		//
+		Assert.assertEquals(CoreResultCode.OK.getCode(), result.getResult().getCode());
+	}
 }

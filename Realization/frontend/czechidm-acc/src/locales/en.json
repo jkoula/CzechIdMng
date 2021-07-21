@@ -2495,6 +2495,11 @@
         "label": "$t(action.delete.action) provisioning operations",
         "help": "$t(action.delete.action) selected provisioning operations.",
         "icon": "$t(action.delete.icon)"
+      },
+      "acc-provisioning-operation-monitoring-ignored-bulk-action": {
+        "label": "Ignore in monitoring",
+        "help": "Ignore selected provisioning operations form monitoring.",
+        "icon": "component:monitoring-ignored"
       }
     },
     "long-running-task": {

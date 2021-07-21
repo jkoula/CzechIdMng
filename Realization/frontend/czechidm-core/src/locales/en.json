@@ -6363,6 +6363,11 @@
         "help": "$t(action.delete.action) selected events.",
         "icon": "$t(action.delete.icon)"
       },
+      "core-entity-event-monitoring-ignored-bulk-action": {
+        "label": "Ignore in monitoring",
+        "help": "Ignore selected entity events in monitoring.",
+        "icon": "component:monitoring-ignored"
+      },
       "core-entity-state-delete-bulk-action": {
         "label": "$t(action.delete.action) states",
         "help": "$t(action.delete.action) selected states.",
@@ -6444,6 +6449,11 @@
         "label": "Cancel tasks",
         "help": "Cancel selected tasks. Newly created or running tasks will be canceled only.",
         "icon": "remove"
+      },
+      "core-long-running-task-monitoring-ignored-bulk-action": {
+        "label": "Ignore in monitoring",
+        "help": "Ignore selected tasks in monitoring.",
+        "icon": "component:monitoring-ignored"
       },
       "core-form-projection-delete-bulk-action": {
         "label": "$t(action.delete.action) projections",
@@ -8400,6 +8410,10 @@
     "IDENTITY_UNIFORM_PASSWORD": {
       "title": "Uniform password.",
       "message": "Uniform password for [{{entity}}]."
+    },
+    "MONITORING_IGNORED": {
+      "title": "Ignored in monitoring",
+      "message": "Record is ignored in monitoring."
     },
     "MONITORING_DATABASE_TABLE": {
       "title": "Number of records in database table",

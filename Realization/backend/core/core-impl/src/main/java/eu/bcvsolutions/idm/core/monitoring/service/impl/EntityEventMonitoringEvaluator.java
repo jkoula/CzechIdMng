@@ -45,6 +45,7 @@ public class EntityEventMonitoringEvaluator extends AbstractDailyMonitoringEvalu
 		//
 		IdmEntityEventFilter filter = new IdmEntityEventFilter();
 		filter.setStates(Lists.newArrayList(OperationState.EXCEPTION));
+		filter.setMonitoringIgnored(Boolean.FALSE);
 		Long givenNumberOfDays = getParameterConverter().toLong(monitoring.getEvaluatorProperties(), PARAMETER_NUMBER_OF_DAYS);
 		if (givenNumberOfDays != null) {
 			filter.setCreatedFrom(ZonedDateTime.now().minusDays(givenNumberOfDays));

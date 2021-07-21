@@ -46,6 +46,8 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 
 /**
  * Synchronization monitoring.
+ * 
+ * TODO: read last logs, not configuration itself + add mnitoring ignored feature to logs.
  *
  * @author Radek Tomiška
  * @since 11.1.0

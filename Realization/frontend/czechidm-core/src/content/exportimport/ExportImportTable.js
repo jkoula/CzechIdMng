@@ -256,6 +256,9 @@ export class ExportImportTable extends Advanced.AbstractTableContent {
         <a
           key="export-download-zip"
           href={ this.getManager().getService().getDownloadUrl(entity.id) }
+          target="_blank"
+          rel="noopener noreferrer"
+          download
           title={ this.i18n('action.download.title')}
           className={ `btn btn-primary ${className}` }
           style={{ color: 'white', marginLeft: 3 }}>

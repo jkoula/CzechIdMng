@@ -885,6 +885,12 @@ module.exports = {
       component: require('./src/components/advanced/Icon/MonitoringIcon')
     },
     {
+      id: 'monitoring-ignored-icon',
+      type: 'icon',
+      entityType: ['monitoring-ignored'],
+      component: require('./src/components/advanced/Icon/MonitoringIgnoredIcon')
+    },
+    {
       id: 'monitoring-info',
       type: 'entity-info',
       entityType: ['monitoring', 'IdmMonitoringDto', 'IdmMonitoring'],

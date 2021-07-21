@@ -132,6 +132,9 @@ export default class StepCrt extends AbstractWizardStep {
             [
               <a
                 href={this.getDownloadCertificateUrl(formData.attachmentId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
                 title={this.i18n(`${locKey}.downloadCertificate.title`)}
                 style={{ color: 'white' }}
                 className="btn btn-success">
@@ -156,6 +159,9 @@ export default class StepCrt extends AbstractWizardStep {
             [
               <a
                 href={this.getDownloadCertificateUrl(formData.serverAttachmentId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
                 title={this.i18n(`${locKey}.downloadCertificate.title`)}
                 style={{ color: 'white' }}
                 className="btn btn-info">

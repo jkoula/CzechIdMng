@@ -11,6 +11,7 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.InstanceIdentifiableFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.MonitoringIgnorableFilter;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 
 /**
@@ -19,7 +20,9 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
  * @author Radek Tomiška
  *
  */
-public class IdmLongRunningTaskFilter extends DataFilter implements InstanceIdentifiableFilter {
+public class IdmLongRunningTaskFilter 
+		extends DataFilter
+		implements InstanceIdentifiableFilter, MonitoringIgnorableFilter {
 
 	public static final String PARAMETER_OPERATION_STATE = "operationState";
 	public static final String PARAMETER_TASK_TYPE = "taskType";

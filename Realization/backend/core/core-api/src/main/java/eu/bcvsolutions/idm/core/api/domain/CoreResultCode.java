@@ -400,6 +400,7 @@ public enum CoreResultCode implements ResultCode {
 	// Uniform password
 	IDENTITY_UNIFORM_PASSWORD(HttpStatus.ACCEPTED, "Identity uniform password."),
 	// Monitoring
+	MONITORING_IGNORED(HttpStatus.ACCEPTED, "Monitoring is ignored."),
 	MONITORING_DATABASE_TABLE(HttpStatus.FOUND, "Table [%s]([%s]) contains [%s] records.", NotificationLevel.SUCCESS),
 	MONITORING_H2_DATABASE_ERROR(HttpStatus.BAD_REQUEST, "H2 database is used on server instance [%s]. H2 database is not supposed to be used for production environment.", NotificationLevel.ERROR),
 	MONITORING_H2_DATABASE_WARNING(HttpStatus.BAD_REQUEST, "H2 database is used on server instance [%s] for [%s] environment.", NotificationLevel.WARNING),

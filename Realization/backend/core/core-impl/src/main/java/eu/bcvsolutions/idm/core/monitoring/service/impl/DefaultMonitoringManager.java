@@ -258,6 +258,11 @@ public class DefaultMonitoringManager implements MonitoringManager {
 	}
 	
 	@Override
+	public Page<IdmMonitoringDto> findMonitorings(IdmMonitoringFilter filter, Pageable pageable, BasePermission... permission) {
+		return monitoringService.find(filter, pageable, permission);
+	}
+	
+	@Override
 	public Page<IdmMonitoringResultDto> getLastResults(IdmMonitoringResultFilter filter, Pageable pageable, BasePermission... permission) {
 		// all instances => last results should be visible on each instance
 		IdmMonitoringFilter monitoringFilter = new IdmMonitoringFilter();

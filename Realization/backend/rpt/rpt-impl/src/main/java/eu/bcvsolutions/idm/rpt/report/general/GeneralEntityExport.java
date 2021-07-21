@@ -26,7 +26,7 @@ import eu.bcvsolutions.idm.rpt.RptModuleDescriptor;
 import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
 
 /**
- * Implemetation of general entity report. This actiot will be available for all
+ * Implementation of general entity report. This action will be available for all
  * formable entities.
  *
  * @author Vít Švanda

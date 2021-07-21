@@ -12,6 +12,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.MonitoringEvaluatorDto;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringResultFilter;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
@@ -51,6 +52,19 @@ public interface MonitoringManager {
 	 * @return
 	 */
 	List<MonitoringEvaluatorDto> getSupportedEvaluators();
+	
+	/**
+	 * Get congured monitoring evaluators by given filter.
+	 * 
+	 * @see IdmMonitoringFilter
+	 * @param filter
+	 * @param pageable
+	 * @param permission base permissions to evaluate (AND) 
+	 * @return states
+	 * @throws ForbiddenEntityException if authorization policies doesn't met
+	 * @since 11.2.0
+	 */
+	Page<IdmMonitoringDto> findMonitorings(IdmMonitoringFilter filter, Pageable pageable, BasePermission... permission);
 	
 	/**
 	 * Returns last monitoring results.

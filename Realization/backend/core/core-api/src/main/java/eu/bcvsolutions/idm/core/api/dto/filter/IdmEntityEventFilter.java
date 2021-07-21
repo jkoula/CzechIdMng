@@ -10,6 +10,7 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.MonitoringIgnorableFilter;
 
 /**
  * Filter for entity events (changes).
@@ -17,7 +18,7 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
  * @author Radek Tomiška
  *
  */
-public class IdmEntityEventFilter extends DataFilter implements InstanceIdentifiableFilter {
+public class IdmEntityEventFilter extends DataFilter implements InstanceIdentifiableFilter, MonitoringIgnorableFilter {
 	
 	public static final String PARAMETER_ROOT_ID = "rootId";
 	public static final String PARAMETER_PARENT_ID = "parentId";

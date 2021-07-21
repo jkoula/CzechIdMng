@@ -13,14 +13,16 @@ import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.MonitoringIgnorableFilter;
 
 /**
- * Provisioning operation filter
+ * Provisioning operation and archive filter.
  * 
  * @author Radek Tomiška
- *
  */
-public class SysProvisioningOperationFilter extends DataFilter {
+public class SysProvisioningOperationFilter
+		extends DataFilter
+		implements MonitoringIgnorableFilter {
 
 	public static final String PARAMETER_FROM = "from"; // created from
 	public static final String PARAMETER_TILL = "till"; // created till

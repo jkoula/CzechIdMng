@@ -6415,6 +6415,11 @@
         "help": "Smaže vybrané události.",
         "icon": "$t(action.delete.icon)"
       },
+      "core-entity-event-monitoring-ignored-bulk-action": {
+        "label": "Ignorovat v monitoringu",
+        "help": "Vybrané události nebudou hlášeny v monitoringu.",
+        "icon": "component:monitoring-ignored"
+      },
       "core-entity-state-delete-bulk-action": {
         "label": "$t(action.delete.action) stavy",
         "help": "Smaže vybrané stavy.",
@@ -6496,6 +6501,11 @@
         "label": "Zrušit úlohy",
         "help": "Zrušit vybrané úlohy. Zrušit se pouze nově vytvořené či běžící úlohy.",
         "icon": "remove"
+      },
+      "core-long-running-task-monitoring-ignored-bulk-action": {
+        "label": "Ignorovat v monitoringu",
+        "help": "Vybrané úlohy nebudou hlášeny v monitoringu.",
+        "icon": "component:monitoring-ignored"
       },
       "core-form-projection-delete-bulk-action": {
         "label": "$t(action.delete.action) projekce",
@@ -8452,6 +8462,10 @@
     "IDENTITY_UNIFORM_PASSWORD": {
       "title": "Jednotné heslo.",
       "message": "Jednotné heslo pro [{{entity}}]."
+    },
+    "MONITORING_IGNORED": {
+      "title": "Záznam ignorován v monitoringu",
+      "message": "Záznam nebude hlášen v monitoringu."
     },
     "MONITORING_DATABASE_TABLE": {
       "title": "Počet záznamů v databázové tabulce",

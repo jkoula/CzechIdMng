@@ -4,12 +4,15 @@ import javax.persistence.criteria.Predicate;
 
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 
 /**
  * Registrable filter - filters will be applied, when property with defined name will be found in filtering parameters.
@@ -27,8 +30,12 @@ public abstract class BaseFilterBuilder<E extends BaseEntity, F extends DataFilt
 	private final Class<E> entityClass;
 	private final Class<F> filterClass;
 	private String beanName; // spring bean name - used as processor id
+	private ParameterConverter parameterConverter;
+	//
 	@Autowired(required = false)
 	private ConfigurationService configurationService; // optional internal dependency - checks for processor is enabled
+	@Autowired @Lazy
+	private LookupService lookupService;
 	
 	@SuppressWarnings("unchecked")
 	public BaseFilterBuilder() {
@@ -93,5 +100,18 @@ public abstract class BaseFilterBuilder<E extends BaseEntity, F extends DataFilt
 	@Override
 	public ConfigurationService getConfigurationService() {
 		return configurationService;
+	}
+	
+	/**
+	 * Return parameter converter helper.
+	 * 
+	 * @return initialized parameter converter
+	 * @since 11.2.0
+	 */
+	protected ParameterConverter getParameterConverter() {
+		if (parameterConverter == null) {
+			parameterConverter = new ParameterConverter(lookupService);
+		}
+		return parameterConverter;
 	}
 }

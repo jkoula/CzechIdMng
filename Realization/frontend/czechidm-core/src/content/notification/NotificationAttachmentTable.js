@@ -69,6 +69,9 @@ export class NotificationAttachmentTable extends Advanced.AbstractTableContent {
                   <a
                     key={ `attachment-download-${entity.id}` }
                     href={ this.getManager().getService().getDownloadUrl(entity.id) }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
                     title={ this.i18n('button.download') }
                     className="btn btn-primary btn-xs"
                     style={{ color: 'white' }}>

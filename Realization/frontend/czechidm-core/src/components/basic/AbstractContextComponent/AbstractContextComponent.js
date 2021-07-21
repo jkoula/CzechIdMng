@@ -484,8 +484,7 @@ class AbstractContextComponent extends AbstractComponent {
             }
           }
           return <Component {...props}/>;
-        }
-        }/>);
+        }}/>);
     });
     return routes;
   }
