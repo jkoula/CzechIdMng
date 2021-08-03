@@ -26,7 +26,8 @@ class NavigationMonitoring extends Basic.AbstractContent {
     super(props, context);
     //
     this.state = {
-      longPollingInprogress: false
+      longPollingInprogress: false,
+      requestControllers: [] // Contains array of requests controllers for abort a request.
     };
     this.canSendLongPollingRequest = false;
   }
@@ -51,8 +52,14 @@ class NavigationMonitoring extends Basic.AbstractContent {
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    // Stop rquest of check rquests (next long-polling request will be not created).
+    //
+    const { requestControllers } = this.state;
+    // Stop request of check requests (next long-polling request will be not created).
     this.canSendLongPollingRequest = false;
+    // Send abort signal to all registered requests in this component.
+    requestControllers.forEach(controller => {
+      controller.abort();
+    });
   }
 
   getComponentKey() {
