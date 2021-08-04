@@ -2500,7 +2500,7 @@
         "icon": "$t(action.delete.icon)"
       },
       "acc-provisioning-operation-monitoring-ignored-bulk-action": {
-        "label": "Ignorovat v monitoringu",
+        "label": "Ignorovat v hlášení monitoringu",
         "help": "Vybrané operace pro provisioning nebudou hlášeny v monitoringu.",
         "icon": "component:monitoring-ignored"
       }

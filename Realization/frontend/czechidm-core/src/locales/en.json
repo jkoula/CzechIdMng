@@ -6364,8 +6364,8 @@
         "icon": "$t(action.delete.icon)"
       },
       "core-entity-event-monitoring-ignored-bulk-action": {
-        "label": "Ignore in monitoring",
-        "help": "Ignore selected entity events in monitoring.",
+        "label": "Ignore in monitoring warning",
+        "help": "Ignore selected entity events in monitoring warnings.",
         "icon": "component:monitoring-ignored"
       },
       "core-entity-state-delete-bulk-action": {
@@ -6451,8 +6451,8 @@
         "icon": "remove"
       },
       "core-long-running-task-monitoring-ignored-bulk-action": {
-        "label": "Ignore in monitoring",
-        "help": "Ignore selected tasks in monitoring.",
+        "label": "Ignore in monitoring warning",
+        "help": "Ignore selected tasks in monitoring warnings.",
         "icon": "component:monitoring-ignored"
       },
       "core-form-projection-delete-bulk-action": {

@@ -21,7 +21,7 @@ import eu.bcvsolutions.idm.core.monitoring.api.service.AbstractMonitoringEvaluat
 public abstract class AbstractDailyMonitoringEvaluator extends AbstractMonitoringEvaluator {
 	
 	public static final String PARAMETER_NUMBER_OF_DAYS = "numberOfDays"; // records not older than
-	public static final int DEFAULT_NUMBER_OF_DAYS = 1;
+	public static final int DEFAULT_NUMBER_OF_DAYS = 3;
 	
 	@Override
 	public List<String> getPropertyNames() {

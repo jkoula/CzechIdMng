@@ -2497,8 +2497,8 @@
         "icon": "$t(action.delete.icon)"
       },
       "acc-provisioning-operation-monitoring-ignored-bulk-action": {
-        "label": "Ignore in monitoring",
-        "help": "Ignore selected provisioning operations form monitoring.",
+        "label": "Ignore in monitoring warning",
+        "help": "Ignore selected provisioning operations form monitoring warnings.",
         "icon": "component:monitoring-ignored"
       }
     },

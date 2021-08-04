@@ -6416,7 +6416,7 @@
         "icon": "$t(action.delete.icon)"
       },
       "core-entity-event-monitoring-ignored-bulk-action": {
-        "label": "Ignorovat v monitoringu",
+        "label": "Ignorovat v hlášení monitoringu",
         "help": "Vybrané události nebudou hlášeny v monitoringu.",
         "icon": "component:monitoring-ignored"
       },
@@ -6503,7 +6503,7 @@
         "icon": "remove"
       },
       "core-long-running-task-monitoring-ignored-bulk-action": {
-        "label": "Ignorovat v monitoringu",
+        "label": "Ignorovat v hlášení monitoringu",
         "help": "Vybrané úlohy nebudou hlášeny v monitoringu.",
         "icon": "component:monitoring-ignored"
       },
