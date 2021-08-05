@@ -836,7 +836,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			// First we have to find root DN (only DCs).
 			String root = getRoot(searchUserContainer);
 			// We need to generate the schema for every level.
-			String parent = getParent(root);
+			String parent = root;
 			while (Strings.isNotBlank(parent)) {
 				this.setValueToConnectorInstance(ROOT_SUFFIXES_KEY, parent, systemDto, connectorFormDef);
 				// Check system (execute a connector test)
