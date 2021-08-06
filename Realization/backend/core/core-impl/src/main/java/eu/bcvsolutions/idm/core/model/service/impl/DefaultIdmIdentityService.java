@@ -306,7 +306,7 @@ public class DefaultIdmIdentityService
 				"Password change DTO is required.");
 		//
 		LOG.debug("Changing password for identity [{}]", passwordChangeEvent.getContent().getUsername());
-		EventContext<IdmIdentityDto> context = entityEventManager.process(passwordChangeEvent);
+		EventContext<IdmIdentityDto> context = publish(passwordChangeEvent);
 		//
 		// get all password change results
 		// more provisioning operation can be executed for one password change - we need to distinct them by account id

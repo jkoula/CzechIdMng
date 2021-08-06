@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.security.service.impl;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.util.Assert;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -56,6 +58,8 @@ public class DefaultLoginService implements LoginService {
 	private JwtAuthenticationMapper jwtTokenMapper;
 	@Autowired 
 	private OAuthAuthenticationManager oAuthAuthenticationManager;
+	@Autowired
+	private SiemLoggerManager siemLogger;
 
 	@Override
 	public LoginDto login(LoginDto loginDto) {
@@ -177,22 +181,34 @@ public class DefaultLoginService implements LoginService {
 	@Override
 	public LoginDto switchUser(IdmIdentityDto identity, BasePermission... permission) {
 		Assert.notNull(identity, "Target identity (to switch) is required.");
-		identityService.checkAccess(identity, permission);
-		//
-		IdmTokenDto currentToken = tokenManager.getCurrentToken();
-		ConfigurationMap properties = currentToken.getProperties();
-		// Preserve the first original user => switch is available repetitively, but original user is preserved.
-		properties.putIfAbsent(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME, securityService.getCurrentUsername());
-		properties.putIfAbsent(JwtAuthenticationMapper.PROPERTY_ORIGINAL_IDENTITY_ID, securityService.getCurrentId());
-		currentToken.setProperties(properties);
-		IdmTokenDto switchedToken = jwtTokenMapper.createToken(identity, currentToken);
-		//
-		// login by updated token
-		LOG.info("Identity with username [{}] - login as switched user [{}].", 
-				properties.get(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME), 
-				identity.getUsername());
-		//
-		return login(identity, switchedToken);
+		String loggedAction = siemLogger.buildAction(SiemLoggerManager.LOGIN_LEVEL_KEY, SiemLoggerManager.SWITCH_SUBLEVEL_KEY);
+		String targetUuid = Objects.toString(identity.getId(),"");
+		String subjectUsername = securityService.getCurrentUsername();
+		String subjectUuid = Objects.toString(securityService.getCurrentId(),"");
+		try {
+			
+			identityService.checkAccess(identity, permission);
+			//
+			IdmTokenDto currentToken = tokenManager.getCurrentToken();
+			ConfigurationMap properties = currentToken.getProperties();
+			// Preserve the first original user => switch is available repetitively, but original user is preserved.
+			properties.putIfAbsent(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME, securityService.getCurrentUsername());
+			properties.putIfAbsent(JwtAuthenticationMapper.PROPERTY_ORIGINAL_IDENTITY_ID, securityService.getCurrentId());
+			currentToken.setProperties(properties);
+			IdmTokenDto switchedToken = jwtTokenMapper.createToken(identity, currentToken);
+			//
+			// login by updated token
+			LOG.info("Identity with username [{}] - login as switched user [{}].", 
+					properties.get(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME), 
+					identity.getUsername());
+			//
+			LoginDto login = login(identity, switchedToken);
+			siemLogger.log(loggedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, identity.getUsername(), targetUuid, subjectUsername, subjectUuid, null,  null);
+			return login;
+		} catch (Exception e) {
+			siemLogger.log(loggedAction, SiemLoggerManager.FAILED_ACTION_STATUS, identity.getUsername(), targetUuid, subjectUsername, subjectUuid, null,  e.getMessage());			
+			throw e;
+		}
 	}
 	
 	@Override
@@ -201,26 +217,37 @@ public class DefaultLoginService implements LoginService {
 		ConfigurationMap properties = currentToken.getProperties();
 		String originalUsername = properties.getString(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME);
 		UUID originalId = properties.getUuid(JwtAuthenticationMapper.PROPERTY_ORIGINAL_IDENTITY_ID);
-		//
-		if (originalId == null) {
-			throw new ResultCodeException(CoreResultCode.NULL_ATTRIBUTE, ImmutableMap.of("attribute", "originalUsername"));
+		String loggedAction = siemLogger.buildAction(SiemLoggerManager.LOGIN_LEVEL_KEY, SiemLoggerManager.SWITCH_SUBLEVEL_KEY);
+		String subjectUsername = securityService.getCurrentUsername();
+		String subjectUuid = Objects.toString(securityService.getCurrentId(),"");
+		String targetUuid = Objects.toString(originalId,"");
+		try {
+			//
+			if (originalId == null) {
+				throw new ResultCodeException(CoreResultCode.NULL_ATTRIBUTE, ImmutableMap.of("attribute", "originalUsername"));
+			}
+			// change logged token authorities
+			IdmIdentityDto identity = identityService.get(originalId);
+			if (identity == null) {
+				throw new EntityNotFoundException(IdmIdentity.class, originalId);
+			}
+			//
+			// Preserve the first original user => switch is available repetitively, but original user is preserved.
+			properties.remove(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME);
+			properties.remove(JwtAuthenticationMapper.PROPERTY_ORIGINAL_IDENTITY_ID);
+			currentToken.setProperties(properties);
+			IdmTokenDto switchedToken = jwtTokenMapper.createToken(identity, currentToken);
+			//
+			// login by updated token
+			LOG.info("Identity with username [{}] - logout from switched user [{}].", originalUsername, securityService.getCurrentUsername());
+			//
+			LoginDto login = login(identity, switchedToken);
+			siemLogger.log(loggedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, originalUsername, targetUuid, subjectUsername, subjectUuid, null, null);
+			return login;
+		} catch (Exception e) {
+			siemLogger.log(loggedAction, SiemLoggerManager.FAILED_ACTION_STATUS, originalUsername, targetUuid, subjectUsername, subjectUuid, null, e.getMessage());
+			throw e;
 		}
-		// change logged token authorities
-		IdmIdentityDto identity = identityService.get(originalId);
-		if (identity == null) {
-			throw new EntityNotFoundException(IdmIdentity.class, originalId);
-		}
-		//
-		// Preserve the first original user => switch is available repetitively, but original user is preserved.
-		properties.remove(JwtAuthenticationMapper.PROPERTY_ORIGINAL_USERNAME);
-		properties.remove(JwtAuthenticationMapper.PROPERTY_ORIGINAL_IDENTITY_ID);
-		currentToken.setProperties(properties);
-		IdmTokenDto switchedToken = jwtTokenMapper.createToken(identity, currentToken);
-		//
-		// login by updated token
-		LOG.info("Identity with username [{}] - logout from switched user [{}].", originalUsername, securityService.getCurrentUsername());
-		//
-		return login(identity, switchedToken);
 	}
 	
 	private LoginDto login(IdmIdentityDto identity, IdmTokenDto token) {

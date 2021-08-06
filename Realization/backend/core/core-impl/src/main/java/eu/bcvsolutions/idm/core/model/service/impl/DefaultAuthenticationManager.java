@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.util.Assert;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.IdmPasswordPolicyType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -22,10 +24,12 @@ import eu.bcvsolutions.idm.core.api.dto.IdmPasswordPolicyDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTokenDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmPasswordPolicyService;
 import eu.bcvsolutions.idm.core.api.service.IdmPasswordService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmPassword_;
 import eu.bcvsolutions.idm.core.notification.api.dto.IdmMessageDto;
 import eu.bcvsolutions.idm.core.notification.api.service.NotificationManager;
@@ -65,83 +69,103 @@ public class DefaultAuthenticationManager implements AuthenticationManager {
 	private TokenManager tokenManager;
 	@Autowired
 	private OAuthAuthenticationManager oAuthAuthenticationManager;
+	@Autowired
+	private SiemLoggerManager siemLogger;
+	@Autowired
+	private IdmIdentityService identityService;
 
 	@Override
 	public LoginDto authenticate(LoginDto loginDto) {
 		List<LoginDto> resultsList = new LinkedList<>();
 		RuntimeException firstFailure = null;
+		String logAction = siemLogger.buildAction(SiemLoggerManager.LOGIN_LEVEL_KEY, SiemLoggerManager.LOGIN_SUBLEVEL_KEY);
+		IdmIdentityDto identity = identityService.getByUsername(loginDto.getUsername());
+		if (identity == null) { // just for logging purpose
+			identity = new IdmIdentityDto();
+			identity.setUsername(loginDto.getUsername());		
+		}
 		//
 		// check if user can log in and hasn't administrator permission
-		IdmPasswordDto passwordDto = passwordService.findOrCreateByIdentity(loginDto.getUsername());
-		if (passwordDto == null) {
-			throw new ResultCodeException(CoreResultCode.AUTH_FAILED, "Invalid login or password.");
-		}
-		if (passwordDto.getBlockLoginDate() != null && passwordDto.getBlockLoginDate().isAfter(ZonedDateTime.now())) {
-			LOG.info("Identity {} has blocked login to IdM.",
-					loginDto.getUsername());
-			IdmIdentityDto identityDto = DtoUtils.getEmbedded(passwordDto, IdmPassword_.identity);
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(configurationService.getDateTimeSecondsFormat());
-			ZonedDateTime blockLoginDate = passwordDto.getBlockLoginDate();
-			String dateAsString = blockLoginDate.format(formatter);
-
-			// Block login date can be set manually by password metadata,
-			// so block login date can be more than int amount.
-			long blockMillies = blockLoginDate.toInstant().toEpochMilli();
-			long nowMillis = ZonedDateTime.now().toInstant().toEpochMilli();
-			long different = blockMillies - nowMillis;
-			different = different / 1000;
-
-			throw new ResultCodeException(CoreResultCode.AUTH_BLOCKED,
-					ImmutableMap.of(
-							"username", identityDto.getUsername(),
-							"date", dateAsString,
-							"seconds", different,
-							"unsuccessfulAttempts", passwordDto.getUnsuccessfulAttempts()));
-		}
-		//
-		for (Authenticator authenticator : getEnabledAuthenticators()) {
-			LOG.debug("AuthenticationManager call authenticate by [{}].", authenticator.getName());
-			try {
-				LoginDto result = authenticator.authenticate(cloneLoginDto(loginDto));
-				if (result == null) { // not done
-					// continue, authenticator is not implemented or etc.
-					continue;
-				}
-				if (authenticator.getExceptedResult() == AuthenticationResponseEnum.SUFFICIENT) {
-					checkAdditionalAuthenticationRequirements(passwordDto, result);
-					passwordDto = passwordService.setLastSuccessfulLogin(passwordDto);
-					return result;
-				}
-				// if otherwise add result too list and continue
-				resultsList.add(result);
-			} catch (MustChangePasswordException | TwoFactorAuthenticationRequiredException ex) {
-				// publish additional authentication requirement
-				throw ex;
-			} catch (RuntimeException e) {
-				// if excepted response is REQUISITE exit immediately with error
-				if (authenticator.getExceptedResult() == AuthenticationResponseEnum.REQUISITE) {
-					blockLogin(passwordDto, loginDto);
-					//
-					throw e;
-				}
-				// if otherwise save first failure into exception
-				if (firstFailure == null) {
-					firstFailure = e;
+		try {
+			IdmPasswordDto passwordDto = passwordService.findOrCreateByIdentity(loginDto.getUsername());
+			if (passwordDto == null) {
+				throw new ResultCodeException(CoreResultCode.AUTH_FAILED, "Invalid login or password.");
+			}
+			if (passwordDto.getBlockLoginDate() != null && passwordDto.getBlockLoginDate().isAfter(ZonedDateTime.now())) {
+				LOG.info("Identity {} has blocked login to IdM.",
+						loginDto.getUsername());
+				IdmIdentityDto identityDto = DtoUtils.getEmbedded(passwordDto, IdmPassword_.identity);
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern(configurationService.getDateTimeSecondsFormat());
+				ZonedDateTime blockLoginDate = passwordDto.getBlockLoginDate();
+				String dateAsString = blockLoginDate.format(formatter);
+	
+				// Block login date can be set manually by password metadata,
+				// so block login date can be more than int amount.
+				long blockMillies = blockLoginDate.toInstant().toEpochMilli();
+				long nowMillis = ZonedDateTime.now().toInstant().toEpochMilli();
+				long different = blockMillies - nowMillis;
+				different = different / 1000;
+	
+				throw new ResultCodeException(CoreResultCode.AUTH_BLOCKED,
+						ImmutableMap.of(
+								"username", identityDto.getUsername(),
+								"date", dateAsString,
+								"seconds", different,
+								"unsuccessfulAttempts", passwordDto.getUnsuccessfulAttempts()));
+			}
+			//
+			for (Authenticator authenticator : getEnabledAuthenticators()) {
+				LOG.debug("AuthenticationManager call authenticate by [{}].", authenticator.getName());
+				try {
+					LoginDto result = authenticator.authenticate(cloneLoginDto(loginDto));
+					if (result == null) { // not done
+						// continue, authenticator is not implemented or etc.
+						continue;
+					}
+					if (authenticator.getExceptedResult() == AuthenticationResponseEnum.SUFFICIENT) {
+						checkAdditionalAuthenticationRequirements(passwordDto, result);
+						passwordDto = passwordService.setLastSuccessfulLogin(passwordDto);
+						siemLogger.log(logAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, identity, null, null, null);
+						return result;
+					}
+					// if otherwise add result too list and continue
+					resultsList.add(result);
+				} catch (MustChangePasswordException | TwoFactorAuthenticationRequiredException ex) {
+					// publish additional authentication requirement
+					throw ex;
+				} catch (RuntimeException e) {
+					// if excepted response is REQUISITE exit immediately with error
+					if (authenticator.getExceptedResult() == AuthenticationResponseEnum.REQUISITE) {
+						blockLogin(passwordDto, loginDto);
+						//
+						throw e;
+					}
+					// if otherwise save first failure into exception
+					if (firstFailure == null) {
+						firstFailure = e;
+					}
 				}
 			}
+			//
+			// authenticator is sorted by implement ordered, return first success authenticate authenticator, if don't exist any otherwise throw first failure
+			if (resultsList.isEmpty()) {
+				blockLogin(passwordDto, loginDto);
+				throw firstFailure;
+			}
+			// 
+			LoginDto result = resultsList.get(0);
+			checkAdditionalAuthenticationRequirements(passwordDto, result);
+			passwordDto = passwordService.setLastSuccessfulLogin(passwordDto);
+			//
+			siemLogger.log(logAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, identity, null, null, null);
+			return result;
+		} catch (TwoFactorAuthenticationRequiredException tfaEx) {
+			// skip logging, 2FA is needed, result will be logged there
+			throw tfaEx;
+		} catch (Exception e) {
+			siemLogger.log(logAction, SiemLoggerManager.FAILED_ACTION_STATUS, identity, null, null, e.getMessage());
+			throw e;
 		}
-		//
-		// authenticator is sorted by implement ordered, return first success authenticate authenticator, if don't exist any otherwise throw first failure
-		if (resultsList.isEmpty()) {
-			blockLogin(passwordDto, loginDto);
-			throw firstFailure;
-		}
-		// 
-		LoginDto result = resultsList.get(0);
-		checkAdditionalAuthenticationRequirements(passwordDto, result);
-		passwordDto = passwordService.setLastSuccessfulLogin(passwordDto);
-		//
-		return result;
 	}
 	
 	@Override
@@ -226,10 +250,24 @@ public class DefaultAuthenticationManager implements AuthenticationManager {
 		}
 		//
 		// all registered authenticator should know about logout given token
-		for (Authenticator authenticator : getEnabledAuthenticators()) {
-			LOG.trace("Process authenticator [{}].", authenticator.getName());
-			//
-			authenticator.logout(token);
+		String userId = Objects.toString(token.getOwnerId(),"");
+		String username = null;
+		if (IdmIdentity.class.getCanonicalName().equals(token.getOwnerType())) {
+			IdmIdentityDto dto = identityService.get(token.getOwnerId());
+			if (dto != null) {
+				username = dto.getUsername();
+			}
+		}
+		String action = siemLogger.buildAction(SiemLoggerManager.LOGIN_LEVEL_KEY, SiemLoggerManager.LOGOUT_SUBLEVEL_KEY);
+		try {
+			for (Authenticator authenticator : getEnabledAuthenticators()) {
+				LOG.trace("Process authenticator [{}].", authenticator.getName());
+				//
+				authenticator.logout(token);
+			}
+			siemLogger.log(action,SiemLoggerManager. SUCCESS_ACTION_STATUS, username, userId, null, null, null, null);
+		} catch (Exception e) {
+			siemLogger.log(action,SiemLoggerManager. FAILED_ACTION_STATUS, username, userId, null, null, null, e.getMessage());
 		}
 	}
 	

@@ -1,8 +1,11 @@
 package eu.bcvsolutions.idm.core.api.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
@@ -11,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent.CoreEventType;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
+import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
@@ -33,6 +37,7 @@ public abstract class AbstractEventableDtoService<DTO extends BaseDto, E extends
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AbstractEventableDtoService.class);
 	//
 	private final EntityEventManager entityEventManager;
+	@Autowired @Lazy private SiemLoggerManager logger;
 	
 	public AbstractEventableDtoService(
 			AbstractEntityRepository<E> repository,
@@ -57,11 +62,20 @@ public abstract class AbstractEventableDtoService<DTO extends BaseDto, E extends
 		Assert.notNull(event, "Event must be not null!");
 		Assert.notNull(event.getContent(), "Content (dto) in event must be not null!");
 		//
-		checkAccess(toEntity(event.getContent(), null), permission);
-		// Set permission into event, if some processor needs additional checks.
-		event.setPermission(permission);
-		//
-		return entityEventManager.process(event, parentEvent);
+		try {
+			checkAccess(toEntity(event.getContent(), null), permission);
+			// Set permission into event, if some processor needs additional checks.
+			event.setPermission(permission);
+			//
+			EventContext<DTO> resultContext = entityEventManager.process(event, parentEvent);
+			EventResult<DTO> eventResult = resultContext.getLastResult();
+			EntityEvent<DTO> newEvent = eventResult == null ? event : eventResult.getEvent();
+			logger.log(newEvent, SiemLoggerManager.SUCCESS_ACTION_STATUS, null);
+			return resultContext;
+		} catch (Exception ex) {
+			logger.log(event, SiemLoggerManager.FAILED_ACTION_STATUS, ex.getMessage());
+			throw ex;
+		}
 	}
 	
 	/**
