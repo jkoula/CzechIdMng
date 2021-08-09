@@ -9,6 +9,7 @@ import * as Utils from '../../../utils';
 import { DataManager, FormDefinitionManager, SecurityManager } from '../../../redux';
 import FormInstance from '../../../domain/FormInstance';
 import EavForm from './EavForm';
+import PanelHeader from '../Panel/PanelHeader';
 
 const formDefinitionManager = new FormDefinitionManager();
 const dataManager = new DataManager();
@@ -313,10 +314,11 @@ class EavContent extends Basic.AbstractContent {
           //
           return (
             <Basic.Panel style={{ border: '1px dashed #ccc' }}>
-              <Basic.PanelHeader
+              <PanelHeader
                 text={ formDefinitionName }
                 style={{ color: '#ccc', borderBottom: '1px dashed #ccc' }}/>
               <Basic.PanelBody>
+                ssss
                 { eavForm }
               </Basic.PanelBody>
               <Basic.PanelFooter style={{ color: '#ccc', borderTop: '1px dashed #ccc' }}>
@@ -335,13 +337,19 @@ class EavContent extends Basic.AbstractContent {
         //
         return (
           <form className="abstract-form" onSubmit={ this.save.bind(this, definitionCode) }>
-            <Basic.Panel className={
-              classnames({
-                last: index === _formInstances.size
-              })
-            }>
+            <Basic.Panel
+              className={
+                classnames({
+                  last: index === _formInstances.size
+                })
+              }
+              style={{ marginBottom: 0 }}>
 
-              <Basic.PanelHeader text={ formDefinitionName }/>
+              <PanelHeader
+                key={ `eav-${ Utils.Ui.spinalCase(definitionCode) }-panel` }
+                uiKey={ `eav-${ Utils.Ui.spinalCase(definitionCode) }-panel` }
+                text={ formDefinitionName }
+                collapsible/>
 
               <Basic.Alert
                 icon="info-sign"

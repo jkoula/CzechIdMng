@@ -17,7 +17,9 @@ import javax.validation.constraints.Size;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
+import eu.bcvsolutions.idm.core.api.dto.PanelDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.ecm.api.entity.AttachableEntity;
 import eu.bcvsolutions.idm.core.ecm.entity.IdmAttachment;
@@ -69,6 +71,10 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "two_factor_authentication_type", length = DefaultFieldLengths.ENUMARATION)
 	private TwoFactorAuthenticationType twoFactorAuthenticationType;
+	
+	@Audited
+	@Column(name = "setting", length = Integer.MAX_VALUE)
+	private ConfigurationMap setting;
 
 	public IdmProfile() {
 	}
@@ -167,5 +173,30 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity {
 	 */
 	public void setTwoFactorAuthenticationType(TwoFactorAuthenticationType twoFactorAuthenticationType) {
 		this.twoFactorAuthenticationType = twoFactorAuthenticationType;
+	}
+	
+	/**
+	 * User setting, e.g. panels configuration - collapsed, expanded.
+	 * 
+	 * @return user setting
+	 * @see PanelDto
+	 * @since 11.2.0
+	 */
+	public ConfigurationMap getSetting() {
+		if (setting == null) {
+			setting = new ConfigurationMap();
+		}
+		return setting;
+	}
+	
+	/**
+	 * User setting, e.g. panels configuration - collapsed, expanded.
+	 * 
+	 * @param user setting
+	 * @see PanelDto
+	 * @since 11.2.0
+	 */
+	public void setSetting(ConfigurationMap setting) {
+		this.setting = setting;
 	}
 }

@@ -437,6 +437,14 @@
           "message": {
             "success": "Pořadí záznamů úspěsně změněno"
           }
+        },
+        "button": {
+          "collapse" : {
+            "title": "Sbalit tabulku"
+          },
+          "expand" : {
+            "title": "Rozbalit tabulku"
+          }
         }
       },
       "ProgressBar": {
@@ -473,6 +481,16 @@
       }
     },
     "advanced": {
+      "PanelHeader": {
+        "button": {
+          "collapse" : {
+            "title": "Sbalit panel"
+          },
+          "expand" : {
+            "title": "Rozbalit panel"
+          }
+        }
+      },
       "EntityInfo": {
         "link": {
           "detail": {

@@ -145,7 +145,6 @@ PanelBody.defaultProps = {
   ...AbstractComponent.defaultProps
 };
 
-
 export class PanelFooter extends AbstractComponent {
 
   render() {

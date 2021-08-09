@@ -474,62 +474,91 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
                 className="no-margin"
                 text={this.i18n('situationActionsAndWf')}/>
             </Basic.LabelWrapper>
-            <Basic.ContentHeader text={this.i18n('acc:entity.SynchronizationConfig.linkedAction')} className="marginable"/>
-            <Basic.EnumSelectBox
-              className=""
-              ref="linkedAction"
-              enum={SynchronizationLinkedActionTypeEnum}
-              useSymbol={false}
-              label={this.i18n('situationAction')}
-              required/>
-            <Basic.SelectBox
-              ref="linkedActionWfKey"
-              label={this.i18n('situationActionWf')}
-              forceSearchParameters={forceSearchSyncActionWfKey}
-              multiSelect={false}
-              manager={workflowProcessDefinitionManager}/>
 
-            <Basic.ContentHeader text={this.i18n('acc:entity.SynchronizationConfig.unlinkedAction')} className="marginable"/>
-            <Basic.EnumSelectBox
-              ref="unlinkedAction"
-              enum={SynchronizationUnlinkedActionTypeEnum}
-              useSymbol={false}
-              label={this.i18n('situationAction')}
-              required/>
-            <Basic.SelectBox
-              ref="unlinkedActionWfKey"
-              label={this.i18n('situationActionWf')}
-              forceSearchParameters={forceSearchSyncActionWfKey}
-              multiSelect={false}
-              manager={workflowProcessDefinitionManager}/>
+            <Basic.Panel className="no-border marginable">
+              <Advanced.Panel.Header
+                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-linked-action` }
+                text={ this.i18n('acc:entity.SynchronizationConfig.linkedAction') }
+                collapsible={ false }/>
+              <Basic.PanelBody>
+                <Basic.EnumSelectBox
+                  className=""
+                  ref="linkedAction"
+                  enum={SynchronizationLinkedActionTypeEnum}
+                  useSymbol={false}
+                  label={this.i18n('situationAction')}
+                  required/>
+                <Basic.SelectBox
+                  ref="linkedActionWfKey"
+                  label={this.i18n('situationActionWf')}
+                  forceSearchParameters={forceSearchSyncActionWfKey}
+                  multiSelect={false}
+                  manager={workflowProcessDefinitionManager}/>
+              </Basic.PanelBody>
+            </Basic.Panel>
 
-            <Basic.ContentHeader text={this.i18n('acc:entity.SynchronizationConfig.missingEntityAction')} className="marginable"/>
-            <Basic.EnumSelectBox
-              ref="missingEntityAction"
-              enum={SynchronizationMissingEntityActionTypeEnum}
-              useSymbol={false}
-              label={this.i18n('situationAction')}
-              required/>
-            <Basic.SelectBox
-              ref="missingEntityActionWfKey"
-              label={this.i18n('situationActionWf')}
-              forceSearchParameters={forceSearchSyncActionWfKey}
-              multiSelect={false}
-              manager={workflowProcessDefinitionManager}/>
+            <Basic.Panel className="no-border marginable">
+              <Advanced.Panel.Header
+                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-unlinked-action` }
+                text={ this.i18n('acc:entity.SynchronizationConfig.unlinkedAction') }
+                collapsible={ false }/>
+              <Basic.PanelBody>
+                <Basic.EnumSelectBox
+                  ref="unlinkedAction"
+                  enum={SynchronizationUnlinkedActionTypeEnum}
+                  useSymbol={false}
+                  label={this.i18n('situationAction')}
+                  required/>
+                <Basic.SelectBox
+                  ref="unlinkedActionWfKey"
+                  label={this.i18n('situationActionWf')}
+                  forceSearchParameters={forceSearchSyncActionWfKey}
+                  multiSelect={false}
+                  manager={workflowProcessDefinitionManager}/>
+              </Basic.PanelBody>
+            </Basic.Panel>
 
-            <Basic.ContentHeader text={this.i18n('acc:entity.SynchronizationConfig.missingAccountAction')} className="marginable"/>
-            <Basic.EnumSelectBox
-              ref="missingAccountAction"
-              enum={ReconciliationMissingAccountActionTypeEnum}
-              useSymbol={false}
-              label={this.i18n('situationAction')}
-              required/>
-            <Basic.SelectBox
-              ref="missingAccountActionWfKey"
-              label={this.i18n('situationActionWf')}
-              forceSearchParameters={forceSearchSyncActionWfKey}
-              multiSelect={false}
-              manager={workflowProcessDefinitionManager}/>
+            <Basic.Panel className="no-border marginable">
+              <Advanced.Panel.Header
+                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-missing-entity-action` }
+                text={ this.i18n('acc:entity.SynchronizationConfig.missingEntityAction') }
+                collapsible={ false }/>
+              <Basic.PanelBody>
+                <Basic.EnumSelectBox
+                  ref="missingEntityAction"
+                  enum={SynchronizationMissingEntityActionTypeEnum}
+                  useSymbol={false}
+                  label={this.i18n('situationAction')}
+                  required/>
+                <Basic.SelectBox
+                  ref="missingEntityActionWfKey"
+                  label={this.i18n('situationActionWf')}
+                  forceSearchParameters={forceSearchSyncActionWfKey}
+                  multiSelect={false}
+                  manager={workflowProcessDefinitionManager}/>
+              </Basic.PanelBody>
+            </Basic.Panel>
+
+            <Basic.Panel className="no-border marginable">
+              <Advanced.Panel.Header
+                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-missing-account-action` }
+                text={ this.i18n('acc:entity.SynchronizationConfig.missingAccountAction') }
+                collapsible={ false }/>
+              <Basic.PanelBody>
+                <Basic.EnumSelectBox
+                  ref="missingAccountAction"
+                  enum={ReconciliationMissingAccountActionTypeEnum}
+                  useSymbol={false}
+                  label={this.i18n('situationAction')}
+                  required/>
+                <Basic.SelectBox
+                  ref="missingAccountActionWfKey"
+                  label={this.i18n('situationActionWf')}
+                  forceSearchParameters={forceSearchSyncActionWfKey}
+                  multiSelect={false}
+                  manager={workflowProcessDefinitionManager}/>
+              </Basic.PanelBody>
+            </Basic.Panel>
           </Basic.AbstractForm>
           <Basic.PanelFooter rendered={!this.isWizard()}>
             <Basic.Button

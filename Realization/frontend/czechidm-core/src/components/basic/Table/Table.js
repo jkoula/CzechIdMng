@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import Waypoint from 'react-waypoint';
 //
 import * as Utils from '../../../utils';
-import AbstractComponent from '../AbstractComponent/AbstractComponent';
+import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 import Loading from '../Loading/Loading';
 import Alert from '../Alert/Alert';
 import Row from './Row';
@@ -25,7 +25,7 @@ const FE_PAGE_SIZE = 20;
  *
  * @author Radek Tomiška
  */
-class Table extends AbstractComponent {
+class Table extends AbstractContextComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -35,13 +35,46 @@ class Table extends AbstractComponent {
     this.state = {
       startRowIndex: null,
       selectedRows: this.props.selectedRows ? new Immutable.Set(this.props.selectedRows) : new Immutable.Set(),
-      showMax: FE_PAGE_SIZE
+      showMax: FE_PAGE_SIZE,
+      collapsed: props.collapsed
     };
+  }
+
+  getComponentKey() {
+    return 'component.basic.Table';
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       selectedRows: nextProps.selectedRows ? new Immutable.Set(nextProps.selectedRows) : new Immutable.Set()
+    });
+  }
+
+  componentDidMount() {
+    const { collapsed } = this.props;
+    if (collapsed) {
+      this._setCollapsed(collapsed);
+    }
+  }
+
+  toogleCollapse(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    //
+    const { collapsed } = this.state;
+    this._setCollapsed(!collapsed);
+  }
+
+  _setCollapsed(collapsed = false) {
+    this.setState({
+      collapsed
+    }, () => {
+      const { uiKey, collapsible } = this.props;
+      //
+      if (uiKey && _.isFunction(collapsible)) {
+        collapsible(uiKey, collapsed);
+      }
     });
   }
 
@@ -367,7 +400,6 @@ class Table extends AbstractComponent {
     }
   }
 
-
   renderBody(columns) {
     const { data, showLoading, supportsPagination } = this.props;
     const { showMax } = this.state;
@@ -461,8 +493,10 @@ class Table extends AbstractComponent {
       noHeader,
       supportsPagination,
       style,
-      draggable
+      draggable,
+      collapsible
     } = this.props;
+    const { collapsed } = this.state;
     //
     if (!rendered) {
       return null;
@@ -524,6 +558,11 @@ class Table extends AbstractComponent {
       content.push(footer);
     }
     //
+    const _style = { cursor: 'pointer' };
+    if (!collapsed) {
+      _style.color = '#ccc';
+    }
+    //
     return (
       <div
         key={ uiKey && draggable ? `${ uiKey }-${ Utils.Ui.getComponentKey(data) }` : null }
@@ -536,13 +575,29 @@ class Table extends AbstractComponent {
               ||
               <thead>
                 <tr className="basic-table-header">
-                  <th colSpan={ columns.length }>
-                    { header }
+                  <th
+                    colSpan={ columns.length }
+                    style={ collapsed ? { borderBottom: 0 } : {} }>
+                    <div style={{ display: 'flex', alignItems: 'center'}}>
+                      <div style={{ flex: 1 }}>
+                        { header }
+                      </div>
+                      <Icon
+                        icon={ !collapsed ? 'fa:angle-double-up' : 'fa:angle-double-down' }
+                        style={ _style }
+                        onClick={ (event) => this.toogleCollapse(event) }
+                        rendered={ collapsible !== false }
+                        title={ !collapsed ? this.i18n('button.collapse.title') : this.i18n('button.expand.title') }/>
+                    </div>
                   </th>
                 </tr>
               </thead>
             }
-            { content }
+            {
+              collapsed
+              ||
+              content
+            }
           </table>
         </Loading>
       </div>
@@ -551,7 +606,7 @@ class Table extends AbstractComponent {
 }
 
 Table.propTypes = {
-  ...AbstractComponent.propTypes,
+  ...AbstractContextComponent.propTypes,
   /**
    * input data as array of json objects.
    */
@@ -635,10 +690,22 @@ Table.propTypes = {
    *
    * @since 10.7.0
    */
-  onDraggableStop: PropTypes.func
+  onDraggableStop: PropTypes.func,
+  /**
+   * Collapsible table.
+   *
+   * @since 11.2.0
+   */
+  collapsible: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+  /**
+   * Table is expanded / collapsed.
+   *
+   * @since 11.2.0
+   */
+  collapsed: PropTypes.bool
 };
 Table.defaultProps = {
-  ...AbstractComponent.defaultProps,
+  ...AbstractContextComponent.defaultProps,
   data: [],
   selectedRows: [],
   showRowSelection: false,
@@ -650,7 +717,9 @@ Table.defaultProps = {
   isRowSelectedCb: null,
   isAllRowsSelectedCb: null,
   supportsPagination: false,
-  draggable: false
+  draggable: false,
+  collapsible: false,
+  collapsed: false
 };
 
 Table.SELECT_ALL = 'select-all-rows';

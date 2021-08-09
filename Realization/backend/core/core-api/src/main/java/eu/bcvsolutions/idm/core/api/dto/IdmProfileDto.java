@@ -6,6 +6,7 @@ import javax.validation.constraints.Size;
 
 import org.springframework.hateoas.core.Relation;
 
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
@@ -40,6 +41,8 @@ public class IdmProfileDto extends AbstractDto  {
 	private Integer defaultPageSize;
 	@ApiModelProperty(notes = "Additional two factor authentication method.")
 	private TwoFactorAuthenticationType twoFactorAuthenticationType;
+	@ApiModelProperty(notes = "User setting, e.g. panels configuration - collapsed, expanded.")
+	private ConfigurationMap setting;
 
 	public IdmProfileDto() {
 	}
@@ -138,5 +141,30 @@ public class IdmProfileDto extends AbstractDto  {
 	 */
 	public void setTwoFactorAuthenticationType(TwoFactorAuthenticationType twoFactorAuthenticationType) {
 		this.twoFactorAuthenticationType = twoFactorAuthenticationType;
+	}
+	
+	/**
+	 * User setting, e.g. panels configuration - collapsed, expanded.
+	 * 
+	 * @return user setting
+	 * @see PanelDto
+	 * @since 11.2.0
+	 */
+	public ConfigurationMap getSetting() {
+		if (setting == null) {
+			setting = new ConfigurationMap();
+		}
+		return setting;
+	}
+	
+	/**
+	 * User setting, e.g. panels configuration - collapsed, expanded.
+	 * 
+	 * @param user setting
+	 * @see PanelDto
+	 * @since 11.2.0
+	 */
+	public void setSetting(ConfigurationMap setting) {
+		this.setting = setting;
 	}
 }

@@ -25,7 +25,7 @@ public interface IdmProfileService extends
 		ScriptEnabled {
 	
 	/**
-	 * Return profile for given identity username / id
+	 * Return profile for given identity username / id.
 	 *
 	 * @param identityIdentifier identity username / id
 	 * @param permission permissions to evaluate (AND)
@@ -46,7 +46,7 @@ public interface IdmProfileService extends
 	IdmProfileDto findOrCreateByIdentity(Serializable identityIdentifier, BasePermission... permission);
 	
 	/**
-	 * Upload new image version for the given profile
+	 * Upload new image version for the given profile.
 	 * 
 	 * @param profile persisted profile
 	 * @param data - one of image/* content type is required.
@@ -60,12 +60,35 @@ public interface IdmProfileService extends
 	IdmProfileDto uploadImage(IdmProfileDto profile, MultipartFile data, String fileName, BasePermission... permission);
 	
 	/**
-	 * Delete profile image (all versions)
+	 * Delete profile image (all versions).
 	 * 
 	 * @param profile persisted profile
 	 * @param permission permissions to evaluate (AND)
 	 * @return
 	 * @throws ForbiddenEntityException if authorization policies doesn't met
 	 */
-	IdmProfileDto deleteImage(IdmProfileDto profile, BasePermission... permission); 
+	IdmProfileDto deleteImage(IdmProfileDto profile, BasePermission... permission);
+	
+	/**
+	 * Collapse given panel for given identity profile.
+	 * 
+	 * @param identityIdentifier identity username / id
+	 * @param panelIdentifier panel identifier ~ uiKey
+	 * @param permission permissions to evaluate (AND)
+	 * @return updated identity profile
+	 * @since 11.2.0
+	 */
+	IdmProfileDto collapsePanel(Serializable identityIdentifier, String panelIdentifier, BasePermission... permission);
+	
+	/**
+	 * Expand given panel for given identity profile.
+	 * 
+	 * @param identityIdentifier identity username / id
+	 * @param panelIdentifier panel identifier ~ uiKey
+	 * @param permission permissions to evaluate (AND)
+	 * @return updated identity profile
+	 * @since 11.2.0
+	 */
+	IdmProfileDto expandPanel(Serializable identityIdentifier, String panelIdentifier, BasePermission... permission);
+	
 }

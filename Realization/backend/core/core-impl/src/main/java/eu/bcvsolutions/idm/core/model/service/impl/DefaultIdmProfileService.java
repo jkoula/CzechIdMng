@@ -20,9 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
+import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
+import eu.bcvsolutions.idm.core.api.dto.PanelDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmProfileFilter;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
@@ -165,6 +167,18 @@ public class DefaultIdmProfileService
 	}
 	
 	@Override
+	@Transactional
+	public IdmProfileDto collapsePanel(Serializable identityIdentifier, String panelIdentifier, BasePermission... permission) {
+		return setPanelCollapsed(identityIdentifier, panelIdentifier, true, permission);
+	}
+	
+	@Override
+	@Transactional
+	public IdmProfileDto expandPanel(Serializable identityIdentifier, String panelIdentifier, BasePermission... permission) {
+		return setPanelCollapsed(identityIdentifier, panelIdentifier, false, permission);
+	}
+	
+	@Override
 	protected List<Predicate> toPredicates(Root<IdmProfile> root, CriteriaQuery<?> query, CriteriaBuilder builder, IdmProfileFilter filter) {
 		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
 		//
@@ -189,5 +203,24 @@ public class DefaultIdmProfileService
 		List<IdmProfileDto> profiles = find(filter, null, permission).getContent();
 		//
 		return profiles.isEmpty() ? null : profiles.get(0);
+	}
+
+	private IdmProfileDto setPanelCollapsed(
+			Serializable identityIdentifier, 
+			String panelIdentifier, 
+			boolean collapsed, 
+			BasePermission... permission) {
+		IdmProfileDto profile = findOrCreateByIdentity(identityIdentifier, permission);
+		//
+		ConfigurationMap setting = profile.getSetting();
+		PanelDto panel = (PanelDto) setting.get(panelIdentifier);
+		if (panel == null) {
+			panel = new PanelDto(panelIdentifier);
+		}
+		panel.setCollapsed(collapsed);
+		setting.put(panelIdentifier, panel);
+		profile.setSetting(setting);
+		//
+		return save(profile, permission);
 	}
 }

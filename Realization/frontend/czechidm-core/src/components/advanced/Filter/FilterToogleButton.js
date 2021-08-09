@@ -1,19 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 //
 import AbstractContextComponent from '../../basic/AbstractContextComponent/AbstractContextComponent';
 import * as Basic from '../../basic';
 import * as Domain from '../../../domain';
-import { DataManager } from '../../../redux';
-
+import { DataManager, IdentityManager } from '../../../redux';
+//
 const dataManager = new DataManager();
+const identityManager = new IdentityManager();
 
 /**
  * Button for closable filter mainly for advanced table.
  *
  * @author Radek Tomiška
  */
-export default class FilterToogleButton extends AbstractContextComponent {
+class FilterToogleButton extends AbstractContextComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -24,7 +26,7 @@ export default class FilterToogleButton extends AbstractContextComponent {
   }
 
   _filterOpen(opened) {
-    const { filterOpen, uiKey } = this.props;
+    const { filterOpen, uiKey, userContext } = this.props;
     //
     this.setState({
       filterOpened: opened
@@ -32,8 +34,14 @@ export default class FilterToogleButton extends AbstractContextComponent {
       if (uiKey) {
         if (opened) {
           this.context.store.dispatch(dataManager.expandFilter(uiKey));
+          if (userContext && userContext.username) {
+            this.context.store.dispatch(identityManager.expandPanel(userContext.username, uiKey));
+          }
         } else {
           this.context.store.dispatch(dataManager.collapseFilter(uiKey));
+          if (userContext && userContext.username) {
+            this.context.store.dispatch(identityManager.collapsePanel(userContext.username, uiKey));
+          }
         }
       }
       if (filterOpen) {
@@ -109,3 +117,10 @@ FilterToogleButton.propTypes = {
 FilterToogleButton.defaultProps = {
   ...Basic.AbstractContextComponent.defaultProps
 };
+function select(state) {
+  return {
+    userContext: state.security.userContext
+  };
+}
+
+export default connect(select)(FilterToogleButton);

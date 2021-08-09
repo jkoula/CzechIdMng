@@ -50,6 +50,14 @@ export default class UiUtils {
    * @since 10.7.0
    */
   static isFilterOpened(state, uiKey) {
+    // try to use user profile
+    const userContext = state.security.userContext;
+    if (userContext && userContext.profile && userContext.profile.setting) {
+      if (userContext.profile.setting[uiKey]) {
+        return !userContext.profile.setting[uiKey].collapsed;
+      }
+    }
+    // try to use ui state
     const uiState = UiUtils.getUiState(state, uiKey);
     if (!uiState) {
       return null;
@@ -417,7 +425,6 @@ export default class UiUtils {
     }
     return text.split('"').join('\\"');
   }
-
 
   /**
    * Transforma object value into string - can be rendered

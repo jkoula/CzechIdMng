@@ -1,5 +1,3 @@
-import _ from 'lodash';
-//
 import FormableEntityManager from './FormableEntityManager';
 import SecurityManager, { RECEIVE_PROFILE } from '../security/SecurityManager';
 import { IdentityService } from '../../services';
@@ -327,6 +325,58 @@ export default class IdentityManager extends FormableEntityManager {
         })
         .catch(error => {
           dispatch(this.receiveError(null, uiKey, error));
+        });
+    };
+  }
+
+  /**
+   * Collapse panel- persist updated identity profile setting.
+   *
+   * @param  {string} identityId logged identity
+   * @param  {string} panelId panel id ~ uiKey
+   * @return {action}
+   * @since 11.2.0
+   */
+  collapsePanel(identityId, panelId) {
+    return (dispatch) => {
+      this.getService().collapsePanel(identityId, panelId)
+        .then((entity) => {
+          // lookout SecurityManager is not used (navigation or loacalization is already refreshed - profile is saved only)
+          dispatch({
+            type: RECEIVE_PROFILE,
+            profile: entity
+          });
+        })
+        .catch(error => {
+          // log error only into message history (e.g. 403 - authorization policies are wrong configured)
+          // saving profile is optional - logged identity couldn't have permission for read profile (or profile not found)
+          this.flashMessagesManager.addErrorMessage({ hidden: true, level: 'info' }, error);
+        });
+    };
+  }
+
+  /**
+   * Expand panel- persist updated identity profile setting.
+   *
+   * @param  {string} identityId logged identity
+   * @param  {string} panelId panel id ~ uiKey
+   * @return {action}
+   * @since 11.2.0
+   */
+  expandPanel(identityId, panelId) {
+    return (dispatch) => {
+      this.getService().expandPanel(identityId, panelId)
+        .then((entity) => {
+          // lookout SecurityManager is not used (navigation or loacalization is already refreshed - profile is saved only)
+          dispatch({
+            type: RECEIVE_PROFILE,
+            profile: entity
+          });
+        })
+        .catch(error => {
+          // log error only into message history (e.g. 403 - authorization policies are wrong configured)
+          // saving profile is optional - logged identity couldn't have permission for read profile (or profile not found)
+          this.flashMessagesManager.addErrorMessage({ hidden: true, level: 'info' }, error);
         });
     };
   }

@@ -326,11 +326,11 @@ public class RoleDeleteBulkActionIntegrationTest extends AbstractBulkActionTest 
 			bulkAction.setIdentifiers(Sets.newHashSet(role.getId()));
 			bulkAction.setProperties(properties);
 			IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
-			checkResultLrt(processAction, 1l, 0l, 0l);
 			//
 			getHelper().waitForResult(res -> {
 				return roleService.get(role) != null;
 			});
+			checkResultLrt(processAction, 1l, 0l, 0l);
 			//
 			Assert.assertTrue(identityRoleService.findAllByIdentity(identityOne.getId()).isEmpty());
 			Assert.assertTrue(identityRoleService.findAllByIdentity(identityTwo.getId()).isEmpty());

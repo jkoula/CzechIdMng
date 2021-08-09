@@ -195,11 +195,11 @@ public class IdentityDeleteBulkActionIntegrationTest extends AbstractBulkActionT
 			IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityDeleteBulkAction.NAME);
 			bulkAction.setIdentifiers(Sets.newHashSet(identity.getId()));
 			IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
-			checkResultLrt(processAction, 1l, 0l, 0l);
 			//
 			getHelper().waitForResult(res -> {
 				return identityService.get(identity) != null;
 			});
+			checkResultLrt(processAction, 1l, 0l, 0l);
 			//
 			Assert.assertTrue(identityRoleService.findAllByIdentity(identityOne.getId()).isEmpty());
 			Assert.assertNull(contractService.get(contract));

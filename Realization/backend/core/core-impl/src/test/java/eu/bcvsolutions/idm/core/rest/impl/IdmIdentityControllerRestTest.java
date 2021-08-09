@@ -44,6 +44,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
+import eu.bcvsolutions.idm.core.api.dto.PanelDto;
 import eu.bcvsolutions.idm.core.api.dto.ResolvedIncompatibleRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
@@ -81,7 +82,7 @@ import eu.bcvsolutions.idm.test.api.TestHelper;
  * - CRUD
  * - bulk actions
  * - eav attributes with authorization policies
- * - profile CRUD
+ * - profile CRUD, upload, download, collapsible panel
  * 
  * - TODO: move all filters here
  * 
@@ -115,7 +116,7 @@ public class IdmIdentityControllerRestTest extends AbstractReadWriteDtoControlle
 	
 	@Test
     public void testUserNotFound() throws Exception {
-		getMockMvc().perform(get(getDetailUrl("n_a_user"))
+		getMockMvc().perform(get(getDetailUrl(getHelper().createName()))
         		.with(authentication(getAdminAuthentication()))
                 .contentType(TestHelper.HAL_CONTENT_TYPE))
                 .andExpect(status().isNotFound());
@@ -996,6 +997,38 @@ public class IdmIdentityControllerRestTest extends AbstractReadWriteDtoControlle
 		        .getContentAsString();
 		//
 		Assert.assertTrue(StringUtils.isEmpty(response));
+	}
+	
+	@Test
+	public void testCollapsiblePanel() throws Exception {
+		IdmIdentityDto dto = createDto();
+		String panelId = getHelper().createName();
+		//
+		getMockMvc().perform(patch(String.format("%s/profile/panels/%s/collapse", getDetailUrl(dto.getId()), panelId))
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isOk())
+                .andExpect(content().contentType(TestHelper.HAL_CONTENT_TYPE));
+		IdmProfileDto profile = profileService.findOneByIdentity(dto.getId());
+		Assert.assertTrue(((PanelDto) profile.getSetting().get(panelId)).getCollapsed());	
+		//
+		getMockMvc().perform(patch(String.format("%s/profile/panels/%s/expand", getDetailUrl(dto.getId()), panelId))
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isOk())
+                .andExpect(content().contentType(TestHelper.HAL_CONTENT_TYPE));
+		profile = profileService.findOneByIdentity(dto.getId());
+		Assert.assertFalse(((PanelDto) profile.getSetting().get(panelId)).getCollapsed());
+		//
+		// not found
+		getMockMvc().perform(patch(String.format("%s/profile/panels/%s/expand", getDetailUrl(UUID.randomUUID()), panelId))
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+                .andExpect(status().isNotFound());
+		getMockMvc().perform(patch(String.format("%s/profile/panels/%s/collapse", getDetailUrl(UUID.randomUUID()), panelId))
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+                .andExpect(status().isNotFound());
 	}
 	
 	protected IdmFormProjectionDto createProjection() {

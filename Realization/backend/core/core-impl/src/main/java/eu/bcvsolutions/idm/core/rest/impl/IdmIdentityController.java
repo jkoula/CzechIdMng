@@ -1085,6 +1085,88 @@ public class IdmIdentityController extends AbstractFormableDtoController<IdmIden
 	}
 	
 	/**
+	 * Collapse panel on frontend - persist updated identity profile setting. 
+	 * 
+	 * @param backendId identity codeable identifier
+	 * @param panelId panel identitfier ~ uiKey
+	 * @return updated profile
+	 * @since 11.2.0
+	 */
+	@RequestMapping(value = "/{backendId}/profile/panels/{panelId}/collapse", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.PROFILE_UPDATE + "')")
+	@ApiOperation(
+			value = "Collapse panel", 
+			nickname = "collapsePanel",
+			tags = { IdmIdentityController.TAG },
+			notes = "Collapse panel - persist updated identity profile setting.",
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+							@AuthorizationScope(scope = CoreGroupPermission.PROFILE_UPDATE, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+							@AuthorizationScope(scope = CoreGroupPermission.PROFILE_UPDATE, description = "") })
+					})
+	public ResponseEntity<?> collapsePanel(
+			@ApiParam(value = "Identity's uuid identifier or username.", required = true)
+			@PathVariable @NotNull String backendId,
+			@ApiParam(value = "Panel identifier - uiKey.", required = true)
+			@PathVariable @NotNull String panelId) {
+		IdmIdentityDto identity = getDto(backendId);
+		if (identity == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		IdmProfileDto profile = profileService.collapsePanel(backendId, panelId, IdmBasePermission.UPDATE);
+		//
+		// refresh with permissions are needed
+		IdmProfileFilter context = new IdmProfileFilter();
+		context.setAddPermissions(true);
+		profile = profileController.getService().get(profile, context, IdmBasePermission.READ);
+		//
+		return new ResponseEntity<>(profileController.toResource(profile), HttpStatus.OK);
+	}
+	
+	/**
+	 * Expand panel on frontend - persist updated identity profile setting. 
+	 * 
+	 * @param backendId identity codeable identifier
+	 * @param panelId panel identitfier ~ uiKey
+	 * @return updated profile
+	 * @since 11.2.0
+	 */
+	@RequestMapping(value = "/{backendId}/profile/panels/{panelId}/expand", method = RequestMethod.PATCH)
+	@ResponseBody
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.PROFILE_UPDATE + "')")
+	@ApiOperation(
+			value = "Expand panel", 
+			nickname = "expandPanel",
+			tags = { IdmIdentityController.TAG },
+			notes = "Expand panel - persist updated identity profile setting.",
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+							@AuthorizationScope(scope = CoreGroupPermission.PROFILE_UPDATE, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+							@AuthorizationScope(scope = CoreGroupPermission.PROFILE_UPDATE, description = "") })
+					})
+	public ResponseEntity<?> expandPanel(
+			@ApiParam(value = "Identity's uuid identifier or username.", required = true)
+			@PathVariable @NotNull String backendId,
+			@ApiParam(value = "Panel identifier - uiKey.", required = true)
+			@PathVariable @NotNull String panelId) {
+		IdmIdentityDto identity = getDto(backendId);
+		if (identity == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		IdmProfileDto profile = profileService.expandPanel(backendId, panelId, IdmBasePermission.UPDATE);
+		//
+		// refresh with permissions are needed
+		IdmProfileFilter context = new IdmProfileFilter();
+		context.setAddPermissions(true);
+		profile = profileController.getService().get(profile, context, IdmBasePermission.READ);
+		//
+		return new ResponseEntity<>(profileController.toResource(profile), HttpStatus.OK);
+	}
+	
+	/**
 	 * Returns profile permissions
 	 * 
 	 * @return 

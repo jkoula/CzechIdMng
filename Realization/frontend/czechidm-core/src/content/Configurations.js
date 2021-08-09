@@ -5,11 +5,12 @@ import _ from 'lodash';
 //
 import * as Basic from '../components/basic';
 import * as Advanced from '../components/advanced';
-import { ConfigurationManager, DataManager, SecurityManager } from '../redux';
+import { ConfigurationManager, DataManager, SecurityManager, IdentityManager } from '../redux';
 import * as Utils from '../utils';
 
-const uiKey = 'configuration_table';
+const uiKey = 'configuration-table';
 const manager = new ConfigurationManager();
+const identityManager = new IdentityManager();
 
 const IDM_CONFIGURATION_PREFIX = 'idm.';
 
@@ -23,6 +24,20 @@ class Configurations extends Advanced.AbstractTableContent {
 
   constructor(props, context) {
     super(props, context);
+    //
+    //
+    const { userContext } = props;
+    let collapsedTableFile = true;
+    let collapsedTableEnvironment = true;
+    if (userContext && userContext.profile && userContext.profile.setting) { // or personalized by profile
+      if (userContext.profile.setting[`${ uiKey }-file-panel`]) {
+        collapsedTableFile = !!userContext.profile.setting[`${ uiKey }-file-panel`].collapsed;
+      }
+      if (userContext.profile.setting[`${ uiKey }-environment-panel`]) {
+        collapsedTableEnvironment = !!userContext.profile.setting[`${ uiKey }-environment-panel`].collapsed;
+      }
+    }
+    //
     this.state = {
       filterOpened: true,
       detail: {
@@ -32,7 +47,9 @@ class Configurations extends Advanced.AbstractTableContent {
       },
       isGuarded: false,
       isSecured: false,
-      showPrefixWarning: false
+      showPrefixWarning: false,
+      collapsedTableFile,
+      collapsedTableEnvironment
     };
   }
 
@@ -282,6 +299,17 @@ class Configurations extends Advanced.AbstractTableContent {
     return false;
   }
 
+  _onToogleCollapse(tableUiKey, collapsed) {
+    const { userContext } = this.props;
+    if (userContext && userContext.username) {
+      if (collapsed) {
+        this.context.store.dispatch(identityManager.collapsePanel(userContext.username, tableUiKey));
+      } else {
+        this.context.store.dispatch(identityManager.expandPanel(userContext.username, tableUiKey));
+      }
+    }
+  }
+
   render() {
     const {
       _showLoading,
@@ -297,7 +325,9 @@ class Configurations extends Advanced.AbstractTableContent {
       detail,
       isGuarded,
       isSecured,
-      showPrefixWarning
+      showPrefixWarning,
+      collapsedTableFile,
+      collapsedTableEnvironment
     } = this.state;
     const showTables = !(detail.show || detail.addMore);
     //
@@ -522,11 +552,14 @@ class Configurations extends Advanced.AbstractTableContent {
 
         <Basic.Panel rendered={ showTables }>
           <Basic.Table
+            uiKey={ `${ uiKey }-file-panel` }
             header={ this.i18n('fromFile', { escape: false }) }
             data={ fileConfigurations }
             showLoading={ _fileConfigurationsShowLoading }
             noData={ this.i18n('component.basic.Table.noData') }
-            supportsPagination>
+            supportsPagination
+            collapsible={ this._onToogleCollapse.bind(this) }
+            collapsed={ collapsedTableFile }>
             <Basic.Column
               property=""
               header=""
@@ -561,11 +594,14 @@ class Configurations extends Advanced.AbstractTableContent {
           ||
           <Basic.Panel rendered={ showTables }>
             <Basic.Table
+              uiKey={ `${ uiKey }-environment-panel` }
               data={ environmentConfigurations }
               header={ this.i18n('fromEnvironment', { escape: false }) }
               showLoading={ _environmentConfigurationsShowLoading }
               noData={ this.i18n('component.basic.Table.noData') }
-              supportsPagination>
+              supportsPagination
+              collapsible={ this._onToogleCollapse.bind(this) }
+              collapsed={ collapsedTableEnvironment }>
               <Basic.Column property="name" header={ this.i18n('entity.Configuration.name') } width={ 150 }/>
               <Basic.Column property="value" header={ this.i18n('entity.Configuration.value') }/>
             </Basic.Table>
@@ -593,6 +629,7 @@ Configurations.defaultProps = {
 function select(state) {
   return {
     i18nReady: state.config.get('i18nReady'),
+    userContext: state.security.userContext,
     _searchParameters: Utils.Ui.getSearchParameters(state, uiKey),
     _showLoading: Utils.Ui.isShowLoading(state, `${uiKey}-detail`),
     fileConfigurations: DataManager.getData(state, ConfigurationManager.FILE_CONFIGURATIONS),

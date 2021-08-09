@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.monitoring.service.impl;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -47,7 +48,7 @@ public class LoggingEventMonitoringEvaluator extends AbstractDailyMonitoringEval
 		filter.setLevelString(LogType.ERROR);
 		Long givenNumberOfDays = getParameterConverter().toLong(monitoring.getEvaluatorProperties(), PARAMETER_NUMBER_OF_DAYS);
 		if (givenNumberOfDays != null) {
-			filter.setFrom(ZonedDateTime.now().minusDays(givenNumberOfDays));
+			filter.setFrom(ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(givenNumberOfDays));
 		}
 		long count = loggingEventService.count(filter);
 		//

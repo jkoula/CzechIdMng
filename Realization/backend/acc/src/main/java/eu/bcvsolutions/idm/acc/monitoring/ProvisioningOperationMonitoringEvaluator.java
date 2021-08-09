@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.monitoring;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -49,7 +50,7 @@ public class ProvisioningOperationMonitoringEvaluator extends AbstractDailyMonit
 		filter.setMonitoringIgnored(Boolean.FALSE);
 		Long givenNumberOfDays = getParameterConverter().toLong(monitoring.getEvaluatorProperties(), PARAMETER_NUMBER_OF_DAYS);
 		if (givenNumberOfDays != null) {
-			filter.setCreatedFrom(ZonedDateTime.now().minusDays(givenNumberOfDays));
+			filter.setCreatedFrom(ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS).minusDays(givenNumberOfDays));
 		}
 		long count = provisioningOperationService.count(filter);
 		//

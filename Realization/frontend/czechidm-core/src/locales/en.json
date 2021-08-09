@@ -405,6 +405,14 @@
           "message": {
             "success": "Order of records successfully changed"
           }
+        },
+        "button": {
+          "collapse" : {
+            "title": "Collapse table"
+          },
+          "expand" : {
+            "title": "Expand table"
+          }
         }
       },
       "ProgressBar": {
@@ -441,6 +449,16 @@
       }
     },
     "advanced": {
+      "PanelHeader": {
+        "button": {
+          "collapse" : {
+            "title": "Collapse panel"
+          },
+          "expand" : {
+            "title": "Expand panel"
+          }
+        }
+      },
       "EntityInfo": {
         "link": {
           "detail": {

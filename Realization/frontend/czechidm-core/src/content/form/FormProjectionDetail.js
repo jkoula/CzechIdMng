@@ -11,7 +11,7 @@ import * as Advanced from '../../components/advanced';
 import * as Domain from '../../domain';
 import { FormProjectionManager, FormDefinitionManager, FormAttributeManager, DataManager } from '../../redux';
 import AbstractEnum from '../../enums/AbstractEnum';
-
+//
 const manager = new FormProjectionManager();
 const formDefinitionManager = new FormDefinitionManager();
 const formAttributeManager = new FormAttributeManager();
@@ -692,13 +692,14 @@ class FormProjectionDetail extends Basic.AbstractContent {
       <Basic.Div>
         <form onSubmit={ this.save.bind(this) }>
           <Basic.Panel className={ Utils.Entity.isNew(projection) ? '' : 'no-border last' }>
-            <Basic.PanelHeader text={
-              Utils.Entity.isNew(projection)
-              ?
-              this.i18n('create.header')
-              :
-              this.i18n('content.form-projections.detail.title')
-            }/>
+            <Advanced.Panel.Header
+              text={
+                Utils.Entity.isNew(projection)
+                ?
+                this.i18n('create.header')
+                :
+                this.i18n('content.form-projections.detail.title')
+              }/>
             <Basic.PanelBody style={ Utils.Entity.isNew(projection) ? { paddingTop: 0, paddingBottom: 0 } : { padding: 0 } }>
               <Basic.AbstractForm
                 ref="form"

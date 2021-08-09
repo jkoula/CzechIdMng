@@ -72,6 +72,7 @@ import DetailHeader from './Content/DetailHeader';
 import CronGenerator from './CronGenerator/CronGenerator';
 import CodeableField from './CodeableField/CodeableField';
 import ReadDtoServiceSelect from './ReadDtoServiceSelect/ReadDtoServiceSelect';
+import PanelHeader from './Panel/PanelHeader';
 
 const Components = {
   Table,
@@ -149,7 +150,10 @@ const Components = {
   CronGenerator,
   ScriptInfo,
   CodeableField,
-  ReadDtoServiceSelect
+  ReadDtoServiceSelect,
+  Panel: {
+    Header: PanelHeader
+  }
 };
 
 Components.version = '11.1.0';

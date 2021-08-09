@@ -361,6 +361,46 @@ class IdentityService extends FormableEntityService {
   }
 
   /**
+   * Collapse panel- persist updated identity profile setting.
+   *
+   * @param  {string} identityId entity id
+   * @param {string} panelId panel id ~ uiKey
+   * @return {Promise}
+   * @since 11.2.0
+   */
+  collapsePanel(identityId, panelId) {
+    return RestApiService
+      .patch(`${ this.getApiPath() }/${ encodeURIComponent(identityId) }/profile/panels/${ encodeURIComponent(panelId) }/collapse`)
+      .then(response => response.json())
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        return json;
+      });
+  }
+
+  /**
+   * Expand panel- persist updated identity profile setting.
+   *
+   * @param  {string, uuid} identityId entity id
+   * @param {string} panelId panel id ~ uiKey
+   * @return {Promise}
+   * @since 11.2.0
+   */
+  expandPanel(identityId, panelId) {
+    return RestApiService
+      .patch(`${ this.getApiPath() }/${ encodeURIComponent(identityId) }/profile/panels/${ encodeURIComponent(panelId) }/expand`)
+      .then(response => response.json())
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        return json;
+      });
+  }
+
+  /**
    * Fetch profile permissions
    *
    * @param  {string, number} identityId entity id

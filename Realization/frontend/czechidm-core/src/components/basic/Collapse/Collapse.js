@@ -21,7 +21,7 @@ export default class BasicCollapse extends AbstractComponent {
     }
 
     return (
-      <Collapse {...others}>
+      <Collapse { ...others }>
         {
           showLoading
           ?
