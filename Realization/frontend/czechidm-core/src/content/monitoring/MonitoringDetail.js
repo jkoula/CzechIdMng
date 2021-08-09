@@ -182,6 +182,7 @@ class MonitoringDetail extends Basic.AbstractContent {
                       onChange={ this.onChangeEvaluatorType.bind(this) }
                       label={ this.i18n('entity.Monitoring.evaluatorType.label') }
                       helpBlock={ evaluatorType ? evaluatorType.description : null }
+                      readOnly={ !Utils.Entity.isNew(entity) }
                       required
                       searchable/>
                     <Basic.TextField
@@ -219,7 +220,7 @@ class MonitoringDetail extends Basic.AbstractContent {
                       helpBlock={ this.i18n('entity.Monitoring.seq.help') }/>
                   </Basic.Col>
                   <Basic.Col lg={ 6 }>
-                    <Basic.Div>
+                    <Basic.Div rendered={formInstance.getAttributes().size > 0 }>
                       <Basic.ContentHeader text={ this.i18n('entity.Monitoring.evaluatorProperties.title') }/>
                       <Advanced.EavForm
                         ref="formInstance"

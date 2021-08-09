@@ -81,7 +81,7 @@ export class MonitoringInfo extends AbstractEntityInfo {
   getLink() {
     const entity = this.getEntity();
     //
-    return `/monitoring/monitorings/${ encodeURIComponent(entity.id) }`;
+    return `/monitoring/monitorings/${ encodeURIComponent(entity.id) }/detail`;
   }
 
   getTableChildren() {
