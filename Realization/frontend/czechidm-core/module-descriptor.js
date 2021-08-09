@@ -1178,7 +1178,29 @@ module.exports = {
                 order: 420,
                 path: '/monitoring/monitorings',
                 type: 'TAB',
-                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ]
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ],
+                items: [
+                  {
+                    id: 'monitoring-detail',
+                    labelKey: 'content.monitorings.header',
+                    titleKey: 'content.monitorings.title',
+                    order: 10,
+                    path: '/monitoring/monitorings/:entityId/detail',
+                    icon: 'component:basic-info',
+                    type: 'TAB',
+                    access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ]
+                  },
+                  {
+                    id: 'monitoring-detail-results',
+                    type: 'TAB',
+                    labelKey: 'content.monitoring-results.header',
+                    titleKey: 'content.monitoring-results.title',
+                    order: 40,
+                    icon: 'component:monitoring-results',
+                    path: '/monitoring/monitorings/:entityId/results',
+                    access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['MONITORING_READ', 'MONITORINGRESULT_READ'] } ]
+                  },
+                ]
               }
             ]
           },

@@ -62,7 +62,7 @@ export default class MonitoringManager extends EntityManager {
       if (loaded) {
         // we dont need to load them again - change depends on BE restart
         if (cb) {
-          cb();
+          cb(loaded);
         }
       } else {
         dispatch(this.dataManager.requestData(uiKey));

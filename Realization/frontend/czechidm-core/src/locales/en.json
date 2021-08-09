@@ -1520,7 +1520,8 @@
         }
       },
       "edit": {
-        "header": "{{name}} <small> monitoring detail</small>"
+        "header": "{{name}} <small> monitoring setting detail</small>",
+        "title": "Monitoring setting detail"
       },
       "create": {
         "header": "New monitoring setting"

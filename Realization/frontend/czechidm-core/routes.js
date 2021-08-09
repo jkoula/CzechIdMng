@@ -636,11 +636,6 @@ module.exports = {
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ]
         },
         {
-          path: 'monitorings/:entityId',
-          component: require('./src/content/monitoring/Monitorings'),
-          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ]
-        },
-        {
           path: 'monitoring-results',
           component: require('./src/content/monitoring/MonitoringResults'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORINGRESULT_READ'] } ]
@@ -650,6 +645,23 @@ module.exports = {
           component: require('./src/content/monitoring/MonitoringResults'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORINGRESULT_READ'] } ]
         }
+      ]
+    },
+    {
+      path: 'monitoring/monitorings/:entityId',
+      component: require('./src/content/monitoring/MonitoringDetailRoutes'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ],
+      childRoutes: [
+        {
+          path: 'detail',
+          component: require('./src/content/monitoring/MonitoringDetail'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['MONITORING_READ'] } ]
+        },
+        {
+          path: 'results',
+          component: require('./src/content/monitoring/MonitoringDetailResults'),
+          access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['MONITORING_READ', 'MONITORINGRESULT_READ'] } ]
+        },
       ]
     },
     {

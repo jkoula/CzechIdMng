@@ -3,6 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import Joi from 'joi';
+import uuid from 'uuid';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
@@ -117,6 +118,14 @@ export class MonitoringTable extends Advanced.AbstractTableContent {
   }
 
   showDetail(entity) {
+    if (entity.id === undefined) {
+      this.context.history.push(`/monitoring/monitorings/${ uuid.v1() }/detail?new=1`);
+    } else {
+      this.context.history.push(`/monitoring/monitorings/${ encodeURIComponent(entity.id) }/detail`);
+    }
+  }
+
+  _showDetail(entity) {
     const { supportedEvaluators } = this.props;
     //
     if (!Utils.Entity.isNew(entity)) {

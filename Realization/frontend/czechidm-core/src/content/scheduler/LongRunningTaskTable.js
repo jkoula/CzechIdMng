@@ -16,7 +16,7 @@ import {
 const schedulerManager = new SchedulerManager();
 
 /**
- * Table with long running tasks
+ * Table with long running tasks.
  *
  * @author Radek Tomiška
  */
@@ -68,7 +68,7 @@ class LongRunningTaskTable extends Advanced.AbstractTableContent {
    * Shows LRT detail with given entity
    */
   showDetail(entity) {
-    this.context.history.push(`/scheduler/all-tasks/${encodeURIComponent(entity.id)}/detail`);
+    this.context.history.push(`/scheduler/all-tasks/${ encodeURIComponent(entity.id) }/detail`);
   }
 
   /**

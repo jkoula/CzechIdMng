@@ -116,6 +116,11 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
    * Open modal with report's select
    */
   loadDetail(entity) {
+    const { location } = this.props;
+    //
+    if (!location || location.pathname !== `/monitoring/monitoring-results/${ entity.id }`) {
+      return;
+    }
     // reload Entity
     this.setState({
       detail: {
@@ -179,6 +184,8 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
       }
     }
     //
+    const textDisabled = forceSearchParameters && forceSearchParameters.getFilters().has('monitoring');
+    //
     return (
       <Basic.Div>
 
@@ -201,7 +208,7 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                   </Basic.Col>
                 </Basic.Row>
                 <Basic.Row className="last">
-                  <Basic.Col lg={ 6 }>
+                  <Basic.Col lg={ 6 } rendered={ !textDisabled }>
                     <Advanced.Filter.TextField
                       ref="text"
                       placeholder={ this.i18n('filter.text.placeholder') }
@@ -224,6 +231,7 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                       ]}
                       clearable={ false }/>
                   </Basic.Col>
+                  <Basic.Col lg={ 6 } rendered={ textDisabled }/>
                 </Basic.Row>
               </Basic.AbstractForm>
             </Advanced.Filter>

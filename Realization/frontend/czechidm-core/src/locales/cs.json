@@ -1560,7 +1560,8 @@
         }
       },
       "edit": {
-        "header": "{{name}} <small>detail konfigurace monitoringu</small>"
+        "header": "{{name}} <small>detail konfigurace monitoringu</small>",
+        "title": "Detail konfigurace monitoringu"
       },
       "create": {
         "header": "Nová konfigurace monitoringu"
