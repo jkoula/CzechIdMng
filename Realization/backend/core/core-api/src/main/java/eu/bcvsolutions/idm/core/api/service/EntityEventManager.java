@@ -174,10 +174,10 @@ public interface EntityEventManager extends ScriptEnabled {
 	 * 
 	 * 
 	 * @param owner can be different than original event content (e.g. original event is for contract, but change is registered for identity)
-	 * @param originalEvent original event
+	 * @param parentEvent parent event
 	 * @since 8.0.0
 	 */
-	<E extends Identifiable> void changedEntity(E owner, EntityEvent<? extends Identifiable> originalEvent);
+	<E extends Identifiable> void changedEntity(E owner, EntityEvent<? extends Identifiable> parentEvent);
 	
 	/**
 	 * Publish entity changed event.
@@ -194,13 +194,13 @@ public interface EntityEventManager extends ScriptEnabled {
 	 * 
 	 * @param ownerType can be different than original event content type (e.g. original event is for contract, but change is on identity)
 	 * @param ownerId
-	 * @param originalEvent original event
+	 * @param parentEvent parent event
 	 * @since 8.0.0
 	 */
 	void changedEntity(
 			Class<? extends Identifiable> ownerType, 
 			UUID ownerId, 
-			EntityEvent<? extends Identifiable> originalEvent);
+			EntityEvent<? extends Identifiable> parentEvent);
 	
 	/**
 	 * Owner type has to be entity class - dto instance can be given.

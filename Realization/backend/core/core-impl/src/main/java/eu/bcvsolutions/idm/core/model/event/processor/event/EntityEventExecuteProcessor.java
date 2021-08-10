@@ -50,7 +50,8 @@ public class EntityEventExecuteProcessor extends CoreEventProcessor<IdmEntityEve
 			resurectedEvent = entityEventManager.toEvent(entityEvent);
 			// execute
 			EventContext<? extends Identifiable> context = entityEventManager.process(resurectedEvent);
-			entityEvent.setContent(context.getContent()); // use current processed content
+			entityEvent.setContent(context.getContent()); // use currently processed content
+			entityEvent.setOriginalSource(resurectedEvent.getOriginalSource()); // use currently processed original source
 			entityEvent.setProcessedOrder(context.getProcessedOrder());
 			entityEvent.setResult(new OperationResultDto.Builder(OperationState.EXECUTED).build());
 			//

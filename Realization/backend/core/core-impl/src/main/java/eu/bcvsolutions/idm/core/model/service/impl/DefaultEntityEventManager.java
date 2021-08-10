@@ -420,13 +420,13 @@ public class DefaultEntityEventManager implements EntityEventManager {
 	}
 	
 	@Override
-	public <E extends Identifiable> void changedEntity(E owner, EntityEvent<? extends Identifiable> originalEvent) {
+	public <E extends Identifiable> void changedEntity(E owner, EntityEvent<? extends Identifiable> parentEvent) {
 		Assert.notNull(owner, "Owner is needed for publish is changed event.");
 		//
-		IdmEntityEventDto notifyEvent = prepareEvent(owner, originalEvent);
+		IdmEntityEventDto notifyEvent = prepareEvent(owner, parentEvent);
 		notifyEvent.setEventType(CoreEventType.NOTIFY.name());
 		//
-		publishNotify(notifyEvent, originalEvent);
+		publishNotify(notifyEvent, parentEvent);
 	}
 	
 	@Override
@@ -438,11 +438,11 @@ public class DefaultEntityEventManager implements EntityEventManager {
 	public void changedEntity(
 			Class<? extends Identifiable> ownerType, 
 			UUID ownerId, 
-			EntityEvent<? extends Identifiable> originalEvent) {
-		IdmEntityEventDto notifyEvent = prepareEvent(ownerType, ownerId, originalEvent);
+			EntityEvent<? extends Identifiable> parentEvent) {
+		IdmEntityEventDto notifyEvent = prepareEvent(ownerType, ownerId, parentEvent);
 		notifyEvent.setEventType(CoreEventType.NOTIFY.name());
 		//
-		publishNotify(notifyEvent, originalEvent);
+		publishNotify(notifyEvent, parentEvent);
 	}
 	
 	/**
@@ -841,7 +841,15 @@ public class DefaultEntityEventManager implements EntityEventManager {
 		initContext.setProcessedOrder(entityEvent.getProcessedOrder());
 		EventType eventType = (EventType) () -> type;
 		EntityEvent<Identifiable> resurectedEvent = new CoreEvent<>(eventType, content, eventProperties, initContext);
-		resurectedEvent.setOriginalSource(entityEvent.getOriginalSource());
+		
+		//
+		// prevent to mix content and original source types between new and parent event
+		Identifiable originalSource = entityEvent.getOriginalSource();
+		if (originalSource != null && !originalSource.getClass().equals(content.getClass())) {
+			resurectedEvent.setOriginalSource(content); // preset original source by current content -> content is already persisted in NOFIFY event
+		} else {
+			resurectedEvent.setOriginalSource(originalSource);
+		}
 		//
 		return resurectedEvent;
 	}
@@ -904,11 +912,11 @@ public class DefaultEntityEventManager implements EntityEventManager {
 	}
 
 	@Override
-	public IdmEntityEventDto prepareEvent(Identifiable owner, EntityEvent<? extends Identifiable> originalEvent) {
+	public IdmEntityEventDto prepareEvent(Identifiable owner, EntityEvent<? extends Identifiable> parentEvent) {
 		Assert.notNull(owner, "Owner is required.");
 		Assert.notNull(owner.getId(), "Change can be published after entity id is assigned at least.");
 		//
-		IdmEntityEventDto event = prepareEvent(owner.getClass(), lookupService.getOwnerId(owner), originalEvent);
+		IdmEntityEventDto event = prepareEvent(owner.getClass(), lookupService.getOwnerId(owner), parentEvent);
 		event.setContent(owner);
 		//
 		return event;
@@ -1327,6 +1335,7 @@ public class DefaultEntityEventManager implements EntityEventManager {
 		copiedProperies.remove(EntityEvent.EVENT_PROPERTY_PARENT_EVENT_TYPE);
 		copiedProperies.remove(EntityEvent.EVENT_PROPERTY_ROOT_EVENT_ID);
 		copiedProperies.remove(EntityEvent.EVENT_PROPERTY_PERMISSION);
+		copiedProperies.remove(EntityEvent.EVENT_PROPERTY_ORIGINAL_SOURCE); // prevent to mix up contents with different types
 		//
 		return copiedProperies;
 	}
@@ -1402,19 +1411,19 @@ public class DefaultEntityEventManager implements EntityEventManager {
 		return true;
 	}
 	
-	private IdmEntityEventDto prepareEvent(Class<? extends Identifiable> ownerType, UUID ownerId, EntityEvent<? extends Identifiable> originalEvent) {
+	private IdmEntityEventDto prepareEvent(Class<? extends Identifiable> ownerType, UUID ownerId, EntityEvent<? extends Identifiable> parentEvent) {
 		Assert.notNull(ownerType, "Owner type is required.");
 		Assert.notNull(ownerId, "Change can be published after entity id is assigned at least.");
 		//
-		IdmEntityEventDto savedEvent = toDto(originalEvent);
+		IdmEntityEventDto savedEvent = toDto(parentEvent);
 		savedEvent.setId(null);
 		savedEvent.setOwnerId(ownerId);
 		savedEvent.setOwnerType(getOwnerType(ownerType));
 		//
-		if (originalEvent != null) {
-			savedEvent.setParent(originalEvent.getId());
-			savedEvent.setRootId(originalEvent.getRootId() == null ? originalEvent.getId() : originalEvent.getRootId());
-			savedEvent.setParentEventType(originalEvent.getType().name());
+		if (parentEvent != null) {
+			savedEvent.setParent(parentEvent.getId());
+			savedEvent.setRootId(parentEvent.getRootId() == null ? parentEvent.getId() : parentEvent.getRootId());
+			savedEvent.setParentEventType(parentEvent.getType().name());
 		} else {
 			// notify as default event type
 			savedEvent.setEventType(CoreEventType.NOTIFY.name());

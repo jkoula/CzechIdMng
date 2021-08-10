@@ -29,6 +29,7 @@ import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.EntityEventProcessorDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -60,8 +61,11 @@ import eu.bcvsolutions.idm.core.event.TestContentTwo;
 import eu.bcvsolutions.idm.core.event.TestEntityEventProcessorConfiguration;
 import eu.bcvsolutions.idm.core.event.domain.MockDto;
 import eu.bcvsolutions.idm.core.event.domain.MockOwner;
+import eu.bcvsolutions.idm.core.model.event.IdentityContractEvent;
+import eu.bcvsolutions.idm.core.model.event.IdentityContractEvent.IdentityContractEventType;
 import eu.bcvsolutions.idm.core.model.event.IdentityEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityEvent.IdentityEventType;
+import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.EntityGenerateValuesProcessor;
 import eu.bcvsolutions.idm.core.model.event.processor.NeverEndingProcessor;
@@ -72,7 +76,7 @@ import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Entity events integration tests
+ * Entity events integration tests.
  * 
  * @author Radek Tomiška
  *
@@ -223,6 +227,43 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 		assertEquals(updateIdentity.getUsername(), savedIdentity.getUsername());
 		assertEquals(updateIdentity.getFirstName(), savedIdentity.getFirstName());
 		assertEquals(updateIdentity.getLastName(), savedIdentity.getLastName());
+	}
+	
+	@Test 
+	public void testOriginalSourceWithNotifyOnDifferentType() {
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityContractDto contract = getHelper().getPrimeContract(identity);
+		//
+		IdmEntityEventFilter eventFilter = new IdmEntityEventFilter();
+		eventFilter.setOwnerType(manager.getOwnerType(identity));
+		eventFilter.setOwnerId(identity.getId());
+		manager.findEvents(eventFilter, null).forEach(entityEvent -> {
+			manager.deleteEvent(entityEvent);
+		});
+		//
+		try {
+			getHelper().enableAsynchronousProcessing();
+			//
+			EntityEvent<IdmIdentityContractDto> event = new IdentityContractEvent(IdentityContractEventType.UPDATE, contract);
+			event.setOriginalSource(contract);
+			manager.changedEntity(identity.getClass(), identity.getId(), event);
+			//
+			eventFilter.setEventType(IdentityEventType.NOTIFY.name());
+			eventFilter.setStates(Lists.newArrayList(OperationState.EXECUTED));
+			getHelper().waitForResult(res -> {
+				return manager.findEvents(eventFilter, null).getContent().isEmpty();
+			});
+			//
+			manager
+				.findEvents(eventFilter, null)
+				.stream()
+				.allMatch(entityEvent -> {
+					return entityEvent.getContent().getId().equals(identity.getId()) 
+							&& entityEvent.getOriginalSource().getId().equals(identity.getId());
+				});
+		} finally {
+			getHelper().disableAsynchronousProcessing();
+		}
 	}
 	
 	@Test 
@@ -737,11 +778,11 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			//
 			getHelper().enableAsynchronousProcessing();
 			getHelper().executeRequest(request, true, false);
-			
+			//
+			// created roles 
 			getHelper().waitForResult(res -> {
 				return identityRoleService.findValidRoles(identity.getId(), null).getContent().isEmpty();
 			}, 500, 20);
-			// created roles 
 			List<IdmIdentityRoleDto> assignedRoles = identityRoleService.findValidRoles(identity.getId(), null).getContent();
 			Assert.assertEquals(1, assignedRoles.size());
 			//
@@ -749,13 +790,16 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			IdmEntityEventFilter filter = new IdmEntityEventFilter();
 			filter.setOwnerId(request.getId());
 			filter.setEventType(RoleRequestEventType.NOTIFY.name());
+			getHelper().waitForResult(res -> {
+				return entityEventService.find(filter, null).getContent().isEmpty();
+			}, 500, 20);
 			List<IdmEntityEventDto> events = entityEventService.find(filter, null).getContent();
 			Assert.assertEquals(1, events.size());
 			Assert.assertEquals(transactionId, events.get(0).getTransactionId());
 			Assert.assertEquals(identity.getId(), events.get(0).getSuperOwnerId());
 			//
 			filter.setOwnerId(assignedRoles.get(0).getId());
-			filter.setEventType(RoleRequestEventType.CREATE.name());
+			filter.setEventType(IdentityRoleEventType.CREATE.name());
 			events = entityEventService.find(filter, null).getContent();
 			Assert.assertEquals(1, events.size());
 			Assert.assertEquals(transactionId, events.get(0).getTransactionId());

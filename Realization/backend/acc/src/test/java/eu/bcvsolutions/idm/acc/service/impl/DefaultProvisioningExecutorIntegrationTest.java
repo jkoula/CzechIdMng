@@ -736,6 +736,9 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 			// check archive is executed
 			SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 			filter.setEntityIdentifier(identity.getId());
+			getHelper().waitForResult(res -> {
+				return provisioningArchiveService.find(filter, null).getContent().isEmpty();
+			});
 			List<SysProvisioningArchiveDto> archives = provisioningArchiveService.find(filter, null).getContent();
 			Assert.assertFalse(archives.isEmpty());
 			Assert.assertTrue(archives.stream().allMatch(a -> a.getResultState().isSuccessful()));
