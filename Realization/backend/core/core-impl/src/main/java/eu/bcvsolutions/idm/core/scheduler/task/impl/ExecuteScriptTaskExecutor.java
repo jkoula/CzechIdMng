@@ -33,7 +33,7 @@ public class ExecuteScriptTaskExecutor extends AbstractSchedulableTaskExecutor<B
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ExecuteScriptTaskExecutor.class);
 	public static final String TASK_NAME = "core-execute-script-long-running-task";
-	private static String PARAMETER_SCRIPT_CODE = "scriptCode";
+	public static final String PARAMETER_SCRIPT_CODE = "scriptCode";
 	private String scriptCode;
 
 	@Autowired
