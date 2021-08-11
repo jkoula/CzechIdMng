@@ -59,4 +59,28 @@ export default class MonitoringResultService extends AbstractService {
         return json;
       });
   }
+
+  /**
+   * Executes related monitoring with the same setting as result again.
+   *
+   * @param  {string} id
+   * @return {promise}
+   * @since 11.2.0
+   */
+  execute(id) {
+    return RestApiService
+      .put(`${ this.getApiPath() }/${ id }/execute`)
+      .then(response => {
+        if (response.status === 204) {
+          return {};
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        return json;
+      });
+  }
 }

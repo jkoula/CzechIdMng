@@ -1,6 +1,11 @@
 package eu.bcvsolutions.idm.core.monitoring.rest;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,6 +31,7 @@ import eu.bcvsolutions.idm.core.monitoring.service.impl.H2DatabaseMonitoringEval
 import eu.bcvsolutions.idm.core.monitoring.service.impl.TestMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
+import eu.bcvsolutions.idm.test.api.TestHelper;
 
 /**
  * Controller tests
@@ -174,5 +180,31 @@ public class IdmMonitoringResultControllerRestTest extends AbstractReadWriteDtoC
 		Assert.assertEquals(1, results.size());
 		Assert.assertEquals(1, lastResults.size());
 		Assert.assertEquals(lastResults.get(0).getId(), results.get(0).getId());
+	}
+	
+	@Test
+	public void testExecute() throws Exception {
+		IdmMonitoringDto monitoring = new IdmMonitoringDto();
+		monitoring.setCheckPeriod(0L);
+		monitoring.setEvaluatorType(AutowireHelper.getTargetType(h2DatabaseMonitoringEvaluator));
+		monitoring.setInstanceId(configurationService.getInstanceId());
+		monitoring =  monitoringService.save(monitoring);
+		//
+		IdmMonitoringResultDto dto = new IdmMonitoringResultDto();
+		dto.setMonitoring(monitoring.getId());
+		dto.setEvaluatorType(AutowireHelper.getTargetType(h2DatabaseMonitoringEvaluator));
+		dto.setInstanceId(configurationService.getInstanceId());
+		dto.setResult(new OperationResultDto(OperationState.BLOCKED));
+		dto = monitoringResultService.save(dto);
+		//
+		getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(dto.getId())))
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isNoContent());
+		//
+		getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(UUID.randomUUID())))
+        		.with(authentication(getAdminAuthentication()))
+                .contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isNotFound());
 	}
 }

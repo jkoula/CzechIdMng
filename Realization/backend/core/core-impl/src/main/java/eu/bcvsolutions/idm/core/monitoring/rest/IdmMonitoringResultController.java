@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -33,12 +34,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.google.common.collect.ImmutableMap;
+
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -48,10 +53,12 @@ import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.service.api.CheckLongPollingResult;
 import eu.bcvsolutions.idm.core.model.service.api.LongPollingManager;
 import eu.bcvsolutions.idm.core.monitoring.api.domain.MonitoringGroupPermission;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringResultFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringResultService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
+import eu.bcvsolutions.idm.core.monitoring.entity.IdmMonitoringResult_;
 import eu.bcvsolutions.idm.core.rest.DeferredResultWrapper;
 import eu.bcvsolutions.idm.core.rest.LongPollingSubscriber;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -482,6 +489,40 @@ public class IdmMonitoringResultController extends AbstractEventableDtoControlle
 	@Scheduled(fixedDelay = 2000)
 	public synchronized void checkDeferredRequests() {
 		longPollingManager.checkDeferredRequests(IdmMonitoringResultDto.class);
+	}
+	
+	/**
+	 * Execute related monitoring evaluator with setting from result again synchronously.
+	 * 
+	 * @since 11.2.0
+	 */
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.PUT, value = "/{backendId}/execute")
+	@PreAuthorize("hasAuthority('" + MonitoringGroupPermission.MONITORINGRESULT_EXECUTE + "')")
+	@ApiOperation(
+			value = "Execute monitoring evaluator",
+			nickname = "executeMonitoring",
+			tags={ IdmMonitoringController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORINGRESULT_EXECUTE, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORINGRESULT_EXECUTE, description = "") })
+			},
+			notes = "Execute related monitoring evaluator with setting from result again synchronously..")
+	public ResponseEntity<?> execute(
+			@ApiParam(value = "Monitoring result identifier.", required = true)
+			@PathVariable @NotNull String backendId) {
+		IdmMonitoringResultDto monitoringResult = getDto(backendId);
+		if (monitoringResult == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		IdmMonitoringDto monitoring = getLookupService().lookupEmbeddedDto(monitoringResult, IdmMonitoringResult_.monitoring);
+		//
+		monitoring.setEvaluatorProperties(monitoringResult.getEvaluatorProperties());
+		monitoringManager.execute(monitoring, IdmBasePermission.EXECUTE);
+		// TODO: return current result (last result is not precise) ...
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	/**

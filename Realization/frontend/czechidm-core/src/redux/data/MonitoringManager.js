@@ -83,6 +83,34 @@ export default class MonitoringManager extends EntityManager {
       }
     };
   }
+
+  /**
+   * Execute given monitoring again.
+   *
+   * @param  {string}   id
+   * @param  {string}   uiKey
+   * @param  {Function} cb
+   * @return {action}
+   * @since 11.2.0
+   */
+  execute(id, uiKey, cb) {
+    return (dispatch) => {
+      uiKey = this.resolveUiKey(uiKey, id);
+      console.log('sssssss', uiKey);
+      //
+      dispatch(this.dataManager.requestData(uiKey));
+      this.getService().execute(id)
+        .then(() => {
+          dispatch(this.dataManager.stopRequest(uiKey));
+          if (cb) {
+            cb();
+          }
+        })
+        .catch(error => {
+          dispatch(this.dataManager.receiveError(null, uiKey, error));
+        });
+    };
+  }
 }
 
 MonitoringManager.UI_KEY_SUPPORTED_EVALUATORS = 'authorization-supported-evaluators';

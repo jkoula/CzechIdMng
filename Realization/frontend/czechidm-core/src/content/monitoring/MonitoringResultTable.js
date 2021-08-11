@@ -142,6 +142,12 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
     });
   }
 
+  showDetail(entity, cb) {
+    this.context.store.dispatch(manager.fetchPermissions(entity.id, `${ this.getUiKey() }-detail`));
+    //
+    super.showDetail(entity, cb);
+  }
+
   closeDetail() {
     this.setState({
       detail: {
@@ -157,6 +163,36 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
     });
   }
 
+  onExecute(monitoringResult, event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.refs['confirm-execute'].show(
+      this.i18n(
+        `action.execute.message`,
+        { count: 1, record: monitoringManager.getNiceLabel(monitoringResult, this.props.supportedEvaluators) }
+      ),
+      this.i18n(`action.execute.header`, { count: 1 })
+    ).then(() => {
+      this.context.store.dispatch(manager.execute(monitoringResult.id, `${ this.getUiKey() }-detail`, (entity, error) => {
+        if (error) {
+          this.addError(error);
+        } else {
+          this.closeDetail();
+          this.addMessage({
+            level: 'success',
+            message: this.i18n(`action.execute.success`, {
+              count: 1, record: monitoringManager.getNiceLabel(monitoringResult, this.props.supportedEvaluators)
+            })
+          });
+          this.refs.table.reload();
+        }
+      }));
+    }, () => {
+      // nothing
+    });
+  }
+
   render() {
     const {
       columns,
@@ -168,7 +204,8 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
       showFilter,
       showToolbar,
       showRowSelection,
-      _showLoading
+      showLoading,
+      _permissions
     } = this.props;
     const { filterOpened, detail } = this.state;
     //
@@ -188,6 +225,7 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
     //
     return (
       <Basic.Div>
+        <Basic.Confirm ref="confirm-execute" level="success" />
 
         <Advanced.Table
           ref="table"
@@ -301,7 +339,13 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
             rendered={ _.includes(columns, 'evaluatorType') }
             cell={
               ({ rowIndex, data }) => (
-                <Advanced.LongRunningTaskName entity={ data[rowIndex] } supportedTasks={ supportedEvaluators } showIcon={ false }/>
+                <Advanced.EntityInfo
+                  entityType="monitoring"
+                  entityIdentifier={ data[rowIndex].monitoring }
+                  entity={ data[rowIndex]._embedded.monitoring }
+                  face="popover"
+                  showIcon
+                  supportedTasks={ supportedEvaluators } />
               )
             }/>
           <Advanced.Column
@@ -365,7 +409,7 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
           bsSize="large"
           show={ detail.show }
           onHide={ this.closeDetail.bind(this) }
-          showLoading={ _showLoading }
+          showLoading={ showLoading }
           backdrop="static">
           <Basic.Modal.Header closeButton text={ this.i18n('edit.header') }/>
           <Basic.Modal.Body style={{ paddingTop: 0 }}>
@@ -392,9 +436,15 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                     </Basic.LabelWrapper>
                   }
 
-                  <Basic.LabelWrapper label={ this.i18n('entity.MonitoringResult.evaluatorType.label') }>
-                    <span title={ detail.entity.evaluatorType }>
-                      <Advanced.LongRunningTaskName entity={ detail.entity } supportedTasks={ supportedEvaluators } showIcon={ false }/>
+                  <Basic.LabelWrapper label={ this.i18n('entity.MonitoringResult.evaluatorType.label') } title={ detail.entity.evaluatorType }>
+                    <span>
+                      <Advanced.EntityInfo
+                        entityType="monitoring"
+                        entityIdentifier={ detail.entity.monitoring }
+                        entity={ detail.entity._embedded ? detail.entity._embedded.monitoring : null }
+                        face="popover"
+                        showIcon
+                        supportedTasks={ supportedEvaluators } />
                     </span>
                   </Basic.LabelWrapper>
 
@@ -470,6 +520,17 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
               onClick={ this.closeDetail.bind(this) }>
               { this.i18n('button.close') }
             </Basic.Button>
+            <Basic.Button
+              icon="play"
+              level="default"
+              onClick={ this.onExecute.bind(this, detail.entity) }
+              title={ this.i18n('eav.bulk-action.core-monitoring-result-run-bulk-action.help') }
+              titlePlacement="bottom"
+              rendered={ !Utils.Entity.isNew(detail.entity) && manager.canExecute(detail.entity, _permissions) }
+              showLoading={ showLoading }
+              style={{ marginRight: 3 }}>
+              { this.i18n('eav.bulk-action.core-monitoring-run-bulk-action.label') }
+            </Basic.Button>
           </Basic.Modal.Footer>
         </Basic.Modal>
       </Basic.Div>
@@ -505,9 +566,10 @@ MonitoringResultTable.defaultProps = {
 function select(state, component) {
   return {
     supportedEvaluators: DataManager.getData(state, MonitoringManager.UI_KEY_SUPPORTED_EVALUATORS),
-    _showLoading: Utils.Ui.isShowLoading(state, `${ component.uiKey }-detail`)
+    showLoading: Utils.Ui.isShowLoading(state, `${ component.uiKey }-detail`)
       || Utils.Ui.isShowLoading(state, MonitoringManager.UI_KEY_SUPPORTED_EVALUATORS),
-    _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey)
+    _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey),
+    _permissions: Utils.Permission.getPermissions(state, `${ component.uiKey }-detail`)
   };
 }
 

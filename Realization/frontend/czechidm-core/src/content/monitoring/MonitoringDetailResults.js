@@ -41,7 +41,7 @@ export default class MonitoringDetailResults extends Basic.AbstractContent {
           filterOpened={ false }
           history={ this.context.history }
           location={ this.props.location }
-          columns={ ['result', 'created', 'owner', 'value', 'instanceId'] }
+          columns={ ['result', 'created', 'evaluatorProperties', 'owner', 'value', 'instanceId'] }
           match={ this.props.match }
           uiKey={ `monitoring-detail-result-table-${ this.props.match.params.entityId }` }
           forceSearchParameters={ forceSearchParameters }

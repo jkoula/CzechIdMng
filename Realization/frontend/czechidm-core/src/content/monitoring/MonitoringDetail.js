@@ -147,6 +147,29 @@ class MonitoringDetail extends Basic.AbstractContent {
     };
   }
 
+  onExecute(monitoring, event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this.refs['confirm-execute'].show(
+      this.i18n(`action.execute.message`, { count: 1, record: manager.getNiceLabel(monitoring, this.props.supportedEvaluators) }),
+      this.i18n(`action.execute.header`, { count: 1 })
+    ).then(() => {
+      this.context.store.dispatch(manager.execute(monitoring.id, null, (entity, error) => {
+        if (error) {
+          this.addError(error);
+        } else {
+          this.addMessage({
+            level: 'success',
+            message: this.i18n(`action.execute.success`, { count: 1, record: manager.getNiceLabel(monitoring, this.props.supportedEvaluators) })
+          });
+        }
+      }));
+    }, () => {
+      // nothing
+    });
+  }
+
   render() {
     const { entity, showLoading, _permissions } = this.props;
     const { evaluatorType } = this.state;
@@ -160,6 +183,8 @@ class MonitoringDetail extends Basic.AbstractContent {
     //
     return (
       <Basic.Div>
+        <Basic.Confirm ref="confirm-execute" level="success" />
+
         <form onSubmit={ this.save.bind(this) }>
           <Basic.Panel className={ Utils.Entity.isNew(entity) ? '' : 'no-border last' }>
             {
@@ -243,6 +268,17 @@ class MonitoringDetail extends Basic.AbstractContent {
             <Basic.PanelFooter showLoading={ showLoading } >
               <Basic.Button type="button" level="link" onClick={ this.context.history.goBack }>
                 { this.i18n('button.back') }
+              </Basic.Button>
+              <Basic.Button
+                icon="play"
+                level="default"
+                onClick={ this.onExecute.bind(this, entity) }
+                title={ this.i18n('eav.bulk-action.core-monitoring-run-bulk-action.help') }
+                titlePlacement="bottom"
+                rendered={ !Utils.Entity.isNew(entity) && manager.canExecute(entity, _permissions) }
+                showLoading={ showLoading }
+                style={{ marginRight: 3 }}>
+                { this.i18n('eav.bulk-action.core-monitoring-run-bulk-action.label') }
               </Basic.Button>
               <Basic.Button
                 type="submit"

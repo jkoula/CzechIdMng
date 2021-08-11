@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -25,9 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.ImmutableMap;
+
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -39,6 +44,7 @@ import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -360,6 +366,37 @@ public class IdmMonitoringController extends AbstractEventableDtoController<IdmM
 		return new Resources<>(monitoringManager.getSupportedEvaluators());
 	}
 	
+	/**
+	 * Execute monitoring evaluator synchronously.
+	 * 
+	 * @since 11.2.0
+	 */
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.PUT, value = "/{backendId}/execute")
+	@PreAuthorize("hasAuthority('" + MonitoringGroupPermission.MONITORING_EXECUTE + "')")
+	@ApiOperation(
+			value = "Execute monitoring evaluator",
+			nickname = "executeMonitoring",
+			tags={ IdmMonitoringController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORING_EXECUTE, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORING_EXECUTE, description = "") })
+			},
+			notes = "Execute monitoring evaluator synchronously.")
+	public ResponseEntity<?> execute(
+			@ApiParam(value = "Monitoring codeable identifier.", required = true)
+			@PathVariable @NotNull String backendId) {
+		IdmMonitoringDto monitoring = getDto(backendId);
+		if (monitoring == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		monitoringManager.execute(monitoring, IdmBasePermission.EXECUTE);
+		// TODO: return current result (last result is not precise) ...
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@Override
 	public Page<IdmMonitoringDto> find(IdmMonitoringFilter filter, Pageable pageable, BasePermission permission) {
 		Page<IdmMonitoringDto> results = super.find(filter, pageable, permission);

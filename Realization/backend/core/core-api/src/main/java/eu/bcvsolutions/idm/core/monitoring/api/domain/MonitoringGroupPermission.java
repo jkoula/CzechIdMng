@@ -32,7 +32,8 @@ public enum MonitoringGroupPermission implements GroupPermission {
 			IdmBasePermission.READ, 
 			IdmBasePermission.CREATE, 
 			IdmBasePermission.UPDATE, 
-			IdmBasePermission.DELETE);
+			IdmBasePermission.DELETE,
+			IdmBasePermission.EXECUTE);
 	
 	// String constants could be used in pre / post authotize SpEl expressions
 	
@@ -50,6 +51,7 @@ public enum MonitoringGroupPermission implements GroupPermission {
 	public static final String MONITORINGRESULT_CREATE = "MONITORINGRESULT" + BasePermission.SEPARATOR + "CREATE";
 	public static final String MONITORINGRESULT_UPDATE = "MONITORINGRESULT" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String MONITORINGRESULT_DELETE = "MONITORINGRESULT" + BasePermission.SEPARATOR + "DELETE";
+	public static final String MONITORINGRESULT_EXECUTE = "MONITORINGRESULT" + BasePermission.SEPARATOR + "EXECUTE";
 	
 	private final List<BasePermission> permissions;
 

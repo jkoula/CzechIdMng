@@ -1531,6 +1531,13 @@
       },
       "tabs": {
         "basic": "Basic information"
+      },
+      "action": {
+        "execute": {
+          "header": "Run monitoring",
+          "message": "Do you want to run selected monitoring [<strong>{{record}}</strong>]?",
+          "success": "Monitoring [{{record}}] successfully ran."
+        }
       }
     },
     "monitoring-results": {
@@ -1551,6 +1558,13 @@
       },
       "tabs": {
         "basic": "Basic information"
+      },
+      "action": {
+        "execute": {
+          "header": "Run monitoring again",
+          "message": "Do you want to run selected monitoring [<strong>{{record}}</strong>] again with the same settings?",
+          "success": "Monitoring [{{record}}] successfully ran."
+        }
       }
     },
     "tasks-summary": {
@@ -6541,6 +6555,11 @@
       "core-monitoring-run-bulk-action": {
         "label": "Run monitoring",
         "help": "Execute selected monitoring settings.",
+        "icon": "play"
+      },
+      "core-monitoring-result-run-bulk-action": {
+        "label": "Run monitoring again",
+        "help": "Execute monitoring again with the same settings.",
         "icon": "play"
       },
       "core-monitoring-delete-bulk-action": {

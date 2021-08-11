@@ -1571,6 +1571,13 @@
       },
       "tabs": {
         "basic": "Základní informace"
+      },
+      "action": {
+        "execute": {
+          "header": "Spustit monitoring",
+          "message": "Chcete spustit vybraný monitoring [<strong>{{record}}</strong>]?",
+          "success": "Monitoring [{{record}}] byl úspěšně spuštěn."
+        }
       }
     },
     "monitoring-results": {
@@ -1591,6 +1598,13 @@
       },
       "tabs": {
         "basic": "Základní informace"
+      },
+      "action": {
+        "execute": {
+          "header": "Spustit monitoring znovu",
+          "message": "Chcete spustit vybraný monitoring [<strong>{{record}}</strong>] znovu se stejným nastavením?",
+          "success": "Monitoring [{{record}}] byl úspěšně spuštěn."
+        }
       }
     },
     "tasks-summary": {
@@ -6593,6 +6607,11 @@
       "core-monitoring-run-bulk-action": {
         "label": "Spustit monitoring",
         "help": "Spustí vybraná nastavení monitoringu.",
+        "icon": "play"
+      },
+      "core-monitoring-result-run-bulk-action": {
+        "label": "Spustit monitoring znovu",
+        "help": "Spustí monitoring znovu se stejným nastavením.",
         "icon": "play"
       },
       "core-monitoring-delete-bulk-action": {

@@ -36,6 +36,31 @@ export default class MonitoringResultManager extends EntityManager {
       ));
     };
   }
+
+  /**
+   * Executes related monitoring with the same setting as result again.
+   *
+   * @param  {string}   id
+   * @param  {string}   uiKey
+   * @param  {Function} cb
+   * @return {action}
+   * @since 11.2.0
+   */
+  execute(id, uiKey, cb) {
+    return (dispatch) => {
+      dispatch(this.dataManager.requestData(uiKey));
+      this.getService().execute(id)
+        .then(() => {
+          dispatch(this.dataManager.stopRequest(uiKey));
+          if (cb) {
+            cb();
+          }
+        })
+        .catch(error => {
+          dispatch(this.dataManager.receiveError(null, uiKey, error));
+        });
+    };
+  }
 }
 
 MonitoringResultManager.UI_KEY_LAST_MONITORING_RESULTS = 'navigation-last-monitoring-results';
