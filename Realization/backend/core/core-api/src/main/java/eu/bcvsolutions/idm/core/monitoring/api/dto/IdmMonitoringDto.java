@@ -11,11 +11,13 @@ import javax.validation.constraints.Size;
 
 import org.springframework.hateoas.core.Relation;
 
+import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Disableable;
 import eu.bcvsolutions.idm.core.api.domain.InstanceIdentifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Configured monitoring evaluator.
@@ -24,10 +26,13 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
  * @since 11.1.0
  */
 @Relation(collectionRelation = "monitorings")
-public class IdmMonitoringDto extends AbstractDto implements Disableable, InstanceIdentifiable {
+public class IdmMonitoringDto extends AbstractDto implements Disableable, InstanceIdentifiable, Codeable {
 
 	private static final long serialVersionUID = 1L;
 	//
+	@ApiModelProperty(required = true, notes = "Monitoring code.")
+    @Size(max = DefaultFieldLengths.NAME)
+    private String code;
 	@NotNull
 	private boolean disabled;
 	@Size(max = DefaultFieldLengths.DESCRIPTION)
@@ -49,6 +54,28 @@ public class IdmMonitoringDto extends AbstractDto implements Disableable, Instan
 
 	public IdmMonitoringDto(UUID id) {
 		super(id);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Monitoring codeable identifier.
+	 * 
+	 * @return unique code
+	 * @since 11.2.0
+	 */
+	@Override
+    public String getCode() {
+    	return code;
+    }
+    
+	/**
+	 * Monitoring codeable identifier.
+	 * 
+	 * @param code unique code
+	 */
+    public void setCode(String code) {
+		this.code = code;
 	}
 	
 	@Override

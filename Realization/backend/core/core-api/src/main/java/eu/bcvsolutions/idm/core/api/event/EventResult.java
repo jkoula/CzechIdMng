@@ -17,6 +17,13 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 public interface EventResult<E extends Serializable> extends Serializable {
 	
 	/**
+	 * Optional event result value in result model properties.
+	 * 
+	 * @since 11.2.0
+	 */
+	String EVENT_PROPERTY_RESULT = "idm:result";
+	
+	/**
 	 * Processed event
 	 * 
 	 * @return

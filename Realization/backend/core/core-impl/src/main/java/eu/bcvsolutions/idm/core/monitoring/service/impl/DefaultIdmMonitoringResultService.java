@@ -70,6 +70,7 @@ public class DefaultIdmMonitoringResultService
 		if (StringUtils.isNotEmpty(text)) {
 			text = text.toLowerCase();
 			predicates.add(builder.or(
+					builder.like(builder.lower(root.get(IdmMonitoringResult_.monitoring).get(IdmMonitoring_.code)), "%" + text + "%"),
 					builder.like(builder.lower(root.get(IdmMonitoringResult_.monitoring).get(IdmMonitoring_.evaluatorType)), "%" + text + "%"),
 					builder.like(builder.lower(root.get(IdmMonitoringResult_.monitoring).get(IdmMonitoring_.description)), "%" + text + "%")
 			));

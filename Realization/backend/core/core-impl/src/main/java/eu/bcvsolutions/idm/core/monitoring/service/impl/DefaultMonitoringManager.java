@@ -25,9 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.config.cache.domain.ValueWrapper;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModel;
+import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
+import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.exception.AcceptedException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
@@ -151,12 +155,23 @@ public class DefaultMonitoringManager implements MonitoringManager {
 	}
 	
 	@Override
-	public void execute(IdmMonitoringDto monitoring, BasePermission... permission) {
+	public IdmMonitoringResultDto execute(IdmMonitoringDto monitoring, BasePermission... permission) {
 		Assert.notNull(monitoring, "Monitoring is required.");
 		//
-		monitoringService
-				.publish(new MonitoringEvent(MonitoringEventType.EXECUTE, monitoring), permission)
-				.getContent();
+		EventContext<IdmMonitoringDto> context = monitoringService.publish(new MonitoringEvent(MonitoringEventType.EXECUTE, monitoring), permission);
+		// with result
+		for (EventResult<IdmMonitoringDto> eventResult : context.getResults()) {
+			for (OperationResult operationResult : eventResult.getResults()) {
+				ResultModel model = operationResult.getModel();
+				if (model != null 
+						&& CoreResultCode.MONITORING_RESULT.getCode().equals(model.getStatusEnum())
+						&& model.getParameters().containsKey(EventResult.EVENT_PROPERTY_RESULT)) {
+					return (IdmMonitoringResultDto) model.getParameters().get(EventResult.EVENT_PROPERTY_RESULT);
+				}
+			}
+		}
+		// without result (just for sure - e.g. wrong exception handling in custom monitoring evaluator)
+		return null;
 	}
 	
 	@Override
@@ -284,7 +299,7 @@ public class DefaultMonitoringManager implements MonitoringManager {
 				continue;
 			}
 			
-			IdmMonitoringResultDto lastResult = getLastResult(monitoring.getId());
+			IdmMonitoringResultDto lastResult = getLastResult(monitoring.getId(), permission);
 			if (lastResult == null) {
 				continue;
 			}
@@ -395,17 +410,17 @@ public class DefaultMonitoringManager implements MonitoringManager {
 	 * @param monitoringId monitoring evaluator identifier
 	 * @return last result
 	 */
-	private IdmMonitoringResultDto getLastResult(UUID monitoringId) {
+	private IdmMonitoringResultDto getLastResult(UUID monitoringId, BasePermission... permission) {
 		// try to get cached value
 		ValueWrapper value = cacheManager.getValue(LAST_RESULT_CACHE_NAME, monitoringId);
 		if (value != null) {
-			return (IdmMonitoringResultDto) value.get();
+			return monitoringResultService.checkAccess((IdmMonitoringResultDto) value.get(), permission);
 		}
 		// or load from database
 		IdmMonitoringResultFilter resultFilter = new IdmMonitoringResultFilter();
 		resultFilter.setMonitoring(monitoringId);
 		List<IdmMonitoringResultDto> monitoringResults = monitoringResultService
-			.find(resultFilter, PageRequest.of(0, 1, Sort.by(Direction.DESC, IdmMonitoringResult_.created.getName())))
+			.find(resultFilter, PageRequest.of(0, 1, Sort.by(Direction.DESC, IdmMonitoringResult_.created.getName())), permission)
 			.getContent();
 		if (monitoringResults.isEmpty()) {
 			cacheManager.cacheValue(LAST_RESULT_CACHE_NAME, monitoringId, null); // null => prevent to load again

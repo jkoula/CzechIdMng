@@ -1556,7 +1556,7 @@
       "title": "Nastavení monitoringu",
       "filter": {
         "text": {
-          "placeholder": "Typ vyhodnocení či popis"
+          "placeholder": "Typ, kód či popis"
         }
       },
       "edit": {
@@ -1585,7 +1585,7 @@
       "title": "Výsledky monitoringu",
       "filter": {
         "text": {
-          "placeholder": "Typ vyhodnocení či popis"
+          "placeholder": "Typ monitoringu, kód či popis"
         },
         "lastResult": {
           "placeholder": "Všechny výsledky monitoringu ...",
@@ -5128,6 +5128,11 @@
     },
     "Monitoring": {
       "_type": "Monitoring - nastavení",
+      "code": {
+        "label": "Kód monitoringu",
+        "help": "Unikátní kód monitoringu. Kód může být použit místo uuid identifikátoru v url (rest) pro zjištění stavu či spuštění daného monitoingu.",
+        "placeholder": "Uuid identifikátor bude použit jako výchozí hodnota."
+      },
       "disabled": {
         "label": "Neaktivní",
         "help": "Neaktivní monitoring nebude spouštěn"

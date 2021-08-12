@@ -45,6 +45,7 @@ public class IdmMonitoringControllerRestTest extends AbstractReadWriteDtoControl
 	@Override
 	protected IdmMonitoringDto prepareDto() {
 		IdmMonitoringDto dto = new IdmMonitoringDto();
+		dto.setCode(getHelper().createName());
 		dto.setEvaluatorType("mock");
 		dto.setInstanceId("mock");
 		//
@@ -91,10 +92,14 @@ public class IdmMonitoringControllerRestTest extends AbstractReadWriteDtoControl
 		//
 		monitoring = service.save(monitoring);
 		//
-		getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(monitoring.getId())))
+		String response = getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(monitoring.getId())))
         		.with(authentication(getAdminAuthentication()))
                 .contentType(TestHelper.HAL_CONTENT_TYPE))
-				.andExpect(status().isNoContent());
+				.andExpect(status().isCreated())
+				.andReturn()
+                .getResponse()
+                .getContentAsString();
+		Assert.assertNotNull(response);
 		//
 		getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(UUID.randomUUID())))
         		.with(authentication(getAdminAuthentication()))

@@ -14,6 +14,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
 
+import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Disableable;
@@ -29,12 +30,18 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 @Entity
 @Audited
 @Table(name = "idm_monitoring", indexes = {
+		@Index(name = "ux_idm_monitoring_code", columnList = "code", unique = true),
 		@Index(name = "idx_idm_monitoring_e_type", columnList = "evaluator_type"),
 		@Index(name = "idx_idm_monitoring_inst", columnList = "instance_id")
 })
-public class IdmMonitoring extends AbstractEntity implements Disableable, InstanceIdentifiable {
+public class IdmMonitoring extends AbstractEntity implements Disableable, InstanceIdentifiable, Codeable {
 	
 	private static final long serialVersionUID = 1L;
+	
+	@NotEmpty
+	@Size(min = 1, max = DefaultFieldLengths.NAME)
+	@Column(name = "code", length = DefaultFieldLengths.NAME, nullable = false)
+	private String code;
 	
 	@NotNull
 	@Column(name = "disabled", nullable = false)
@@ -68,6 +75,28 @@ public class IdmMonitoring extends AbstractEntity implements Disableable, Instan
 	
 	@Column(name = "execute_date")
 	private ZonedDateTime executeDate;
+	
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Monitoring codeable identifier.
+	 * 
+	 * @return unique code
+	 * @since 11.2.0
+	 */
+	@Override
+    public String getCode() {
+    	return code;
+    }
+    
+	/**
+	 * Monitoring codeable identifier.
+	 * 
+	 * @param code unique code
+	 */
+    public void setCode(String code) {
+		this.code = code;
+	}
 
 	@Override
 	public boolean isDisabled() {

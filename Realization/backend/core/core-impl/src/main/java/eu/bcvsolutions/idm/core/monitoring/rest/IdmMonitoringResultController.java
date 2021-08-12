@@ -520,9 +520,13 @@ public class IdmMonitoringResultController extends AbstractEventableDtoControlle
 		IdmMonitoringDto monitoring = getLookupService().lookupEmbeddedDto(monitoringResult, IdmMonitoringResult_.monitoring);
 		//
 		monitoring.setEvaluatorProperties(monitoringResult.getEvaluatorProperties());
-		monitoringManager.execute(monitoring, IdmBasePermission.EXECUTE);
-		// TODO: return current result (last result is not precise) ...
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		IdmMonitoringResultDto currentResult = monitoringManager.execute(monitoring, IdmBasePermission.EXECUTE);
+		// without result
+		if (currentResult == null) {
+			new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		// return current result
+		return new ResponseEntity<>(toResource(currentResult), HttpStatus.CREATED);
 	}
 
 	/**
@@ -542,6 +546,10 @@ public class IdmMonitoringResultController extends AbstractEventableDtoControlle
 	
 	@Override
 	protected IdmMonitoringResultFilter toFilter(MultiValueMap<String, Object> parameters) {
-		return new IdmMonitoringResultFilter(parameters, getParameterConverter());
+		IdmMonitoringResultFilter filter = new IdmMonitoringResultFilter(parameters, getParameterConverter());
+		//
+		filter.setMonitoring(getParameterConverter().toEntityUuid(parameters, IdmMonitoringResultFilter.PARAMETER_MONITORING, IdmMonitoringDto.class));
+		//
+		return filter;
 	}
 }

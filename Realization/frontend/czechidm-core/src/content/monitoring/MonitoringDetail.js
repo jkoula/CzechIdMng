@@ -211,6 +211,12 @@ class MonitoringDetail extends Basic.AbstractContent {
                       required
                       searchable/>
                     <Basic.TextField
+                      ref="code"
+                      label={ this.i18n('entity.Monitoring.code.label') }
+                      helpBlock={ this.i18n('entity.Monitoring.code.help') }
+                      placeholder={ this.i18n('entity.Monitoring.code.placeholder') }
+                      max={ 255 }/>
+                    <Basic.TextField
                       ref="checkPeriod"
                       validation={
                         Joi

@@ -33,6 +33,10 @@ export default class MonitoringManager extends EntityManager {
     return 'monitorings';
   }
 
+  getIdentifierAlias() {
+    return 'code';
+  }
+
   getNiceLabel(entity, supportedEvaluators = null, showEvaluatorType = true) {
     let _taskType;
     if (supportedEvaluators && supportedEvaluators.has(entity.evaluatorType)) {

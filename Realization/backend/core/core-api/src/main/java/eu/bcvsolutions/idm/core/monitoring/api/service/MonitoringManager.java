@@ -35,7 +35,7 @@ public interface MonitoringManager {
 	 * @param monitoring monitoring configuration
 	 * @return monitoring result
 	 */
-	void execute(IdmMonitoringDto monitoring, BasePermission... permission);
+	IdmMonitoringResultDto execute(IdmMonitoringDto monitoring, BasePermission... permission);
 	
 	/**
 	 * Evaluate ~ process monitoring.

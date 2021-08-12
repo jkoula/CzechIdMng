@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
@@ -39,8 +40,10 @@ import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.monitoring.api.domain.MonitoringGroupPermission;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.MonitoringEvaluatorDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringResultFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -67,9 +70,10 @@ import io.swagger.annotations.AuthorizationScope;
 		consumes = MediaType.APPLICATION_JSON_VALUE)
 public class IdmMonitoringController extends AbstractEventableDtoController<IdmMonitoringDto, IdmMonitoringFilter> {
 	
-	protected static final String TAG = "Configured monitoring evaluators";
+	protected static final String TAG = "Monitoring evaluators";
 	
 	@Autowired private MonitoringManager monitoringManager;
+	@Autowired private IdmMonitoringResultController monitoringResultController;
 	
 	@Autowired
 	public IdmMonitoringController(IdmMonitoringService service) {
@@ -392,9 +396,53 @@ public class IdmMonitoringController extends AbstractEventableDtoController<IdmM
 		if (monitoring == null) {
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
 		}
-		monitoringManager.execute(monitoring, IdmBasePermission.EXECUTE);
-		// TODO: return current result (last result is not precise) ...
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		IdmMonitoringResultDto monitoringResult = monitoringManager.execute(monitoring, IdmBasePermission.EXECUTE);
+		// without result
+		if (monitoringResult == null) {
+			new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		// return current result
+		return new ResponseEntity<>(monitoringResultController.toResource(monitoringResult), HttpStatus.CREATED);
+	}
+	
+	/**
+	 * Get last monitoring result.
+	 * 
+	 * @since 11.2.0
+	 */
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.GET, value = "/{backendId}/last-result")
+	@PreAuthorize("hasAuthority('" + MonitoringGroupPermission.MONITORING_READ + "') "
+			+ "and hasAuthority('" + MonitoringGroupPermission.MONITORINGRESULT_READ + "')")
+	@ApiOperation(
+			value = "Get last monitoring result",
+			nickname = "getLastMonitoringResult",
+			tags={ IdmMonitoringController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORING_READ, description = ""),
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORINGRESULT_READ, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORING_READ, description = ""),
+							@AuthorizationScope(scope = MonitoringGroupPermission.MONITORINGRESULT_READ, description = "")})
+			},
+			notes = "Get last monitoring result.")
+	public ResponseEntity<?> getLastResult(
+			@ApiParam(value = "Monitoring codeable identifier.", required = true)
+			@PathVariable @NotNull String backendId) {
+		IdmMonitoringDto monitoring = getDto(backendId);
+		if (monitoring == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		IdmMonitoringResultFilter filter = new IdmMonitoringResultFilter();
+		filter.setMonitoring(monitoring.getId());
+		List<IdmMonitoringResultDto> lastResults = monitoringManager.getLastResults(filter, PageRequest.of(0, 1), IdmBasePermission.READ).getContent();
+		// without result
+		if (lastResults.isEmpty()) {
+			new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		// return last result
+		return new ResponseEntity<>(monitoringResultController.toResource(lastResults.get(0)), HttpStatus.OK);
 	}
 
 	@Override

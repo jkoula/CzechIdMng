@@ -197,10 +197,14 @@ public class IdmMonitoringResultControllerRestTest extends AbstractReadWriteDtoC
 		dto.setResult(new OperationResultDto(OperationState.BLOCKED));
 		dto = monitoringResultService.save(dto);
 		//
-		getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(dto.getId())))
+		String response = getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(dto.getId())))
         		.with(authentication(getAdminAuthentication()))
                 .contentType(TestHelper.HAL_CONTENT_TYPE))
-				.andExpect(status().isNoContent());
+				.andExpect(status().isCreated())
+				.andReturn()
+                .getResponse()
+                .getContentAsString();
+		Assert.assertNotNull(response);
 		//
 		getMockMvc().perform(put(String.format("%s/execute", getDetailUrl(UUID.randomUUID())))
         		.with(authentication(getAdminAuthentication()))
