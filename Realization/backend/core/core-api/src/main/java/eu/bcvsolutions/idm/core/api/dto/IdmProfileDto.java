@@ -6,6 +6,9 @@ import javax.validation.constraints.Size;
 
 import org.springframework.hateoas.core.Relation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
@@ -13,6 +16,7 @@ import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.security.api.domain.TwoFactorAuthenticationType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty.AccessMode;
 
 /**
  * Dto for identity profile - setting.
@@ -41,7 +45,11 @@ public class IdmProfileDto extends AbstractDto  {
 	private Integer defaultPageSize;
 	@ApiModelProperty(notes = "Additional two factor authentication method.")
 	private TwoFactorAuthenticationType twoFactorAuthenticationType;
-	@ApiModelProperty(notes = "User setting, e.g. panels configuration - collapsed, expanded.")
+	@JsonProperty(value = "setting", access = Access.READ_ONLY)
+	@ApiModelProperty(
+			accessMode = AccessMode.READ_ONLY,
+			notes = "User setting, e.g. panels configuration - collapsed, expanded."
+	)
 	private ConfigurationMap setting;
 
 	public IdmProfileDto() {
