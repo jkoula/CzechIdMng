@@ -35,7 +35,7 @@ public class RoleRequestPublishChangeProcessor
 	@Override
 	protected EntityEvent<IdmRoleRequestDto> setAdditionalEventProperties(EntityEvent<IdmRoleRequestDto> event) {
 		event = super.setAdditionalEventProperties(event);
-		// we need to set super entity owner - identity contracts should not be processed concurrently for given identity
+		// we need to set super entity owner - role requests should not be processed concurrently for given identity
 		event.setSuperOwnerId(event.getContent().getApplicant());
 		//
 		return event;

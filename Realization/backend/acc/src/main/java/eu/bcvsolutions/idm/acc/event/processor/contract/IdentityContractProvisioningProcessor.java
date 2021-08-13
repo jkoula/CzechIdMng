@@ -19,7 +19,6 @@ import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
-import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.event.IdentityContractEvent.IdentityContractEventType;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 
@@ -29,8 +28,8 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
  * 
  * @author Radek Tomiška
  */
-@Component
 @Enabled(AccModuleDescriptor.MODULE_ID)
+@Component(IdentityContractProvisioningProcessor.PROCESSOR_NAME)
 @Description("Executes provisioning for contract's identity and all contract's subordinates (newly added and previous) - depends on configuration property")
 public class IdentityContractProvisioningProcessor extends AbstractIdentityContractProvisioningProcessor {
 
@@ -39,7 +38,6 @@ public class IdentityContractProvisioningProcessor extends AbstractIdentityContr
 	//	
 	@Autowired private EntityEventManager entityEventManager;	
 	@Autowired private ProvisioningService provisioningService;
-	@Autowired private LookupService lookupService;
 	@Autowired private EntityManager entityManager;
 	
 	public IdentityContractProvisioningProcessor() {
@@ -89,7 +87,13 @@ public class IdentityContractProvisioningProcessor extends AbstractIdentityContr
 	private void doProvisioning(UUID identityId, EntityEvent<IdmIdentityContractDto> event) {
 		if (!event.hasType(IdentityContractEventType.NOTIFY)) {
 			// sync
-			doProvisioning((IdmIdentityDto) lookupService.lookupDto(IdmIdentityDto.class, identityId), event);
+			IdmIdentityDto identity = getLookupService().lookupDto(IdmIdentityDto.class, identityId);
+			if (identity == null) {
+				LOG.debug("Identity [{}] was already deleted, duplicate provisioning will be skipped.", identityId);
+				//
+				return;
+			}
+			doProvisioning(identity, event);
 		} else {
 			// async
 			LOG.debug("Register change for identity [{}]", identityId);

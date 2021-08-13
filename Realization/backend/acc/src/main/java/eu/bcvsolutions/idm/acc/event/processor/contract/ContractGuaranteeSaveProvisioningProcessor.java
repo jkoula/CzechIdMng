@@ -30,7 +30,6 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
  */
-
 @Component
 @Enabled(AccModuleDescriptor.MODULE_ID)
 @Description("Do provisioning for identity after contract guarantee save.")
@@ -39,7 +38,7 @@ public class ContractGuaranteeSaveProvisioningProcessor extends CoreEventProcess
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory
 			.getLogger(ContractGuaranteeSaveProvisioningProcessor.class);
 
-	public static final String PROCESSOR_NAME = "contract-guarantee-save";
+	public static final String PROCESSOR_NAME = "contract-guarantee-save"; // rt: wrong name, but it's too late :(
 
 	private final IdmIdentityContractService identityContractService;
 	//

@@ -12,7 +12,7 @@ import eu.bcvsolutions.idm.core.api.event.EventType;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 
 /**
- * Publish entity change
+ * Publish entity change.
  * 
  * @author Radek Tomiška
  *

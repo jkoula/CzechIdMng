@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.acc.event.processor.contract;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -27,7 +29,6 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
-
 @Component
 @Enabled(AccModuleDescriptor.MODULE_ID)
 @Description("Publish change (~do provisioning) for identity after contract guarantee delete.")
@@ -55,7 +56,13 @@ public class ContractGuaranteeDeleteProvisioningProcessor extends CoreEventProce
 	@Override
 	public EventResult<IdmContractGuaranteeDto> process(EntityEvent<IdmContractGuaranteeDto> event) {
 		IdmContractGuaranteeDto contractGuarantee = event.getContent();
-		IdmIdentityContractDto contract = identityContractService.get(contractGuarantee.getIdentityContract());
+		UUID contractId = contractGuarantee.getIdentityContract();
+		IdmIdentityContractDto contract = identityContractService.get(contractId);
+		if (contract == null) {
+			LOG.debug("Contract [{}] was already deleted, duplicate provisioning will be skipped.", contractId);
+			//
+			return new DefaultEventResult<>(event, this);
+		}
 		//
 		LOG.debug("Publish change for identity [{}], contract guarantee will be added.", contract.getIdentity());
 		//

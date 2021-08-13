@@ -24,7 +24,8 @@ public class ProfileEvent extends CoreEvent<IdmProfileDto> {
 	public enum ProfileEventType implements EventType {
 		CREATE, 
 		UPDATE, // prolong expiration / disable
-		DELETE
+		DELETE,
+		NOTIFY
 	}
 	
 	public ProfileEvent(ProfileEventType operation, IdmProfileDto content) {
