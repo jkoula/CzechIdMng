@@ -43,6 +43,7 @@ import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue_;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute_;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
 import eu.bcvsolutions.idm.core.eav.repository.AbstractFormValueRepository;
+import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
@@ -70,6 +71,8 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	private LookupService lookupService;
 	@Autowired @Lazy
 	private RequestManager requestManager;
+	@Autowired @Lazy
+	private AttachmentManager attachmentManager;
 
 	@SuppressWarnings("unchecked")
 	public AbstractFormValueService(AbstractFormValueRepository<O, E> repository) {
@@ -190,14 +193,22 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	@Transactional
 	public void deleteInternal(IdmFormValueDto dto) {
 		Assert.notNull(dto, "DTO is required to delete.");
+		UUID id = dto.getId();
+		Assert.notNull(id, "DTO identifier is required to delete.");
 		//
-		LOG.debug("FormValue [{}] will be removed", dto.getId());
+		LOG.debug("FormValue [{}] will be removed", id);
 		if (dto.isConfidential()) {
-			LOG.debug("FormValue [{}] will be removed from confidential storage", dto.getId());
-			confidentialStorage.delete(dto.getId(), toEntity(dto).getClass(), getConfidentialStorageKey(dto.getFormAttribute()));
+			LOG.debug("FormValue [{}] will be removed from confidential storage", id);
+			confidentialStorage.delete(id, toEntity(dto).getClass(), getConfidentialStorageKey(dto.getFormAttribute()));
 		}
+		//
 		// Cancel requests and request items using that deleting DTO
 		requestManager.onDeleteRequestable(dto);
+		//
+		// remove attachments for this form value
+		if (PersistentType.ATTACHMENT == dto.getPersistentType()) {
+			attachmentManager.deleteAttachments(id, attachmentManager.getOwnerType(toEntity(dto).getClass()));
+		}
 		//
 		super.deleteInternal(dto);
 	}

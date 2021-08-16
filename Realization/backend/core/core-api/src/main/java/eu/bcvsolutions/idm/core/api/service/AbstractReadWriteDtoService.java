@@ -136,9 +136,11 @@ public abstract class AbstractReadWriteDtoService<DTO extends BaseDto, E extends
 	@Override
 	@Transactional
 	public void deleteInternal(DTO dto) {
-		Assert.notNull(dto, "Identifier is required for delete.");
+		Assert.notNull(dto, "DTO is required for delete.");
+		Serializable id = dto.getId();
+		Assert.notNull(id, "DTO identifier is required for delete.");
 		//
-		getRepository().deleteById((UUID) dto.getId());
+		getRepository().deleteById((UUID) id);
 	}
 
 	@Override

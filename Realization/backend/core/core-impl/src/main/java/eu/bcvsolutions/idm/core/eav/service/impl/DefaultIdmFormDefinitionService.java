@@ -130,21 +130,23 @@ public class DefaultIdmFormDefinitionService
 	@Override
 	@Transactional
 	public void deleteInternal(IdmFormDefinitionDto dto) {
+		Assert.notNull(dto, "Form definition is required for delete.");
+		UUID id = dto.getId();
+		Assert.notNull(id, "Form definition identifier is required for delete.");
+		//
 		// delete all attributes in definition
 		IdmFormAttributeFilter filter = new IdmFormAttributeFilter();
-		filter.setDefinitionId(dto.getId());
+		filter.setDefinitionId(id);
 		formAttributeService.find(filter, null).forEach(formAttribute -> {
 			formAttributeService.delete(formAttribute);
 		});
 		//
-		if(dto.getId() != null) {
-			IdmRoleFilter roleFilter = new IdmRoleFilter();
-			roleFilter.setAttributeFormDefinitionId(dto.getId());
-			
-			List<IdmRoleDto> roles = roleService.find(roleFilter, PageRequest.of(0, 1)).getContent();
-			if(roles.size() > 0) {
-				throw new ResultCodeException(CoreResultCode.FORM_DEFINITION_DELETE_FAILED_ROLE, ImmutableMap.of("definition", dto.getCode(), "role", roles.get(0).getCode()));
-			}
+		IdmRoleFilter roleFilter = new IdmRoleFilter();
+		roleFilter.setAttributeFormDefinitionId(id);
+		
+		List<IdmRoleDto> roles = roleService.find(roleFilter, PageRequest.of(0, 1)).getContent();
+		if(roles.size() > 0) {
+			throw new ResultCodeException(CoreResultCode.FORM_DEFINITION_DELETE_FAILED_ROLE, ImmutableMap.of("definition", dto.getCode(), "role", roles.get(0).getCode()));
 		}
 		super.deleteInternal(dto);
 	}

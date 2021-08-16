@@ -269,7 +269,7 @@ public class FormValueDeleteBulkAction extends AbstractRemoveBulkAction<IdmFormV
 		UUID ownerId = DtoUtils.toUuid(dto.getOwnerId());
 		Class<? extends FormableEntity> ownerType = dto.getOwnerType();
 		List<IdmFormValueDto> newValues = Lists.newArrayList(dto); 
-		if(formAttribute.isMultiple()) {
+		if (formAttribute.isMultiple()) {
 			// prevent to remove other values of the same attribute
 			formService
 				.getValues(ownerId, ownerType, formAttribute)

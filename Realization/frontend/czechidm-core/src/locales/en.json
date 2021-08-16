@@ -6339,7 +6339,13 @@
       "form-definition-delete-bulk-action": {
         "label": "$t(action.delete.action) form definitions",
         "help": "$t(action.delete.action) selected form definitions.",
-        "icon": "$t(action.delete.icon)"
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Force delete",
+            "help": "Delete form definition with all attributes and with all filled values."
+          }
+        }
       },
       "script-definition-delete-bulk-action": {
         "label": "$t(action.delete.action) script definitions",
@@ -6545,7 +6551,13 @@
       "core-form-attribute-delete-bulk-action": {
         "label": "$t(action.delete.action) attributes",
         "help": "$t(action.delete.action) selected attributes.",
-        "icon": "$t(action.delete.icon)"
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Force delete",
+            "help": "Delete attribute with all filled values."
+          }
+        }
       },
       "core-token-delete-bulk-action": {
         "label": "$t(action.delete.action) tokens",

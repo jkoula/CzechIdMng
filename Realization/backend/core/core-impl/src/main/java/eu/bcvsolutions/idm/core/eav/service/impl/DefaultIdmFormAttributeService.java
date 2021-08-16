@@ -51,7 +51,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
- * Form attribute (attribute definition) service
+ * Form attribute (attribute definition) service.
  * 
  * @author Radek Tomiška
  *
@@ -184,14 +184,6 @@ public class DefaultIdmFormAttributeService
 				throw new ResultCodeException(CoreResultCode.FORM_ATTRIBUTE_DELETE_FAILED_HAS_VALUES, ImmutableMap.of("formAttribute", dto.getCode()));
 			}
 		});
-		// delete all values
-		// TODO: add some force delete parameter => rewrite service to event usage - can be solved as new event processor before ... 
-		/* formValueServices.getPlugins().forEach(formValueService -> {
-			formValueService.find(filter, null).getContent().forEach(formValue -> {
-				formValueService.delete((IdmFormValueDto) formValue);
-			});
-		});*/
-		
 		//
 		// check rules for automatic role attributes
 		IdmAutomaticRoleAttributeRuleFilter automaticRoleRuleFilter = new IdmAutomaticRoleAttributeRuleFilter();
