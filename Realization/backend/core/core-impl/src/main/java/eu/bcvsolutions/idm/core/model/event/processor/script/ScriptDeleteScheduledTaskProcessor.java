@@ -65,7 +65,7 @@ public class ScriptDeleteScheduledTaskProcessor
 					String scriptCodeableIdentifier = task.getParameters().get(ExecuteScriptTaskExecutor.PARAMETER_SCRIPT_CODE);
 					//
 					return scriptId.toString().equals(scriptCodeableIdentifier)
-							|| scriptCode.toString().equals(scriptCodeableIdentifier);
+							|| scriptCode.equals(scriptCodeableIdentifier);
 				})
 				.map(Task::getId)
 				.forEach(taskId -> {

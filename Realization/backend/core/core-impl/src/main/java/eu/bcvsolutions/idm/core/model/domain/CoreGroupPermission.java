@@ -604,6 +604,7 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String AUTOMATIC_ROLE_REQUEST_DELETE = "AUTOMATICROLEREQUEST" + BasePermission.SEPARATOR + "DELETE";
 	public static final String AUTOMATIC_ROLE_REQUEST_AUTOCOMPLETE = "AUTOMATICROLEREQUEST" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	//
+	public static final String FORM_DEFINITION_ADMIN = "FORMDEFINITION" + BasePermission.SEPARATOR + "ADMIN";
 	public static final String FORM_DEFINITION_COUNT = "FORMDEFINITION" + BasePermission.SEPARATOR + "COUNT";
 	public static final String FORM_DEFINITION_AUTOCOMPLETE = "FORMDEFINITION" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String FORM_DEFINITION_READ = "FORMDEFINITION" + BasePermission.SEPARATOR + "READ";
@@ -618,6 +619,7 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String FORM_PROJECTION_UPDATE = "FORMPROJECTION" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String FORM_PROJECTION_DELETE = "FORMPROJECTION" + BasePermission.SEPARATOR + "DELETE";
 	//
+	public static final String FORM_ATTRIBUTE_ADMIN = "FORMATTRIBUTE" + BasePermission.SEPARATOR + "ADMIN";
 	public static final String FORM_ATTRIBUTE_COUNT = "FORMATTRIBUTE" + BasePermission.SEPARATOR + "COUNT";
 	public static final String FORM_ATTRIBUTE_AUTOCOMPLETE = "FORMATTRIBUTE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String FORM_ATTRIBUTE_READ = "FORMATTRIBUTE" + BasePermission.SEPARATOR + "READ";
