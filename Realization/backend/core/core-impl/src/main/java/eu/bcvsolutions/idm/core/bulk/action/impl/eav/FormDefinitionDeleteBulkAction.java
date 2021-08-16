@@ -1,8 +1,6 @@
 package eu.bcvsolutions.idm.core.bulk.action.impl.eav;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -56,13 +54,11 @@ public class FormDefinitionDeleteBulkAction extends AbstractRemoveBulkAction<Idm
 	
 	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
-		Set<String> distinctAttributes = new HashSet<>();
 		List<IdmFormAttributeDto> formAttributes = super.getFormAttributes();
 		//
 		// add force delete, if currently logged user is ROLE_ADMIN
 		if (securityService.hasAnyAuthority(CoreGroupPermission.FORM_DEFINITION_ADMIN)) {
 			formAttributes.add(new IdmFormAttributeDto(EntityEventProcessor.PROPERTY_FORCE_DELETE, "Force delete", PersistentType.BOOLEAN));
-			distinctAttributes.add(EntityEventProcessor.PROPERTY_FORCE_DELETE);
 		}
 		return formAttributes;
 	}
