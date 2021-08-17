@@ -32,6 +32,13 @@ import eu.bcvsolutions.idm.core.scheduler.exception.SchedulerException;
 import eu.bcvsolutions.idm.core.scheduler.repository.IdmScheduledTaskRepository;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
+/**
+ * Scheduled tasks - persists task, when is executed from quartz scheduler.
+ * Lookout: not contains scheduled task itself - scheduled task is persisted in quartz tables.
+ * 
+ * @author Jan Helbich
+ * @author Radek Tomiška
+ */
 public class DefaultIdmScheduledTaskService
 	extends AbstractReadWriteDtoService<IdmScheduledTaskDto, IdmScheduledTask, IdmScheduledTaskFilter>
 	implements IdmScheduledTaskService {
@@ -53,8 +60,8 @@ public class DefaultIdmScheduledTaskService
 		this.lrtService = lrtService;
 	}
 
-	@Transactional(readOnly = true)
 	@Override
+	@Transactional(readOnly = true)
 	public IdmScheduledTaskDto findByQuartzTaskName(String taskName) {
 		IdmScheduledTaskFilter filter = new IdmScheduledTaskFilter();
 		filter.setQuartzTaskName(taskName);
@@ -86,8 +93,8 @@ public class DefaultIdmScheduledTaskService
 		return new AuthorizableType(CoreGroupPermission.SCHEDULER, this.getEntityClass());
 	}
 
-	@Transactional
 	@Override
+	@Transactional
 	public void deleteInternal(IdmScheduledTaskDto dto) {
 		Assert.notNull(dto, "DTO is required.");
 		//
@@ -104,5 +111,4 @@ public class DefaultIdmScheduledTaskService
 		//
 		return lrt.getScheduledTask() == null ? null : this.get(lrt.getScheduledTask());
 	}
-	
 }

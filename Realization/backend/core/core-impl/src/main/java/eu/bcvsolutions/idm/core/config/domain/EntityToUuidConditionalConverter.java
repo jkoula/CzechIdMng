@@ -34,15 +34,11 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 public class EntityToUuidConditionalConverter implements ConditionalConverter<BaseEntity, UUID> {
 	
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(EntityToUuidConditionalConverter.class);
-	
-	private ModelMapper modeler;
+
 	private LookupService lookupService;
 	private ApplicationContext applicationContext;
 
 	public EntityToUuidConditionalConverter(ModelMapper modeler, ApplicationContext applicationContext) {
-		Assert.notNull(modeler, "Modeler is required!");
-		//
-		this.modeler = modeler;
 		this.applicationContext = applicationContext;
 	}
 	
@@ -98,7 +94,7 @@ public class EntityToUuidConditionalConverter implements ConditionalConverter<Ba
 					}
 					dto.setTrimmed(true);
 					// Separate map entity to new embedded DTO
-					modeler.map(entity, dto);
+					getLookupService().toDto(entity, dto, null);
 					embedded.put(field, dto);
 					// Add filled DTO to embedded map to parent DTO
 					parentDto.setEmbedded(embedded);

@@ -25,7 +25,7 @@ import eu.bcvsolutions.idm.core.notification.entity.IdmNotification_;
 import eu.bcvsolutions.idm.core.notification.repository.IdmNotificationLogRepository;
 
 /**
- * Notification log service
+ * Notification log service.
  * 
  * @author Radek Tomiška
  *

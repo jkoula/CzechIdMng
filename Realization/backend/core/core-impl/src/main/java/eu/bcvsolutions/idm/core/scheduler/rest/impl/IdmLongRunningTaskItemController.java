@@ -25,9 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -35,6 +38,7 @@ import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmProcessedTaskItemDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmProcessedTaskItemFilter;
 import eu.bcvsolutions.idm.core.scheduler.api.service.IdmProcessedTaskItemService;
+import eu.bcvsolutions.idm.core.scheduler.entity.IdmProcessedTaskItem_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,6 +64,8 @@ public class IdmLongRunningTaskItemController extends AbstractReadWriteDtoContro
 	protected static final String TAG = "Long running task items";
 	//
 	private final IdmProcessedTaskItemService itemService;
+	//
+	@Autowired private IdmAuditService auditService;
 
 	@Autowired
 	public IdmLongRunningTaskItemController(IdmProcessedTaskItemService itemService) {
@@ -194,14 +200,30 @@ public class IdmLongRunningTaskItemController extends AbstractReadWriteDtoContro
 	 * 
 	 * @param dto
 	 */
+	@SuppressWarnings("unchecked")
 	private void loadEmbeddedEntity(Map<UUID, BaseDto> loadedDtos, IdmProcessedTaskItemDto dto) {
 		UUID entityId = dto.getReferencedEntityId();
 		try {
+			BaseDto item = null;
 			if (!loadedDtos.containsKey(entityId)) {
-				loadedDtos.put(entityId, getLookupService().lookupDto(dto.getReferencedDtoType(), entityId));
+				String referencedDtoType = dto.getReferencedDtoType();
+				item = getLookupService().lookupDto(referencedDtoType, entityId);
+				//
+				// try to find in audit for deleted entities
+				if (item == null) {
+					dto.setDeleted(true);
+					Object lastPersistedVersion = auditService.findLastPersistedVersion(
+							getLookupService().getEntityClass((Class<? extends Identifiable>) Class.forName(referencedDtoType)), 
+							entityId
+					);
+					if (lastPersistedVersion != null) {
+						item = getLookupService().toDto((BaseEntity) lastPersistedVersion, null, null);
+					}
+				}
+				loadedDtos.put(entityId, item);
 			}
-			dto.getEmbedded().put("referencedEntityId", loadedDtos.get(entityId));
-		} catch (IllegalArgumentException ex) {
+			dto.getEmbedded().put(IdmProcessedTaskItem_.referencedEntityId.getName(), loadedDtos.get(entityId));
+		} catch (IllegalArgumentException | ClassNotFoundException ex) {
 			LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getReferencedDtoType(), ex);
 		}
 	}

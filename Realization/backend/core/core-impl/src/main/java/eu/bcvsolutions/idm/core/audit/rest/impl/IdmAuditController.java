@@ -36,12 +36,12 @@ import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditEntityDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmAuditFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
-import eu.bcvsolutions.idm.core.api.domain.Auditable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
@@ -353,18 +353,16 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 		}
 		dto.getEmbedded().put(IdmAudit_.entityId.getName(), revision); // nullable
 		//
-		// try to load last revision for deleted entity - main table only ~ subowner will not be soled
+		// try to load last revision for deleted entity - main table only ~ subowner will not be solved
 		if (revision == null) {
+			dto.setDeleted(true);
 			try {
 				Object lastPersistedVersion = auditService.findLastPersistedVersion(Class.forName(dto.getType()), entityId);
 				if (lastPersistedVersion != null) {
-					// FIXME: this returns entity => i need to map it to dto properly => #978
-					Map<String, Object> valuesFromVersion = auditService.getValuesFromVersion(lastPersistedVersion);
-					if (!valuesFromVersion.containsKey(Auditable.PROPERTY_ID)) {
-						// id is not in values by default
-						valuesFromVersion.put(Auditable.PROPERTY_ID, entityId);
-					}
-					dto.setRevisionValues(valuesFromVersion);
+					dto.getEmbedded().put(
+							IdmAudit_.entityId.getName(), 
+							getLookupService().toDto((BaseEntity) lastPersistedVersion, null, null)
+					);
 				}
 			} catch (IllegalArgumentException | ClassNotFoundException ex) {
 				LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getType(), ex);

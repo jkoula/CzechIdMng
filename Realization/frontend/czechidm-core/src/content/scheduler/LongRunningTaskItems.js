@@ -12,7 +12,7 @@ const UIKEY = 'long-running-task-item-table';
 const manager = new LongRunningTaskItemManager();
 
 /**
- * Queue(list) of processed items
+ * Queue(list) of processed items.
  *
  * @author Marek Klement
  * @author Radek Tomiška
@@ -135,7 +135,9 @@ class LongRunningTaskItems extends Advanced.AbstractTableContent {
                     entity={ data[rowIndex]._embedded[property] }
                     face="popover"
                     showEntityType={ false }
-                    showIcon/>
+                    showIcon
+                    showLink={ !data[rowIndex].deleted }
+                    deleted={ data[rowIndex].deleted }/>
                 );
               }
             }

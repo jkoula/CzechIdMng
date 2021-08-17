@@ -140,7 +140,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		attributeDefinitionOne.setCode(getHelper().createName());
 		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
 		attributeDefinitionOne.setPersistentType(PersistentType.TEXT);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v1", Lists.newArrayList(attributeDefinitionOne));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
 		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
 		//
 		// create definition two
@@ -148,7 +148,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		attributeDefinitionTwo.setCode(getHelper().createName());
 		attributeDefinitionTwo.setName(attributeDefinitionTwo.getCode());
 		attributeDefinitionTwo.setPersistentType(PersistentType.TEXT);
-		IdmFormDefinitionDto formDefinitionTwo = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v2", Lists.newArrayList(attributeDefinitionTwo));
+		IdmFormDefinitionDto formDefinitionTwo = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attributeDefinitionTwo));
 		attributeDefinitionTwo = formDefinitionTwo.getMappedAttributeByCode(attributeDefinitionTwo.getCode());
 		//
 		IdmFormValueDto value1 = new IdmFormValueDto(attributeDefinitionOne);
@@ -201,7 +201,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		multiAttribite.setName(multiAttribite.getCode());
 		multiAttribite.setPersistentType(PersistentType.TEXT);
 		multiAttribite.setMultiple(true);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v3", Lists.newArrayList(multiAttribite));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(multiAttribite));
 		multiAttribite = formDefinitionOne.getMappedAttributeByCode(multiAttribite.getCode());
 		//
 		// fill values
@@ -562,7 +562,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		attribute.setCode(getHelper().createName());
 		attribute.setName(attribute.getCode());
 		attribute.setPersistentType(PersistentType.SHORTTEXT);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmTreeNode.class.getCanonicalName(), "t_v1", Lists.newArrayList(attribute));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmTreeNode.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attribute));
 		attribute = formDefinitionOne.getMappedAttributeByCode(attribute.getCode());
 		// save values
 		formService.saveValues(owner.getId(), IdmTreeNode.class, attribute, Lists.newArrayList(FORM_VALUE_ONE));
@@ -584,7 +584,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		attribute.setCode(getHelper().createName());
 		attribute.setName(attribute.getCode());
 		attribute.setPersistentType(PersistentType.TEXT);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmTreeNode.class.getCanonicalName(), "t_v1", Lists.newArrayList(attribute));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmTreeNode.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attribute));
 		attribute = formDefinitionOne.getMappedAttributeByCode(attribute.getCode());
 		// save values
 		formService.saveValues(owner.getId(), IdmTreeNode.class, attribute, Lists.newArrayList(FORM_VALUE_ONE));
@@ -880,7 +880,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		multiAttribite.setName(multiAttribite.getCode());
 		multiAttribite.setPersistentType(PersistentType.TEXT);
 		multiAttribite.setMultiple(true);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v3", Lists.newArrayList(multiAttribite));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(multiAttribite));
 		multiAttribite = formDefinitionOne.getMappedAttributeByCode(multiAttribite.getCode());
 		//
 		// fill values
@@ -986,7 +986,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		multiAttribite.setName(multiAttribite.getCode());
 		multiAttribite.setPersistentType(PersistentType.TEXT);
 		multiAttribite.setMultiple(true);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v3", Lists.newArrayList(multiAttribite));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(multiAttribite));
 		multiAttribite = formDefinitionOne.getMappedAttributeByCode(multiAttribite.getCode());
 		//
 		// fill values
@@ -1033,7 +1033,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		attribute.setName(attribute.getCode());
 		attribute.setPersistentType(PersistentType.SHORTTEXT);
 		attribute.setConfidential(true);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v3", Lists.newArrayList(attribute));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attribute));
 		attribute = formDefinitionOne.getMappedAttributeByCode(attribute.getCode());
 		//
 		// fill values
@@ -1083,7 +1083,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		attribute.setPersistentType(PersistentType.SHORTTEXT);
 		attribute.setConfidential(true);
 		attribute.setMultiple(true);
-		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v3", Lists.newArrayList(attribute));
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attribute));
 		attribute = formDefinitionOne.getMappedAttributeByCode(attribute.getCode());
 		//
 		// save three values
@@ -2030,7 +2030,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 			attributeDefinitionOne.setCode(getHelper().createName());
 			attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
 			attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
-			IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), "t_v1", Lists.newArrayList(attributeDefinitionOne));
+			IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class.getCanonicalName(), getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
 			attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
 			//
 			IdmFormValueDto value1 = new IdmFormValueDto(attributeDefinitionOne);

@@ -4,11 +4,15 @@ import java.util.UUID;
 
 import org.springframework.hateoas.core.Relation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiModelProperty.AccessMode;
 
 /**
  * LRT item - contains processed item state.
@@ -29,6 +33,9 @@ public class IdmProcessedTaskItemDto extends AbstractDto {
 	private UUID longRunningTask;
 	@Embedded(dtoClass = IdmScheduledTaskDto.class)
 	private UUID scheduledTaskQueueOwner;
+	@JsonProperty(access = Access.READ_ONLY)
+	@ApiModelProperty(accessMode = AccessMode.READ_ONLY, notes = "Related entity was already deleted.")
+	private transient boolean deleted;
 
 	public UUID getReferencedEntityId() {
 		return referencedEntityId;
@@ -69,5 +76,24 @@ public class IdmProcessedTaskItemDto extends AbstractDto {
 	public void setScheduledTaskQueueOwner(UUID scheduledTaskQueueOwner) {
 		this.scheduledTaskQueueOwner = scheduledTaskQueueOwner;
 	}
-
+	
+	/**
+	 * Related entity was already deleted.
+	 * 
+	 * @return true - deleted
+	 * @since 11.2.0
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+	
+	/**
+	 * Related entity was already deleted.
+	 * 
+	 * @param deleted true - deleted
+	 * @since 11.2.0
+	 */
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 }

@@ -75,6 +75,10 @@ public class IdmAuditDto implements BaseDto {
 	@JsonProperty(access = Access.READ_ONLY)
 	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
     private Map<String, Object> revisionValues;
+	
+	@JsonProperty(access = Access.READ_ONLY)
+	@ApiModelProperty(accessMode = AccessMode.READ_ONLY, notes = "Related entity was already deleted.")
+	private transient boolean deleted;
 
     public IdmAuditDto() {
         super();
@@ -271,5 +275,25 @@ public class IdmAuditDto implements BaseDto {
 	 */
 	public UUID getTransactionId() {
 		return transactionId;
+	}
+	
+	/**
+	 * Related entity was already deleted.
+	 * 
+	 * @return true - deleted
+	 * @since 11.2.0
+	 */
+	public boolean isDeleted() {
+		return deleted;
+	}
+	
+	/**
+	 * Related entity was already deleted.
+	 * 
+	 * @param deleted true - deleted
+	 * @since 11.2.0
+	 */
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 }

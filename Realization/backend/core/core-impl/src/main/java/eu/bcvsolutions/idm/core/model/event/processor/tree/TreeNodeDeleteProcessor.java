@@ -95,7 +95,7 @@ public class TreeNodeDeleteProcessor extends CoreEventProcessor<IdmTreeNodeDto> 
 		// check related automatic roles
 		IdmRoleTreeNodeFilter filter = new IdmRoleTreeNodeFilter();
 		filter.setTreeNodeId(treeNode.getId());
-		if(roleTreeNodeService.find(filter, null).getTotalElements() > 0) {
+		if (roleTreeNodeService.find(filter, null).getTotalElements() > 0) {
 			throw new TreeNodeException(CoreResultCode.TREE_NODE_DELETE_FAILED_HAS_ROLE, 
 					ImmutableMap.of("treeNode", treeNode.getName()));
 		}

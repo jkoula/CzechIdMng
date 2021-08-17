@@ -29,14 +29,10 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
  */
 public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 
-	private ModelMapper modeler;
 	private LookupService lookupService;
 	private ApplicationContext applicationContext;
 
 	public EntityToUuidConverter(ModelMapper modeler, ApplicationContext applicationContext) {
-		Assert.notNull(modeler, "Modeler is required!");
-		//
-		this.modeler = modeler;
 		this.applicationContext = applicationContext;
 	}
 
@@ -78,7 +74,7 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 						}
 						dto.setTrimmed(true);
 						// Separate map entity to new embedded DTO
-						modeler.map(entity, dto);
+						getLookupService().toDto(entity, dto, null);
 						embedded.put(field, dto);
 						// Add filled DTO to embedded map to parent DTO
 						parentDto.setEmbedded(embedded);
@@ -95,7 +91,7 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 		if (this.lookupService == null) {
 			Assert.notNull(applicationContext, "Application context is required!");
 			//
-			this.lookupService = this.applicationContext.getBean(LookupService.class);
+			this.lookupService = applicationContext.getBean(LookupService.class);
 		}
 		return this.lookupService;
 	}

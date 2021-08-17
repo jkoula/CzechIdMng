@@ -438,11 +438,8 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
               <Basic.ShortText value={ this.getPopoverTitle(_entity) } maxLength={ 60 } cutChar="" />
             </Basic.Div>
             <Basic.Div>
-              {
-                !this.isDisabled(_entity)
-                ||
-                <Basic.Label text={ this.i18n('label.disabled') } className="label-disabled"/>
-              }
+              <Basic.Label text={ this.i18n('label.disabled') } className="label-disabled" rendered={ !deleted && this.isDisabled(_entity) }/>
+              <Basic.Label text={ this.i18n('label.deleted') } className="label-deleted" rendered={ !!deleted }/>
               { this._renderSystemInformationIcon(_entity) }
               { this._renderSystemCollapsIcon() }
             </Basic.Div>

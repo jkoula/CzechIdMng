@@ -15,13 +15,20 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationContext;
 
 import eu.bcvsolutions.idm.core.api.config.domain.TreeConfiguration;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmContractSliceFilter;
+import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmContractSliceService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.config.domain.EntityToUuidConditionalConverter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract;
@@ -48,6 +55,8 @@ public class DefaultIdmIdentityContractServiceUnitTest extends AbstractUnitTest 
 	@Mock private TreeConfiguration treeConfiguration;
 	@Mock private IdmTreeNodeRepository treeNodeRepository;
 	@Mock private IdmContractSliceService contractSliceService;
+	@Mock private LookupService lookupService;
+	@Mock private ApplicationContext applicationContext;
 	@Spy private ModelMapper modelMapper = new ModelMapper();
 	//
 	@InjectMocks 
@@ -55,7 +64,7 @@ public class DefaultIdmIdentityContractServiceUnitTest extends AbstractUnitTest 
 	
 	@Before
 	public void init() {
-		modelMapper.getConfiguration().getConverters().add(new EntityToUuidConditionalConverter(modelMapper, null));
+		modelMapper.getConfiguration().getConverters().add(new EntityToUuidConditionalConverter(modelMapper, applicationContext));
 	}
 	
 	@Test
@@ -91,10 +100,11 @@ public class DefaultIdmIdentityContractServiceUnitTest extends AbstractUnitTest 
 		contracts.add(contractWithPosition);
 		contracts.add(otherContract);
 		//
+		when(applicationContext.getBean(LookupService.class)).thenReturn(lookupService);
+		when(lookupService.toDto(any(), any(), any())).then(new LookupAnswer());
 		when(repository.findAllByIdentity_Id(any(UUID.class), any())).thenReturn(contracts);		
 		when(treeConfiguration.getDefaultType()).thenReturn(null);
 		when(contractSliceService.count(any(IdmContractSliceFilter.class))).thenReturn(0L);
-		
 		//
 		Assert.assertEquals(contractWithPosition.getId(), service.getPrimeContract(UUID.randomUUID()).getId());
 	}
@@ -120,10 +130,11 @@ public class DefaultIdmIdentityContractServiceUnitTest extends AbstractUnitTest 
 		contracts.add(contractWithDefaultPosition);
 		contracts.add(otherContract);
 		//
+		when(applicationContext.getBean(LookupService.class)).thenReturn(lookupService);
+		when(lookupService.toDto(any(), any(), any())).then(new LookupAnswer());
 		when(repository.findAllByIdentity_Id(any(UUID.class), any())).thenReturn(contracts);		
 		when(treeConfiguration.getDefaultType()).thenReturn(new IdmTreeTypeDto(defaultTreeType.getId()));
 		when(contractSliceService.count(any(IdmContractSliceFilter.class))).thenReturn(0L);
-		
 		//
 		Assert.assertEquals(contractWithDefaultPosition.getId(), service.getPrimeContract(UUID.randomUUID()).getId());
 	}
@@ -244,5 +255,21 @@ public class DefaultIdmIdentityContractServiceUnitTest extends AbstractUnitTest 
 		when(contractSliceService.count(any(IdmContractSliceFilter.class))).thenReturn(0L);
 		//
 		Assert.assertEquals(oneContract.getId(), service.getPrimeContract(UUID.randomUUID()).getId());
+	}
+	
+	private class LookupAnswer implements Answer<BaseDto> {
+		
+		@Override
+		public BaseDto answer(InvocationOnMock invocation) throws Throwable {
+			BaseEntity entity = (BaseEntity) invocation.getArguments()[0];
+			BaseDto dto = (BaseDto) invocation.getArguments()[1];
+			//
+			if (dto == null) {
+				return modelMapper.map(entity, IdmIdentityContractDto.class);
+			}
+			modelMapper.map(entity, dto);
+			return dto;
+			
+		}
 	}
 }

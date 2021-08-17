@@ -5,11 +5,16 @@ import java.util.UUID;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.modelmapper.ModelMapper;
+
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DtoLookup;
+import eu.bcvsolutions.idm.core.api.rest.lookup.DtoLookupByExample;
+import eu.bcvsolutions.idm.core.api.rest.lookup.DtoMapper;
 import eu.bcvsolutions.idm.core.api.rest.lookup.EntityLookup;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -83,7 +88,15 @@ public interface LookupService extends ScriptEnabled {
 	 */
 	<DTO extends BaseDto> DTO lookupDto(String identifiableType, Serializable entityId);
 	
-	
+	/**
+	 * Find dto by example.
+	 * 
+	 * @see DtoLookupByExample
+	 * @param <DTO> dto type
+	 * @param example filled example
+	 * @return dto or null
+	 * @since 10.8.0
+	 */
 	<DTO extends BaseDto> DTO lookupByExample(DTO example);
 	
 	/**
@@ -149,4 +162,19 @@ public interface LookupService extends ScriptEnabled {
 	 * @since 9.0.0
 	 */
 	UUID getOwnerId(Identifiable owner);
+	
+	/**
+	 * Convert {@link BaseEntity} to {@link BaseDto}.
+	 * 
+	 * @see DtoMapper
+	 * @see ModelMapper
+	 * @see ModelMapperConfig
+	 * @param <DTO> dto type
+	 * @param entity entity to convert
+	 * @param dto [optional] prepared dto instance
+	 * @param context [optional] context parameters
+	 * @return filled dto
+	 * @since 11.2.0
+	 */
+	<DTO extends BaseDto> DTO toDto(BaseEntity entity, DTO dto, BaseFilter context);
 }

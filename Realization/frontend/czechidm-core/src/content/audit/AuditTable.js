@@ -229,8 +229,8 @@ export class AuditTable extends Advanced.AbstractTableContent {
               ({ rowIndex, data }) => {
                 return (
                   <Advanced.DetailButton
-                    title={this.i18n('button.detail')}
-                    onClick={this.showDetail.bind(this, data[rowIndex].id)}/>
+                    title={ this.i18n('button.detail') }
+                    onClick={ this.showDetail.bind(this, data[rowIndex].id) }/>
                 );
               }
             }
@@ -265,20 +265,9 @@ export class AuditTable extends Advanced.AbstractTableContent {
                       entity={ data[rowIndex]._embedded[property] }
                       face="popover"
                       showEntityType={ false }
+                      showLink={ !data[rowIndex].deleted }
+                      deleted={ data[rowIndex].deleted }
                       showIcon/>
-                  );
-                }
-                if (data[rowIndex].revisionValues) {
-                  return (
-                    <Advanced.EntityInfo
-                      entityType={ this._getType(data[rowIndex].type) }
-                      entityIdentifier={ value }
-                      entity={ data[rowIndex].revisionValues }
-                      face="popover"
-                      showLink={ false }
-                      showEntityType={ false }
-                      showIcon
-                      deleted/>
                   );
                 }
                 //

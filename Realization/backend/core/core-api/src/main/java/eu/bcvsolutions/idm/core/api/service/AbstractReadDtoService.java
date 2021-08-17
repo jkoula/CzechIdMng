@@ -56,6 +56,7 @@ import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterKey;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
+import eu.bcvsolutions.idm.core.api.rest.lookup.DtoMapper;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
@@ -79,7 +80,7 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
  * @param <F> filter {@link DataFilter} generalization is preferred.
  */
 public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends BaseEntity, F extends BaseFilter>
-		implements ReadDtoService<DTO, F> {
+		implements ReadDtoService<DTO, F>, DtoMapper<DTO, E, F> {
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AbstractReadDtoService.class);
 	//
@@ -580,6 +581,11 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 		}
 		modelMapper.map(entity, dto);
 		return dto;
+	}
+	
+	@Override
+	public DTO map(E entity, DTO dto, F context) {
+		return toDto(entity, dto, context);
 	}
 
 	/**

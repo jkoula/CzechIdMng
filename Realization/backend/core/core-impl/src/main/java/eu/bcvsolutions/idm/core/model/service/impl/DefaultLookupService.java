@@ -12,22 +12,29 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.hibernate.proxy.HibernateProxy;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.plugin.core.OrderAwarePluginRegistry;
 import org.springframework.plugin.core.PluginRegistry;
 import org.springframework.util.Assert;
 
+import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.rest.lookup.CodeableDtoLookup;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DefaultDtoLookup;
+import eu.bcvsolutions.idm.core.api.rest.lookup.DefaultDtoMapper;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DefaultEntityLookup;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DtoLookup;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DtoLookupByExample;
+import eu.bcvsolutions.idm.core.api.rest.lookup.DtoMapper;
 import eu.bcvsolutions.idm.core.api.rest.lookup.EntityLookup;
 import eu.bcvsolutions.idm.core.api.service.CodeableService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
@@ -51,6 +58,7 @@ public class DefaultLookupService implements LookupService {
 	private final PluginRegistry<DtoLookupByExample<?>, Class<?>> dtoLookupByExamples;
 	// loaded services cache
 	private final Map<Class<? extends Identifiable>, Object> services = new HashMap<>();
+	private PluginRegistry<DtoMapper<?, ?, ?>, Class<?>> dtoMappers;
 	
 	@Autowired
 	public DefaultLookupService(
@@ -61,9 +69,9 @@ public class DefaultLookupService implements LookupService {
 			List<? extends DtoLookupByExample<?>> dtoLookupByExamples) {
 		Assert.notNull(context, "Context is required.");
 		Assert.notNull(entityManager, "Manager is required.");
-		Assert.notNull(entityLookups, "Entity lookups are required");
-		Assert.notNull(dtoLookups, "Dto lookups are required");
-		Assert.notNull(dtoLookupByExamples, "Dto lookups by example are required");
+		Assert.notNull(entityLookups, "Entity lookups are required.");
+		Assert.notNull(dtoLookups, "Dto lookups are required.");
+		Assert.notNull(dtoLookupByExamples, "Dto lookups by example are required.");
 		//
 		this.context = context;
 		this.entityManager = entityManager;
@@ -258,6 +266,23 @@ public class DefaultLookupService implements LookupService {
 		return ((ReadDtoService) service).getEntityClass();
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes"})
+	private Class<? extends BaseDto> getDtoClass(Class<? extends Identifiable> identifiableType) {
+		Assert.notNull(identifiableType, "Identifiable type is required!");
+		//
+		// given identifiable type is already entity class
+		if (BaseDto.class.isAssignableFrom(identifiableType)) {
+			return (Class<? extends BaseDto>) identifiableType;
+		}
+		//
+		// try to find entity class by dto class
+		Object service = getService(identifiableType);
+		if (service == null) {
+			return null;
+		}
+		return ((ReadDtoService) service).getDtoClass();
+	}
+	
 	@Override
 	public UUID getOwnerId(Identifiable owner) {
 		Assert.notNull(owner, "Owner is required.");
@@ -286,6 +311,36 @@ public class DefaultLookupService implements LookupService {
 			throw new IllegalArgumentException(String.format("Owner type [%s] has to generalize [BaseEntity]", ownerType));
 		}
 		return ownerEntityType.getCanonicalName();
+	}
+	
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <DTO extends BaseDto> DTO toDto(BaseEntity entity, DTO dto, BaseFilter context) {
+		Assert.notNull(entity, "Entity is required.");
+		//
+		Class<? extends BaseDto> dtoClass;
+		if (dto != null) {
+			dtoClass = dto.getClass();
+		} else {
+			Class<? extends BaseEntity> entityClass = entity.getClass();
+			if (entity instanceof HibernateProxy) {
+				entityClass = (Class<? extends BaseEntity>) ((HibernateProxy) entity).getHibernateLazyInitializer().getImplementation().getClass();
+			}
+			dtoClass = getDtoClass(entityClass);
+		}
+		if (dtoClass == null) {
+			LOG.error("DTO class for entity type [{}] cannot be resolved. Entity cannot be mapped to DTO.", entity.getClass());
+			//
+			return null;
+		}
+		//
+		DtoMapper mapper = (DtoMapper) getDtoMappers().getPluginFor(dtoClass);
+		if (mapper == null) {
+			LOG.debug("DTO for entity type [{}] will be mapped by default mapper.", entity.getClass());
+			//
+			mapper = new DefaultDtoMapper(this.context.getBean(ModelMapper.class), dtoClass);
+		}
+		return (DTO) mapper.map(entity, dto, context);
 	}
 	
 	/**
@@ -327,5 +382,12 @@ public class DefaultLookupService implements LookupService {
 			return (Class<? extends BaseEntity>) ownerEntityType;
 		}
 		return null;
+	}
+	
+	private PluginRegistry<DtoMapper<?, ?, ?>, Class<?>> getDtoMappers() {
+		if (dtoMappers == null) {
+			dtoMappers = OrderAwarePluginRegistry.create(Lists.newArrayList(context.getBeansOfType(DtoMapper.class).values()));
+		}
+		return dtoMappers;
 	}
 }

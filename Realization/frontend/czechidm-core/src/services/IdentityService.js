@@ -44,7 +44,7 @@ class IdentityService extends FormableEntityService {
       toString += (entity.externalCode ? `, ${entity.externalCode}` : '');
       toString += `)`;
     }
-    return toString;
+    return toString || entity.id;
   }
 
   getFullName(entity) {
