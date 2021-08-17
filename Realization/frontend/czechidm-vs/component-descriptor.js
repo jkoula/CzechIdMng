@@ -21,6 +21,12 @@ module.exports = {
       type: 'icon',
       entityType: ['virtual-reality'],
       component: require('./src/components/basic/VsConnectorIcon/VsConnectorIcon')
+    },
+    {
+      id: 'vs-form-value-info',
+      type: 'entity-info',
+      entityType: ['VsAccountFormValue'],
+      component: require('czechidm-core/src/components/advanced/FormValueInfo/FormValueInfo').default
     }
   ]
 };

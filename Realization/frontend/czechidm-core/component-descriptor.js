@@ -904,6 +904,24 @@ module.exports = {
       faceType: 'READ-DTO-SERVICE-SELECT',
       component: require('./src/components/advanced/Form/ReadDtoServiceSelectFormAttributeRenderer'),
       labelKey: 'core:component.advanced.EavForm.faceType.READ-DTO-SERVICE-SELECT'
+    },
+    {
+      id: 'form-value-info',
+      type: 'entity-info',
+      entityType: [
+        'formValue',
+        'IdmFormValue',
+        'IdmFormValueDto',
+        'IdmIdentityFormValue',
+        'IdmCodeListItemValue',
+        'IdmConceptRoleRequestFormValue',
+        'IdmContractSliceFormValue',
+        'IdmIdentityContractFormValue',
+        'IdmIdentityRoleFormValue',
+        'IdmRoleFormValue',
+        'IdmTreeNodeFormValue'
+      ],
+      component: require('./src/components/advanced/FormValueInfo/FormValueInfo').default
     }
   ]
 };

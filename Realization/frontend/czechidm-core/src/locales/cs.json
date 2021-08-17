@@ -4656,6 +4656,7 @@
       }
     },
     "FormValue": {
+      "_type": "Hodnota atributu formuláře",
       "ownerId": {
         "label": "Vlastník"
       },

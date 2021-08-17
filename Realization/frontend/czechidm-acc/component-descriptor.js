@@ -233,6 +233,12 @@ module.exports = {
       entityType: [ 'remoteServer' ],
       searchInFields: ['host', 'description'],
       manager: require('./src/redux').RemoteServerManager
+    },
+    {
+      id: 'acc-form-value-info',
+      type: 'entity-info',
+      entityType: ['SysSystemFormValue'],
+      component: require('czechidm-core/src/components/advanced/FormValueInfo/FormValueInfo').default
     }
   ]
 };

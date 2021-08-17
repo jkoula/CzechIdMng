@@ -1,15 +1,18 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 //
-import {FormAttributeManager} from '../../../redux';
+import { FormAttributeManager } from '../../../redux';
 import AbstractEntityInfo from '../EntityInfo/AbstractEntityInfo';
-
+import EntityInfo from '../EntityInfo/EntityInfo';
+//
 const manager = new FormAttributeManager();
 
 /**
- * Form attribute basic information (info card)
+ * Form attribute basic information (info card).
  *
  * @author Vít Švanda
+ * @author Radek Tomiška
  */
 export class FormAttributeInfo extends AbstractEntityInfo {
 
@@ -21,6 +24,10 @@ export class FormAttributeInfo extends AbstractEntityInfo {
     if (!super.showLink()) {
       return false;
     }
+    const { _permissions } = this.props;
+    if (!manager.canRead(this.getEntity(), _permissions)) {
+      return false;
+    }
     return true;
   }
 
@@ -30,7 +37,7 @@ export class FormAttributeInfo extends AbstractEntityInfo {
    * @return {string}
    */
   getLink() {
-    return `/form-definitions/attribute/${encodeURIComponent(this.getEntityId())}/detail`;
+    return `/form-definitions/attribute/${ encodeURIComponent(this.getEntityId()) }/detail`;
   }
 
   /**
@@ -52,6 +59,16 @@ export class FormAttributeInfo extends AbstractEntityInfo {
       {
         label: this.i18n('entity.name.label'),
         value: this.getManager().getNiceLabel(entity)
+      },
+      {
+        label: this.i18n('entity.FormDefinition._type'),
+        value: (
+          <EntityInfo
+            entityType="formDefinition"
+            entity={ entity._embedded ? entity._embedded.formDefinition : null }
+            entityIdentifier={ entity.formDefinition }
+            face="link" />
+        )
       }
     ];
   }
@@ -82,9 +99,16 @@ FormAttributeInfo.defaultProps = {
 };
 
 function select(state, component) {
+  const { entityIdentifier, entity } = component;
+  let entityId = entityIdentifier;
+  if (!entityId && entity) {
+    entityId = entity.id;
+  }
+  //
   return {
-    _entity: manager.getEntity(state, component.entityIdentifier),
-    _showLoading: manager.isShowLoading(state, null, component.entityIdentifier)
+    _entity: manager.getEntity(state, entityId),
+    _showLoading: manager.isShowLoading(state, null, entityId),
+    _permissions: manager.getPermissions(state, null, entityId),
   };
 }
 export default connect(select)(FormAttributeInfo);

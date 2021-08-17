@@ -8,9 +8,10 @@ import AbstractEntityInfo from '../EntityInfo/AbstractEntityInfo';
 const manager = new FormDefinitionManager();
 
 /**
- * Form attribute basic information (info card)
+ * Form attribute basic information (info card).
  *
  * @author Vít Švanda
+ * @author Radek Tomiška
  */
 export class FormDefinitionInfo extends AbstractEntityInfo {
 
@@ -22,6 +23,10 @@ export class FormDefinitionInfo extends AbstractEntityInfo {
     if (!super.showLink()) {
       return false;
     }
+    const { _permissions } = this.props;
+    if (!manager.canRead(this.getEntity(), _permissions)) {
+      return false;
+    }
     return true;
   }
 
@@ -31,7 +36,7 @@ export class FormDefinitionInfo extends AbstractEntityInfo {
    * @return {string}
    */
   getLink() {
-    return `/form-definitions/${encodeURIComponent(this.getEntityId())}/detail`;
+    return `/form-definitions/${ encodeURIComponent(this.getEntityId()) }/detail`;
   }
 
   /**
@@ -87,9 +92,16 @@ FormDefinitionInfo.defaultProps = {
 };
 
 function select(state, component) {
+  const { entityIdentifier, entity } = component;
+  let entityId = entityIdentifier;
+  if (!entityId && entity) {
+    entityId = entity.id;
+  }
+  //
   return {
-    _entity: manager.getEntity(state, component.entityIdentifier),
-    _showLoading: manager.isShowLoading(state, null, component.entityIdentifier)
+    _entity: manager.getEntity(state, entityId),
+    _showLoading: manager.isShowLoading(state, null, entityId),
+    _permissions: manager.getPermissions(state, null, entityId),
   };
 }
 export default connect(select)(FormDefinitionInfo);

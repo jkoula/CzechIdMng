@@ -99,16 +99,10 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	public AuthorizableType getAuthorizableType() {
 		return null; // each implementation should be secured itself
 	}
-
+	
 	@Override
-	protected IdmFormValueDto toDto(E entity) {
-		IdmFormValueDto dto = super.toDto(entity);
-		if (dto != null && entity != null) {
-			dto.setOwnerId(entity.getOwner().getId());
-			dto.setOwnerType(entity.getOwner().getClass());
-			// TODO: put owner to embedded => depends on #978
-		}
-		return dto;
+	protected IdmFormValueDto toDto(E entity, IdmFormValueDto dto, IdmFormValueFilter<O> context) {
+		return lookupService.toDto(entity, dto, context);
 	}
 
 	@Override

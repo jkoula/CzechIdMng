@@ -4603,11 +4603,12 @@
       }
     },
     "FormValue": {
+      "_type": "Form attribute value",
       "ownerId": {
         "label": "Owner"
       },
       "value": {
-        "label": "Attribute's value"
+        "label": "Attribute value"
       },
       "persistentType": {
         "label": "Attribute type"
