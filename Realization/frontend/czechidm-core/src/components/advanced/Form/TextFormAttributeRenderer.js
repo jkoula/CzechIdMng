@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Joi from 'joi';
 //
 import * as Basic from '../../basic';
+import * as Utils from '../../../utils';
 import AbstractFormAttributeRenderer from './AbstractFormAttributeRenderer';
 
 /**
@@ -136,13 +137,22 @@ export default class TextFormAttributeRenderer extends AbstractFormAttributeRend
   }
 
   /**
-   * Returns joi validator by persistent type
+   * Returns joi validator by persistent type.
    *
-   * @param  {FormAttribute} attribute
    * @return {Joi}
    */
   getInputValidation() {
+    const { attribute } = this.props;
     let validation = Joi.string();
+    //
+    const max = this.getMax(attribute);
+    const min = this.getMin(attribute);
+    if (!Utils.Ui.isEmpty(max) && max > 0) {
+      validation = validation.concat(Joi.string().max(max));
+    }
+    if (!Utils.Ui.isEmpty(min) && min > 0) {
+      validation = validation.concat(Joi.string().min(min));
+    }
     if (!this.isRequired()) {
       validation = validation.concat(Joi.string().allow(null).allow(''));
     }

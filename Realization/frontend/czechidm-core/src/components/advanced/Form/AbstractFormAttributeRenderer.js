@@ -370,20 +370,6 @@ export default class AbstractFormAttributeRenderer extends Basic.AbstractContext
     return readOnly || attribute.readonly;
   }
 
-  /**
-   * Input as single fields
-   */
-  renderSingleInput() {
-    return this._unsupportedMode();
-  }
-
-  /**
-   * Input for multiple values
-   */
-  renderMultipleInput() {
-    return this._unsupportedMode('multiple');
-  }
-
   valueChanged() {
     const {values} = this.props;
     if (!values) {
@@ -423,6 +409,79 @@ export default class AbstractFormAttributeRenderer extends Basic.AbstractContext
       originalValues.push(values);
     }
     return originalValues;
+  }
+
+  /**
+   * Get configured minumum as integer for validations.
+   *
+   * @param  {IdmFormAttributeDto}  attribute       configured attribute
+   * @param  {Boolean} [readOnly=false] attribute is readonly
+   * @param  {int} [maxValueRange=false] hard minimum
+   * @return {int}        min
+   * @since 11.2.0
+   */
+  getMin(attribute, readOnly = false, minValueRange = null) {
+    if (!attribute || readOnly) {
+      return minValueRange;
+    }
+    let min = attribute.min;
+    // not configured
+    if (Utils.Ui.isEmpty(min)) {
+      return minValueRange;
+    }
+    min = parseInt(min, 10);
+    if (Utils.Ui.isEmpty(min)) {
+      return minValueRange;
+    }
+    if (Utils.Ui.isEmpty(minValueRange)) {
+      return min;
+    }
+    //
+    return min < minValueRange ? minValueRange : min;
+  }
+
+  /**
+   * Get configured maximum as integer for validations.
+   *
+   * @param  {IdmFormAttributeDto}  attribute       configured attribute
+   * @param  {Boolean} [readOnly=false] attribute is readonly
+   * @param  {int} [maxValueRange=false] hard maximum
+   * @return {int}        max
+   * @since 11.2.0
+   */
+  getMax(attribute, readOnly = false, maxValueRange = null) {
+    if (!attribute || readOnly) {
+      return maxValueRange;
+    }
+    //
+    let max = attribute.max;
+    // not configured
+    if (Utils.Ui.isEmpty(max)) {
+      return maxValueRange;
+    }
+    max = parseInt(max, 10);
+    if (Utils.Ui.isEmpty(max)) {
+      return maxValueRange;
+    }
+    if (Utils.Ui.isEmpty(maxValueRange)) {
+      return max;
+    }
+    //
+    return max > maxValueRange ? maxValueRange : max;
+  }
+
+  /**
+   * Input as single fields
+   */
+  renderSingleInput() {
+    return this._unsupportedMode();
+  }
+
+  /**
+   * Input for multiple values
+   */
+  renderMultipleInput() {
+    return this._unsupportedMode('multiple');
   }
 
   render() {

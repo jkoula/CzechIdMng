@@ -1,6 +1,8 @@
 import React from 'react';
+import moment from 'moment';
 //
 import * as Basic from '../../basic';
+import * as Utils from '../../../utils';
 import AbstractFormAttributeRenderer from './AbstractFormAttributeRenderer';
 
 /**
@@ -36,6 +38,26 @@ export default class DateTimeFormAttributeRenderer extends AbstractFormAttribute
     return formValue.dateValue ? formValue.dateValue : formValue.value;
   }
 
+  getMinDate(attribute, readOnly = false) {
+    const minDays = this.getMin(attribute, readOnly);
+    // not configured
+    if (Utils.Ui.isEmpty(minDays) || readOnly) {
+      return null;
+    }
+    //
+    return moment().add(minDays, 'days');
+  }
+
+  getMaxDate(attribute, readOnly = false) {
+    const maxDays = this.getMax(attribute, readOnly);
+    // not configured
+    if (Utils.Ui.isEmpty(maxDays) || readOnly) {
+      return null;
+    }
+    //
+    return moment().add(maxDays, 'days');
+  }
+
   renderSingleInput(originalValues) {
     const { attribute, values, validationErrors, className, style } = this.props;
     const showOriginalValue = !!originalValues;
@@ -45,6 +67,8 @@ export default class DateTimeFormAttributeRenderer extends AbstractFormAttribute
         ref={ AbstractFormAttributeRenderer.INPUT }
         mode={ attribute.persistentType.toLowerCase() }
         required={ this.isRequired() }
+        minDate={ this.getMinDate(attribute, showOriginalValue ? true : this.isReadOnly()) }
+        maxDate={ this.getMaxDate(attribute, showOriginalValue ? true : this.isReadOnly()) }
         label={ this.getLabel(null, showOriginalValue) }
         placeholder={ this.getPlaceholder() }
         value={ this.toInputValue(showOriginalValue ? originalValues : values) }
@@ -53,7 +77,7 @@ export default class DateTimeFormAttributeRenderer extends AbstractFormAttribute
         validationErrors={ validationErrors }
         validationMessage={ attribute.validationMessage }
         className={ className }
-        style={ style}/>
+        style={ style }/>
     );
   }
 

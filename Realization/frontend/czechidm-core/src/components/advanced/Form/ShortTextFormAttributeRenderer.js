@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Joi from 'joi';
 //
+import * as Utils from '../../../utils';
 import TextFormAttributeRenderer from './TextFormAttributeRenderer';
 
 /**
@@ -108,7 +109,17 @@ export default class ShortTextFormAttributeRenderer extends TextFormAttributeRen
    * @return {Joi}
    */
   getInputValidation() {
-    let validation = Joi.string().max(2000);
+    const { attribute } = this.props;
+    //
+    let max = this.getMax(attribute, false, 2000);
+    if (Utils.Ui.isEmpty(max) || max <= 0) {
+      max = 2000;
+    }
+    let validation = Joi.string().max(max);
+    const min = this.getMin(attribute);
+    if (!Utils.Ui.isEmpty(min) && min > 0) {
+      validation = validation.concat(Joi.string().min(min));
+    }
     if (!this.isRequired()) {
       validation = validation.concat(Joi.string().allow(null).allow(''));
     }

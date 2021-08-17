@@ -237,7 +237,73 @@ class FormAttributeDetail extends Basic.AbstractContent {
     }
     return persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DOUBLE)
         || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)
-        || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.LONG);
+        || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.LONG)
+        || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.TEXT)
+        || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT)
+        || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATE)
+        || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATETIME);
+  }
+
+  _getMinLabel(persistentType) {
+    if (persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.TEXT)
+      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT)) {
+      return this.i18n('entity.FormAttribute.minLength.label');
+    }
+    if (persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATE)
+      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATETIME)) {
+      return this.i18n('entity.FormAttribute.minDate.label');
+    }
+    //
+    return this.i18n('entity.FormAttribute.min.label');
+  }
+
+  _getMaxLabel(persistentType) {
+    if (persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.TEXT)
+      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT)) {
+      return this.i18n('entity.FormAttribute.maxLength.label');
+    }
+    if (persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATE)
+      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATETIME)) {
+      return this.i18n('entity.FormAttribute.maxDate.label');
+    }
+    //
+    return this.i18n('entity.FormAttribute.max.label');
+  }
+
+  _getMin(persistentType) {
+    if (persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.TEXT)
+      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT)) {
+      return Joi
+        .number()
+        .integer()
+        .min(0)
+        .max(persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT) ? 2000 : 10 ** 33)
+        .allow(null);
+    }
+    return Joi
+      .number()
+      .precision(4)
+      .min(-(10 ** 33))
+      .max(10 ** 33)
+      .allow(null);
+  }
+
+  _getMax(persistentType) {
+    if (persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.TEXT)
+      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT)) {
+      return Joi
+        .number()
+        .integer()
+        .min(0)
+        .max(persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.SHORTTEXT) ? 2000 : 10 ** 33)
+        .allow(null);
+    }
+    return Joi
+      .number()
+      .precision(4)
+      .min(-(10 ** 33))
+      .max(10 ** 33)
+      .allow(null);
   }
 
   /**
@@ -445,27 +511,29 @@ class FormAttributeDetail extends Basic.AbstractContent {
                   readOnly={ !this._supportsUniqueValidation(persistentType) }/>
                 <Basic.TextField
                   ref="min"
-                  label={ this.i18n('entity.FormAttribute.min.label') }
-                  validation={
-                    Joi
-                      .number()
-                      .precision(4)
-                      .min(-(10 ** 33))
-                      .max(10 ** 33)
-                      .allow(null)
+                  label={ this._getMinLabel(persistentType) }
+                  helpBlock={
+                    persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATE)
+                      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATETIME)
+                    ?
+                    this.i18n('entity.FormAttribute.minDate.help')
+                    :
+                    null
                   }
+                  validation={ this._getMin(persistentType) }
                   readOnly={ !this._supportsMinMaxValidation(persistentType) }/>
                 <Basic.TextField
                   ref="max"
-                  label={ this.i18n('entity.FormAttribute.max.label') }
-                  validation={
-                    Joi
-                      .number()
-                      .precision(4)
-                      .min(-(10 ** 33))
-                      .max(10 ** 33)
-                      .allow(null)
+                  label={ this._getMaxLabel(persistentType) }
+                  helpBlock={
+                    persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATE)
+                      || persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DATETIME)
+                    ?
+                    this.i18n('entity.FormAttribute.maxDate.help')
+                    :
+                    null
                   }
+                  validation={ this._getMax(persistentType) }
                   readOnly={ !this._supportsMinMaxValidation(persistentType) }/>
                 <Basic.TextField
                   ref="regex"
