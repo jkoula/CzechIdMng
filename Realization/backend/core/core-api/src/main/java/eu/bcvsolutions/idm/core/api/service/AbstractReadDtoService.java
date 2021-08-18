@@ -80,7 +80,7 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
  * @param <F> filter {@link DataFilter} generalization is preferred.
  */
 public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends BaseEntity, F extends BaseFilter>
-		implements ReadDtoService<DTO, F>, DtoMapper<DTO, E, F> {
+		implements ReadDtoService<DTO, F>, DtoMapper<DTO, E> {
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AbstractReadDtoService.class);
 	//
@@ -584,8 +584,16 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 	}
 	
 	@Override
-	public DTO map(E entity, DTO dto, F context) {
-		return toDto(entity, dto, context);
+	@SuppressWarnings("unchecked")
+	public DTO map(E entity, DTO dto, DataFilter context) {
+		if (context == null) {
+			return toDto(entity, dto, null);
+		}
+		if (getFilterClass().isAssignableFrom(context.getClass())) {
+			return toDto(entity, dto, (F) context);
+		}
+		// TODO: try to convert data filter automatically
+		return toDto(entity, dto, null);
 	}
 
 	/**

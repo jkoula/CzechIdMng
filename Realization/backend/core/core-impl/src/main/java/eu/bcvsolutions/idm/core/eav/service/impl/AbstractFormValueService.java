@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
@@ -102,7 +103,19 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	
 	@Override
 	protected IdmFormValueDto toDto(E entity, IdmFormValueDto dto, IdmFormValueFilter<O> context) {
+		if (entity == null) {
+			return null;
+		}
 		return lookupService.toDto(entity, dto, context);
+	}
+	
+	@Override
+	public IdmFormValueDto map(E entity, IdmFormValueDto dto, DataFilter context) {
+		if (context == null) {
+			return toDto(entity, dto, null);
+		}
+		//
+		return toDto(entity, dto, new IdmFormValueFilter<O>(context.getData()));
 	}
 
 	@Override

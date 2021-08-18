@@ -7575,6 +7575,10 @@
       "title": "Form definition can not be deleted",
       "message": "Definition [{{code}}] can't be deleted, because it is flagged as main. Flag another definition as main before its deletion."
     },
+    "FORM_DEFINITION_UPDATE_FAILED_MAIN_FORM": {
+      "title": "Form definition can not be updated",
+      "message": "Definition [{{code}}] can't be updated, because it is flagged as main. Flag another definition as main before."
+    },
     "FORM_ATTRIBUTE_DELETE_FAILED_HAS_VALUES": {
       "title": "Form attribute can not be deleted",
       "message": "Form attribute cannot be deleted - some form values already using this attribute."

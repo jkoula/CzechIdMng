@@ -10,7 +10,7 @@ import org.modelmapper.ModelMapper;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DtoLookup;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DtoLookupByExample;
@@ -87,6 +87,17 @@ public interface LookupService extends ScriptEnabled {
 	 * @since 8.1.7
 	 */
 	<DTO extends BaseDto> DTO lookupDto(String identifiableType, Serializable entityId);
+	
+	/**
+	 * Returns {@link BaseEntity} by given identifier and type. 
+	 * {@link BaseEntity} and {@link BaseDto} type can be given.
+	 * 
+	 * @param identifiableType
+	 * @param entityId
+	 * @return {@link BaseEntity}
+	 * @since 11.2.0
+	 */
+	<E extends BaseEntity> E lookupEntity(String identifiableType, Serializable entityId);
 	
 	/**
 	 * Find dto by example.
@@ -176,5 +187,5 @@ public interface LookupService extends ScriptEnabled {
 	 * @return filled dto
 	 * @since 11.2.0
 	 */
-	<DTO extends BaseDto> DTO toDto(BaseEntity entity, DTO dto, BaseFilter context);
+	<DTO extends BaseDto> DTO toDto(BaseEntity entity, DTO dto, DataFilter context);
 }

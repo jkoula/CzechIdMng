@@ -41,6 +41,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
@@ -48,6 +49,7 @@ import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.audit.entity.IdmAudit_;
+import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
@@ -339,13 +341,18 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 		if (entityId == null || StringUtils.isEmpty(dto.getType())) {
 			return; // just for sure - IdmAudit entity doesn't specify it as required (but it should be)
 		}
-		//
+		// set context - add additional common props
+		DataFilter context = new DataFilter(null);
+		context.set(IdmFormValueFilter.PARAMETER_ADD_OWNER_DTO, true);
 		BaseDto revision = null;
 		if (loadedDtos.containsKey(entityId)) {
 			revision = loadedDtos.get(entityId);
 		} else {
 			try {
-				revision = getLookupService().lookupDto(dto.getType(), entityId);
+				BaseEntity revisionEntity = getLookupService().lookupEntity(dto.getType(), entityId);
+				if (revisionEntity != null) {
+					revision = getLookupService().toDto(revisionEntity, null, context);
+				}
 				loadedDtos.put(entityId, revision);
 			} catch (IllegalArgumentException ex) {
 				LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getType(), ex);
@@ -361,7 +368,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 				if (lastPersistedVersion != null) {
 					dto.getEmbedded().put(
 							IdmAudit_.entityId.getName(), 
-							getLookupService().toDto((BaseEntity) lastPersistedVersion, null, null)
+							getLookupService().toDto((BaseEntity) lastPersistedVersion, null, context)
 					);
 				}
 			} catch (IllegalArgumentException | ClassNotFoundException ex) {

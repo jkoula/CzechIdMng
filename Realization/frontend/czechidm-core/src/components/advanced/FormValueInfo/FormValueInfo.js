@@ -7,6 +7,7 @@ import * as Utils from '../../../utils';
 import { FormAttributeManager } from '../../../redux';
 import AbstractEntityInfo from '../EntityInfo/AbstractEntityInfo';
 import EntityInfo from '../EntityInfo/EntityInfo';
+import UuidInfo from '../UuidInfo/UuidInfo';
 //
 const formAttributeManager = new FormAttributeManager();
 
@@ -88,7 +89,7 @@ export class FormValueInfo extends AbstractEntityInfo {
             entityIdentifier={ entity.ownerId }
             face="popover" />
           :
-          entity.ownerId
+          <UuidInfo value={ entity.ownerId }/>
         )
       }
     ];

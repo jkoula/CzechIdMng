@@ -3,7 +3,7 @@ package eu.bcvsolutions.idm.core.api.rest.lookup;
 import org.springframework.plugin.core.Plugin;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 
 /**
@@ -15,7 +15,7 @@ import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
  * @param <C> context parameters
  * @since 11.2.0
  */
-public interface DtoMapper<DTO extends BaseDto, E extends BaseEntity, C extends BaseFilter> extends Plugin<Class<?>> {
+public interface DtoMapper<DTO extends BaseDto, E extends BaseEntity> extends Plugin<Class<?>> {
 
 	/**
 	 * Convert {@link BaseEntity} to {@link BaseDto}.
@@ -25,5 +25,5 @@ public interface DtoMapper<DTO extends BaseDto, E extends BaseEntity, C extends 
 	 * @param context [optional] context parameters
 	 * @return filled dto
 	 */
-	DTO map(E entity, DTO dto, C context);
+	DTO map(E entity, DTO dto, DataFilter context);
 }

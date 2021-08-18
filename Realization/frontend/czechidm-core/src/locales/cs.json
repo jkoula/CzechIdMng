@@ -7627,6 +7627,10 @@
       "title": "Definici formuláře nelze smazat",
       "message": "Definici [{{code}}] nelze smazat, protože je označena jako hlavní. Označte nejprve jinou definici jako hlavní."
     },
+    "FORM_DEFINITION_UPDATE_FAILED_MAIN_FORM": {
+      "title": "Definici formuláře nelze upravit",
+      "message": "Definici [{{code}}] nelze upravit, protože je označena jako hlavní. Označte nejprve jinou definici jako hlavní."
+    },
     "FORM_ATTRIBUTE_DELETE_FAILED_HAS_VALUES": {
       "title": "Atribut formuláře nelze smazat",
       "message": "Atribut nelze smazat, některé formulářové hodnoty používají tento atribut."

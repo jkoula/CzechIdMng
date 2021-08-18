@@ -16,6 +16,7 @@ import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormValueService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
@@ -59,7 +60,9 @@ public class IdmFormValueDtoMapperIntegrationTest extends AbstractIntegrationTes
 		//
 		IdmIdentityFormValue savedEntity = identityFormValueRepository.findById(savedValue.getId()).get();
 		//
-		IdmFormValueDto valueDto = lookupService.toDto(savedEntity, null, null);
+		IdmFormValueFilter<?> context = new IdmFormValueFilter<>();
+		context.setAddOwnerDto(true);
+		IdmFormValueDto valueDto = lookupService.toDto(savedEntity, null, context);
 		//
 		Assert.assertEquals(value.getStringValue(), valueDto.getStringValue());
 		BaseDto owner = valueDto.getEmbedded().get(FormValueService.PROPERTY_OWNER);
@@ -90,7 +93,9 @@ public class IdmFormValueDtoMapperIntegrationTest extends AbstractIntegrationTes
 		IdmIdentityFormValue savedEntity = identityFormValueRepository.findById(savedValue.getId()).get();
 		//
 		DefaultDtoMapper mapper = new DefaultDtoMapper(modelMapper, IdmFormValueDto.class);
-		IdmFormValueDto valueDto = (IdmFormValueDto) mapper.map(savedEntity, null, null);
+		IdmFormValueFilter<?> context = new IdmFormValueFilter<>();
+		context.setAddOwnerDto(true);
+		IdmFormValueDto valueDto = (IdmFormValueDto) mapper.map(savedEntity, null, context);
 		//
 		Assert.assertEquals(value.getStringValue(), valueDto.getStringValue());
 		BaseDto owner = valueDto.getEmbedded().get(FormValueService.PROPERTY_OWNER);

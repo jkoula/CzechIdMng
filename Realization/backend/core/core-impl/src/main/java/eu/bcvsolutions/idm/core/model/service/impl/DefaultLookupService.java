@@ -26,7 +26,7 @@ import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.rest.lookup.CodeableDtoLookup;
 import eu.bcvsolutions.idm.core.api.rest.lookup.DefaultDtoLookup;
@@ -58,7 +58,7 @@ public class DefaultLookupService implements LookupService {
 	private final PluginRegistry<DtoLookupByExample<?>, Class<?>> dtoLookupByExamples;
 	// loaded services cache
 	private final Map<Class<? extends Identifiable>, Object> services = new HashMap<>();
-	private PluginRegistry<DtoMapper<?, ?, ?>, Class<?>> dtoMappers;
+	private PluginRegistry<DtoMapper<?, ?>, Class<?>> dtoMappers;
 	
 	@Autowired
 	public DefaultLookupService(
@@ -114,6 +114,16 @@ public class DefaultLookupService implements LookupService {
 			return lookupDto((Class<? extends Identifiable>) Class.forName(identifiableType), entityId);
 		} catch (ClassNotFoundException ex) {
 			throw new IllegalArgumentException(String.format("Dto lookup for identifiable type [%s] is not supported", identifiableType), ex);
+		}
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E extends BaseEntity> E lookupEntity(String identifiableType, Serializable entityId) {
+		try {
+			return lookupEntity((Class<? extends Identifiable>) Class.forName(identifiableType), entityId);
+		} catch (ClassNotFoundException ex) {
+			throw new IllegalArgumentException(String.format("Entity lookup for identifiable type [%s] is not supported", identifiableType), ex);
 		}
 	}
 	
@@ -315,7 +325,7 @@ public class DefaultLookupService implements LookupService {
 	
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <DTO extends BaseDto> DTO toDto(BaseEntity entity, DTO dto, BaseFilter context) {
+	public <DTO extends BaseDto> DTO toDto(BaseEntity entity, DTO dto, DataFilter context) {
 		Assert.notNull(entity, "Entity is required.");
 		//
 		Class<? extends BaseDto> dtoClass;
@@ -384,7 +394,7 @@ public class DefaultLookupService implements LookupService {
 		return null;
 	}
 	
-	private PluginRegistry<DtoMapper<?, ?, ?>, Class<?>> getDtoMappers() {
+	private PluginRegistry<DtoMapper<?, ?>, Class<?>> getDtoMappers() {
 		if (dtoMappers == null) {
 			dtoMappers = OrderAwarePluginRegistry.create(Lists.newArrayList(context.getBeansOfType(DtoMapper.class).values()));
 		}

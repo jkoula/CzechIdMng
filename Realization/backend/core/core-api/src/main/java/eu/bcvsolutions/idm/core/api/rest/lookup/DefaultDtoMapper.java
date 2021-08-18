@@ -7,7 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 
 /**
@@ -20,17 +20,17 @@ import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
  * @since 11.2.0
  */
 @Order(Ordered.LOWEST_PRECEDENCE)
-public class DefaultDtoMapper implements DtoMapper<BaseDto, BaseEntity, BaseFilter> {
+public class DefaultDtoMapper extends AbstractDtoMapper<BaseDto, BaseEntity> {
 
 	private final Class<? extends BaseDto> dtoClass;
-	private final ModelMapper modelMapper;
 	
 	@Autowired
 	public DefaultDtoMapper(ModelMapper modelMapper, Class<? extends BaseDto> dtoClass) {
+		super(modelMapper);
+		//
 		Assert.notNull(modelMapper, "Model mapper is required.");
 		Assert.notNull(dtoClass, "DTO class is required.");
 		//
-		this.modelMapper = modelMapper;
 		this.dtoClass = dtoClass;
 	}
 	
@@ -50,14 +50,14 @@ public class DefaultDtoMapper implements DtoMapper<BaseDto, BaseEntity, BaseFilt
 	}
 	
 	@Override
-	public BaseDto map(BaseEntity entity, BaseDto dto, BaseFilter context) {
+	public BaseDto map(BaseEntity entity, BaseDto dto, DataFilter context) {
 		if (entity == null) {
 			return null;
 		}
 		if (dto == null) {
-			return modelMapper.map(entity, getDtoClass(entity));
+			return getModelMapper().map(entity, getDtoClass(entity));
 		}
-		modelMapper.map(entity, dto);
+		getModelMapper().map(entity, dto);
 		//
 		return dto;
 	}

@@ -35,6 +35,7 @@ public class IdmFormValueFilter<O extends FormableEntity> extends DataFilter {
 	public static final String PARAMETER_DOUBLE_VALUE = "doubleValue"; // equals
 	public static final String PARAMETER_DATE_VALUE = "dateValue"; // equals
 	public static final String PARAMETER_UUID_VALUE = "uuidValue"; // equals
+	public static final String PARAMETER_ADD_OWNER_DTO = "addOwnerDto"; // convert owner into embedded dtos
 
 	public IdmFormValueFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -159,5 +160,25 @@ public class IdmFormValueFilter<O extends FormableEntity> extends DataFilter {
 
 	public void setUuidValue(UUID uuidValue) {
 		set(PARAMETER_UUID_VALUE, uuidValue);
+	}
+	
+	/**
+	 * Convert owner into embedded dtos.
+	 * 
+	 * @return true - owner will be in embeded dtos. false by default.
+	 * @since 11.2.0
+	 */
+	public boolean isAddOwnerDto() {
+		return getParameterConverter().toBoolean(getData(), PARAMETER_ADD_OWNER_DTO, false);
+	}
+	
+	/**
+	 * Convert owner into embedded dtos.
+	 * 
+	 * @param addOwnerDto true - owner will be in embeded dtos. false by default.
+	 * @since 11.2.0
+	 */
+	public void setAddOwnerDto(boolean addOwnerDto) {
+		set(PARAMETER_ADD_OWNER_DTO, addOwnerDto);
 	}
 }
