@@ -27,7 +27,7 @@ import eu.bcvsolutions.idm.core.eav.api.service.FormService;
  * @author Radek Tomiška
  * @since 9.4.0
  */
-@Component
+@Component(FormAttributeValidateProcessor.PROCESSOR_NAME)
 @Description("Change persistent type and confidential is possible, only if no form values for this attribute is persisted.")
 public class FormAttributeValidateProcessor
 		extends CoreEventProcessor<IdmFormAttributeDto> 

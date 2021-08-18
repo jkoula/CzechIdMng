@@ -459,7 +459,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		attributeTwo.setRequired(true);
 		attributeTwo.setDefaultValue(attributeTwoDefaultValue);
 
-		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class,
+		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, FormService.DEFAULT_DEFINITION_CODE,
 				ImmutableList.of(attributeOne, attributeTwo));
 		roleOne.setIdentityRoleAttributeDefinition(definition.getId());
 		roleOne = roleService.save(roleOne);
@@ -556,7 +556,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		attributeThree.setPersistentType(PersistentType.SHORTTEXT);
 		attributeThree.setRequired(true);
 
-		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class,
+		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, FormService.DEFAULT_DEFINITION_CODE,
 				ImmutableList.of(attributeOne, attributeTwo, attributeThree));
 		roleOne.setIdentityRoleAttributeDefinition(definition.getId());
 		roleOne = roleService.save(roleOne);
@@ -621,7 +621,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		IdmFormAttributeDto attribute = new IdmFormAttributeDto(attributeCode);
 		attribute.setPersistentType(PersistentType.ATTACHMENT);
 
-		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class,
+		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, FormService.DEFAULT_DEFINITION_CODE,
 				ImmutableList.of(attribute));
 		role.setIdentityRoleAttributeDefinition(definition.getId());
 		role = roleService.save(role);
@@ -1149,7 +1149,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		ipAttribute.setPersistentType(PersistentType.TEXT);
 		ipAttribute.setRequired(ipRequired);
 		
-		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, ImmutableList.of(ipAttribute));
+		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, FormService.DEFAULT_DEFINITION_CODE, ImmutableList.of(ipAttribute));
 		role.setIdentityRoleAttributeDefinition(definition.getId());
 		role = roleService.save(role);
 		assertNotNull(role.getIdentityRoleAttributeDefinition());

@@ -17,7 +17,7 @@ import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Code list tests
+ * Code list tests.
  * 
  * @author Radek Tomiška
  *

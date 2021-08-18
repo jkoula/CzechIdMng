@@ -41,7 +41,7 @@ public class FormDefinitionExportBulkActionIntegrationTest extends AbstractExpor
 
 	@Test
 	public void testExportImportFormDefinition() {
-		IdmFormDefinitionDto formDef = getHelper().createFormDefinition("type_" + getHelper().createName(), true);
+		IdmFormDefinitionDto formDef = getHelper().createFormDefinition("type_" + getHelper().createName(), false);
 		Assert.assertNotNull(formDef.getId());
 
 		final String testAttrName = "testFormAttr" + getHelper().createName();

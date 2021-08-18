@@ -767,7 +767,7 @@ public class DefaultIdmRoleServiceIntegrationTest extends AbstractRestTest {
 		ipAttribute.setPersistentType(PersistentType.TEXT);
 		ipAttribute.setRequired(ipRequired);
 		
-		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, ImmutableList.of(ipAttribute));
+		IdmFormDefinitionDto definition = formService.createDefinition(IdmIdentityRole.class, FormService.DEFAULT_DEFINITION_CODE, ImmutableList.of(ipAttribute));
 		role.setIdentityRoleAttributeDefinition(definition.getId());
 		role = roleService.save(role);
 		assertNotNull(role.getIdentityRoleAttributeDefinition());

@@ -42,6 +42,9 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormDefinitionFilter;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
+import eu.bcvsolutions.idm.core.eav.api.event.FormDefinitionEvent;
+import eu.bcvsolutions.idm.core.eav.api.event.FormDefinitionEvent.FormDefinitionEventType;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute_;
@@ -66,7 +69,7 @@ public class DefaultIdmFormDefinitionService
 	private final IdmFormDefinitionRepository formDefinitionRepository;
 	//
 	@Autowired private IdmFormAttributeService formAttributeService;
-	@Autowired private LookupService lookupService;
+	@Autowired @Lazy private LookupService lookupService;
 	@Autowired @Lazy private IdmRoleService roleService;
 
 	@Autowired
@@ -84,7 +87,7 @@ public class DefaultIdmFormDefinitionService
 	}
 	
 	/**
-	 * Fill default definition code and name, if no code / name is given
+	 * Fill default definition code and name, if no code / name is given.
 	 */
 	@Override
 	@Transactional
@@ -100,9 +103,15 @@ public class DefaultIdmFormDefinitionService
 			IdmFormDefinitionDto mainDefinition = findOneByMain(dto.getType());
 			if (mainDefinition != null && !mainDefinition.getId().equals(dto.getId())) {
 				mainDefinition.setMain(false);
-				save(mainDefinition);
+				//
+				FormDefinitionEvent formDefinitionEvent = new FormDefinitionEvent(FormDefinitionEventType.UPDATE, mainDefinition);
+				// We don't need validation - main definition is set in the same transaction bellow.
+				formDefinitionEvent.getProperties().put(FormService.SKIP_EAV_VALIDATION, Boolean.TRUE);
+				//
+				publish(formDefinitionEvent);
 			}
 		}
+		//
 		return super.saveInternal(dto);
 	}
 	
