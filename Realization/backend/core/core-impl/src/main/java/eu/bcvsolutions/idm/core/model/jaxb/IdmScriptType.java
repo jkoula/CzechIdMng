@@ -22,13 +22,13 @@ import eu.bcvsolutions.idm.core.api.jaxb.CDATAAdapter;
 @XmlType(propOrder = { 
 		"code", 
 		"name",
+		"body",
+		"type",
 		"category", 
-		"type", 
 		"parameters", 
-		"body", 
+		"description",
 		"services", 
-		"allowClasses", 
-		"description"
+		"allowClasses"
 })
 public class IdmScriptType implements Codeable {
 

@@ -343,7 +343,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 		}
 		// set context - add additional common props
 		DataFilter context = new DataFilter(null);
-		context.set(IdmFormValueFilter.PARAMETER_ADD_OWNER_DTO, true);
+		context.set(IdmFormValueFilter.PARAMETER_ADD_OWNER_DTO, Boolean.TRUE);
 		BaseDto revision = null;
 		if (loadedDtos.containsKey(entityId)) {
 			revision = loadedDtos.get(entityId);

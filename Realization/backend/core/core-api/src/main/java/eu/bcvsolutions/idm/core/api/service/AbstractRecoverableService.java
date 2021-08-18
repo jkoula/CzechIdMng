@@ -22,6 +22,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.http.MediaType;
@@ -114,6 +115,16 @@ public abstract class AbstractRecoverableService<T extends Codeable, DTO extends
 	abstract protected T toType(DTO dto);
 	
 	/**
+	 * Return xsd no namespace schema location (JAXB_NO_NAMESPACE_SCHEMA_LOCATION).
+	 * 
+	 * @return xsd location
+	 * @since 11.2.0
+	 */
+	protected String getXsdLocation() {
+		return null;
+	}
+	
+	/**
 	 * Create instance of JaxbMarshaller and set required properties to him.
 	 * 
 	 * @return
@@ -176,6 +187,10 @@ public abstract class AbstractRecoverableService<T extends Codeable, DTO extends
 		T type = toType(dto);
 		File file = new File(getBackupFileName(directory, dto));
 		try {
+			String xsdLocation = getXsdLocation();
+			if (StringUtils.isNotBlank(xsdLocation)) {
+				jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, xsdLocation);
+			}
 			jaxbMarshaller.marshal(type, file);
 			//
 			return file;

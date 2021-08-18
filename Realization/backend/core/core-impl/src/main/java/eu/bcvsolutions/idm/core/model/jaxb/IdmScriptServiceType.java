@@ -26,7 +26,7 @@ public class IdmScriptServiceType {
 		this.name = name;
 	}
 
-	@XmlElement(required = true, type = String.class)
+	@XmlElement(type = String.class)
 	public String getClassName() {
 		return className;
 	}

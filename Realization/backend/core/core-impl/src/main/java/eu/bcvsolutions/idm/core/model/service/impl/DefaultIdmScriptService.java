@@ -164,6 +164,11 @@ public class DefaultIdmScriptService
 	protected String getBackupFolderName() {
 		return SCRIPT_DEFAULT_BACKUP_FOLDER;
 	}
+	
+	@Override
+	protected String getXsdLocation() {
+		return "IdmScript.xsd";
+	}
 
 	@Override
 	@Transactional

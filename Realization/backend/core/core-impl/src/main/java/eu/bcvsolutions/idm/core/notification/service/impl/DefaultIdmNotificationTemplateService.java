@@ -272,6 +272,11 @@ public class DefaultIdmNotificationTemplateService
 	protected String getBackupFolderName() {
 		return TEMPLATE_DEFAULT_BACKUP_FOLDER;
 	}
+	
+	@Override
+	protected String getXsdLocation() {
+		return "IdmNotificationTemplate.xsd";
+	}
 
 	@Override
 	@Transactional
