@@ -899,7 +899,7 @@ module.exports = {
         {
           path: ':entityId/values',
           component: require('./src/content/form/FormDefinitionValues'),
-          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['APP_ADMIN'] } ]
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['FORMVALUE_READ'] } ]
         }
       ]
     },
@@ -916,7 +916,7 @@ module.exports = {
         {
           path: ':entityId/values',
           component: require('./src/content/form/FormAttributeValues'),
-          access: [{ type: 'HAS_ANY_AUTHORITY', authorities: ['APP_ADMIN'] }]
+          access: [{ type: 'HAS_ANY_AUTHORITY', authorities: ['FORMVALUE_READ'] }]
         }
       ]
     },

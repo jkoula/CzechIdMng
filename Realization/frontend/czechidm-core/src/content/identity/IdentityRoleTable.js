@@ -237,7 +237,8 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 // return 'warning';
               }
               return Utils.Ui.getRowClass(entity);
-            }}
+            }
+          }
           filter={
             <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
               <Basic.AbstractForm ref="filterForm">

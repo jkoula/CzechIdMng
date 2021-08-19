@@ -50,7 +50,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
- * Custom form value service can be registered by spring plugin
+ * Custom form value service can be registered by spring plugin.
  *
  * @author Radek Tomiška
  *
@@ -102,6 +102,11 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	}
 	
 	@Override
+	public boolean supportsToDtoWithFilter() {
+		return true;
+	}
+	
+	@Override
 	protected IdmFormValueDto toDto(E entity, IdmFormValueDto dto, IdmFormValueFilter<O> context) {
 		if (entity == null) {
 			return null;
@@ -137,7 +142,7 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	}
 
 	/**
-	 * Returns entity repository
+	 * Returns entity repository.
 	 *
 	 * @return
 	 */
@@ -267,6 +272,16 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 			predicates.add(builder.equal(root.get(AbstractFormValue_.shortTextValue), shortTextValue));
 		}
 		//
+		String stringValueLike = filter.getStringValueLike();
+		if (StringUtils.isNotEmpty(stringValueLike)) {
+			predicates.add(builder.like(builder.lower(root.get(AbstractFormValue_.stringValue)), "%" + stringValueLike.toLowerCase() + "%"));
+		}
+		//
+		String shortTextValueLike = filter.getShortTextValueLike();
+		if (StringUtils.isNotEmpty(shortTextValueLike)) {
+			predicates.add(builder.like(builder.lower(root.get(AbstractFormValue_.shortTextValue)), "%" + shortTextValueLike.toLowerCase() + "%"));
+		}
+		//
 		Boolean booleanValue = filter.getBooleanValue();
 		if (booleanValue != null) {
 			predicates.add(builder.equal(root.get(AbstractFormValue_.booleanValue), booleanValue));
@@ -286,10 +301,18 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 		if (dateValue != null) {
 			predicates.add(builder.equal(root.get(AbstractFormValue_.dateValue), dateValue));
 		}
+		ZonedDateTime dateValueFrom = filter.getDateValueFrom();
+		if (dateValueFrom != null) {
+			predicates.add(builder.greaterThanOrEqualTo(root.get(AbstractFormValue_.dateValue), dateValueFrom));
+		}
+		ZonedDateTime dateValueTill = filter.getDateValueTill();
+		if (dateValueTill != null) {
+			predicates.add(builder.lessThanOrEqualTo(root.get(AbstractFormValue_.dateValue), dateValueTill));
+		}
 		//
 		UUID uuidValue = filter.getUuidValue();
 		if (uuidValue != null) {
-			predicates.add(builder.equal(root.get(AbstractFormValue_.uuidValue), dateValue));
+			predicates.add(builder.equal(root.get(AbstractFormValue_.uuidValue), uuidValue));
 		}
 		//
 		return predicates;

@@ -8,8 +8,6 @@ import java.util.UUID;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.google.common.collect.Lists;
-
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
@@ -30,10 +28,14 @@ public class IdmFormValueFilter<O extends FormableEntity> extends DataFilter {
 	public static final String PARAMETER_PERSISTENT_TYPE = "persistentType";
 	public static final String PARAMETER_STRING_VALUE = "stringValue"; // equals
 	public static final String PARAMETER_SHORT_TEXT_VALUE = "shortTextValue"; // equals
+	public static final String PARAMETER_STRING_VALUE_LIKE = "stringValueLike"; // like
+	public static final String PARAMETER_SHORT_TEXT_VALUE_LIKE = "shortTextValueLike"; // like
 	public static final String PARAMETER_BOOLEAN_VALUE = "booleanValue"; // equals
 	public static final String PARAMETER_LONG_VALUE = "longValue"; // equals
 	public static final String PARAMETER_DOUBLE_VALUE = "doubleValue"; // equals
 	public static final String PARAMETER_DATE_VALUE = "dateValue"; // equals
+	public static final String PARAMETER_DATE_VALUE_FROM = "dateValueFrom"; // => date value from
+	public static final String PARAMETER_DATE_VALUE_TILL = "dateValueTill"; // => date value till
 	public static final String PARAMETER_UUID_VALUE = "uuidValue"; // equals
 	public static final String PARAMETER_ADD_OWNER_DTO = "addOwnerDto"; // convert owner into embedded dtos
 
@@ -62,11 +64,7 @@ public class IdmFormValueFilter<O extends FormableEntity> extends DataFilter {
 	}
 
 	public void setAttributeId(UUID attributeId) {
-		if (attributeId == null) {
-    		remove(PARAMETER_ATTRIBUTE_ID);
-    	} else {
-    		put(PARAMETER_ATTRIBUTE_ID, Lists.newArrayList(attributeId));
-    	}
+		set(PARAMETER_ATTRIBUTE_ID, attributeId);
 	}
 	
 	/**
@@ -121,6 +119,46 @@ public class IdmFormValueFilter<O extends FormableEntity> extends DataFilter {
 	public void setShortTextValue(String shortTextValue) {
 		set(PARAMETER_SHORT_TEXT_VALUE, shortTextValue);
 	}
+	
+	/**
+	 * String value - like operator is used.
+	 * 
+	 * @return string value
+	 * @since 11.2.0
+	 */
+	public String getStringValueLike() {
+		return getParameterConverter().toString(getData(), PARAMETER_STRING_VALUE_LIKE);
+	}
+
+	/**
+	 * String value - like operator is used.
+	 * 
+	 * @param stringValueLike string value
+	 * @since 11.2.0
+	 */
+	public void setStringValueLike(String stringValueLike) {
+		set(PARAMETER_STRING_VALUE_LIKE, stringValueLike);
+	}
+
+	/**
+	 * Short text value - like operator is used.
+	 * 
+	 * @return short text value
+	 * @since 11.2.0
+	 */
+	public String getShortTextValueLike() {
+		return getParameterConverter().toString(getData(), PARAMETER_SHORT_TEXT_VALUE_LIKE);
+	}
+
+	/**
+	 * Short text value - like operator is used.
+	 * 
+	 * @param shortTextValueLike value
+	 * @since 11.2.0
+	 */
+	public void setShortTextValueLike(String shortTextValueLike) {
+		set(PARAMETER_SHORT_TEXT_VALUE_LIKE, shortTextValueLike);
+	}
 
 	public Boolean getBooleanValue() {
 		return getParameterConverter().toBoolean(getData(), PARAMETER_BOOLEAN_VALUE);
@@ -152,6 +190,46 @@ public class IdmFormValueFilter<O extends FormableEntity> extends DataFilter {
 
 	public void setDateValue(ZonedDateTime dateValue) {
 		set(PARAMETER_DATE_VALUE, dateValue);
+	}
+	
+	/**
+	 * Date value from.
+	 * 
+	 * @return date value
+	 * @since 11.2.0
+	 */
+	public ZonedDateTime getDateValueFrom() {
+		return getParameterConverter().toDateTime(getData(), PARAMETER_DATE_VALUE_FROM);
+	}
+
+	/**
+	 * Date value from.
+	 * 
+	 * @param from date value
+	 * @since 11.2.0
+	 */
+	public void setDateValueFrom(ZonedDateTime from) {
+		set(PARAMETER_DATE_VALUE_FROM, from);
+	}
+
+	/**
+	 * Date value till.
+	 * 
+	 * @return date value
+	 * @since 11.2.0
+	 */
+	public ZonedDateTime getDateValueTill() {
+		return getParameterConverter().toDateTime(getData(), PARAMETER_DATE_VALUE_TILL);
+	}
+
+	/**
+	 * Date value till.
+	 * 
+	 * @param till date value
+	 * @since 11.2.0
+	 */
+	public void setDateValueTill(ZonedDateTime till) {
+		set(PARAMETER_DATE_VALUE_TILL, till);
 	}
 
 	public UUID getUuidValue() {

@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
@@ -34,8 +35,6 @@ import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
-import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -72,46 +71,89 @@ public class IdmFormValueController extends AbstractReadWriteDtoController<IdmFo
 	@Override
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
-	@PreAuthorize("hasAuthority('" + IdmGroupPermission.APP_ADMIN + "')")
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.FORM_VALUE_READ + "')")
 	@ApiOperation(
 			value = "Search form values (/search/quick alias)", 
 			nickname = "searchFormValues",
 			tags = { IdmFormValueController.TAG }, 
 			authorizations = {
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
-						@AuthorizationScope(scope = IdmGroupPermission.APP_ADMIN, description = "") }),
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_READ, description = "") }),
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
-						@AuthorizationScope(scope = IdmGroupPermission.APP_ADMIN, description = "") })
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_READ, description = "") })
 				})
 	public Resources<?> find(
 			@RequestParam(required = false) MultiValueMap<String, Object> parameters,
 			@PageableDefault Pageable pageable) {
-		return toResources(find(toFilter(parameters), pageable, IdmBasePermission.READ), IdmFormValueDto.class);
+		return super.find(parameters, pageable);
 	}
 	
 	@Override
 	@ResponseBody
 	@RequestMapping(value= "/search/quick", method = RequestMethod.GET)
-	@PreAuthorize("hasAuthority('" + IdmGroupPermission.APP_ADMIN + "')")
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.FORM_VALUE_READ + "')")
 	@ApiOperation(
 			value = "Search form values", 
 			nickname = "searchQuickFormValues", 
 			tags = { IdmFormValueController.TAG }, 
 			authorizations = {
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
-						@AuthorizationScope(scope = IdmGroupPermission.APP_ADMIN, description = "") }),
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_READ, description = "") }),
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
-						@AuthorizationScope(scope = IdmGroupPermission.APP_ADMIN, description = "") })
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_READ, description = "") })
 				})
 	public Resources<?> findQuick(
 			@RequestParam(required = false) MultiValueMap<String, Object> parameters,
 			@PageableDefault Pageable pageable) {
-		return find(parameters, pageable);
+		return super.findQuick(parameters, pageable);
 	}
 	
 	@Override
-	public Page<IdmFormValueDto> find(IdmFormValueFilter<?> filter, Pageable pageable, BasePermission permission) {
+	@ResponseBody
+	@RequestMapping(value = "/search/autocomplete", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.FORM_VALUE_AUTOCOMPLETE + "')")
+	@ApiOperation(
+			value = "Autocomplete form values (selectbox usage)", 
+			nickname = "autocompleteFormValues", 
+			tags = { IdmFormValueController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_AUTOCOMPLETE, description = "") }),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_AUTOCOMPLETE, description = "") })
+				})
+	public Resources<?> autocomplete(
+			@RequestParam(required = false) MultiValueMap<String, Object> parameters, 
+			@PageableDefault Pageable pageable) {
+		return super.autocomplete(parameters, pageable);
+	}
+	
+	@Override
+	protected Page<IdmFormValueDto> findWithOperator(IdmFormValueFilter<?> filter, Pageable pageable, BasePermission... permission) {
 		return formService.findValues(filter, pageable, permission);
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/search/count", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.FORM_VALUE_COUNT + "')")
+	@ApiOperation(
+			value = "The number of entities that match the filter", 
+			nickname = "countFormValues", 
+			tags = { IdmFormValueController.TAG },
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_COUNT, description = "") }),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_COUNT, description = "") })
+				})
+	public long count(@RequestParam(required = false) MultiValueMap<String, Object> parameters) {
+		return super.count(parameters);
+	}
+	
+	@Override
+	protected long countWithOperator(IdmFormValueFilter<?> filter, BasePermission... permission) {
+		return formService.findValues(filter, PageRequest.of(0, 1), permission).getTotalElements();
 	}
 	
 	@Override

@@ -75,3 +75,4 @@ All parameters form parent component ``AbstractFormComponent`` is supported.
 | facePlaceholder | string | Face select box placeholder | default i18n('face.placeholder') from locale |
 | fromPlaceholder | string | Face select box placeholder | default i18n('from.placeholder') from locale |
 | tillPlaceholder | string | Face select box placeholder | default i18n('till.placeholder') from locale |
+| hidden | bool | Date filter is hidden. | false |

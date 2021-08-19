@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import classNames from 'classnames';
 //
 import * as Basic from '../../basic';
 import FilterDateTimePicker from './FilterDateTimePicker';
@@ -212,10 +213,10 @@ export default class FilterDate extends Basic.AbstractFormComponent {
   }
 
   _renderBetween() {
-    const { mode, fromPlaceholder, tillPlaceholder } = this.props;
+    const { hidden, mode, fromPlaceholder, tillPlaceholder } = this.props;
     //
     return (
-      <Basic.Row>
+      <Basic.Row className={ classNames({ hidden }) }>
         <Basic.Col lg={ 4 }>
           { this._renderFaceSelect() }
         </Basic.Col>
@@ -236,6 +237,7 @@ export default class FilterDate extends Basic.AbstractFormComponent {
   }
 
   render() {
+    const { hidden } = this.props;
     const { face } = this.state;
     //
     switch (face) { // string representation
@@ -244,7 +246,7 @@ export default class FilterDate extends Basic.AbstractFormComponent {
       }
       default: { // face select box only as default
         return (
-          <Basic.Row>
+          <Basic.Row className={ classNames({ hidden }) }>
             <Basic.Col lg={ 4 }>
               { this._renderFaceSelect() }
             </Basic.Col>
@@ -264,34 +266,41 @@ FilterDate.propTypes = {
    */
   mode: FilterDateTimePicker.propTypes.mode,
   /**
-   * Property face - face - will be used for get/set value (configurable - more date filters can be used on the same content)
+   * Property face - face - will be used for get/set value (configurable - more date filters can be used on the same content).
    */
   faceProperty: PropTypes.string,
   /**
-   * Property name - from - will be used for get/set value
+   * Property name - from - will be used for get/set value.
    */
   fromProperty: PropTypes.string,
   /**
-   * Property name - till - will be used for get/set value
+   * Property name - till - will be used for get/set value.
    */
   tillProperty: PropTypes.string,
   /**
-   * Face select box placeholder - default i18n('face.placeholder') from locale
+   * Face select box placeholder - default i18n('face.placeholder') from locale.
    */
   facePlaceholder: PropTypes.string,
   /**
-   * Face select box placeholder - default i18n('from.placeholder') from locale
+   * Face select box placeholder - default i18n('from.placeholder') from locale.
    */
   fromPlaceholder: PropTypes.string,
   /**
-   * Face select box placeholder - default i18n('till.placeholder') from locale
+   * Face select box placeholder - default i18n('till.placeholder') from locale.
    */
-  tillPlaceholder: PropTypes.string
+  tillPlaceholder: PropTypes.string,
+  /**
+   * Date filter is hidden.
+   *
+   * @since 11.2.0
+   */
+  hidden: PropTypes.bool
 };
 FilterDate.defaultProps = {
   mode: FilterDateTimePicker.defaultProps.mode,
   required: false,
   faceProperty: 'face',
   fromProperty: 'from',
-  tillProperty: 'till'
+  tillProperty: 'till',
+  hidden: false
 };

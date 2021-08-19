@@ -1542,7 +1542,7 @@ module.exports = {
                         path: '/form-definitions/attribute/:entityId/values',
                         icon: 'component:form-values',
                         type: 'TAB',
-                        access: [{ type: 'HAS_ANY_AUTHORITY', authorities: ['APP_ADMIN'] }]
+                        access: [{ type: 'HAS_ANY_AUTHORITY', authorities: ['FORMVALUE_READ'] }]
                       }
                     ]
                   },
@@ -1553,7 +1553,7 @@ module.exports = {
                     path: '/form-definitions/:entityId/values',
                     icon: 'component:form-values',
                     type: 'TAB',
-                    access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['APP_ADMIN'] } ]
+                    access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['FORMVALUE_READ'] } ]
                   },
                   {
                     id: 'forms-localization',

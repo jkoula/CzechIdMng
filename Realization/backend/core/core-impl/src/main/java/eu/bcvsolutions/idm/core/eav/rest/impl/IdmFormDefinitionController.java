@@ -147,7 +147,7 @@ public class IdmFormDefinitionController extends AbstractReadWriteDtoController<
 	@ApiOperation(
 			value = "Autocomplete form definitions (selectbox usage)", 
 			nickname = "autocompleteFormDefinitions", 
-			tags = { IdmFormAttributeController.TAG }, 
+			tags = { IdmFormDefinitionController.TAG }, 
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = CoreGroupPermission.FORM_DEFINITION_AUTOCOMPLETE, description = "") }),
@@ -167,7 +167,7 @@ public class IdmFormDefinitionController extends AbstractReadWriteDtoController<
 	@ApiOperation(
 			value = "The number of entities that match the filter", 
 			nickname = "countFormDefinitions", 
-			tags = { IdmFormAttributeController.TAG },
+			tags = { IdmFormDefinitionController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = CoreGroupPermission.FORM_DEFINITION_COUNT, description = "") }),
