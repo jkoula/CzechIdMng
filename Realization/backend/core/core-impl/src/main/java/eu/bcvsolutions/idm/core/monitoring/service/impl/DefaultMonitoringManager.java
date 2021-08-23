@@ -287,15 +287,17 @@ public class DefaultMonitoringManager implements MonitoringManager {
 		}
 		monitoringFilter.setDisabled(Boolean.FALSE);
 		//
+		List<IdmMonitoringDto> monitorings = monitoringService
+			.find(
+					monitoringFilter,
+					PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmMonitoring_.seq.getName())),
+					PermissionUtils.isEmpty(permission) ? null : IdmBasePermission.AUTOCOMPLETE
+			)
+			.getContent();
+		//
 		// last results sorted by monitoring order
-		List<IdmMonitoringResultDto> results = new ArrayList<>();
-		for (IdmMonitoringDto monitoring : monitoringService
-				.find(
-						monitoringFilter,
-						PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmMonitoring_.seq.getName())),
-						PermissionUtils.isEmpty(permission) ? null : IdmBasePermission.AUTOCOMPLETE
-				)
-				.getContent()) {
+		List<IdmMonitoringResultDto> results = new ArrayList<>(monitorings.size());
+		for (IdmMonitoringDto monitoring : monitorings) {
 			MonitoringEvaluator evaluator = getEvaluator(monitoring);
 			if (evaluator == null) {
 				LOG.debug("Monitoring evaluator for motitoring configuration [{}] not exists.", monitoring.getId());
