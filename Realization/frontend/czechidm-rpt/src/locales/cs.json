@@ -85,6 +85,13 @@
         "title": "Reportovat vybrané objekty do xls",
         "icon": "fa:file-excel"
       }
+    },
+    "eu-bcvsolutions-idm-rpt-entity-rptreport": {
+      "core-monitoring-report": {
+        "label": "Report monitoringu",
+        "help": "Report s posledními výsledky monitoringu.",
+        "icon": "component:monitoring-results"
+      }
     }
   },
   "error": {

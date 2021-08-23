@@ -6,7 +6,7 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.rpt.api.domain.RptResultCode;
 
 /**
- * Report render failed
+ * Report render failed.
  * 
  * @author Radek Tomiška
  *

@@ -119,7 +119,7 @@ public class IdentityReportExecutor extends AbstractReportExecutor {
 						// supports cancel report generating (report extends long running task)
 						++counter;
 						canContinue = updateState();
-					}		
+					}
 					// iterate while next page of identities is available
 					pageable = identities.hasNext() && canContinue ? identities.nextPageable() : null;
 				} while (pageable != null);

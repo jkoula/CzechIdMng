@@ -85,6 +85,13 @@
         "title": "Report selected objects to xls spreadsheet",
         "icon": "fa:file-excel"
       }
+    },
+    "eu-bcvsolutions-idm-rpt-entity-rptreport": {
+      "core-monitoring-report": {
+        "label": "Monitoring report",
+        "help": "Report with last monitoring results.",
+        "icon": "component:monitoring-results"
+      }
     }
   },
   "error": {

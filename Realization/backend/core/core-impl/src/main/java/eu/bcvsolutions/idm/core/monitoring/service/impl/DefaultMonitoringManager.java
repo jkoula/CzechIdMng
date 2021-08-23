@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -281,7 +282,9 @@ public class DefaultMonitoringManager implements MonitoringManager {
 	public Page<IdmMonitoringResultDto> getLastResults(IdmMonitoringResultFilter filter, Pageable pageable, BasePermission... permission) {
 		// all instances => last results should be visible on each instance
 		IdmMonitoringFilter monitoringFilter = new IdmMonitoringFilter();
-		monitoringFilter.setId(filter.getMonitoring());
+		if (filter != null) {
+			monitoringFilter.setId(filter.getMonitoring());
+		}
 		monitoringFilter.setDisabled(Boolean.FALSE);
 		//
 		// last results sorted by monitoring order
@@ -305,17 +308,12 @@ public class DefaultMonitoringManager implements MonitoringManager {
 			}
 			// filter by level 
 			NotificationLevel lastResultLevel = lastResult.getLevel();
-			List<NotificationLevel> levels = filter.getLevels();
+			List<NotificationLevel> levels = filter == null ? null : filter.getLevels();
 			if (CollectionUtils.isNotEmpty(levels)  && !levels.contains(lastResultLevel)) {
 				continue;
 			}
-			// TODO: sort by level desc on the end
 			lastResult.setTrimmed(true);
-			if (lastResult.getLevel() != null && lastResultLevel == NotificationLevel.ERROR) {
-				results.add(0, lastResult);
-			} else {
-				results.add(lastResult);
-			}
+			results.add(lastResult);
 		}
 		//
 		// pageable is required internally
@@ -325,6 +323,10 @@ public class DefaultMonitoringManager implements MonitoringManager {
 		} else {
 			internalPageable = pageable;
 		}
+		//
+		// Sort by level desc
+		results.sort((r1, r2) -> { return ObjectUtils.compare(r2.getLevel(), r1.getLevel()); });
+		//
 		// "naive" pagination
 		int first = internalPageable.getPageNumber() * internalPageable.getPageSize();
 		int last = internalPageable.getPageSize() + first;
@@ -332,8 +334,6 @@ public class DefaultMonitoringManager implements MonitoringManager {
 				first < results.size() ? first : results.size() > 0 ? results.size() - 1 : 0, 
 				last < results.size() ? last : results.size()
 		);
-		//
-		// TODO: sort by level desc
 		//
 		return new PageImpl<>(page, internalPageable, results.size());
 	}

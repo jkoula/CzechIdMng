@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -17,12 +18,14 @@ import com.google.common.collect.ImmutableMap;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.ResultModel;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
 import eu.bcvsolutions.idm.core.api.utils.SpinalCase;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
@@ -49,7 +52,7 @@ import eu.bcvsolutions.idm.rpt.renderer.DefaultJsonRenderer;
  * @author Radek Tomiška
  *
  */
-@Component
+@Component(ReportGenerateEndSendNotificationProcessor.PROCESSOR_NAME)
 @Description("Sends notification after report is generated to report creator.")
 public class ReportGenerateEndSendNotificationProcessor 
 		extends CoreEventProcessor<RptReportDto> 
@@ -104,23 +107,34 @@ public class ReportGenerateEndSendNotificationProcessor
 						.stream()
 						.filter(renderer -> !renderer.getName().equals(DefaultJsonRenderer.RENDERER_NAME)) // default json will be ignored
 						.map(renderer -> {
-							RptRenderedReportDto result = reportManager.render(report, renderer.getName());
-							//
-							// save rendered report as attachment
-							IdmAttachmentDto attachmentDto = new IdmAttachmentDto();
-							attachmentDto.setDescription(getDescription());
-							String reportName = String.format(
-									"%s-%s.%s", 
-									SpinalCase.format(report.getExecutorName()),
-									report.getCreated().format(formatter),
-									renderer.getExtension()
-							);
-							attachmentDto.setName(reportName);
-							attachmentDto.setMimetype(renderer.getFormat().toString());
-							attachmentDto.setInputData(result.getRenderedReport());
-							//
-							return attachmentManager.saveAttachment(report, attachmentDto);
+							try {
+								RptRenderedReportDto result = reportManager.render(report, renderer.getName());
+								//
+								// save rendered report as attachment
+								IdmAttachmentDto attachmentDto = new IdmAttachmentDto();
+								attachmentDto.setDescription(getDescription());
+								String reportName = String.format(
+										"%s-%s.%s", 
+										SpinalCase.format(report.getExecutorName()),
+										report.getCreated().format(formatter),
+										renderer.getExtension()
+								);
+								attachmentDto.setName(reportName);
+								attachmentDto.setMimetype(renderer.getFormat().toString());
+								attachmentDto.setInputData(result.getRenderedReport());
+								//
+								return attachmentManager.saveAttachment(report, attachmentDto);
+							} catch (Exception ex) {
+								ResultModel resultModel = new DefaultResultModel(
+										RptResultCode.REPORT_RENDER_FAILED,
+										ImmutableMap.of("reportName", report.getName())
+								);
+								ExceptionUtils.log(LOG, resultModel, ex);
+								//
+								return null;
+							}
 						})
+						.filter(Objects::nonNull)
 						.collect(Collectors.toList());
 				//
 				// load topic configuration

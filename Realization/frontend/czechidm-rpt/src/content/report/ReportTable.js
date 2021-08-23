@@ -10,6 +10,7 @@ import { ReportManager } from '../../redux';
 const manager = new ReportManager();
 const schedulerManager = new Managers.SchedulerManager();
 const longRunningTaskManager = new Managers.LongRunningTaskManager();
+const formAttributeManager = new Managers.FormAttributeManager();
 
 /**
 * Table of reports.
@@ -291,9 +292,9 @@ export class ReportTable extends Advanced.AbstractTableContent {
     if (supportedReports) {
       supportedReports.forEach(executor => {
         _supportedReports.push({
-          niceLabel: `${executor.description} (${executor.name})`,
+          niceLabel: formAttributeManager.getLocalization(executor.formDefinition, null, 'label', `${executor.description} (${executor.name})`),
+          description: formAttributeManager.getLocalization(executor.formDefinition, null, 'help', executor.description),
           value: executor.id,
-          description: executor.description,
           formDefinition: executor.formDefinition,
           disabled: executor.disabled
         });
@@ -339,8 +340,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
                       ref="text"
                       placeholder={this.i18n('filter.text.placeholder')}/>
                   </Basic.Col>
-                  <Basic.Col lg={ 6 }>
-                  </Basic.Col>
+                  <Basic.Col lg={ 6 }/>
                 </Basic.Row>
               </Basic.AbstractForm>
             </Advanced.Filter>
@@ -428,7 +428,16 @@ export class ReportTable extends Advanced.AbstractTableContent {
                 //
                 return (
                   <Basic.Div>
-                    <Basic.Div>{ supportedReports.get(entity.executorName).description }</Basic.Div>
+                    <Basic.Div>
+                      {
+                        formAttributeManager.getLocalization(
+                          supportedReports.get(entity.executorName).formDefinition,
+                          null,
+                          'label',
+                          supportedReports.get(entity.executorName).description
+                        )
+                      }
+                    </Basic.Div>
                     <Basic.Div><small>{ `(${ entity[property] })` }</small></Basic.Div>
                   </Basic.Div>
                 );
