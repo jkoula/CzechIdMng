@@ -22,7 +22,7 @@ export default class BusinessRoleIcon extends AbstractIcon {
       <span
         className={ this.getClassName('fa-layers fa-fw') }
         title={ i18n('entity.RoleComposition._type') }
-        style={ iconSize ? {} : { fontSize: '0.9em' } }>
+        style={ iconSize ? { marginRight: -2 } : { marginRight: -1, fontSize: '0.9em' } }>
         <FontAwesomeIcon icon={ faKey } transform="rotate-315 up-1 right-0.3" style={{ color: '#ccc' }} />
         <FontAwesomeIcon icon={ faKey } transform="up-3.2 right--3"/>
         <FontAwesomeIcon icon={ faCircle } transform="up-9 right-5 shrink-6"/>

@@ -82,8 +82,8 @@ export default class RoleService extends AbstractRequestFormableService {
     return this.getDefaultSearchParameters()
       .setName(SearchParameters.NAME_AUTOCOMPLETE)
       .clearSort()
-      .setSort('childrenCount', 'desc')
       .setSort('name')
+      .setSort('childrenCount', 'desc')
       .setSort('environment')
       .setSize(50);
   }

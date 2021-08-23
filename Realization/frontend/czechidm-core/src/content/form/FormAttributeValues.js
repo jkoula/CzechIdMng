@@ -6,7 +6,7 @@ import FormValueTableComponent, { FormValueTable } from './FormValueTable';
 import SearchParameters from '../../domain/SearchParameters';
 
 /**
- * Form values - for given attribute
+ * Form values - for given attribute.
  *
  * @author Roman Kučera
  * @author Radek Tomiška
@@ -31,7 +31,6 @@ export default class FormAttributeValues extends Basic.AbstractContent {
         <FormValueTableComponent
           uiKey="form-attribute-values-table"
           forceSearchParameters={ forceSearchParameters }
-          showFilter={ false }
           columns={ _.difference(FormValueTable.defaultProps.columns, ['code', 'name']) }
           className="no-margin"/>
       </Basic.Div>
