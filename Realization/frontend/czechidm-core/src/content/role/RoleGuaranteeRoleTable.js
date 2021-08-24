@@ -12,7 +12,7 @@ let roleManager = new RoleManager();
 const codeListManager = new CodeListManager();
 
 /**
-* Table of role guarantees - by roles
+* Table of role guarantees - by roles.
 *
 * @author Radek Tomiška
 */
@@ -93,9 +93,8 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
                 key="add_button"
                 className="btn-xs"
                 onClick={ this.showDetail.bind(this, { role }) }
-                rendered={ manager.canSave() }>
-                <Basic.Icon type="fa" icon="plus"/>
-                {' '}
+                rendered={ manager.canSave() }
+                icon="fa:plus">
                 { this.i18n('button.add') }
               </Basic.Button>
             ]
