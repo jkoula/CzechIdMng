@@ -3,8 +3,11 @@
 <!-- http://logback.qos.ch/manual/appenders.html -->
 <!DOCTYPE configuration>
 <configuration>
+  <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level %relative --- [%thread] %logger{60}.%M : %msg%n"/>
+  <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level %relative --- [%thread] %logger{60}.%M : %msg%n"/>
+
 	<include resource="org/springframework/boot/logging/logback/base.xml"/>
-	
+  
 	<springProperty name="spring.profiles.active" source="spring.profiles.active"/>
 	
 	<springProfile name="default">
@@ -13,6 +16,7 @@
 		<logger name="org.springframework.web" level="INFO"/>
 		<logger name="org.hibernate.SQL" level="INFO"/>
 		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+		<logger name="AUDIT" level="ERROR"/>
     </springProfile>
     
     <springProfile name="test">
@@ -21,6 +25,7 @@
 		<logger name="org.springframework.web" level="INFO"/>
 		<logger name="org.hibernate.SQL" level="INFO"/>
 		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="INFO"/>
+		<logger name="AUDIT" level="ERROR"/>
     </springProfile>
     
     <springProfile name="dev">  
@@ -50,6 +55,7 @@
 		<logger name="org.springframework.web" level="WARN"/>
 		<logger name="org.hibernate.SQL" level="WARN"/>
 		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+		<logger name="AUDIT" level="ERROR"/>
     </springProfile>
     
     <springProfile name="dev-mysql">  	
@@ -57,7 +63,8 @@
 		<logger name="org.springframework" level="INFO"/>
 		<logger name="org.springframework.web" level="DEBUG"/>
 		<logger name="org.hibernate.SQL" level="DEBUG"/>
-		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>        
+		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+		<logger name="AUDIT" level="ERROR"/>
     </springProfile>
 
 	<springProfile name="dev-mssql">  
@@ -86,6 +93,7 @@
 		<logger name="org.springframework" level="WARN"/>
 		<logger name="org.springframework.web" level="WARN"/>
 		<logger name="org.hibernate.SQL" level="WARN"/>
-		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>        
+		<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
+		<logger name="AUDIT" level="ERROR"/>
     </springProfile>
 </configuration>

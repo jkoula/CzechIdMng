@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.security.service.impl;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import dev.samstevens.totp.spring.autoconfigure.TotpProperties;
 import dev.samstevens.totp.time.TimeProvider;
 import dev.samstevens.totp.util.Utils;
 import eu.bcvsolutions.idm.core.api.CoreModule;
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmPasswordDto;
@@ -34,6 +36,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmPasswordService;
 import eu.bcvsolutions.idm.core.api.service.IdmProfileService;
 import eu.bcvsolutions.idm.core.api.utils.HttpFilterUtils;
 import eu.bcvsolutions.idm.core.api.utils.SpinalCase;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 import eu.bcvsolutions.idm.core.notification.api.dto.IdmMessageDto;
 import eu.bcvsolutions.idm.core.notification.api.service.NotificationManager;
@@ -77,6 +80,7 @@ public class DefaultTwoFactorAuthenticationManager implements TwoFactorAuthentic
 	@Autowired private CodeGenerator codeGenerator;
 	@Autowired private CodeVerifier codeVerifier;
 	@Autowired private TotpProperties props;
+	@Autowired private SiemLoggerManager siemLogger;
 	
 	@Override
 	@Transactional
@@ -232,52 +236,64 @@ public class DefaultTwoFactorAuthenticationManager implements TwoFactorAuthentic
 	public LoginDto authenticate(LoginDto loginTwoFactorRequestDto) {
 		Assert.notNull(loginTwoFactorRequestDto, "Login request is required.");
 		//
-		Optional<Jwt> jwt = HttpFilterUtils.parseToken(loginTwoFactorRequestDto.getToken());
-		if (!jwt.isPresent()) {
-			throw new ResultCodeException(CoreResultCode.AUTH_FAILED, "Verification code must be filled");
-		}
-		HttpFilterUtils.verifyToken(jwt.get(), jwtAuthenticationMapper.getVerifier());
-		// authentication dto from request
 		IdmJwtAuthenticationDto claims = null;
+		String loggedAction = siemLogger.buildAction(SiemLoggerManager.LOGIN_LEVEL_KEY);
+		String targetName = loginTwoFactorRequestDto.getUsername();
+		String targetUuid = null;
 		try {
-			claims = jwtAuthenticationMapper.getClaims(jwt.get());
-		} catch (IOException ex) {
-			throw new ResultCodeException(CoreResultCode.TOKEN_READ_FAILED, ex);
+			Optional<Jwt> jwt = HttpFilterUtils.parseToken(loginTwoFactorRequestDto.getToken());
+			if (!jwt.isPresent()) {
+				throw new ResultCodeException(CoreResultCode.AUTH_FAILED, "Verification code must be filled");
+			}
+			HttpFilterUtils.verifyToken(jwt.get(), jwtAuthenticationMapper.getVerifier());
+			// authentication dto from request
+			try {
+				claims = jwtAuthenticationMapper.getClaims(jwt.get());
+				targetName = claims.getCurrentUsername();
+				targetUuid = Objects.toString(claims.getCurrentIdentityId(),"");
+			} catch (IOException ex) {
+				throw new ResultCodeException(CoreResultCode.TOKEN_READ_FAILED, ex);
+			}
+			// check expiration for token given in header
+			// we need to check expiration, before current (automatically prolonged) token is used by mapper
+			if (claims.getExpiration() != null && claims.getExpiration().isBefore(ZonedDateTime.now())) {
+				throw new ResultCodeException(CoreResultCode.AUTH_EXPIRED);
+			}
+			UUID identityId = claims.getCurrentIdentityId();
+			IdmIdentityDto identity = identityService.get(identityId);
+			if (identity == null) { 
+				throw new EntityNotFoundException(IdmIdentityDto.class, identityId);
+			}
+			IdmPasswordDto password = passwordService.findOneByIdentity(identityId);
+			if (password == null) { 
+				throw new EntityNotFoundException(IdmPasswordDto.class, identityId);
+			}
+			if (!verifyCode(password, loginTwoFactorRequestDto.getPassword())) {
+				throw new ResultCodeException(CoreResultCode.TWO_FACTOR_VERIFICATION_CODE_FAILED);
+			}
+			//
+			if (password.isMustChange() && !loginTwoFactorRequestDto.isSkipMustChange()) {
+				throw new MustChangePasswordException(claims.getCurrentUsername());
+			}
+	        // set token verified 
+	        IdmTokenDto token = tokenManager.getToken(claims.getId());
+	        token.setSecretVerified(true);
+	        // and login - new login dto new to be constructed to preserve original login metadata
+	        LoginDto loginDto = new LoginDto();
+	        loginDto.setUsername(claims.getCurrentUsername());
+	        loginDto.setAuthenticationModule(claims.getFromModule());
+	        //
+	        LoginDto resultLoginDto = jwtAuthenticationService.createJwtAuthenticationAndAuthenticate(
+	        		loginDto, 
+	        		identity,
+	        		token
+	        );
+	        siemLogger.log(loggedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, targetName, targetUuid, null, null, null, null);
+	        return resultLoginDto;
+		} catch (Exception e) {
+			siemLogger.log(loggedAction, SiemLoggerManager.FAILED_ACTION_STATUS, targetName, targetUuid, null, null, null, e.getMessage());
+			throw e;
 		}
-		// check expiration for token given in header
-		// we need to check expiration, before current (automatically prolonged) token is used by mapper
-		if (claims.getExpiration() != null && claims.getExpiration().isBefore(ZonedDateTime.now())) {
-			throw new ResultCodeException(CoreResultCode.AUTH_EXPIRED);
-		}
-		UUID identityId = claims.getCurrentIdentityId();
-		IdmIdentityDto identity = identityService.get(identityId);
-		if (identity == null) { 
-			throw new EntityNotFoundException(IdmIdentityDto.class, identityId);
-		}
-		IdmPasswordDto password = passwordService.findOneByIdentity(identityId);
-		if (password == null) { 
-			throw new EntityNotFoundException(IdmPasswordDto.class, identityId);
-		}
-		if (!verifyCode(password, loginTwoFactorRequestDto.getPassword())) {
-			throw new ResultCodeException(CoreResultCode.TWO_FACTOR_VERIFICATION_CODE_FAILED);
-		}
-		//
-		if (password.isMustChange() && !loginTwoFactorRequestDto.isSkipMustChange()) {
-			throw new MustChangePasswordException(claims.getCurrentUsername());
-		}
-        // set token verified 
-        IdmTokenDto token = tokenManager.getToken(claims.getId());
-        token.setSecretVerified(true);
-        // and login - new login dto new to be constructed to preserve original login metadata
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUsername(claims.getCurrentUsername());
-        loginDto.setAuthenticationModule(claims.getFromModule());
-        //
-        return jwtAuthenticationService.createJwtAuthenticationAndAuthenticate(
-        		loginDto, 
-        		identity,
-        		token
-        );
 	}
 	
 	private boolean verifyCode(IdmPasswordDto password, GuardedString verificationCode) {

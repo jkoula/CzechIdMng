@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventContext;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -47,6 +48,7 @@ public class DefaultConfigurationServiceUnitTest extends AbstractUnitTest {
 	@Mock private ConfidentialStorage confidentialStorage;
 	@Mock private EntityEventManager entityEventManager;
 	@Mock private IdmCacheManager cacheManager;
+	@Mock private SiemLoggerManager logger;
 	//
 	@InjectMocks private DefaultConfigurationService service;
 	
