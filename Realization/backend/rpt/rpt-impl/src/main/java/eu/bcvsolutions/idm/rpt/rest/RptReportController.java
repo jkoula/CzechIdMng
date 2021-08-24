@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.rpt.rest;
 
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -28,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
+import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
@@ -52,7 +55,7 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
 
 /**
- * Report controller
+ * Report controller.
  * 
  * @author Radek Tomiška
  *
@@ -140,6 +143,24 @@ public class RptReportController extends AbstractReadWriteDtoController<RptRepor
 			@PageableDefault Pageable pageable) {
 		return super.autocomplete(parameters, pageable);
 	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/search/count", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + RptGroupPermission.REPORT_COUNT + "')")
+	@ApiOperation(
+			value = "The number of entities that match the filter", 
+			nickname = "countReports", 
+			tags = { RptReportController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_COUNT, description = "") }),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_COUNT, description = "") })
+				})
+	public long count(@RequestParam(required = false) MultiValueMap<String, Object> parameters) {
+		return super.count(parameters);
+	}
 
 	@Override
 	@ResponseBody
@@ -225,6 +246,8 @@ public class RptReportController extends AbstractReadWriteDtoController<RptRepor
 		return super.getPermissions(backendId);
 	}
 	
+	
+	
 	@ResponseBody
 	@RequestMapping(value = "/{backendId}/render", method = RequestMethod.GET)
 	public ResponseEntity<InputStreamResource> renderReport(
@@ -257,6 +280,62 @@ public class RptReportController extends AbstractReadWriteDtoController<RptRepor
 		}
 	}
 	
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/bulk/actions", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + RptGroupPermission.REPORT_READ + "')")
+	@ApiOperation(
+			value = "Get available bulk actions", 
+			nickname = "availableBulkAction", 
+			tags = { RptReportController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_READ, description = "") }),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_READ, description = "") })
+				})
+	public List<IdmBulkActionDto> getAvailableBulkActions() {
+		return super.getAvailableBulkActions();
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/action", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + RptGroupPermission.REPORT_READ + "')")
+	@ApiOperation(
+			value = "Process bulk action for report", 
+			nickname = "bulkAction", 
+			response = IdmBulkActionDto.class, 
+			tags = { RptReportController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_READ, description = "")})
+				})
+	public ResponseEntity<IdmBulkActionDto> bulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.bulkAction(bulkAction);
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/prevalidate", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + RptGroupPermission.REPORT_READ + "')")
+	@ApiOperation(
+			value = "Prevalidate bulk action for reports", 
+			nickname = "prevalidateBulkAction", 
+			response = IdmBulkActionDto.class, 
+			tags = { RptReportController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = RptGroupPermission.REPORT_READ, description = "")})
+				})
+	public ResponseEntity<ResultModels> prevalidateBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.prevalidateBulkAction(bulkAction);
+	}
+	
 	@ResponseBody
 	@RequestMapping(path = "/search/supported", method = RequestMethod.GET)
 	@PreAuthorize("hasAuthority('" + RptGroupPermission.REPORT_CREATE + "')")
@@ -277,8 +356,10 @@ public class RptReportController extends AbstractReadWriteDtoController<RptRepor
 	@Override
 	protected RptReportFilter toFilter(MultiValueMap<String, Object> parameters) {
 		RptReportFilter filter = new RptReportFilter(parameters);
+		//
 		filter.setFrom(getParameterConverter().toDateTime(parameters, "from"));
 		filter.setTill(getParameterConverter().toDateTime(parameters, "till"));
+		//
 		return filter;
 	}
 

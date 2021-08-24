@@ -24,6 +24,7 @@ import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 import eu.bcvsolutions.idm.rpt.RptModuleDescriptor;
 import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
+import eu.bcvsolutions.idm.rpt.entity.RptReport;
 
 /**
  * Implementation of general entity report. This action will be available for all
@@ -42,7 +43,6 @@ public class GeneralEntityExport extends AbstractFormableEntityExport<FormableDt
 	private ReadWriteDtoService<FormableDto, BaseFilter> localService;
 
 	public GeneralEntityExport(RptReportService reportService, AttachmentManager attachmentManager, ObjectMapper mapper, FormService formService) {
-
 		super(reportService, attachmentManager, mapper, formService);
 	}
 
@@ -105,7 +105,8 @@ public class GeneralEntityExport extends AbstractFormableEntityExport<FormableDt
 
 	@Override
 	public boolean supports(Class<? extends BaseEntity> clazz) {
-		return FormableEntity.class.isAssignableFrom(clazz);
+		return FormableEntity.class.isAssignableFrom(clazz) 
+				&& !RptReport.class.isAssignableFrom(clazz); // cyclic report of report is not supported now
 	}
 
 	@Override

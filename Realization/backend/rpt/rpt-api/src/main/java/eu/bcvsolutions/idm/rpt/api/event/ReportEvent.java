@@ -8,7 +8,7 @@ import eu.bcvsolutions.idm.core.api.event.EventType;
 import eu.bcvsolutions.idm.rpt.api.dto.RptReportDto;
 
 /**
- * Events for reports - creating new report
+ * Events for reports - creating new report.
  * 
  * @author Radek Tomiška
  *

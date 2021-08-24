@@ -84,6 +84,11 @@
         "label": "Report",
         "title": "Report selected objects to xls spreadsheet",
         "icon": "fa:file-excel"
+      },
+      "rpt-report-delete-bulk-action": {
+        "label": "$t(action.delete.action) reports",
+        "help": "$t(action.delete.action) selected reports.",
+        "icon": "$t(action.delete.icon)"
       }
     },
     "eu-bcvsolutions-idm-rpt-entity-rptreport": {

@@ -84,6 +84,11 @@
         "label": "Report",
         "title": "Reportovat vybrané objekty do xls",
         "icon": "fa:file-excel"
+      },
+      "rpt-report-delete-bulk-action": {
+        "label": "$t(action.delete.action) reporty",
+        "help": "Smaže vybrané reporty.",
+        "icon": "$t(action.delete.icon)"
       }
     },
     "eu-bcvsolutions-idm-rpt-entity-rptreport": {

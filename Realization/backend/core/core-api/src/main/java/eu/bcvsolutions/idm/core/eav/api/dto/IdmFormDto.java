@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
-import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.FormableDto;
 
 /**
  * Persistent common eav form
@@ -19,7 +19,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
  * @since 7.6.0
  */
 @Relation(collectionRelation = "forms")
-public class IdmFormDto extends AbstractDto {
+public class IdmFormDto extends FormableDto {
 	
 	private static final long serialVersionUID = 1L;
 	//

@@ -17,7 +17,8 @@ import eu.bcvsolutions.idm.rpt.RptModuleDescriptor;
 public enum RptGroupPermission implements GroupPermission {
 	
 	REPORT(
-			IdmBasePermission.ADMIN, 
+			IdmBasePermission.ADMIN,
+			IdmBasePermission.COUNT,
 			IdmBasePermission.AUTOCOMPLETE,
 			IdmBasePermission.READ, 
 			IdmBasePermission.CREATE, 
@@ -27,6 +28,7 @@ public enum RptGroupPermission implements GroupPermission {
 	// String constants could be used in pre / post authotize SpEl expressions
 	
 	public static final String REPORT_ADMIN = "REPORT" + BasePermission.SEPARATOR + "ADMIN";
+	public static final String REPORT_COUNT = "REPORT" + BasePermission.SEPARATOR + "COUNT";
 	public static final String REPORT_AUTOCOMPLETE = "REPORT" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String REPORT_READ = "REPORT" + BasePermission.SEPARATOR + "READ";
 	public static final String REPORT_CREATE = "REPORT" + BasePermission.SEPARATOR + "CREATE";

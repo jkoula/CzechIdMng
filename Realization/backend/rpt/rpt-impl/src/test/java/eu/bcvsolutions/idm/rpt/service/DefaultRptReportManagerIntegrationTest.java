@@ -64,6 +64,11 @@ import eu.bcvsolutions.idm.rpt.api.executor.AbstractReportExecutor;
 import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
+/**
+ * Report manager tests.
+ * 
+ * @author Radek Tomiška
+ */
 public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired private ApplicationContext context;
@@ -136,6 +141,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
+		reportService.delete(report);
 		attachmentManager.deleteAttachments(report);
 	}
 	
@@ -165,7 +171,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
-		
+		reportService.delete(report);
 		attachmentManager.deleteAttachments(report);
 	}
 	
@@ -233,6 +239,8 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 		Assert.assertTrue(persistentValues.contains(TestReportExecutor.identities.get(0).getUsername()));
 		Assert.assertTrue(persistentValues.contains(usernameTwo.getValue()));
 		//
+		reportService.delete(report);
+		reportService.delete(recoveredReport);
 		attachmentManager.deleteAttachments(report);
 		attachmentManager.deleteAttachments(recoveredReport);
 	}
@@ -320,6 +328,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 			Assert.assertEquals(1, notificationAttachments.size());
 			Assert.assertNotNull(notificationAttachments.get(0).getAttachment());
 			//
+			reportService.delete(report);
 			attachmentManager.deleteAttachments(report);
 		} finally {
 			logout();
@@ -348,6 +357,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 		try (InputStream is = attachmentManager.getAttachmentData(report.getData())) {
 			Assert.assertEquals(mapper.writeValueAsString(TestReportExecutor.identities), IOUtils.toString(is));
 		}
+		reportService.delete(report);
 		attachmentManager.deleteAttachments(report);
 		//
 		// test notification is sent
@@ -385,6 +395,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 			try (InputStream is = attachmentManager.getAttachmentData(report.getData())) {
 				Assert.assertEquals(mapper.writeValueAsString(TestReportExecutor.identities), IOUtils.toString(is));
 			}
+			reportService.delete(report);
 			attachmentManager.deleteAttachments(report);
 			//
 			// test notification is sent
@@ -423,6 +434,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 			try (InputStream is = attachmentManager.getAttachmentData(report.getData())) {
 				Assert.assertEquals(mapper.writeValueAsString(TestReportExecutor.identities), IOUtils.toString(is));
 			}
+			reportService.delete(report);
 			attachmentManager.deleteAttachments(report);
 			//
 			// test notification is sent
@@ -463,6 +475,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 			try (InputStream is = attachmentManager.getAttachmentData(report.getData())) {
 				Assert.assertEquals(mapper.writeValueAsString(TestReportExecutor.identities), IOUtils.toString(is));
 			}
+			reportService.delete(report);
 			attachmentManager.deleteAttachments(report);
 			//
 			// test notification is sent
@@ -510,6 +523,7 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 			try (InputStream is = attachmentManager.getAttachmentData(report.getData())) {
 				Assert.assertEquals(mapper.writeValueAsString(TestReportExecutor.identities), IOUtils.toString(is));
 			}
+			reportService.delete(report);
 			attachmentManager.deleteAttachments(report);
 			//
 			// test notification is sent

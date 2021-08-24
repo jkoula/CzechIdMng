@@ -16,7 +16,7 @@ import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 
 /**
- * IdM report data ~ generated report
+ * IdM report data ~ generated report.
  * 
  * @author Radek Tomiška
  *
@@ -38,7 +38,6 @@ public class RptReportDto extends AbstractDto {
 	@Embedded(dtoClass = IdmLongRunningTaskDto.class)
 	private UUID longRunningTask;
 	private IdmFormDto filter;
-	// TODO: columns - lists or idmForm?
 
 	public RptReportDto() {
 	}

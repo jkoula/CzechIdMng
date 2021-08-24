@@ -40,6 +40,13 @@ export default class ReportService extends Services.AbstractService {
   }
 
   /**
+   * @since 11.2.0
+   */
+  supportsBulkAction() {
+    return true;
+  }
+
+  /**
    * Returns default searchParameters for current entity type
    *
    * @return {object} searchParameters
