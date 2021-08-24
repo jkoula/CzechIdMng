@@ -55,8 +55,8 @@ public interface SiemLoggerManager {
 	final String SUCCESS_ACTION_STATUS = "SUCCESS";
 	final String FAILED_ACTION_STATUS = "FAIL";
 	
-	final String PARAMETER_DELIMITER_ATTRIBUTE = ":";
-	final String LEVEL_DELIMITER_ATTRIBUTE = ".";
+	final char PARAMETER_DELIMITER_ATTRIBUTE = ':';
+	final char LEVEL_DELIMITER_ATTRIBUTE = '.';
 	
 	
 	/**

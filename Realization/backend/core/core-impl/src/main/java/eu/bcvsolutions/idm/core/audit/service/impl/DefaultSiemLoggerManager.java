@@ -259,7 +259,7 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 		}
 		OperationState state = dto.getResult().getState();
 		String result = Objects.toString(state,"");
-		status = OperationState.EXCEPTION.equals(state) ? FAILED_ACTION_STATUS : status;
+		status = OperationState.EXCEPTION == state ? FAILED_ACTION_STATUS : status;
 		detail = StringUtils.isEmpty(detail) ? result : detail;
 		log(action, status, dto, null, transactionUuid, detail);
 	}
@@ -287,7 +287,7 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 			if(StringUtils.isEmpty(detail)) {
 				RoleRequestState state = concept.getState();
 				result = Objects.toString(state,"");
-				status = RoleRequestState.EXCEPTION.equals(state) ? FAILED_ACTION_STATUS : status; 
+				status = RoleRequestState.EXCEPTION == state ? FAILED_ACTION_STATUS : status; 
 			} else {
 				result = detail;
 			}
@@ -322,7 +322,7 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 		boolean result = true;
 		String levels[] = {};
 		if(action!=null) {
-			levels = action.split(Pattern.quote(LEVEL_DELIMITER_ATTRIBUTE)); 
+			levels = action.split(Pattern.quote(String.valueOf(LEVEL_DELIMITER_ATTRIBUTE))); 
 		}
 		StringBuilder sb = new StringBuilder();
 		sb.append(CONFIGURATION_PROPERTY_PREFIX);
