@@ -26,7 +26,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
       ...this.state,
       filterOpened: this.props.filterOpened,
       report: null,
-      longRunningTask: null
+      longRunningTask: null,
+      recover: false
     };
   }
 
@@ -363,7 +364,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
                 level="success"
                 key="add_button"
                 className="btn-xs"
-                onClick={ this.showDetail.bind(this, { }) }
+                onClick={ this.showDetail.bind(this, { }, false) }
                 rendered={ Managers.SecurityManager.hasAuthority('REPORT_CREATE') && showAddButton}
                 disabled={ !_supportedReports || !_supportedReports.length }
                 showLoading={ showLoading }
@@ -573,7 +574,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
                     label={ this.i18n('rpt:entity.Report._type') }
                     options={ _supportedReports }
                     onChange={ this.onChangeReport.bind(this) }
-                    readOnly={ recover || !Utils.Entity.isNew(detail.entity) }
+                    readOnly={ recover ? true : !Utils.Entity.isNew(detail.entity) }
                     required
                     searchable/>
                   {

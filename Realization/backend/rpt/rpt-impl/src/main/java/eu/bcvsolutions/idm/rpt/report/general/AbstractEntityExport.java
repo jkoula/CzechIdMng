@@ -45,7 +45,7 @@ import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
  */
 public class AbstractEntityExport <D extends AbstractDto, F extends BaseFilter> extends AbstractBulkAction<D, F> {
 
-	public static final String  REPORT_NAME = "generic-entity-report";
+	public static final String REPORT_NAME = "generic-entity-report"; // RT: ~ bulk action name, but it's too late :(
 
 	private final RptReportService reportService;
 	private final AttachmentManager attachmentManager;
