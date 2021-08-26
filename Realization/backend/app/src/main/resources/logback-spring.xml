@@ -3,6 +3,9 @@
 <!-- http://logback.qos.ch/manual/appenders.html -->
 <!DOCTYPE configuration>
 <configuration>
+  <!-- !!!BEWARE!!! The specification of the LOG PATTERNS overrides the default configuration and increases the maximum length of the %logger{<size>} attribute. 
+  It is neccessary for correct function of the AUDIT logging feature (redmine ticket #2717). If AUDIT logger key is longer then the set limit it gets shortened 
+  and SIEM software is not able to parse logs properly. -->
   <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level %relative --- [%thread] %logger{60}.%M : %msg%n"/>
   <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %5level %relative --- [%thread] %logger{60}.%M : %msg%n"/>
 
