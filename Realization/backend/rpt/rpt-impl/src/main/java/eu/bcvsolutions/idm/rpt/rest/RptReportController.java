@@ -4,12 +4,14 @@ import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
@@ -38,6 +40,9 @@ import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.utils.SpinalCase;
+import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
+import eu.bcvsolutions.idm.core.ecm.api.dto.filter.IdmAttachmentFilter;
+import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.rpt.RptModuleDescriptor;
@@ -71,7 +76,10 @@ import io.swagger.annotations.AuthorizationScope;
 		consumes = MediaType.APPLICATION_JSON_VALUE)
 public class RptReportController extends AbstractReadWriteDtoController<RptReportDto, RptReportFilter>  {
 
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(RptReportController.class);
 	protected static final String TAG = "Reports";
+	//
+	@Autowired private AttachmentManager attachmentManager;
 	//
 	private final ReportManager reportManager;
 	
@@ -261,19 +269,46 @@ public class RptReportController extends AbstractReadWriteDtoController<RptRepor
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
 		}
 		try {
-			RptRenderedReportDto result = reportManager.render(report, rendererName);
-			InputStream is = result.getRenderedReport();
+			InputStream is = null;
+			MediaType contentType = null;
+			String reportName = null;
 			//
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-			String reportName = String.format(
-					"%s-%s", 
-					SpinalCase.format(report.getExecutorName()),
-					report.getCreated().format(formatter)
-			);
+			// try to find already rendered report as persisted attachment
+			IdmAttachmentFilter attachmentFilter = new IdmAttachmentFilter();
+			attachmentFilter.setOwnerId(report.getId());
+			attachmentFilter.setOwnerType(attachmentManager.getOwnerType(report));
+			attachmentFilter.setAttachmentType(rendererName);
+			List<IdmAttachmentDto> attachments = attachmentManager.find(attachmentFilter, PageRequest.of(0, 1)).getContent();
+			if (!attachments.isEmpty()) {
+				IdmAttachmentDto attachment = attachments.get(0);
+				UUID attachmentId = attachment.getId();
+				contentType = MediaType.valueOf(attachment.getMimetype());
+				reportName = attachment.getName();
+				//
+				try {
+					is = attachmentManager.getAttachmentData(attachmentId);
+				} catch(Exception ex) {
+					LOG.warn("Attachment [{}] is not valid. Report [{}] will be rendered again by renderer [{}].",
+							attachmentId, report.getExecutorName(), rendererName);
+				}
+			} 
+			if (is == null) {
+				RptRenderedReportDto result = reportManager.render(report, rendererName);
+				is = result.getRenderedReport();
+				contentType = result.getRenderer().getFormat();
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+				reportName = String.format(
+						"\"%s-%s.%s\"",
+						SpinalCase.format(report.getExecutorName()),
+						report.getCreated().format(formatter),
+						result.getRenderer().getExtension()
+				);
+			}
+			//
 			return ResponseEntity.ok()
 					.contentLength(is.available())
-					.contentType(result.getRenderer().getFormat())
-					.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s.%s\"", reportName, result.getRenderer().getExtension()))
+					.contentType(contentType)
+					.header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", reportName))
 					.body(new InputStreamResource(is));
 		} catch (Exception ex) {
 			throw new ResultCodeException(CoreResultCode.INTERNAL_SERVER_ERROR, ex);

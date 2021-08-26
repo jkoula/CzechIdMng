@@ -23,7 +23,7 @@ import eu.bcvsolutions.idm.rpt.api.renderer.AbstractXlsxRenderer;
 import eu.bcvsolutions.idm.rpt.api.renderer.RendererRegistrar;
 
 /**
- * Basic identity report xlsx renderer
+ * Basic identity report xlsx renderer.
  * 
  * @author Radek Tomiška
  *
@@ -94,7 +94,7 @@ public class IdentityReportXlsxRenderer
 	}
 
 	/**
-	 * Register renderer to example report
+	 * Register renderer to example report.
 	 */
 	@Override
 	public String[] register(String reportName) {

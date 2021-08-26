@@ -38,11 +38,18 @@ import eu.bcvsolutions.idm.rpt.dto.RptMonitoringResultDto;
  * @author Radek Tomiška
  * @since 11.2.0
  */
-@Component("core-monitoring-report-xlsx-renderer")
+@Component(MonitoringReportXlsxRenderer.RENDERER_NAME)
 @Description(AbstractXlsxRenderer.RENDERER_EXTENSION) // will be show as format for download
 public class MonitoringReportXlsxRenderer extends AbstractXlsxRenderer implements RendererRegistrar {
 	
+	public static final String RENDERER_NAME = "core-monitoring-report-xlsx-renderer";
+	//
 	@Autowired private ConfigurationService configurationService;
+	
+	@Override
+	public String getName() {
+		return RENDERER_NAME;
+	}
 	
 	@Override
 	public InputStream render(RptReportDto report) {
