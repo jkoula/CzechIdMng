@@ -115,7 +115,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
     }
   }
 
-  showDetail(entity) {
+  showDetail(entity, recover = false) {
     const { supportedReports } = this.props;
     let report = null;
     if (entity.executorName && supportedReports && supportedReports.has(entity.executorName)) {
@@ -124,7 +124,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
     //
     this.setState({
       report,
-      longRunningTask: entity._embedded && entity._embedded.longRunningTask ? entity._embedded.longRunningTask : null
+      longRunningTask: entity._embedded && entity._embedded.longRunningTask ? entity._embedded.longRunningTask : null,
+      recover
     }, () => {
       super.showDetail(entity, () => {
         if (this.refs.executorName) {
@@ -144,7 +145,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
         entity: {}
       },
       report: null,
-      longRunningTask: null
+      longRunningTask: null,
+      recover: false
     });
   }
 
@@ -157,23 +159,33 @@ export class ReportTable extends Advanced.AbstractTableContent {
   /**
    * Saves give entity
    */
-  createReport(event) {
+  createReport(recover = false, event) {
     if (event) {
       event.preventDefault();
     }
     if (!this.refs.form.isFormValid() || (this.refs.reportFilter && !this.refs.reportFilter.isValid())) {
       return;
     }
-    const entity = this.refs.form.getData();
+    let entity;
+    if (recover) {
+      entity = {
+        executorName: this.refs.executorName.getValue()
+      };
+    } else {
+      entity = this.refs.form.getData();
+    }
     //
     if (this.refs.reportFilter) {
       entity.filter = {
         formDefinition: this.refs.reportFilter.getFormDefinition().id,
-        values: this.refs.reportFilter.getValues()
+        values: this.refs.reportFilter.getValues().map(value => {
+          value.id = null;
+          return value;
+        })
       };
     }
     //
-    this.context.store.dispatch(this.getManager().createEntity(entity, `${this.getUiKey()}-detail`, this.afterSave.bind(this)));
+    this.context.store.dispatch(this.getManager().createEntity(entity, `${ this.getUiKey() }-detail`, this.afterSave.bind(this)));
   }
 
   /**
@@ -194,24 +206,18 @@ export class ReportTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs['confirm-task-recover'].show(
-      this.i18n(`content.scheduler.all-tasks.action.task-recover.message`, {
-        record: longRunningTaskManager.getNiceLabel(entity, this.props.supportedTasks)
-      }),
-      this.i18n(`content.scheduler.all-tasks.action.task-recover.header`)
-    ).then(() => {
-      this.context.store.dispatch(longRunningTaskManager.recover(entity, 'task-queue-process-created', () => {
-        this.addMessage({
-          message: this.i18n('content.scheduler.all-tasks.action.task-recover.success', {
-            count: 1,
-            record: longRunningTaskManager.getNiceLabel(entity, this.props.supportedTasks)
-          })
-        });
-        this.refs.table.reload();
-      }));
-    }, () => {
-      // Rejected
-    });
+    this.showDetail(entity, true);
+  }
+
+  _getModalHeader(entity, recover = false) {
+    if (Utils.Entity.isNew(entity)) {
+      return this.i18n('action.report-create.header');
+    }
+    if (recover) {
+      return this.i18n(`button.recover.label`);
+    }
+    //
+    return this.i18n('action.report-detail.header');
   }
 
   renderDownloadButtons(entity, className = '') {
@@ -285,7 +291,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
       filterOpened,
       detail,
       report,
-      longRunningTask
+      longRunningTask,
+      recover
     } = this.state;
 
     const _supportedReports = [];
@@ -319,8 +326,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
           ref="table"
           uiKey={ uiKey }
           manager={ manager }
-          rowClass={ ({rowIndex, data}) => { return Utils.Ui.getRowClass(data[rowIndex]); } }
-          filterOpened={filterOpened}
+          rowClass={ ({ rowIndex, data }) => { return Utils.Ui.getRowClass(data[rowIndex]); } }
+          filterOpened={ filterOpened }
           forceSearchParameters={ forceSearchParameters }
           showRowSelection={ Managers.SecurityManager.hasAuthority('REPORT_DELETE') && showRowSelection }
           filter={
@@ -359,9 +366,8 @@ export class ReportTable extends Advanced.AbstractTableContent {
                 onClick={ this.showDetail.bind(this, { }) }
                 rendered={ Managers.SecurityManager.hasAuthority('REPORT_CREATE') && showAddButton}
                 disabled={ !_supportedReports || !_supportedReports.length }
-                showLoading={ showLoading }>
-                <Basic.Icon type="fa" icon="plus"/>
-                { ' ' }
+                showLoading={ showLoading }
+                icon="fa:plus">
                 { this.i18n('button.add') }
               </Basic.Button>
             ]
@@ -527,12 +533,12 @@ export class ReportTable extends Advanced.AbstractTableContent {
                         ?
                         this.i18n('content.scheduler.all-tasks.button.recover.disabled')
                         :
-                        this.i18n('content.scheduler.all-tasks.button.recover.title')
+                        this.i18n('button.recover.label')
                       }
                       titlePlacement="bottom"
                       rendered={ !isCreated && !lrt.running && !isRunning }
                       disabled={ !lrt.recoverable }
-                      onClick={ this.onRecover.bind(this, lrt) }
+                      onClick={ this.onRecover.bind(this, entity) }
                       icon="play"/>
                   </Basic.Div>
                 );
@@ -549,21 +555,25 @@ export class ReportTable extends Advanced.AbstractTableContent {
           {
             showLoadingDetail
             ||
-            <form onSubmit={this.createReport.bind(this)}>
+            <form onSubmit={ this.createReport.bind(this, recover) }>
               <Basic.Modal.Header
                 closeButton={ !showLoadingDetail }
                 buttons={[
-                  <Advanced.AuditableInfo entity={ detail.entity } placement="bottom" />
+                  <Advanced.AuditableInfo entity={ recover ? null : detail.entity } placement="bottom" />
                 ]}
-                text={ Utils.Entity.isNew(detail.entity) ? this.i18n('action.report-create.header') : this.i18n('action.report-detail.header') }/>
+                text={ this._getModalHeader(detail.entity, recover) }/>
               <Basic.Modal.Body>
                 <Basic.Loading isStatic show={ showLoadingDetail }/>
-                <Basic.AbstractForm ref="form" readOnly={ !Utils.Entity.isNew(detail.entity) } className={ showLoadingDetail ? 'hidden' : '' }>
+                <Basic.AbstractForm
+                  ref="form"
+                  readOnly={ recover ? false : !Utils.Entity.isNew(detail.entity) }
+                  className={ showLoadingDetail ? 'hidden' : '' }>
                   <Basic.EnumSelectBox
                     ref="executorName"
                     label={ this.i18n('rpt:entity.Report._type') }
                     options={ _supportedReports }
                     onChange={ this.onChangeReport.bind(this) }
+                    readOnly={ recover || !Utils.Entity.isNew(detail.entity) }
                     required
                     searchable/>
                   {
@@ -578,11 +588,11 @@ export class ReportTable extends Advanced.AbstractTableContent {
                           detail.entity && detail.entity.filter ? detail.entity.filter.values : null
                         )
                       }
-                      readOnly={ !Utils.Entity.isNew(detail.entity) }
-                      useDefaultValue={ Utils.Entity.isNew(detail.entity) }/>
+                      readOnly={ !recover && !Utils.Entity.isNew(detail.entity) }
+                      useDefaultValue={ recover || Utils.Entity.isNew(detail.entity) }/>
                   }
                   {
-                    !longRunningTask
+                    !longRunningTask || recover
                     ||
                     <Basic.Div>
                       <Basic.Row>
@@ -620,7 +630,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
                 </Basic.Button>
 
                 {
-                  Utils.Entity.isNew(detail.entity)
+                  recover || Utils.Entity.isNew(detail.entity)
                   ?
                   <Basic.Button
                     type="submit"
@@ -628,7 +638,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
                     showLoading={ showLoadingDetail }
                     showLoadingIcon
                     showLoadingText={ this.i18n('button.saving') }
-                    rendered={ detail.entity.id === undefined && Managers.SecurityManager.hasAnyAuthority(['REPORT_CREATE']) }>
+                    rendered={ Managers.SecurityManager.hasAnyAuthority(['REPORT_CREATE']) }>
                     { this.i18n('button.generate.label') }
                   </Basic.Button>
                   :

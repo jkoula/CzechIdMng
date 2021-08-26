@@ -45,6 +45,9 @@
         "generate": {
           "label": "Generate report"
         },
+        "recover": {
+          "label": "Generate report again"
+        },
         "link": {
           "longRunningTask": {
             "title": "Show long running task",

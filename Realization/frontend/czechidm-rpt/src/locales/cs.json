@@ -45,6 +45,9 @@
         "generate": {
           "label": "Generovat report"
         },
+        "recover": {
+          "label": "Generovat report znovu"
+        },
         "link": {
           "longRunningTask": {
             "title": "Zobrazit dlouho trvající úlohy",
