@@ -11,10 +11,6 @@ import LoggingEventTable from './LoggingEventTable';
 
 class LoggingEventContent extends Basic.AbstractContent {
 
-  constructor(props, context) {
-    super(props, context);
-  }
-
   getContentKey() {
     return 'content.audit.logging-event';
   }
@@ -25,13 +21,13 @@ class LoggingEventContent extends Basic.AbstractContent {
 
   render() {
     return (
-      <div>
-        {this.renderPageHeader()}
+      <Basic.Div>
+        { this.renderPageHeader() }
 
         <Basic.Panel>
           <LoggingEventTable uiKey="audit-event-table"/>
         </Basic.Panel>
-      </div>
+      </Basic.Div>
     );
   }
 }

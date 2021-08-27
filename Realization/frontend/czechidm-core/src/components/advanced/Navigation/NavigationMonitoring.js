@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 //
 import * as Basic from '../../basic';
+import * as Utils from '../../../utils';
+import ComponentService from '../../../services/ComponentService';
 import {
   ConfigurationManager,
   SecurityManager,
@@ -11,11 +13,12 @@ import {
 } from '../../../redux';
 import NavigationItem from './NavigationItem';
 import NavigationSeparator from './NavigationSeparator';
-
+//
 const monitoringResultManager = new MonitoringResultManager();
+const componentService = new ComponentService();
 
 /**
- * Monitoring icon in navbigastion.
+ * Monitoring icon in navigation.
  *
  * @author Radek Tomiška
  * @since 11.1.0
@@ -137,12 +140,21 @@ class NavigationMonitoring extends Basic.AbstractContent {
                   result.result.model.level = result.level;
                 }
                 const message = this.getFlashManager().convertFromResultModel(result.result.model);
+                const monitoringResultButton = componentService.getMonitoringResultButtonComponent(Utils.Ui.getSimpleJavaType(result.evaluatorType));
                 //
                 return (
                   <Basic.FlashMessage
                     className="monitoring-result-message"
                     message={ message }
                     buttons={
+                      monitoringResultButton
+                      ?
+                      [
+                        <monitoringResultButton.component
+                          monitoringResult={ result }
+                          buttonSize="xs"/>
+                      ]
+                      :
                       [
                         <Basic.Button
                           icon="fa:angle-double-right"

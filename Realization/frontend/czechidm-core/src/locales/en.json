@@ -3674,7 +3674,10 @@
             "title": "Run task again",
             "disabled": "Task cannot be executed again"
           },
-          "cancel": "Cancel task"
+          "cancel": "Cancel task",
+          "show": {
+            "label": "Show tasks"
+          }
         },
         "filter": {
           "text": {
@@ -3973,7 +3976,12 @@
         "header-detail": "Logging event",
         "detail": "detail",
         "exceptions": "Error message",
-        "rawSource": "Show copyable content"
+        "rawSource": "Show copyable content",
+        "button": {
+          "show": {
+            "label": "Show logging events"
+          }
+        }
       },
       "revision": {
         "id": "Revision Id",
@@ -4051,6 +4059,11 @@
         },
         "parent": {
           "placeholder": "$t(entity.EntityEvent.parent.label) (uuid)"
+        }
+      },
+      "button": {
+        "show": {
+          "label": "Show entity events"
         }
       },
       "counter": {

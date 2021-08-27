@@ -67,5 +67,4 @@ class ButtonMenuItem extends AbstractComponent {
   }
 }
 
-
 module.exports = ButtonMenuItem;

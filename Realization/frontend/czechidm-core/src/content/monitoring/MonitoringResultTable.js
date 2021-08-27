@@ -7,12 +7,14 @@ import * as Domain from '../../domain';
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
+import ComponentService from '../../services/ComponentService';
 import { MonitoringResultManager, MonitoringManager, FormAttributeManager, DataManager } from '../../redux';
 import NotificationLevelEnum from '../../enums/NotificationLevelEnum';
 //
 const manager = new MonitoringResultManager();
 const monitoringManager = new MonitoringManager();
 const formAttributeManager = new FormAttributeManager();
+const componentService = new ComponentService();
 
 /**
  * Monitoring results.
@@ -185,7 +187,9 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
               count: 1, record: monitoringManager.getNiceLabel(monitoringResult, this.props.supportedEvaluators)
             })
           });
-          this.refs.table.reload();
+          if (this.refs.table) {
+            this.refs.table.reload();
+          }
         }
       }));
     }, () => {
@@ -218,6 +222,30 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
       const evaluatorType = supportedEvaluators.has(detail.entity.evaluatorType) ? supportedEvaluators.get(detail.entity.evaluatorType) : null;
       if (evaluatorType && evaluatorType.formDefinition) {
         formInstance = new Domain.FormInstance(evaluatorType.formDefinition).setProperties(detail.entity.evaluatorProperties);
+      }
+    }
+    //
+    let ownerContent = null;
+    if (detail.entity.ownerType && detail.entity.ownerId) {
+      ownerContent = (
+        <Advanced.EntityInfo
+          entityType={ Utils.Ui.getSimpleJavaType(detail.entity.ownerType) }
+          entityIdentifier={ detail.entity.ownerId }
+          style={{ margin: 0 }}
+          face="popover"
+          showEntityType={ false }
+          showIcon/>
+      );
+    } else {
+      const monitoringResultButton = componentService.getMonitoringResultButtonComponent(
+        Utils.Ui.getSimpleJavaType(detail.entity.evaluatorType)
+      );
+      if (monitoringResultButton) {
+        ownerContent = (
+          <monitoringResultButton.component
+            monitoringResult={ detail.entity }
+            buttonSize="xs"/>
+        );
       }
     }
     //
@@ -371,17 +399,14 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                 const entity = data[rowIndex];
                 //
                 if (!entity._embedded || !entity._embedded[property]) {
-                  if (entity._embedded.revision) {
+                  const monitoringResultButton = componentService.getMonitoringResultButtonComponent(
+                    Utils.Ui.getSimpleJavaType(entity.evaluatorType)
+                  );
+                  if (monitoringResultButton) {
                     return (
-                      <Advanced.EntityInfo
-                        entityType={ Utils.Ui.getSimpleJavaType(entity.ownerType) }
-                        entityIdentifier={ entity[property] }
-                        entity={ entity.content }
-                        face="popover"
-                        showLink={ false }
-                        showEntityType={ false }
-                        showIcon
-                        deleted/>
+                      <monitoringResultButton.component
+                        monitoringResult={ entity }
+                        buttonSize="xs"/>
                     );
                   }
                   return (
@@ -464,27 +489,17 @@ export class MonitoringResultTable extends Advanced.AbstractTableContent {
                 </Basic.Col>
               </Basic.Row>
 
-              <Basic.Row rendered={ detail.entity.ownerType && detail.entity.ownerId } >
-                <Basic.Col lg={ 6 }>
+              <Basic.Row rendered={ (detail.entity.ownerType && detail.entity.ownerId) || ownerContent } >
+                <Basic.Col lg={ detail.entity.ownerType && detail.entity.ownerId ? 6 : 12 }>
+                  <Basic.LabelWrapper label={ this.i18n('entity.MonitoringResult.owner.label') }>
+                    { ownerContent }
+                  </Basic.LabelWrapper>
+                </Basic.Col>
+                <Basic.Col lg={ 6 } rendered={ detail.entity.ownerType && detail.entity.ownerId }>
                   <Basic.LabelWrapper label={ this.i18n('entity.MonitoringResult.ownerType.label') }>
                     <span title={ detail.entity.ownerType }>
                       { Utils.Ui.getSimpleJavaType(detail.entity.ownerType) }
                     </span>
-                  </Basic.LabelWrapper>
-                </Basic.Col>
-                <Basic.Col lg={ 6 }>
-                  <Basic.LabelWrapper label={ this.i18n('entity.MonitoringResult.owner.label') }>
-                    {
-                      !detail.entity || !detail.entity.ownerType
-                      ||
-                      <Advanced.EntityInfo
-                        entityType={ Utils.Ui.getSimpleJavaType(detail.entity.ownerType) }
-                        entityIdentifier={ detail.entity.ownerId }
-                        style={{ margin: 0 }}
-                        face="popover"
-                        showEntityType={ false }
-                        showIcon/>
-                    }
                   </Basic.LabelWrapper>
                 </Basic.Col>
               </Basic.Row>

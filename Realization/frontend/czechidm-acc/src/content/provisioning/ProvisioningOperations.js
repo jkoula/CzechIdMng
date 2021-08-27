@@ -303,7 +303,7 @@ class ProvisioningOperations extends Basic.AbstractContent {
             <ProvisioningOperationTableComponent
               ref="archiveTable"
               key="archiveTable"
-              uiKey={ `archive-${uiKey}` }
+              uiKey={ `archive-${ uiKey }` }
               manager={ archiveManager }
               isArchive
               showDetail={ this.showDetail.bind(this) }

@@ -23,7 +23,35 @@ export class ProvisioningOperationTable extends Advanced.AbstractTableContent {
     super(props, context);
     this.state = {
       filterOpened: this.props.filterOpened,
+      operationState: this._getOperationState(props._searchParameters)
     };
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    //  filters from redux
+    if (nextProps._searchParameters) {
+      const newOperationState = this._getOperationState(nextProps._searchParameters);
+      if (newOperationState && this.state.operationState !== newOperationState) {
+        this.setState({
+          operationState: newOperationState
+        }, () => {
+          //
+          const filterData = {};
+          nextProps._searchParameters.getFilters().forEach((v, k) => {
+            filterData[k] = v;
+          });
+          this.refs.filterForm.setData(filterData);
+          this.refs.table.useFilterData(filterData);
+        });
+      }
+    }
+  }
+
+  _getOperationState(searchParameters) {
+    if (!searchParameters || !searchParameters.getFilters().has('resultState')) {
+      return null;
+    }
+    return searchParameters.getFilters().get('resultState');
   }
 
   getContentKey() {
@@ -53,10 +81,14 @@ export class ProvisioningOperationTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    if (this.refs.emptyProvisioning) {
-      this.refs.emptyProvisioning.setValue(null);
-    }
-    this.refs.table.cancelFilter(this.refs.filterForm);
+    this.setState({
+      operationState: null
+    }, () => {
+      if (this.refs.emptyProvisioning) {
+        this.refs.emptyProvisioning.setValue(null);
+      }
+      this.refs.table.cancelFilter(this.refs.filterForm);
+    });
   }
 
   getDefaultSearchParameters() {
@@ -143,7 +175,7 @@ export class ProvisioningOperationTable extends Advanced.AbstractTableContent {
 
         <Advanced.Table
           ref="table"
-          uiKey={uiKey}
+          uiKey={ uiKey }
           manager={ manager }
           showRowSelection={ showRowSelection }
           forceSearchParameters={ forceSearchParameters }

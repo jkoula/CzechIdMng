@@ -36,6 +36,9 @@
       "button": {
         "addDefault": {
           "label": "Vytvořit nový systém výchozím formulářem"
+        },
+        "show": {
+          "label": "Zobrazit napojené systémy"
         }
       }
     },
@@ -164,7 +167,10 @@
           "success": "Konfigurace synchronizace [{{name}}] byla úspěšně uložena"
         },
         "button": {
-          "saveAndStartSynchronization": "Uložit a spustit synchronizaci"
+          "saveAndStartSynchronization": "Uložit a spustit synchronizaci",
+          "show": {
+            "label": "Zobrazit detail synchronizace"
+          }
         },
         "help": {
           "header": "Definice vlastního filtru synchronizace.",
@@ -824,6 +830,11 @@
           "placeholder": "Všechny operace ...",
           "yes": "Pouze prázdný provisioning (bez atributů)",
           "no": "Bez prázdného provisioningu (s atributy)"
+        }
+      },
+      "button": {
+        "show": {
+          "label": "Zobrazit operace pro provisioning"
         }
       }
     },

@@ -140,6 +140,20 @@ export default class ComponentService {
     return this.getComponentByEntityType(ComponentService.CONNECTOR_TYPE, connectorType);
   }
 
+  /**
+   * Returns registered monitroing result button component.
+   *
+   * @param  {string} monitoringType monitoring evaluator simple java type
+   * @return {object}            component
+   * @since 11.2.0
+   */
+  getMonitoringResultButtonComponent(monitoringType) {
+    if (!monitoringType) {
+      return null;
+    }
+    return this.getComponentByEntityType(ComponentService.MONITORING_RESULT_BUTTON_COMPONENT_TYPE, monitoringType);
+  }
+
 }
 // reserved component types
 ComponentService.ENTITY_INFO_COMPONENT_TYPE = 'entity-info';
@@ -152,3 +166,4 @@ ComponentService.PASSWORD_CHANGE_COMPONENTS_TYPE = 'password-change-component';
 ComponentService.ICON_COMPONENT_TYPE = 'icon';
 ComponentService.CONNECTOR_TYPE = 'connector-type';
 ComponentService.MODAL_COMPONENT_TYPE = 'modal';
+ComponentService.MONITORING_RESULT_BUTTON_COMPONENT_TYPE = 'monitoring-result-button';

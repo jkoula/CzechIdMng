@@ -65,6 +65,7 @@ import CodeListValue from './CodeListValue/CodeListValue';
 import AbstractIcon from './Icon/AbstractIcon';
 import Icons from './Icon/Icons';
 import AbstractIdentityDashboardButton from './Button/AbstractIdentityDashboardButton';
+import AbstractMonitoringResultButton from './Button/AbstractMonitoringResultButton';
 import RoleRequestInfo from './RoleRequestInfo/RoleRequestInfo';
 import PasswordInfo from './PasswordInfo/PasswordInfo';
 import AuditableInfo from './EntityInfo/AuditableInfo';
@@ -143,6 +144,7 @@ const Components = {
   AbstractIcon,
   Icons,
   AbstractIdentityDashboardButton,
+  AbstractMonitoringResultButton,
   RoleRequestInfo,
   PasswordInfo,
   AuditableInfo,
@@ -156,5 +158,5 @@ const Components = {
   }
 };
 
-Components.version = '11.1.0';
+Components.version = '11.2.0';
 module.exports = Components;

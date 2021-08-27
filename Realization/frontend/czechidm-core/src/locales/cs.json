@@ -3727,7 +3727,10 @@
             "title": "Spustit úlohu znovu",
             "disabled": "Úlohu nelze spustit znovu"
           },
-          "cancel": "Zrušit úlohu"
+          "cancel": "Zrušit úlohu",
+          "show": {
+            "label": "Zobrazit úlohy"
+          }
         },
         "filter": {
           "text": {
@@ -4026,7 +4029,12 @@
         "header-detail": "Logovaná událost",
         "detail": "detail",
         "exceptions": "Chybové hlášení",
-        "rawSource": "Zobrazit kopírovatelný obsah"
+        "rawSource": "Zobrazit kopírovatelný obsah",
+        "button": {
+          "show": {
+            "label": "Zobrazit logované události"
+          }
+        }
       },
       "revision": {
         "id": "ID revize",
@@ -4104,6 +4112,11 @@
         },
         "parent": {
           "placeholder": "$t(entity.EntityEvent.parent.label) (uuid)"
+        }
+      },
+      "button": {
+        "show": {
+          "label": "Zobrazit události"
         }
       },
       "counter": {

@@ -48,6 +48,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
  * Synchronization monitoring.
  * 
  * TODO: read last logs, not configuration itself + add monitoring ignored feature to logs.
+ * TODO: https://redmine.czechidm.com/issues/2058 - another monitoring eveluator instead ~ DailyMonitoring
  *
  * @author Radek Tomiška
  * @since 11.1.0
@@ -89,6 +90,7 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 		IdmMonitoringResultDto result = new IdmMonitoringResultDto();
 		result.setOwnerId(getLookupService().getOwnerId(sync));
 		result.setOwnerType(getLookupService().getOwnerType(SysSyncConfig.class));
+		//
 		ResultModel resultModel;
 		SysSyncLogDto lastSyncLog = sync.getLastSyncLog();
 		if (!sync.isEnabled()) {
@@ -96,7 +98,8 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 					AccResultCode.MONITORING_SYNCHRONIZATION_DISABLED,
 					ImmutableMap.of(
 							"synchronizationName", sync.getName(),
-							"systemName", system.getName()
+							"systemName", system.getName(),
+							"systemId", system.getId().toString()
 					)
 			);
 		} else if(lastSyncLog != null) {
@@ -121,6 +124,7 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 						ImmutableMap.of(
 								"synchronizationName", sync.getName(),
 								"systemName", system.getName(),
+								"systemId", system.getId().toString(),
 								"count", errorCounter
 						)
 				);
@@ -131,6 +135,7 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 						ImmutableMap.of(
 								"synchronizationName", sync.getName(),
 								"systemName", system.getName(),
+								"systemId", system.getId().toString(),
 								"count", otherCounter
 						)
 				);
@@ -140,7 +145,8 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 					AccResultCode.MONITORING_SYNCHRONIZATION_NOT_EXECUTED,
 					ImmutableMap.of(
 							"synchronizationName", sync.getName(),
-							"systemName", system.getName()
+							"systemName", system.getName(),
+							"systemId", system.getId().toString()
 					)
 			);
 		}
@@ -188,8 +194,7 @@ public class SynchronizationMonitoringEvaluator extends AbstractMonitoringEvalua
 		//
 		AbstractSysSyncConfigDto sync = syncConfigService.get(synchronizationId);
 		if (sync == null) {
-			// id only => prevent to load on UI
-			// TODO: load from audit => #978 required
+			// id only => prevent to load on UI. Just for sure - evaluator is deleted after synchronization is deleted
 			sync = new SysSyncConfigDto(synchronizationId);
 		}
 		value.getEmbedded().put(IdmFormValueDto.PROPERTY_UUID_VALUE, sync);

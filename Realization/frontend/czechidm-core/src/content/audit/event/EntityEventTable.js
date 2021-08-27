@@ -34,7 +34,8 @@ export class EntityEventTable extends Advanced.AbstractTableContent {
       },
       entityType: (props._searchParameters && props._searchParameters.getFilters().has('ownerType'))
         ? props._searchParameters.getFilters().get('ownerType')
-        : null
+        : null,
+      operationState: this._getOperationState(props._searchParameters)
     };
   }
 
@@ -44,6 +45,33 @@ export class EntityEventTable extends Advanced.AbstractTableContent {
     if (SecurityManager.hasAuthority('AUDIT_READ')) {
       this.context.store.dispatch(auditManager.fetchAuditedEntitiesNames());
     }
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    //  filters from redux
+    if (nextProps._searchParameters) {
+      const newOperationState = this._getOperationState(nextProps._searchParameters);
+      if (newOperationState && this.state.operationState !== newOperationState) {
+        this.setState({
+          operationState: newOperationState
+        }, () => {
+          //
+          const filterData = {};
+          nextProps._searchParameters.getFilters().forEach((v, k) => {
+            filterData[k] = v;
+          });
+          this.refs.filterForm.setData(filterData);
+          this.refs.table.useFilterData(filterData);
+        });
+      }
+    }
+  }
+
+  _getOperationState(searchParameters) {
+    if (!searchParameters || !searchParameters.getFilters().has('states')) {
+      return null;
+    }
+    return searchParameters.getFilters().get('states');
   }
 
   getContentKey() {
@@ -76,7 +104,11 @@ export class EntityEventTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.cancelFilter(this.refs.filterForm);
+    this.setState({
+      operationState: null
+    }, () => {
+      this.refs.table.cancelFilter(this.refs.filterForm);
+    });
   }
 
   onEntityTypeChange(entityType) {

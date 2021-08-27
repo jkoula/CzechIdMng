@@ -661,7 +661,7 @@ module.exports = {
     {
       id: 'scheduled-task-icon',
       type: 'icon',
-      entityType: ['scheduled-task', 'scheduled-tasks'],
+      entityType: ['scheduled-task', 'scheduled-tasks', 'long-running-task', 'long-running-tasks'],
       component: 'fa:calendar-times-o'
     },
     {
@@ -922,6 +922,30 @@ module.exports = {
         'IdmTreeNodeFormValue'
       ],
       component: require('./src/components/advanced/FormValueInfo/FormValueInfo').default
+    },
+    {
+      id: 'demo-admin-monitoring-result-button',
+      type: 'monitoring-result-button',
+      entityType: ['DemoAdminMonitoringEvaluator'],
+      component: require('./src/content/monitoring/button/DemoAdminMonitoringResultButton').default
+    },
+    {
+      id: 'long-running-task-monitoring-result-button',
+      type: 'monitoring-result-button',
+      entityType: ['LongRunningTaskMonitoringEvaluator'],
+      component: require('./src/content/monitoring/button/LongRunningTaskMonitoringResultButton').default
+    },
+    {
+      id: 'logging-event-monitoring-result-button',
+      type: 'monitoring-result-button',
+      entityType: ['LoggingEventMonitoringEvaluator'],
+      component: require('./src/content/monitoring/button/LoggingEventMonitoringResultButton').default
+    },
+    {
+      id: 'entity-event-monitoring-result-button',
+      type: 'monitoring-result-button',
+      entityType: ['EntityEventMonitoringEvaluator'],
+      component: require('./src/content/monitoring/button/EntityEventMonitoringResultButton').default
     }
   ]
 };

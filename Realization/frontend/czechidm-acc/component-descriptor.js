@@ -239,6 +239,18 @@ module.exports = {
       type: 'entity-info',
       entityType: ['SysSystemFormValue'],
       component: require('czechidm-core/src/components/advanced/FormValueInfo/FormValueInfo').default
+    },
+    {
+      id: 'synchronization-monitoring-result-button',
+      type: 'monitoring-result-button',
+      entityType: ['SynchronizationMonitoringEvaluator'],
+      component: require('./src/content/monitoring/button/SynchronizationMonitoringResultButton').default
+    },
+    {
+      id: 'provisioning-operation-monitoring-result-button',
+      type: 'monitoring-result-button',
+      entityType: ['ProvisioningOperationMonitoringEvaluator'],
+      component: require('./src/content/monitoring/button/ProvisioningOperationMonitoringResultButton').default
     }
   ]
 };

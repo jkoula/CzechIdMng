@@ -4,7 +4,7 @@ import { Basic } from 'czechidm-core';
 import ProvisioningOperations from './ProvisioningOperations';
 
 /**
- * Route only
+ * Provisioning in audit route.
  *
  * @author Radek Tomiška
  */

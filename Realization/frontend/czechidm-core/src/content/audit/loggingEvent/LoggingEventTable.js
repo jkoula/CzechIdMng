@@ -24,15 +24,47 @@ const manager = new LoggingEventManager();
 * text combine most of loggingEvent attributes
 *
 * @author Ondřej Kopr
+* @author Radek Tomiška
 */
 class LoggingEventTable extends Advanced.AbstractTableContent {
 
   constructor(props, context) {
     super(props, context);
+    //
+    this.state = {
+      levelString: this._getLevelString(props._searchParameters)
+    };
   }
 
   componentDidMount() {
     super.componentDidMount();
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    //  filters from redux
+    if (nextProps._searchParameters) {
+      const newLevelString = this._getLevelString(nextProps._searchParameters);
+      if (newLevelString && this.state.levelString !== newLevelString) {
+        this.setState({
+          levelString: newLevelString
+        }, () => {
+          //
+          const filterData = {};
+          nextProps._searchParameters.getFilters().forEach((v, k) => {
+            filterData[k] = v;
+          });
+          this.refs.filterForm.setData(filterData);
+          this.refs.table.useFilterData(filterData);
+        });
+      }
+    }
+  }
+
+  _getLevelString(searchParameters) {
+    if (!searchParameters || !searchParameters.getFilters().has('levelString')) {
+      return null;
+    }
+    return searchParameters.getFilters().get('levelString');
   }
 
   useFilter(event) {
@@ -46,9 +78,13 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    if (this.refs.table !== undefined) {
-      this.refs.table.cancelFilter(this.refs.filterForm);
-    }
+    this.setState({
+      levelString: null
+    }, () => {
+      if (this.refs.table !== undefined) {
+        this.refs.table.cancelFilter(this.refs.filterForm);
+      }
+    });
   }
 
   /**
@@ -66,7 +102,7 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
 
   _getAdvancedFilter() {
     return (
-      <Advanced.Filter onSubmit={this.useFilter.bind(this)}>
+      <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
         <Basic.AbstractForm ref="filterForm">
           <Basic.Row>
             <Basic.Col lg={ 8 }>
@@ -76,7 +112,7 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
                 tillPlaceholder={ this.i18n('content.audit.filter.dateTill.placeholder') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 } className="text-right">
-              <Advanced.Filter.FilterButtons cancelFilter={this.cancelFilter.bind(this)}/>
+              <Advanced.Filter.FilterButtons cancelFilter={ this.cancelFilter.bind(this) }/>
             </Basic.Col>
           </Basic.Row>
           <Basic.Row className="last">
@@ -84,36 +120,36 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
               <Advanced.Filter.EnumSelectBox
                 ref="levelString"
                 searchable
-                placeholder={this.i18n('entity.LoggingEvent.levelString')}
-                enum={LogTypeEnum}/>
+                placeholder={ this.i18n('entity.LoggingEvent.levelString') }
+                enum={ LogTypeEnum }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.TextField
                 ref="text"
-                placeholder={this.i18n('entity.LoggingEvent.text')}/>
+                placeholder={ this.i18n('entity.LoggingEvent.text') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.TextField
                 ref="loggerName"
-                placeholder={this.i18n('entity.LoggingEvent.loggerName')}/>
+                placeholder={ this.i18n('entity.LoggingEvent.loggerName') }/>
             </Basic.Col>
           </Basic.Row>
           <Basic.Row className="last" hidden>
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.TextField
                 ref="callerLine"
-                placeholder={this.i18n('entity.LoggingEvent.callerLine')}/>
+                placeholder={ this.i18n('entity.LoggingEvent.callerLine') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.TextField
                 ref="callerMethod"
-                placeholder={this.i18n('entity.LoggingEvent.callerMethod')}/>
+                placeholder={ this.i18n('entity.LoggingEvent.callerMethod') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.TextField
                 className="pull-right"
                 ref="callerFilename"
-                placeholder={this.i18n('entity.LoggingEvent.callerFilename')}/>
+                placeholder={ this.i18n('entity.LoggingEvent.callerFilename') }/>
             </Basic.Col>
           </Basic.Row>
         </Basic.AbstractForm>
@@ -127,19 +163,20 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
    * @param entityId id of revision
    */
   showDetail(entityId) {
-    this.context.history.push(`/audit/logging-event/${entityId}`);
+    this.context.history.push(`/audit/logging-event/${ entityId }`);
   }
 
   render() {
     const { uiKey } = this.props;
     return (
-      <div>
+      <Basic.Div>
         <Advanced.Table
           ref="table"
-          uiKey={uiKey}
+          uiKey={ uiKey }
           filterOpened
-          manager={manager} showId={false}
-          rowClass={({rowIndex, data}) => { return Utils.Ui.getRowClass(data[rowIndex]); }}
+          manager={ manager }
+          showId={ false }
+          rowClass={ ({rowIndex, data}) => { return Utils.Ui.getRowClass(data[rowIndex]); } }
           filter={ this._getAdvancedFilter() }
           _searchParameters={ this.getSearchParameters() }>
           <Advanced.Column
@@ -149,14 +186,15 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
               ({ rowIndex, data }) => {
                 return (
                   <Advanced.DetailButton
-                    title={this.i18n('button.detail')}
-                    onClick={this.showDetail.bind(this, data[rowIndex].id)}/>
+                    title={ this.i18n('button.detail') }
+                    onClick={ this.showDetail.bind(this, data[rowIndex].id) }/>
                 );
               }
             }
-            sort={false}/>
+            sort={ false }/>
           <Advanced.ColumnLink to="/audit/logging-event/:id" property="id" sort face="text" />
-          <Advanced.Column sort
+          <Advanced.Column
+            sort
             property="callerClass"
             cell={
               ({ rowIndex, data, property }) => {
@@ -166,22 +204,30 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
                     { Utils.Ui.getSimpleJavaType(value) }
                   </span>
                 );
-              }}
-            />
-          <Advanced.Column sort
+              }
+            }/>
+          <Advanced.Column
+            sort
             property="callerMethod"/>
-          <Advanced.Column property="levelString"
-            sort face="enum" enumClass={LogTypeEnum}/>
-          <Advanced.Column property="timestmp"
-            sort face="datetime"/>
-          <Advanced.Column sort
-            property="formattedMessage" cell={
+          <Advanced.Column
+            property="levelString"
+            sort
+            face="enum"
+            enumClass={ LogTypeEnum }/>
+          <Advanced.Column
+            property="timestmp"
+            sort
+            face="datetime"/>
+          <Advanced.Column
+            sort
+            property="formattedMessage"
+            cell={
               ({ rowIndex, data }) => {
-                return <Basic.ShortText text={data[rowIndex].formattedMessage} maxLength={ MAX_LENGTH_MESSAGE }/>;
+                return <Basic.ShortText text={ data[rowIndex].formattedMessage } maxLength={ MAX_LENGTH_MESSAGE }/>;
               }
             }/>
         </Advanced.Table>
-      </div>
+      </Basic.Div>
     );
   }
 }
