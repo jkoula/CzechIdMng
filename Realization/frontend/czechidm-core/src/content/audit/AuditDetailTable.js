@@ -12,7 +12,7 @@ const auditManager = new AuditManager();
 const MOD_ADD = 'ADD';
 
 /**
-* Table for detail audits
+* Table for audit detail revision values.
 *
 * @author Ondřej Kopr
 * @author Radek Tomiška
@@ -41,12 +41,15 @@ export class AuditDetailTable extends Basic.AbstractContent {
     return null;
   }
 
-  _prepareData(revisionValues) {
+  _prepareData(revision) {
+    const revisionValues = revision.revisionValues;
     const transformData = [];
+    //
     let index = 0;
     for (const key in revisionValues) {
       if (revisionValues.hasOwnProperty(key)) {
-        if (revisionValues[key] instanceof Object) {
+        if (revisionValues[key] instanceof Object
+          && !(key === 'setting' && revision.type === 'eu.bcvsolutions.idm.core.model.entity.IdmProfile')) { // FIXME: how to work with big hash maps?
           for (const keySec in revisionValues[key]) {
             if (revisionValues[key].hasOwnProperty(keySec)) {
               const row = {
@@ -73,65 +76,64 @@ export class AuditDetailTable extends Basic.AbstractContent {
   }
 
   render() {
-    const { detail, weight, diffValues, diffRowClass, showLoading } = this.props;
+    const { detail, diffValues, diffRowClass, showLoading } = this.props;
     if (detail === null || detail.revisionValues === null) {
       return null;
     }
-
+    //
     // transform revision values for table, key=>value
-    const transformData = this._prepareData(detail.revisionValues);
-
+    const transformData = this._prepareData(detail);
+    //
     return (
-      <Basic.Div className={ weight }>
-        <Basic.Table
-          showLoading={showLoading}
-          data={transformData}
-          noData={detail.modification === MOD_ADD ? this.i18n('revision.created') : this.i18n('revision.deleted') }
-          rowClass={({ rowIndex, data }) => {
-            if (diffValues && diffValues[data[rowIndex].key] !== undefined) {
-              return diffRowClass;
-            }
-            return null;
-          }}>
-          <Basic.Column
-            property="key"
-            header={ this.i18n('entity.Audit.key') }/>
-          <Basic.Column
-            property="value"
-            header={ this.i18n('entity.Audit.value') }
-            cell={
-              ({ data, rowIndex }) => {
-                const rowData = data[rowIndex];
-                const propertyName = rowData.key;
-                const propertyValue = rowData.value;
-                //
-                if (propertyValue === null) {
-                  return Utils.Ui.toStringValue(null);
-                }
-                //
-                // reserved audit constants
-                if ((propertyName === 'modifier'
-                      || propertyName === 'creator'
-                      || propertyName === 'originalModifier'
-                      || propertyName === 'originalCreator')
-                    && propertyValue !== '[SYSTEM]'
-                    && propertyValue !== '[GUEST]') {
-                  return (
-                    <Advanced.EntityInfo entityType="identity" entityIdentifier={ propertyValue } face="popover" />
-                  );
-                }
-                if (Advanced.EntityInfo.getComponent(propertyName)) {
-                  return (
-                    <Advanced.EntityInfo entityType={ propertyName } entityIdentifier={ propertyValue } face="popover" />
-                  );
-                }
+      <Basic.Table
+        showLoading={ showLoading }
+        className={ !transformData || transformData.length === 0 ? 'no-margin' : '' }
+        data={ transformData }
+        noData={ detail.modification === MOD_ADD ? this.i18n('revision.created') : this.i18n('revision.deleted') }
+        rowClass={({ rowIndex, data }) => {
+          if (diffValues && diffValues[data[rowIndex].key] !== undefined) {
+            return diffRowClass;
+          }
+          return null;
+        }}>
+        <Basic.Column
+          property="key"
+          header={ this.i18n('entity.Audit.key') }/>
+        <Basic.Column
+          property="value"
+          header={ this.i18n('entity.Audit.value') }
+          cell={
+            ({ data, rowIndex }) => {
+              const rowData = data[rowIndex];
+              const propertyName = rowData.key;
+              const propertyValue = rowData.value;
+              //
+              if (propertyValue === null) {
+                return Utils.Ui.toStringValue(null);
+              }
+              //
+              // reserved audit constants
+              if ((propertyName === 'modifier'
+                    || propertyName === 'creator'
+                    || propertyName === 'originalModifier'
+                    || propertyName === 'originalCreator')
+                  && propertyValue !== '[SYSTEM]'
+                  && propertyValue !== '[GUEST]') {
                 return (
-                  <span>{ Utils.Ui.toStringValue(propertyValue) }</span>
+                  <Advanced.EntityInfo entityType="identity" entityIdentifier={ propertyValue } face="popover" />
                 );
               }
-            }/>
-        </Basic.Table>
-      </Basic.Div>
+              if (Advanced.EntityInfo.getComponent(propertyName)) {
+                return (
+                  <Advanced.EntityInfo entityType={ propertyName } entityIdentifier={ propertyValue } face="popover" />
+                );
+              }
+              return (
+                <span>{ Utils.Ui.toStringValue(propertyValue) }</span>
+              );
+            }
+          }/>
+      </Basic.Table>
     );
   }
 }
@@ -143,8 +145,6 @@ AuditDetailTable.propTypes = {
   detail: PropTypes.object,
   // diff value for check
   diffValues: PropTypes.object,
-  // weight of table
-  weight: PropTypes.string,
   // Class for row when diffValues contains key
   diffRowClass: PropTypes.string,
   showLoading: PropTypes.bool
@@ -152,7 +152,6 @@ AuditDetailTable.propTypes = {
 
 AuditDetailTable.defaultProps = {
   columns: ['id', 'type', 'modification', 'modifier', 'revisionDate', 'changedAttributes'],
-  weight: 'col-md-6',
   diffRowClass: 'warning'
 };
 

@@ -3989,6 +3989,8 @@
       "pickRevision": "Vyberte revizi",
       "detail": "detail",
       "id": "ID",
+      "previousRevision": "Předchozí revize",
+      "selectedRevision": "Vybraná revize",
       "noPreviousRevision": "Neexistují žádné předchozí revize",
       "profile": {
         "userDetail": "{{revision}}. revize, {{name}}, {{date}}"

@@ -25,9 +25,10 @@ const FIRST_ENTITY_UIKEY = 'firstEntityUiKey';
 const SECOND_ENTITY_UIKEY = 'secondEntityUiKey';
 
 /**
- * Audit detail content
+ * Audit detail content.
  *
  * @author Ondřej Kopr
+ * @author Radek Tomiška
  */
 class AuditDetail extends Basic.AbstractContent {
 
@@ -40,13 +41,18 @@ class AuditDetail extends Basic.AbstractContent {
     };
   }
 
+  componentDidMount() {
+    super.componentDidMount();
+    //
+    this._reloadComponent(this.props);
+  }
+
   getContentKey() {
     return 'content.audit';
   }
 
-  componentDidMount() {
-    this.selectNavigationItems(['audit', 'audit-entities']);
-    this._reloadComponent(this.props);
+  getNavigationKey() {
+    return 'audit-entities';
   }
 
   /**
@@ -118,10 +124,10 @@ class AuditDetail extends Basic.AbstractContent {
   }
 
   render() {
-    const { auditDetailFirst, auditDetailSecond, diffValues, previousVersion } = this.props;
+    const { auditDetailSelected, auditDetailSecond, diffValues, previousVersion } = this.props;
     const { noVersion, showLoadingSelect } = this.state;
     const auditDetailSecondFinal = auditDetailSecond !== null ? auditDetailSecond : previousVersion;
-
+    //
     return (
       <Basic.Row>
         <Helmet title={ this.i18n('title') } />
@@ -135,49 +141,63 @@ class AuditDetail extends Basic.AbstractContent {
 
         <Basic.Panel>
           <Basic.PanelBody style={{ padding: '0 15px' }}>
-            <Basic.Row >
-              <div className="col-md-6">
+            <Basic.Row>
+              <Basic.Col md={ 6 }>
+                <Basic.ContentHeader
+                  className="marginable"
+                  icon="component:audit">
+                  { this.i18n('previousRevision') }
+                </Basic.ContentHeader>
+                {
+                  noVersion
+                  ?
+                  <Basic.Alert text={ this.i18n('noPreviousRevision') } className="no-margin"/>
+                  :
+                  <Basic.Div>
+                    <AuditDetailInfo
+                      ref="detailSecond"
+                      auditDetail={ auditDetailSecondFinal }
+                      noVersion={ noVersion }
+                      showLoading={ showLoadingSelect }
+                      cbChangeSecondRev={ this.changeSecondRevision.bind(this) }
+                      auditManager={ auditManager }
+                      forceSearchParameters={
+                        auditManager
+                          .getDefaultSearchParameters()
+                          .setFilter('entityId', auditDetailSelected ? auditDetailSelected.entityId : null)
+                      } />
+                    <AuditDetailTable
+                      showLoading={ showLoadingSelect }
+                      detail={ this._sameType(auditDetailSelected, auditDetailSecondFinal) ? auditDetailSecondFinal : null }
+                      diffValues={ diffValues ? diffValues.diffValues : null }/>
+                  </Basic.Div>
+                }
+              </Basic.Col>
+              <Basic.Col md={ 6 }>
+                <Basic.ContentHeader
+                  className="marginable"
+                  icon="fa:arrow-right">
+                  { this.i18n('selectedRevision') }
+                </Basic.ContentHeader>
                 <AuditDetailInfo
-                  ref="detailFirst"
-                  showLoading={ auditDetailFirst === null }
-                  auditDetail={ auditDetailFirst }
+                  ref="detailSelecter"
+                  showLoading={ auditDetailSelected === null }
+                  auditDetail={ auditDetailSelected }
                   auditManager={ auditManager } />
-              </div>
-              <div className="col-md-6">
-                <AuditDetailInfo
-                  ref="detailSecond"
-                  auditDetail={auditDetailSecondFinal}
-                  useAsSelect
-                  noVersion={noVersion}
-                  showLoading={showLoadingSelect}
-                  cbChangeSecondRev={this.changeSecondRevision.bind(this)}
-                  auditManager={auditManager}
-                  forceSearchParameters={
-                    auditManager
-                      .getDefaultSearchParameters()
-                      .setFilter('entityId', auditDetailFirst ? auditDetailFirst.entityId : null)
-                  } />
-              </div>
-            </Basic.Row>
-            <Basic.Row >
-              <AuditDetailTable detail={auditDetailFirst} showLoading={auditDetailFirst === null} />
-
-              {
-                noVersion
-                ?
-                <div className="col-md-6">
-                  <Basic.Alert text={this.i18n('noPreviousRevision')} className="no-margin"/>
-                </div>
-                :
                 <AuditDetailTable
-                  showLoading={showLoadingSelect}
-                  detail={this._sameType(auditDetailFirst, auditDetailSecondFinal) ? auditDetailSecondFinal : null}
-                  diffValues={diffValues ? diffValues.diffValues : null}/>
-              }
+                  detail={ auditDetailSelected }
+                  showLoading={ auditDetailSelected === null }
+                  diffValues={ diffValues ? diffValues.diffValues : null } />
+              </Basic.Col>
             </Basic.Row>
           </Basic.PanelBody>
           <Basic.PanelFooter>
-            <Basic.Button type="button" level="link" onClick={this.context.history.goBack}>{this.i18n('button.back')}</Basic.Button>
+            <Basic.Button
+              type="button"
+              level="link"
+              onClick={ this.context.history.goBack }>
+              { this.i18n('button.back') }
+            </Basic.Button>
           </Basic.PanelFooter>
         </Basic.Panel>
       </Basic.Row>
@@ -186,7 +206,7 @@ class AuditDetail extends Basic.AbstractContent {
 }
 
 AuditDetail.propTypes = {
-  auditDetailFirst: PropTypes.object
+  auditDetailSelected: PropTypes.object
 };
 
 AuditDetail.defaultProps = {
@@ -197,7 +217,7 @@ function select(state, component) {
 
   return {
     userContext: state.security.userContext,
-    auditDetailFirst: auditManager.getEntity(state, entityId),
+    auditDetailSelected: auditManager.getEntity(state, entityId),
     auditDetailSecond: auditManager.getEntity(state, revID),
     previousVersion: DataManager.getData(state, AUDIT_PREVIOUS_VERSION),
     diffValues: DataManager.getData(state, AUDIT_DETAIL_DIFF)

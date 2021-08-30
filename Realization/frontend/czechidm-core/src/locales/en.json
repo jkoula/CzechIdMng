@@ -3936,6 +3936,8 @@
       "pickRevision": "Select revision",
       "detail": "Revision details",
       "id": "Id",
+      "previousRevision": "Previous revision",
+      "selectedRevision": "Selected revision",
       "noPreviousRevision": "No previous revision",
       "profile": {
         "userDetail": "{{revision}}. revision, {{name}}, {{date}}"
