@@ -72,7 +72,7 @@ public class SynchronizationMonitoringEvaluatorIntegrationTest extends AbstractI
 		SysSchemaObjectClassDto schema = new SysSchemaObjectClassDto();
 		schema.setSystem(syncId);
 		mapping.getEmbedded().put(SysSystemMapping_.objectClass.getName(), schema);
-		SysSystemDto system = new SysSystemDto();
+		SysSystemDto system = new SysSystemDto(UUID.randomUUID());
 		system.setName("mock");
 		//
 		SysSyncConfigFilter context = new SysSyncConfigFilter();
@@ -98,7 +98,7 @@ public class SynchronizationMonitoringEvaluatorIntegrationTest extends AbstractI
 		SysSchemaObjectClassDto schema = new SysSchemaObjectClassDto();
 		schema.setSystem(syncId);
 		mapping.getEmbedded().put(SysSystemMapping_.objectClass.getName(), schema);
-		SysSystemDto system = new SysSystemDto();
+		SysSystemDto system = new SysSystemDto(UUID.randomUUID());
 		system.setName("mock");
 		//
 		SysSyncConfigFilter context = new SysSyncConfigFilter();
@@ -129,7 +129,7 @@ public class SynchronizationMonitoringEvaluatorIntegrationTest extends AbstractI
 		SysSchemaObjectClassDto schema = new SysSchemaObjectClassDto();
 		schema.setSystem(syncId);
 		mapping.getEmbedded().put(SysSystemMapping_.objectClass.getName(), schema);
-		SysSystemDto system = new SysSystemDto();
+		SysSystemDto system = new SysSystemDto(UUID.randomUUID());
 		system.setName("mock");
 		//
 		SysSyncConfigFilter context = new SysSyncConfigFilter();
@@ -161,7 +161,7 @@ public class SynchronizationMonitoringEvaluatorIntegrationTest extends AbstractI
 		SysSchemaObjectClassDto schema = new SysSchemaObjectClassDto();
 		schema.setSystem(syncId);
 		mapping.getEmbedded().put(SysSystemMapping_.objectClass.getName(), schema);
-		SysSystemDto system = new SysSystemDto();
+		SysSystemDto system = new SysSystemDto(UUID.randomUUID());
 		system.setName("mock");
 		//
 		SysSyncConfigFilter context = new SysSyncConfigFilter();
@@ -194,7 +194,7 @@ public class SynchronizationMonitoringEvaluatorIntegrationTest extends AbstractI
 		SysSchemaObjectClassDto schema = new SysSchemaObjectClassDto();
 		schema.setSystem(syncId);
 		mapping.getEmbedded().put(SysSystemMapping_.objectClass.getName(), schema);
-		SysSystemDto system = new SysSystemDto();
+		SysSystemDto system = new SysSystemDto(UUID.randomUUID());
 		system.setName("mock");
 		//
 		SysSyncConfigFilter context = new SysSyncConfigFilter();

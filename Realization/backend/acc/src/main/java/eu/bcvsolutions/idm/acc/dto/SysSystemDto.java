@@ -52,6 +52,13 @@ public class SysSystemDto extends FormableDto implements Codeable, Disableable {
 	@Embedded(dtoClass = SysConnectorServerDto.class)
 	private UUID remoteServer;
 
+	public SysSystemDto() {
+	}
+	
+	public SysSystemDto(UUID id) {
+		super(id);
+	}
+	
 	public String getName() {
 		return name;
 	}
