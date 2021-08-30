@@ -224,6 +224,21 @@ public class IdmIdentityRoleControllerRestTest extends AbstractReadWriteDtoContr
 	}
 	
 	@Test
+	public void testFindByRoleText() {
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmRoleDto roleOne = getHelper().createRole();
+		IdmRoleDto roleTwo = getHelper().createRole();
+		IdmIdentityRoleDto createIdentityRole = getHelper().createIdentityRole(identity, roleOne);
+		getHelper().createIdentityRole(identity, roleTwo);
+		//
+		IdmIdentityRoleFilter filter = new IdmIdentityRoleFilter();
+		filter.setRoleText(roleOne.getCode());
+		List<IdmIdentityRoleDto> results = find(filter);
+		Assert.assertEquals(1, results.size());
+		Assert.assertTrue(results.stream().anyMatch(r -> r.getId().equals(createIdentityRole.getId())));
+	}
+	
+	@Test
 	public void testFindByRoleCatalogueId() {
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmRoleDto roleOne = getHelper().createRole();

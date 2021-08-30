@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.eav.rest.impl;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -263,11 +264,11 @@ public class IdmFormValueControllerRestTest extends AbstractReadWriteDtoControll
 	@Test
 	public void testFindByDateValue() {		
 		IdmFormValueDto value = prepareDto(PersistentType.DATETIME);
-		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 		value.setDateValue(now);
 		IdmFormValueDto valueOne = createDto(value);
 		value = prepareDto(PersistentType.DATETIME);
-		value.setDateValue(ZonedDateTime.now().plusDays(2));
+		value.setDateValue(now.plusDays(2));
 		createDto(value); // other
 		//
 		IdmFormValueFilter<?> filter = new IdmFormValueFilter<>();

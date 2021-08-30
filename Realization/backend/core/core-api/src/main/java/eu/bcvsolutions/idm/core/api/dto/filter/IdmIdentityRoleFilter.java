@@ -3,11 +3,8 @@ package eu.bcvsolutions.idm.core.api.dto.filter;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 
@@ -24,6 +21,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	public static final String PARAMETER_DIRECT_ROLE_ID = "directRoleId";
 	public static final String PARAMETER_ROLE_COMPOSITION_ID = "roleCompositionId";
 	public static final String PARAMETER_ROLE_ID = "roleId"; // list - OR
+	public static final String PARAMETER_ROLE_TEXT = "roleText"; // role text ~ quick ~ like
 	public static final String PARAMETER_ROLE_ENVIRONMENT = "roleEnvironment";  // list - OR
 	public static final String PARAMETER_IDENTITY_ID = "identityId"; // list - OR
 	public static final String PARAMETER_ROLE_CATALOGUE_ID = "roleCatalogueId";
@@ -42,19 +40,15 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
     public UUID getIdentityId() {
-    	return getParameterConverter().toUuid(data, PARAMETER_IDENTITY_ID);
+    	return getParameterConverter().toUuid(getData(), PARAMETER_IDENTITY_ID);
     }
 
     public void setIdentityId(UUID identityId) {
-    	if (identityId == null) {
-    		data.remove(PARAMETER_IDENTITY_ID);
-    	} else {
-    		data.put(PARAMETER_IDENTITY_ID, Lists.newArrayList(identityId));
-    	}
+    	set(PARAMETER_IDENTITY_ID, identityId);
     }
     
     public List<UUID> getIdentities() {
-		return getParameterConverter().toUuids(data, PARAMETER_IDENTITY_ID);
+		return getParameterConverter().toUuids(getData(), PARAMETER_IDENTITY_ID);
 	}
     
     public void setIdentities(List<UUID> identities) {
@@ -62,19 +56,15 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
     
     public UUID getRoleId() {
-    	return getParameterConverter().toUuid(data, PARAMETER_ROLE_ID);
+    	return getParameterConverter().toUuid(getData(), PARAMETER_ROLE_ID);
 	}
     
     public void setRoleId(UUID roleId) {
-    	if (roleId == null) {
-    		data.remove(PARAMETER_ROLE_ID);
-    	} else {
-    		data.put(PARAMETER_ROLE_ID, Lists.newArrayList(roleId));
-    	}
+    	set(PARAMETER_ROLE_ID, roleId);
 	}
     
     public List<UUID> getRoles() {
-		return getParameterConverter().toUuids(data, PARAMETER_ROLE_ID);
+		return getParameterConverter().toUuids(getData(), PARAMETER_ROLE_ID);
 	}
     
     public void setRoles(List<UUID> roles) {
@@ -82,19 +72,15 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
     
     public String getRoleEnvironment() {
-    	return getParameterConverter().toString(data, PARAMETER_ROLE_ENVIRONMENT);
+    	return getParameterConverter().toString(getData(), PARAMETER_ROLE_ENVIRONMENT);
 	}
     
     public void setRoleEnvironment(String roleEnvironment) {
-    	if (StringUtils.isEmpty(roleEnvironment)) {
-    		data.remove(PARAMETER_ROLE_ENVIRONMENT);
-    	} else {
-    		data.put(PARAMETER_ROLE_ENVIRONMENT, Lists.newArrayList(roleEnvironment));
-    	}
+    	set(PARAMETER_ROLE_ENVIRONMENT, roleEnvironment);
 	}
     
     public List<String> getRoleEnvironments() {
-		return getParameterConverter().toStrings(data, PARAMETER_ROLE_ENVIRONMENT);
+		return getParameterConverter().toStrings(getData(), PARAMETER_ROLE_ENVIRONMENT);
 	}
     
     public void setRoleEnvironments(List<String> roleEnvironments) {
@@ -102,7 +88,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public UUID getRoleCatalogueId() {
-		return getParameterConverter().toUuid(data, PARAMETER_ROLE_CATALOGUE_ID);
+		return getParameterConverter().toUuid(getData(), PARAMETER_ROLE_CATALOGUE_ID);
 	}
 
 	public void setRoleCatalogueId(UUID roleCatalogueId) {
@@ -110,7 +96,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public Boolean getValid() {
-    	return getParameterConverter().toBoolean(data, PARAMETER_VALID);
+    	return getParameterConverter().toBoolean(getData(), PARAMETER_VALID);
 	}
 
 	public void setValid(Boolean valid) {
@@ -118,7 +104,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public Boolean getAutomaticRole() {
-		return getParameterConverter().toBoolean(data, PARAMETER_AUTOMATIC_ROLE);
+		return getParameterConverter().toBoolean(getData(), PARAMETER_AUTOMATIC_ROLE);
 	}
 
 	public void setAutomaticRole(Boolean automaticRole) {
@@ -126,7 +112,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public UUID getAutomaticRoleId() {
-		return getParameterConverter().toUuid(data, PARAMETER_AUTOMATIC_ROLE_ID);
+		return getParameterConverter().toUuid(getData(), PARAMETER_AUTOMATIC_ROLE_ID);
 	}
 
 	public void setAutomaticRoleId(UUID automaticRoleId) {
@@ -134,7 +120,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public UUID getIdentityContractId() {
-		return getParameterConverter().toUuid(data, PARAMETER_IDENTITY_CONTRACT_ID);
+		return getParameterConverter().toUuid(getData(), PARAMETER_IDENTITY_CONTRACT_ID);
 	}
 
 	public void setIdentityContractId(UUID identityContractId) {
@@ -142,7 +128,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 	
 	public Boolean getDirectRole() {
-    	return getParameterConverter().toBoolean(data, PARAMETER_DIRECT_ROLE);
+    	return getParameterConverter().toBoolean(getData(), PARAMETER_DIRECT_ROLE);
 	}
 
 	public void setDirectRole(Boolean directRole) {
@@ -150,7 +136,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public UUID getDirectRoleId() {
-		return getParameterConverter().toUuid(data, PARAMETER_DIRECT_ROLE_ID);
+		return getParameterConverter().toUuid(getData(), PARAMETER_DIRECT_ROLE_ID);
 	}
 
 	public void setDirectRoleId(UUID directRoleId) {
@@ -158,7 +144,7 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 
 	public UUID getRoleCompositionId() {
-		return getParameterConverter().toUuid(data, PARAMETER_ROLE_COMPOSITION_ID);
+		return getParameterConverter().toUuid(getData(), PARAMETER_ROLE_COMPOSITION_ID);
 	}
 
 	public void setRoleCompositionId(UUID roleCompositionId) {
@@ -166,10 +152,30 @@ public class IdmIdentityRoleFilter extends DataFilter implements ExternalIdentif
 	}
 	
 	public UUID getContractPositionId() {
-		return getParameterConverter().toUuid(data, PARAMETER_CONTRACT_POSITION_ID);
+		return getParameterConverter().toUuid(getData(), PARAMETER_CONTRACT_POSITION_ID);
 	}
 	
 	public void setContractPositionId(UUID contractPositionId) {
 		set(PARAMETER_CONTRACT_POSITION_ID, contractPositionId);
+	}
+	
+	/**
+	 * Role text ~ quick ~ like.
+	 * 
+	 * @return role text
+	 * @since 11.2.0
+	 */
+	public String getRoleText() {
+		return getParameterConverter().toString(getData(), PARAMETER_ROLE_TEXT);
+	}
+	
+	/**
+	 * Role text ~ quick ~ like.
+	 * 
+	 * @param roleText role text
+	 * @since 11.2.0
+	 */
+	public void setRoleText(String roleText) {
+		set(PARAMETER_ROLE_TEXT, roleText);
 	}
 }

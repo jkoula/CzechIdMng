@@ -566,11 +566,17 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                 <Basic.AbstractForm ref="filterForm">
                   <Basic.Row className="last">
                     <Basic.Col lg={ 3 }>
-                      <Advanced.Filter.RoleSelect
-                        ref="roleId"
-                        label={ null }
+                      <Advanced.Filter.TextField
+                        ref="roleText"
                         placeholder={ this.i18n('content.identity.roles.filter.role.placeholder') }
-                        header={ this.i18n('content.identity.roles.filter.role.placeholder') }/>
+                        header={ this.i18n('content.identity.roles.filter.role.placeholder') }
+                        help={ Advanced.Filter.getTextHelp() }
+                        onKeyPress={ (event) => {
+                          // Filter is embedded in request form => onEnter on input only.
+                          if (event.key === 'Enter') {
+                            this.useFilter();
+                          }
+                        }}/>
                     </Basic.Col>
                     <Basic.Col lg={ 3 } className={ showEnvironment ? '' : 'hidden'}>
                       <Advanced.CodeListSelect

@@ -12,7 +12,7 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 
 /**
- * Filter for concept role request
+ * Filter for concept role request.
  *
  * @author svandav
  */
@@ -22,6 +22,7 @@ public class IdmConceptRoleRequestFilter extends DataFilter {
     private RoleRequestState state;
     private UUID identityRoleId;
     private UUID roleId;
+    private String roleText;
     private UUID identityContractId;
     private UUID automaticRole;
     private ConceptRoleRequestOperation operation;
@@ -127,4 +128,23 @@ public class IdmConceptRoleRequestFilter extends DataFilter {
 		this.roleEnvironments = roleEnvironments;
 	}
 
+	/**
+	 * Role text ~ quick ~ like.
+	 * 
+	 * @return role text
+	 * @since 11.2.0
+	 */
+	public String getRoleText() {
+		return roleText;
+	}
+	
+	/**
+	 * Role text ~ quick ~ like.
+	 * 
+	 * @param roleText role text
+	 * @since 11.2.0
+	 */
+	public void setRoleText(String roleText) {
+		this.roleText = roleText;
+	}
 }

@@ -305,6 +305,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 		identityRoleFilter.setIdentityContractId(filter.getIdentityContractId());
 		identityRoleFilter.setIdentityId(filter.getIdentityId());
 		identityRoleFilter.setRoleId(filter.getRoleId());
+		identityRoleFilter.setRoleText(filter.getRoleText());
 		identityRoleFilter.setRoleEnvironments(filter.getRoleEnvironments());
 		identityRoleFilter.setAddPermissions(true); // permissions are required
 		

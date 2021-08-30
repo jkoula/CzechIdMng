@@ -15,8 +15,10 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +42,12 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.exception.InvalidFormException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
+import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
@@ -65,6 +69,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest;
 import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
+import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
@@ -109,6 +114,8 @@ public class DefaultIdmConceptRoleRequestService extends
 	private ValueGeneratorManager valueGeneratorManager;
 	@Autowired
 	private WorkflowHistoricProcessInstanceService historicProcessService;
+	@Autowired 
+	private FilterManager filterManager;
 
 	@Autowired
 	public DefaultIdmConceptRoleRequestService(IdmConceptRoleRequestRepository repository,
@@ -429,6 +436,28 @@ public class DefaultIdmConceptRoleRequestService extends
 		}
 		if (filter.getRoleId() != null) {
 			predicates.add(builder.equal(root.get(IdmConceptRoleRequest_.role).get(IdmRole_.id), filter.getRoleId()));
+		}
+		// by role text
+		String roleText = filter.getRoleText();
+		if (StringUtils.isNotEmpty(roleText)) {
+			IdmRoleFilter subFilter = new IdmRoleFilter();
+			subFilter.setText(roleText);
+			Subquery<IdmRole> subquery = query.subquery(IdmRole.class);
+			Root<IdmRole> subRoot = subquery.from(IdmRole.class);
+			subquery.select(subRoot);
+
+			Predicate rolePredicate = filterManager
+					.getBuilder(IdmRole.class, IdmRoleFilter.PARAMETER_TEXT)
+					.getPredicate(subRoot, subquery, builder, subFilter);
+
+			subquery.where(
+	                builder.and(
+	                		builder.equal(root.get(IdmConceptRoleRequest_.role), subRoot), // correlation attr
+	                		rolePredicate
+	                )
+	        );
+			//		
+			predicates.add(builder.exists(subquery));
 		}
 		if (filter.getIdentityContractId() != null) {
 			predicates.add(builder.equal(root.get(IdmConceptRoleRequest_.identityContract).get(IdmIdentityContract_.id),

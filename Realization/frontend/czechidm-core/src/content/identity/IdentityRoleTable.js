@@ -158,7 +158,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     }
     return (
       <Basic.Div className="abstract-form condensed" style={{minWidth: 150, padding: 0}}>
-        {result}
+        { result }
       </Basic.Div>
     );
   }
@@ -233,7 +233,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
               }
               const entity = data[rowIndex];
               if (this._getIncompatibleRoles(entity).length > 0) {
-                // RT: is looks to agressive? Or combine disabled + incompatible
+                // RT: is looks to agressive ... or combine disabled + incompatible
                 // return 'warning';
               }
               return Utils.Ui.getRowClass(entity);
@@ -244,12 +244,12 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
               <Basic.AbstractForm ref="filterForm">
                 <Basic.Row className="last">
                   <Basic.Col lg={ showEnvironment ? 3 : 5 }>
-                    <Advanced.Filter.RoleSelect
-                      ref="roleId"
-                      label={ null }
+                    <Advanced.Filter.TextField
+                      ref="roleText"
                       placeholder={ this.i18n('filter.role.placeholder') }
                       header={ this.i18n('filter.role.placeholder') }
-                      hidden={ hasRoleForceFilter }/>
+                      hidden={ hasRoleForceFilter }
+                      help={ Advanced.Filter.getTextHelp() }/>
                     <Advanced.Filter.SelectBox
                       ref="identityId"
                       manager={ identityManager }

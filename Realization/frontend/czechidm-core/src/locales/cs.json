@@ -3214,7 +3214,7 @@
         "title": "$t(navigation.menu.roles.label)",
         "filter": {
           "role": {
-            "placeholder": "$t(content.identities.filter.role.placeholder)"
+            "placeholder": "Přiřazená role"
           },
           "identity": {
             "placeholder": "$t(entity.Identity._type)"

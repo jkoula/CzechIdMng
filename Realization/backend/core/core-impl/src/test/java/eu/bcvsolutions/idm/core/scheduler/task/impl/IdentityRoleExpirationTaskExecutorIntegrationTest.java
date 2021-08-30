@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.scheduler.task.impl;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -122,16 +123,18 @@ public class IdentityRoleExpirationTaskExecutorIntegrationTest extends AbstractI
 			identityRole.setRole(role.getId());
 			identityRole.setValidTill(LocalDate.now().minusDays(1));
 			identityRole = identityRoleService.save(identityRole);
-			
-			// Quick check
+			//
+			// quick check
 			List<IdmIdentityRoleDto> assignedRoles = identityRoleService.findAllByIdentity(identity.getId());
 			Assert.assertEquals(1, assignedRoles.size());
 			Assert.assertTrue(LocalDate.now().isAfter(assignedRoles.get(0).getValidTill()));
-			
+			UUID assignedRoleId = assignedRoles.get(0).getId();
+			identityRoleService.findDirectExpiredRoleIds(LocalDate.now()).stream().anyMatch(ir -> ir.equals(assignedRoleId));
+			//
 			IdentityRoleExpirationTaskExecutor lrt = new IdentityRoleExpirationTaskExecutor();
 			lrt.init(null);
 			lrtManager.execute(lrt);
-			
+			//
 			getHelper().waitForResult(res -> {
 				return !identityRoleService.findAllByIdentity(identity.getId()).isEmpty();
 			}, 1000, 30);

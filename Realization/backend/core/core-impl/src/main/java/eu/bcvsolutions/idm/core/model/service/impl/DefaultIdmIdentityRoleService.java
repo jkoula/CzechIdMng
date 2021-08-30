@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,6 @@ import javax.persistence.criteria.Subquery;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +34,9 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
+import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
@@ -55,6 +57,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition_;
@@ -81,6 +84,7 @@ public class DefaultIdmIdentityRoleService
 	@Autowired private LookupService lookupService;
 	@Autowired private IdmAutomaticRoleRepository automaticRoleRepository;
 	@Autowired private IdmRoleService roleService;
+	@Autowired private FilterManager filterManager;
 
 	@Autowired
 	public DefaultIdmIdentityRoleService(
@@ -188,6 +192,28 @@ public class DefaultIdmIdentityRoleService
 							builder.lower(root.get(IdmIdentityRole_.identityContract).get(IdmIdentityContract_.identity).get(IdmIdentity_.username)),
 							"%" + text + "%")
 					);
+		}
+		// by role text
+		String roleText = filter.getRoleText();
+		if (StringUtils.isNotEmpty(roleText)) {
+			IdmRoleFilter subFilter = new IdmRoleFilter();
+			subFilter.setText(roleText);
+			Subquery<IdmRole> subquery = query.subquery(IdmRole.class);
+			Root<IdmRole> subRoot = subquery.from(IdmRole.class);
+			subquery.select(subRoot);
+			//
+			Predicate rolePredicate = filterManager
+					.getBuilder(IdmRole.class, IdmRoleFilter.PARAMETER_TEXT)
+					.getPredicate(subRoot, subquery, builder, subFilter);
+			//
+			subquery.where(
+	                builder.and(
+	                		builder.equal(root.get(IdmIdentityRole_.role), subRoot), // correlation attr
+	                		rolePredicate
+	                )
+	        );
+			//		
+			predicates.add(builder.exists(subquery));
 		}
 		List<UUID> identities = filter.getIdentities();
 		if (!identities.isEmpty()) {

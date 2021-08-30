@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import eu.bcvsolutions.idm.core.api.config.domain.RequestConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +24,7 @@ import org.springframework.util.Assert;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.api.config.domain.RequestConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.RoleType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -41,7 +41,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleFormAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
-import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractFormableService;
@@ -169,19 +168,7 @@ public class DefaultIdmRoleService
 	@Override
 	protected List<Predicate> toPredicates(Root<IdmRole> root, CriteriaQuery<?> query, CriteriaBuilder builder, IdmRoleFilter filter) {
 		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
-		// quick
-		String text = filter.getText();
-		if (StringUtils.isNotEmpty(text)) {
-			text = text.toLowerCase();
-			List<Predicate> textPredicates = new ArrayList<>(4);
-			//
-			RepositoryUtils.appendUuidIdentifierPredicate(textPredicates, root, builder, text);
-			textPredicates.add(builder.like(builder.lower(root.get(IdmRole_.code)), "%" + text + "%"));
-			textPredicates.add(builder.like(builder.lower(root.get(IdmRole_.name)), "%" + text + "%"));
-			textPredicates.add(builder.like(builder.lower(root.get(IdmRole_.description)), "%" + text + "%"));
-			//
-			predicates.add(builder.or(textPredicates.toArray(new Predicate[textPredicates.size()])));
-		}
+		//
 		// role type
 		RoleType roleType = filter.getRoleType();
 		if (roleType != null) {

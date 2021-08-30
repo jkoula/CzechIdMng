@@ -53,7 +53,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Integration tests with request-identity-role service
+ * Integration tests with request-identity-role service.
  * 
  * @author Vít Švanda
  *
@@ -490,6 +490,44 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(identityRole.getId(), removingConcept.getIdentityRole());
 		Assert.assertNotEquals(removingConcept.getId(), removingConcept.getIdentityRole());
 
+	}
+	
+	@Test
+	@Transactional
+	public void testFindByRoleText() {
+		IdmIdentityDto identity = this.getHelper().createIdentity(new GuardedString());
+		IdmIdentityContractDto contract = this.getHelper().getPrimeContract(identity);
+		IdmRoleDto assignedRole = this.getHelper().createRole();
+		IdmIdentityRoleDto identityRole = this.getHelper().createIdentityRole(contract, assignedRole);
+		IdmRoleDto role = this.getHelper().createRole();
+
+		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
+		filter.setIdentityId(identity.getId());
+		filter.setRoleText(assignedRole.getCode());
+
+		// We expecting only one already assigned identity-role
+		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(filter, null)
+				.getContent();
+		Assert.assertEquals(1, requestIdentityRoles.size());
+		Assert.assertEquals(identityRole.getId(), requestIdentityRoles.get(0).getId());
+
+		// Create request for new identity-role
+		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
+		dto.setIdentityContract(contract.getId());
+		dto.setRole(role.getId());
+		dto.setValidFrom(LocalDate.now().minusDays(1));
+		dto.setValidTill(LocalDate.now().plusDays(10));
+
+		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
+		Assert.assertNotNull(createdRequestIdentityRole);
+		// Request must been created
+		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
+		// Filter will be filtering by this request
+		filter.setRoleRequestId(createdRequestIdentityRole.getRoleRequest());
+
+		// We expecting one item
+		requestIdentityRoles = requestIdentityRoleService.find(filter, null).getContent();
+		Assert.assertEquals(1, requestIdentityRoles.size());
 	}
 
 	@Test

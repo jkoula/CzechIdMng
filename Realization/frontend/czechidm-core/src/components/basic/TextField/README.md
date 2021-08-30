@@ -15,6 +15,7 @@ All parameters from AbstractFormComponent are supported. Added parameters:
 | confidential  | bool   | Confidential text field - if it is filled, then shows asterix only and supports to add new value. If new value is not given, then returns undefined value (this is used for preserving previous value).  | false  |
 | warnIfTrimmable | bool | Enables/disables warning that there are any leading/trailing white-spaces in the input. | true |
 | pwdAutocomplete | bool | Designed for turn off password prefilling. Uses workaround for turn off autocomplete for password input (false). This will works maybe only in the Chrome. | true |
+| onKeyPress | func | onKeyPress Callback | ||
 
 ## Usage
 

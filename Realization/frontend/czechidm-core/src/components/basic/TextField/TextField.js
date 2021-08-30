@@ -216,7 +216,7 @@ class TextField extends AbstractFormComponent {
   }
 
   getBody(feedback) {
-    const { type, labelSpan, label, componentSpan, placeholder, style, required, pwdAutocomplete } = this.props;
+    const { type, labelSpan, label, componentSpan, placeholder, style, required, pwdAutocomplete, onKeyPress } = this.props;
     const { inputType, value, disabled, readOnly } = this.state;
     //
     const className = classNames(
@@ -256,7 +256,8 @@ class TextField extends AbstractFormComponent {
         onClick={ this.toogleConfidentialState.bind(this, true) }
         value={ _value }
         style={ style }
-        readOnly={ _readOnly }/>
+        readOnly={ _readOnly }
+        onKeyPress={ onKeyPress }/>
     );
     //
     // show confidential wrapper, when confidential value could be changed
@@ -348,7 +349,13 @@ TextField.propTypes = {
    * Uses workaround for turn off autocomplete for password input (false). This will works maybe only in the Chrome.
    * Change ref of a password input doesn't work, because Chrome prefill any input with password type and !ANY! previous input.
    */
-  pwdAutocomplete: PropTypes.bool
+  pwdAutocomplete: PropTypes.bool,
+  /**
+   * onKeyPress Callback
+   *
+   * @since 11.2.0
+   */
+  onKeyPress: PropTypes.func
 };
 
 TextField.defaultProps = {
