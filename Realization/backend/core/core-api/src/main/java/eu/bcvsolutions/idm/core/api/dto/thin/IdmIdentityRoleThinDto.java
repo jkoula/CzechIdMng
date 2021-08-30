@@ -1,7 +1,9 @@
 package eu.bcvsolutions.idm.core.api.dto.thin;
 
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
@@ -33,6 +35,8 @@ public class IdmIdentityRoleThinDto extends IdmIdentityRoleDto {
     private UUID directRole; // direct identity role
     @Embedded(enabled = false, dtoClass = IdmRoleCompositionDto.class)
     private UUID roleComposition; // direct role
+	@Embedded(dtoClass = IdmRoleThinDto.class)
+	private UUID role;
 	
     public UUID getIdentityContract() {
 		return identityContract;
@@ -72,5 +76,13 @@ public class IdmIdentityRoleThinDto extends IdmIdentityRoleDto {
 	
 	public void setRoleComposition(UUID roleComposition) {
 		this.roleComposition = roleComposition;
+	}
+	
+	public UUID getRole() {
+		return role;
+	}
+
+	public void setRole(UUID role) {
+		this.role = role;
 	}
 }

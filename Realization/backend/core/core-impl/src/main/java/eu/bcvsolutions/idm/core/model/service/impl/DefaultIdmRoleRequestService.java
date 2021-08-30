@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 
 import static eu.bcvsolutions.idm.core.api.dto.OperationResultDto.PROPERTY_STATE;
 
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -477,10 +478,12 @@ public class DefaultIdmRoleRequestService
 		}
 
 		// Add changed identity-roles to event (prevent redundant search). We will used them for recalculations (ACM / provisioning).
+		// Beware!! Sets have to be defined here, because without that will be not propagated to a sub event (role-request -> identity-role event)!
 		requestEvent.getProperties().put(IdentityRoleEvent.PROPERTY_ASSIGNED_NEW_ROLES, Sets.newHashSet());
 		requestEvent.getProperties().put(IdentityRoleEvent.PROPERTY_ASSIGNED_UPDATED_ROLES, Sets.newHashSet());
 		requestEvent.getProperties().put(IdentityRoleEvent.PROPERTY_ASSIGNED_REMOVED_ROLES, Sets.newHashSet());
 		requestEvent.getProperties().put(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, Sets.newHashSet());
+		requestEvent.getProperties().put(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, Sets.newHashSet());
 		
 		// Remove not approved concepts.
 		List<IdmConceptRoleRequestDto> approvedConcepts = concepts
@@ -1121,13 +1124,19 @@ public class DefaultIdmRoleRequestService
 			IdentityRoleEvent event = new IdentityRoleEvent(IdentityRoleEventType.DELETE, identityRole,
 					 ImmutableMap.of(IdmAccountDto.SKIP_PROPAGATE, Boolean.TRUE));
 
-			identityRoleService.publish(event, requestEvent);
+			EventContext<IdmIdentityRoleDto> eventContext = identityRoleService.publish(event, requestEvent);
 			// Add list of identity-accounts for delayed ACM to parent event
 			Set<UUID> subIdentityAccountsForAcm = event
 					.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);
 			Set<UUID> identityAccountsForAcm = requestEvent
 					.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);
 			identityAccountsForAcm.addAll(subIdentityAccountsForAcm);
+			// Add list of accounts for additional provisioning to parent event
+			Set<UUID> subIdentityAccountsForProvisioning = event
+					.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, UUID.class);
+			Set<UUID> identityAccountsForProvisioning = requestEvent
+					.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, UUID.class);
+			identityAccountsForProvisioning.addAll(subIdentityAccountsForProvisioning);
 
 			// Removed assigned roles by business roles
 			Set<UUID> subRemovedIdentityRoles = event.getSetProperty(IdentityRoleEvent.PROPERTY_ASSIGNED_REMOVED_ROLES, UUID.class);
@@ -1299,6 +1308,7 @@ public class DefaultIdmRoleRequestService
 			identityRole.setDirectRole(directRole);
 		}
 		identityRole.setRoleComposition(conceptRole.getRoleComposition());
+		identityRole.setRoleSystem(conceptRole.getRoleSystem());
 
 		return identityRole;
 	}
@@ -1413,6 +1423,7 @@ public class DefaultIdmRoleRequestService
 		temp.setRole(concept.getRole());
 		temp.setValidFrom(concept.getValidFrom());
 		temp.setValidTill(concept.getValidTill());
+		temp.setRoleSystem(concept.getRoleSystem());
 
 		temp.setEavs(concept.getEavs());
 		// Other way how to get eavs. But this way is to slow.

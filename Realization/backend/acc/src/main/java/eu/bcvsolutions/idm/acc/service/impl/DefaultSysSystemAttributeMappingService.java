@@ -1,5 +1,8 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
+import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -145,6 +148,8 @@ public class DefaultSysSystemAttributeMappingService
 	private IdmFormAttributeService formAttributeService;
 	@Autowired
 	private SysSyncConfigService syncConfigService;
+	@Autowired
+	private SysSystemGroupSystemService systemGroupSystemService;
 
 
 	@Autowired
@@ -342,6 +347,14 @@ public class DefaultSysSystemAttributeMappingService
 			} else {
 				predicates.add(builder.isTrue(root.get(SysSystemAttributeMapping_.passwordFilter)));
 			}
+		}
+		
+		if (filter.getStrategyType() != null) {
+			predicates.add(builder.equal(root.get(SysSystemAttributeMapping_.strategyType), filter.getStrategyType()));
+		}
+		
+		if (filter.getId() != null) {
+			predicates.add(builder.equal(root.get(SysSystemAttributeMapping_.id), filter.getId()));
 		}
 
 		return predicates;
@@ -611,6 +624,14 @@ public class DefaultSysSystemAttributeMappingService
 		SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(dto, SysSystemAttributeMapping_.systemMapping, SysSystemMappingDto.class);
 		SysSchemaObjectClassDto objectClassDto = DtoUtils.getEmbedded(systemMappingDto, SysSystemMapping_.objectClass, SysSchemaObjectClassDto.class);
 		SysSystemDto systemDto = DtoUtils.getEmbedded(objectClassDto, SysSchemaObjectClass_.system, SysSystemDto.class);
+		// Check if attribute is used in some systems group.
+		SysSystemGroupSystemFilter groupSystemFilter = new SysSystemGroupSystemFilter();
+		groupSystemFilter.setMergeMappingAttributeId(entity.getId());
+		long count = systemGroupSystemService.count(groupSystemFilter);
+		if (count > 0) {
+			throw new ResultCodeException(AccResultCode.SYSTEM_DELETE_FAILED_HAS_SYSTEM_GROUPS,
+					ImmutableMap.of("attribute", dto.getName(), "count", count));
+		}
 		if (syncConfigRepository.countByCorrelationAttribute_Id(dto.getId()) > 0) {
 			throw new ResultCodeException(AccResultCode.ATTRIBUTE_MAPPING_DELETE_FAILED_USED_IN_SYNC,
 					ImmutableMap.of("attribute", dto.getName(), "system", systemDto.getName()));

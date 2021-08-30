@@ -1,5 +1,15 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import eu.bcvsolutions.idm.acc.dto.SysSystemGroupSystemDto;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccount;
+import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleSystemDto;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -90,6 +100,10 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	private EntityStateManager entityStateManager;
 	@Autowired
 	private EntityEventManager entityEventManager;
+	@Autowired
+	private LookupService lookupService;
+	@Autowired
+	private SysSystemGroupSystemService systemGroupSystemService;
 
 	@Autowired
 	public DefaultAccAccountManagementService(SysRoleSystemService roleSystemService, AccAccountService accountService,
@@ -152,7 +166,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	
 			// Is role valid in this moment
 			resolveIdentityAccountForCreate(identity, identityAccountList, identityRoles, identityAccountsToCreate,
-					identityAccountsToDelete, false);
+					identityAccountsToDelete, false, null);
 	
 			// Is role invalid in this moment
 			resolveIdentityAccountForDelete(identityAccountList, identityRoles, identityAccountsToDelete);
@@ -192,12 +206,13 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		List<IdmIdentityRoleDto> identityRolesList = Lists.newArrayList(identityRoles);
 		List<AccIdentityAccountDto> identityAccountsToCreate = Lists.newArrayList();
 
-		// Is role valid in this moment
-		resolveIdentityAccountForCreate(identity, Lists.newArrayList(), identityRolesList, identityAccountsToCreate,
-				Lists.newArrayList(), true);
-
 		// For this account should be executed provisioning
 		List<UUID> accounts = Lists.newArrayList();
+		
+		// Is role valid in this moment
+		resolveIdentityAccountForCreate(identity, Lists.newArrayList(), identityRolesList, identityAccountsToCreate,
+				Lists.newArrayList(), true, accounts);
+
 		// Create new identity accounts
 		identityAccountsToCreate.forEach(identityAccount -> {
 			// Check if this identity-account already exists, if yes then is his account ID
@@ -231,7 +246,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 
 		// Is role valid in this moment
 		resolveIdentityAccountForCreate(identity, identityAccountList, identityRolesList, identityAccountsToCreate,
-				identityAccountsToDelete, false);
+				identityAccountsToDelete, false, null);
 
 		// Is role invalid in this moment
 		resolveIdentityAccountForDelete(identityAccountList, identityRolesList, identityAccountsToDelete);
@@ -383,17 +398,54 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 					identityAccount.setIdentityRole(null);
 
 					if (bulk) {
-						// For bulk create entity state for identity account.
+						// For bulk create entity state for identity account. 
 						IdmEntityStateDto stateDeleted = new IdmEntityStateDto();
 						stateDeleted.setSuperOwnerId(identityAccount.getIdentity());
 						stateDeleted.setResult(new OperationResultDto.Builder(OperationState.RUNNING)
 								.setModel(new DefaultResultModel(CoreResultCode.DELETED)).build());
 						entityStateManager.saveState(identityAccount, stateDeleted);
 					} else {
-						// Noting identity-accounts for delayed account management
-						notingIdentityAccountForDelayedAcm(event, identityAccount);
+						// Noting identity-accounts for delayed delete and account management
+						notingIdentityAccountForDelayedAcm(event, identityAccount, IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM);
 					}
 					identityAccountService.save(identityAccount);
+				});
+		
+		// If default creation of accounts is disabled for this role-system  (or system is in a cross-domain group), then relation between identity
+		// and account may not exist. In this scenario we have to made provisioning too.
+		// So we try to find these role-systems and its accounts.
+		SysRoleSystemFilter roleSystemForProvisioningFilter = new SysRoleSystemFilter();
+		roleSystemForProvisioningFilter.setRoleId(identityRole.getRole());
+
+		roleSystemService.find(roleSystemForProvisioningFilter, null).getContent().stream()
+				.filter(roleSystem -> {
+					if (!roleSystem.isCreateAccountByDefault()) {
+						return true;
+					} else {
+						SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+						systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
+						if (systemGroupSystemService.count(systemGroupSystemFilter) >= 1
+							&& (identityRole.getRoleSystem() == null || roleSystem.getId().equals(identityRole.getRoleSystem()))
+						) {
+							// This role-system overriding a merge attribute which is using in
+							// active cross-domain group and roleSystem in identity-role is null or same as role-system.
+							// -> Provisioning should be made.
+							return true;
+						}
+					}
+					return false;
+				})
+				.forEach(roleSystem -> {
+					IdmIdentityContractDto contractDto = lookupService.lookupEmbeddedDto(identityRole, IdmIdentityRole_.identityContract);
+
+					AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
+					identityAccountFilter.setSystemId(roleSystem.getSystem());
+					identityAccountFilter.setIdentityId(contractDto.getIdentity());
+					identityAccountService.find(identityAccountFilter, null).getContent()
+							.forEach(identityAccount -> {
+								// Noting identity-accounts for delayed additional provisioning.
+								notingIdentityAccountForDelayedAcm(event, identityAccount, IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING);
+							});
 				});
 	}
 	
@@ -420,39 +472,52 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 							|| !( ((SysRoleSystemDto) DtoUtils
 									.getEmbedded(identityAccount, AccIdentityAccount_.roleSystem))
 									.isForwardAccountManagemen() && identityRole.isValidNowOrInFuture())) //
-					.forEach(identityAccount -> {
-						identityAccountsToDelete.add(identityAccount);
-					});
+					.forEach(identityAccountsToDelete::add);
 		});
-		
+
 		// Search IdentityAccounts to delete - we want to delete identity-account if
 		// identity-role is valid, but mapped system on the role does not longer exist.
 		identityRoles.stream().filter(identityRole -> {
 			return identityRole.isValid();
 		}).forEach(identityRole -> {
 			identityAccountList.stream() //
-					.filter(identityAccount -> identityRole.getId().equals(identityAccount.getIdentityRole())) //
-					.filter(identityAccount -> identityAccount.getRoleSystem() == null) //
-					.forEach(identityAccount -> {
-						identityAccountsToDelete.add(identityAccount);
-					});
+					.filter(identityAccount -> identityRole.getId().equals(identityAccount.getIdentityRole()))
+					.filter(identityAccount -> {
+						// Remove account if role-system is null.
+						if (identityAccount.getRoleSystem() == null) {
+							return true;
+						}
+						// Remove an account if role-system does not supports creation by default or if is in cross-domain group.
+						SysRoleSystemDto roleSystem = lookupService.lookupEmbeddedDto(identityAccount, AccIdentityAccount_.roleSystem);
+						if (roleSystem != null
+								&& !roleSystem.isCreateAccountByDefault()) {
+							return true;
+						} else if (roleSystem != null) {
+							SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+							systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
+							if (systemGroupSystemService.count(systemGroupSystemFilter) >= 1) {
+								// This role-system overriding a merge attribute which is using in
+								// active cross-domain group. -> Identity account should be deleted.
+								return true;
+							}
+						}
+						return false;
+					})
+					.forEach(identityAccountsToDelete::add);
 		});
 	}
 
 	/**
-	 * Resolve Identity account - to create
-	 * 
-	 * @param identity
-	 * @param identityAccountList
-	 * @param identityRoles
-	 * @param identityAccountsToCreate
-	 * @param identityAccountsToDelete
-	 * @param resolvedRolesForCreate
+	 * Resolve Identity account - to create.
 	 */
 	private void resolveIdentityAccountForCreate(IdmIdentityDto identity,
-			List<AccIdentityAccountDto> identityAccountList, List<IdmIdentityRoleDto> identityRoles,
-			List<AccIdentityAccountDto> identityAccountsToCreate, List<AccIdentityAccountDto> identityAccountsToDelete,
-			boolean onlyCreateNew) {
+												 List<AccIdentityAccountDto> identityAccountList,
+												 List<IdmIdentityRoleDto> identityRoles,
+												 List<AccIdentityAccountDto> identityAccountsToCreate,
+												 List<AccIdentityAccountDto> identityAccountsToDelete,
+												 boolean onlyCreateNew,
+												 List<UUID> additionalAccountsForProvisioning
+												 ) {
 
 		identityRoles.forEach(identityRole -> {
 			UUID role = identityRole.getRole();
@@ -465,11 +530,44 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			// valid in the future)
 			roleSystems.stream()
 					.filter(roleSystem -> (identityRole.isValid()
-							|| (roleSystem.isForwardAccountManagemen() && identityRole.isValidNowOrInFuture()))) //
+							|| (roleSystem.isForwardAccountManagemen() && identityRole.isValidNowOrInFuture())))
+					// Create account only if role-systems supports creation by default (not for cross-domains).
+					.filter(roleSystem -> {
+						boolean canBeCreated = roleSystem.isCreateAccountByDefault();
+						if (canBeCreated) {
+							SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+							systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
+							if (systemGroupSystemService.count(systemGroupSystemFilter) >= 1) {
+								// This role-system overriding a merge attribute which is using in
+								// active cross-domain group. -> Account will be not created.
+								canBeCreated = false;
+							}
+						}
+
+						if (!canBeCreated) {
+							// We need to made provisioning for skipped identity-role/accounts (because Cross-domains).
+							// We have to find all identity-accounts for identity and system.
+							AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
+							identityAccountFilter.setSystemId(roleSystem.getSystem());
+							identityAccountFilter.setIdentityId(identity.getId());
+							AccIdentityAccountDto identityAccountDto = identityAccountService.find(identityAccountFilter, null)
+									.getContent()
+									.stream()
+									.filter(identityAccount -> {
+										SysRoleSystemDto roleSystemFromIdentityAccount = lookupService.lookupEmbeddedDto(identityAccount, AccIdentityAccount_.roleSystem);
+										return roleSystemFromIdentityAccount != null
+												&& roleSystem.getSystemMapping().equals(roleSystemFromIdentityAccount.getSystemMapping());
+									}
+							).findFirst().orElse(null);
+							if (identityAccountDto != null && additionalAccountsForProvisioning != null) {
+								additionalAccountsForProvisioning.add(identityAccountDto.getAccount());
+							}
+						}
+						return canBeCreated;
+						
+					})
 					.forEach(roleSystem -> {
-
 						String uid = generateUID(identity, roleSystem);
-
 						// Check on change of UID is not executed if all given identity-roles are new
 						if (!onlyCreateNew) {
 							// Check identity-account for that role-system on change the definition of UID
@@ -482,7 +580,6 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 								identityAccountList, identityAccountsToDelete, identityRole, roleSystem);
 
 						if (existsIdentityAccount != null) {
-							
 							if(existsIdentityAccount.getRoleSystem() == null) {
 								// IdentityAccount already exist, but doesn't have relation on RoleSystem. This
 								// could happen if system mapping was deleted and recreated or if was role use
@@ -518,17 +615,13 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 
 							identityAccountsToCreate.add(identityAccount);
 						}
-
 					});
 		});
 	}
 	
 	/**
 	 * Check identity-account for that role-system on change the definition of UID
-	 * 
-	 * @param roleSystem
-	 * @param identityAccountList
-	 * @param identityAccountsToDelete
+	 *
 	 */
 	private void checkOnChangeUID(String uid, SysRoleSystemDto roleSystem,
 			List<AccIdentityAccountDto> identityAccountList, List<AccIdentityAccountDto> identityAccountsToDelete) {
@@ -675,26 +768,28 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	}
 	
 	/**
-	 * Method for noting identity-accounts for delayed account management
-	 * 
-	 * @param event
-	 * @param identityAccount
+	 * Method for noting identity-accounts for delayed account management or delete.
 	 */
 	private void notingIdentityAccountForDelayedAcm(EntityEvent<IdmIdentityRoleDto> event,
-			AccIdentityAccountDto identityAccount) {
+			AccIdentityAccountDto identityAccount, String key) {
 		Assert.notNull(identityAccount, "Identity account is required.");
 		Assert.notNull(identityAccount.getId(), "Identity account identifier is required.");
 
-		if (!event.getProperties().containsKey(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM)) {
-			event.getProperties().put(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM,
+		if (!event.getProperties().containsKey(key)) {
+			event.getProperties().put(key,
 					new HashSet<UUID>());
 		}
 
 		@SuppressWarnings("unchecked")
-		Set<UUID> identityAccounts = (Set<UUID>) event.getProperties()
-				.get(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM);
+		Set<UUID> ids = (Set<UUID>) event.getProperties()
+				.get(key);
 
-		// Add single identity-account to parent event
-		identityAccounts.add(identityAccount.getId());
+		if (key.equals(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING)) {
+			// Add single account to parent event
+			ids.add(identityAccount.getAccount());
+		} else {
+			// Add single identity-account to parent event
+			ids.add(identityAccount.getId());
+		}
 	}
 }

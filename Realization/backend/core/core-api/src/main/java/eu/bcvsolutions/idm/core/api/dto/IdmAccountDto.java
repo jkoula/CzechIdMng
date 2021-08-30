@@ -21,6 +21,11 @@ public class IdmAccountDto implements BaseDto {
 	 * We need to know identity-accounts which were connected to deleted identity-role (we want to execute account management).
 	 */
 	public static final String IDENTITY_ACCOUNT_FOR_DELAYED_ACM = "identity-account-for-delayed-acm";
+	/**
+	 * For made additional provisioning. For example in scenario when, default creation of accounts is disabled for this role-system, then relation between identity
+	 * and account may not exist. In this scenario we have to made additional provisioning.
+	 */
+	public static final String ACCOUNT_FOR_ADDITIONAL_PROVISIONING = "account-for-additional-provisioning";
 	
 	/**
 	 * Skip propagate changes - equals to the skip account management

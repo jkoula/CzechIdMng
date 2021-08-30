@@ -1,45 +1,27 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-
 import eu.bcvsolutions.idm.core.api.config.domain.RequestConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.RoleType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleFormAttributeDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleCatalogueRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFormAttributeFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleSystemFilter;
+import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleFormAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
@@ -59,6 +41,24 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.event.RoleEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmRoleRepository;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Default role service
@@ -79,6 +79,7 @@ public class DefaultIdmRoleService
 	@Autowired @Lazy private IdmIdentityService identityService;
 	@Autowired private IdmRoleFormAttributeService roleFormAttributeService;
 	@Autowired private RequestConfiguration requestConfiguration;
+	@Autowired(required = false) private IdmRoleSystemService roleSystemService;
 	
 	@Autowired
 	public DefaultIdmRoleService(
@@ -106,7 +107,13 @@ public class DefaultIdmRoleService
 		//
 		return super.saveInternal(dto);
 	}
-	
+
+	@Override
+	public boolean supports(Class<?> delimiter) {
+		// We need to use equals, because IdmRoleDto is parent of IdmRoleThinDto.
+		return getDtoClass().equals(delimiter);
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public IdmRoleDto getByCode(String code) {
@@ -163,8 +170,37 @@ public class DefaultIdmRoleService
 		definition.setFormAttributes(allowedAttributes);
 		return definition;
 	}
-	
-	
+
+	@Override
+	public boolean supportsToDtoWithFilter() {
+		return true;
+	}
+
+	@Override
+	protected IdmRoleDto toDto(IdmRole entity, IdmRoleDto dto, IdmRoleFilter context) {
+		IdmRoleDto roleDto = super.toDto(entity, dto, context);
+		// Adds to result count of systems for this role, which are in cross-domain group.
+		if (context != null
+				&& context.getIncludeCrossDomainsSystemsCount() != null
+				&& context.getIncludeCrossDomainsSystemsCount()
+				&& roleDto != null
+				&& roleDto.getId() != null
+				&& roleSystemService instanceof AbstractReadDtoService) {
+			@SuppressWarnings(value = "rawtypes")
+			AbstractReadDtoService roleSystemService = (AbstractReadDtoService) this.roleSystemService;
+			BaseFilter roleSystemFilter = roleSystemService.createFilterInstance();
+			if (roleSystemFilter instanceof IdmRoleSystemFilter) {
+				IdmRoleSystemFilter idmRoleSystemFilter = (IdmRoleSystemFilter) roleSystemFilter;
+				idmRoleSystemFilter.setIsInCrossDomainGroupRoleId(roleDto.getId());
+				// Permission: User can read role -> can read connected systems.
+				long count = roleSystemService.count(idmRoleSystemFilter);
+				roleDto.setSystemsInCrossDomains(count);
+			}
+		}
+
+		return roleDto;
+	}
+
 	@Override
 	protected List<Predicate> toPredicates(Root<IdmRole> root, CriteriaQuery<?> query, CriteriaBuilder builder, IdmRoleFilter filter) {
 		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);

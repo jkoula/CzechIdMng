@@ -32,6 +32,8 @@ public enum AccResultCode implements ResultCode {
 	SYSTEM_DELETE_FAILED_HAS_ENTITIES(HttpStatus.BAD_REQUEST, "System [%s] has system entities assigned, cannot be deleted."),
 	SYSTEM_DELETE_FAILED_HAS_ACCOUNTS(HttpStatus.BAD_REQUEST, "System [%s] has accounts assigned, cannot be deleted."),
 	SYSTEM_DELETE_FAILED_HAS_OPERATIONS(HttpStatus.BAD_REQUEST, "System [%s] cannot be deleted. It is used in active provisioning operations. Resolve operations first."),
+	SYSTEM_DELETE_FAILED_HAS_SYSTEM_GROUPS(HttpStatus.BAD_REQUEST, "System [%s] cannot be deleted. It is used in system groups [%s]."),
+	SYSTEM_ATTRIBUTE_MAPPING_DELETE_FAILED_HAS_SYSTEM_GROUPS(HttpStatus.BAD_REQUEST, "A mapping attribute [%s] cannot be deleted. It is used in system groups [%s]."),
 	SYSTEM_MAPPING_NOT_FOUND(HttpStatus.BAD_REQUEST, "Cannot find system mapping on system [%s] for object class name [%s]"),
 	SYSTEM_SCHEMA_OBJECT_CLASS_NOT_FOUND(HttpStatus.BAD_REQUEST, "Cannot find schema object class [%s] on system [%s]"),
 	SYSTEM_ATTRIBUTE_MAPPING_NOT_FOUND(HttpStatus.BAD_REQUEST, "Cannot find system attribute mapping for schema [%s] on system [%s]"),
@@ -72,6 +74,7 @@ public enum AccResultCode implements ResultCode {
 	PROVISIONING_ATTRIBUTE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "Schema attribute [%s] defines type [%s], but we were unable to load this class!"),
 	PROVISIONING_ATTRIBUTE_MORE_UID(HttpStatus.CONFLICT, "More than one UID attribute was found for system [%s]. Only one UID attribute can be defined!"),
 	PROVISIONING_ROLE_ATTRIBUTE_MORE_UID(HttpStatus.CONFLICT, "More than one UID attribute was found for role [%s] and system [%s]. Only one UID attribute can be defined!"),
+	PROVISIONING_ROLE_ATTRIBUTE_NO_LOGIN_CANNOT_OVERRIDE_UID(HttpStatus.CONFLICT, "Attribute in the role [%s] and system [%s] cannot override an UID attribute, because is no-login or in a cross-domain group!"),
 	PROVISIONING_ATTRIBUTE_UID_IS_NOT_STRING(HttpStatus.BAD_REQUEST, "Value of UID attribute must be String, but value is [%s] (on system [%s])."),
 	PROVISIONING_ATTRIBUTE_UID_NOT_FOUND(HttpStatus.NOT_FOUND, "UID attribute (mapped attribute marked as 'Is identifier') was not found for system [%s]. UID attribute is mandatory for provisioning/sync!"),
 	PROVISIONING_GENERATED_UID_IS_NULL(HttpStatus.NOT_FOUND, "Generated UID is null (for system [%s])! Account UID must be not null and String value."),
@@ -195,7 +198,10 @@ public enum AccResultCode implements ResultCode {
 	MONITORING_SYNCHRONIZATION_NOT_EXECUTED(HttpStatus.OK, "Synchronization [%s] on system [%s] was not executed yet.", NotificationLevel.INFO),
 	MONITORING_SYNCHRONIZATION_OK(HttpStatus.OK, "Synchronization [%s] on system [%s] is ok. Count of processed items [%s].", NotificationLevel.SUCCESS),
 	MONITORING_SYNCHRONIZATION_CONTAINS_ERROR(HttpStatus.CONFLICT, "Synchronization [%s] on system [%s] contains error. Count of processed items [%s].", NotificationLevel.ERROR),
-	MONITORING_PROVISIONING_OPERATION_ERROR(HttpStatus.CONFLICT, "Provisioning queue contains [%s] errors.", NotificationLevel.ERROR);
+	MONITORING_PROVISIONING_OPERATION_ERROR(HttpStatus.CONFLICT, "Provisioning queue contains [%s] errors.", NotificationLevel.ERROR),
+	SYSTEM_GROUP_SCRIPT_RESULT_IS_NOT_LIST(HttpStatus.BAD_REQUEST, "System group - Result of script for find connector values from system [%s] have to return List!"),
+	// Identity-role
+	ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE(HttpStatus.FOUND, "Role system [%s] is used [%s] in identity-roles!");
 	
 	private final HttpStatus status;
 	private final String message;

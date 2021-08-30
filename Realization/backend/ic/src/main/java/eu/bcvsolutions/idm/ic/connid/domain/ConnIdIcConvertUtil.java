@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.identityconnectors.common.pooling.ObjectPoolConfiguration;
@@ -210,9 +211,20 @@ public class ConnIdIcConvertUtil {
 		ObjectPoolConfiguration connectorPoolConfiguration = convertIcPoolConfiguration(
 				icConf.getConnectorPoolConfiguration());
 		((APIConfigurationImpl) defaultConnIdConf).setConnectorPoolConfiguration(connectorPoolConfiguration);
+
+		Map<String, Object> systemOperationOptions = icConf.getSystemOperationOptions();
+		boolean disableFilterValidation = false;
+		if(systemOperationOptions != null && systemOperationOptions.containsKey(IcConnectorConfiguration.DISABLE_FILTER_VALIDATION_KEY)){
+			Object valueObj = systemOperationOptions.get(IcConnectorConfiguration.DISABLE_FILTER_VALIDATION_KEY);
+			if (Boolean.TRUE.equals(valueObj)) {
+				disableFilterValidation = true;
+			}
+		}
 		
-		// This option must be enabled for pagination purpose
-		defaultConnIdConf.getResultsHandlerConfiguration().setFilteredResultsHandlerInValidationMode(true);
+		// Filter authentication can be turned off because it does not work properly in some cases.
+		// This option must be enabled for pagination purpose.
+		defaultConnIdConf.getResultsHandlerConfiguration().setEnableFilteredResultsHandler(!disableFilterValidation);
+		defaultConnIdConf.getResultsHandlerConfiguration().setFilteredResultsHandlerInValidationMode(!disableFilterValidation);
 		return defaultConnIdConf;
 	}
 

@@ -53,6 +53,8 @@ public class IdmRoleDto extends FormableDto implements Disableable, Codeable, Ex
     @Embedded(dtoClass = IdmFormDefinitionDto.class)
 	private UUID identityRoleAttributeDefinition;
     private long childrenCount;
+    // Count of role-systems for this role, which are in cross-domain groups.
+    private long systemsInCrossDomains;
 
     public IdmRoleDto() {
 	}
@@ -210,5 +212,19 @@ public class IdmRoleDto extends FormableDto implements Disableable, Codeable, Ex
 	 */
 	public void setChildrenCount(long childrenCount) {
 		this.childrenCount = childrenCount;
+	}
+
+	/**
+	 * Count of role-systems for this role, which are in cross-domain groups.
+	 */
+	public void setSystemsInCrossDomains(long systemsInCrossDomains) {
+		this.systemsInCrossDomains = systemsInCrossDomains;
+	}
+
+	/**
+	 * Count of role-systems for this role, which are in cross-domain groups.
+	 */
+	public long getSystemsInCrossDomains() {
+		return systemsInCrossDomains;
 	}
 }

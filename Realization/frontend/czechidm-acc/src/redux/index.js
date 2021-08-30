@@ -25,6 +25,8 @@ import AttributeControlledValueManager from './AttributeControlledValueManager';
 import UniformPasswordManager from './UniformPasswordManager';
 import UniformPasswordSystemManager from './UniformPasswordSystemManager';
 import RemoteServerManager from './RemoteServerManager';
+import SystemGroupManager from './SystemGroupManager';
+import SystemGroupSystemManager from './SystemGroupSystemManager';
 
 const ManagerRoot = {
   SystemManager,
@@ -53,7 +55,9 @@ const ManagerRoot = {
   AttributeControlledValueManager,
   UniformPasswordManager,
   UniformPasswordSystemManager,
-  RemoteServerManager
+  RemoteServerManager,
+  SystemGroupManager,
+  SystemGroupSystemManager
 };
 
 ManagerRoot.version = '0.0.1';

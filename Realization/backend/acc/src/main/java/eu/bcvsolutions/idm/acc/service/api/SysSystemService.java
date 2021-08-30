@@ -1,13 +1,10 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
-import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
-import java.util.List;
-import java.util.UUID;
-
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemFilter;
 import eu.bcvsolutions.idm.acc.event.SystemEvent;
+import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.api.service.CloneableService;
 import eu.bcvsolutions.idm.core.api.service.CodeableService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
@@ -18,6 +15,8 @@ import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
 import eu.bcvsolutions.idm.ic.api.IcConnectorKey;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Target system configuration service.
@@ -72,9 +71,6 @@ public interface SysSystemService extends
 	 * Returns form definition to given connector key. If no definition for
 	 * connector type is found, then new definition is created by connector
 	 * properties.
-	 * 
-	 * @param connectorKey
-	 * @return
 	 * @deprecated @since 10.8.0 use {@link #getConnectorFormDefinition(SysSystemDto)}
 	 */
 	@Deprecated
@@ -113,7 +109,7 @@ public interface SysSystemService extends
 	 * @since 10.8.0
 	 */
 	IdmFormDefinitionDto getPoolingConnectorFormDefinition(SysSystemDto system);
-
+	
 	/**
 	 * Check if is connector works fine
 	 * 
@@ -141,6 +137,15 @@ public interface SysSystemService extends
 	IcConnectorObject readConnectorObject(UUID systemId, String uid, IcObjectClass objectClass);
 
 	/**
+	 * Read connector object by given UID. Method call directly connector-type.
+	 * This method can add additional information (for example values from other system in cross-domain groups).
+	 * Beware - this method can be very expensive (readConnectorObject(UUID systemId, String uid, IcObjectClass objectClass) is faster)!
+	 *
+	 * @since 11.2.0
+	 */
+	IcConnectorObject readConnectorObject(UUID systemId, String uid, IcObjectClass objectClass, ConnectorType connectorTypeBySystem);
+
+	/**
 	 * @param connectorInstance
 	 * @return
 	 * @since 10.2.0
@@ -151,9 +156,6 @@ public interface SysSystemService extends
 	
 	/**
 	 * Returns definition for additional operation options.
-	 * 
-	 * @param connectorInstance
-	 * @return
 	 * @since 10.8.0
 	 */
 	IdmFormDefinitionDto getOperationOptionsConnectorFormDefinition(SysSystemDto system);

@@ -397,6 +397,9 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
     forceSearchCorrelationAttribute,
     forceSearchSyncActionWfKey,
     enabled) {
+
+    const syncId = synchronizationConfig ? synchronizationConfig.id : 'no-id';
+
     return (
       <form onSubmit={this.save.bind(this, false, false, finalEntityType)}>
         <Basic.Panel className="no-border">
@@ -477,7 +480,7 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
 
             <Basic.Panel className="no-border marginable">
               <Advanced.Panel.Header
-                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-linked-action` }
+                uiKey={ `synchronization-detail-${ syncId }-panel-linked-action` }
                 text={ this.i18n('acc:entity.SynchronizationConfig.linkedAction') }
                 collapsible={ false }/>
               <Basic.PanelBody>
@@ -499,7 +502,7 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
 
             <Basic.Panel className="no-border marginable">
               <Advanced.Panel.Header
-                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-unlinked-action` }
+                uiKey={ `synchronization-detail-${ syncId }-panel-unlinked-action` }
                 text={ this.i18n('acc:entity.SynchronizationConfig.unlinkedAction') }
                 collapsible={ false }/>
               <Basic.PanelBody>
@@ -520,7 +523,7 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
 
             <Basic.Panel className="no-border marginable">
               <Advanced.Panel.Header
-                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-missing-entity-action` }
+                uiKey={ `synchronization-detail-${ syncId }-panel-missing-entity-action` }
                 text={ this.i18n('acc:entity.SynchronizationConfig.missingEntityAction') }
                 collapsible={ false }/>
               <Basic.PanelBody>
@@ -541,7 +544,7 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
 
             <Basic.Panel className="no-border marginable">
               <Advanced.Panel.Header
-                uiKey={ `synchronization-detail-${ synchronizationConfig.id }-panle-missing-account-action` }
+                uiKey={ `synchronization-detail-${ syncId }-panel-missing-account-action` }
                 text={ this.i18n('acc:entity.SynchronizationConfig.missingAccountAction') }
                 collapsible={ false }/>
               <Basic.PanelBody>

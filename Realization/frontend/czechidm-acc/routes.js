@@ -391,6 +391,33 @@ module.exports = {
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['PASSWORDFILTER_READ'] } ]
         }
       ]
+    },
+    {
+      path: 'system-groups/:entityId/new',
+      component: require('./src/content/systemgroup/SystemGroupContent'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_CREATE'] } ],
+    },
+    {
+      path: 'system-groups',
+      component: require('./src/content/systemgroup/SystemGroups'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
+    },
+    {
+      path: 'system-groups/:entityId/',
+      component: require('./src/content/systemgroup/SystemGroup'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ],
+      childRoutes: [
+        {
+          path: 'detail',
+          component: require('./src/content/systemgroup/SystemGroupContent'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
+        },
+        {
+          path: 'systems',
+          component: require('./src/content/systemgroup/SystemGroupSystems'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
+        }
+      ]
     }
   ]
 };

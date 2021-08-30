@@ -1,7 +1,9 @@
 package eu.bcvsolutions.idm.core.api.service;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -182,6 +184,17 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 	@Override
 	public Class<F> getFilterClass() {
 		return filterClass;
+	}
+
+	/**
+	 * Creates and return new instance of filter class.
+	 */
+	public F createFilterInstance() {
+		try {
+			return filterClass.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			throw new CoreException(e);
+		}
 	}
 
 	/**

@@ -73,6 +73,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     const entityFormData = _.merge({}, entity, {
       role: entity._embedded && entity._embedded.role ? entity._embedded.role : null
     });
+    
     if (entityFormData.role && entityFormData.role.identityRoleAttributeDefinition) {
       selectedRole = entityFormData.role;
       selectedIdentityRole = entityFormData;
@@ -147,7 +148,11 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       selectedRole = null;
     }
     // TODO: move selectedRole, _identityRoleAttributeDefinition, _identityRoleFormInstance to state and get them directly from callback above
-    this.setState({ selectedRole });
+    this.setState({ selectedRole }, () => {
+      if (this.refs.roleSystem) {
+        this.refs.roleSystem.setValue(null);
+      }
+    } );
     //
     return true;
   }
@@ -195,6 +200,21 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     if (selectedRole && selectedRole.identityRoleAttributeDefinition) {
       _showEAV = true;
     }
+    let _showSystems = false;
+    if ((selectedRole && selectedRole.systemsInCrossDomains > 0)
+      || entity.roleSystem
+      || (entity && entity._embedded && entity._embedded.role && entity._embedded.role.systemsInCrossDomains > 0)) {
+      _showSystems = true;
+    }
+
+    let selectedRoleId = null;
+    if (selectedRole) {
+      selectedRoleId = selectedRole.id;
+    }
+    if (!selectedRoleId && entity && entity._embedded && entity._embedded.role) {
+      selectedRoleId = entity._embedded.role.id;
+    }
+
     if (selectedRole && _identityRoleAttributeDefinition) {
       if (entity
         && entity._eav
@@ -235,7 +255,23 @@ export class RoleConceptDetail extends Basic.AbstractContent {
           onChange={ this._onChangeSelectOfRole.bind(this) }
           label={ this.i18n('entity.IdentityRole.role') }
           ref="role"
-          forceSearchParameters={ new SearchParameters('can-be-requested').setFilter('environment', environment) }/>
+          forceSearchParameters={new SearchParameters('can-be-requested')
+            .setFilter('environment', environment)
+            .setFilter('includeCrossDomainsSystemsCount', 'true')}
+        />
+        <Advanced.EntitySelectBox
+          ref="roleSystem"
+          readOnly={ !added || readOnly }
+          hidden={!_showSystems}
+          entityType="roleSystem"
+          disableable={false}
+          clearable
+          forceSearchParameters={
+            new SearchParameters()
+              .setFilter('isInCrossDomainGroupRoleId', selectedRoleId ? selectedRoleId : SearchParameters.BLANK_UUID)
+          }
+          helpBlock={ this.i18n('entity.IdentityRole.roleSystem.help')}
+          label={ this.i18n('entity.IdentityRole.roleSystem.label') }/>
         <Advanced.IdentityContractSelect
           ref="identityContract"
           manager={ identityContractManager }

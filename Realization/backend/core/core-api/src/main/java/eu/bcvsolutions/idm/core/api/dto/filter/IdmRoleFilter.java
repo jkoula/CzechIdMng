@@ -38,6 +38,10 @@ public class IdmRoleFilter
 	public static final String PARAMETER_IDENTITY_ROLE_ATTRIBUTE_DEF = "identityRoleAttributeDefinition";
 	public static final String PARAMETER_ROLE_TYPE = "roleType";
 	/**
+	 * If true, then will add to count of systems for this role, which are in cross-domain group.
+	 */
+	public static final String PARAMETER_INCLUDE_CROSS_DOMAINS_SYSTEMS_COUNT = "includeCrossDomainsSystemsCount";
+	/**
 	 * Roles, which are not placed in any catalogue folder.
 	 * 
 	 * @since 10.4.0
@@ -149,5 +153,19 @@ public class IdmRoleFilter
 	 */
 	public void setWithoutCatalogue(Boolean withoutCatalogue) {
 		set(PARAMETER_WITHOUT_CATALOGUE, withoutCatalogue);
+	}
+	
+	/**
+	 * If true, then will add to count of systems for this role, which are in cross-domain group.
+	 */
+	public Boolean getIncludeCrossDomainsSystemsCount() {
+		return getParameterConverter().toBoolean(getData(), PARAMETER_INCLUDE_CROSS_DOMAINS_SYSTEMS_COUNT);
+	}
+	
+	/**
+	 * If true, then will add to count of systems for this role, which are in cross-domain group.
+	 */
+	public void setIncludeCrossDomainsSystemsCount(Boolean withoutCatalogue) {
+		set(PARAMETER_INCLUDE_CROSS_DOMAINS_SYSTEMS_COUNT, withoutCatalogue);
 	}
 }

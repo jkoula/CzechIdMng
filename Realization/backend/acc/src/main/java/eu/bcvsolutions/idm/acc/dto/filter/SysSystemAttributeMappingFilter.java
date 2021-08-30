@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.dto.filter;
 
+import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -29,6 +30,7 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 	private String name;
 	private Boolean authenticationAttribute;
 	private Boolean passwordFilter;
+	private AttributeMappingStrategyType strategyType;
 
 	public Boolean getIsUid() {
 		return isUid;
@@ -149,5 +151,12 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 	public void setPasswordFilter(Boolean passwordFilter) {
 		this.passwordFilter = passwordFilter;
 	}
-	
+
+	public AttributeMappingStrategyType getStrategyType() {
+		return strategyType;
+	}
+
+	public void setStrategyType(AttributeMappingStrategyType strategyType) {
+		this.strategyType = strategyType;
+	}
 }

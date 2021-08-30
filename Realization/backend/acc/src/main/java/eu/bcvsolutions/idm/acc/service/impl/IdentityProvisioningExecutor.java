@@ -166,25 +166,36 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		if(mapping == null) {
 			return roleSystemAttributesAll;
 		}
-		// Search overridden attributes for this account (searching via
-		// identity-accounts -> identity-roles -> role-systems ->
-		// role-system-attributes)
-		
-		// !Strange behavior - attributes are searching via assigned identity-accounts,
-		// it means in some case aren't returns all overridden attributes for this
-		// system and assigned roles! For example, when UID is changed, then exists old
-		// and new accounts in same time and we cannot return overridden UID attribute
-		// for original account. 
-		// TODO: Investigate and prevent situation when exists two accounts in same time (change the UID).
+		// Search overridden attributes for this account.
 		SysRoleSystemAttributeFilter roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
 		roleSystemAttributeFilter.setSystemMappingId(mapping.getId());
-		roleSystemAttributeFilter.setIdentityId(entity.getId());
-		roleSystemAttributeFilter.setAccountId(account.getId());
+		// Filtering by identity-account relation.
+		 roleSystemAttributeFilter.setAccountId(account.getId());
+		 roleSystemAttributeFilter.setIdentityId(entity.getId());
 		List<SysRoleSystemAttributeDto> roleAttributes = roleSystemAttributeService
 				.find(roleSystemAttributeFilter, null).getContent();
-
 		if (!CollectionUtils.isEmpty(roleAttributes)) {
 			roleSystemAttributesAll.addAll(roleAttributes);
+		}
+
+		// Cross-domains attributes and no-login attributes will be added only for default UID.
+		// It means, if some attributes override an UID attribute, then now additional attribute will be used!
+		boolean uidIsOverridden = roleSystemAttributesAll.stream().anyMatch(SysRoleSystemAttributeDto::isUid);
+
+		if (!uidIsOverridden) {
+			// Add overridden attributes which are in a cross-domain group or is in no-login role.
+			// Beware - these attributes are added for every account (overridden attributes are not supported)
+			roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
+			roleSystemAttributeFilter.setIdentityId(entity.getId());
+			roleSystemAttributeFilter.setSystemMappingId(mapping.getId());
+			roleSystemAttributeFilter.setInCrossDomainGroupOrIsNoLogin(Boolean.TRUE);
+
+			List<SysRoleSystemAttributeDto> roleAttributesInCrossGroup = roleSystemAttributeService
+					.find(roleSystemAttributeFilter, null).getContent();
+
+			if (!CollectionUtils.isEmpty(roleAttributesInCrossGroup)) {
+				roleSystemAttributesAll.addAll(roleAttributesInCrossGroup);
+			}
 		}
 		
 		return roleSystemAttributesAll;

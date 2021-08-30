@@ -20,6 +20,13 @@ public class SysRoleSystemAttributeFilter implements BaseFilter {
 	private UUID identityId;
 	private UUID accountId;
 	private UUID systemId;
+	private UUID roleSystemRelationForIdentityId;
+	/**
+	 * Get role-system-attributes with cross domains groups (using same merge attribute)
+	 * or attributes where default account creation is disabled (no-login roles).
+	 * Only TRUE and NULL is implemented!
+	 */
+	private Boolean isInCrossDomainGroupOrIsNoLogin;
 
 	public Boolean getIsUid() {
 		return isUid;
@@ -83,5 +90,30 @@ public class SysRoleSystemAttributeFilter implements BaseFilter {
 
 	public void setSystemId(UUID systemId) {
 		this.systemId = systemId;
+	}
+
+	public UUID getRoleSystemRelationForIdentityId() {
+		return roleSystemRelationForIdentityId;
+	}
+
+	/**
+	 * We want to find all override attribute for identity, where relation between
+	 * identity-role and role-system is null or if relation is not null, then return
+	 * override attributes where same role-systems are used.
+	 */
+	public void setRoleSystemRelationForIdentityId(UUID roleSystemRelationForIdentityId) {
+		this.roleSystemRelationForIdentityId = roleSystemRelationForIdentityId;
+	}
+
+	public Boolean getInCrossDomainGroupOrIsNoLogin() {
+		return isInCrossDomainGroupOrIsNoLogin;
+	}
+
+	/**
+	 * Get role-system-attributes with cross domains groups (using same merge attribute) or attributes where default account creation is disabled.
+	 * Only TRUE and NULL is implemented!
+	 */
+	public void setInCrossDomainGroupOrIsNoLogin(Boolean inCrossDomainGroup) {
+		isInCrossDomainGroupOrIsNoLogin = inCrossDomainGroup;
 	}
 }

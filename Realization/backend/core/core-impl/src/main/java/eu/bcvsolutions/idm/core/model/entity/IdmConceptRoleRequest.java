@@ -121,6 +121,11 @@ public class IdmConceptRoleRequest extends AbstractEntity implements ValidableEn
 	@Type(type = "org.hibernate.type.TextType")
 	@Column(name = "log")
 	private String log;
+	
+	// Relation on sys-system form ACC. We need to working with that also in the core module (cross-domains). 
+	@Audited
+	@Column(name = "role_system_id", length = 16)
+	private UUID roleSystem;
 
 	public IdmRoleRequest getRoleRequest() {
 		return roleRequest;
@@ -271,7 +276,6 @@ public class IdmConceptRoleRequest extends AbstractEntity implements ValidableEn
 	/**
 	 * Concept for business role concept.
 	 * 
-	 * @param directRole directly assigned role concept
 	 * @since 10.6.0
 	 */
 	public void setDirectConcept(UUID directConcept) {
@@ -296,5 +300,13 @@ public class IdmConceptRoleRequest extends AbstractEntity implements ValidableEn
 	 */
 	public void setRoleComposition(UUID roleComposition) {
 		this.roleComposition = roleComposition;
+	}
+
+	public UUID getRoleSystem() {
+		return roleSystem;
+	}
+
+	public void setRoleSystem(UUID roleSystem) {
+		this.roleSystem = roleSystem;
 	}
 }

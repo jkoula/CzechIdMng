@@ -194,12 +194,14 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     if (forceSearchParameters && hasIdentityForceFilter) {
       contractForceSearchparameters = new SearchParameters().setFilter('identity', forceSearchParameters.getFilters().get('identityId'));
     }
+    const _columns = this.getColumns();
     //
     return (
       <Basic.Div>
         <Advanced.Table
           ref="table"
           uiKey={ this.getUiKey() }
+          columns={ _columns }
           manager={ this.getManager() }
           forceSearchParameters={ forceSearchParameters }
           showRefreshButton={ showRefreshButton }
@@ -308,6 +310,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             rendered={ showDetailButton }/>
           <Advanced.Column
             header={this.i18n('entity.IdentityRole.role')}
+            property="role"
             sort
             sortProperty="role.name"
             cell={
@@ -345,6 +348,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             }
             rendered={ _.includes(columns, 'identity') }/>
           <Advanced.Column
+            property="baseCode"
             header={ this.i18n('entity.Role.baseCode.label') }
             title={ this.i18n('entity.Role.baseCode.help') }
             width={ 125 }
@@ -355,6 +359,18 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.baseCode }
           />
           <Advanced.Column
+            property="system"
+            header={ this.i18n('entity.RoleSystem.label') }
+            width={ 125 }
+            face="text"
+            sort={false}
+            rendered={ _.includes(columns, 'system') }
+            cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.roleSystem
+              ? data[rowIndex]._embedded.roleSystem._embedded.system.name
+              : null }
+          />
+          <Advanced.Column
+            property="environment"
             header={ this.i18n('entity.Role.environment.label') }
             title={ this.i18n('entity.Role.environment.help') }
             width={ 125 }
@@ -369,6 +385,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             }
           />
           <Advanced.Column
+            property="roleAttributes"
             header={this.i18n('content.task.IdentityRoleConceptTable.identityRoleAttributes.header')}
             cell={ ({rowIndex, data}) => this._attributesCell({ rowIndex, data }) }
             rendered={ _.includes(columns, 'roleAttributes') }/>
@@ -500,6 +517,11 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                       manager={ roleManager }
                       label={ this.i18n('entity.IdentityRole.role') }
                       required/>
+                    <Advanced.EntitySelectBox
+                      ref="roleSystem"
+                      entityType="roleSystem"
+                      readOnly
+                      label={ this.i18n('entity.RoleSystem.label') }/>
                     <Basic.SelectBox
                       ref="identityContract"
                       manager={ identityContractManager }
@@ -628,10 +650,9 @@ IdentityRoleTable.propTypes = {
 IdentityRoleTable.defaultProps = {
   manager,
   rendered: true,
-  columns: [
+  columns: ConfigLoader.getConfig('identityRole.table.columns', [
     'role',
     'roleAttributes',
-    'baseCode',
     'environment',
     'identityContract',
     'contractPosition',
@@ -640,7 +661,7 @@ IdentityRoleTable.defaultProps = {
     'directRole',
     'automaticRole',
     'incompatibleRoles'
-  ],
+  ]),
   forceSearchParameters: null,
   showAddButton: true,
   showDetailButton: true,
@@ -658,6 +679,11 @@ function select(state, component) {
     _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey),
     _incompatibleRoles: DataManager.getData(state, `${ uiKeyIncompatibleRoles }${ component.match.params.entityId }`),
     environmentItems: codeListManager.getCodeList(state, 'environment'),
+    columns: component.columns || ConfigurationManager.getPublicValueAsArray(
+      state,
+      'idm.pub.app.show.identityRole.table.columns',
+      IdentityRoleTable.defaultProps.columns
+    )
   };
 }
 

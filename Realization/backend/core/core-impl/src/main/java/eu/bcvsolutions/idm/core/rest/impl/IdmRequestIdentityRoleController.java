@@ -194,6 +194,7 @@ public class IdmRequestIdentityRoleController
 		filter.setState(getParameterConverter().toEnum(parameters, "state", RoleRequestState.class));
 		filter.setOnlyChanges(getParameterConverter().toBoolean(parameters, "onlyChanges", false));
 		filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));
+		filter.setIncludeCrossDomainsSystemsCount(getParameterConverter().toBoolean(parameters, "includeCrossDomainsSystemsCount", false));
 		
 		return filter;
 	}

@@ -1,5 +1,9 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleSystemFilter;
+import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -81,6 +85,9 @@ public class DefaultIdmRequestIdentityRoleService extends
 	private LookupService lookupService;
 	@Autowired
 	private IdmRoleService roleService;
+	@Autowired(required = false)
+	@SuppressWarnings(value = "rawtypes")
+	private IdmRoleSystemService roleSystemService;
 
 	@Override
 	public Page<IdmRequestIdentityRoleDto> find(IdmRequestIdentityRoleFilter filter, Pageable pageable,
@@ -173,6 +180,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 					ConceptRoleRequestOperation.UPDATE);
 			conceptRoleRequest.setValidFrom(dto.getValidFrom());
 			conceptRoleRequest.setValidTill(dto.getValidTill());
+			conceptRoleRequest.setRoleSystem(dto.getRoleSystem());
 			conceptRoleRequest.setEavs(dto.getEavs());
 			// Create concept with EAVs
 			conceptRoleRequest = conceptRoleService.save(conceptRoleRequest, permission);
@@ -212,6 +220,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 				IdmConceptRoleRequestDto conceptRoleRequest = createConcept(null, identityContractDto, finalRequestId,
 						role, dto.getValidFrom(), dto.getValidTill(), ConceptRoleRequestOperation.ADD);
 				conceptRoleRequest.setEavs(dto.getEavs());
+				conceptRoleRequest.setRoleSystem(dto.getRoleSystem());
 				// Create concept with EAVs
 				conceptRoleRequest = conceptRoleService.save(conceptRoleRequest);
 				if (finalRequest != null) {
@@ -536,6 +545,24 @@ public class DefaultIdmRequestIdentityRoleService extends
 			}
 			addEav(requestIdentityRoleDto, formInstanceDto);
 		}
+		// Include info if is role in cross-domain group.
+		if (filter != null && filter.isIncludeCrossDomainsSystemsCount()) {
+			if (ConceptRoleRequestOperation.REMOVE != concept.getOperation()) {
+				IdmRoleDto roleDto = DtoUtils.getEmbedded(concept, IdmConceptRoleRequest_.role.getName(), IdmRoleDto.class, null);
+				if (roleDto != null && this.roleSystemService instanceof AbstractReadDtoService) {
+					@SuppressWarnings(value = "rawtypes")
+					AbstractReadDtoService roleSystemService = (AbstractReadDtoService) this.roleSystemService;
+					BaseFilter roleSystemFilter = roleSystemService.createFilterInstance();
+					if (roleSystemFilter instanceof IdmRoleSystemFilter) {
+						IdmRoleSystemFilter idmRoleSystemFilter = (IdmRoleSystemFilter) roleSystemFilter;
+						idmRoleSystemFilter.setIsInCrossDomainGroupRoleId(roleDto.getId());
+						long count = roleSystemService.count(idmRoleSystemFilter);
+						roleDto.setSystemsInCrossDomains(count);
+					}
+				}
+			}
+				
+		}
 
 		return addCandidates(requestIdentityRoleDto, concept, filter);
 	}
@@ -577,6 +604,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 			request.setRole(identityRole.getRole());
 			request.setIdentityRole(identityRole.getId());
 			request.setDirectRole(identityRole.getDirectRole());
+			request.setRoleSystem(identityRole.getRoleSystem());
 			request.setRoleComposition(identityRole.getRoleComposition());
 			request.setIdentityContract(identityRole.getIdentityContract());
 			request.setValidFrom(identityRole.getValidFrom());

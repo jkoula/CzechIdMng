@@ -4798,6 +4798,10 @@
         "label": "Další pozice",
         "title": "Další pozice pracovně právního vztahu"
       },
+      "roleSystem": {
+        "label": "System s účtem",
+        "help": "Vyberte system s účtem kterému chcete tuto roli přidělit. Pokud žádný systém nevyberete, pak bude role přidělena na všechny systémy u této role. Pokud účet na systému ještě neexistuje, pak ho tato role nebude vytvářet!"
+      },
       "automaticRole": {
         "label": "Automatická role",
         "title": "Automatická role",
@@ -4815,6 +4819,11 @@
         "header": "Požadovaná role je duplicitní k roli:"
       }
     },
+    "RoleSystem": {
+      "label": "Systém",
+      "help": "Vyberte systém, na kterém chcete vytvořit účet."
+    },
+    
     "ExportImport": {
       "_type": "Export/Import dávky",
       "name": {

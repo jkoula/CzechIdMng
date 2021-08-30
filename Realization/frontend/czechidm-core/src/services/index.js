@@ -92,6 +92,7 @@ import NotificationAttachmentService from './NotificationAttachmentService';
 import TokenService from './TokenService';
 import MonitoringService from './MonitoringService';
 import MonitoringResultService from './MonitoringResultService';
+import RoleSystemService from './RoleSystemService';
 
 const ServiceRoot = {
   RestApiService,
@@ -180,7 +181,8 @@ const ServiceRoot = {
   BulkActionService,
   TokenService,
   MonitoringService,
-  MonitoringResultService
+  MonitoringResultService,
+  RoleSystemService
 };
 
 ServiceRoot.version = '11.1.0';

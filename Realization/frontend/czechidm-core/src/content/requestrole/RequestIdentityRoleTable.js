@@ -499,6 +499,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     }
     forceSearchParameters = forceSearchParameters.setFilter('onlyChanges', showChangesOnly);
     forceSearchParameters = forceSearchParameters.setFilter('includeCandidates', true);
+    forceSearchParameters = forceSearchParameters.setFilter('includeCrossDomainsSystemsCount', true);
     //
     const showLoading = this.props.showLoading || this.state.showLoading;
     const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);

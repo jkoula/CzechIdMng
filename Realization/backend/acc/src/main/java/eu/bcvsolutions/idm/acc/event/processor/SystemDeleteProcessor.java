@@ -1,5 +1,8 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
+import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,8 @@ public class SystemDeleteProcessor extends CoreEventProcessor<SysSystemDto> impl
 	private SysProvisioningOperationService provisioningOperationService;
 	@Autowired
 	private AccUniformPasswordSystemService passwordFilterSystemService;
+	@Autowired
+	private SysSystemGroupSystemService systemGroupSystemService;
 
 	@Autowired
 	public SystemDeleteProcessor(SysSystemService service,
@@ -111,6 +116,14 @@ public class SystemDeleteProcessor extends CoreEventProcessor<SysSystemDto> impl
 		if (accountRepository.countBySystem_Id(system.getId()) > 0) {
 			throw new ResultCodeException(AccResultCode.SYSTEM_DELETE_FAILED_HAS_ACCOUNTS,
 					ImmutableMap.of("system", system.getName()));
+		}
+		// Check if system is used in some systems group.
+		SysSystemGroupSystemFilter groupSystemFilter = new SysSystemGroupSystemFilter();
+		groupSystemFilter.setSystemId(system.getId());
+		long count = systemGroupSystemService.count(groupSystemFilter);
+		if (count > 0) {
+			throw new ResultCodeException(AccResultCode.SYSTEM_DELETE_FAILED_HAS_SYSTEM_GROUPS,
+					ImmutableMap.of("system", system.getName(), "count", count));
 		}
 		// delete system entities
 		SysSystemEntityFilter systemEntityFilter = new SysSystemEntityFilter();

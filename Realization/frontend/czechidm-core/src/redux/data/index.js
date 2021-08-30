@@ -89,6 +89,7 @@ import NotificationAttachmentManager from './NotificationAttachmentManager';
 import TokenManager from './TokenManager';
 import MonitoringManager from './MonitoringManager';
 import MonitoringResultManager from './MonitoringResultManager';
+import RoleSystemManager from './RoleSystemManager';
 
 const ManagerRoot = {
   EntityManager,
@@ -174,7 +175,8 @@ const ManagerRoot = {
   BulkActionManager,
   TokenManager,
   MonitoringManager,
-  MonitoringResultManager
+  MonitoringResultManager,
+  RoleSystemManager
 };
 
 ManagerRoot.version = '11.1.0';

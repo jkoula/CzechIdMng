@@ -37,6 +37,7 @@ public interface SysSystemEntityService extends ReadWriteDtoService<SysSystemEnt
 
 	/**
 	 * Load object from the connector.
+	 * Loading additional values (for example values from other systems in cross-domain groups.).
 	 * 
 	 * @param systemEntity
 	 * @param permissions

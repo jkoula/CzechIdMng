@@ -1,30 +1,10 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -33,16 +13,22 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
+import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
+import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
+import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.entity.SysSystem_;
+import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.repository.SysRoleSystemRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.ExportDescriptorDto;
@@ -50,17 +36,39 @@ import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.ExportManager;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.RequestManager;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.annotation.Priority;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Role could assign identity account on target system.
@@ -69,9 +77,11 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
  *
  */
 @Service
+@Priority(Ordered.LOWEST_PRECEDENCE - 100)
+@SuppressWarnings(value = "rawtypes")
 public class DefaultSysRoleSystemService
 		extends AbstractReadWriteDtoService<SysRoleSystemDto, SysRoleSystem, SysRoleSystemFilter>
-		implements SysRoleSystemService {
+		implements SysRoleSystemService, IdmRoleSystemService {
 
 	@Autowired private AccIdentityAccountService identityAccountService;
 	@Autowired private IdmRoleService roleService;
@@ -80,6 +90,8 @@ public class DefaultSysRoleSystemService
 	@Autowired private SysRoleSystemAttributeService roleSystemAttributeService;
 	@Autowired private IdmRoleCompositionService roleCompositionService;
 	@Autowired private LookupService lookupService;
+	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
+	@Autowired private IdmIdentityRoleService identityRoleService;
 
 	@Autowired
 	public DefaultSysRoleSystemService(SysRoleSystemRepository repository) {
@@ -93,6 +105,17 @@ public class DefaultSysRoleSystemService
 		Assert.notNull(roleSystem.getId(), "Role system relation identifier is required.");
 
 		SysRoleSystem roleSystemEntity = this.getEntity(roleSystem.getId());
+
+		// Identity-role check.
+		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		identityRoleFilter.setRoleSystemId(roleSystemEntity.getId());
+		long count = identityRoleService.count(identityRoleFilter);
+		if (count > 0) {
+			IdmRoleDto roleDto = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.role, IdmRoleDto.class, null);
+			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE,
+					ImmutableMap.of("role", roleDto != null ? roleDto.getBaseCode() : "-", "count", count));
+		}
+
 		//
 		// delete attributes
 		SysRoleSystemAttributeFilter filter = new SysRoleSystemAttributeFilter();
@@ -149,9 +172,9 @@ public class DefaultSysRoleSystemService
 		filter.setSystemId(dto.getSystem());
 
 		List<SysRoleSystemDto> roleSystems = this.find(filter, null).getContent();
-		boolean isDuplicated = roleSystems.stream().filter(roleSystem -> {
+		boolean isDuplicated = roleSystems.stream().anyMatch(roleSystem -> {
 			return !roleSystem.getId().equals(dto.getId());
-		}).findFirst().isPresent();
+		});
 
 		if (isDuplicated) {
 			IdmRoleDto roleDto = roleService.get(dto.getRole());
@@ -159,8 +182,25 @@ public class DefaultSysRoleSystemService
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_ALREADY_EXISTS,
 					ImmutableMap.of("role", roleDto.getCode(), "system", systemDto.getName()));
 		}
-
-		return super.save(dto, permission);
+		
+		SysRoleSystemDto roleSystemDto = super.save(dto, permission);
+		
+		// Cross-domain or no-login role, cannot override an UID attribute!
+		SysRoleSystemAttributeFilter systemAttributeFilter = new SysRoleSystemAttributeFilter();
+		systemAttributeFilter.setRoleSystemId(roleSystemDto.getId());
+		systemAttributeFilter.setInCrossDomainGroupOrIsNoLogin(Boolean.TRUE);
+		if (roleSystemAttributeService.count(systemAttributeFilter) > 0) {
+			systemAttributeFilter = new SysRoleSystemAttributeFilter();
+			systemAttributeFilter.setRoleSystemId(roleSystemDto.getId());
+			systemAttributeFilter.setIsUid(Boolean.TRUE);
+			if (roleSystemAttributeService.count(systemAttributeFilter) > 0) {
+				IdmRoleDto roleDto = roleService.get(roleSystemDto.getRole());
+				SysSystemDto systemDto = DtoUtils.getEmbedded(roleSystemDto, SysRoleSystem_.system);
+				throw new ProvisioningException(AccResultCode.PROVISIONING_ROLE_ATTRIBUTE_NO_LOGIN_CANNOT_OVERRIDE_UID,
+						ImmutableMap.of("role", roleDto.getCode(), "system", systemDto.getName()));
+			}
+		}
+		return roleSystemDto;
 	}
 
 	@Override
@@ -218,7 +258,32 @@ public class DefaultSysRoleSystemService
 
 				}).collect(Collectors.toList());
 	}
+
+	@Override
+	public boolean supportsToDtoWithFilter() {
+		return true;
+	}
 	
+
+	@Override
+	protected SysRoleSystemDto toDto(SysRoleSystem entity, SysRoleSystemDto dto, SysRoleSystemFilter context) {
+		SysRoleSystemDto roleSystemDto = super.toDto(entity, dto, context);
+
+		if (context != null
+				&& Boolean.TRUE.equals(context.getCheckIfIsInCrossDomainGroup())
+				&& roleSystemDto != null
+				&& roleSystemDto.getId() != null) {
+			SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+			systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystemDto.getId());
+			if (systemGroupSystemService.count(systemGroupSystemFilter) >= 1) {
+				// This role-system overriding a merge attribute which is using in
+				// active cross-domain group. -> We will set this information to the DTO.
+				roleSystemDto.setInCrossDomainGroup(true);
+			}
+		}
+		return roleSystemDto;
+	}
+
 	@Override
 	protected SysRoleSystemDto internalExport(UUID id) {
 		 SysRoleSystemDto roleSystemDto = this.get(id);
@@ -278,6 +343,26 @@ public class DefaultSysRoleSystemService
 					filter.getSystemMappingId()));
 		}
 
+		// CreateAccountByDefault
+		Boolean createAccountByDefault = filter.getCreateAccountByDefault();
+		if(createAccountByDefault != null) {
+			predicates.add(builder.equal(root.get(SysRoleSystem_.createAccountByDefault), createAccountByDefault));
+		}
+
+		// Return role-system where is uses given attribute mapping
+		if (filter.getAttributeMappingId() != null) {
+			Subquery<SysRoleSystemAttribute> subquery = query.subquery(SysRoleSystemAttribute.class);
+			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
+			subquery.select(subRoot);
+
+			subquery.where(builder.and( //
+					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
+					builder.equal(subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping).get(AbstractEntity_.id),
+							filter.getAttributeMappingId())));
+
+			predicates.add(builder.exists(subquery));
+		}
+		
 		// Return role-system where is uses given attribute mapping
 		if (filter.getAttributeMappingId() != null) {
 			Subquery<SysRoleSystemAttribute> subquery = query.subquery(SysRoleSystemAttribute.class);
@@ -292,11 +377,39 @@ public class DefaultSysRoleSystemService
 			predicates.add(builder.exists(subquery));
 		}
 
+		// Get role-systems with cross domains groups for given role (using same merge attribute).
+		if (filter.getIsInCrossDomainGroupRoleId() != null) {
+
+			Subquery<SysRoleSystemAttribute> subquery = query.subquery(SysRoleSystemAttribute.class);
+			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
+			subquery.select(subRoot);
+
+			Subquery<SysSystemGroupSystem> subquerySystemGroup = query.subquery(SysSystemGroupSystem.class);
+			Root<SysSystemGroupSystem> subRootSystemGroup = subquerySystemGroup.from(SysSystemGroupSystem.class);
+			subquerySystemGroup.select(subRootSystemGroup);
+
+			subquerySystemGroup.where(builder.and(
+							builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.mergeAttribute),
+									subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping))), // Correlation attribute
+					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.disabled),
+							Boolean.FALSE),
+					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.type),
+							SystemGroupType.CROSS_DOMAIN));
+							
+			subquery.where(builder.and( //
+					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
+					builder.exists(subquerySystemGroup),
+					builder.equal(root.get(SysRoleSystem_.role).get(AbstractEntity_.id),
+							filter.getIsInCrossDomainGroupRoleId())));
+
+			predicates.add(builder.exists(subquery));
+		}
+
 		Set<UUID> ids = filter.getRoleIds();
 		if (CollectionUtils.isNotEmpty(ids)) {
 			predicates.add(root.get(SysRoleSystem_.role).get(IdmRole_.id).in(ids));
 		}
-
+		
 		return predicates;
 	}
 

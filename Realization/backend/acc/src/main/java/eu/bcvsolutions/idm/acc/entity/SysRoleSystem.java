@@ -50,6 +50,10 @@ public class SysRoleSystem extends AbstractEntity {
 	@Audited
 	@Column(name = "forward_acm_enabled", nullable = false)
 	private boolean forwardAccountManagemen = false;
+	
+	@Audited
+	@Column(name = "create_acc_by_default", nullable = false)
+	private boolean createAccountByDefault = true;
 
 	public IdmRole getRole() {
 		return role;
@@ -83,4 +87,11 @@ public class SysRoleSystem extends AbstractEntity {
 		this.forwardAccountManagemen = forwardAccountManagemen;
 	}
 
+	public boolean isCreateAccountByDefault() {
+		return createAccountByDefault;
+	}
+
+	public void setCreateAccountByDefault(boolean createAccountByDefault) {
+		this.createAccountByDefault = createAccountByDefault;
+	}
 }

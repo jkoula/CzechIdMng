@@ -10,6 +10,7 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -19,16 +20,23 @@ import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncIdentityConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemGroupSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaObjectClassFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
+import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute_;
+import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
+import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
 import eu.bcvsolutions.idm.acc.event.SystemMappingEvent;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.Pair;
@@ -44,6 +52,7 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
 import eu.bcvsolutions.idm.core.api.service.IdmEntityStateService;
 import eu.bcvsolutions.idm.core.api.utils.CertificateUtils;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.SpinalCase;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -55,14 +64,27 @@ import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import eu.bcvsolutions.idm.ic.api.IcAttribute;
 import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
+import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
+import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
 import eu.bcvsolutions.idm.ic.api.IcConnectorKey;
+import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
+import eu.bcvsolutions.idm.ic.api.IcObjectClass;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
+import eu.bcvsolutions.idm.ic.filter.api.IcFilter;
+import eu.bcvsolutions.idm.ic.filter.impl.IcFilterBuilder;
+import eu.bcvsolutions.idm.ic.impl.IcAttributeImpl;
+import eu.bcvsolutions.idm.ic.impl.IcConnectorConfigurationImpl;
+import eu.bcvsolutions.idm.ic.impl.IcObjectClassImpl;
+import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -77,7 +99,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.naming.AuthenticationException;
 import javax.naming.CommunicationException;
 import javax.naming.Context;
@@ -148,8 +172,8 @@ public class AdUserConnectorType extends DefaultConnectorType {
 	public static final String PROTECTED_MODE_SWITCH_KEY = "protectedModeSwitch";
 	public static final String PAIRING_SYNC_ID = "pairingSyncId";
 	protected static final String SSL = "ssl";
-	protected static final String PRINCIPAL = "principal";
-	protected static final String CREDENTIALS = "credentials";
+	public static final String PRINCIPAL = "principal";
+	public static final String CREDENTIALS = "credentials";
 	private static final String SCHEMA_ID_KEY = "schemaId";
 	private static final String CRT_ATTACHMENT_ID_KEY = "attachmentId";
 	private static final String CRT_SUBJECT_DN_KEY = "subjectDN";
@@ -174,6 +198,14 @@ public class AdUserConnectorType extends DefaultConnectorType {
 	protected static final String PAIRING_SYNC_DN_ATTR_KEY = "pairingSyncEavDnAttribute";
 	protected static final String MAPPING_SYNC_ID = "mappingSyncId";
 	private static final String REGENERATE_SCHEMA_SWITCH = "regenerateSchemaSwitch";
+	private static final String FOREIGN_SECURITY_PRINCIPALS_CN = "ForeignSecurityPrincipals";
+	private static final String SID_ATTRIBUTE_KEY = "objectSID";
+	public static final String OLD_ATTRIBUTE_PATTERN = "{0}_OLD";
+	public static final String CROSS_DOMAIN_HOST_PATTERN = "CROSS_DOMAIN_HOST_{0}";
+	public static final String CROSS_DOMAIN_USER_PATTERN = "CROSS_DOMAIN_USER_{0}";
+	public static final String CROSS_DOMAIN_PASSWORD_PATTERN = "CROSS_DOMAIN_PASSWORD_{0}";
+	public static final String CROSS_DOMAIN_SYSTEM_IDS = "CROSS_DOMAIN_SYSTEM_IDS";
+
 
 	// Default values
 	protected static final String[] ENTRY_OBJECT_CLASSES_DEFAULT_VALUES = {"top", "user", "person", "organizationalPerson"};
@@ -200,6 +232,10 @@ public class AdUserConnectorType extends DefaultConnectorType {
 	private SysSchemaObjectClassService schemaObjectClassService;
 	@Autowired
 	private IdmFormAttributeService formAttributeService;
+	@Autowired
+	private SysSystemGroupSystemService systemGroupSystemService;
+	@Autowired
+	protected IcConnectorFacade connectorFacade;
 
 	@Override
 	public String getConnectorName() {
@@ -239,7 +275,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			return connectorType;
 		}
 		connectorType.getMetadata().put(REGENERATE_SCHEMA_SWITCH, Boolean.FALSE.toString());
-		
+
 		// Load the system.
 		SysSystemDto systemDto = (SysSystemDto) connectorType.getEmbedded().get(SYSTEM_DTO_KEY);
 		Assert.notNull(systemDto, "System must exists!");
@@ -379,6 +415,280 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			throw ex;
 		}
 		return connectorType;
+	}
+
+	@Override
+	public IcConnectorObject readConnectorObject(SysSystemDto system, String uid, IcObjectClass objectClass) {
+		IcConnectorObject icConnectorObject = super.readConnectorObject(system, uid, objectClass);
+		if (icConnectorObject == null) {
+			return  null;
+		}
+
+		return getCrossDomainConnectorObject(system, uid, objectClass, icConnectorObject);
+	}
+	
+	public IcConnectorObject getCrossDomainConnectorObject(SysSystemDto system, String uid, IcObjectClass objectClass, IcConnectorObject icConnectorObject) {
+		// Find merge attributes in cross-domains.
+		SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+		systemGroupSystemFilter.setGroupType(SystemGroupType.CROSS_DOMAIN);
+		systemGroupSystemFilter.setDisabled(Boolean.FALSE);
+		systemGroupSystemFilter.setSystemId(system.getId());
+
+		List<SysSystemGroupSystemDto> systemGroupSystemDtos = systemGroupSystemService.find(systemGroupSystemFilter, null).getContent();
+		systemGroupSystemDtos.forEach(systemGroupSystemDto -> {
+			SysSystemAttributeMappingDto mergeAttribute = DtoUtils.getEmbedded(systemGroupSystemDto, SysSystemGroupSystem_.mergeAttribute, SysSystemAttributeMappingDto.class);
+			SysSchemaAttributeDto schemaMergeAttribute = DtoUtils.getEmbedded(mergeAttribute, SysSystemAttributeMapping_.schemaAttribute, SysSchemaAttributeDto.class);
+			// Load values for this attribute from others systems in group.
+			List<Object> connectorValuesByAttribute = this.getConnectorValuesByAttribute(uid,
+					objectClass,
+					schemaMergeAttribute.getName(),
+					system,
+					icConnectorObject,
+					null);
+			
+			IcAttribute icAttribute = icConnectorObject.getAttributes().stream()
+					.filter(attribute -> schemaMergeAttribute.getName().equals(attribute.getName()))
+					.findFirst().orElse(null);
+			if (icAttribute instanceof IcAttributeImpl) {
+				// Add results to original connector-object.
+				IcAttributeImpl icAttributeImpl = (IcAttributeImpl) icAttribute;
+				icAttributeImpl.setMultiValue(true);
+				icAttributeImpl.setValues(connectorValuesByAttribute);
+			}else {
+				// Attribute missing in connector-object -> create new one.
+				icConnectorObject.getAttributes()
+						.add(new IcAttributeImpl(schemaMergeAttribute.getName(),
+								connectorValuesByAttribute));
+			} 
+		});
+		return icConnectorObject;
+	}
+
+	/**
+	 * Search connector values for given attribute.
+	 * If is system in cross-domain system group, then is will be call this method for all systems in a group.
+	 * For searching in other systems will be used SID, GROUPS and 'foreignSecurityPrincipals' container.
+	 */
+	@Override
+	public List<Object> getConnectorValuesByAttribute(String uid,
+													  IcObjectClass objectClass,
+													  String schemaAttributeName,
+													  SysSystemDto system,
+													  IcConnectorObject connectorObject,
+													  SysSystemGroupSystemDto systemGroupSystem) {
+
+		List<Object> connectorValues = super.getConnectorValuesByAttribute(uid, objectClass, schemaAttributeName, system, connectorObject, systemGroupSystem);
+
+		if (systemGroupSystem == null) {
+			// Find if the system is in a group with cross-domain type and for given schema attribute.
+			SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+			systemGroupSystemFilter.setGroupType(SystemGroupType.CROSS_DOMAIN);
+			systemGroupSystemFilter.setDisabled(Boolean.FALSE);
+			systemGroupSystemFilter.setSystemId(system.getId());
+			systemGroupSystemFilter.setMergeAttributeCode(schemaAttributeName);
+
+			UUID systemGroupId = systemGroupSystemService.find(systemGroupSystemFilter, null)
+					.getContent()
+					.stream()
+					.findFirst()
+					.map(SysSystemGroupSystemDto::getSystemGroup)
+					.orElse(null);
+
+			if (systemGroupId == null) {
+				// System is not in a cross-domain group -> we have all connector values.
+				return connectorValues;
+			}
+
+			// Found all group-systems for this group (without given system).
+			systemGroupSystemFilter.setSystemGroupId(systemGroupId);
+			systemGroupSystemFilter.setSystemId(null);
+			List<SysSystemGroupSystemDto> groupSystems = systemGroupSystemService.find(systemGroupSystemFilter, null)
+					.getContent()
+					.stream()
+					.filter(groupSystem -> !system.getId().equals(groupSystem.getSystem()))
+					.collect(Collectors.toList());
+			// Call connector type for every system and load values for given attribute.
+			groupSystems.forEach(groupSystem -> {
+				SysSystemDto systemInGroup = DtoUtils.getEmbedded(groupSystem, SysSystemGroupSystem_.system, SysSystemDto.class);
+				ConnectorType connectorType = getConnectorManager().findConnectorTypeBySystem(systemInGroup);
+				if (connectorType != null) {
+					List<Object> connectorValuesForSystemInGroup = connectorType.getConnectorValuesByAttribute(uid,
+							objectClass,
+							schemaAttributeName,
+							systemInGroup,
+							connectorObject,
+							groupSystem);
+					if (connectorValuesForSystemInGroup != null) {
+						connectorValuesForSystemInGroup.forEach(value -> {
+							if (!connectorValues.contains(value)) {
+								connectorValues.add(value);
+							}
+						});
+					}
+				}
+			});
+		} else {
+			// System group is not null, so this is sub system in group. We need to get groups by SID.
+			Assert.notNull(connectorObject, "The parent connector object cannot be null!");
+			IcAttribute sid = connectorObject.getAttributeByName(SID_ATTRIBUTE_KEY);
+			Assert.notNull(sid, "SID attribute cannot be null!");
+			Object sidValue = sid.getValue();
+			Assert.notNull(sidValue, "SID value cannot be null!");
+			IdmFormDefinitionDto operationOptionsFormDefinition = this.getSystemService().getOperationOptionsConnectorFormDefinition(system);
+			Assert.notNull(operationOptionsFormDefinition, "Operation options form-definition cannot be null!");
+			// Find attribute with container with existed users.
+			String userContainer = getValueFromConnectorInstance(USER_SEARCH_CONTAINER_KEY, system, operationOptionsFormDefinition);
+			Assert.notNull(userContainer, "User container cannot be null!");
+			// First we have to find root DN (only DCs).
+			String dcs = getRoot(userContainer);
+
+			String foreignSecurityPrincipalsDN = MessageFormat.format("CN={0},CN={1},{2}", convertSidToStr((byte[]) sidValue), FOREIGN_SECURITY_PRINCIPALS_CN, dcs);
+
+			IcConnectorConfiguration connectorConfiguration = getSystemService().getConnectorConfiguration(system);
+			IcConnectorInstance connectorInstance = getSystemService().getConnectorInstance(system);
+			Set<String> groups = searchGroups("member", connectorConfiguration, connectorInstance, foreignSecurityPrincipalsDN);
+
+			connectorValues.addAll(groups);
+		}
+		return connectorValues;
+	}
+
+	@Override
+	public void addUpdatedAttribute(SysSchemaAttributeDto schemaAttribute, IcAttribute updatedAttribute, IcConnectorObject updateConnectorObject, IcConnectorObject existsConnectorObject) {
+		if (updatedAttribute != null) {
+			updateConnectorObject.getAttributes().add(updatedAttribute);
+
+			// Add original values to connector object and send them to the connector.
+			// This is optimization for WinRM connector where is needed to be decided what of groups were added and removed.
+			if (existsConnectorObject != null){
+				// Find if the system is in a group with cross-domain type and for given schema attribute.
+				SysSchemaObjectClassDto schemaObjectClassDto = DtoUtils.getEmbedded(schemaAttribute, SysSchemaAttribute_.objectClass, SysSchemaObjectClassDto.class);
+				Assert.notNull(schemaObjectClassDto, "Schema class cannot be null!");
+				SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+				systemGroupSystemFilter.setGroupType(SystemGroupType.CROSS_DOMAIN);
+				systemGroupSystemFilter.setDisabled(Boolean.FALSE);
+				systemGroupSystemFilter.setSystemId(schemaObjectClassDto.getSystem());
+				systemGroupSystemFilter.setMergeAttributeCode(schemaAttribute.getName());
+				
+				if (systemGroupSystemService.count(systemGroupSystemFilter) == 0) {
+					// Attribute is not in the cross-domain group.
+					return;
+				}
+				
+				IcAttribute attributeInExists = existsConnectorObject.getAttributeByName(schemaAttribute.getName());
+				if (attributeInExists != null) {
+					IcAttributeImpl attributeWithGroupsOld = new IcAttributeImpl();
+					attributeWithGroupsOld.setName(MessageFormat.format(OLD_ATTRIBUTE_PATTERN, schemaAttribute.getName()));
+					attributeWithGroupsOld.setMultiValue(true);
+					attributeWithGroupsOld.setValues(attributeInExists.getValues());
+					updateConnectorObject.getAttributes().add(attributeWithGroupsOld);
+					existsConnectorObject.getAttributes().add(attributeWithGroupsOld);
+				}
+			}
+		}
+	}
+
+	@Override
+	public IcConnectorConfiguration getConnectorConfiguration(SysSystemDto system) {
+		IcConnectorConfiguration connectorConfiguration = super.getConnectorConfiguration(system);
+
+		Set<UUID> otherSystemIds = systemGroupSystemService.getSystemsInCrossDomainGroup(system)
+				.stream()
+				.map(SysSystemGroupSystemDto::getSystem)
+				.distinct()
+				.filter(systemId -> !systemId.equals(system.getId()))
+				.collect(Collectors.toSet());
+
+		StringBuilder systemIdsBuilder = new StringBuilder();
+		for (UUID otherSystemId : otherSystemIds) {
+
+			systemIdsBuilder.append(otherSystemId.toString());
+			systemIdsBuilder.append(',');
+
+			SysSystemDto otherSystemDto = getSystemService().get(otherSystemId);
+			IdmFormDefinitionDto connectorFormDef = this.getSystemService().getConnectorFormDefinition(otherSystemDto);
+
+			// Host
+			connectorConfiguration.getSystemOperationOptions()
+					.put(MessageFormat.format(CROSS_DOMAIN_HOST_PATTERN, otherSystemId.toString()), getValueFromConnectorInstance(HOST, otherSystemDto, connectorFormDef));
+
+			// User
+			connectorConfiguration.getSystemOperationOptions()
+					.put(MessageFormat.format(CROSS_DOMAIN_USER_PATTERN, otherSystemId.toString()), getValueFromConnectorInstance(PRINCIPAL, otherSystemDto, connectorFormDef));
+
+			// Password
+			String confValue = getConfidentialValueFromConnectorInstance(CREDENTIALS, otherSystemDto, connectorFormDef);
+			connectorConfiguration.getSystemOperationOptions()
+					.put(MessageFormat.format(CROSS_DOMAIN_PASSWORD_PATTERN, otherSystemId.toString()),
+							confValue != null ? new org.identityconnectors.common.security.GuardedString(confValue.toCharArray()) : null);
+		}
+
+		// All IDs of other systems in group.
+		connectorConfiguration.getSystemOperationOptions()
+				.put(CROSS_DOMAIN_SYSTEM_IDS,
+						systemIdsBuilder.toString());
+
+		return connectorConfiguration;
+	}
+
+	private Set<String> searchGroups(
+			String memberAttribute,
+			IcConnectorConfiguration icConfig,
+			IcConnectorInstance connectorInstance,
+			String dn) {
+
+		// Disable filter validations for connector results (validation does not work for AD properly). 
+		Map<String, Object> systemOperationOptions = icConfig.getSystemOperationOptions();
+		if (systemOperationOptions == null) {
+			systemOperationOptions = new HashMap<>();
+		}
+		systemOperationOptions.put(IcConnectorConfiguration.DISABLE_FILTER_VALIDATION_KEY, Boolean.TRUE);
+		if (icConfig instanceof IcConnectorConfigurationImpl) {
+			IcConnectorConfigurationImpl config = (IcConnectorConfigurationImpl) icConfig;
+			config.setOperationOptions(systemOperationOptions);
+		}
+
+		Set<String> groups = Sets.newHashSet();
+		IcAttributeImpl dnFilterAttribute = new IcAttributeImpl(memberAttribute, dn);
+		IcFilter icFilter = IcFilterBuilder.equalTo(dnFilterAttribute);
+
+		IcObjectClass groupObjectClass = new IcObjectClassImpl(IcObjectClassInfo.GROUP);
+
+		connectorFacade.search(
+				connectorInstance,
+				icConfig,
+				groupObjectClass,
+				icFilter,
+				connectorObject -> {
+					if (connectorObject != null) {
+						IcAttribute attribute = connectorObject.getAttributeByName(IcAttributeInfo.NAME);
+						if (attribute != null) {
+							groups.add((String) attribute.getValue());
+						}
+					}
+					return true;
+				});
+		return groups;
+	}
+
+	/**
+	 * Convert a SID to String.
+	 */
+	private String convertSidToStr(byte[] sid) {
+		if (sid == null)
+			return null;
+		if (sid.length < 8 || sid.length % 4 != 0)
+			return "";
+		StringBuilder sb = new StringBuilder();
+		sb.append("S-").append(sid[0]);
+		int c = sid[1]; // Init with Subauthority Count.
+		ByteBuffer bb = ByteBuffer.wrap(sid);
+		sb.append("-").append(bb.getLong() & 0xFFFFFFFFFFFFL);
+		bb.order(ByteOrder.LITTLE_ENDIAN); // Now switch.
+		for (int i = 0; i < c; i++) { // Create Subauthorities.
+			sb.append("-").append((long) bb.getInt() & 0xFFFFFFFFL);
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -727,7 +1037,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 		// We need to searching in all containers (for new, existed and deleted users). So all three values will be use in the base context.
 		List<Serializable> values = Lists.newArrayList(Sets.newHashSet(searchUserContainer, newUserContainer, deleteUserContainer));
 		this.setValueToConnectorInstance(BASE_CONTEXT_USER_KEY, values, systemDto, connectorFormDef);
-		
+
 		// Set root suffixes and generate a schema.
 		SysSchemaObjectClassDto schemaDto = generateSchema(connectorType, systemDto, connectorFormDef, searchUserContainer, values);
 
@@ -778,7 +1088,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			// Attribute missing -> create it now.
 			createSchemaAttribute(schemaDto, LDAP_GROUPS_ATTRIBUTE, String.class.getName(), true, true, true);
 		}
-	
+
 		mappingId = connectorType.getMetadata().get(MAPPING_ID);
 		if (mappingId == null) {
 			// Create identity mapping for provisioning.
@@ -789,10 +1099,10 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			mappingDto.setName("AD users provisioning mapping.");
 			mappingDto.setProtectionEnabled(protectedModeSwitch);
 			mappingDto = systemMappingService.publish(
-					new SystemMappingEvent(
-							SystemMappingEvent.SystemMappingEventType.CREATE,
-							mappingDto,
-							ImmutableMap.of(SysSystemMappingService.ENABLE_AUTOMATIC_CREATION_OF_MAPPING, Boolean.TRUE)))
+							new SystemMappingEvent(
+									SystemMappingEvent.SystemMappingEventType.CREATE,
+									mappingDto,
+									ImmutableMap.of(SysSystemMappingService.ENABLE_AUTOMATIC_CREATION_OF_MAPPING, Boolean.TRUE)))
 					.getContent();
 			mappingDto = systemMappingService.save(mappingDto);
 			connectorType.getEmbedded().put(DefaultConnectorType.MAPPING_DTO_KEY, mappingDto);
@@ -831,7 +1141,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 	protected SysSchemaObjectClassDto generateSchema(ConnectorTypeDto connectorType, SysSystemDto systemDto, IdmFormDefinitionDto connectorFormDef, String searchUserContainer, List<Serializable> values) {
 		boolean regenerateSchemaSwitch = Boolean.parseBoolean(connectorType.getMetadata().get(REGENERATE_SCHEMA_SWITCH));
 		String schemaId = connectorType.getMetadata().get(SCHEMA_ID_KEY);
-		
+
 		if (regenerateSchemaSwitch || schemaId == null) {
 			// First we have to find root DN (only DCs).
 			String root = getRoot(searchUserContainer);
@@ -1004,7 +1314,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 
 		return schemaAttributeService.save(attribute);
 	}
-	
+
 	/**
 	 * Generate schema.
 	 */
@@ -1044,7 +1354,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 		}
 		return root;
 	}
-	
+
 	/**
 	 * Find parent in DN. -> cut first level.
 	 */

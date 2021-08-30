@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public interface IcConnectorConfiguration extends Serializable {
 
+	public static String DISABLE_FILTER_VALIDATION_KEY = "disableFilterValidation";
+
 	/**
 	 * @return the configurationProperties
 	 */

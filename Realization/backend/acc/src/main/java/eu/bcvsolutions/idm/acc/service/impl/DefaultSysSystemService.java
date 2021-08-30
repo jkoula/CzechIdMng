@@ -1,32 +1,7 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.util.Asserts;
-import org.identityconnectors.framework.common.objects.OperationOptions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
 import com.google.common.collect.ImmutableMap;
-
+import eu.bcvsolutions.idm.acc.connector.DefaultConnectorType;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysConnectorKeyDto;
@@ -45,6 +20,8 @@ import eu.bcvsolutions.idm.acc.entity.SysRemoteServer_;
 import eu.bcvsolutions.idm.acc.entity.SysSystem;
 import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.repository.SysSystemRepository;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.FormPropertyManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
@@ -86,9 +63,31 @@ import eu.bcvsolutions.idm.ic.impl.IcConnectorConfigurationImpl;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorInstanceImpl;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorKeyImpl;
 import eu.bcvsolutions.idm.ic.impl.IcObjectPoolConfigurationImpl;
-import eu.bcvsolutions.idm.ic.impl.IcUidAttributeImpl;
 import eu.bcvsolutions.idm.ic.service.api.IcConfigurationFacade;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.util.Asserts;
+import org.identityconnectors.framework.common.objects.OperationOptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Default target system configuration service.
@@ -116,6 +115,11 @@ public class DefaultSysSystemService
 	private final SysSystemMappingService systemMappingService;
 	private final SysSystemAttributeMappingService systemAttributeMappingService;
 	private final SysSchemaObjectClassService schemaObjectClassService;
+	@Autowired
+	@Qualifier("default-connector-type")
+	private DefaultConnectorType defaultConnectorType;
+	@Autowired
+	private ConnectorManager connectorManager;
 
 	@Autowired
 	public DefaultSysSystemService(
@@ -325,18 +329,18 @@ public class DefaultSysSystemService
 	@Override
 	@Transactional
 	public IcConnectorObject readConnectorObject(UUID systemId, String uid, IcObjectClass objectClass) {
+		return readConnectorObject(systemId, uid, objectClass, defaultConnectorType);
+	}
+	
+	@Override
+	public IcConnectorObject readConnectorObject(UUID systemId, String uid, IcObjectClass objectClass, ConnectorType connectorTypeBySystem) {
 		Assert.notNull(systemId, "System ID cannot be null!");
 		Assert.notNull(uid, "Account UID cannot be null!");
-
+		Assert.notNull(connectorTypeBySystem, "Connector-type cannot be null!");
 		SysSystemDto system = this.get(systemId);
 		Assert.notNull(system, "System cannot be null!");
-
-		return connectorFacade.readObject(
-				getConnectorInstance(system),
-				getConnectorConfiguration(system),
-				objectClass, 
-				new IcUidAttributeImpl(null, uid, null)
-		);
+		
+		return connectorTypeBySystem.readConnectorObject(system, uid, objectClass);
 
 	}
 

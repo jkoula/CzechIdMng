@@ -125,5 +125,16 @@ public class IdentityRoleDeleteProcessor
 			((Set<UUID>) event.getProperties().get(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM))
 				.addAll(identityAccounts);
 		}
+		
+		if (!event.getProperties().containsKey(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING)) {
+			event.getProperties().put(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, new HashSet<UUID>());
+		}
+
+		Set<UUID> accounts = (Set<UUID>) subEvent.getProperties()
+				.get(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING);
+		if (accounts != null) {
+			((Set<UUID>) event.getProperties().get(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING))
+				.addAll(accounts);
+		}
 	}
 }

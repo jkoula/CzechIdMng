@@ -1,27 +1,8 @@
 package eu.bcvsolutions.idm.acc.event.processor.provisioning;
 
-import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.config.domain.ProvisioningConfiguration;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
@@ -42,6 +23,8 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningAttributeService;
@@ -52,6 +35,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
 import eu.bcvsolutions.idm.core.api.domain.IdmPasswordPolicyType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
@@ -69,13 +53,25 @@ import eu.bcvsolutions.idm.core.security.api.domain.ConfidentialString;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
-import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
-import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
-import eu.bcvsolutions.idm.ic.impl.IcUidAttributeImpl;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Prepare provisioning - resolve connector object properties from account and
@@ -108,6 +104,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	@Autowired private ConfidentialStorage confidentialStorage;
 	@Autowired private SysProvisioningAttributeService provisioningAttributeService;
 	@Autowired private UniformPasswordManager uniformPasswordManager;
+	@Autowired private ConnectorManager connectorManager;
 	
 	@Autowired
 	public PrepareConnectorObjectProcessor(
@@ -171,26 +168,19 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 			throw new ProvisioningException(AccResultCode.CONNECTOR_KEY_FOR_SYSTEM_NOT_FOUND,
 					ImmutableMap.of("system", system.getName()));
 		}
-		// load connector configuration
-		IcConnectorConfiguration connectorConfig = systemService.getConnectorConfiguration(system);
-		if (connectorConfig == null) {
-			throw new ProvisioningException(AccResultCode.CONNECTOR_CONFIGURATION_FOR_SYSTEM_NOT_FOUND,
-					ImmutableMap.of("system", system.getName()));
-		}
-		//
+		
 		try {
 			IcConnectorObject existsConnectorObject = null;
 			// We do not want search account on the target system, when this is the first
 			// call the connector and auto mapping is not allowed.
+			ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(system);
 			if (!isWish || provisioningConfiguration.isAllowedAutoMappingOnExistingAccount()) {
-				IcUidAttribute uidAttribute = new IcUidAttributeImpl(null, uid, null);
-				existsConnectorObject = connectorFacade.readObject(systemService.getConnectorInstance(system), connectorConfig,
-						objectClass, uidAttribute);
+				existsConnectorObject = connectorType.readConnectorObject(system, uid, objectClass);
 			}
 			if (existsConnectorObject == null) {
 				processCreate(provisioningOperation);
 			} else {
-				processUpdate(provisioningOperation, connectorConfig, existsConnectorObject);
+				processUpdate(provisioningOperation, existsConnectorObject, connectorType);
 				// prepare attributes on target system for FE view
 				ProvisioningContext context = provisioningOperation.getProvisioningContext();
 				IcConnectorObject systemAttrs = intersectAccountAndSystemAttrs(context.getAccountObject(), existsConnectorObject);
@@ -337,48 +327,40 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 					boolean existSetAttribute = fullAccountObject //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> { //
+							.anyMatch(provisioningAttributeKey -> { //
 								return provisioningAttributeKey.getSchemaAttributeName().equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.SET == provisioningAttributeKey.getStrategyType();
-							})
-							.findFirst() //
-							.isPresent();
+							});
 
 					boolean existIfResourceNulltAttribute = fullAccountObject  //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> { //
+							.anyMatch(provisioningAttributeKey -> { //
 								return provisioningAttributeKey.getSchemaAttributeName()
 										.equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.WRITE_IF_NULL == provisioningAttributeKey
 												.getStrategyType();
-							}) //
-							.findFirst() //
-							.isPresent();
+							});
 
 					boolean existMergeAttribute = fullAccountObject //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> { //
+							.anyMatch(provisioningAttributeKey -> { //
 								return provisioningAttributeKey.getSchemaAttributeName()
 										.equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.MERGE == provisioningAttributeKey
 												.getStrategyType();
-							}) //
-							.findFirst() //
-							.isPresent();
+							});
 
 					boolean existAuthMergeAttribute = fullAccountObject //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> {
+							.anyMatch(provisioningAttributeKey -> {
 								return provisioningAttributeKey.getSchemaAttributeName()
 										.equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.AUTHORITATIVE_MERGE == provisioningAttributeKey
 												.getStrategyType();
-							}) //
-							.findFirst() //
-							.isPresent();
+							});
 
 					if (AttributeMappingStrategyType.CREATE == provisioningAttribute.getStrategyType()) {
 
@@ -413,7 +395,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	}
 
 	private void processUpdate(SysProvisioningOperationDto provisioningOperation,
-			IcConnectorConfiguration connectorConfig, IcConnectorObject existsConnectorObject) {
+							   IcConnectorObject existsConnectorObject,
+							   ConnectorType connectorType) {
 		SysSystemDto system = systemService.get(provisioningOperation.getSystem());
 		String systemEntityUid = provisioningOperationService.getByProvisioningOperation(provisioningOperation)
 				.getUid();
@@ -438,7 +421,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				ProvisioningAttributeDto provisioningAttribute = entry.getKey();
 				//  Resolve update for given attribute
 				processUpdateByAttribute(provisioningAttribute, provisioningOperation, existsConnectorObject, system,
-						systemEntityUid, updateConnectorObject, fullAccountObject, schemaAttributes);
+						systemEntityUid, updateConnectorObject, fullAccountObject, schemaAttributes, connectorType);
 			}
 		}
 		//
@@ -448,7 +431,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 
 	/**
 	 * Resolve update for given attribute
-	 * 
+	 *
 	 * @param provisioningAttribute
 	 * @param provisioningOperation
 	 * @param existsConnectorObject
@@ -459,9 +442,14 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	 * @param schemaAttributes
 	 */
 	private void processUpdateByAttribute(ProvisioningAttributeDto provisioningAttribute,
-			SysProvisioningOperationDto provisioningOperation, IcConnectorObject existsConnectorObject,
-			SysSystemDto system, String systemEntityUid, IcConnectorObject updateConnectorObject,
-			Map<ProvisioningAttributeDto, Object> fullAccountObject, List<SysSchemaAttributeDto> schemaAttributes) {
+										  SysProvisioningOperationDto provisioningOperation,
+										  IcConnectorObject existsConnectorObject,
+										  SysSystemDto system,
+										  String systemEntityUid,
+										  IcConnectorObject updateConnectorObject,
+										  Map<ProvisioningAttributeDto, Object> fullAccountObject,
+										  List<SysSchemaAttributeDto> schemaAttributes,
+										  ConnectorType connectorType) {
 		Optional<SysSchemaAttributeDto> schemaAttributeOptional = schemaAttributes //
 				.stream() //
 				.filter(schemaAttribute -> { //
@@ -477,13 +465,6 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 		SysSchemaAttributeDto schemaAttribute = schemaAttributeOptional.get();
 		if (schemaAttribute.isUpdateable()) {
 			Object idmValue = fullAccountObject.get(provisioningAttribute);
-			IcAttribute attribute = existsConnectorObject.getAttributeByName(schemaAttribute.getName());
-			Object connectorValue = attribute != null
-					? (attribute.isMultiValue() ? attribute.getValues() : attribute.getValue())
-					: null;
-			if (connectorValue != null && !(connectorValue instanceof List)) {
-				connectorValue = Lists.newArrayList(connectorValue);
-			}
 
 			if (AttributeMappingStrategyType.CREATE == provisioningAttribute.getStrategyType()) {
 				return;
@@ -500,38 +481,32 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 					boolean existSetAttribute = fullAccountObject //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> { //
+							.anyMatch(provisioningAttributeKey -> { //
 								return provisioningAttributeKey.getSchemaAttributeName()
 										.equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.SET == provisioningAttributeKey
-												.getStrategyType();
-							}) //
-							.findFirst() //
-							.isPresent();
+										.getStrategyType();
+							});
 
 					boolean existMergeAttribute = fullAccountObject //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> { //
+							.anyMatch(provisioningAttributeKey -> { //
 								return provisioningAttributeKey.getSchemaAttributeName()
 										.equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.MERGE == provisioningAttributeKey
-												.getStrategyType();
-							}) //
-							.findFirst() //
-							.isPresent();
+										.getStrategyType();
+							});
 
 					boolean existAuthMergeAttribute = fullAccountObject //
 							.keySet() //
 							.stream() //
-							.filter(provisioningAttributeKey -> { //
+							.anyMatch(provisioningAttributeKey -> { //
 								return provisioningAttributeKey.getSchemaAttributeName()
 										.equals(schemaAttribute.getName())
 										&& AttributeMappingStrategyType.AUTHORITATIVE_MERGE == provisioningAttributeKey
-												.getStrategyType();
-							}) //
-							.findFirst() //
-							.isPresent();
+										.getStrategyType();
+							});
 
 					if (AttributeMappingStrategyType.WRITE_IF_NULL == provisioningAttribute.getStrategyType()) {
 						List<IcAttribute> icAttributes = existsConnectorObject.getAttributes();
@@ -557,7 +532,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				}
 				Object resultValue = idmValue;
 				if (AttributeMappingStrategyType.MERGE == provisioningAttribute.getStrategyType()) {
-					resultValue = resolveMergeValues(provisioningAttribute, idmValue, connectorValue,
+					List<Object> allConnectorValues = this.getAllConnectorValues(provisioningAttribute, existsConnectorObject);
+					resultValue = resolveMergeValues(provisioningAttribute, idmValue, allConnectorValues,
 							provisioningOperation);
 				}
 
@@ -565,9 +541,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				// attribute and mapped value in entity
 				IcAttribute updatedAttribute = updateAttribute(systemEntityUid, resultValue, schemaAttribute,
 						existsConnectorObject, system, provisioningAttribute);
-				if (updatedAttribute != null) {
-					updateConnectorObject.getAttributes().add(updatedAttribute);
-				}
+				// Add updated attribute to updateConnectorObject.
+				connectorType.addUpdatedAttribute(schemaAttribute, updatedAttribute, updateConnectorObject, existsConnectorObject);
 			} else {
 				// create attribute without target system read - password etc.
 				// filled values only
@@ -582,14 +557,31 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 		}
 	}
 
+	private List<Object> getAllConnectorValues(ProvisioningAttributeDto provisioningAttribute,
+											   IcConnectorObject existsConnectorObject) {
+
+		if (existsConnectorObject == null) {
+			return Lists.newArrayList();
+		}
+		IcAttribute attribute = existsConnectorObject.getAttributeByName(provisioningAttribute.getSchemaAttributeName());
+		Object connectorValue = attribute != null
+				? (attribute.isMultiValue() ? attribute.getValues() : attribute.getValue())
+				: null;
+		if (connectorValue != null && !(connectorValue instanceof List)) {
+			connectorValue = Lists.newArrayList(connectorValue);
+		}
+
+		List<Object> connectorValues = Lists.newArrayList();
+
+		if (connectorValue != null) {
+			connectorValues.addAll((List<?>) connectorValue);
+		}
+		return connectorValues;
+	}
+
 	/**
 	 * Returns merged values for given attribute
-	 * 
-	 * @param provisioningAttribute
-	 * @param idmValue
-	 * @param connectorValue
-	 * @param provisioningOperation
-	 * @return
+	 *
 	 */
 	@SuppressWarnings("unchecked")
 	private Object resolveMergeValues(ProvisioningAttributeDto provisioningAttribute, Object idmValue,
@@ -608,7 +600,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				connectorValues.add(connectorValue);
 			}
 		}
-		if(idmValues instanceof List) {
+		if(idmValue instanceof List) {
 			idmValues.addAll((List<?>) idmValue);
 		}else {
 			if(idmValue != null) {
@@ -826,7 +818,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 			if (dto instanceof AbstractDto) {
 				abstractDto = (AbstractDto) dto;
 			} else {
-				LOG.warn("Dto with id [{}] hasn't type [{}]. Current type: [{}]. Into script will be send null as entity.", entityIdentifier, AbstractDto.class.getName(), dto.getClass());
+				LOG.warn("Dto with id [{}] hasn't type [{}]. Current type: [{}]. Into script will be send null as entity.", entityIdentifier, AbstractDto.class.getName(), dto == null ? null : dto.getClass());
 			}
 		} else {
 			LOG.warn("Entity identifier for uid [{}] is null. Provisioning is probably called directly. Into password transfomartion will not be sent entity.", uid);

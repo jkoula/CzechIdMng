@@ -1,17 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
-import eu.bcvsolutions.idm.ic.api.IcObjectClass;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
 import com.google.common.collect.ImmutableMap;
-
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperation;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -27,15 +16,27 @@ import eu.bcvsolutions.idm.acc.entity.SysSystemEntity;
 import eu.bcvsolutions.idm.acc.entity.SysSystemEntity_;
 import eu.bcvsolutions.idm.acc.repository.SysSystemEntityRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
+import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBatchService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
+import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
+import eu.bcvsolutions.idm.ic.api.IcObjectClass;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Entities on target system.
@@ -56,6 +57,8 @@ public class DefaultSysSystemEntityService
 	@Autowired @Lazy private SysSchemaObjectClassService schemaService;
 	@Autowired private SysProvisioningBatchService batchService;
 	@Autowired private SysSystemService systemService;
+	@Autowired private LookupService lookupService;
+	@Autowired private ConnectorManager connectorManager;
 
 	@Autowired
 	public DefaultSysSystemEntityService(SysSystemEntityRepository systemEntityRepository) {
@@ -132,9 +135,16 @@ public class DefaultSysSystemEntityService
 	public IcConnectorObject getConnectorObject(SysSystemEntityDto systemEntity, BasePermission... permissions) {
 		Assert.notNull(systemEntity, "System entity cannot be null!");
 		this.checkAccess(systemEntity, permissions);
+		// Find connector-type.
+		SysSystemDto systemDto = lookupService.lookupEmbeddedDto(systemEntity, SysSystemEntity_.system);
+		ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(systemDto);
 		// Find first mapping for entity type and system, from the account and return his object class.
 		IcObjectClass icObjectClass = schemaService.findByAccount(systemEntity.getSystem(), systemEntity.getEntityType());
-		
-		return this.systemService.readConnectorObject(systemEntity.getSystem(), systemEntity.getUid(), icObjectClass);
+
+		return this.systemService
+				.readConnectorObject(systemEntity.getSystem(),
+						systemEntity.getUid(),
+						icObjectClass,
+						connectorType);
 	}
 }

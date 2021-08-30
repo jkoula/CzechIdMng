@@ -561,6 +561,15 @@ module.exports = {
       manager: require('./src/redux').FormProjectionManager
     },
     {
+      id: 'role-system-select-box',
+      type: 'entity-select-box',
+      priority: 0,
+      localizationKey: 'entity.RoleSystem',
+      entityType: ['roleSystem'],
+      searchInFields: ['system.name'],
+      manager: require('./src/redux').RoleSystemManager
+    },
+    {
       id: 'basic-password-change',
       type: 'password-change-component',
       component: require('./src/components/advanced/PasswordChangeComponent/PasswordChangeComponent'),

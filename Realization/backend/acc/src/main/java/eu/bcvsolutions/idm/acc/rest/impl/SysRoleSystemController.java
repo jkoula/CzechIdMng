@@ -121,7 +121,16 @@ public class SysRoleSystemController extends AbstractReadWriteDtoController<SysR
 			@PathVariable @NotNull String backendId) {
 		return super.get(backendId);
 	}
-	
+
+	@Override
+	protected SysRoleSystemFilter getContext(MultiValueMap<String, Object> parameters) {
+		SysRoleSystemFilter context = super.getContext(parameters);
+		if (context != null) {
+			context.setCheckIfIsInCrossDomainGroup(Boolean.TRUE);
+		}
+		return context;
+	}
+
 	@Override
 	@ResponseBody
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.ROLE_UPDATE + "')")

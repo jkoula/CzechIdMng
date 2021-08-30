@@ -1,5 +1,8 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleSystemDto;
+import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -84,6 +87,7 @@ public class DefaultIdmIdentityRoleService
 	@Autowired private LookupService lookupService;
 	@Autowired private IdmAutomaticRoleRepository automaticRoleRepository;
 	@Autowired private IdmRoleService roleService;
+	@Autowired private IdmRoleSystemService roleSystemService;
 	@Autowired private FilterManager filterManager;
 
 	@Autowired
@@ -150,7 +154,7 @@ public class DefaultIdmIdentityRoleService
 		if (dto == null) {
 			return null;
 		}
-		//
+		
 		IdmAutomaticRole automaticRole = entity.getAutomaticRole();
 		if (automaticRole != null) {
 			dto.setAutomaticRole(automaticRole.getId());
@@ -164,7 +168,18 @@ public class DefaultIdmIdentityRoleService
 			embedded.put(IdmIdentityRole_.automaticRole.getName(), baseDto);
 			dto.setEmbedded(embedded);
 		}
-		//
+
+		UUID roleSystemId = entity.getRoleSystem();
+		if (roleSystemId != null) {
+			Map<String, BaseDto> embedded = dto.getEmbedded();
+			if (roleSystemService instanceof AbstractReadDtoService) {
+				@SuppressWarnings("rawtypes")
+				BaseDto baseDto = ((AbstractReadDtoService) roleSystemService).get(roleSystemId);
+				embedded.put(IdmIdentityRole_.roleSystem.getName(), baseDto);
+				dto.setEmbedded(embedded);
+			}
+		}
+		
 		return dto;
 	}
 	
@@ -321,7 +336,11 @@ public class DefaultIdmIdentityRoleService
 				predicates.add(builder.isNotNull(root.get(IdmIdentityRole_.directRole)));
 			}
 		}
-		//
+		// Role-system
+		UUID roleSystemId = filter.getRoleSystemId();
+		if (roleSystemId != null) {
+			predicates.add(builder.equal(root.get(IdmIdentityRole_.roleSystem), roleSystemId));
+		}
 		return predicates;
 	}
 	
@@ -399,6 +418,16 @@ public class DefaultIdmIdentityRoleService
 			// Contract isn't same
 			return null;
 		}
+
+		// Role-system isn't same.
+		if (one.getRoleSystem() == null) {
+			if (two.getRoleSystem() != null) {
+				return null;
+			}
+		} else if (!one.getRoleSystem().equals(two.getRoleSystem())) {
+			return null;
+		}
+		
 		
 		IdmIdentityRoleDto manually = null;
 		IdmIdentityRoleDto automatic = null;
@@ -473,6 +502,17 @@ public class DefaultIdmIdentityRoleService
 	}
 
 	/**
+	 * Check if given {@link IdmIdentityRoleDto} is automatic or business role.
+	 *
+	 * @param identityRole
+	 * @return
+	 */
+	@Override
+	public boolean isRoleAutomaticOrComposition(IdmIdentityRoleDto identityRole) {
+		return identityRole.getAutomaticRole() != null || identityRole.getDirectRole() != null;
+	}
+
+	/**
 	 * Method decides identity role that will be removed if both roles are same.
 	 * In default behavior is for removing choosen the newer. Method is protected for easy
 	 * overriding.
@@ -544,16 +584,6 @@ public class DefaultIdmIdentityRoleService
 		}
 
 		return validTillContract;
-	}
-
-	/**
-	 * Check if given {@link IdmIdentityRoleDto} is automatic or business role.
-	 *
-	 * @param identityRole
-	 * @return
-	 */
-	private boolean isRoleAutomaticOrComposition(IdmIdentityRoleDto identityRole) {
-		return identityRole.getAutomaticRole() != null || identityRole.getDirectRole() != null;
 	}
 	
 	/**

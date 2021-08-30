@@ -5,8 +5,10 @@ import java.io.ObjectInputStream.GetField;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
+import org.hibernate.envers.Audited;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.util.Assert;
 
@@ -54,6 +56,8 @@ public class IdmIdentityRoleDto extends FormableDto implements ValidableEntity, 
     private UUID directRole; // direct identity role
     @Embedded(dtoClass = IdmRoleCompositionDto.class)
     private UUID roleComposition; // direct role
+	// Relation on sys-system form ACC. We need to working with that also in the core module (cross-domains).
+	private UUID roleSystem;
 
     public IdmIdentityRoleDto() {
     }
@@ -143,6 +147,14 @@ public class IdmIdentityRoleDto extends FormableDto implements ValidableEntity, 
 	public void setContractPosition(UUID contractPosition) {
 		this.contractPosition = contractPosition;
 	}
+
+	public UUID getRoleSystem() {
+		return roleSystem;
+	}
+
+	public void setRoleSystem(UUID roleSystem) {
+		this.roleSystem = roleSystem;
+	}
 	
 	
 	/**
@@ -164,5 +176,6 @@ public class IdmIdentityRoleDto extends FormableDto implements ValidableEntity, 
 	    roleTreeNode = (UUID) readFields.get("roleTreeNode", null);
 	    directRole = (UUID) readFields.get("directRole", null);
 	    roleComposition = (UUID) readFields.get("roleComposition", null);
+		roleSystem = (UUID) readFields.get("roleSystem", null);
     }
 }

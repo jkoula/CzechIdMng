@@ -32,7 +32,8 @@ class RoleSystemDetail extends Advanced.AbstractTableContent {
       systemId: this._isSystemMenu() ? props.match.params.entityId : null, // dependant select box
       roleSystem: {
         role: this._isSystemMenu() ? null : props.match.params.entityId,
-        system: this._isSystemMenu() ? props.match.params.entityId : null
+        system: this._isSystemMenu() ? props.match.params.entityId : null,
+        createAccountByDefault: true
       }
     };
   }
@@ -200,6 +201,7 @@ class RoleSystemDetail extends Advanced.AbstractTableContent {
       .setFilter('roleSystemId', _roleSystem && _roleSystem.id ? _roleSystem.id : Domain.SearchParameters.BLANK_UUID);
     const isNew = this._getIsNew();
     const roleSystem = isNew ? this.state.roleSystem : _roleSystem;
+    const isInCrossDomainGroup = roleSystem ? !!roleSystem.inCrossDomainGroup : false;
     const forceSearchMappings = new Domain.SearchParameters()
       .setFilter('operationType', SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
       .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
@@ -248,11 +250,24 @@ class RoleSystemDetail extends Advanced.AbstractTableContent {
                 placeholder={ systemId ? null : this.i18n('systemMapping.systemPlaceholder') }
                 readOnly={!isNew || !systemId}
                 required />
-              <Basic.Checkbox
+              <Basic.ToggleSwitch
                 ref="forwardAccountManagemen"
                 label={this.i18n('acc:entity.RoleSystem.forwardAccountManagemen.label')}
                 helpBlock={this.i18n('acc:entity.RoleSystem.forwardAccountManagemen.help')}/>
+              <Basic.ToggleSwitch
+                ref="createAccountByDefault"
+                readOnly={isInCrossDomainGroup}
+                label={this.i18n('acc:entity.RoleSystem.createAccountByDefault.label')}
+                helpBlock={this.i18n('acc:entity.RoleSystem.createAccountByDefault.help')}/>
             </Basic.AbstractForm>
+            <Basic.Alert
+              rendered={isInCrossDomainGroup}
+              text={this.i18n('acc:entity.RoleSystem.isInCrossDomainGroupAlert.text')}
+              icon="fa:layer-group"
+              style={{maxWidth: 600}}
+              showHtmlText
+              level="warning"
+            />
             <Basic.PanelFooter>
               <Basic.Button
                 type="button"

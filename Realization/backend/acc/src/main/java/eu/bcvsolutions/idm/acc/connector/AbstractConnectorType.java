@@ -2,13 +2,16 @@ package eu.bcvsolutions.idm.acc.connector;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemGroupSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaObjectClassFilter;
@@ -16,6 +19,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.event.SystemMappingEvent;
+import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
@@ -32,6 +36,13 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import eu.bcvsolutions.idm.ic.api.IcAttribute;
+import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
+import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
+import eu.bcvsolutions.idm.ic.api.IcObjectClass;
+import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
+import eu.bcvsolutions.idm.ic.impl.IcUidAttributeImpl;
+import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -75,6 +86,8 @@ public abstract class AbstractConnectorType implements
 	private SysSyncConfigService syncConfigService;
 	@Autowired
 	private IdmTreeTypeService treeTypeService;
+	@Autowired
+	private IcConnectorFacade connectorFacade;
 
 	@Override
 	public void setBeanName(String name) {
@@ -146,6 +159,68 @@ public abstract class AbstractConnectorType implements
 		connectorType.getEmbedded().put(SYNC_DTO_KEY, syncDto);
 
 		return connectorType;
+	}
+
+	@Override
+	public List<Object> getConnectorValuesByAttribute(String uid,
+													  IcObjectClass objectClass,
+													  String schemaAttributeName,
+													  SysSystemDto system,
+													  IcConnectorObject connectorObject,
+													  SysSystemGroupSystemDto systemGroupSystem) {
+
+		if (connectorObject == null) {
+			Assert.notNull(uid, "UID cannot be null!");
+			IcUidAttribute uidAttribute = new IcUidAttributeImpl(null, uid, null);
+			connectorObject = connectorFacade.readObject(systemService.getConnectorInstance(system), systemService.getConnectorConfiguration(system),
+					objectClass, uidAttribute);
+
+		}
+		if (connectorObject == null) {
+			return Lists.newArrayList();
+		}
+		IcAttribute attribute = connectorObject.getAttributeByName(schemaAttributeName);
+		Object connectorValue = attribute != null
+				? (attribute.isMultiValue() ? attribute.getValues() : attribute.getValue())
+				: null;
+		if (connectorValue != null && !(connectorValue instanceof List)) {
+			connectorValue = Lists.newArrayList(connectorValue);
+		}
+
+		List<Object> connectorValues = Lists.newArrayList();
+
+		if (connectorValue != null) {
+			connectorValues.addAll((List<?>) connectorValue);
+		}
+		return connectorValues;
+	}
+
+	@Override
+	public void addUpdatedAttribute(SysSchemaAttributeDto schemaAttribute, IcAttribute updatedAttribute, IcConnectorObject updateConnectorObject, IcConnectorObject existsConnectorObject) {
+		if (updatedAttribute != null) {
+			updateConnectorObject.getAttributes().add(updatedAttribute);
+		}
+	}
+
+	@Override
+	public IcConnectorConfiguration getConnectorConfiguration(SysSystemDto system) {
+		Assert.notNull(system, "System cannot be null!");
+		IcConnectorConfiguration connectorConfig = systemService.getConnectorConfiguration(systemService.get(system));
+		if (connectorConfig == null) {
+			throw new ProvisioningException(AccResultCode.CONNECTOR_CONFIGURATION_FOR_SYSTEM_NOT_FOUND,
+					ImmutableMap.of("system", system.getName()));
+		}
+		return connectorConfig;
+	}
+
+	@Override
+	public IcConnectorObject readConnectorObject(SysSystemDto system, String uid, IcObjectClass objectClass) {
+		return connectorFacade.readObject(
+				systemService.getConnectorInstance(system),
+				systemService.getConnectorConfiguration(system),
+				objectClass,
+				new IcUidAttributeImpl(null, uid, null)
+		);
 	}
 
 	/**

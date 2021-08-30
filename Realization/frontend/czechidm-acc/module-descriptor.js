@@ -193,6 +193,35 @@ module.exports = {
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['UNIFORMPASSWORD_READ'] } ]
               }
             ]
+          },
+          {
+            id: 'system-groups',
+            labelKey: 'acc:content.systemGroup.label',
+            titleKey: 'acc:content.systemGroup.title',
+            order: 20,
+            priority: 0,
+            path: '/system-groups',
+            icon: 'fa:layer-group',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ],
+            items: [
+              {
+                id: 'system-groups-detail',
+                type: 'TAB',
+                labelKey: 'acc:content.systemGroup.basic',
+                order: 10,
+                path: '/system-groups/:entityId/detail',
+                icon: 'fa:layer-group',
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
+              },
+              {
+                id: 'system-group-systems',
+                type: 'TAB',
+                labelKey: 'acc:content.systemGroupSystem.detail',
+                order: 20,
+                path: '/system-groups/:entityId/systems',
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
+              }
+            ]
           }
         ]
       },

@@ -461,6 +461,7 @@ public class IdentityAccountManagementTest extends AbstractIntegrationTest {
 		Assert.assertEquals("Idenitity accounts have to exists (three items) after account management was started!", 3,
 				identityAccountService.find(iaccFilter, null).getContent().size());
 
+		// Overridden attributes from previous tests are not use, because UID is overridden too!
 		TestResource createdAccount = helper.findResource("y" + IDENTITY_USERNAME);
 		Assert.assertNotNull("Idenitity have to exists on target system (after account management)", createdAccount);
 		Assert.assertEquals("First name on target system must be equals with first name on identity",

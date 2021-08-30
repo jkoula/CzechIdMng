@@ -47,6 +47,7 @@ public class IdmConceptRoleRequestDto extends FormableDto implements Loggable {
     private String wfProcessId;
     private String log;
     private boolean valid = true; // Is concept valid?
+	private UUID roleSystem; 	// Relation on sys-system form ACC. We need to working with that also in the core module (cross-domains). 
     /*
      *  Is concept duplicate and with identity role or another concept,
      *  if boolean is null. Duplicated wasn't processed. Duplicates can be
@@ -276,6 +277,14 @@ public class IdmConceptRoleRequestDto extends FormableDto implements Loggable {
 		this.roleComposition = roleComposition;
 	}
 
+	public UUID getRoleSystem() {
+		return roleSystem;
+	}
+
+	public void setRoleSystem(UUID roleSystem) {
+		this.roleSystem = roleSystem;
+	}
+
 	@Override
     public int hashCode() {
         final int prime = 31;
@@ -348,6 +357,13 @@ public class IdmConceptRoleRequestDto extends FormableDto implements Loggable {
         } else if (!wfProcessId.equals(other.wfProcessId)) {
             return false;
         }
+		if (roleSystem == null) {
+			if (other.roleSystem != null) {
+				return false;
+			}
+		} else if (!roleSystem.equals(other.roleSystem)) {
+			return false;
+		}
         return true;
     }
     
@@ -376,5 +392,6 @@ public class IdmConceptRoleRequestDto extends FormableDto implements Loggable {
 	    valid = readFields.get("valid", false);
 	    duplicate = (Boolean) readFields.get("duplicate", null);
 	    systemState = (OperationResultDto) readFields.get("systemState", null);
+		roleSystem = (UUID) readFields.get("roleSystem", null);
     }
  }

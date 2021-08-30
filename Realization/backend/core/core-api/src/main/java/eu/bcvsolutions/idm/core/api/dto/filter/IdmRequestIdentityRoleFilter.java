@@ -15,6 +15,7 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
     private boolean includeEav = false;
     private boolean onlyChanges = false;
     private boolean includeCandidates = false;
+    private boolean includeCrossDomainsSystemsCount = false;
     
     public IdmRequestIdentityRoleFilter() {
 		super();
@@ -54,5 +55,13 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
 
 	public void setIncludeCandidates(boolean includeCandidates) {
 		this.includeCandidates = includeCandidates;
+	}
+
+	public boolean isIncludeCrossDomainsSystemsCount() {
+		return includeCrossDomainsSystemsCount;
+	}
+
+	public void setIncludeCrossDomainsSystemsCount(boolean includeCrossDomainsSystemsCount) {
+		this.includeCrossDomainsSystemsCount = includeCrossDomainsSystemsCount;
 	}
 }

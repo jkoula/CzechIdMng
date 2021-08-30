@@ -1,12 +1,17 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
-import java.util.Map;
-
-import org.springframework.core.Ordered;
-
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemGroupSystemDto;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
+import eu.bcvsolutions.idm.ic.api.IcAttribute;
+import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
+import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
+import eu.bcvsolutions.idm.ic.api.IcObjectClass;
+import java.util.List;
+import java.util.Map;
+import org.springframework.core.Ordered;
 
 /**
  * Connector type extends standard IC connector for more metadata (image, wizard, ...).
@@ -111,4 +116,30 @@ public interface ConnectorType extends Ordered {
 	 * Returns true if this connector type should be use for open given system.
 	 */
 	boolean supportsSystem(SysSystemDto systemDto);
+
+	/**
+	 * Returns values for given attribute and connector object by default.
+	 * Can be used for more sophisticated searching with using system-group (see Cross-domains in AD connector type).
+	 */
+	List<Object> getConnectorValuesByAttribute(String uid,
+											   IcObjectClass objectClass,
+											   String schemaAttributeName,
+											   SysSystemDto system,
+											   IcConnectorObject existsConnectorObject,
+											   SysSystemGroupSystemDto systemGroupSystem);
+
+	/**
+	 * Add given attribute with updated value to the update connector object.
+	 */
+	void addUpdatedAttribute(SysSchemaAttributeDto schemaAttribute, IcAttribute updatedAttribute, IcConnectorObject updateConnectorObject, IcConnectorObject existsConnectorObject);
+
+	/**
+	 * Get connector configuration for given system.
+	 */
+	IcConnectorConfiguration getConnectorConfiguration(SysSystemDto system);
+
+	/**
+	 * Get connector object from a connector.
+	 */
+	IcConnectorObject readConnectorObject(SysSystemDto system, String uid, IcObjectClass objectClass);
 }

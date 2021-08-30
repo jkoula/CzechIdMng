@@ -304,7 +304,7 @@ class IdentityRoles extends Basic.AbstractContent {
 
   render() {
     const { entityId } = this.props.match.params;
-    const { _showLoadingContracts, _contracts, _permissions, _requestUi, columns, embedded } = this.props;
+    const { _showLoadingContracts, _contracts, _permissions, _requestUi, embedded, _columns } = this.props;
     const { activeKey } = this.state;
     //
     let force = new SearchParameters();
@@ -357,7 +357,7 @@ class IdentityRoles extends Basic.AbstractContent {
               showAddButton={ false }
               showRefreshButton={ false }
               match={ this.props.match }
-              columns={ _.difference(columns || IdentityRoleTable.defaultProps.columns, ['directRole']) }
+              columns={ _.difference(_columns || IdentityRoleTable.defaultProps.columns, ['directRole']) }
               _permissions={ _permissions }
               fetchIncompatibleRoles={ false }
               fetchCodeLists={ false }/>
@@ -378,7 +378,7 @@ class IdentityRoles extends Basic.AbstractContent {
               showAddButton={ false }
               showRefreshButton={ false }
               match={ this.props.match }
-              columns={ _.difference(columns || IdentityRoleTable.defaultProps.columns, ['automaticRole']) }
+              columns={ _.difference(_columns || IdentityRoleTable.defaultProps.columns, ['automaticRole']) }
               fetchIncompatibleRoles={ false }
               fetchCodeLists={ false }/>
           </Basic.Tab>
@@ -521,7 +521,12 @@ function select(state, component) {
     _permissions: identityManager.getPermissions(state, null, entityId),
     _searchParameters: Utils.Ui.getSearchParameters(state, `${uiKey}-${entityId}`),
     _requestUi: requestUi,
-    _longPollingEnabled: longPollingEnabled
+    _longPollingEnabled: longPollingEnabled,
+    _columns: component.columns || ConfigurationManager.getPublicValueAsArray(
+      state,
+      'idm.pub.app.show.identityRole.table.columns',
+      IdentityRoleTable.defaultProps.columns
+    )
   };
 }
 

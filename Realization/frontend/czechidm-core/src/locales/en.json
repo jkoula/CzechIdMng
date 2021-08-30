@@ -4745,6 +4745,10 @@
         "label": "Other positon",
         "title": "Other contracted positon"
       },
+      "roleSystem": {
+        "label": "System with an account",
+        "help": "Select the system with the account to which you want to assign this role. If you do not select any system, then the role will be assigned to all systems for this role. If the account does not exist on the system yet, then this role will not create it!"
+      },
       "automaticRole": {
         "label": "Automatic role",
         "title": "Automatic role",
@@ -4761,6 +4765,10 @@
         "label": "Requested role is duplicate",
         "header": "Requested role is duplicate with role:"
       }
+    },
+    "RoleSystem": {
+      "label": "System",
+      "help": "Select a system on which you want to create an account."
     },
     "ExportImport": {
       "_type": "Export/Import batches",

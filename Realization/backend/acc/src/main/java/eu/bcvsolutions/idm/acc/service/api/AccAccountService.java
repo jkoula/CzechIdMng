@@ -66,7 +66,8 @@ public interface AccAccountService extends//
 	Page<AccAccountDto> findExpired(ZonedDateTime expirationDate, Pageable pageable);
 
 	/**
-	 * Load object from the connector
+	 * Load object from the connector.
+	 * Loading additional values (for example values from other systems in cross-domain groups.).
 	 * 
 	 * @param account
 	 * @param permissions

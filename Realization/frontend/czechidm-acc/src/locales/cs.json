@@ -885,37 +885,68 @@
           }
         }
       },
-      "uniformPassword": {
-        "header": "Systém jednotného hesla",
-        "label": "Jednotné heslo",
-        "title": "Systém jednotného hesla",
-        "create": {
-          "header": "Nová definice jednotného hesla"
-        },
-        "edit": {
-          "header": "Editace definice jednotného hesla"
-        },
-        "basic": "Základní informace",
-        "system": "Navázané systémy",
-        "filter": {
-          "text": "Název jednotného hesla"
-        },
-        "save": {
-          "success": "Definice jednotného hesla byla úspěšně uložena"
-        }
+    "uniformPassword": {
+      "header": "Systém jednotného hesla",
+      "label": "Jednotné heslo",
+      "title": "Systém jednotného hesla",
+      "create": {
+        "header": "Nová definice jednotného hesla"
       },
-      "uniformPasswordSystem": {
-        "detail": "Navázané systémy",
-        "save": {
-          "success": "Navázaný systém byl úspěšně uložen."
-        },
-        "create": {
-          "header": "Nová vazba na systém"
-        },
-        "edit": {
-          "header": "Editace vazby na systém"
-        }
+      "edit": {
+        "header": "Editace definice jednotného hesla"
+      },
+      "basic": "Základní informace",
+      "system": "Navázané systémy",
+      "filter": {
+        "text": "Název jednotného hesla"
+      },
+      "save": {
+        "success": "Definice jednotného hesla byla úspěšně uložena"
       }
+    },
+    "uniformPasswordSystem": {
+      "detail": "Navázané systémy",
+      "save": {
+        "success": "Navázaný systém byl úspěšně uložen."
+      },
+      "create": {
+        "header": "Nová vazba na systém"
+      },
+      "edit": {
+        "header": "Editace vazby na systém"
+      }
+    },
+    "systemGroup": {
+      "header": "Skupiny systémů",
+      "label": "Skupiny systémů",
+      "title": "Skupiny systémů",
+      "create": {
+        "header": "Nová definice skupiny systémů"
+      },
+      "edit": {
+        "header": "Editace definice skupiny systémů"
+      },
+      "basic": "Základní informace",
+      "system": "Navázané systémy",
+      "filter": {
+        "text": "Název skupiny"
+      },
+      "save": {
+        "success": "Definice skupiny systémů byla úspěšně uložena"
+      }
+    },
+    "systemGroupSystem": {
+      "detail": "Navázané systémy",
+      "save": {
+        "success": "Navázaný systém byl úspěšně uložen."
+      },
+      "create": {
+        "header": "Nová vazba na systém"
+      },
+      "edit": {
+        "header": "Editace vazby na systém"
+      }
+    }
   },
   "entity": {
     "System": {
@@ -1048,6 +1079,13 @@
       "forwardAccountManagemen": {
         "label": "Dopředná správa účtů",
         "help": "Pokud je zaškrtnuto, pak bude účet na tomto systému vytvořen i v případě, že přiřazení této role uživateli bude platné až v budoucnu."
+      },
+      "createAccountByDefault": {
+        "label": "Automaticky vytvářet účty",
+        "help": "Přiřazením této role bude automaticky vytvořen účet na systému. Pokud tato volba není vybrána, pak se účet vytvoří pouze pokud bude přiřazena i jiná role přiřazující tento systém a vytvářející účet automaticky (tzv. login role)."
+      },
+      "isInCrossDomainGroupAlert": {
+        "text": "Toto napojení je součástí <b>Cross-domain skupiny</b>. Správa účtů bude řízena <b>dle pravidel rolí v Cross-domain</b> skupinách. Nastavení automatického vytváření účtů bude ignorováno."
       }
     },
     "SystemEntity": {
@@ -1537,6 +1575,23 @@
     "UniformPasswordSystem": {
       "system": "Systém",
       "uniformPassword": "Password filtr"
+    },
+    "SystemGroup": {
+      "code": "Kód",
+      "description": "Popis",
+      "disabled": {
+        "label": "Neaktivní",
+        "helpBlock": ""
+      },
+      "type": {
+        "label": "Typ skupiny",
+        "helpBlock": ""
+      }
+    },
+    "SystemGroupSystem": {
+      "system": "Systém",
+      "systemGroup": "Skupina",
+      "mergeAttribute": "Atribut kontrolující skupiny"
     }
   },
   "enums" : {
@@ -1553,6 +1608,9 @@
       "PROVISIONING": "Provisioning",
       "RECONCILIACE": "Rekonciliace",
       "SYNCHRONIZATION": "Synchronizace"
+    },
+    "SystemGroupTypeEnum": {
+      "CROSS_DOMAIN": "Cross domain"
     },
     "AccountTypeEnum": {
       "PERSONAL": "Osobní",
@@ -1742,7 +1800,8 @@
       "PROVISIONINGOPERATION": "Provisioning - operace ve frontě",
       "PROVISIONINGARCHIVE": "Provisioning - archív",
       "SYSTEMATTRIBUTEMAPPING": "Mapované atributy systému",
-      "UNIFORMPASSWORD": "Systém jednotného hesla"
+      "UNIFORMPASSWORD": "Systém jednotného hesla",
+      "SYSTEMGROUP": "Skupiny systémů"
     }
   },
   "eav": {
@@ -2458,6 +2517,16 @@
         "help": "Smaže vybrané systémy. <strong>Systém nesmí obsahovat žádné účty ani nevyřešené provisioning operace</strong>.",
         "icon": "$t(action.delete.icon)"
       },
+      "sys-system-group-delete-bulk-action": {
+        "label": "$t(action.delete.action) skupiny systémů",
+        "help": "Smaže vybrané skupiny systémů.",
+        "icon": "$t(action.delete.icon)"
+      },
+      "sys-system-group-system-delete-bulk-action": {
+        "label": "$t(action.delete.action) systémy ve skupině",
+        "help": "Smaže vybrané systémy ve skupině.",
+        "icon": "$t(action.delete.icon)"
+      },
       "acc-remote-server-delete-bulk-action": {
         "label": "$t(action.delete.action) vzdálené konektor servery",
         "help": "Smaže vybrané vzdálené konektor servery. <strong>Server nesmí být používán žádným koncovým systémem</strong>.",
@@ -3107,6 +3176,10 @@
       "title": "Již existuje jiný unikátní identifikátor",
       "message": "Pro roli [{{role}}] a systém [{{system}}] byl již nalezen unikátní identifikátor."
     },
+    "PROVISIONING_ROLE_ATTRIBUTE_NO_LOGIN_CANNOT_OVERRIDE_UID": {
+      "title": "Nelze přetížit unikátní identifikátor",
+      "message": "Pro roli [{{role}}] a systém [{{system}}] nemůže být vytvořen atribut přetěžující výchozí identifikátor. Tato role je buď no-login role a nebo je součástí cross-domain skupiny!"
+    },
     "PROVISIONING_SYSTEM_DISABLED_PROVISIONING": {
       "title": "Provisioning účtu [{{name}}] neproběhl",
       "message": "Provisioning účtu [{{name}}] na systém [{{system}}] nebyl proveden. Systém je nakonfigurován jako neaktivní - bey fronty provisioningu."
@@ -3274,6 +3347,18 @@
     "SYSTEM_DELETE_FAILED_HAS_OPERATIONS": {
       "title": "Systém nemůže být smazán",
       "message": "Systém [{{system}}] nemůže být smazán. Na systému jsou evidovány entity."
+    },
+    "SYSTEM_DELETE_FAILED_HAS_SYSTEM_GROUPS": {
+      "title": "Systém nemůže být smazán",
+      "message": "Systém [{{system}}] nemůže být smazán. Systém je použit ve skupině systémů [{{count}}]."
+    },
+    "SYSTEM_ATTRIBUTE_MAPPING_DELETE_FAILED_HAS_SYSTEM_GROUPS": {
+      "title": "Atribut nemůže být smazán",
+      "message": "Atribut [{{attribute}}] nemůže být smazán. Atribut je použit ve skupině systémů [{{count}}]."
+    },
+    "ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE": {
+      "title": "Napojení nemůže být smazáno",
+      "message": "Napojení na roli [{{role}}] nemůže být smazáno, protože je použito v přiřazených rolích uživatelů [{{count}}]."
     },
     "SYSTEM_DELETE_FAILED_HAS_ACCOUNTS": {
       "title": "Systém nemůže být smazán",

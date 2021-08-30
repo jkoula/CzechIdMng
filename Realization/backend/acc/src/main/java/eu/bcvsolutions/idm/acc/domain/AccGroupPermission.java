@@ -68,6 +68,13 @@ public enum AccGroupPermission implements GroupPermission {
 			IdmBasePermission.READ,
 			IdmBasePermission.CREATE,
 			IdmBasePermission.UPDATE,
+			IdmBasePermission.DELETE),
+	SYSTEMGROUP(
+			IdmBasePermission.AUTOCOMPLETE,
+			IdmBasePermission.COUNT,
+			IdmBasePermission.READ,
+			IdmBasePermission.CREATE,
+			IdmBasePermission.UPDATE,
 			IdmBasePermission.DELETE);
 	
 	// String constants could be used in pre / post authotize SpEl expressions
@@ -164,6 +171,13 @@ public enum AccGroupPermission implements GroupPermission {
 	public static final String REMOTESERVER_CREATE = "REMOTESERVER" + BasePermission.SEPARATOR + "CREATE";
 	public static final String REMOTESERVER_UPDATE = "REMOTESERVER" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String REMOTESERVER_DELETE = "REMOTESERVER" + BasePermission.SEPARATOR + "DELETE";
+	//
+	public static final String SYSTEM_GROUP_AUTOCOMPLETE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
+	public static final String SYSTEM_GROUP_COUNT = "SYSTEMGROUP" + BasePermission.SEPARATOR + "COUNT";
+	public static final String SYSTEM_GROUP_READ = "SYSTEMGROUP" + BasePermission.SEPARATOR + "READ";
+	public static final String SYSTEM_GROUP_CREATE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "CREATE";
+	public static final String SYSTEM_GROUP_UPDATE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "UPDATE";
+	public static final String SYSTEM_GROUP_DELETE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "DELETE";
 	
 	private final List<BasePermission> permissions;
 

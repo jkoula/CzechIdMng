@@ -92,6 +92,11 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 	@JoinColumn(name = "role_composition_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private IdmRoleComposition roleComposition;
 
+	// Relation on sys-system form ACC. We need to working with that also in the core module (cross-domains). 
+	@Audited
+	@Column(name = "role_system_id", length = 16)
+	private UUID roleSystem;
+
 	public IdmIdentityRole() {
 	}
 
@@ -217,5 +222,13 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 	
 	public void setContractPosition(IdmContractPosition contractPosition) {
 		this.contractPosition = contractPosition;
+	}
+
+	public UUID getRoleSystem() {
+		return roleSystem;
+	}
+
+	public void setRoleSystem(UUID roleSystem) {
+		this.roleSystem = roleSystem;
 	}
 }

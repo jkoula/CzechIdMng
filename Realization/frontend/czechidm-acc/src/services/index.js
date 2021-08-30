@@ -25,6 +25,8 @@ import AttributeControlledValueService from './AttributeControlledValueService';
 import UniformPasswordService from './UniformPasswordService';
 import UniformPasswordSystemService from './UniformPasswordSystemService';
 import RemoteServerService from './RemoteServerService';
+import SystemGroupService from './SystemGroupService';
+import SystemGroupSystemService from './SystemGroupSystemService';
 
 const ServiceRoot = {
   SystemService,
@@ -53,7 +55,9 @@ const ServiceRoot = {
   AttributeControlledValueService,
   UniformPasswordService,
   UniformPasswordSystemService,
-  RemoteServerService
+  RemoteServerService,
+  SystemGroupService,
+  SystemGroupSystemService
 };
 
 ServiceRoot.version = '0.1.0';

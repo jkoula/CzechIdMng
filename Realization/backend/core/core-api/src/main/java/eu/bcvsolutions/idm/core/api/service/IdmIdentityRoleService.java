@@ -139,4 +139,9 @@ public interface IdmIdentityRoleService extends
 	 * @see <a href="https://wiki.czechidm.com/devel/documentation/roles/dev/identity-role-deduplication">Documentation link</a> for more information
 	 */
 	IdmIdentityRoleDto getDuplicated(IdmIdentityRoleDto one, IdmIdentityRoleDto two, Boolean skipSubdefinition);
+
+	/**
+	 * Returns true, if given identity-role is automatic or business role.
+	 */
+	boolean isRoleAutomaticOrComposition(IdmIdentityRoleDto identityRole);
 }

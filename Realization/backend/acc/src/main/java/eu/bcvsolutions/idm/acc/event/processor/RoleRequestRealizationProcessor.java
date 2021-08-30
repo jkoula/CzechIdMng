@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,9 +86,11 @@ public class RoleRequestRealizationProcessor extends CoreEventProcessor<IdmRoleR
 				IdentityRoleEvent.PROPERTY_ASSIGNED_UPDATED_ROLES, event, IdmIdentityRoleDto.class);
 		Set<UUID> removedIdentityAccounts = this.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM,
 				event, UUID.class);
+		Set<UUID> accountsForAdditionalProvisioning = this.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING,
+				event, UUID.class);
 		boolean skipProvisioning = this.getBooleanProperty(ProvisioningService.SKIP_PROVISIONING, event.getProperties());
 
-		Set<UUID> accountsForProvisioning = Sets.newHashSet();
+		Set<UUID> accountsForProvisioning = new HashSet<>(accountsForAdditionalProvisioning);
 
 		if (addedIdentityRoles.size() > 0) {
 			LOG.debug("Call account management for identity [{}] and new identity-roles [{}]",

@@ -914,7 +914,38 @@
        "edit": {
          "header": "Edit system connection"
        }
-     }
+     },
+    "systemGroup": {
+      "header": "Systems groups",
+      "label": "Systems groups",
+      "title": "Systems groups",
+      "create": {
+        "header": "New system group definition"
+      },
+      "edit": {
+        "header": "Edit system group definition"
+      },
+      "basic": "Basic information",
+      "system": "Linked systems",
+      "filter": {
+        "text": "Group name"
+      },
+      "save": {
+        "success": "System group definition saved successfully"
+      }
+    },
+    "systemGroupSystem": {
+      "detail": "Connected systems",
+      "save": {
+        "success": "The established system was saved successfully."
+      },
+      "create": {
+        "header": "New link to system"
+      },
+      "edit": {
+        "header": "Edit link to the system"
+      }
+    }
   },
   "entity": {
     "System": {
@@ -1047,6 +1078,13 @@
       "forwardAccountManagemen": {
         "label": "Forward account management",
         "help": "If checked, then an account on this system is created even though the assignment of this role to the user will be valid in the future."
+      },
+      "createAccountByDefault": {
+        "label": "Automatically create accounts",
+        "help": "Assigning this role will automatically create an account on the system. If this option is not selected, then the account will only be created if another role is assigned for this system and creates the account automatically."
+      },
+      "isInCrossDomainGroupAlert": {
+        "text": "This connection is part of a <b>Cross-domain group</b>. Account management will be managed <b>according to the role rules in Cross-domain</b> groups. The automatic account creation setting will be ignored."
       }
     },
     "SystemEntity": {
@@ -1536,6 +1574,23 @@
     "UniformPasswordSystem": {
       "system": "System",
       "uniformPassword": "Password filter"
+    },
+    "SystemGroup": {
+      "code": "Code",
+      "description": "Description",
+      "disabled": {
+        "label": "Inactive",
+        "helpBlock": ""
+      },
+      "type": {
+        "label": "Group type",
+        "helpBlock": ""
+      }
+    },
+    "SystemGroupSystem": {
+      "system": "System",
+      "systemGroup": "Group",
+      "mergeAttribute": "Attribute for controlling groups"
     }
   },
   "enums" : {
@@ -1552,6 +1607,9 @@
       "PROVISIONING": "Provisioning",
       "RECONCILIACE": "Reconciliation",
       "SYNCHRONIZATION": "Synchronization"
+    },
+    "SystemGroupTypeEnum": {
+      "CROSS_DOMAIN": "Cross domain"
     },
     "AccountTypeEnum": {
       "PERSONAL": "Personal",
@@ -1739,7 +1797,8 @@
       "PROVISIONINGOPERATION": "Provisioning - operations in queue",
       "PROVISIONINGARCHIVE": "Provisioning - archive",
       "SYSTEMATTRIBUTEMAPPING": "Mapping atribute in system",
-      "UNIFORMPASSWORD": "Uniform password system"
+      "UNIFORMPASSWORD": "Uniform password system",
+      "SYSTEMGROUP": "Group of systems"
     }
   },
   "eav": {
@@ -2455,6 +2514,16 @@
         "help": "$t(action.delete.action) selected systems. <strong>System must not contains any accounts and unresolved provisioning operations</strong>.",
         "icon": "$t(action.delete.icon)"
       },
+      "sys-system-group-delete-bulk-action": {
+        "label": "$t(action.delete.action) system groups",
+        "help": "Delete selected system groups.",
+        "icon": "$t(action.delete.icon)"
+      },
+      "sys-system-group-system-delete-bulk-action": {
+        "label": "$t(action.delete.action) systems in the group",
+        "help": "Deletes the selected systems in the group.",
+        "icon": "$t(action.delete.icon)"
+      },
       "acc-remote-server-delete-bulk-action": {
         "label": "$t(action.delete.action) remote connector servers",
         "help": "$t(action.delete.action) selected remote connector servers. <strong>Server can be deleted, if it is not used for a target system</strong>.",
@@ -3105,6 +3174,10 @@
       "title": "Unique identifier already exists",
       "message": "Role [{{role}}] and system [{{system}}] have already set unique identifier."
     },
+    "PROVISIONING_ROLE_ATTRIBUTE_NO_LOGIN_CANNOT_OVERRIDE_UID": {
+      "title": "Cannot override unique identifier",
+      "message": "An attribute overriding the default identifier cannot be created for the role [{{role}}] and system [{{system}}]. This role is either a no-login role or part of a cross-domain group!"
+    },
     "PROVISIONING_SYSTEM_DISABLED_PROVISIONING": {
       "title": "Provisioning of account [{{name}}] wasn't executed",
       "message": "Provisioning of account [{{name}}] in system [{{system}}] wasn't executed. System is configured as inactive - without provisioning queue."
@@ -3272,6 +3345,18 @@
     "SYSTEM_DELETE_FAILED_HAS_OPERATIONS": {
       "title": "System cannot be removed",
       "message": "System [{{system}}] cannot be removed. Active provisioning operations exist for the entity."
+    },
+    "SYSTEM_DELETE_FAILED_HAS_SYSTEM_GROUPS": {
+      "title": "System cannot be deleted",
+      "message": "System [{{system}}] cannot be deleted. System is used in system group [{{count}}]."
+    },
+    "SYSTEM_ATTRIBUTE_MAPPING_DELETE_FAILED_HAS_SYSTEM_GROUPS": {
+      "title": "Attribute cannot be deleted.",
+      "message": "Attribute [{{attribute}}] cannot be deleted. Attribute is used in system group [{{count}}]."
+    },
+    "ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE": {
+      "title": "Connection cannot be deleted",
+      "message": "The connection to role [{{role}}] cannot be deleted because it is used in assigned user roles [{{count}}]."
     },
     "SYSTEM_DELETE_FAILED_HAS_ACCOUNTS": {
       "title": "System cannot be removed",

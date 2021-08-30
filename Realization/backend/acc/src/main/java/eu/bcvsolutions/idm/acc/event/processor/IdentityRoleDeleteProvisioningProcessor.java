@@ -1,5 +1,9 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import com.google.common.collect.Lists;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +56,7 @@ public class IdentityRoleDeleteProvisioningProcessor extends AbstractEntityEvent
 	@Autowired private EntityEventManager entityEventManager;
 	@Autowired private SysRoleSystemService roleSystemService;
 	@Autowired private AccAccountService accountService;
+	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
 
 	public IdentityRoleDeleteProvisioningProcessor() {
 		super(IdentityRoleEventType.DELETE);
@@ -107,7 +112,44 @@ public class IdentityRoleDeleteProvisioningProcessor extends AbstractEntityEvent
 			return new DefaultEventResult<>(event, this);
 		}
 		
-		accountsIds.forEach(accountId -> {
+		// If default creation of accounts is disabled for this role-system (or system is in a cross-domain group), then relation between identity
+		// and account may not exist. In this scenario we have to made provisioning too.
+		// So we try to find these role-systems and its accounts.
+		SysRoleSystemFilter roleSystemForProvisioningFilter = new SysRoleSystemFilter();
+		roleSystemForProvisioningFilter.setRoleId(roleId);
+
+		List<UUID> finalAccountsIds = accountsIds;
+		roleSystemService.find(roleSystemForProvisioningFilter, null).getContent().stream()
+				.filter(roleSystem -> {
+					if (!roleSystem.isCreateAccountByDefault()) {
+						return true;
+					} else {
+						SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+						systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
+						if ((identityRole.getRoleSystem() == null || roleSystem.getId().equals(identityRole.getRoleSystem())
+								&& systemGroupSystemService.count(systemGroupSystemFilter) >= 1)
+						) {
+							// This role-system overriding a merge attribute which is using in
+							// active cross-domain group and roleSystem in identity-role is null or same as role-system.
+							// -> Provisioning should be made.
+							return true;
+						}
+					}
+					return false;
+				})
+				.forEach(roleSystem -> {
+					AccAccountFilter accountFilter = new AccAccountFilter();
+					accountFilter.setSystemId(roleSystem.getSystem());
+					accountFilter.setIdentityId(identity.getId());
+					accountService.find(accountFilter, null).getContent()
+							.stream()
+							.filter(account -> !finalAccountsIds.contains(account.getId()))
+							.forEach(account -> {
+								finalAccountsIds.add(account.getId());
+							});
+				});
+
+		finalAccountsIds.forEach(accountId -> {
 			AccAccountDto account = accountService.get(accountId);
 			if (account != null) { // Account could be null (was deleted).
 				LOG.debug("Call provisioning for identity [{}] and account [{}]", identity.getUsername(), account.getUid());
