@@ -1,9 +1,13 @@
 package eu.bcvsolutions.idm.acc.service.impl.mock;
 
+import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.service.impl.CrossDomainAdUserConnectorTypeTest;
+import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
+import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +29,11 @@ public class MockCrossDomainAdUserConnectorType extends MockAdUserConnectorType 
 			return this.readConnectorObjectCallBack.call(system, uid, objectClass);
 		}
 		return null;
+	}
+
+	@Override
+	protected Set<String> searchGroups(String memberAttribute, IcConnectorConfiguration icConfig, IcConnectorInstance connectorInstance, String dn) {
+		return Sets.newHashSet("EXTERNAL_ONE");
 	}
 
 	@Override

@@ -199,7 +199,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 	protected static final String MAPPING_SYNC_ID = "mappingSyncId";
 	private static final String REGENERATE_SCHEMA_SWITCH = "regenerateSchemaSwitch";
 	private static final String FOREIGN_SECURITY_PRINCIPALS_CN = "ForeignSecurityPrincipals";
-	private static final String SID_ATTRIBUTE_KEY = "objectSID";
+	public static final String SID_ATTRIBUTE_KEY = "objectSID";
 	public static final String OLD_ATTRIBUTE_PATTERN = "{0}_OLD";
 	public static final String CROSS_DOMAIN_HOST_PATTERN = "CROSS_DOMAIN_HOST_{0}";
 	public static final String CROSS_DOMAIN_USER_PATTERN = "CROSS_DOMAIN_USER_{0}";
@@ -631,7 +631,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 		return connectorConfiguration;
 	}
 
-	private Set<String> searchGroups(
+	protected Set<String> searchGroups(
 			String memberAttribute,
 			IcConnectorConfiguration icConfig,
 			IcConnectorInstance connectorInstance,
@@ -683,10 +683,10 @@ public class AdUserConnectorType extends DefaultConnectorType {
 		sb.append("S-").append(sid[0]);
 		int c = sid[1]; // Init with Subauthority Count.
 		ByteBuffer bb = ByteBuffer.wrap(sid);
-		sb.append("-").append(bb.getLong() & 0xFFFFFFFFFFFFL);
+		sb.append('-').append(bb.getLong() & 0xFFFFFFFFFFFFL);
 		bb.order(ByteOrder.LITTLE_ENDIAN); // Now switch.
 		for (int i = 0; i < c; i++) { // Create Subauthorities.
-			sb.append("-").append((long) bb.getInt() & 0xFFFFFFFFL);
+			sb.append('-').append((long) bb.getInt() & 0xFFFFFFFFL);
 		}
 		return sb.toString();
 	}

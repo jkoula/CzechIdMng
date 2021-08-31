@@ -452,7 +452,6 @@ public class DefaultSysRoleSystemAttributeService extends
 			Predicate identityRolePredicate = builder.isNull(subRoot.get(IdmIdentityRole_.roleSystem));
 
 			subquery.where(builder.and(correlationPredicate, identityPredicate, identityRolePredicate));
-
 			
 			// Query via role-system:
 			Subquery<IdmIdentityRole> subqueryViaRoleSystem = query.subquery(IdmIdentityRole.class);

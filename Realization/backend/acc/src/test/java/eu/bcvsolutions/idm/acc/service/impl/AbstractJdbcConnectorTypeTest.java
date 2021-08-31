@@ -76,7 +76,7 @@ public abstract class AbstractJdbcConnectorTypeTest extends AbstractIntegrationT
 			// Skip test.
 			return;
 		}
-		ConnectorTypeDto mockPostgresqlConnectorTypeDto = new ConnectorTypeDto();
+		ConnectorTypeDto mockPostgresqlConnectorTypeDto = getConnectorTypeDto();
 		mockPostgresqlConnectorTypeDto.setReopened(false);
 		mockPostgresqlConnectorTypeDto.setId(this.getJdbcConnectorType());
 
@@ -132,10 +132,10 @@ public abstract class AbstractJdbcConnectorTypeTest extends AbstractIntegrationT
 		// If not, whole test will be skipped.
 		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
 			// Skip test.
-			return;
+			//return;
 		}
 
-		ConnectorTypeDto mockPostgresqlConnectorTypeDto = new ConnectorTypeDto();
+		ConnectorTypeDto mockPostgresqlConnectorTypeDto = getConnectorTypeDto();
 		mockPostgresqlConnectorTypeDto.setReopened(false);
 		mockPostgresqlConnectorTypeDto.setId(this.getJdbcConnectorType());
 
@@ -162,7 +162,7 @@ public abstract class AbstractJdbcConnectorTypeTest extends AbstractIntegrationT
 
 		// Load wizard data for existed system;
 		ConnectorType connectorTypeBySystem = connectorManager.findConnectorTypeBySystem(systemDto);
-		ConnectorTypeDto reopenSystem = new ConnectorTypeDto();
+		ConnectorTypeDto reopenSystem = getConnectorTypeDto();
 		reopenSystem.setReopened(true);
 		reopenSystem.setId(connectorTypeBySystem.getId());
 		reopenSystem.getEmbedded().put(PostgresqlConnectorType.SYSTEM_DTO_KEY, systemDto);
@@ -179,6 +179,10 @@ public abstract class AbstractJdbcConnectorTypeTest extends AbstractIntegrationT
 
 		// Delete created system.
 		systemService.delete(systemDto);
+	}
+
+	protected ConnectorTypeDto getConnectorTypeDto() {
+		return new ConnectorTypeDto();
 	}
 
 	protected String getValueFromConnectorInstance(String attributeCode, SysSystemDto systemDto, IdmFormDefinitionDto connectorFormDef) {

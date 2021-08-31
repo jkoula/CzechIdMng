@@ -230,7 +230,7 @@ public class MsSqlConnectorType extends AbstractJdbcConnectorType {
 							missingDriverExMessage = missingDriverExMessage.substring(0, 119) + "...";
 						}
 						throw new ResultCodeException(AccResultCode.WIZARD_MSSQL_CONNECTOR_LIB_MISSING,
-								ImmutableMap.of("text", missingDriverExMessage));
+								ImmutableMap.of("text", missingDriverExMessage), ex);
 					}
 				}
 			}

@@ -30,8 +30,8 @@ public class MockSysSystemService extends DefaultSysSystemService {
 	
 	@Autowired
 	private SysSchemaObjectClassService schemaService;
-
-
+	private MockMsSqlConnectorType.GetSchemaCallBack getSchemaCallBack;
+	
 	public MockSysSystemService(SysSystemRepository systemRepository, FormService formService, IcConfigurationFacade icConfigurationFacade, SysSchemaObjectClassService objectClassService, SysSchemaAttributeService attributeService, SysSyncConfigService synchronizationConfigService, FormPropertyManager formPropertyManager, ConfidentialStorage confidentialStorage, IcConnectorFacade connectorFacade, SysSystemFormValueService systemFormValueService, SysSystemMappingService systemMappingService, SysSystemAttributeMappingService systemAttributeMappingService, SysSchemaObjectClassService schemaObjectClassService, EntityEventManager entityEventManager) {
 		super(systemRepository, formService, icConfigurationFacade, objectClassService, attributeService, synchronizationConfigService, formPropertyManager, confidentialStorage, connectorFacade, systemFormValueService, systemMappingService, systemAttributeMappingService, schemaObjectClassService, entityEventManager);
 	}
@@ -44,9 +44,20 @@ public class MockSysSystemService extends DefaultSysSystemService {
 	@Override
 	public List<SysSchemaObjectClassDto> generateSchema(SysSystemDto system) {
 		// Mock - We don't have an AD.
+		if (getSchemaCallBack != null) {
+			return getSchemaCallBack.call(system);
+		}
 		SysSchemaObjectClassFilter schemaFilter = new SysSchemaObjectClassFilter();
 		schemaFilter.setSystemId(system.getId());
 		
 		return schemaService.find(schemaFilter, null).getContent();
+	}
+
+	public void setGetSchemaCallBack(MockMsSqlConnectorType.GetSchemaCallBack getSchemaCallBack) {
+		this.getSchemaCallBack = getSchemaCallBack;
+	}
+
+	public MockMsSqlConnectorType.GetSchemaCallBack getGetSchemaCallBack() {
+		return getSchemaCallBack;
 	}
 }

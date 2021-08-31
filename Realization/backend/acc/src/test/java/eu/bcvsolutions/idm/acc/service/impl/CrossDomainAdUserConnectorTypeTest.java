@@ -40,6 +40,7 @@ import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -49,6 +50,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeRuleService;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
@@ -58,6 +60,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormProjectionRoute;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition;
@@ -73,6 +76,7 @@ import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import eu.bcvsolutions.idm.ic.impl.IcAttributeImpl;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import java.util.List;
@@ -139,9 +143,9 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 	@Autowired
 	private IdmAutomaticRoleAttributeService automaticRoleAttributeService;
 	@Autowired
-	private IdmAutomaticRoleAttributeRuleService automaticRoleAttributeRuleService;
-	@Autowired
 	private IdmRoleCompositionService roleCompositionService;
+	@Autowired
+	private IdmConceptRoleRequestService conceptRoleRequestService;
 
 	@Before
 	public void init() {
@@ -188,18 +192,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -250,18 +243,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be not in a cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -320,18 +302,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -419,18 +390,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -449,8 +409,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
 			}
 		});
-
-
+		
 		IdmRoleRequestDto roleRequestDto = getHelper().assignRoles(contract, roleInCrossDomainGroup, loginRole);
 		assertEquals(RoleRequestState.EXECUTED, roleRequestDto.getState());
 		assertNotNull(roleRequestDto.getSystemState());
@@ -501,6 +460,378 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		getHelper().deleteIdentity(identity.getId());
 		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(null);
 	}
+	
+	@Test
+	public void testUpdateAccountInCrossDomainOnTwoSystems() {
+		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		// System one
+		SysSystemDto systemDto = initSystem(connectorType);
+		
+		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
+		filter.setSystemId(systemDto.getId());
+		filter.setName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		List<SysSystemAttributeMappingDto> attributes = attributeMappingService.find(filter, null).getContent();
+		assertEquals(1, attributes.size());
+		SysSystemAttributeMappingDto ldapGroupsAttribute = attributes.stream().findFirst().get();
+		// System two
+		SysSystemDto systemTwoDto = initSystem(connectorType);
+
+		SysSystemAttributeMappingFilter filterTwo = new SysSystemAttributeMappingFilter();
+		filterTwo.setSystemId(systemTwoDto.getId());
+		filterTwo.setName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		List<SysSystemAttributeMappingDto> attributesTwo = attributeMappingService.find(filterTwo, null).getContent();
+		assertEquals(1, attributesTwo.size());
+		SysSystemAttributeMappingDto ldapGroupsAttributeTwo = attributesTwo.stream().findFirst().get();
+
+		// Creates cross-domain group.
+		SysSystemGroupDto groupSystemDto = new SysSystemGroupDto();
+		groupSystemDto.setCode(getHelper().createName());
+		groupSystemDto.setType(SystemGroupType.CROSS_DOMAIN);
+		groupSystemDto = systemGroupService.save(groupSystemDto);
+
+		SysSystemGroupSystemDto systemGroupSystemOne = new SysSystemGroupSystemDto();
+		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
+		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
+		systemGroupSystemOne.setSystem(systemDto.getId());
+		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		
+		SysSystemGroupSystemDto systemGroupSystemTwo = new SysSystemGroupSystemDto();
+		systemGroupSystemTwo.setSystemGroup(groupSystemDto.getId());
+		systemGroupSystemTwo.setMergeAttribute(ldapGroupsAttributeTwo.getId());
+		systemGroupSystemTwo.setSystem(systemTwoDto.getId());
+		systemGroupSystemTwo = systemGroupSystemService.save(systemGroupSystemTwo);
+
+		// Creates the login role ONE.
+		IdmRoleDto loginRole = helper.createRole();
+		helper.createRoleSystem(loginRole, systemDto);
+		// Creates the login role TWO.
+		IdmRoleDto loginRoleTwo = helper.createRole();
+		helper.createRoleSystem(loginRoleTwo, systemTwoDto);
+
+		// Creates cross-domain no-login role ONE.
+		IdmRoleDto noLoginRole = helper.createRole();
+		SysRoleSystemDto roleSystem = helper.createRoleSystem(noLoginRole, systemDto);
+		SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
+		roleSystemFilter.setIsInCrossDomainGroupRoleId(noLoginRole.getId());
+		roleSystemFilter.setCheckIfIsInCrossDomainGroup(Boolean.TRUE);
+		roleSystemFilter.setId(roleSystem.getId());
+		List<SysRoleSystemDto> roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
+		assertEquals(0, roleSystemDtos.size());
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
+		
+		// Creates cross-domain no-login role TWO.
+		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(noLoginRole, systemTwoDto);
+		SysRoleSystemFilter roleSystemFilterTwo = new SysRoleSystemFilter();
+		roleSystemFilterTwo.setIsInCrossDomainGroupRoleId(noLoginRole.getId());
+		roleSystemFilterTwo.setCheckIfIsInCrossDomainGroup(Boolean.TRUE);
+		roleSystemFilterTwo.setId(roleSystemTwo.getId());
+		List<SysRoleSystemDto> roleSystemDtosTwo = roleSystemService.find(roleSystemFilterTwo, null).getContent();
+		assertEquals(0, roleSystemDtosTwo.size());
+		createOverriddenLdapGroupAttribute(ldapGroupsAttributeTwo, roleSystemTwo, "return 'TWO';");
+
+		// Role-system should be in cross-domain group now.
+		roleSystemDtos = roleSystemService.find(roleSystemFilterTwo, null).getContent();
+		assertEquals(1, roleSystemDtos.size());
+		SysRoleSystemDto roleSystemDto = roleSystemDtos.stream().findFirst().get();
+		assertTrue(roleSystemDto.isInCrossDomainGroup());
+
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmIdentityContractDto contract = getHelper().createContract(identity);
+
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(new GetConnectorObjectCallback() {
+			@Override
+			public IcConnectorObject call(SysSystemDto system, String uid, IcObjectClass objectClass) {
+				IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
+				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "THREE"));
+				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.SID_ATTRIBUTE_KEY, "SID".getBytes(StandardCharsets.UTF_8)));
+				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
+			}
+		});
+		// Assign login (ONE and TWO) and no-login roles.
+		IdmRoleRequestDto roleRequestDto = getHelper().assignRoles(contract, noLoginRole, loginRole, loginRoleTwo);
+		assertEquals(RoleRequestState.EXECUTED, roleRequestDto.getState());
+		assertNotNull(roleRequestDto.getSystemState());
+
+		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
+		identityAccountFilter.setIdentityId(identity.getId());
+		assertEquals(2, identityAccountService.find(identityAccountFilter, null).getContent().size());
+		
+		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
+		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
+		provisioningOperationFilter.setSystemId(systemDto.getId());
+		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityIdentifier(identity.getId());
+		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
+		assertEquals(1, provisioningOperationDtos.size());
+		SysProvisioningOperationDto provisioningOperationDto = provisioningOperationDtos.stream().findFirst().get();
+		assertEquals(ProvisioningEventType.UPDATE, provisioningOperationDto.getOperationType());
+		
+		ProvisioningAttributeDto provisioningAttributeLdapGroupsDto = provisioningOperationDto.getProvisioningContext().getAccountObject().keySet()
+				.stream()
+				.filter(provisioningAtt -> MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE.equals(provisioningAtt.getSchemaAttributeName()))
+				.findFirst()
+				.get();
+		
+		assertNotNull(provisioningAttributeLdapGroupsDto);
+		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
+		assertEquals(1, ((List) ldapGroupsValue).size());
+		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("ONE")));
+
+		IcAttribute ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		IcAttribute ldapGroupsOld = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MessageFormat.format(MockCrossDomainAdUserConnectorType.OLD_ATTRIBUTE_PATTERN, MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE));
+		assertNotNull(ldapGroups);
+		assertTrue(ldapGroups.getValues().stream().anyMatch(value -> value.equals("ONE")));
+		assertTrue(ldapGroups.getValues().stream().anyMatch(value -> value.equals("THREE")));
+		assertNotNull(ldapGroupsOld);
+		assertEquals(2, ldapGroupsOld.getValues().size());
+		assertTrue(ldapGroupsOld.getValues().stream().anyMatch(value -> value.equals("THREE")));
+		assertTrue(ldapGroupsOld.getValues().stream().anyMatch(value -> value.equals("EXTERNAL_ONE")));
+		
+		
+		// Check if provisioning contains ldapGroups attribute with value ('TWO') from the role.
+		provisioningOperationFilter = new SysProvisioningOperationFilter();
+		provisioningOperationFilter.setSystemId(systemTwoDto.getId());
+		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityIdentifier(identity.getId());
+		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
+		assertEquals(1, provisioningOperationDtos.size());
+		provisioningOperationDto = provisioningOperationDtos.stream().findFirst().get();
+		assertEquals(ProvisioningEventType.UPDATE, provisioningOperationDto.getOperationType());
+		
+		provisioningAttributeLdapGroupsDto = provisioningOperationDto.getProvisioningContext().getAccountObject().keySet()
+				.stream()
+				.filter(provisioningAtt -> MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE.equals(provisioningAtt.getSchemaAttributeName()))
+				.findFirst()
+				.get();
+		
+		assertNotNull(provisioningAttributeLdapGroupsDto);
+		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
+		assertEquals(1, ((List) ldapGroupsValue).size());
+		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("TWO")));
+
+		ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		ldapGroupsOld = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MessageFormat.format(MockCrossDomainAdUserConnectorType.OLD_ATTRIBUTE_PATTERN, MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE));
+		assertNotNull(ldapGroups);
+		assertTrue(ldapGroups.getValues().stream().anyMatch(value -> value.equals("TWO")));
+		assertTrue(ldapGroups.getValues().stream().anyMatch(value -> value.equals("THREE")));
+		assertNotNull(ldapGroupsOld);
+		assertEquals(2, ldapGroupsOld.getValues().size());
+		assertTrue(ldapGroupsOld.getValues().stream().anyMatch(value -> value.equals("THREE")));
+		assertTrue(ldapGroupsOld.getValues().stream().anyMatch(value -> value.equals("EXTERNAL_ONE")));
+
+		// Clean
+		provisioningOperationService.deleteOperations(systemDto.getId());
+		provisioningOperationService.deleteOperations(systemTwoDto.getId());
+		systemGroupService.delete(groupSystemDto);
+		getHelper().deleteIdentity(identity.getId());
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(null);
+	}
+	
+	@Test
+	public void testUpdateAccountInCrossDomainOnOneSystem() {
+		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		// System one
+		SysSystemDto systemDto = initSystem(connectorType);
+		
+		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
+		filter.setSystemId(systemDto.getId());
+		filter.setName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		List<SysSystemAttributeMappingDto> attributes = attributeMappingService.find(filter, null).getContent();
+		assertEquals(1, attributes.size());
+		SysSystemAttributeMappingDto ldapGroupsAttribute = attributes.stream().findFirst().get();
+		// System two
+		SysSystemDto systemTwoDto = initSystem(connectorType);
+
+		SysSystemAttributeMappingFilter filterTwo = new SysSystemAttributeMappingFilter();
+		filterTwo.setSystemId(systemTwoDto.getId());
+		filterTwo.setName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		List<SysSystemAttributeMappingDto> attributesTwo = attributeMappingService.find(filterTwo, null).getContent();
+		assertEquals(1, attributesTwo.size());
+		SysSystemAttributeMappingDto ldapGroupsAttributeTwo = attributesTwo.stream().findFirst().get();
+
+		// Creates cross-domain group.
+		SysSystemGroupDto groupSystemDto = new SysSystemGroupDto();
+		groupSystemDto.setCode(getHelper().createName());
+		groupSystemDto.setType(SystemGroupType.CROSS_DOMAIN);
+		groupSystemDto = systemGroupService.save(groupSystemDto);
+
+		SysSystemGroupSystemDto systemGroupSystemOne = new SysSystemGroupSystemDto();
+		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
+		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
+		systemGroupSystemOne.setSystem(systemDto.getId());
+		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		
+		SysSystemGroupSystemDto systemGroupSystemTwo = new SysSystemGroupSystemDto();
+		systemGroupSystemTwo.setSystemGroup(groupSystemDto.getId());
+		systemGroupSystemTwo.setMergeAttribute(ldapGroupsAttributeTwo.getId());
+		systemGroupSystemTwo.setSystem(systemTwoDto.getId());
+		systemGroupSystemTwo = systemGroupSystemService.save(systemGroupSystemTwo);
+
+		// Creates the login role ONE.
+		IdmRoleDto loginRole = helper.createRole();
+		helper.createRoleSystem(loginRole, systemDto);
+		// Creates the login role TWO.
+		IdmRoleDto loginRoleTwo = helper.createRole();
+		helper.createRoleSystem(loginRoleTwo, systemTwoDto);
+
+		// Creates cross-domain no-login role ONE.
+		IdmRoleDto noLoginRole = helper.createRole();
+		SysRoleSystemDto roleSystem = helper.createRoleSystem(noLoginRole, systemDto);
+		SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
+		roleSystemFilter.setIsInCrossDomainGroupRoleId(noLoginRole.getId());
+		roleSystemFilter.setCheckIfIsInCrossDomainGroup(Boolean.TRUE);
+		roleSystemFilter.setId(roleSystem.getId());
+		List<SysRoleSystemDto> roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
+		assertEquals(0, roleSystemDtos.size());
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
+		
+		// Creates cross-domain no-login role TWO.
+		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(noLoginRole, systemTwoDto);
+		SysRoleSystemFilter roleSystemFilterTwo = new SysRoleSystemFilter();
+		roleSystemFilterTwo.setIsInCrossDomainGroupRoleId(noLoginRole.getId());
+		roleSystemFilterTwo.setCheckIfIsInCrossDomainGroup(Boolean.TRUE);
+		roleSystemFilterTwo.setId(roleSystemTwo.getId());
+		List<SysRoleSystemDto> roleSystemDtosTwo = roleSystemService.find(roleSystemFilterTwo, null).getContent();
+		assertEquals(0, roleSystemDtosTwo.size());
+		createOverriddenLdapGroupAttribute(ldapGroupsAttributeTwo, roleSystemTwo, "return 'TWO';");
+
+		// Role-system should be in cross-domain group now.
+		roleSystemDtos = roleSystemService.find(roleSystemFilterTwo, null).getContent();
+		assertEquals(1, roleSystemDtos.size());
+		SysRoleSystemDto roleSystemDto = roleSystemDtos.stream().findFirst().get();
+		assertTrue(roleSystemDto.isInCrossDomainGroup());
+
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmIdentityContractDto contract = getHelper().createContract(identity);
+
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(new GetConnectorObjectCallback() {
+			@Override
+			public IcConnectorObject call(SysSystemDto system, String uid, IcObjectClass objectClass) {
+				IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
+				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "THREE"));
+				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.SID_ATTRIBUTE_KEY, "SID".getBytes(StandardCharsets.UTF_8)));
+				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
+			}
+		});
+		
+		// Assign login (ONE and TWO) and no-login roles.
+		// But no-login role will be set only on system two!
+		IdmRoleRequestDto roleRequestDto = getHelper().createRoleRequest(contract, noLoginRole, loginRole, loginRoleTwo);
+		List<IdmConceptRoleRequestDto> concepts = conceptRoleRequestService.findAllByRoleRequest(roleRequestDto.getId());
+		IdmConceptRoleRequestDto noLoginConcept = concepts.stream()
+				.filter(concept -> noLoginRole.getId().equals(concept.getRole()))
+				.findFirst()
+				.get();
+		assertNotNull(noLoginConcept);
+		noLoginConcept.setRoleSystem(roleSystemTwo.getId());
+		noLoginConcept = conceptRoleRequestService.save(noLoginConcept);
+		roleRequestDto = getHelper().executeRequest(roleRequestDto, true);
+
+		assertEquals(RoleRequestState.EXECUTED, roleRequestDto.getState());
+		assertNotNull(roleRequestDto.getSystemState());
+
+		IdmIdentityRoleDto identityRoleWithRoleSystemDto = identityRoleService.findAllByIdentity(identity.getId()).stream()
+				.filter(identityRole -> roleSystemTwo.getId().equals(identityRole.getRoleSystem()))
+				.findFirst()
+				.get();
+		assertNotNull(identityRoleWithRoleSystemDto);
+
+		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
+		identityAccountFilter.setIdentityId(identity.getId());
+		assertEquals(2, identityAccountService.find(identityAccountFilter, null).getContent().size());
+		
+		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
+		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
+		provisioningOperationFilter.setSystemId(systemDto.getId());
+		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityIdentifier(identity.getId());
+		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
+		assertEquals(1, provisioningOperationDtos.size());
+		SysProvisioningOperationDto provisioningOperationDto = provisioningOperationDtos.stream().findFirst().get();
+		assertEquals(ProvisioningEventType.UPDATE, provisioningOperationDto.getOperationType());
+		
+		ProvisioningAttributeDto provisioningAttributeLdapGroupsDto = provisioningOperationDto.getProvisioningContext().getAccountObject().keySet()
+				.stream()
+				.filter(provisioningAtt -> MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE.equals(provisioningAtt.getSchemaAttributeName()))
+				.findFirst()
+				.get();
+		
+		assertNotNull(provisioningAttributeLdapGroupsDto);
+		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
+		assertEquals(0, ((List) ldapGroupsValue).size());
+
+		IcAttribute ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		IcAttribute ldapGroupsOld = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MessageFormat.format(MockCrossDomainAdUserConnectorType.OLD_ATTRIBUTE_PATTERN, MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE));
+		assertNull(ldapGroups);
+		assertNull(ldapGroupsOld);
+		
+		// Check if provisioning contains ldapGroups attribute with value ('TWO') from the role.
+		provisioningOperationFilter = new SysProvisioningOperationFilter();
+		provisioningOperationFilter.setSystemId(systemTwoDto.getId());
+		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityIdentifier(identity.getId());
+		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
+		assertEquals(1, provisioningOperationDtos.size());
+		provisioningOperationDto = provisioningOperationDtos.stream().findFirst().get();
+		assertEquals(ProvisioningEventType.UPDATE, provisioningOperationDto.getOperationType());
+		
+		provisioningAttributeLdapGroupsDto = provisioningOperationDto.getProvisioningContext().getAccountObject().keySet()
+				.stream()
+				.filter(provisioningAtt -> MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE.equals(provisioningAtt.getSchemaAttributeName()))
+				.findFirst()
+				.get();
+		
+		assertNotNull(provisioningAttributeLdapGroupsDto);
+		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
+		assertEquals(1, ((List) ldapGroupsValue).size());
+		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("TWO")));
+
+		ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
+		ldapGroupsOld = provisioningOperationDto.getProvisioningContext().getConnectorObject()
+				.getAttributeByName(MessageFormat.format(MockCrossDomainAdUserConnectorType.OLD_ATTRIBUTE_PATTERN, MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE));
+		assertNotNull(ldapGroups);
+		assertTrue(ldapGroups.getValues().stream().anyMatch(value -> value.equals("TWO")));
+		assertTrue(ldapGroups.getValues().stream().anyMatch(value -> value.equals("THREE")));
+		assertNotNull(ldapGroupsOld);
+		assertEquals(2, ldapGroupsOld.getValues().size());
+		assertTrue(ldapGroupsOld.getValues().stream().anyMatch(value -> value.equals("THREE")));
+		assertTrue(ldapGroupsOld.getValues().stream().anyMatch(value -> value.equals("EXTERNAL_ONE")));
+
+		// Clean
+		provisioningOperationService.deleteOperations(systemDto.getId());
+		provisioningOperationService.deleteOperations(systemTwoDto.getId());
+		systemGroupService.delete(groupSystemDto);
+		getHelper().deleteIdentity(identity.getId());
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(null);
+	}
+	
+	
+	private void createOverriddenLdapGroupAttribute(SysSystemAttributeMappingDto ldapGroupsAttribute, SysRoleSystemDto roleSystem) {
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem, "return 'ONE';");
+	}
+
+	private void createOverriddenLdapGroupAttribute(SysSystemAttributeMappingDto ldapGroupsAttribute, SysRoleSystemDto roleSystem, String script) {
+		// Creates overridden ldapGroup merge attribute.
+		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
+		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
+		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
+		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
+		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
+		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
+		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
+		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
+		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
+		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
+		ldapGroupsRoleSystemAttribute.setTransformScript(script);
+		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+	}
 
 	@Test
 	public void testGetConnectorObjectWithCrossDomainValues() {
@@ -541,18 +872,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -714,18 +1034,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(1, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityContractDto contract = getHelper().createContract(identity);
@@ -796,18 +1105,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(1, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		String automaticRoleValue = getHelper().createName();
 		IdmAutomaticRoleAttributeDto automaticRole = getHelper().createAutomaticRole(noLoginRole.getId());
@@ -909,18 +1207,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -1016,18 +1303,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(1, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		IdmRoleCompositionDto roleComposition = getHelper().createRoleComposition(parentNoLoginRole, noLoginRole);
 
@@ -1124,18 +1400,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -1238,18 +1503,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -1372,18 +1626,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
@@ -1516,18 +1759,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		assertEquals(0, roleSystemDtos.size());
 
 		// Creates overridden ldapGroup merge attribute.
-		SysRoleSystemAttributeDto ldapGroupsRoleSystemAttribute = new SysRoleSystemAttributeDto();
-		ldapGroupsRoleSystemAttribute.setSystemAttributeMapping(ldapGroupsAttribute.getId());
-		ldapGroupsRoleSystemAttribute.setRoleSystem(roleSystem.getId());
-		ldapGroupsRoleSystemAttribute.setEntityAttribute(ldapGroupsAttribute.isEntityAttribute());
-		ldapGroupsRoleSystemAttribute.setSchemaAttribute(ldapGroupsAttribute.getSchemaAttribute());
-		ldapGroupsRoleSystemAttribute.setExtendedAttribute(ldapGroupsAttribute.isExtendedAttribute());
-		ldapGroupsRoleSystemAttribute.setName(ldapGroupsAttribute.getName());
-		ldapGroupsRoleSystemAttribute.setStrategyType(ldapGroupsAttribute.getStrategyType());
-		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
-		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
-		ldapGroupsRoleSystemAttribute.setTransformScript("return 'ONE';");
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		createOverriddenLdapGroupAttribute(ldapGroupsAttribute, roleSystem);
 
 		// Role-system should be in cross-domain group now.
 		roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();

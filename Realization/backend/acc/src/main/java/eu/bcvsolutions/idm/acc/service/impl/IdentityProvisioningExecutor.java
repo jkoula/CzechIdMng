@@ -170,8 +170,8 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		SysRoleSystemAttributeFilter roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
 		roleSystemAttributeFilter.setSystemMappingId(mapping.getId());
 		// Filtering by identity-account relation.
-		 roleSystemAttributeFilter.setAccountId(account.getId());
-		 roleSystemAttributeFilter.setIdentityId(entity.getId());
+		roleSystemAttributeFilter.setAccountId(account.getId());
+		roleSystemAttributeFilter.setIdentityId(entity.getId());
 		List<SysRoleSystemAttributeDto> roleAttributes = roleSystemAttributeService
 				.find(roleSystemAttributeFilter, null).getContent();
 		if (!CollectionUtils.isEmpty(roleAttributes)) {
@@ -179,14 +179,14 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		}
 
 		// Cross-domains attributes and no-login attributes will be added only for default UID.
-		// It means, if some attributes override an UID attribute, then now additional attribute will be used!
+		// It means, if some attributes override an UID attribute, then no additional attribute will be used!
 		boolean uidIsOverridden = roleSystemAttributesAll.stream().anyMatch(SysRoleSystemAttributeDto::isUid);
 
 		if (!uidIsOverridden) {
 			// Add overridden attributes which are in a cross-domain group or is in no-login role.
 			// Beware - these attributes are added for every account (overridden attributes are not supported)
 			roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
-			roleSystemAttributeFilter.setIdentityId(entity.getId());
+			roleSystemAttributeFilter.setRoleSystemRelationForIdentityId(entity.getId());
 			roleSystemAttributeFilter.setSystemMappingId(mapping.getId());
 			roleSystemAttributeFilter.setInCrossDomainGroupOrIsNoLogin(Boolean.TRUE);
 

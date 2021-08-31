@@ -6,6 +6,7 @@ import eu.bcvsolutions.idm.acc.connector.PostgresqlConnectorType;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
+import eu.bcvsolutions.idm.acc.service.impl.mock.MockMsSqlConnectorType;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
@@ -14,6 +15,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -25,6 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
+
+	@Autowired
+	@Qualifier(MockMsSqlConnectorType.NAME)
+	private MockMsSqlConnectorType mockMsSqlConnectorType;
 
 	@Test
 	@Override
@@ -44,13 +51,12 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 		// If not, whole test will be skipped.
 		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
 			// Skip test.
-			return;
+			//return;
 		}
-		ConnectorTypeDto mockPostgresqlConnectorTypeDto = new ConnectorTypeDto();
-		mockPostgresqlConnectorTypeDto.setReopened(false);
-		mockPostgresqlConnectorTypeDto.setId(this.getJdbcConnectorType());
+		ConnectorTypeDto connectorTypeDto = getConnectorTypeDto();
+		connectorTypeDto.setReopened(false);
 
-		ConnectorTypeDto jdbcConnectorTypeDto = connectorManager.load(mockPostgresqlConnectorTypeDto);
+		ConnectorTypeDto jdbcConnectorTypeDto = connectorManager.load(connectorTypeDto);
 		assertNotNull(jdbcConnectorTypeDto);
 
 		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.HOST, this.getHost());
@@ -95,7 +101,7 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 		// Check Domain.
 		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + domain));
 		// Check instance name.
-		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + instanceName));
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.INSTANCE_NAME_TEMPLATE + instanceName));
 
 		// Delete created system.
 		systemService.delete(systemDto);
@@ -107,13 +113,12 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 		// If not, whole test will be skipped.
 		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
 			// Skip test.
-			return;
+			//return;
 		}
-		ConnectorTypeDto mockPostgresqlConnectorTypeDto = new ConnectorTypeDto();
-		mockPostgresqlConnectorTypeDto.setReopened(false);
-		mockPostgresqlConnectorTypeDto.setId(this.getJdbcConnectorType());
+		ConnectorTypeDto connectorTypeDto = getConnectorTypeDto();
+		connectorTypeDto.setReopened(false);
 
-		ConnectorTypeDto jdbcConnectorTypeDto = connectorManager.load(mockPostgresqlConnectorTypeDto);
+		ConnectorTypeDto jdbcConnectorTypeDto = connectorManager.load(connectorTypeDto);
 		assertNotNull(jdbcConnectorTypeDto);
 
 		jdbcConnectorTypeDto.getMetadata().put(AbstractJdbcConnectorType.HOST, this.getHost());
@@ -143,10 +148,10 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 		assertNotNull(systemDto);
 
 		ConnectorType connectorTypeBySystem = connectorManager.findConnectorTypeBySystem(systemDto);
-		ConnectorTypeDto reopenSystem = new ConnectorTypeDto();
+		ConnectorTypeDto reopenSystem = getConnectorTypeDto();
 		reopenSystem.setReopened(true);
-		reopenSystem.setId(connectorTypeBySystem.getId());
 		reopenSystem.getEmbedded().put(PostgresqlConnectorType.SYSTEM_DTO_KEY, systemDto);
+		reopenSystem.getMetadata().put(PostgresqlConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
 		reopenSystem = connectorManager.load(reopenSystem);
 		assertNotNull(reopenSystem);
 		reopenSystem.setWizardStepName(AbstractJdbcConnectorType.STEP_ONE_CREATE_SYSTEM);
@@ -180,39 +185,59 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + domain));
 		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + domainTwo));
 		// Check instance name.
-		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + instanceName));
-		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.DOMAIN_TEMPLATE + instanceNameTwo));
+		Assert.assertFalse(jdbcUrlTemplate.contains(MsSqlConnectorType.INSTANCE_NAME_TEMPLATE + instanceName));
+		Assert.assertTrue(jdbcUrlTemplate.contains(MsSqlConnectorType.INSTANCE_NAME_TEMPLATE + instanceNameTwo));
 		
 		// Delete created system.
 		systemService.delete(systemDto);
 	}
 
+	@Override
+	protected ConnectorTypeDto getConnectorTypeDto() {
+		return connectorManager.convertTypeToDto(mockMsSqlConnectorType);
+	}
+
 	protected String getHost() {
-		//jdbc:sqlserver://localhost:1433;databaseName=bcv_idm_10
+		//"jdbc:sqlserver://localhost:1433;databaseName=bcv_idm_10";
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			return "localhost";
+		}
 		String jdbcUrl = env.getProperty("spring.datasource.url");
 		return jdbcUrl.split("//")[1].split(":")[0];
 	}
 
 	protected String getUsername() {
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			return "user";
+		}
 		return env.getProperty("spring.datasource.username");
 	}
 
 	protected String getPassword() {
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			return "password";
+		}
 		return env.getProperty("spring.datasource.password");
 	}
 
 	protected String getPort() {
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			return "1433";
+		}
 		String jdbcUrl = env.getProperty("spring.datasource.url");
 		return jdbcUrl.split("//")[1].split(":")[1].split(";")[0];
 	}
 
 	protected String getDatabase() {
+		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
+			return "db";
+		}
 		String jdbcUrl = env.getProperty("spring.datasource.url");
 		return jdbcUrl.split("databaseName=")[1];
 	}
 
 	protected String getJdbcConnectorType() {
-		return MsSqlConnectorType.NAME;
+		return MockMsSqlConnectorType.NAME;
 	}
 
 	protected String getJdbcConnectorTypeDriverName() {
