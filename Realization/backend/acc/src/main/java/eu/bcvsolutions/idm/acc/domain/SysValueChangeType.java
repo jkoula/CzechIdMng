@@ -1,4 +1,4 @@
-package eu.bcvsolutions.idm.vs.domain;
+package eu.bcvsolutions.idm.acc.domain;
 
 /**
  * Type of value change
@@ -6,7 +6,7 @@ package eu.bcvsolutions.idm.vs.domain;
  * @author svandav
  *
  */
-public enum VsValueChangeType {
+public enum SysValueChangeType {
 	
 	ADDED,
 	UPDATED,

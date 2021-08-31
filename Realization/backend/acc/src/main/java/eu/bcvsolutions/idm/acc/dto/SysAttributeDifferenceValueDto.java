@@ -1,9 +1,9 @@
-package eu.bcvsolutions.idm.vs.dto;
+package eu.bcvsolutions.idm.acc.dto;
 
 import org.springframework.hateoas.core.Relation;
 
+import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
-import eu.bcvsolutions.idm.vs.domain.VsValueChangeType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -11,23 +11,23 @@ import io.swagger.annotations.ApiModelProperty;
  * DTO for attribute value with marked type of change
  * 
  * @author Svanda
+ * @author Ondrej Husnik
  *
  */
 @Relation(collectionRelation = "accounts")
 @ApiModel(description = "Attribute value with marked type of change")
-public class VsAttributeValueDto extends AbstractDto {
-
+public class SysAttributeDifferenceValueDto extends AbstractDto {
 	private static final long serialVersionUID = 1L;
 
 	private Object value;
 	private Object oldValue;
 	@ApiModelProperty(required = false, notes = "Type of value change")
-	private VsValueChangeType change;
+	private SysValueChangeType change;
 
-	public VsAttributeValueDto() {
+	public SysAttributeDifferenceValueDto() {
 	}
 	
-	public VsAttributeValueDto(Object value, Object oldValue, VsValueChangeType type) {
+	public SysAttributeDifferenceValueDto(Object value, Object oldValue, SysValueChangeType type) {
 		this.value = value;
 		this.oldValue = oldValue;
 		this.change = type;
@@ -41,11 +41,11 @@ public class VsAttributeValueDto extends AbstractDto {
 		this.value = value;
 	}
 
-	public VsValueChangeType getChange() {
+	public SysValueChangeType getChange() {
 		return change;
 	}
 
-	public void setChange(VsValueChangeType change) {
+	public void setChange(SysValueChangeType change) {
 		this.change = change;
 	}
 
@@ -56,7 +56,4 @@ public class VsAttributeValueDto extends AbstractDto {
 	public void setOldValue(Object oldValue) {
 		this.oldValue = oldValue;
 	}
-	
-	
-
 }

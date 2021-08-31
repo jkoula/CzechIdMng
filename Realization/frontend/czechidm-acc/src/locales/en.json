@@ -792,7 +792,7 @@
         "attributeNameCol": "Attribute name",
         "accountObject": {
          "label": "Updated values",
-         "help": "The state of values ready to provisioning. Attributes will be in this state on the target system after performing provisioning. Highlighted lines depicts attributes to change. The new values are emphasized by bold text."
+         "help": "The state of values ready to provisioning. Highlighted lines depicts attributes to change."
         },
         "connectorObject": {
           "label": "Changed only",
@@ -808,7 +808,7 @@
           "label": "<strong>Attempt:</strong> {{currentAttempt}} / {{maxAttempts}}, Next attempt will execute after <strong>{{nextAttempt}}</strong>"
         },
         "switchShowChangesOnly": {
-          "label": "Changes for provisioning only"
+          "label": "Changes only"
         }
       },
       "filter": {
@@ -1493,6 +1493,11 @@
       "roleRequestId": {
         "label": "Request",
         "help": "Go to the request within which this operation was created."
+      },
+      "attributeDiffType": {
+        "ADDED": "Value will be added",
+        "REMOVED": "Value will be removed",
+        "UPDATED": "Value will be updated"
       }
     },
     "ProvisioningArchive": {
@@ -1502,6 +1507,11 @@
         "label": "Processed",
         "title": "Operation was processed (executed, canceled)",
         "help": "Operation was processed (executed, canceled)."
+      },
+      "attributeDiffType": {
+        "ADDED": "Value was added",
+        "REMOVED": "Value was removed",
+        "UPDATED": "Value was updated"
       }
     },
     "ProvisioningBreakConfig": {

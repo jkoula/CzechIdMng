@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +21,10 @@ import org.springframework.util.CollectionUtils;
 
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
+import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceValueDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto.Builder;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
@@ -45,6 +49,9 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
+import eu.bcvsolutions.idm.ic.api.IcAttribute;
+import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
+import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
 
 /**
  * Archived provisioning operations
@@ -130,6 +137,95 @@ public class DefaultSysProvisioningArchiveService
 		//
 		return system;
 	}
+	
+	@Override
+	public List<SysAttributeDifferenceDto> evaluateProvisioningDifferences(IcConnectorObject current, IcConnectorObject changed) {
+		List<SysAttributeDifferenceDto> resultAttributes = new ArrayList<>();
+		IcConnectorObject currentObject = current != null ? current : new IcConnectorObjectImpl();
+		IcConnectorObject changedObject = changed != null ? changed : new IcConnectorObjectImpl();
+		
+		List<IcAttribute> currentAttributes = currentObject.getAttributes();
+		List<IcAttribute> changedAttributes = changedObject.getAttributes();
+		
+		changedAttributes.forEach(changedAttribute -> {
+			if (currentObject.getAttributeByName(changedAttribute.getName()) == null) {
+				SysAttributeDifferenceDto vsAttribute = new SysAttributeDifferenceDto(changedAttribute.getName(),
+						changedAttribute.isMultiValue(), true);
+				if (changedAttribute.isMultiValue()) {
+					if (changedAttribute.getValues() != null) {
+						changedAttribute.getValues().forEach(value -> {
+							vsAttribute.getValues().add(new SysAttributeDifferenceValueDto(value, null, SysValueChangeType.ADDED));
+						});
+					}
+				} else {
+					vsAttribute.setValue(
+							new SysAttributeDifferenceValueDto(changedAttribute.getValue(), null, SysValueChangeType.ADDED));
+				}
+				resultAttributes.add(vsAttribute);
+			}
+		});
+
+		// Second add all already existing attributes
+		currentAttributes.forEach(currentAttribute -> {
+			SysAttributeDifferenceDto vsAttribute;
+			// Attribute was changed
+			if (changedObject.getAttributeByName(currentAttribute.getName()) != null) {
+				vsAttribute = new SysAttributeDifferenceDto(currentAttribute.getName(), currentAttribute.isMultiValue(), true);
+				IcAttribute changedAttribute = changedObject.getAttributeByName(currentAttribute.getName());
+				if (changedAttribute.isMultiValue()) {
+					vsAttribute.setChanged(false);
+					if (changedAttribute.getValues() != null) {
+						changedAttribute.getValues().forEach(value -> {
+							if (currentAttribute.getValues() != null && currentAttribute.getValues().contains(value)) {
+								vsAttribute.getValues().add(new SysAttributeDifferenceValueDto(value, value, null));
+							} else {
+								vsAttribute.setChanged(true);
+								vsAttribute.getValues()
+										.add(new SysAttributeDifferenceValueDto(value, null, SysValueChangeType.ADDED));
+							}
+						});
+					}
+					if (currentAttribute.getValues() != null) {
+						currentAttribute.getValues().forEach(value -> {
+							if (changedAttribute.getValues() == null || !changedAttribute.getValues().contains(value)) {
+								vsAttribute.setChanged(true);
+								vsAttribute.getValues()
+										.add(new SysAttributeDifferenceValueDto(value, value, SysValueChangeType.REMOVED));
+							}
+						});
+					}
+				} else {
+					Object changedValue = changedAttribute.getValue();
+					Object currentValue = currentAttribute.getValue();
+					if ((changedValue == null && currentValue == null)
+							|| (changedValue != null && changedValue.equals(currentValue))
+							|| (currentValue != null && currentValue.equals(changedValue))) {
+
+						vsAttribute.setValue(new SysAttributeDifferenceValueDto(changedValue, currentValue, null));
+					} else {
+						vsAttribute.setValue(
+								new SysAttributeDifferenceValueDto(changedValue, currentValue, SysValueChangeType.UPDATED));
+					}
+				}
+			} else {
+				// Attribute was not changed
+				vsAttribute = new SysAttributeDifferenceDto(currentAttribute.getName(), currentAttribute.isMultiValue(), false);
+				if (currentAttribute.isMultiValue()) {
+					if (currentAttribute.getValues() != null) {
+						currentAttribute.getValues().forEach(value -> {
+							vsAttribute.getValues().add(new SysAttributeDifferenceValueDto(value, value, null));
+						});
+					}
+				} else {
+					vsAttribute.setValue(
+							new SysAttributeDifferenceValueDto(currentAttribute.getValue(), currentAttribute.getValue(), null));
+				}
+			}
+			resultAttributes.add(vsAttribute);
+		});
+		
+		return resultAttributes;
+	} 
 	
 	@Override
 	protected List<Predicate> toPredicates(Root<SysProvisioningArchive> root, CriteriaQuery<?> query, CriteriaBuilder builder, SysProvisioningOperationFilter filter) {
