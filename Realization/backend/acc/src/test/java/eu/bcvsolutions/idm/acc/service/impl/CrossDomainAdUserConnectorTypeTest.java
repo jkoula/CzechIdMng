@@ -387,13 +387,10 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityContractDto contract = getHelper().createContract(identity);
 
-		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(new GetConnectorObjectCallback() {
-			@Override
-			public IcConnectorObject call(SysSystemDto system, String uid, IcObjectClass objectClass) {
-				IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
-				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "TWO"));
-				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
-			}
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack((system, uid, objectClass) -> {
+			IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
+			connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "TWO"));
+			return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
 		});
 		
 		IdmRoleRequestDto roleRequestDto = getHelper().assignRoles(contract, roleInCrossDomainGroup, loginRole);
@@ -524,14 +521,11 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityContractDto contract = getHelper().createContract(identity);
 
-		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(new GetConnectorObjectCallback() {
-			@Override
-			public IcConnectorObject call(SysSystemDto system, String uid, IcObjectClass objectClass) {
-				IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
-				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "THREE"));
-				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.SID_ATTRIBUTE_KEY, "SID".getBytes(StandardCharsets.UTF_8)));
-				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
-			}
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack((system, uid, objectClass) -> {
+			IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
+			connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "THREE"));
+			connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.SID_ATTRIBUTE_KEY, "SID".getBytes(StandardCharsets.UTF_8)));
+			return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
 		});
 		// Assign login (ONE and TWO) and no-login roles.
 		IdmRoleRequestDto roleRequestDto = getHelper().assignRoles(contract, noLoginRole, loginRole, loginRoleTwo);
@@ -694,14 +688,11 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityContractDto contract = getHelper().createContract(identity);
 
-		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(new GetConnectorObjectCallback() {
-			@Override
-			public IcConnectorObject call(SysSystemDto system, String uid, IcObjectClass objectClass) {
-				IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
-				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "THREE"));
-				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.SID_ATTRIBUTE_KEY, "SID".getBytes(StandardCharsets.UTF_8)));
-				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
-			}
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack((system, uid, objectClass) -> {
+			IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
+			connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "THREE"));
+			connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.SID_ATTRIBUTE_KEY, "SID".getBytes(StandardCharsets.UTF_8)));
+			return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
 		});
 		
 		// Assign login (ONE and TWO) and no-login roles.
@@ -869,13 +860,10 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityContractDto contract = getHelper().createContract(identity);
 
-		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack(new GetConnectorObjectCallback() {
-			@Override
-			public IcConnectorObject call(SysSystemDto system, String uid, IcObjectClass objectClass) {
-				IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
-				connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "TWO"));
-				return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
-			}
+		mockCrossDomainAdUserConnectorType.setReadConnectorObjectCallBack((system, uid, objectClass) -> {
+			IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl(identity.getUsername(), null, null);
+			connectorObject.getAttributes().add(new IcAttributeImpl(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE, "TWO"));
+			return mockCrossDomainAdUserConnectorType.getCrossDomainConnectorObject(system, uid, objectClass, connectorObject);
 		});
 
 		IdmRoleRequestDto roleRequestDto = getHelper().assignRoles(contract, roleInCrossDomainGroup, loginRole);
