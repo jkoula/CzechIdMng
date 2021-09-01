@@ -36,7 +36,6 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.impl.mock.MockCrossDomainAdUserConnectorType;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
-import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
@@ -48,24 +47,13 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeRuleService;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
-import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
-import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
-import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
-import eu.bcvsolutions.idm.core.eav.api.service.FormProjectionRoute;
-import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition;
-import eu.bcvsolutions.idm.core.model.event.AutomaticRoleAttributeEvent;
-import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
 import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
 import eu.bcvsolutions.idm.ic.api.IcConfigurationProperty;
@@ -93,13 +81,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Tests for cross-domains on AD User connector type.
  *
  * @author Vít Švanda
  * @since 11.2.0
+ * @noinspection OptionalGetWithoutIsPresent
  */
 public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest {
 
@@ -109,8 +97,6 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 	private SysSystemService systemService;
 	@Autowired
 	private IdmRoleService roleService;
-	@Autowired
-	private FormService formService;
 	@Autowired
 	private SysSchemaAttributeService schemaAttributeService;
 	@Autowired
@@ -285,7 +271,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -343,7 +329,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		// Clean
 		provisioningOperationService.deleteOperations(systemDto.getId());
@@ -373,7 +359,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -440,8 +426,8 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(1, ((List) ldapGroupsValue).size());
-		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("ONE")));
+		assertEquals(1, ((List<?>) ldapGroupsValue).size());
+		assertTrue(((List<?>) ldapGroupsValue).stream().anyMatch(value -> value.equals("ONE")));
 
 		IcAttribute ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
 				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
@@ -493,13 +479,13 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 		
 		SysSystemGroupSystemDto systemGroupSystemTwo = new SysSystemGroupSystemDto();
 		systemGroupSystemTwo.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemTwo.setMergeAttribute(ldapGroupsAttributeTwo.getId());
 		systemGroupSystemTwo.setSystem(systemTwoDto.getId());
-		systemGroupSystemTwo = systemGroupSystemService.save(systemGroupSystemTwo);
+		systemGroupSystemService.save(systemGroupSystemTwo);
 
 		// Creates the login role ONE.
 		IdmRoleDto loginRole = helper.createRole();
@@ -574,8 +560,8 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(1, ((List) ldapGroupsValue).size());
-		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("ONE")));
+		assertEquals(1, ((List<?>) ldapGroupsValue).size());
+		assertTrue(((List<?>) ldapGroupsValue).stream().anyMatch(value -> value.equals("ONE")));
 
 		IcAttribute ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
 				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
@@ -608,8 +594,8 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(1, ((List) ldapGroupsValue).size());
-		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("TWO")));
+		assertEquals(1, ((List<?>) ldapGroupsValue).size());
+		assertTrue(((List<?>) ldapGroupsValue).stream().anyMatch(value -> value.equals("TWO")));
 
 		ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
 				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
@@ -663,13 +649,13 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 		
 		SysSystemGroupSystemDto systemGroupSystemTwo = new SysSystemGroupSystemDto();
 		systemGroupSystemTwo.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemTwo.setMergeAttribute(ldapGroupsAttributeTwo.getId());
 		systemGroupSystemTwo.setSystem(systemTwoDto.getId());
-		systemGroupSystemTwo = systemGroupSystemService.save(systemGroupSystemTwo);
+		systemGroupSystemService.save(systemGroupSystemTwo);
 
 		// Creates the login role ONE.
 		IdmRoleDto loginRole = helper.createRole();
@@ -728,7 +714,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 				.get();
 		assertNotNull(noLoginConcept);
 		noLoginConcept.setRoleSystem(roleSystemTwo.getId());
-		noLoginConcept = conceptRoleRequestService.save(noLoginConcept);
+		conceptRoleRequestService.save(noLoginConcept);
 		roleRequestDto = getHelper().executeRequest(roleRequestDto, true);
 
 		assertEquals(RoleRequestState.EXECUTED, roleRequestDto.getState());
@@ -762,7 +748,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(0, ((List) ldapGroupsValue).size());
+		assertEquals(0, ((List<?>) ldapGroupsValue).size());
 
 		IcAttribute ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
 				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
@@ -789,8 +775,8 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(1, ((List) ldapGroupsValue).size());
-		assertTrue(((List) ldapGroupsValue).stream().anyMatch(value -> value.equals("TWO")));
+		assertEquals(1, ((List<?>) ldapGroupsValue).size());
+		assertTrue(((List<?>) ldapGroupsValue).stream().anyMatch(value -> value.equals("TWO")));
 
 		ldapGroups = provisioningOperationDto.getProvisioningContext().getConnectorObject()
 				.getAttributeByName(MockCrossDomainAdUserConnectorType.LDAP_GROUPS_ATTRIBUTE);
@@ -830,7 +816,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		ldapGroupsRoleSystemAttribute.setIdmPropertyName(ldapGroupsAttribute.getIdmPropertyName());
 		ldapGroupsRoleSystemAttribute.setUid(ldapGroupsAttribute.isUid());
 		ldapGroupsRoleSystemAttribute.setTransformScript(script);
-		ldapGroupsRoleSystemAttribute = roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
+		roleSystemAttributeService.save(ldapGroupsRoleSystemAttribute);
 	}
 
 	@Test
@@ -855,7 +841,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -938,7 +924,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		IcConnectorConfiguration connectorConfiguration = connectorType.getConnectorConfiguration(systemDto);
 		Object otherSystemInGroupsObj = connectorConfiguration.getSystemOperationOptions().get(MockCrossDomainAdUserConnectorType.CROSS_DOMAIN_SYSTEM_IDS);
@@ -1069,7 +1055,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		// Clean
 		provisioningOperationService.deleteOperations(systemDto.getId());
@@ -1156,7 +1142,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		// Clean
 		provisioningOperationService.deleteOperations(systemDto.getId());
@@ -1187,7 +1173,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -1264,7 +1250,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		// Clean
 		provisioningOperationService.deleteOperations(systemDto.getId());
@@ -1347,7 +1333,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		// Clean
 		provisioningOperationService.deleteOperations(systemDto.getId());
@@ -1379,7 +1365,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -1450,7 +1436,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		// Clean
 		provisioningOperationService.deleteOperations(systemDto.getId());
@@ -1482,7 +1468,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -1546,7 +1532,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(0, ((List) ldapGroupsValue).size());
+		assertEquals(0, ((List<?>) ldapGroupsValue).size());
 
 		// Delete old provisioning.
 		provisioningOperationService.delete(provisioningOperationDto);
@@ -1572,7 +1558,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		assertEquals(1, identityRoleService.count(identityRoleFilter));
 
@@ -1606,7 +1592,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -1677,7 +1663,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(0, ((List) ldapGroupsValue).size());
+		assertEquals(0, ((List<?>) ldapGroupsValue).size());
 
 		// Delete old provisioning.
 		provisioningOperationService.delete(provisioningOperationDto);
@@ -1706,7 +1692,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		assertEquals(1, identityRoleService.count(identityRoleFilter));
 
@@ -1739,7 +1725,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		systemGroupSystemOne.setSystemGroup(groupSystemDto.getId());
 		systemGroupSystemOne.setMergeAttribute(ldapGroupsAttribute.getId());
 		systemGroupSystemOne.setSystem(systemDto.getId());
-		systemGroupSystemOne = systemGroupSystemService.save(systemGroupSystemOne);
+		systemGroupSystemService.save(systemGroupSystemOne);
 
 		// Creates the login role.
 		IdmRoleDto loginRole = helper.createRole();
@@ -1800,7 +1786,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		Object ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals(0, ((List) ldapGroupsValue).size());
+		assertEquals(0, ((List<?>) ldapGroupsValue).size());
 
 		// Delete old provisioning.
 		provisioningOperationService.delete(provisioningOperationDto);
@@ -1829,7 +1815,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 		assertNotNull(provisioningAttributeLdapGroupsDto);
 		ldapGroupsValue = provisioningOperationDto.getProvisioningContext().getAccountObject().get(provisioningAttributeLdapGroupsDto);
-		assertEquals("ONE", ((List) ldapGroupsValue).get(0));
+		assertEquals("ONE", ((List<?>) ldapGroupsValue).get(0));
 
 		assertEquals(1, identityRoleService.count(identityRoleFilter));
 
@@ -1911,15 +1897,6 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		SysSystemDto system = systemService.get(systemDto.getId());
 		assertNotNull(system);
 		return system;
-	}
-
-	protected String getValueFromConnectorInstance(String attributeCode, SysSystemDto systemDto, IdmFormDefinitionDto connectorFormDef) {
-		IdmFormAttributeDto attribute = connectorFormDef.getMappedAttributeByCode(attributeCode);
-		List<IdmFormValueDto> values = formService.getValues(systemDto, attribute, IdmBasePermission.READ);
-		if (values != null && values.size() == 1) {
-			return (String) values.get(0).getValue();
-		}
-		return null;
 	}
 
 }
