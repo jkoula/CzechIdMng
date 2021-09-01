@@ -32,7 +32,8 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 		@Index(name = "idx_idm_attachment_o_id", columnList = "owner_id"),
 		@Index(name = "idx_idm_attachment_o_type", columnList = "owner_type"),
 		@Index(name = "idx_idm_attachment_name", columnList = "name"),
-		@Index(name = "idx_idm_attachment_desc", columnList = "description")
+		@Index(name = "idx_idm_attachment_desc", columnList = "description"),
+		@Index(name = "idx_idm_attachment_a_type", columnList = "attachment_type")
 })
 public class IdmAttachment extends AbstractEntity {
 	
@@ -83,8 +84,8 @@ public class IdmAttachment extends AbstractEntity {
 	@Max(999999999999999999l)
 	private Long filesize;
 	
-	@Size(max = 50)
-	@Column(name = "attachment_type", length = 50)
+	@Size(max = DefaultFieldLengths.NAME)
+	@Column(name = "attachment_type", length = DefaultFieldLengths.NAME)
 	private String attachmentType;
 	
 	@Size(max = 50)

@@ -1,6 +1,7 @@
-package eu.bcvsolutions.idm.core.bulk.action.impl;
+package eu.bcvsolutions.idm.core.bulk.action.impl.identity;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
+import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
@@ -15,46 +18,55 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.bulk.action.impl.role.AbstractAssignRoleBulkAction;
-import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmProcessedTaskItemDto;
+import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 
 /**
- * Bulk operation for add role to identity.
+ * Bulk operation for assign role to identity from role detail side.
  *
- * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
+ * @since 11.2.0
  */
-@Component(IdentityAddRoleBulkAction.NAME)
-@Description("Add role to idetity in bulk action.")
-public class IdentityAddRoleBulkAction extends AbstractAssignRoleBulkAction<IdmIdentityDto, IdmIdentityFilter> {
+@Enabled(CoreModuleDescriptor.MODULE_ID)
+@Component(IdentityAddRoleWithoutSelectionBulkAction.NAME)
+@Description("Assign role to identity.")
+public class IdentityAddRoleWithoutSelectionBulkAction extends AbstractAssignRoleBulkAction<IdmIdentityDto, IdmIdentityFilter> {
 
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(IdentityAddRoleBulkAction.class);
-	public static final String NAME = "identity-add-role-bulk-action";
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(IdentityAddRoleWithoutSelectionBulkAction.class);
 	//
-	public static final String ROLE_CODE = PROPERTY_ROLE;
-	public static final String PRIMARY_CONTRACT_CODE = "mainContract";
-	public static final String VALID_TILL_CODE = PROPERTY_VALID_TILL;
-	public static final String VALID_FROM_CODE = PROPERTY_VALID_FROM;
-	public static final String APPROVE_CODE = PROPERTY_APPROVE;
+	public static final String NAME = "core-identity-add-role-without-selection-bulk-action";
 	//
 	@Autowired private IdmIdentityService identityService;
 
 	@Override
+	public String getName() {
+		return IdentityAddRoleWithoutSelectionBulkAction.NAME;
+	}
+	
+	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
 		List<IdmFormAttributeDto> formAttributes = super.getFormAttributes();
-		// identity select is not needed
-		formAttributes.removeIf(attribute -> attribute.getCode().equals(PROPERTY_IDENTITY));
-		// role select is needed
+		//
 		formAttributes.add(0, getRoleAttribute());
 		//
 		return formAttributes;
 	}
-
+	
 	@Override
-	public String getName() {
-		return IdentityAddRoleBulkAction.NAME;
+	public boolean showWithSelection() {
+		return false;
+	}
+	
+	@Override
+	public boolean showWithoutSelection() {
+		return true;
+	}
+	
+	@Override
+	protected List<UUID> getAllEntities(IdmBulkActionDto action, StringBuilder description) {
+		return getIdentities();
 	}
 
 	@Override
@@ -69,31 +81,6 @@ public class IdentityAddRoleBulkAction extends AbstractAssignRoleBulkAction<IdmI
 		return Lists.newArrayList(
 				CoreGroupPermission.IDENTITY_READ
 		);
-	}
-	
-	/**
-	 * Is set only primary contract
-	 *
-	 * @return
-	 */
-	@Override
-	protected boolean isPrimeContract() {
-		return getParameterConverter().toBoolean(getProperties(), PRIMARY_CONTRACT_CODE, true);
-	}
-
-	/**
-	 * Get {@link IdmFormAttributeDto} for checkbox primary contract.
-	 *
-	 * @return
-	 */
-	@Override
-	protected IdmFormAttributeDto getPrimeContractAttribute() {
-		IdmFormAttributeDto primaryContract = new IdmFormAttributeDto(
-				PRIMARY_CONTRACT_CODE, 
-				PRIMARY_CONTRACT_CODE, 
-				PersistentType.BOOLEAN);
-		primaryContract.setDefaultValue(Boolean.TRUE.toString());
-		return primaryContract;
 	}
 	
 	@Override

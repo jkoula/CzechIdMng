@@ -474,6 +474,10 @@ public class DefaultAttachmentManager
 		if (createdAfter != null) {
 			predicates.add(builder.greaterThan(root.get(IdmAttachment_.created), createdAfter));
 		}
+		String attachmentType = filter.getAttachmentType();
+		if (StringUtils.isNotEmpty(attachmentType)) {
+			predicates.add(builder.equal(root.get(IdmAttachment_.attachmentType), attachmentType));
+		}
 		//
 		return predicates;
 	}

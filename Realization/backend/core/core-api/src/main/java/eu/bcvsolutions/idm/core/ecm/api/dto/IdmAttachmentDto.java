@@ -42,7 +42,7 @@ public class IdmAttachmentDto extends AbstractDto {
 	private String encoding;
 	@Max(999999999999999999l)
 	private Long filesize;
-	@Size(max = 50)
+	@Size(max = DefaultFieldLengths.NAME)
 	private String attachmentType;
 	@Size(max = 50)
 	private String ownerState;

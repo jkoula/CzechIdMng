@@ -635,6 +635,7 @@
           "IDENTITY-SELECT": "Select identity (SelectBox)",
           "IDENTITY-CONTRACT-SELECT": "Select contracts (SelectBox)",
           "IDENTITY-ALLOW-DISABLED-SELECT": "Select identity, disabled included (SelectBox)",
+          "IDENTITY-READ-SELECT": "Select identity (SelectBox, read permission)",
           "ROLE-SELECT": "Select role (SelectBox)",
           "CAN-BE-REQUESTED-ROLE-SELECT": "Select role available for request (SelectBox)",
           "FORM-DEFINITION-SELECT": "Select form definition (SelectBox)",
@@ -6225,6 +6226,62 @@
           }
         }
       },
+      "core-role-add-identity-bulk-action": {
+        "label": "Roles assignment",
+        "icon": "component:identity-role-add",
+        "attributes": {
+          "identity": {
+            "label": "User",
+            "help": ""
+          },
+          "approve": {
+            "label": "Approve",
+            "help": "After check, the role assignment will be approved"
+          },
+          "primecontract": {
+            "label": "Assign to main contract only",
+            "help": "Assigning new roles will only be done on the main contract. Otherwise role will be assigned to all valid and future valid contracts."
+          },
+          "validfrom": {
+            "label": "Valid from",
+            "help": "If valid from is not filled, then will be filled from contract automatically."
+          },
+          "validtill": {
+            "label": "Valid till",
+            "help": "If valid from is not filled, then will be not set (assigned role will be removed by contact validity)."
+          }
+        }
+      },
+      "core-identity-add-role-without-selection-bulk-action": {
+        "label": "Roles assignment",
+        "icon": "component:identity-role-add",
+        "attributes": {
+          "role": {
+            "label": "Roles",
+            "help": ""
+          },
+          "identity": {
+            "label": "User",
+            "help": ""
+          },
+          "approve": {
+            "label": "Approve",
+            "help": "After check, the role assignment will be approved"
+          },
+          "primecontract": {
+            "label": "Assign to main contract only",
+            "help": "Assigning new roles will only be done on the main contract. Otherwise role will be assigned to all valid and future valid contracts."
+          },
+          "validfrom": {
+            "label": "Valid from",
+            "help": "If valid from is not filled, then will be filled from contract automatically."
+          },
+          "validtill": {
+            "label": "Valid till",
+            "help": "If valid from is not filled, then will be not set (assigned role will be removed by contact validity)."
+          }
+        }
+      },
       "identity-remove-role-bulk-action": {
         "label": "Role removing",
         "icon": "component:identity-role-remove",
@@ -7833,6 +7890,14 @@
     "BULK_ACTION_BAD_FILTER": {
       "title": "Bulk action can not be started",
       "message": "Filter must be instance of [{{filter}}], given instance [{{givenFilter}}]."
+    },
+    "BULK_ACTION_INSUFFICIENT_PERMISSION": {
+      "title": "Insufficient permissions",
+      "message": "User is not authorized to perform bulk action for selected record."
+    },
+    "BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT": {
+      "title": "Insufficient permissions",
+      "message": "User is not authorized to assign role for selected contract."
     },
     "CONTRACT_IS_CONTROLLED_CANNOT_BE_MODIFIED": {
       "title": "Contract cannot be modified!",

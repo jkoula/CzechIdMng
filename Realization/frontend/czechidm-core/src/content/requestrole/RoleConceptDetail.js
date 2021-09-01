@@ -73,7 +73,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     const entityFormData = _.merge({}, entity, {
       role: entity._embedded && entity._embedded.role ? entity._embedded.role : null
     });
-    
+
     if (entityFormData.role && entityFormData.role.identityRoleAttributeDefinition) {
       selectedRole = entityFormData.role;
       selectedIdentityRole = entityFormData;
@@ -152,7 +152,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       if (this.refs.roleSystem) {
         this.refs.roleSystem.setValue(null);
       }
-    } );
+    });
     //
     return true;
   }
@@ -268,7 +268,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
           clearable
           forceSearchParameters={
             new SearchParameters()
-              .setFilter('isInCrossDomainGroupRoleId', selectedRoleId ? selectedRoleId : SearchParameters.BLANK_UUID)
+              .setFilter('isInCrossDomainGroupRoleId', selectedRoleId || SearchParameters.BLANK_UUID)
           }
           helpBlock={ this.i18n('entity.IdentityRole.roleSystem.help')}
           label={ this.i18n('entity.IdentityRole.roleSystem.label') }/>

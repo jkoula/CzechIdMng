@@ -467,15 +467,14 @@ public abstract class AbstractBulkAction<DTO extends AbstractDto, F extends Base
 	 */
 	protected void createPermissionFailedLog(DTO dto) {
 		String entityCode = "";
-		if (dto.getClass().isAssignableFrom(Codeable.class)) {
-			Codeable codeAbleDto = (Codeable) dto;
-			entityCode = codeAbleDto.getCode();
+		if (dto instanceof Codeable) {
+			entityCode = ((Codeable) dto).getCode();
 		}
 		DefaultResultModel model = new DefaultResultModel(CoreResultCode.BULK_ACTION_INSUFFICIENT_PERMISSION,
 				ImmutableMap.of("bulkAction", this.getAction().getName(),
 						"entityId", dto.getId(),
 						"entityCode", entityCode));
-		// operation state = blocked for insufficient permission
+		//
 		this.logItemProcessed(dto, new OperationResult.Builder(OperationState.NOT_EXECUTED).setModel(model).build());
 	}
 

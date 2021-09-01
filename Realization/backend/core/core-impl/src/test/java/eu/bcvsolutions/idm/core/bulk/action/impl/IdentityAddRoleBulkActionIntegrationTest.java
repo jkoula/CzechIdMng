@@ -40,13 +40,12 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
 
 /**
- * Integration tests for {@link IdentityAddRoleBulkAction}
+ * Integration tests for {@link IdentityAddRoleBulkAction}.
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
-
-public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
+public class IdentityAddRoleBulkActionIntegrationTest extends AbstractBulkActionTest {
 
 	@Autowired
 	private IdmIdentityService identityService;
@@ -60,8 +59,8 @@ public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
 		IdmIdentityDto identity = getHelper().createIdentity();
 		
 		IdmRoleDto createRole = getHelper().createRole();
-		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITY, IdmIdentity.class, IdmBasePermission.READ, IdentityBasePermission.CHANGEPERMISSION);
-		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITYCONTRACT, IdmIdentityContract.class, IdmBasePermission.AUTOCOMPLETE);
+		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITY, IdmIdentity.class, IdmBasePermission.READ);
+		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITYCONTRACT, IdmIdentityContract.class, IdmBasePermission.AUTOCOMPLETE, IdentityBasePermission.CHANGEPERMISSION);
 		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.ROLEREQUEST, IdmRoleRequest.class, IdmBasePermission.ADMIN);
 		
 		getHelper().createIdentityRole(identity, createRole);
@@ -96,7 +95,7 @@ public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
 
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
 		
-		checkResultLrt(processAction, 5l, null, null);
+		checkResultLrt(processAction, 10l, null, null);
 		
 		for (UUID id : ids) {
 			IdmIdentityDto identityDto = identityService.get(id);
@@ -141,7 +140,7 @@ public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
 
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
 		
-		checkResultLrt(processAction, 1l, null, null);
+		checkResultLrt(processAction, 2l, null, null);
 		
 		List<IdmIdentityContractDto> contracts = identityContractService.findAllByIdentity(identityOne.getId());
 		Assert.assertEquals(3, contracts.size()); // +1 primary vithout validity is set
@@ -192,7 +191,7 @@ public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
 		bulkAction.setProperties(properties);
 		
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
-		checkResultLrt(processAction, 5l, null, null);
+		checkResultLrt(processAction, 10l, null, null);
 		
 		for (IdmIdentityDto identity : identities) {
 			List<IdmIdentityContractDto> contracts = identityContractService.findAllByIdentity(identity.getId());
@@ -210,7 +209,7 @@ public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
 
 	@Test
 	public void processBulkActionByFilterWithRemove() {
-		String testLastName = "bulkActionLastName" + System.currentTimeMillis();
+		String testLastName = getHelper().createName();
 		List<IdmIdentityDto> identities = this.createIdentities(5);
 		IdmIdentityDto removedIdentity = identities.get(0);
 		IdmIdentityDto removedIdentity2 = identities.get(1);
@@ -334,7 +333,7 @@ public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
 
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
 		
-		checkResultLrt(processAction, 0l, 0l, 5l);
+		checkResultLrt(processAction, 0l, 0l, 0l);
 		
 		for (UUID id : ids) {
 			IdmIdentityDto identity = identityService.get(id);
