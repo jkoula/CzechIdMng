@@ -668,7 +668,8 @@ IdentityTable.defaultProps = {
   showRowSelection: false,
   forceSearchParameters: null,
   rendered: true,
-  treeType: false
+  treeType: false,
+  prohibitedActions: [ 'core-identity-add-role-without-selection-bulk-action' ] // ~ hidden by default, show only from role detail
 };
 
 function select(state, component) {

@@ -48,8 +48,16 @@ export default class IdentitySelectFormAttributeRenderer extends SelectBoxFormAt
     //
     // set search name into force search parameters
     let forceSearchParameters = null;
-    if (component && component.searchName) {
-      forceSearchParameters = new SearchParameters(component.searchName);
+    if (component) {
+      if (component.searchName) {
+        forceSearchParameters = new SearchParameters(component.searchName);
+      }
+      if (component.permission) {
+        if (!forceSearchParameters) {
+          forceSearchParameters = new SearchParameters();
+        }
+        forceSearchParameters = forceSearchParameters.setFilter('_permission', component.permission);
+      }
     }
     //
     return (

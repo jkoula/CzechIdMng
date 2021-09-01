@@ -51,18 +51,17 @@ import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.role.RoleRequestApprovalProcessor;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
-import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 
 /**
- * Remove role from given identities by bulk operation
+ * Remove role from given identities by bulk operation.
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
- *
+ * @author Radek Tomiška
  */
-
 @Enabled(CoreModuleDescriptor.MODULE_ID)
 @Component("identityRemoveRoleBulkAction")
 @Description("Remove role from given identities.")
@@ -117,6 +116,21 @@ public class IdentityRemoveRoleBulkAction extends AbstractBulkAction<IdmIdentity
 		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>();
 		for (IdmIdentityContractDto contract : contracts) {
 			if (!checkPermissionForContract(contract)) {
+				LOG.warn("Insufficient permissions for asign role for contract [{}]", contract.getId());
+				//
+				logItemProcessed(
+						contract,
+						new OperationResult
+							.Builder(OperationState.NOT_EXECUTED)
+							.setModel(
+								new DefaultResultModel(
+										CoreResultCode.BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT,
+										ImmutableMap.of("contractId", contract.getId())
+								)
+							)
+							.build()
+				);
+				//
 				continue;
 			}
 			// check if contract has role
@@ -196,13 +210,18 @@ public class IdentityRemoveRoleBulkAction extends AbstractBulkAction<IdmIdentity
 
 	@Override
 	protected List<String> getAuthoritiesForEntity() {
-		return Lists.newArrayList(CoreGroupPermission.IDENTITY_READ, CoreGroupPermission.IDENTITY_CHANGEPERMISSION);
+		return Lists.newArrayList(
+				CoreGroupPermission.IDENTITY_READ, 
+				CoreGroupPermission.IDENTITY_CHANGEPERMISSION // ~ FIXME: this is too strict - if logged user doesn't have permission to change roles on all identity contracts, then action is not available.
+		);
 	}
 
 	@Override
 	public List<String> getAuthorities() {
 		List<String> permissions = super.getAuthorities();
-		permissions.addAll(this.getAuthoritiesForContract());
+		//
+		permissions.add(CoreGroupPermission.IDENTITYCONTRACT_READ);
+		//
 		return permissions;
 	}
 
@@ -213,17 +232,13 @@ public class IdentityRemoveRoleBulkAction extends AbstractBulkAction<IdmIdentity
 	 * @return
 	 */
 	private boolean checkPermissionForContract(IdmIdentityContractDto contract) {
-		return PermissionUtils.hasAnyPermission(identityContractService.getPermissions(contract), 
-				PermissionUtils.toPermissions(getAuthoritiesForContract()).toArray(new BasePermission[] {}));
-	}
-
-	/**
-	 * Get permission for contract
-	 *
-	 * @return
-	 */
-	private List<String> getAuthoritiesForContract() {
-		return Lists.newArrayList(CoreGroupPermission.IDENTITYCONTRACT_READ, CoreGroupPermission.IDENTITYCONTRACT_AUTOCOMPLETE);
+		Set<String> permissions = identityContractService.getPermissions(contract);
+		//
+		return PermissionUtils.hasPermission(permissions, IdmBasePermission.READ) 
+				&& PermissionUtils.hasAnyPermission( // OR -> CANBEREQUESTED or CHANGEPERMISSION for both sides from role guarantee or contract manager
+						permissions, 
+						ContractBasePermission.CHANGEPERMISSION,
+						ContractBasePermission.CANBEREQUESTED);
 	}
 
 	@Override

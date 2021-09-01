@@ -392,6 +392,16 @@ module.exports = {
       manager: require('./src/redux').IdentityManager
     },
     {
+      id: 'identity-read-select-form-value',
+      type: 'form-attribute-renderer',
+      persistentType: 'UUID',
+      faceType: 'IDENTITY-READ-SELECT',
+      component: require('./src/components/advanced/Form/IdentitySelectFormAttributeRenderer'),
+      labelKey: 'core:component.advanced.EavForm.faceType.IDENTITY-READ-SELECT',
+      manager: require('./src/redux').IdentityManager,
+      permission: 'READ'
+    },
+    {
       id: 'role-select-form-value',
       type: 'form-attribute-renderer',
       persistentType: 'UUID',

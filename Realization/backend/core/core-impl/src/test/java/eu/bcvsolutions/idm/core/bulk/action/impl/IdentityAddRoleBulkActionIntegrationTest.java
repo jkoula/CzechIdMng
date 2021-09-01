@@ -40,13 +40,12 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
 
 /**
- * Integration tests for {@link IdentityAddRoleBulkAction}
+ * Integration tests for {@link IdentityAddRoleBulkAction}.
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
-
-public class IdentityAddRoleBulkActionTest extends AbstractBulkActionTest {
+public class IdentityAddRoleBulkActionIntegrationTest extends AbstractBulkActionTest {
 
 	@Autowired
 	private IdmIdentityService identityService;

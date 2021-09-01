@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,20 +49,19 @@ import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.role.RoleRequestApprovalProcessor;
-import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 
 /**
- * Bulk operation for add role to identity
+ * Bulk operation for add role to identity.
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
- *
+ * @author Radek Tomiška
  */
-
 @Enabled(CoreModuleDescriptor.MODULE_ID)
-@Component("identityAddRoleBulkAction")
+@Component(IdentityAddRoleBulkAction.NAME)
 @Description("Add role to idetity in bulk action.")
 public class IdentityAddRoleBulkAction extends AbstractBulkAction<IdmIdentityDto, IdmIdentityFilter> {
 
@@ -135,6 +135,21 @@ public class IdentityAddRoleBulkAction extends AbstractBulkAction<IdmIdentityDto
 		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>();
 		for (IdmIdentityContractDto contract : contracts) {
 			if (!checkPermissionForContract(contract)) {
+				LOG.warn("Insufficient permissions for asign role for contract [{}]", contract.getId());
+				//
+				logItemProcessed(
+						contract,
+						new OperationResult
+							.Builder(OperationState.NOT_EXECUTED)
+							.setModel(
+								new DefaultResultModel(
+										CoreResultCode.BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT,
+										ImmutableMap.of("contractId", contract.getId())
+								)
+							)
+							.build()
+				);
+				//
 				continue;
 			}
 			//
@@ -184,7 +199,9 @@ public class IdentityAddRoleBulkAction extends AbstractBulkAction<IdmIdentityDto
 	@Override
 	public List<String> getAuthorities() {
 		List<String> permissions = super.getAuthorities();
-		permissions.addAll(this.getAuthoritiesForContract());
+		//
+		permissions.add(CoreGroupPermission.IDENTITYCONTRACT_READ);
+		//
 		return permissions;
 	}
 
@@ -195,22 +212,21 @@ public class IdentityAddRoleBulkAction extends AbstractBulkAction<IdmIdentityDto
 	 * @return
 	 */
 	private boolean checkPermissionForContract(IdmIdentityContractDto contract) {
-		return PermissionUtils.hasAnyPermission(identityContractService.getPermissions(contract), 
-				PermissionUtils.toPermissions(getAuthoritiesForContract()).toArray(new BasePermission[] {}));
-	}
-
-	/**
-	 * Get permission for contract
-	 *
-	 * @return
-	 */
-	private List<String> getAuthoritiesForContract() {
-		return Lists.newArrayList(CoreGroupPermission.IDENTITYCONTRACT_READ, CoreGroupPermission.IDENTITYCONTRACT_AUTOCOMPLETE);
+		Set<String> permissions = identityContractService.getPermissions(contract);
+		//
+		return PermissionUtils.hasPermission(permissions, IdmBasePermission.READ) 
+				&& PermissionUtils.hasAnyPermission( // OR -> CANBEREQUESTED or CHANGEPERMISSION for both sides from role guarantee or contract manager
+						permissions, 
+						ContractBasePermission.CHANGEPERMISSION,
+						ContractBasePermission.CANBEREQUESTED);
 	}
 
 	@Override
 	protected List<String> getAuthoritiesForEntity() {
-		return Lists.newArrayList(CoreGroupPermission.IDENTITY_READ, CoreGroupPermission.IDENTITY_CHANGEPERMISSION);
+		return Lists.newArrayList(
+				CoreGroupPermission.IDENTITY_READ, 
+				CoreGroupPermission.IDENTITY_CHANGEPERMISSION// ~ FIXME: this is too strict - if logged user doesn't have permission to change roles on all identity contracts, then action is not available.
+		);
 	}
 
 	/**
@@ -247,8 +263,7 @@ public class IdentityAddRoleBulkAction extends AbstractBulkAction<IdmIdentityDto
 	 * @return
 	 */
 	private boolean isApprove() {
-		Boolean approve = this.getParameterConverter().toBoolean(getProperties(), APPROVE_CODE);
-		return approve != null ? approve.booleanValue() : true;
+		return getParameterConverter().toBoolean(getProperties(), APPROVE_CODE, true);
 	}
 	
 	/**
@@ -257,8 +272,7 @@ public class IdentityAddRoleBulkAction extends AbstractBulkAction<IdmIdentityDto
 	 * @return
 	 */
 	private boolean isPrimaryContract() {
-		Boolean approve = this.getParameterConverter().toBoolean(getProperties(), PRIMARY_CONTRACT_CODE);
-		return approve != null ? approve.booleanValue() : true;
+		return getParameterConverter().toBoolean(getProperties(), PRIMARY_CONTRACT_CODE, true);
 	}
 	
 	/**

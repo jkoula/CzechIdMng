@@ -452,6 +452,8 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String IDENTITYCONTRACT_CREATE = "IDENTITYCONTRACT" + BasePermission.SEPARATOR + "CREATE";
 	public static final String IDENTITYCONTRACT_UPDATE = "IDENTITYCONTRACT" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String IDENTITYCONTRACT_DELETE = "IDENTITYCONTRACT" + BasePermission.SEPARATOR + "DELETE";
+	public static final String IDENTITYCONTRACT_CHANGEPERMISSION = "IDENTITYCONTRACT" + BasePermission.SEPARATOR + "CHANGEPERMISSION";
+	public static final String IDENTITYCONTRACT_CANBEREQUESTED = "IDENTITYCONTRACT" + BasePermission.SEPARATOR + "CANBEREQUESTED";
 	//
 	public static final String CONTRACTSLICE_COUNT = "CONTRACTSLICE" + BasePermission.SEPARATOR + "COUNT";
 	public static final String CONTRACTSLICE_AUTOCOMPLETE = "CONTRACTSLICE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
@@ -510,6 +512,7 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String ROLE_UPDATE = "ROLE" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String ROLE_DELETE = "ROLE" + BasePermission.SEPARATOR + "DELETE";
 	public static final String ROLE_CANBEREQUESTED = "ROLE" + BasePermission.SEPARATOR + "CANBEREQUESTED";
+	public static final String ROLE_CHANGEPERMISSION = "ROLE" + BasePermission.SEPARATOR + "CHANGEPERMISSION";
 	//
 	public static final String ROLECATALOGUE_COUNT = "ROLECATALOGUE" + BasePermission.SEPARATOR + "COUNT";
 	public static final String ROLECATALOGUE_AUTOCOMPLETE = "ROLECATALOGUE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";

@@ -668,6 +668,7 @@
           "IDENTITY-SELECT": "Výběr identit (SelectBox)",
           "IDENTITY-CONTRACT-SELECT": "Výběr kontraktů (SelectBox)",
           "IDENTITY-ALLOW-DISABLED-SELECT": "Výběr identit včetně neaktivních (SelectBox)",
+          "IDENTITY-READ-SELECT": "Výběr identit (SelectBox, oprávnění číst)",
           "ROLE-SELECT": "Výběr rolí (SelectBox)",
           "CAN-BE-REQUESTED-ROLE-SELECT": "Výběr rolí dostupných pro žádost (SelectBox)",
           "FORM-DEFINITION-SELECT": "Výběr definice formuláře (SelectBox)",
@@ -4823,7 +4824,7 @@
       "label": "Systém",
       "help": "Vyberte systém, na kterém chcete vytvořit účet."
     },
-    
+
     "ExportImport": {
       "_type": "Export/Import dávky",
       "name": {
@@ -6265,6 +6266,62 @@
             "help": "Po zaškrtnutí bude přidělení role schvalováno"
           },
           "maincontract": {
+            "label": "Přiřadit pouze na hlavní kontrakt",
+            "help": "Přiřazení nových rolí bude provedeno pouze na hlavní kontrakt. Jinak bude role přazena na všechny validní a v budoucnu validní kontrakty."
+          },
+          "validfrom": {
+            "label": "Platnost od",
+            "help": "Pokud nebude platnost zadána, bude vyplněna dle kontraktu, na který bude role přidělena."
+          },
+          "validtill": {
+            "label": "Platnost do",
+            "help": "Pokud nebude platnost zadána, nebude vyplněna (role bude odebrána dle platnosti kontraktu)."
+          }
+        }
+      },
+      "core-role-add-identity-bulk-action": {
+        "label": "Přidělení rolí",
+        "icon": "component:identity-role-add",
+        "attributes": {
+          "identity": {
+            "label": "Uživatel",
+            "help": ""
+          },
+          "approve": {
+            "label": "Schvalovat",
+            "help": "Po zaškrtnutí bude přidělení role schvalováno"
+          },
+          "primecontract": {
+            "label": "Přiřadit pouze na hlavní kontrakt",
+            "help": "Přiřazení nových rolí bude provedeno pouze na hlavní kontrakt. Jinak bude role přazena na všechny validní a v budoucnu validní kontrakty."
+          },
+          "validfrom": {
+            "label": "Platnost od",
+            "help": "Pokud nebude platnost zadána, bude vyplněna dle kontraktu, na který bude role přidělena."
+          },
+          "validtill": {
+            "label": "Platnost do",
+            "help": "Pokud nebude platnost zadána, nebude vyplněna (role bude odebrána dle platnosti kontraktu)."
+          }
+        }
+      },
+      "core-identity-add-role-without-selection-bulk-action": {
+        "label": "Přidělení rolí",
+        "icon": "component:identity-role-add",
+        "attributes": {
+          "role": {
+            "label": "Role",
+            "help": ""
+          },
+          "identity": {
+            "label": "Uživatel",
+            "help": ""
+          },
+          "approve": {
+            "label": "Schvalovat",
+            "help": "Po zaškrtnutí bude přidělení role schvalováno"
+          },
+          "primecontract": {
             "label": "Přiřadit pouze na hlavní kontrakt",
             "help": "Přiřazení nových rolí bude provedeno pouze na hlavní kontrakt. Jinak bude role přazena na všechny validní a v budoucnu validní kontrakty."
           },
@@ -7886,6 +7943,14 @@
     "BULK_ACTION_BAD_FILTER": {
       "title": "Hromadnou akci nelze spustit",
       "message": "Špatná třída filtru. Je požadována třída [{{filter}}]. Obdržená třída [{{givenFilter}}]."
+    },
+    "BULK_ACTION_INSUFFICIENT_PERMISSION": {
+      "title": "Nedostatečná oprávnění",
+      "message": "Uživatel nemá oprávnění k provedení hromadné akce nad vybraným záznamem."
+    },
+    "BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT": {
+      "title": "Nedostatečná oprávnění",
+      "message": "Uživatel nemá oprávnění pro přiřazení role na vzbraný kontrakt."
     },
     "CONTRACT_IS_CONTROLLED_CANNOT_BE_MODIFIED": {
       "title": "Pracovní pozici není možné změnit.",
