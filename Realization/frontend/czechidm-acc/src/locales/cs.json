@@ -792,7 +792,7 @@
         "attributeNameCol": "Název atributu",
         "accountObject": {
           "label": "Aktualizované hodnoty",
-          "help": "Stav hodnot v IdM připravených k provisioningu. Po provedení provisioningu budou atributy na koncovém systému v tomto stavu. Zvýrazněné řádky značí změněné atributy, které se budou provisionovat. Nové hodnoty jsou zvýrazněny tučně."
+          "help": "Stav hodnot v IdM připravených k provisioningu. Zvýrazněné řádky značí změněné atributy, které se budou provisionovat."
          },
         "connectorObject": {
           "label": "Pouze změny",
@@ -808,7 +808,7 @@
           "label": "<strong>Pokus:</strong> {{currentAttempt}} / {{maxAttempts}}, Další pokus bude spuštěn po <strong>{{nextAttempt}}</strong>"
         },
         "switchShowChangesOnly": {
-          "label": "Pouze změny určené k provisioningu"
+          "label": "Pouze změny"
         }
       },
       "filter": {
@@ -1494,6 +1494,11 @@
       "roleRequestId": {
         "label": "Žádost",
         "help": "Přejít na žádost v rámci které byla tato operace vytvořena."
+      },
+      "attributeDiffType": {
+        "ADDED": "Hodnota bude přidána",
+        "REMOVED": "Hodnota bude odebrána",
+        "UPDATED": "Hodnota bude upravena"
       }
     },
     "ProvisioningArchive": {
@@ -1503,6 +1508,11 @@
         "label": "Zpracováno",
         "title": "Operace byla zpracována (provedena, zrušena)",
         "help": "Operace byla zpracována (provedena, zrušena)."
+      },
+      "attributeDiffType": {
+        "ADDED": "Hodnota byla přidána",
+        "REMOVED": "Hodnota byla odebrána",
+        "UPDATED": "Hodnota byla upravena"
       }
     },
     "ProvisioningBreakConfig": {

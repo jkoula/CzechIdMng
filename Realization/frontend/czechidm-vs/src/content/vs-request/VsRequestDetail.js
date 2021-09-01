@@ -151,7 +151,6 @@ class VsRequestDetail extends Basic.AbstractContent {
     return accountData;
   }
 
-
   /**
    * Create value (highlights changes) cell for attributes table
    */

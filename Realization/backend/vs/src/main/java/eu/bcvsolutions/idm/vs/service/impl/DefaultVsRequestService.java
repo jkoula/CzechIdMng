@@ -29,10 +29,12 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationEntityExecutor;
+import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -71,10 +73,7 @@ import eu.bcvsolutions.idm.vs.connector.basic.BasicVirtualConfiguration;
 import eu.bcvsolutions.idm.vs.domain.VirtualSystemGroupPermission;
 import eu.bcvsolutions.idm.vs.domain.VsOperationType;
 import eu.bcvsolutions.idm.vs.domain.VsRequestState;
-import eu.bcvsolutions.idm.vs.domain.VsValueChangeType;
 import eu.bcvsolutions.idm.vs.dto.VsAccountDto;
-import eu.bcvsolutions.idm.vs.dto.VsAttributeDto;
-import eu.bcvsolutions.idm.vs.dto.VsAttributeValueDto;
 import eu.bcvsolutions.idm.vs.dto.VsConnectorObjectDto;
 import eu.bcvsolutions.idm.vs.dto.VsRequestDto;
 import eu.bcvsolutions.idm.vs.dto.filter.VsRequestFilter;
@@ -119,6 +118,8 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 	private IdmRoleRequestService roleRequestService;
 	@Autowired
 	private AccAccountService accAccountService;
+	@Autowired
+	private SysProvisioningArchiveService provisioningArchiveService;
 
 	@Autowired
 	public DefaultVsRequestService(VsRequestRepository repository, EntityEventManager entityEventManager,
@@ -439,7 +440,7 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 		LOG.info(MessageFormat.format("Start read wish connector object [{0}].", request));
 		Assert.notNull(request, "VS request cannot be null!");
 
-		List<VsAttributeDto> resultAttributes = new ArrayList<>();
+		List<SysAttributeDifferenceDto> resultAttributes = new ArrayList<>();
 		IcConnectorObject realConnectorObject = null;
 
 		boolean isArchived = false;
@@ -460,92 +461,14 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 				: new IcConnectorObjectImpl();
 		IcConnectorObject changeObject = request.getConnectorObject() != null ? request.getConnectorObject()
 				: new IcConnectorObjectImpl();
-		List<IcAttribute> currentAttributes = currentObject.getAttributes();
-		List<IcAttribute> changedAttributes = request.getConnectorObject().getAttributes();
-
-		// First add all new attributes
-		changedAttributes.forEach(changedAttribute -> {
-			if (currentObject.getAttributeByName(changedAttribute.getName()) == null) {
-				VsAttributeDto vsAttribute = new VsAttributeDto(changedAttribute.getName(),
-						changedAttribute.isMultiValue(), true);
-				if (changedAttribute.isMultiValue()) {
-					if (changedAttribute.getValues() != null) {
-						changedAttribute.getValues().forEach(value -> {
-							vsAttribute.getValues().add(new VsAttributeValueDto(value, null, VsValueChangeType.ADDED));
-						});
-					}
-				} else {
-					vsAttribute.setValue(
-							new VsAttributeValueDto(changedAttribute.getValue(), null, VsValueChangeType.ADDED));
-				}
-				resultAttributes.add(vsAttribute);
-			}
-		});
-
-		// Second add all already exists attributes
-		currentAttributes.forEach(currentAttribute -> {
-			VsAttributeDto vsAttribute;
-			// Attribute was changed
-			if (changeObject.getAttributeByName(currentAttribute.getName()) != null) {
-				vsAttribute = new VsAttributeDto(currentAttribute.getName(), currentAttribute.isMultiValue(), true);
-				IcAttribute changedAttribute = changeObject.getAttributeByName(currentAttribute.getName());
-				if (changedAttribute.isMultiValue()) {
-					vsAttribute.setChanged(false);
-					if (changedAttribute.getValues() != null) {
-						changedAttribute.getValues().forEach(value -> {
-							if (currentAttribute.getValues() != null && currentAttribute.getValues().contains(value)) {
-								vsAttribute.getValues().add(new VsAttributeValueDto(value, value, null));
-							} else {
-								vsAttribute.setChanged(true);
-								vsAttribute.getValues()
-										.add(new VsAttributeValueDto(value, null, VsValueChangeType.ADDED));
-							}
-						});
-					}
-					if (currentAttribute.getValues() != null) {
-						currentAttribute.getValues().forEach(value -> {
-							if (changedAttribute.getValues() == null || !changedAttribute.getValues().contains(value)) {
-								vsAttribute.setChanged(true);
-								vsAttribute.getValues()
-										.add(new VsAttributeValueDto(value, value, VsValueChangeType.REMOVED));
-							}
-						});
-					}
-				} else {
-					Object changedValue = changedAttribute.getValue();
-					Object currentValue = currentAttribute.getValue();
-					if ((changedValue == null && currentValue == null)
-							|| (changedValue != null && changedValue.equals(currentValue))
-							|| (currentValue != null && currentValue.equals(changedValue))) {
-
-						vsAttribute.setValue(new VsAttributeValueDto(changedValue, currentValue, null));
-					} else {
-						vsAttribute.setValue(
-								new VsAttributeValueDto(changedValue, currentValue, VsValueChangeType.UPDATED));
-					}
-				}
-			} else {
-				// Attribute was not changed
-				vsAttribute = new VsAttributeDto(currentAttribute.getName(), currentAttribute.isMultiValue(), false);
-				if (currentAttribute.isMultiValue()) {
-					if (currentAttribute.getValues() != null) {
-						currentAttribute.getValues().forEach(value -> {
-							vsAttribute.getValues().add(new VsAttributeValueDto(value, value, null));
-						});
-					}
-				} else {
-					vsAttribute.setValue(
-							new VsAttributeValueDto(currentAttribute.getValue(), currentAttribute.getValue(), null));
-				}
-			}
-			resultAttributes.add(vsAttribute);
-		});
+		
+		resultAttributes = provisioningArchiveService.evaluateProvisioningDifferences(currentObject, changeObject);
 
 		BasicVirtualConfiguration configuration = getVirtualConnector(request).getVirtualConfiguration();
 		// If system does not support enable, then enable attribute will be removed from
 		// result list
 		if (!configuration.isDisableSupported()) {
-			VsAttributeDto enableAttribute = resultAttributes.stream()
+			SysAttributeDifferenceDto enableAttribute = resultAttributes.stream()
 					.filter(attribute -> attribute.getName().equals(IcAttributeInfo.ENABLE)).findFirst().orElse(null);
 			if (enableAttribute != null) {
 				resultAttributes.remove(enableAttribute);

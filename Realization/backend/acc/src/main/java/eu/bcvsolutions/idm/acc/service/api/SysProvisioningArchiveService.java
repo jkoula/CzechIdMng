@@ -1,5 +1,8 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
+import java.util.List;
+
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -7,6 +10,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
+import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 
 /**
  * Archived provisioning operation.
@@ -34,4 +38,13 @@ public interface SysProvisioningArchiveService extends
 	 * @return
 	 */
 	SysSystemDto getSystem(SysProvisioningArchiveDto archive);
+
+	/**
+	 * Creates differences of attributes with evaluated type of change.
+	 * 
+	 * @param currentObject
+	 * @param changedObject
+	 * @return
+	 */
+	List<SysAttributeDifferenceDto> evaluateProvisioningDifferences(IcConnectorObject currentObject, IcConnectorObject changedObject);
 }

@@ -46,6 +46,10 @@ class ProvisioningOperations extends Basic.AbstractContent {
    * Shows modal detail with given entity
    */
   showDetail(entity, isArchive) {
+    if (entity && entity.id) {
+      this.__obtainProvisioningDifferences(entity.id, isArchive);
+    }
+
     this.setState({
       detail: {
         show: true,
@@ -103,11 +107,10 @@ class ProvisioningOperations extends Basic.AbstractContent {
    */
   _reorganizeTableData(detail) {
     const result = [];
-    const systemObject = detail.entity.provisioningContext.systemConnectorObject; // values on targhet system
     const accountObject = detail.entity.provisioningContext.accountObject; // values in IdM
-    const connectorObject = detail.entity.provisioningContext.connectorObject; // changes to provision
+    const diffData = this.state.provisioningDifferences;
 
-    // IdM data
+    // prepare attribute name and strategy
     if (accountObject) {
       for (const schemaAttributeId in accountObject) {
         if (!{}.hasOwnProperty.call(accountObject, schemaAttributeId)) {
@@ -117,40 +120,94 @@ class ProvisioningOperations extends Basic.AbstractContent {
         const attrName = this._extractAttrName(schemaAttributeId, strategyStr);
         result.push({
           property: attrName,
-          strategy: strategyStr,
-          accountVal: this._toPropertyValue(accountObject[schemaAttributeId])});
+          strategy: strategyStr
+        });
       }
     }
-    // Changes to provision
-    if (connectorObject) {
-      for (const attr of connectorObject.attributes) {
-        const index = result.findIndex(item => { return item.property === attr.name; });
+
+    // create difference view based on dedicated diff object
+    if (diffData && diffData.length > 0) {
+      for (const item of diffData) {
+        const name = item.name;
+        const multivalue = item.multivalue;
+        const changed = item.changed;
+        const index = result.findIndex(attr => { return attr.property === name; });
         if (index < 0) {
-          result.push({
-            property: attr.name,
-            strategy: '',
-            accountVal: this._toPropertyValue(attr.values),
-            changedVal: this._toPropertyValue(attr.values)});
+          continue;
+        }
+        result[index].multivalue = multivalue;
+        result[index].changed = changed;
+
+        if (multivalue) {
+          result[index].accountVal = [];
+          result[index].systemVal = [];
+          result[index].valueState = [];
+          for (const value of item.values) {
+            result[index].accountVal.push(value.value == null ? '' : this._toPropertyValue(value.value));
+            result[index].systemVal.push(value.oldValue == null ? '' : this._toPropertyValue(value.oldValue));
+            result[index].valueState.push(value.change == null ? '' : this._toPropertyValue(value.change));
+          }
         } else {
-          result[index].changedVal = this._toPropertyValue(attr.values);
+          result[index].accountVal = item.value.value == null ? '' : this._toPropertyValue(item.value.value);
+          result[index].systemVal = item.value.oldValue == null ? '' : this._toPropertyValue(item.value.oldValue);
+          result[index].valueState = item.value.change == null ? '' : this._toPropertyValue(item.value.change);
         }
       }
+      return result;
     }
-    // System values
-    if (systemObject) {
-      for (const attr of systemObject.attributes) {
-        const index = result.findIndex(item => { return item.property === attr.name; });
+    // fallback solution in case of multiple records in the batch of the provisioning queue
+    // then there is missing dedicated diff object
+    if (accountObject) {
+      for (const schemaAttributeId in accountObject) {
+        if (!{}.hasOwnProperty.call(accountObject, schemaAttributeId)) {
+          continue;
+        }
+        const strategyStr = this._extractStrategy(schemaAttributeId);
+        const attrName = this._extractAttrName(schemaAttributeId, strategyStr);
+        const multivalue = Array.isArray(accountObject[schemaAttributeId]);
+
+        let value;
+        if (multivalue) {
+          value = [];
+          for (const variable of accountObject[schemaAttributeId]) {
+            value.push(variable == null ? '' : this._toPropertyValue(variable));
+          }
+        } else {
+          value = accountObject[schemaAttributeId] == null ? '' : this._toPropertyValue(accountObject[schemaAttributeId]);
+        }
+
+        const valueState = multivalue ? Array(value.length).fill(null) : null;
+        const index = result.findIndex(item => { return item.property === attrName; });
         if (index < 0) {
           result.push({
-            property: attr.name,
-            strategy: '',
-            systemVal: this._toPropertyValue(attr.values)});
+            property: attrName,
+            strategy: strategyStr,
+            accountVal: value,
+            multivalue,
+            valueState
+          });
         } else {
-          result[index].systemVal = this._toPropertyValue(attr.values);
+          result[index].accountVal = value;
+          result[index].systemVal = '';
+          result[index].valueState = valueState;
+          result[index].multivalue = multivalue;
         }
       }
     }
     return result;
+  }
+
+  __obtainProvisioningDifferences(id, isArchive) {
+    let selectedManager;
+    if (isArchive) {
+      selectedManager = archiveManager;
+    } else {
+      selectedManager = manager;
+    }
+    selectedManager.getService().getDecoratedDifferenceObject(id)
+      .then(json => {
+        this.setState({provisioningDifferences: json});
+      });
   }
 
   /**
@@ -167,8 +224,27 @@ class ProvisioningOperations extends Basic.AbstractContent {
     // filter out unchanged values if set so
     if (this.state.showChangesOnly) {
       resultContent = _.filter(resultContent, item => {
-        return item.hasOwnProperty('changedVal');
+        return item.changed;
       });
+    }
+
+    // filter out unchanged individual values of a multivalue attribute
+    if (this.state.showChangesOnly) {
+      for (const attr of resultContent) {
+        if (attr.multivalue && Array.isArray(attr.valueState)) {
+          const toRemove = [];
+          for (let idx = 0; idx < attr.valueState.length; ++idx) {
+            if (!attr.valueState[idx]) {
+              toRemove.push(idx);
+            }
+          }
+          for (const idxRem of toRemove) {
+            attr.accountVal.splice(idxRem, 1);
+            attr.systemVal.splice(idxRem, 1);
+            attr.valueState.splice(idxRem, 1);
+          }
+        }
+      }
     }
 
     // sort by name
@@ -185,8 +261,8 @@ class ProvisioningOperations extends Basic.AbstractContent {
     });
     // order changed attributes at the beginning
     resultContent.sort((lItem, rItem) => {
-      const l = lItem.hasOwnProperty('changedVal');
-      const r = rItem.hasOwnProperty('changedVal');
+      const l = lItem.changed;
+      const r = rItem.changed;
       if (l && !r) {
         return -1;
       }
@@ -247,15 +323,76 @@ class ProvisioningOperations extends Basic.AbstractContent {
   }
 
   /**
+  * Turns attribute state into decoration style
+  *
+  * @param  {[type]} key value change state
+  * @return {[type]}     Style string representation
+  */
+  _getValueStateDecoration(key) {
+    if (!key) {
+      return null;
+    }
+    switch (key) {
+      case 'ADDED': {
+        return 'success';
+      }
+      case 'UPDATED': {
+        return 'warning';
+      }
+      case 'REMOVED': {
+        return 'danger';
+      }
+      default: {
+        return 'default';
+      }
+    }
+  }
+
+  /**
    * Highlights the content of cells of attributes to change
    * @param {}
    * @returns
    */
-  _highlightCellContent({rowIndex, data, property}) {
-    if (!data[rowIndex].hasOwnProperty('changedVal')) {
-      return (`${data[rowIndex][property]}`);
+  _highlightCellContent(isArchive, {rowIndex, data, property}) {
+    const row = data[rowIndex];
+    const decorate = property === 'accountVal';
+    const titleKey = isArchive ? 'ProvisioningArchive' : 'ProvisioningOperation';
+
+    if (row.multivalue) {
+      const values = row[property];
+      const valueStates = row.valueState;
+      const result = [];
+      if (!values || !valueStates) {
+        return null;
+      }
+      for (let idx = 0; idx < values.length; ++idx) {
+        if (valueStates[idx] && decorate) {
+          result.push(<Basic.Label
+            title={this.i18n(`acc:entity.${titleKey}.attributeDiffType.${valueStates[idx]}`)}
+            level={this._getValueStateDecoration(valueStates[idx])}
+            style={valueStates[idx] === 'REMOVED' ? {textDecoration: 'line-through'} : null}
+            text={values[idx] || ' '}/>);
+        } else {
+          result.push((`${values[idx]}`));
+        }
+        if (idx < values.length - 1) {
+          result.push(' ');
+        }
+      }
+      return result;
     }
-    return (<strong>{data[rowIndex][property]}</strong>);
+    const value = row[property];
+    const valueState = row.valueState;
+    const level = this._getValueStateDecoration(valueState);
+    if (row.changed && decorate) {
+      return (
+        <Basic.Label
+          title={this.i18n(`acc:entity.${titleKey}.attributeDiffType.${valueState}`)}
+          level={level}
+          style={valueState === 'REMOVED' ? {textDecoration: 'line-through'} : null}
+          text={value || ' '}/>);
+    }
+    return (`${value}`);
   }
 
   /**
@@ -271,6 +408,7 @@ class ProvisioningOperations extends Basic.AbstractContent {
   render() {
     const { forceSearchParameters, columns, uiKey, showDeleteAllButton } = this.props;
     const { detail, activeKey, showChangesOnly} = this.state;
+    const isArchive = detail && detail.isArchive ? detail.isArchive : false;
 
     const tableContent = this._prepareProvisioningDetail(detail);
     //
@@ -454,7 +592,7 @@ class ProvisioningOperations extends Basic.AbstractContent {
                       noData={ this.i18n('component.basic.Table.noData') }
                       className="table-bordered"
                       rowClass={({rowIndex, data}) => {
-                        return data[rowIndex].hasOwnProperty('changedVal') ? 'warning' : '';
+                        return data[rowIndex].changed ? 'warning' : '';
                       }}>
                       <Basic.Column
                         property="property"
@@ -464,11 +602,12 @@ class ProvisioningOperations extends Basic.AbstractContent {
                       <Basic.Column
                         property="systemVal"
                         header={ this._renderColumnHelp(this.i18n('detail.systemObject.label'), this.i18n('detail.systemObject.help')) }
+                        cell={this._highlightCellContent.bind(this, isArchive)}
                       />
                       <Basic.Column
                         property="accountVal"
                         header={ this._renderColumnHelp(this.i18n('detail.accountObject.label'), this.i18n('detail.accountObject.help')) }
-                        cell={this._highlightCellContent}
+                        cell={this._highlightCellContent.bind(this, isArchive)}
                       />
                     </Basic.Table>
                   </Basic.Col>

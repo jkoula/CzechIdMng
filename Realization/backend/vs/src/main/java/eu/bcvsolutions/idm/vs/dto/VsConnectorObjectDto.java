@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.hateoas.core.Relation;
 
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import io.swagger.annotations.ApiModel;
@@ -29,7 +30,7 @@ public class VsConnectorObjectDto extends AbstractDto {
 	@ApiModelProperty(required = true, notes = "Unique account identifier. UID on system and for connector.")
 	private String uid;
 	@ApiModelProperty(required = false, notes = "Object attributes with mark changes")
-	private List<VsAttributeDto> attributes;
+	private List<SysAttributeDifferenceDto> attributes;
 
 	public String getUid() {
 		return uid;
@@ -39,11 +40,11 @@ public class VsConnectorObjectDto extends AbstractDto {
 		this.uid = uid;
 	}
 
-	public List<VsAttributeDto> getAttributes() {
+	public List<SysAttributeDifferenceDto> getAttributes() {
 		return attributes;
 	}
 
-	public void setAttributes(List<VsAttributeDto> attributes) {
+	public void setAttributes(List<SysAttributeDifferenceDto> attributes) {
 		this.attributes = attributes;
 	}
 }

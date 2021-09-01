@@ -34,11 +34,14 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
+import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningExecutor;
+import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.core.api.bulk.action.BulkActionManager;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
@@ -82,6 +85,7 @@ public class SysProvisioningOperationController
 	//
 	@Autowired private ProvisioningExecutor provisioningExecutor;
 	@Autowired private BulkActionManager bulkActionManager;
+	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
 
 	@Autowired
 	public SysProvisioningOperationController(SysProvisioningOperationService service) {
@@ -285,6 +289,34 @@ public class SysProvisioningOperationController
 		}
 		//
 		return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/{backendId}/difference-object", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.PROVISIONING_OPERATION_READ + "')")
+	@ApiOperation(
+			value = "Detail of the provisioning changes", 
+			nickname = "getProvisioningDetail", 
+			tags = { SysProvisioningOperationController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.PROVISIONING_OPERATION_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.PROVISIONING_OPERATION_READ, description = "")})
+				})
+	public ResponseEntity<?> getDifferenceObject(
+			@ApiParam(value = "Provisioning detail uuid identifier.", required = true)
+			@PathVariable @NotNull String backendId) {
+		SysProvisioningOperationDto archive = getDto(backendId);
+		if (archive == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		ProvisioningContext context = archive.getProvisioningContext();
+		if (context == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		List<SysAttributeDifferenceDto> result = provisioningArchiveService.evaluateProvisioningDifferences(context.getSystemConnectorObject(), context.getConnectorObject());
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 
 	/**

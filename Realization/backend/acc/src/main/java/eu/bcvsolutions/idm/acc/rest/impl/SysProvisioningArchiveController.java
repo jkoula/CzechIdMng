@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.rest.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
+import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningArchive;
@@ -185,6 +189,35 @@ public class SysProvisioningArchiveController extends AbstractReadWriteDtoContro
 			@ApiParam(value = "Archive's uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId) {
 		return super.getPermissions(backendId);
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "/{backendId}/difference-object", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.PROVISIONING_ARCHIVE_READ + "')")
+	@ApiOperation(
+			value = "Detail of the provisioning changes", 
+			nickname = "getProvisioningDetail", 
+			tags = { SysProvisioningArchiveController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.PROVISIONING_ARCHIVE_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.PROVISIONING_ARCHIVE_READ, description = "")})
+				})
+	public ResponseEntity<?> getDifferenceObject(
+			@ApiParam(value = "Provisioning detail uuid identifier.", required = true)
+			@PathVariable @NotNull String backendId) {
+		SysProvisioningArchiveDto archive = getDto(backendId);
+		if (archive == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		ProvisioningContext context = archive.getProvisioningContext();
+		if (context == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		List<SysAttributeDifferenceDto> result = ((SysProvisioningArchiveService)getService()).evaluateProvisioningDifferences(context.getSystemConnectorObject(), context.getConnectorObject());
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
 	@Override
