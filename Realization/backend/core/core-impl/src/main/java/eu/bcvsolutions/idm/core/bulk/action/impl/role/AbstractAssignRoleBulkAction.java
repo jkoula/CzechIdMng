@@ -106,7 +106,7 @@ public abstract class AbstractAssignRoleBulkAction<DTO extends AbstractDto, F ex
 			LocalDate validFrom = this.getValidFrom();
 			LocalDate validTill = this.getValidTill();
 			//
-			List<IdmConceptRoleRequestDto> concepts = new ArrayList<>();
+			List<IdmConceptRoleRequestDto> concepts = new ArrayList<>(contracts.size() + roleIds.size());
 			for (IdmIdentityContractDto contract : contracts) {
 				if (!checkPermissionForContract(contract)) {
 					LOG.warn("Insufficient permissions for asign role for contract [{}]", contract.getId());
@@ -140,36 +140,37 @@ public abstract class AbstractAssignRoleBulkAction<DTO extends AbstractDto, F ex
 					concepts.add(concept);
 				}
 			}
-			// if exists at least one concept create and starts request
-			if (!concepts.isEmpty()) {
-				// create request
-				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-				roleRequest.setApplicant(identityId);
-				roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
-				roleRequest.setLog("Request was created by bulk action.");
-				roleRequest.setExecuteImmediately(!approve); // if set approve, don't execute immediately
-				
-				roleRequest = roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
-				//
-				List<IdmIdentityContractDto> processedContracts = new ArrayList<>(concepts.size());
-				for (IdmConceptRoleRequestDto concept : concepts) {
-					processedContracts.add(DtoUtils.getEmbedded(concept, IdmIdentityRoleDto.PROPERTY_IDENTITY_CONTRACT));
-					concept.setRoleRequest(roleRequest.getId());
-					concept = conceptRoleRequestService.save(concept, IdmBasePermission.CREATE);
-				}
-				//
-				Map<String, Serializable> properties = new HashMap<>();
-				properties.put(RoleRequestApprovalProcessor.CHECK_RIGHT_PROPERTY, Boolean.TRUE);
-				RoleRequestEvent event = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest, properties);
-				event.setPriority(PriorityType.HIGH);
-				IdmRoleRequestDto request = roleRequestService.startRequestInternal(event);
-				processedContracts.forEach(contract -> {
-					logItemProcessed(
-							contract, 
-							new OperationResult.Builder(request.getState() == RoleRequestState.EXECUTED ? OperationState.EXECUTED : OperationState.CREATED).build()
-					); 
-				});
+			// nothing to assign
+			if (concepts.isEmpty()) {
+				continue;
 			}
+			// create request, if exists at least one concept create and starts request
+			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
+			roleRequest.setApplicant(identityId);
+			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
+			roleRequest.setLog("Request was created by bulk action.");
+			roleRequest.setExecuteImmediately(!approve); // if set approve, don't execute immediately
+			
+			roleRequest = roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
+			//
+			List<IdmIdentityContractDto> processedContracts = new ArrayList<>(concepts.size());
+			for (IdmConceptRoleRequestDto concept : concepts) {
+				processedContracts.add(DtoUtils.getEmbedded(concept, IdmIdentityRoleDto.PROPERTY_IDENTITY_CONTRACT));
+				concept.setRoleRequest(roleRequest.getId());
+				concept = conceptRoleRequestService.save(concept, IdmBasePermission.CREATE);
+			}
+			//
+			Map<String, Serializable> properties = new HashMap<>();
+			properties.put(RoleRequestApprovalProcessor.CHECK_RIGHT_PROPERTY, Boolean.TRUE);
+			RoleRequestEvent event = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest, properties);
+			event.setPriority(PriorityType.HIGH);
+			IdmRoleRequestDto request = roleRequestService.startRequestInternal(event);
+			processedContracts.forEach(contract -> {
+				logItemProcessed(
+						contract, 
+						new OperationResult.Builder(request.getState() == RoleRequestState.EXECUTED ? OperationState.EXECUTED : OperationState.CREATED).build()
+				); 
+			});
 		}
 	}
 	
