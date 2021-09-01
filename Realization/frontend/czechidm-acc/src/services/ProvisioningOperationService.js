@@ -67,4 +67,27 @@ export default class ProvisioningOperationService extends Services.AbstractServi
         return json;
       });
   }
+
+  /**
+   * Obtains provisioning values with operation type
+   *
+   * @param  {[type]} id Provisioning operation item id
+   * @return {[type]}
+   */
+  getDecoratedDifferenceObject(id) {
+    return Services.RestApiService
+      .get(`${ this.getApiPath() }/${ encodeURIComponent(id) }/difference-object`)
+      .then(response => {
+        return response.json();
+      })
+      .then(jsonResponse => {
+        if (Utils.Response.hasError(jsonResponse)) {
+          throw Utils.Response.getFirstError(jsonResponse);
+        }
+        if (Utils.Response.hasInfo(jsonResponse)) {
+          throw Utils.Response.getFirstInfo(jsonResponse);
+        }
+        return jsonResponse;
+      });
+  }
 }

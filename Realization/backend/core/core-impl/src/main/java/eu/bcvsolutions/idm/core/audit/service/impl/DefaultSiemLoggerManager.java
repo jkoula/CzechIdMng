@@ -296,22 +296,6 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 		}
 	}
 	
-	
-	/**
-	 * Optimization method skipping the log process according to the configuration.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private boolean skipLogging() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(CONFIGURATION_PROPERTY_PREFIX);
-		sb.append('.');
-		sb.append(DefaultSiemLoggerManager.class.getCanonicalName());
-		String value = configurationService.getValue(sb.toString());
-		return  !isLoggingOnByLevel(value);
-	}
-	
 	/**
 	 * Optimization method skipping the log process according to the configuration.
 	 *

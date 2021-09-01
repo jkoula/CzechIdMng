@@ -2,6 +2,9 @@ package eu.bcvsolutions.idm.vs.service.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
+import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -54,9 +57,7 @@ import eu.bcvsolutions.idm.vs.connector.basic.BasicVirtualConfiguration;
 import eu.bcvsolutions.idm.vs.domain.VirtualSystemGroupPermission;
 import eu.bcvsolutions.idm.vs.domain.VsOperationType;
 import eu.bcvsolutions.idm.vs.domain.VsRequestState;
-import eu.bcvsolutions.idm.vs.domain.VsValueChangeType;
 import eu.bcvsolutions.idm.vs.dto.VsAccountDto;
-import eu.bcvsolutions.idm.vs.dto.VsAttributeDto;
 import eu.bcvsolutions.idm.vs.dto.VsConnectorObjectDto;
 import eu.bcvsolutions.idm.vs.dto.VsRequestDto;
 import eu.bcvsolutions.idm.vs.dto.VsSystemDto;
@@ -608,7 +609,7 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 		Assert.assertTrue(!findAttributeWithouChange);
 
 		// Check on exist ldapGroups attribute with three values
-		VsAttributeDto ldapGroupAttribute = wish.getAttributes().stream()
+		SysAttributeDifferenceDto ldapGroupAttribute = wish.getAttributes().stream()
 				.filter(attribute -> ldapGroupsName.equals(attribute.getName())).findFirst().get();
 		Assert.assertTrue(ldapGroupAttribute.isMultivalue());
 		Assert.assertEquals(3, ldapGroupAttribute.getValues().size());
@@ -655,14 +656,14 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 		// Find deleted value
 		boolean findCorrectDeletedTest2Value = ldapGroupAttribute.getValues().stream()
 				.filter(value -> value.getValue().equals(initList.get(1)) && value.getOldValue().equals(initList.get(1))
-						&& VsValueChangeType.REMOVED == value.getChange())
+						&& SysValueChangeType.REMOVED == value.getChange())
 				.findFirst().isPresent();
 		Assert.assertTrue(findCorrectDeletedTest2Value);
 
 		// Find added value
 		boolean findCorrectCreatedChangedValue = ldapGroupAttribute.getValues().stream()
 				.filter(value -> value.getValue().equals(changed) && value.getOldValue() == null
-						&& VsValueChangeType.ADDED == value.getChange())
+						&& SysValueChangeType.ADDED == value.getChange())
 				.findFirst().isPresent();
 		Assert.assertTrue(findCorrectCreatedChangedValue);
 	}
@@ -721,7 +722,7 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 		boolean findCorrectChangedFirstName = wish.getAttributes().stream()
 				.filter(attr -> attr.getValue() != null && attr.getValue().getValue().equals(changed)
 						&& attr.getValue().getOldValue().equals(firstName)
-						&& VsValueChangeType.UPDATED == attr.getValue().getChange())
+						&& SysValueChangeType.UPDATED == attr.getValue().getChange())
 				.findFirst().isPresent();
 		Assert.assertTrue(findCorrectChangedFirstName);
 
@@ -729,7 +730,7 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 		boolean findCorrectChangedLastName = wish.getAttributes().stream()
 				.filter(attr -> attr.getValue() != null && attr.getValue().getValue().equals(changed)
 						&& attr.getValue().getOldValue().equals(lastName)
-						&& VsValueChangeType.UPDATED == attr.getValue().getChange())
+						&& SysValueChangeType.UPDATED == attr.getValue().getChange())
 				.findFirst().isPresent();
 		Assert.assertTrue(findCorrectChangedLastName);
 
@@ -783,7 +784,7 @@ public class DefaultVsRequestServiceIntegrationTest extends AbstractIntegrationT
 		boolean findCorrectChangedUserName = wish.getAttributes().stream()
 				.filter(attr -> attr.getValue().getValue().equals(USER_ONE_CHANGED_NAME)
 						&& attr.getValue().getOldValue().equals(USER_ONE_NAME)
-						&& VsValueChangeType.UPDATED == attr.getValue().getChange())
+						&& SysValueChangeType.UPDATED == attr.getValue().getChange())
 				.findFirst().isPresent();
 		Assert.assertTrue(findCorrectChangedUserName);
 

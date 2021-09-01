@@ -1,11 +1,11 @@
-package eu.bcvsolutions.idm.vs.dto;
+package eu.bcvsolutions.idm.acc.dto;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-import javax.validation.constraints.NotEmpty;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -13,31 +13,32 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+
 /**
- * DTO for attribute in virtual system
+ * DTO containing attribute values and difference type
  * 
  * @author Svanda
+ * @author Ondrej Husnik
  *
  */
 @Relation(collectionRelation = "attributes")
-@ApiModel(description = "Attribute virtual system")
-public class VsAttributeDto extends AbstractDto {
-
+@ApiModel(description = "System attribute differences")
+public class SysAttributeDifferenceDto extends AbstractDto {
 	private static final long serialVersionUID = 1L;
-
+	
 	@NotEmpty
 	@Size(min = 1, max = DefaultFieldLengths.NAME)
 	@ApiModelProperty(required = true, notes = "Name of attribute")
 	private String name;
 	private boolean multivalue;
 	private boolean changed = false;
-	private VsAttributeValueDto value;
-	private List<VsAttributeValueDto> values;
+	private SysAttributeDifferenceValueDto value;
+	private List<SysAttributeDifferenceValueDto> values;
 
-	public VsAttributeDto() {
+	public SysAttributeDifferenceDto() {
 	}
 	
-	public VsAttributeDto(String name, boolean multiValue, boolean changed) {
+	public SysAttributeDifferenceDto(String name, boolean multiValue, boolean changed) {
 		this.name = name;
 		this.multivalue = multiValue;
 		this.changed = changed;
@@ -59,22 +60,22 @@ public class VsAttributeDto extends AbstractDto {
 		this.multivalue = multivalue;
 	}
 
-	public VsAttributeValueDto getValue() {
+	public SysAttributeDifferenceValueDto getValue() {
 		return value;
 	}
 
-	public void setValue(VsAttributeValueDto value) {
+	public void setValue(SysAttributeDifferenceValueDto value) {
 		this.value = value;
 	}
 
-	public List<VsAttributeValueDto> getValues() {
+	public List<SysAttributeDifferenceValueDto> getValues() {
 		if(values == null){
 			this.values = new ArrayList<>();
 		}
 		return values;
 	}
 
-	public void setValues(List<VsAttributeValueDto> values) {
+	public void setValues(List<SysAttributeDifferenceValueDto> values) {
 		this.values = values;
 	}
 
@@ -85,5 +86,5 @@ public class VsAttributeDto extends AbstractDto {
 	public void setChanged(boolean changed) {
 		this.changed = changed;
 	}
-
+	
 }

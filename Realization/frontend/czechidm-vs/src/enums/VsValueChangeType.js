@@ -1,4 +1,3 @@
-
 import { Enums } from 'czechidm-core';
 /**
  * Type of value change on virtual system
