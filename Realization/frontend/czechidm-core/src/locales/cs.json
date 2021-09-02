@@ -7834,7 +7834,7 @@
     },
     "IDENTITY_PROFILE_IMAGE_WRONG_CONTENT_TYPE": {
       "title": "Profilová fotka má špatný formát",
-      "message": "Profilová fotka ve formátu [{{contentType}}] není podporovaná. Použite některý z [image/*] podporovaných formatů."
+      "message": "Profilová fotka ve formátu [{{contentType}}] není podporovaná. Použijte některý z [image/*] podporovaných formátů."
     },
     "IDENTITY_PROFILE_IMAGE_MAX_FILE_SIZE_EXCEEDED": {
       "title": "Profilová fotka je příliš veliká",
