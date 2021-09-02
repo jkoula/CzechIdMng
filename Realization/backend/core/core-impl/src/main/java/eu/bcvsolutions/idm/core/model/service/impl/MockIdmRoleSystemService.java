@@ -2,10 +2,10 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleSystemDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleSystemFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
-import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
-import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -13,15 +13,14 @@ import java.io.Serializable;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Priority;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
- * Default mock core implementation for idm-role-system service - It is parent for SysRoleSystemService in Acc module (we need to work with role-system also in the core module).
+ * Default mock core implementation for idm-role-system service.
+ * It is a parent for SysRoleSystemService in Acc module (we need to work with role-system also in the core module).
  *
  * @author Vít Švanda
  * @since 11.2.0
@@ -34,7 +33,7 @@ public class MockIdmRoleSystemService
 
 	@Override
 	public Class getDtoClass() {
-		return null;
+		return IdmRoleSystemDto.class;
 	}
 
 	@Override
@@ -44,7 +43,7 @@ public class MockIdmRoleSystemService
 
 	@Override
 	public Class getFilterClass() {
-		return null;
+		return IdmRoleSystemFilter.class;
 	}
 
 	@Override
