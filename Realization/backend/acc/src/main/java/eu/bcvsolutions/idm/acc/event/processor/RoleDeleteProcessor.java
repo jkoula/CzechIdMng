@@ -1,11 +1,5 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.stereotype.Component;
-
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningBreakRecipientDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncIdentityConfigDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccRoleAccountFilter;
@@ -17,13 +11,19 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBreakRecipientService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.event.processor.RoleProcessor;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.model.event.RoleEvent.RoleEventType;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.stereotype.Component;
 
 /**
  * Before role delete - deletes all role system mappings.
@@ -43,6 +43,7 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 	@Autowired private SysProvisioningBreakRecipientService provisioningBreakRecipientService;
 	@Autowired private SysSyncConfigRepository syncConfigRepository;
 	@Autowired private SysSyncConfigService syncConfigService;
+	@Autowired private IdmIdentityRoleService identityRoleService;
 
 	public RoleDeleteProcessor() {
 		super(RoleEventType.DELETE);
@@ -55,6 +56,7 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 
 	@Override
 	public EventResult<IdmRoleDto> process(EntityEvent<IdmRoleDto> event) {
+		boolean forceDelete = getBooleanProperty(PROPERTY_FORCE_DELETE, event.getProperties());
 		IdmRoleDto role = event.getContent();
 		//
 		if (role.getId() == null) {
@@ -65,7 +67,19 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 		SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
 		roleSystemFilter.setRoleId(role.getId());
 		roleSystemService.find(roleSystemFilter, null).forEach(roleSystem -> {
-			roleSystemService.delete(roleSystem);
+			// Identity-role clear relations to a role-system, but only on force-delete!
+			if (forceDelete) {
+				IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+				identityRoleFilter.setRoleSystemId(roleSystem.getId());
+				identityRoleService.find(identityRoleFilter, null).stream()
+						.forEach(identityRole -> {
+							// Clear role-system. Identity-role will be removed in next processor.
+							identityRole.setRoleSystem(null);
+							identityRoleService.saveInternal(identityRole);
+						});
+
+				roleSystemService.delete(roleSystem);
+			}
 		});
 		//
 		// delete relations on account (includes delete of account )
@@ -104,7 +118,7 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 	/**
 	 * Method remove all provisioning recipient for role id given in parameter
 	 * 
-	 * @param identityId
+	 * @param roleId
 	 */
 	private void deleteProvisioningRecipient(UUID roleId) {
 		SysProvisioningBreakRecipientFilter filter = new SysProvisioningBreakRecipientFilter();
