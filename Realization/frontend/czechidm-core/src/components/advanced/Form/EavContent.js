@@ -318,7 +318,6 @@ class EavContent extends Basic.AbstractContent {
                 text={ formDefinitionName }
                 style={{ color: '#ccc', borderBottom: '1px dashed #ccc' }}/>
               <Basic.PanelBody>
-                ssss
                 { eavForm }
               </Basic.PanelBody>
               <Basic.PanelFooter style={{ color: '#ccc', borderTop: '1px dashed #ccc' }}>
