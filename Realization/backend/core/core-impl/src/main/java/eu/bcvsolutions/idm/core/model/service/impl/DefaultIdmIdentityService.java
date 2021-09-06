@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -41,6 +43,7 @@ import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.event.processor.IdentityProcessor;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -573,6 +576,33 @@ public class DefaultIdmIdentityService
 		}
 		//
 		return evaluateState(identity);
+	}
+	
+	/**
+	 * Method provides specific logic for identity siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmIdentityDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmIdentityDto dto = event.getContent();
+		IdmIdentityDto oldDto = event.getOriginalSource();
+		String operationType = event.getType().name();
+		String transactionUuid = Objects.toString(dto.getTransactionId(),"");
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.IDENTITY_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}
+		if(dto != null && oldDto != null && StringUtils.isEmpty(detail)) {
+			IdentityState newState = dto.getState();
+			IdentityState oldState = oldDto.getState();
+			if (newState != null && oldState != null && oldState.isDisabled() != newState.isDisabled()) {
+				detail = newState.isDisabled() ? "DISABLED" : "ENABLED";
+			}
+		}		
+		siemLog(action, status, dto, null, transactionUuid, detail);
 	}
 	
 	/**

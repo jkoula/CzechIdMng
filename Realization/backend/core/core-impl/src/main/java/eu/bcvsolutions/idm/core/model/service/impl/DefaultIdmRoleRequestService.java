@@ -44,6 +44,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Loggable;
@@ -80,6 +81,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmIncompatibleRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ValueGeneratorManager;
 import eu.bcvsolutions.idm.core.api.service.thin.IdmIdentityRoleThinService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -162,6 +164,8 @@ public class DefaultIdmRoleRequestService
 	private ValueGeneratorManager valueGeneratorManager;
 	@Autowired
 	private IdmIdentityRoleThinService identityRoleThinService;
+	@Autowired
+	private LookupService lookupService;
 	//
 	private IdmRoleRequestService roleRequestService;
 
@@ -1077,6 +1081,40 @@ public class DefaultIdmRoleRequestService
 		conceptRoleRequest.setRole(roleId);
 		conceptRoleRequest.setOperation(operation);
 		return conceptRoleRequestService.save(conceptRoleRequest);
+	}
+	
+	/**
+	 * Method provides specific logic for role request siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmRoleRequestDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmRoleRequestDto dto = event.getContent();
+		String operationType = event.getType().name();
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.ROLE_REQUEST_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}
+		String transactionUuid = java.util.Objects.toString(dto.getTransactionId(),"");
+		IdmConceptRoleRequestFilter filter = new IdmConceptRoleRequestFilter();
+		filter.setRoleRequestId(dto.getId());
+		List<IdmConceptRoleRequestDto> concepts = conceptRoleRequestService.find(filter, null).getContent();
+		String result;
+		for (IdmConceptRoleRequestDto concept : concepts) {
+			IdmRoleDto roleDto = lookupService.lookupEmbeddedDto(concept, IdmConceptRoleRequest_.role.getName());
+			if(StringUtils.isEmpty(detail)) {
+				RoleRequestState state = concept.getState();
+				result = java.util.Objects.toString(state,"");
+				status = RoleRequestState.EXCEPTION == state ? SiemLoggerManager.FAILED_ACTION_STATUS : status;
+			} else {
+				result = detail;
+			}
+			siemLog(action, status, concept, roleDto, transactionUuid, result);
+			result = null;
+		}
 	}
 
 	/**

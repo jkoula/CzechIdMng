@@ -170,4 +170,14 @@ public class AbstractBaseDtoService<DTO extends BaseDto, F extends BaseFilter> i
 	public void export(UUID id, IdmExportImportDto batch) {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public void siemLog(String action, String status, String targetName, String targetUuid, String subjectName, String subjectUuid, String transactionUuid, String reason) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void siemLog(String action, String status, BaseDto targetDto, BaseDto subjectDto, String transactionUuid, String reason) {
+		throw new UnsupportedOperationException();
+	}
 }

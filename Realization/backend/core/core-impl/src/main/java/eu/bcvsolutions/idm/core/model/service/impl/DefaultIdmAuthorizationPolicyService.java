@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,17 +23,20 @@ import org.springframework.util.Assert;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.IdmAuthorizationPolicyDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmAuthorizationPolicyFilter;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmAuthorizationPolicyService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ModuleService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -62,6 +66,7 @@ public class DefaultIdmAuthorizationPolicyService
 	private final ModuleService moduleService;
 	//
 	@Autowired private IdmRoleCompositionService roleCompositionService;
+	@Autowired private LookupService lookupService;
 	
 	public DefaultIdmAuthorizationPolicyService(
 			IdmAuthorizationPolicyRepository repository, 
@@ -267,5 +272,25 @@ public class DefaultIdmAuthorizationPolicyService
 		}
 		//
 		return authorities;
+	}
+	
+	/**
+	 * Method provides specific logic for role authorization events siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmAuthorizationPolicyDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmAuthorizationPolicyDto subjectDto = event.getContent();
+		String operationType = event.getType().name();
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.ROLE_PERMISSION_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}
+		IdmRoleDto targetDto = lookupService.lookupEmbeddedDto(subjectDto, IdmAuthorizationPolicy_.role.getName());
+		String transactionUuid = Objects.toString(subjectDto.getTransactionId(),"");
+		siemLog(action, status, targetDto, subjectDto, transactionUuid, detail);
 	}
 }

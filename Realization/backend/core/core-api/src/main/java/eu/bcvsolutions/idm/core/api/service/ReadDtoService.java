@@ -169,4 +169,33 @@ public interface ReadDtoService<DTO extends BaseDto, F extends BaseFilter>
 	 * @param batch
 	 */
 	void export(UUID id, IdmExportImportDto batch);
+	
+	/**
+	 * Logging method writing accepting all necessary attributes.
+	 * Dedicated to SIEM logging. 
+	 * 
+	 * @param action
+	 * @param status
+	 * @param targetName
+	 * @param targetUuid
+	 * @param subjectName
+	 * @param subjectUuid
+	 * @param transactionUuid
+	 * @param reason
+	 */
+	void siemLog(String action, String status, String targetName, String targetUuid, String subjectName, String subjectUuid, String transactionUuid, String reason);
+	
+	/**
+	 * Logging method accepting some attributes in the form of DTOs.
+	 * Serves as shortcut method for dedicated SIEM logging.
+	 * 
+	 * @param <DTO>
+	 * @param action
+	 * @param status
+	 * @param targetDto
+	 * @param subjectDto
+	 * @param transactionUuid
+	 * @param reason
+	 */
+	void siemLog(String action, String status, BaseDto targetDto, BaseDto subjectDto, String transactionUuid, String reason);
 }

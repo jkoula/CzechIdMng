@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import eu.bcvsolutions.idm.core.api.dto.IdmRoleSystemDto;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import java.io.Serializable;
@@ -30,15 +29,18 @@ import org.springframework.util.Assert;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
@@ -510,6 +512,28 @@ public class DefaultIdmIdentityRoleService
 	@Override
 	public boolean isRoleAutomaticOrComposition(IdmIdentityRoleDto identityRole) {
 		return identityRole.getAutomaticRole() != null || identityRole.getDirectRole() != null;
+	}
+	
+	/**
+	 * Method provides specific logic for role assignment siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmIdentityRoleDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmIdentityRoleDto dto = event.getContent();
+		String operationType = event.getType().name();
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.ROLE_ASSIGNMENT_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}
+		IdmIdentityContractDto contractDto = lookupService.lookupEmbeddedDto(dto, IdmIdentityRole_.identityContract.getName());
+		IdmRoleDto subjectDto = lookupService.lookupEmbeddedDto(dto, IdmIdentityRole_.role.getName());
+		IdmIdentityDto targetDto = lookupService.lookupEmbeddedDto(contractDto, IdmIdentityContract_.identity.getName());		
+		String transactionUuid = java.util.Objects.toString(dto.getTransactionId(),"");
+		siemLog(action, status, targetDto, subjectDto, transactionUuid, detail);
 	}
 
 	/**

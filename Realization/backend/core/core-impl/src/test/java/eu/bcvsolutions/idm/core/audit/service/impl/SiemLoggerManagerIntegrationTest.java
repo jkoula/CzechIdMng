@@ -1,7 +1,10 @@
 package eu.bcvsolutions.idm.core.audit.service.impl;
 
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,6 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
@@ -21,7 +25,10 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.model.event.IdentityEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
@@ -48,6 +55,10 @@ public class SiemLoggerManagerIntegrationTest extends AbstractIntegrationTest {
 	private SecurityService securityService;
 	@Autowired
 	private IdmConceptRoleRequestService conceptRoleRequestService;
+	@Autowired
+	private IdmIdentityService identityService;
+	@Autowired
+	private IdmRoleRequestService roleRequestService;
 	
 	@Before
 	public void init() {
@@ -120,7 +131,15 @@ public class SiemLoggerManagerIntegrationTest extends AbstractIntegrationTest {
 		String transactionId = Objects.toString(identityDto.getTransactionId(),"");
 		
 		setTestStandardOut();
-		logger.log(event, SiemLoggerManager.SUCCESS_ACTION_STATUS, "");
+		Class<?> clazz = identityService.getClass();
+		Method method;
+		try {
+			method = clazz.getDeclaredMethod("siemLog", EntityEvent.class, String.class, String.class);
+			method.setAccessible(true);;
+			method.invoke(identityService, event, SiemLoggerManager.SUCCESS_ACTION_STATUS, "");
+		} catch (Exception e) {
+			fail("Failed to invoke crucial method");
+		}
 		String out = stdOut.toString();
 		setOriginalStandardOut();
 		String pattern = createPattern(expectedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, identityDto.getCode(), identityDto.getId().toString(), "",  "", transactionId, "");
@@ -144,7 +163,15 @@ public class SiemLoggerManagerIntegrationTest extends AbstractIntegrationTest {
 		String transactionId = Objects.toString(roleRequestDto.getTransactionId(),"");
 		
 		setTestStandardOut();
-		logger.log(event, SiemLoggerManager.SUCCESS_ACTION_STATUS, "");
+		Class<?> clazz = roleRequestService.getClass();
+		Method method;
+		try {
+			method = clazz.getDeclaredMethod("siemLog", EntityEvent.class, String.class, String.class);
+			method.setAccessible(true);
+			method.invoke(roleRequestService, event, SiemLoggerManager.SUCCESS_ACTION_STATUS, "");
+		} catch (Exception e) {
+			fail("Failed to invoke crucial method");
+		}
 		String out = stdOut.toString();
 		setOriginalStandardOut();
 		String pattern = createPattern(expectedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, "", conceptDto.getId().toString(), roleDto.getCode(), roleDto.getId().toString(), transactionId, conceptDto.getState().toString());

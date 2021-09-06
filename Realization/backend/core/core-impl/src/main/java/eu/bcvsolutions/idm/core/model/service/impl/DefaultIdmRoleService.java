@@ -2,6 +2,8 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.config.domain.RequestConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.RoleType;
@@ -14,6 +16,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleCatalogueRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFormAttributeFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleSystemFilter;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -43,6 +46,7 @@ import eu.bcvsolutions.idm.core.model.repository.IdmRoleRepository;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -410,5 +414,24 @@ public class DefaultIdmRoleService
 		}
 		//
 		return String.format("%s%s%s", code, roleConfiguration.getCodeEnvironmentSeperator(), role.getEnvironment());
+	}
+	
+	/**
+	 * Method provides specific logic for role siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmRoleDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmRoleDto dto = event.getContent();
+		String operationType = event.getType().name();
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.ROLE_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}
+		String transactionUuid = Objects.toString(dto.getTransactionId(),"");
+		siemLog(action, status, dto, null, transactionUuid, detail);
 	}
 }

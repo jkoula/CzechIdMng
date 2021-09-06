@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.scheduler.service.impl;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -18,11 +19,13 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult_;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -198,6 +201,29 @@ public class DefaultIdmLongRunningTaskService
 		itemService.deleteAllByLongRunningTask(get(dto.getId()));
 		//
 		super.deleteInternal(dto);
+	}
+	
+	/**
+	 * Method provides specific logic for LRT siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmLongRunningTaskDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmLongRunningTaskDto dto = event.getContent();
+		String operationType = event.getType().name();
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.LRT_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}		
+		String transactionUuid = Objects.toString(dto.getTransactionId(),"");
+		OperationState state = dto.getResult().getState();
+		String result = Objects.toString(state,"");
+		status = OperationState.EXCEPTION == state ? SiemLoggerManager.FAILED_ACTION_STATUS : status;
+		detail = StringUtils.isEmpty(detail) ? result : detail;
+		siemLog(action, status, dto, null, transactionUuid, detail);
 	}
 	
 	/**

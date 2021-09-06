@@ -28,10 +28,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
 import eu.bcvsolutions.idm.core.api.CoreModule;
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.config.cache.domain.ValueWrapper;
 import eu.bcvsolutions.idm.core.api.domain.comparator.CodeableComparator;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
@@ -475,6 +477,25 @@ public class DefaultConfigurationService
 			dto.setValue(null);
 		}
 		return dto;
+	}
+	
+	/**
+	 * Method provides specific logic for configuration change siem logging.
+	 * 
+	 */
+	@Override
+	protected void siemLog(EntityEvent<IdmConfigurationDto> event, String status, String detail) {
+		if (event == null) {
+			return;
+		}
+		IdmConfigurationDto dto = event.getContent();
+		String operationType = event.getType().name();
+		String action = siemLoggerManager.buildAction(SiemLoggerManager.CONFIGURATION_LEVEL_KEY, operationType);
+		if(siemLoggerManager.skipLogging(action)) {
+			return;
+		}		
+		String transactionUuid = Objects.toString(dto.getTransactionId(),"");
+		siemLog(action, status, dto, null, transactionUuid, detail);
 	}
 	
 	private static IdmConfigurationDto toConfigurationDto(String key, Object value) {

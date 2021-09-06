@@ -41,5 +41,4 @@ public interface EventableService<E extends Serializable> {
 	 * @throws ForbiddenEntityException if authorization policies doesn't met
 	 */
 	EventContext<E> publish(EntityEvent<E> event, EntityEvent<?> parentEvent, BasePermission... permission);
-
 }

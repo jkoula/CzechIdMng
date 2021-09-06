@@ -115,5 +115,15 @@ public class MockIdmRoleSystemService
 	public boolean supports(Object delimiter) {
 		return false;
 	}
+	
+	@Override
+	public void siemLog(String action, String status, String targetName, String targetUuid, String subjectName, String subjectUuid, String transactionUuid, String reason) {
+		
+	}
+	
+	@Override
+	public void siemLog(String action, String status, BaseDto targetDto, BaseDto subjectDto, String transactionUuid, String reason) {
+		
+	}
 }
 

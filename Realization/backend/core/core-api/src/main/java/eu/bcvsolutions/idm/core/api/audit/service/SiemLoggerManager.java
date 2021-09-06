@@ -1,9 +1,7 @@
 package eu.bcvsolutions.idm.core.api.audit.service;
 
-import java.io.Serializable;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 
 /**
  * This manager implements logging feature suitable for an external SIEM-like tool.
@@ -58,19 +56,6 @@ public interface SiemLoggerManager {
 	final char PARAMETER_DELIMITER_ATTRIBUTE = ':';
 	final char LEVEL_DELIMITER_ATTRIBUTE = '.';
 	
-	
-	/**
-	 * Logging method specified for entities propagated by events.
-	 * Contains some logic to log interesting entities only.
-	 * Provides extraction of some meaningful data for logging.
-	 * 
-	 * @param <E>
-	 * @param event
-	 * @param status
-	 * @param reason
-	 */
-	<E extends Serializable> void log(EntityEvent<E> event, String status, String reason);
-	
 	/**
 	 * Logging method accepting some attributes in the form of DTOs.
 	 * Serves as shortcut method.
@@ -110,4 +95,12 @@ public interface SiemLoggerManager {
 	 * @return
 	 */
 	String buildAction(String... levels);
+	
+	/**
+	 * Optimization method skipping the log process according to the configuration.
+	 *
+	 * @param action
+	 * @return
+	 */
+	boolean skipLogging(String action);
 }

@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.core.api.service;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
@@ -41,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
+import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -95,6 +95,9 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 	@Autowired
 	@Lazy
 	private ExportManager exportManager;
+	@Autowired
+	@Lazy
+	protected SiemLoggerManager siemLoggerManager;
 	//
 	private final Class<E> entityClass;
 	private final Class<F> filterClass;
@@ -608,6 +611,16 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 		// TODO: try to convert data filter automatically
 		return toDto(entity, dto, null);
 	}
+	
+	@Override
+	public void siemLog(String action, String status, String targetName, String targetUuid, String subjectName, String subjectUuid, String transactionUuid, String reason) {
+		siemLoggerManager.log(action, status, targetName, targetUuid, subjectName, subjectUuid, transactionUuid, reason);
+	}
+	
+	@Override
+	public void siemLog(String action, String status, BaseDto targetDto, BaseDto subjectDto, String transactionUuid, String reason) {
+		siemLoggerManager.log(action, status, targetDto, subjectDto, transactionUuid, reason);
+	}
 
 	/**
 	 * Converts list of entities wrapped to Page object to list of DTOs wrapped
@@ -845,4 +858,5 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 	protected ExportManager getExportManager() {
 		return exportManager;
 	}
+
 }

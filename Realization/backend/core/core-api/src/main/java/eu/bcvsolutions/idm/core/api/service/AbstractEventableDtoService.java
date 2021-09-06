@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.core.api.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -37,7 +36,6 @@ public abstract class AbstractEventableDtoService<DTO extends BaseDto, E extends
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AbstractEventableDtoService.class);
 	//
 	private final EntityEventManager entityEventManager;
-	@Autowired @Lazy private SiemLoggerManager logger;
 	
 	public AbstractEventableDtoService(
 			AbstractEntityRepository<E> repository,
@@ -70,10 +68,10 @@ public abstract class AbstractEventableDtoService<DTO extends BaseDto, E extends
 			EventContext<DTO> resultContext = entityEventManager.process(event, parentEvent);
 			EventResult<DTO> eventResult = resultContext.getLastResult();
 			EntityEvent<DTO> newEvent = eventResult == null ? event : eventResult.getEvent();
-			logger.log(newEvent, SiemLoggerManager.SUCCESS_ACTION_STATUS, null);
+			siemLog(newEvent, SiemLoggerManager.SUCCESS_ACTION_STATUS, null);
 			return resultContext;
 		} catch (Exception ex) {
-			logger.log(event, SiemLoggerManager.FAILED_ACTION_STATUS, ex.getMessage());
+			siemLog(event, SiemLoggerManager.FAILED_ACTION_STATUS, ex.getMessage());
 			throw ex;
 		}
 	}
@@ -110,4 +108,21 @@ public abstract class AbstractEventableDtoService<DTO extends BaseDto, E extends
 		//
 		publish(new CoreEvent<DTO>(CoreEventType.DELETE, dto), permission);
 	}
+	
+	/**
+	 * Logging method specified for entities propagated by events.
+	 * Contains some logic to log interesting entities only.
+	 * Provides extraction of some meaningful data for logging.
+	 * Has to be implemented in particular services.
+	 * 
+	 * @param <E>
+	 * @param event
+	 * @param status
+	 * @param reason
+	 */
+	protected void siemLog(EntityEvent<DTO> event, String status, String detail) {
+		// This is default empty implementation of the log method.
+		// it has to be overridden in services which are supposed to be logged. 
+	}
+	
 }
