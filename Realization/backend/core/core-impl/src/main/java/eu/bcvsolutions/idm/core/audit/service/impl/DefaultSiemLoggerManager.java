@@ -1,22 +1,18 @@
 package eu.bcvsolutions.idm.core.audit.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
-import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
-import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
 
 /**
  * 
@@ -34,12 +30,6 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 	private SecurityService securityService;
 	@Autowired
 	@Lazy
-	private LookupService lookupService;
-	@Autowired
-	@Lazy
-	private IdmConceptRoleRequestService conceptRoleRequestService;
-	@Autowired
-	@Lazy
 	private ConfigurationService configurationService;
 
 	@Override
@@ -55,7 +45,7 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 			targetName = ((Codeable)targetDto).getCode();
 		}
 		
-		if (targetDto instanceof BaseDto) {
+		if (targetDto != null) {
 			targetUuid = Objects.toString(((BaseDto)targetDto).getId(),"");
 		}
 		
@@ -63,7 +53,7 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 			subjectName = ((Codeable)subjectDto).getCode();
 		}
 		
-		if (subjectDto instanceof BaseDto) {
+		if (subjectDto != null) {
 			subjectUuid = Objects.toString(((BaseDto)subjectDto).getId(),"");
 		}
 		
@@ -89,11 +79,11 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 	public String buildAction(String... levels) {
 		StringBuilder sb = new StringBuilder();
 		List<String> toPrint = new ArrayList<String>();
-		for(int i = 0; i < levels.length; ++i) {
-			if(StringUtils.isBlank(levels[i])) {
+		for (String level : levels) {
+			if (StringUtils.isBlank(level)) {
 				continue;
 			}
-			toPrint.add(levels[i]);
+			toPrint.add(level);
 		}
 				
 		for(int i = 0; i < toPrint.size(); ++i) {
@@ -108,7 +98,7 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 	@Override
 	public boolean skipLogging(String action) {
 		boolean result = true;
-		String levels[] = {};
+		String[] levels = {};
 		if(action!=null) {
 			levels = action.split(Pattern.quote(String.valueOf(LEVEL_DELIMITER_ATTRIBUTE))); 
 		}
@@ -118,28 +108,18 @@ public class DefaultSiemLoggerManager implements SiemLoggerManager {
 		sb.append(ROOT_LEVEL_KEY);
 		String value = configurationService.getValue(sb.toString());
 		result = !isLoggingOnByLevel(value);
-		for(int i=0; i < levels.length; ++i) {
+		for (String level : levels) {
 			sb.append(LEVEL_DELIMITER_ATTRIBUTE);
-			sb.append(levels[i]);
+			sb.append(level);
 			value = configurationService.getValue(sb.toString());
-			result = value == null ? result : !isLoggingOnByLevel(value);  
+			result = value == null ? result : !isLoggingOnByLevel(value);
 		}
 		return result;
 	}
 	
 	/**
-	 * Internal log formatter.
-	 * 
-	 * @param action
-	 * @param status
-	 * @param targetName
-	 * @param targetUuid
-	 * @param subjectName
-	 * @param subjectUuid
-	 * @param performedByName
-	 * @param performedByUuid
-	 * @param reason
-	 * @return
+	 *  Internal log formatter.
+	 *
 	 */
 	private String formatLog(String action, String result, String targetName, String targetUuid, String subjectName, String subjectUuid, 
 			String performedByName, String performedByUuid, String transactionUuid, String detail) {

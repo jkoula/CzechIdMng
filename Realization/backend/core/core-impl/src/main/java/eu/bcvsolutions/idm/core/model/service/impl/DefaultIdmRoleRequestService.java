@@ -1099,22 +1099,15 @@ public class DefaultIdmRoleRequestService
 			return;
 		}
 		String transactionUuid = java.util.Objects.toString(dto.getTransactionId(),"");
-		IdmConceptRoleRequestFilter filter = new IdmConceptRoleRequestFilter();
-		filter.setRoleRequestId(dto.getId());
-		List<IdmConceptRoleRequestDto> concepts = conceptRoleRequestService.find(filter, null).getContent();
 		String result;
-		for (IdmConceptRoleRequestDto concept : concepts) {
-			IdmRoleDto roleDto = lookupService.lookupEmbeddedDto(concept, IdmConceptRoleRequest_.role.getName());
-			if(StringUtils.isEmpty(detail)) {
-				RoleRequestState state = concept.getState();
-				result = java.util.Objects.toString(state,"");
-				status = RoleRequestState.EXCEPTION == state ? SiemLoggerManager.FAILED_ACTION_STATUS : status;
-			} else {
-				result = detail;
-			}
-			siemLog(action, status, concept, roleDto, transactionUuid, result);
-			result = null;
+		if(StringUtils.isEmpty(detail)) {
+			RoleRequestState state = dto.getState();
+			result = java.util.Objects.toString(state,"");
+			status = RoleRequestState.EXCEPTION == state ? SiemLoggerManager.FAILED_ACTION_STATUS : status;
+		} else {
+			result = detail;
 		}
+		siemLog(action, status, dto, null, transactionUuid, result);
 	}
 
 	/**

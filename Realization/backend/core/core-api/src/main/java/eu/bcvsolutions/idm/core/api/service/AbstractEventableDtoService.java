@@ -114,11 +114,6 @@ public abstract class AbstractEventableDtoService<DTO extends BaseDto, E extends
 	 * Contains some logic to log interesting entities only.
 	 * Provides extraction of some meaningful data for logging.
 	 * Has to be implemented in particular services.
-	 * 
-	 * @param <E>
-	 * @param event
-	 * @param status
-	 * @param reason
 	 */
 	protected void siemLog(EntityEvent<DTO> event, String status, String detail) {
 		// This is default empty implementation of the log method.
