@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-classes-per-file
 import {Basic} from 'czechidm-core';
 import React from 'react';
 import Joi from 'joi';
@@ -68,6 +69,13 @@ class JdbcStepOne extends AbstractWizardStep {
         this.state.authenticationType = metadata.authenticationType;
         this.state.domain = metadata.domain;
         this.state.instanceName = metadata.instanceName;
+        this.state.name = metadata.name;
+        this.state.port = metadata.port;
+        this.state.host = metadata.host;
+        this.state.user = metadata.user;
+        this.state.database = metadata.database;
+        this.state.table = metadata.table;
+        this.state.keyColumn = metadata.keyColumn;
       }
       if (!wizardContext.connectorType.reopened) {
         // primary schema attribute will be cleared only for new system (in reopened case is UID attribute not deleted).
@@ -131,24 +139,36 @@ class JdbcStepOne extends AbstractWizardStep {
 
   render() {
     const {connectorType} = this.props;
-    const {showLoading, ntlm, authenticationType, trustServerCertificate, domain, instanceName} = this.state;
+    const {showLoading,
+      ntlm,
+      authenticationType,
+      trustServerCertificate,
+      domain,
+      instanceName,
+      name,
+      port,
+      host,
+      user,
+      database,
+      table,
+      keyColumn} = this.state;
 
     const _connectorType = this.state.connectorType ? this.state.connectorType : connectorType;
     const formData = {};
     if (_connectorType && _connectorType.metadata) {
       const metadata = _connectorType.metadata;
-      formData.name = metadata.name;
+      formData.name = name;
       formData.ntlm = ntlm;
       formData.authenticationType = authenticationType;
       formData.trustServerCertificate = trustServerCertificate;
       formData.domain = domain;
       formData.instanceName = instanceName;
-      formData.port = metadata.port;
-      formData.host = metadata.host;
-      formData.user = metadata.user;
-      formData.database = metadata.database;
-      formData.table = metadata.table;
-      formData.keyColumn = metadata.keyColumn;
+      formData.port = port;
+      formData.host = host;
+      formData.user = user;
+      formData.database = database;
+      formData.table = table;
+      formData.keyColumn = keyColumn;
       if (_connectorType.reopened) {
         // We expecting the password was already filled for reopened system.
         formData.password = '********';
@@ -169,13 +189,15 @@ class JdbcStepOne extends AbstractWizardStep {
           data={formData}>
           <Basic.TextField
             ref="name"
+            onChange={this._onChangeTextField.bind(this, 'name')}
             label={this.i18n(`${jdbcLocKey}.systemName`)}
             required
             max={255}/>
-           <Basic.Div style={{display: 'flex'}}>
+          <Basic.Div style={{display: 'flex'}}>
             <Basic.Div style={{flex: 3, marginRight: 15}}>
               <Basic.TextField
                 ref="host"
+                onChange={this._onChangeTextField.bind(this, 'host')}
                 label={this.i18n(`${jdbcLocKey}.host.label`)}
                 helpBlock={this.i18n(`${jdbcLocKey}.host.help`)}
                 required
@@ -184,6 +206,7 @@ class JdbcStepOne extends AbstractWizardStep {
             <Basic.Div style={{flex: 1}}>
               <Basic.TextField
                 ref="port"
+                onChange={this._onChangeTextField.bind(this, 'port')}
                 validation={Joi.number().integer().min(0).max(65535)}
                 label={this.i18n(`${jdbcLocKey}.port.label`)}
                 helpBlock={this.i18n(`${jdbcLocKey}.port.help`)}
@@ -192,6 +215,7 @@ class JdbcStepOne extends AbstractWizardStep {
           </Basic.Div>
           <Basic.TextField
             ref="database"
+            onChange={this._onChangeTextField.bind(this, 'database')}
             label={this.i18n(`${jdbcLocKey}.database.label`)}
             helpBlock={this.i18n(`${jdbcLocKey}.database.help`)}
             required
@@ -200,6 +224,7 @@ class JdbcStepOne extends AbstractWizardStep {
             <Basic.Div style={{flex: 1, marginRight: 15}}>
               <Basic.TextField
                 ref="table"
+                onChange={this._onChangeTextField.bind(this, 'table')}
                 label={this.i18n(`${jdbcLocKey}.table.label`)}
                 helpBlock={this.i18n(`${jdbcLocKey}.table.help`)}
                 required
@@ -208,6 +233,7 @@ class JdbcStepOne extends AbstractWizardStep {
             <Basic.Div style={{flex: 1}}>
               <Basic.TextField
                 ref="keyColumn"
+                onChange={this._onChangeTextField.bind(this, 'keyColumn')}
                 label={this.i18n(`${jdbcLocKey}.keyColumn.label`)}
                 helpBlock={this.i18n(`${jdbcLocKey}.keyColumn.help`)}
                 required

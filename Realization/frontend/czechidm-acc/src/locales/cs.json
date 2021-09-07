@@ -1085,7 +1085,7 @@
         "help": "Přiřazením této role bude automaticky vytvořen účet na systému. Pokud tato volba není vybrána, pak se účet vytvoří pouze pokud bude přiřazena i jiná role přiřazující tento systém a vytvářející účet automaticky (tzv. login role)."
       },
       "isInCrossDomainGroupAlert": {
-        "text": "Toto napojení je součástí <b>Cross-domain skupiny</b>. Správa účtů bude řízena <b>dle pravidel rolí v Cross-domain</b> skupinách. Nastavení automatického vytváření účtů bude ignorováno."
+        "text": "Toto napojení je součástí <b>Cross-domain skupiny</b>. Tzn přiřazením této role uživateli nedojde k vytvoření účtu na systému. Nastavení automatického vytváření účtů bude ignorováno."
       }
     },
     "SystemEntity": {

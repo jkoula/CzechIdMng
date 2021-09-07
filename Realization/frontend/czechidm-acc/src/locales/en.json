@@ -1084,7 +1084,7 @@
         "help": "Assigning this role will automatically create an account on the system. If this option is not selected, then the account will only be created if another role is assigned for this system and creates the account automatically."
       },
       "isInCrossDomainGroupAlert": {
-        "text": "This connection is part of a <b>Cross-domain group</b>. Account management will be managed <b>according to the role rules in Cross-domain</b> groups. The automatic account creation setting will be ignored."
+        "text": "This connection is part of the <b>Cross-domain group</b>. That is, assigning this role to a user does not create an account on the system. The automatic account creation setting will be ignored."
       }
     },
     "SystemEntity": {
