@@ -14,15 +14,7 @@ import org.springframework.util.MultiValueMap;
  *
  */
 public class IdmRoleSystemFilter extends DataFilter {
-
-	public IdmRoleSystemFilter() {
-		this(new LinkedMultiValueMap<>());
-	}
-
-	public IdmRoleSystemFilter(MultiValueMap<String, Object> data) {
-		super(IdmRoleSystemDto.class, data);
-	}
-
+	
 	private UUID roleId;
 	private UUID systemId;
 	private UUID systemMappingId;
@@ -31,6 +23,14 @@ public class IdmRoleSystemFilter extends DataFilter {
 	private Boolean createAccountByDefault;
 	private Boolean checkIfIsInCrossDomainGroup;
 	private UUID isInCrossDomainGroupRoleId;
+	
+	public IdmRoleSystemFilter() {
+		this(new LinkedMultiValueMap<>());
+	}
+
+	public IdmRoleSystemFilter(MultiValueMap<String, Object> data) {
+		super(IdmRoleSystemDto.class, data);
+	}
 
 	public UUID getRoleId() {
 		return roleId;

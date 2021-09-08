@@ -11,11 +11,8 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
-import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroup;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
@@ -25,7 +22,6 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
-import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import java.util.List;
@@ -38,6 +34,7 @@ import javax.persistence.criteria.Subquery;
 import org.modelmapper.internal.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * System groups-system relation service
@@ -67,6 +64,7 @@ public class DefaultSysSystemGroupSystemService
 	}
 
 	@Override
+	@Transactional
 	public SysSystemGroupSystemDto saveInternal(SysSystemGroupSystemDto dto) {
 		UUID mergeAttributeId = dto.getMergeAttribute();
 		UUID systemId = dto.getSystem();

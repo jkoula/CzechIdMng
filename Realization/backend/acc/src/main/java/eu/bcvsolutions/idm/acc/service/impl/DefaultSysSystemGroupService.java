@@ -10,7 +10,6 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
-import eu.bcvsolutions.idm.core.model.entity.IdmConfidentialStorageValue_;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import java.util.List;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -33,9 +32,6 @@ import org.springframework.stereotype.Service;
 public class DefaultSysSystemGroupService
 		extends AbstractEventableDtoService<SysSystemGroupDto, SysSystemGroup, SysSystemGroupFilter>
 		implements SysSystemGroupService {
-	
-	@Autowired
-	private SysSystemGroupSystemService systemGroupSystemService;
 
 	@Autowired
 	public DefaultSysSystemGroupService(SysSystemGroupRepository repository,

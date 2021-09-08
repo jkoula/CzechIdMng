@@ -35,7 +35,7 @@ public class SystemGroupSystemDeleteBulkAction extends AbstractRemoveBulkAction<
 
 	@Override
 	protected List<String> getAuthoritiesForEntity() {
-		return Lists.newArrayList(AccGroupPermission.SYSTEM_GROUP_DELETE);
+		return Lists.newArrayList(AccGroupPermission.SYSTEM_GROUP_SYSTEM_DELETE);
 	}
 
 	@Override

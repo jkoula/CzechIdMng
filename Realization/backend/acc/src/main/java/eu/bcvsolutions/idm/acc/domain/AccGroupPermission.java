@@ -70,6 +70,15 @@ public enum AccGroupPermission implements GroupPermission {
 			IdmBasePermission.UPDATE,
 			IdmBasePermission.DELETE),
 	SYSTEMGROUP(
+			IdmBasePermission.ADMIN,
+			IdmBasePermission.AUTOCOMPLETE,
+			IdmBasePermission.COUNT,
+			IdmBasePermission.READ,
+			IdmBasePermission.CREATE,
+			IdmBasePermission.UPDATE,
+			IdmBasePermission.DELETE),
+	SYSTEMGROUPSYSTEM(
+			IdmBasePermission.ADMIN,
 			IdmBasePermission.AUTOCOMPLETE,
 			IdmBasePermission.COUNT,
 			IdmBasePermission.READ,
@@ -172,12 +181,21 @@ public enum AccGroupPermission implements GroupPermission {
 	public static final String REMOTESERVER_UPDATE = "REMOTESERVER" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String REMOTESERVER_DELETE = "REMOTESERVER" + BasePermission.SEPARATOR + "DELETE";
 	//
+	public static final String SYSTEM_GROUP_ADMIN = "SYSTEMGROUP" + BasePermission.SEPARATOR + "ADMIN";
 	public static final String SYSTEM_GROUP_AUTOCOMPLETE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String SYSTEM_GROUP_COUNT = "SYSTEMGROUP" + BasePermission.SEPARATOR + "COUNT";
 	public static final String SYSTEM_GROUP_READ = "SYSTEMGROUP" + BasePermission.SEPARATOR + "READ";
 	public static final String SYSTEM_GROUP_CREATE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "CREATE";
 	public static final String SYSTEM_GROUP_UPDATE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String SYSTEM_GROUP_DELETE = "SYSTEMGROUP" + BasePermission.SEPARATOR + "DELETE";
+	//
+	public static final String SYSTEM_GROUP_SYSTEM_ADMIN = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "ADMIN";
+	public static final String SYSTEM_GROUP_SYSTEM_AUTOCOMPLETE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
+	public static final String SYSTEM_GROUP_SYSTEM_COUNT = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "COUNT";
+	public static final String SYSTEM_GROUP_SYSTEM_READ = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "READ";
+	public static final String SYSTEM_GROUP_SYSTEM_CREATE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "CREATE";
+	public static final String SYSTEM_GROUP_SYSTEM_UPDATE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "UPDATE";
+	public static final String SYSTEM_GROUP_SYSTEM_DELETE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "DELETE";
 	
 	private final List<BasePermission> permissions;
 
