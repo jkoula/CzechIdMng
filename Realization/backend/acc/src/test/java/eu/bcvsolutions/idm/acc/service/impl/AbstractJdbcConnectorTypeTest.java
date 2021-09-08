@@ -132,7 +132,7 @@ public abstract class AbstractJdbcConnectorTypeTest extends AbstractIntegrationT
 		// If not, whole test will be skipped.
 		if (!getJdbcConnectorTypeDriverName().equals(getDriver())) {
 			// Skip test.
-			//return;
+			return;
 		}
 
 		ConnectorTypeDto mockPostgresqlConnectorTypeDto = getConnectorTypeDto();

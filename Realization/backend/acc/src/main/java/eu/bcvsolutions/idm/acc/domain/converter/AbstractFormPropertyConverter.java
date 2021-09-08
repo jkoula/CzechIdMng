@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
@@ -30,9 +31,7 @@ public abstract class AbstractFormPropertyConverter implements FormPropertyConve
 	
 	/**
 	 * Returns true, if connector property supports multiple values
-	 * 
-	 * @param type
-	 * @return
+	 *
 	 */
 	public boolean isMultiple() {
 		return false;
@@ -124,7 +123,14 @@ public abstract class AbstractFormPropertyConverter implements FormPropertyConve
 			// arrays only
 			// override for other data types
 			if (PersistentType.TEXT == getFormPropertyType()) {
-				value = valueList.toArray(new String[]{});
+				// We need to trim a value (default value can contains /r).
+				List convertedList = (List) valueList.stream().map(itemValue -> {
+					if (itemValue instanceof String) {
+						return ((String) itemValue).trim();
+					}
+					return itemValue;
+				}).collect(Collectors.toList());
+				value = convertedList.toArray(new String[]{});
 			}else if(PersistentType.UUID == getFormPropertyType()) {
 				value = valueList.toArray(new UUID[]{});
 			} else {

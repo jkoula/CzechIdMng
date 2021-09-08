@@ -78,8 +78,8 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 							identityRoleService.saveInternal(identityRole);
 						});
 
-				roleSystemService.delete(roleSystem);
 			}
+			roleSystemService.delete(roleSystem);
 		});
 		//
 		// delete relations on account (includes delete of account )
