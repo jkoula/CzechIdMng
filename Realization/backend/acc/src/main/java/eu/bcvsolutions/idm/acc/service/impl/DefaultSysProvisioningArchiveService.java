@@ -170,9 +170,10 @@ public class DefaultSysProvisioningArchiveService
 			SysAttributeDifferenceDto vsAttribute;
 			// Attribute was changed
 			if (changedObject.getAttributeByName(currentAttribute.getName()) != null) {
-				vsAttribute = new SysAttributeDifferenceDto(currentAttribute.getName(), currentAttribute.isMultiValue(), true);
 				IcAttribute changedAttribute = changedObject.getAttributeByName(currentAttribute.getName());
-				if (changedAttribute.isMultiValue()) {
+				boolean isMultivalue = isIcAttributeMultivalue(currentAttribute, changedAttribute);
+				vsAttribute = new SysAttributeDifferenceDto(currentAttribute.getName(), isMultivalue, true);
+				if (isMultivalue) {
 					vsAttribute.setChanged(false);
 					if (changedAttribute.getValues() != null) {
 						changedAttribute.getValues().forEach(value -> {
@@ -209,8 +210,9 @@ public class DefaultSysProvisioningArchiveService
 				}
 			} else {
 				// Attribute was not changed
-				vsAttribute = new SysAttributeDifferenceDto(currentAttribute.getName(), currentAttribute.isMultiValue(), false);
-				if (currentAttribute.isMultiValue()) {
+				boolean isMultivalue = isIcAttributeMultivalue(currentAttribute, null);
+				vsAttribute = new SysAttributeDifferenceDto(currentAttribute.getName(), isMultivalue, false);
+				if (isMultivalue) {
 					if (currentAttribute.getValues() != null) {
 						currentAttribute.getValues().forEach(value -> {
 							vsAttribute.getValues().add(new SysAttributeDifferenceValueDto(value, value, null));
@@ -225,7 +227,19 @@ public class DefaultSysProvisioningArchiveService
 		});
 		
 		return resultAttributes;
-	} 
+	}
+	
+	/**
+	 * Auxiliary method to tell whether attribute contains multivalue attribute
+	 * The flag itself is not sufficient  
+	 */
+	private boolean isIcAttributeMultivalue(IcAttribute current, IcAttribute changed) {
+		boolean res1 = current != null &&
+				(current.isMultiValue() || (current.getValues() != null && current.getValues().size() > 1));
+		boolean res2 = changed != null &&
+				(changed.isMultiValue() || (changed.getValues() != null && changed.getValues().size() > 1));
+		return res1 || res2;
+	}
 	
 	@Override
 	protected List<Predicate> toPredicates(Root<SysProvisioningArchive> root, CriteriaQuery<?> query, CriteriaBuilder builder, SysProvisioningOperationFilter filter) {

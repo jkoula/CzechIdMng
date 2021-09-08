@@ -1497,7 +1497,8 @@
       "attributeDiffType": {
         "ADDED": "Value will be added",
         "REMOVED": "Value will be removed",
-        "UPDATED": "Value will be updated"
+        "UPDATED": "Value will be updated",
+        "UNKNOWN": "Unknown change type"
       }
     },
     "ProvisioningArchive": {
@@ -1511,7 +1512,8 @@
       "attributeDiffType": {
         "ADDED": "Value was added",
         "REMOVED": "Value was removed",
-        "UPDATED": "Value was updated"
+        "UPDATED": "Value was updated",
+        "UNKNOWN": "Unknown change type"
       }
     },
     "ProvisioningBreakConfig": {

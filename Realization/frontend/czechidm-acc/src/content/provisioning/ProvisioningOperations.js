@@ -120,7 +120,12 @@ class ProvisioningOperations extends Basic.AbstractContent {
         const attrName = this._extractAttrName(schemaAttributeId, strategyStr);
         result.push({
           property: attrName,
-          strategy: strategyStr
+          strategy: strategyStr,
+          multivalue: false,
+          changed: false,
+          accountVal: '',
+          systemVal: '',
+          valueState: ''
         });
       }
     }
@@ -128,12 +133,19 @@ class ProvisioningOperations extends Basic.AbstractContent {
     // create difference view based on dedicated diff object
     if (diffData && diffData.length > 0) {
       for (const item of diffData) {
+        if (!item || !item.name) {
+          continue;
+        }
         const name = item.name;
         const multivalue = item.multivalue;
         const changed = item.changed;
-        const index = result.findIndex(attr => { return attr.property === name; });
+        let index = result.findIndex(attr => { return attr.property === name; });
         if (index < 0) {
-          continue;
+          result.push({
+            property: name,
+            strategy: ''
+          });
+          index = result.length - 1;
         }
         result[index].multivalue = multivalue;
         result[index].changed = changed;
@@ -143,14 +155,20 @@ class ProvisioningOperations extends Basic.AbstractContent {
           result[index].systemVal = [];
           result[index].valueState = [];
           for (const value of item.values) {
-            result[index].accountVal.push(value.value == null ? '' : this._toPropertyValue(value.value));
-            result[index].systemVal.push(value.oldValue == null ? '' : this._toPropertyValue(value.oldValue));
-            result[index].valueState.push(value.change == null ? '' : this._toPropertyValue(value.change));
+            result[index].accountVal.push(value && value.value ? this._toPropertyValue(value.value) : '');
+            result[index].systemVal.push(value && value.oldValue ? this._toPropertyValue(value.oldValue) : '');
+            result[index].valueState.push(value && value.change ? this._toPropertyValue(value.change) : '');
           }
         } else {
-          result[index].accountVal = item.value.value == null ? '' : this._toPropertyValue(item.value.value);
-          result[index].systemVal = item.value.oldValue == null ? '' : this._toPropertyValue(item.value.oldValue);
-          result[index].valueState = item.value.change == null ? '' : this._toPropertyValue(item.value.change);
+          const accountVal = item && item.value && item.value.value
+            ? item.value.value : '';
+          const systemVal = item && item.value && item.value.oldValue
+            ? item.value.oldValue : '';
+          const valueState = item && item.value && item.value.change
+            ? item.value.change : '';
+          result[index].accountVal = this._toPropertyValue(accountVal);
+          result[index].systemVal = this._toPropertyValue(systemVal);
+          result[index].valueState = this._toPropertyValue(valueState);
         }
       }
       return result;
@@ -232,16 +250,13 @@ class ProvisioningOperations extends Basic.AbstractContent {
     if (this.state.showChangesOnly) {
       for (const attr of resultContent) {
         if (attr.multivalue && Array.isArray(attr.valueState)) {
-          const toRemove = [];
-          for (let idx = 0; idx < attr.valueState.length; ++idx) {
-            if (!attr.valueState[idx]) {
-              toRemove.push(idx);
+          let i = attr.valueState.length;
+          while (i--) {
+            if (!attr.valueState[i]) {
+              attr.accountVal.splice(i, 1);
+              attr.systemVal.splice(i, 1);
+              attr.valueState.splice(i, 1);
             }
-          }
-          for (const idxRem of toRemove) {
-            attr.accountVal.splice(idxRem, 1);
-            attr.systemVal.splice(idxRem, 1);
-            attr.valueState.splice(idxRem, 1);
           }
         }
       }
@@ -329,9 +344,6 @@ class ProvisioningOperations extends Basic.AbstractContent {
   * @return {[type]}     Style string representation
   */
   _getValueStateDecoration(key) {
-    if (!key) {
-      return null;
-    }
     switch (key) {
       case 'ADDED': {
         return 'success';
@@ -343,7 +355,7 @@ class ProvisioningOperations extends Basic.AbstractContent {
         return 'danger';
       }
       default: {
-        return 'default';
+        return 'info';
       }
     }
   }
@@ -367,8 +379,9 @@ class ProvisioningOperations extends Basic.AbstractContent {
       }
       for (let idx = 0; idx < values.length; ++idx) {
         if (valueStates[idx] && decorate) {
+          const hintKey = this._getValueStateDecoration(valueStates[idx]) === 'info' ? 'UNKNOWN' : valueStates[idx];
           result.push(<Basic.Label
-            title={this.i18n(`acc:entity.${titleKey}.attributeDiffType.${valueStates[idx]}`)}
+            title={this.i18n(`acc:entity.${titleKey}.attributeDiffType.${hintKey}`)}
             level={this._getValueStateDecoration(valueStates[idx])}
             style={valueStates[idx] === 'REMOVED' ? {textDecoration: 'line-through'} : null}
             text={values[idx] || ' '}/>);
@@ -385,9 +398,10 @@ class ProvisioningOperations extends Basic.AbstractContent {
     const valueState = row.valueState;
     const level = this._getValueStateDecoration(valueState);
     if (row.changed && decorate) {
+      const hintKey = this._getValueStateDecoration(valueState) === 'info' ? 'UNKNOWN' : valueState;
       return (
         <Basic.Label
-          title={this.i18n(`acc:entity.${titleKey}.attributeDiffType.${valueState}`)}
+          title={this.i18n(`acc:entity.${titleKey}.attributeDiffType.${hintKey}`)}
           level={level}
           style={valueState === 'REMOVED' ? {textDecoration: 'line-through'} : null}
           text={value || ' '}/>);

@@ -1498,7 +1498,8 @@
       "attributeDiffType": {
         "ADDED": "Hodnota bude přidána",
         "REMOVED": "Hodnota bude odebrána",
-        "UPDATED": "Hodnota bude upravena"
+        "UPDATED": "Hodnota bude upravena",
+        "UNKNOWN": "Neznámý typ změny"
       }
     },
     "ProvisioningArchive": {
@@ -1512,7 +1513,8 @@
       "attributeDiffType": {
         "ADDED": "Hodnota byla přidána",
         "REMOVED": "Hodnota byla odebrána",
-        "UPDATED": "Hodnota byla upravena"
+        "UPDATED": "Hodnota byla upravena",
+        "UNKNOWN": "Neznámý typ změny"
       }
     },
     "ProvisioningBreakConfig": {
