@@ -169,17 +169,26 @@ export class FormValueTable extends Advanced.AbstractTableContent {
                     }
                     fromProperty="dateValueFrom"
                     tillProperty="dateValueTill"/>
-                  <Basic.TextField
-                    ref="longValue"
-                    placeholder={ this.i18n('filter.value.placeholder') }
-                    hidden={
-                      persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)
-                        && persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.LONG)
-                    }
-                    validation={ Joi.number().integer().min(-9223372036854775808).max(9223372036854775807) }/>
+                  {
+                    persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)
+                    ?
+                    <Basic.TextField
+                      ref="longValue"
+                      placeholder={ this.i18n('filter.value.placeholder') }
+                      validation={ Joi.number().integer().min(-2147483648).max(2147483647) }/>
+                    :
+                    <Basic.TextField
+                      ref="longValue"
+                      placeholder={ this.i18n('filter.value.placeholder') }
+                      hidden={
+                        persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)
+                          && persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.LONG)
+                      }
+                      validation={ Joi.number().integer().min(-9223372036854775808).max(9223372036854775807) }/>
+                  }
                   <Basic.TextField
                     ref="doubleValue"
-                    placeholder={this.i18n('filter.value.placeholder')}
+                    placeholder={ this.i18n('filter.value.placeholder') }
                     hidden={ persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.DOUBLE) }
                     validation={ Joi.number().min(-(10 ** 33)).max(10 ** 33) } />
                   <Basic.BooleanSelectBox
