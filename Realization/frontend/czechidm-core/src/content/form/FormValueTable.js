@@ -46,7 +46,16 @@ export class FormValueTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.useFilterForm(this.refs.filterForm);
+    const filterData = Domain.SearchParameters.getFilterData(this.refs.filterForm);
+    //
+    // resolve additional filter options
+    const intValue = this.refs.intValue.getValue();
+    if (intValue) {
+      filterData.longValue = intValue;
+    }
+    delete filterData.intValue;
+    //
+    this.refs.table.useFilterData(filterData);
   }
 
   cancelFilter(event) {
@@ -94,6 +103,7 @@ export class FormValueTable extends Advanced.AbstractTableContent {
       this.refs.stringValueLike.setValue(null);
       this.refs.shortTextValueLike.setValue(null);
       this.refs.fromTill.setValue(null);
+      this.refs.intValue.setValue(null);
       this.refs.longValue.setValue(null);
       this.refs.doubleValue.setValue(null);
       this.refs.booleanValue.setValue(null);
@@ -169,23 +179,16 @@ export class FormValueTable extends Advanced.AbstractTableContent {
                     }
                     fromProperty="dateValueFrom"
                     tillProperty="dateValueTill"/>
-                  {
-                    persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)
-                    ?
-                    <Basic.TextField
-                      ref="longValue"
-                      placeholder={ this.i18n('filter.value.placeholder') }
-                      validation={ Joi.number().integer().min(-2147483648).max(2147483647) }/>
-                    :
-                    <Basic.TextField
-                      ref="longValue"
-                      placeholder={ this.i18n('filter.value.placeholder') }
-                      hidden={
-                        persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)
-                          && persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.LONG)
-                      }
-                      validation={ Joi.number().integer().min(-9223372036854775808).max(9223372036854775807) }/>
-                  }
+                  <Basic.TextField
+                    ref="intValue"
+                    placeholder={ this.i18n('filter.value.placeholder') }
+                    hidden={ persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT) }
+                    validation={ Joi.number().integer().min(-2147483648).max(2147483647) }/>
+                  <Basic.TextField
+                    ref="longValue"
+                    placeholder={ this.i18n('filter.value.placeholder') }
+                    hidden={ persistentType !== PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.LONG) }
+                    validation={ Joi.number().integer().min(-9223372036854775808).max(9223372036854775807) }/>
                   <Basic.TextField
                     ref="doubleValue"
                     placeholder={ this.i18n('filter.value.placeholder') }
