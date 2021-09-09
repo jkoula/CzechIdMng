@@ -5,7 +5,6 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemGroupDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DisableableFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
-import java.util.UUID;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 

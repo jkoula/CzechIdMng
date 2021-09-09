@@ -92,7 +92,8 @@ class SystemGroupTable extends Advanced.AbstractTableContent {
                     <Basic.Col lg={ 8 }>
                       <Advanced.Filter.TextField
                         ref="text"
-                        placeholder={this.i18n('filter.text')}/>
+                        placeholder={this.i18n('filter.text')}
+                        help={ Advanced.Filter.getTextHelp() }/>
                     </Basic.Col>
                     <Basic.Col lg={ 4 } className="text-right">
                       <Advanced.Filter.FilterButtons cancelFilter={ this.cancelFilter.bind(this) }/>

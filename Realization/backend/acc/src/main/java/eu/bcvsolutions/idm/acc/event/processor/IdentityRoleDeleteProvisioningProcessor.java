@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
-import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;

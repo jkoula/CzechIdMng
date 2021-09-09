@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.acc.entity;
 
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
-import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
@@ -10,7 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
 /**

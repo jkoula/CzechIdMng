@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.impl.mock;
 
-import eu.bcvsolutions.idm.acc.connector.AdGroupConnectorType;
 import eu.bcvsolutions.idm.acc.connector.MsSqlConnectorType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;

@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.model.entity;
 
-import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;

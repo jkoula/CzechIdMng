@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.dto;
 
-import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import java.util.UUID;

@@ -4,7 +4,6 @@ import java.util.List;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
-import eu.bcvsolutions.idm.acc.security.authentication.impl.DefaultAccAuthenticator;
 import eu.bcvsolutions.idm.acc.security.authentication.impl.DefaultAccMultipleSystemAuthenticator;
 import eu.bcvsolutions.idm.core.api.service.Configurable;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;

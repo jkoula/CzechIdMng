@@ -15,6 +15,8 @@ import java.util.UUID;
  *
  */
 public class IdmSystemDto extends FormableDto implements Codeable, Disableable {
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private String description;
 	private boolean readonly;
