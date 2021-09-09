@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import java.beans.IntrospectionException;
 import java.io.IOException;

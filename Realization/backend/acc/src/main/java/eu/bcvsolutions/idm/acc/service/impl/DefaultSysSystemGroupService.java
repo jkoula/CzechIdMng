@@ -7,7 +7,6 @@ import eu.bcvsolutions.idm.acc.entity.SysSystemGroup;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
 import eu.bcvsolutions.idm.acc.repository.SysSystemGroupRepository;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
