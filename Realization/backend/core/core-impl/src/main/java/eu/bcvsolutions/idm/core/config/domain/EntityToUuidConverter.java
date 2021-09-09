@@ -26,13 +26,20 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
  * and add entity to embedded part main DTO.
  * 
  * @author svandav
+ * @author Radek Tomiška
  */
 public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(EntityToUuidConverter.class);
+	//
+	private ModelMapper modeler;
 	private LookupService lookupService;
 	private ApplicationContext applicationContext;
 
 	public EntityToUuidConverter(ModelMapper modeler, ApplicationContext applicationContext) {
+		Assert.notNull(modeler, "Modeler is required!");
+		//
+		this.modeler = modeler;
 		this.applicationContext = applicationContext;
 	}
 
@@ -63,20 +70,26 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 					if (embeddedAnnotation.enabled()) {
 						// If has field Embedded (enabled) annotation, then
 						// we will create new
-						// instance of DTO
+						// instance of DTO.
 						//
 						AbstractDto dto = null;
-						// If dto class is abstract get dto from lookup
+						// If dto class is abstract get dto from lookup.
 						if (Modifier.isAbstract(embeddedAnnotation.dtoClass().getModifiers())) {
 							dto = (AbstractDto) getLookupService().lookupDto(entity.getClass(), entity.getId());
 						} else {
 							dto = embeddedAnnotation.dtoClass().getDeclaredConstructor().newInstance();
 						}
 						dto.setTrimmed(true);
-						// Separate map entity to new embedded DTO
-						getLookupService().toDto(entity, dto, null);
+						// Separate map entity to new embedded DTO.
+						try {
+							dto = getLookupService().toDto(entity, dto, null);
+						} catch (Exception ex) {
+							LOG.warn("DTO [{}] cannot be converted into embedded by underlying service, try to convert by default converter.",
+									dto.getClass().getCanonicalName(), ex);
+							modeler.map(entity, dto);
+						}
 						embedded.put(field, dto);
-						// Add filled DTO to embedded map to parent DTO
+						// Add filled DTO to embedded map to parent DTO.
 						parentDto.setEmbedded(embedded);
 					}
 				}
