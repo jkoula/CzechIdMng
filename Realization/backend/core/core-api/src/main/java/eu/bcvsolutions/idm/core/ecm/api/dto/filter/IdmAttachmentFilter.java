@@ -15,6 +15,8 @@ import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 /**
  * Filter for attachments.
  * 
+ * TODO: pure data filter.
+ * 
  * @author Radek Tomiška
  * @since 7.6.0
  *
@@ -30,7 +32,6 @@ public class IdmAttachmentFilter extends DataFilter {
 	private String name;
 	private Boolean lastVersionOnly; // true - last version only
 	private UUID versionsFor; // attachment id - all versions for attachment
-	private String attachmentType;
 	
 	public IdmAttachmentFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -49,7 +50,7 @@ public class IdmAttachmentFilter extends DataFilter {
 	}
 
 	public String getOwnerType() {
-		return (String) data.getFirst(PARAMETER_OWNER_TYPE);
+		return getParameterConverter().toString(getData(), PARAMETER_OWNER_TYPE);
 	}
 
 	public void setOwnerType(String ownerType) {
@@ -108,7 +109,7 @@ public class IdmAttachmentFilter extends DataFilter {
 	 * @since 11.2.0
 	 */
 	public String getAttachmentType() {
-		return attachmentType;
+		return getParameterConverter().toString(getData(), PARAMETER_ATTACHMENT_TYPE);
 	}
 	
 	/**
@@ -117,6 +118,6 @@ public class IdmAttachmentFilter extends DataFilter {
 	 * @since 11.2.0
 	 */
 	public void setAttachmentType(String attachmentType) {
-		this.attachmentType = attachmentType;
+		set(PARAMETER_ATTACHMENT_TYPE, attachmentType);
 	}
 }

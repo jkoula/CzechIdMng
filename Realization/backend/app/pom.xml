@@ -11,7 +11,7 @@
 	<artifactId>idm-app</artifactId>
 	<packaging>war</packaging>
 	<name>CzechIdM Application</name>
-	<description>CzechIdM web application. Contains application modules with rest endpoints , authentication etc.</description>
+	<description>CzechIdM web application. Contains application modules with rest endpoints, authentication etc.</description>
 
 	<dependencies>
 		<dependency>

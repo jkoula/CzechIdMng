@@ -1,12 +1,13 @@
 package eu.bcvsolutions.idm.acc.dto.filter;
 
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemGroupDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DisableableFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 /**
  *  System groups (cross-domain) filter.
