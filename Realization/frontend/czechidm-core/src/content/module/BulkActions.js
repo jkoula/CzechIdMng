@@ -241,7 +241,7 @@ class BulkActions extends Advanced.AbstractTableContent {
                           const icon = (
                             <Basic.Icon
                               icon={ action[property] }
-                              level={ action.level !== 'SUCCESS' ? action.level.toLowerCase() : 'default' }/>
+                              level={ action.level && action.level !== 'SUCCESS' ? action.level.toLowerCase() : 'default' }/>
                           );
                           if (!icon) {
                             return null;
