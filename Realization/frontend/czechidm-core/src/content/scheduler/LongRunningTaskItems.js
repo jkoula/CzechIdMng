@@ -98,8 +98,8 @@ class LongRunningTaskItems extends Advanced.AbstractTableContent {
               ({ rowIndex, data }) => {
                 return (
                   <Advanced.DetailButton
-                    title={this.i18n('button.detail')}
-                    onClick={this.showDetail.bind(this, data[rowIndex], null)}/>
+                    title={ this.i18n('button.detail') }
+                    onClick={ this.showDetail.bind(this, data[rowIndex], null) }/>
                 );
               }
             }/>
@@ -111,8 +111,18 @@ class LongRunningTaskItems extends Advanced.AbstractTableContent {
             cell={
               ({ data, rowIndex }) => {
                 const entity = data[rowIndex];
+                //
                 return (
-                  <Advanced.OperationResult value={ entity.operationResult } detailLink={ () => this.showDetail(data[rowIndex], null) }/>
+                  <Advanced.OperationResult
+                    value={ entity.operationResult }
+                    detailLink={ () => this.showDetail(data[rowIndex], null) }
+                    level={
+                      entity.operationResult && entity.operationResult.state === 'CREATED'
+                      ?
+                      'success'
+                      :
+                      null
+                    }/>
                 );
               }
             }
@@ -174,7 +184,18 @@ class LongRunningTaskItems extends Advanced.AbstractTableContent {
 
           <Basic.Modal.Header text={ this.i18n('detail.header') }/>
           <Basic.Modal.Body>
-            <Advanced.OperationResult value={ detail.entity ? detail.entity.operationResult : null } face="full"/>
+            <Advanced.OperationResult
+              value={ detail.entity ? detail.entity.operationResult : null }
+              level={
+                detail.entity
+                  && detail.entity.operationResult
+                  && detail.entity.operationResult.state === 'CREATED'
+                ?
+                'success'
+                :
+                null
+              }
+              face="full"/>
           </Basic.Modal.Body>
 
           <Basic.Modal.Footer>

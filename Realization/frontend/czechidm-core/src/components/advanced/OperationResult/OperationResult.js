@@ -25,17 +25,28 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     return 'component.advanced.OperationResult';
   }
 
+  _getLevel(level, message) {
+    if (level) {
+      return level;
+    }
+    if (!message) {
+      return null;
+    }
+    return message.level;
+  }
+
   /**
    * Renders popover info card
    */
   _renderPopover() {
-    const { value, stateLabel } = this.props;
+    const { value, stateLabel, level } = this.props;
     const message = this.getFlashManager().convertFromResultModel(value.model);
+    const _level = this._getLevel(level, message);
     //
     return (
       <Basic.Div style={{ whiteSpace: 'nowrap' }}>
         <Basic.EnumValue
-          level={ message ? message.level : null }
+          level={ _level }
           value={ value.state }
           enum={ OperationStateEnum }
           label={ stateLabel || (message && message.level === 'info' && value.state === 'EXCEPTION' ? this.i18n('label.warning') : null) } />
@@ -124,8 +135,9 @@ export default class OperationResult extends Basic.AbstractContextComponent {
    * Renders full info card (with exception stacktrace etc.)
    */
   _renderFull() {
-    const { value, stateLabel, header, downloadLinkPrefix, downloadLinkSuffix } = this.props;
+    const { value, stateLabel, level, header, downloadLinkPrefix, downloadLinkSuffix } = this.props;
     const message = this.getFlashManager().convertFromResultModel(value.model);
+    const _level = this._getLevel(level, message);
     //
     return (
       <Basic.Div>
@@ -134,7 +146,7 @@ export default class OperationResult extends Basic.AbstractContextComponent {
         <Basic.Div style={{ marginBottom: 15 }}>
           <Basic.Div style={{ float: 'left' }}>
             <Basic.EnumValue
-              level={ message ? message.level : null }
+              level={ _level }
               value={ value.state }
               enum={ OperationStateEnum }
               label={ stateLabel || (message && message.level === 'info' && value.state === 'EXCEPTION' ? this.i18n('label.warning') : null) }/>
@@ -207,6 +219,12 @@ OperationResult.propTypes = {
    */
   stateLabel: PropTypes.string,
   /**
+   * Label level / css / class - override level from given message.
+   *
+   * @since 11.2.0
+   */
+  level: PropTypes.oneOf(['default', 'success', 'warning', 'info', 'danger', 'error', 'primary']),
+  /**
    * link to detail
    */
   detailLink: PropTypes.oneOfType([
@@ -238,7 +256,8 @@ OperationResult.defaultProps = {
   detailLink: null,
   header: null, // default text from component locale will be used
   downloadLinkPrefix: null,
-  downloadLinkSuffix: null
+  downloadLinkSuffix: null,
+  level: null
 };
 
 OperationResult.PARTIAL_CONTENT_STATUS = 206;
