@@ -1,32 +1,6 @@
 package eu.bcvsolutions.idm.vs.service.impl;
 
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleRequest_;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
 import com.google.common.collect.ImmutableMap;
-
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
@@ -53,6 +27,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.model.entity.IdmRoleRequest_;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 import eu.bcvsolutions.idm.core.notification.api.dto.IdmMessageDto;
 import eu.bcvsolutions.idm.core.notification.api.service.NotificationManager;
@@ -91,6 +66,26 @@ import eu.bcvsolutions.idm.vs.service.api.VsAccountService;
 import eu.bcvsolutions.idm.vs.service.api.VsRequestService;
 import eu.bcvsolutions.idm.vs.service.api.VsSystemImplementerService;
 import eu.bcvsolutions.idm.vs.service.api.VsSystemService;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.UUID;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 /**
  * Service for request in virtual system
@@ -422,11 +417,9 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 		// If system does not support enable, then enable attribute will be removed from
 		// result list
 		if (!configuration.isDisableSupported()) {
-			IcAttribute enableAttribute = attributes.stream()
-					.filter(attribute -> attribute.getName().equals(IcAttributeInfo.ENABLE)).findFirst().orElse(null);
-			if (enableAttribute != null) {
-				attributes.remove(enableAttribute);
-			}
+			attributes.stream()
+					.filter(attribute -> IcAttributeInfo.ENABLE.equals(attribute.getName()))
+					.findFirst().ifPresent(attributes::remove);
 		}
 		IcConnectorObjectImpl connectorObject = new IcConnectorObjectImpl();
 		connectorObject.setUidValue(account.getUid());
@@ -440,17 +433,14 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 		LOG.info(MessageFormat.format("Start read wish connector object [{0}].", request));
 		Assert.notNull(request, "VS request cannot be null!");
 
-		List<SysAttributeDifferenceDto> resultAttributes = new ArrayList<>();
+		List<SysAttributeDifferenceDto> resultAttributes;
 		IcConnectorObject realConnectorObject = null;
 
-		boolean isArchived = false;
-		if (VsRequestState.REALIZED == request.getState() 
-				|| VsRequestState.CANCELED == request.getState() 
-				|| VsRequestState.DUPLICATED == request.getState() 
-				|| VsRequestState.REJECTED == request.getState()) {
-			isArchived = true;
-		}
-		
+		boolean isArchived = VsRequestState.REALIZED == request.getState()
+				|| VsRequestState.CANCELED == request.getState()
+				|| VsRequestState.DUPLICATED == request.getState()
+				|| VsRequestState.REJECTED == request.getState();
+
 		// We don't want use current object, when request is archived. We want to show
 		// only changes.
 		if (!isArchived) {
@@ -468,11 +458,10 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 		// If system does not support enable, then enable attribute will be removed from
 		// result list
 		if (!configuration.isDisableSupported()) {
-			SysAttributeDifferenceDto enableAttribute = resultAttributes.stream()
-					.filter(attribute -> attribute.getName().equals(IcAttributeInfo.ENABLE)).findFirst().orElse(null);
-			if (enableAttribute != null) {
-				resultAttributes.remove(enableAttribute);
-			}
+			resultAttributes.stream()
+					.filter(attribute -> IcAttributeInfo.ENABLE.equals(attribute.getName()))
+					.findFirst()
+					.ifPresent(resultAttributes::remove);
 		}
 
 		VsConnectorObjectDto wishObject = new VsConnectorObjectDto();
@@ -654,7 +643,7 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 
 		// For information about role request and role request applicant
 		UUID roleRequestId = request.getRoleRequestId();
-		IdmRoleRequestDto roleRequestDto = null;
+		IdmRoleRequestDto roleRequestDto;
 		IdmIdentityDto roleRequestCreator = null;
 		if (roleRequestId != null) {
 			roleRequestDto = roleRequestService.get(roleRequestId);
@@ -786,10 +775,7 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 			IdmRoleRequestDto returnedReqeust = roleRequestService.refreshSystemState(mockRequest);
 			
 			OperationResultDto systemState = returnedReqeust.getSystemState(); 
-			if (systemState == null) {
-				// State on system of request was not changed (may be not all provisioning operations are
-				// resolved)
-			} else {
+			if (systemState != null) {
 				// We have final state on systems
 				IdmRoleRequestDto requestDto = roleRequestService.get(requestId);
 				if (requestDto != null) {
@@ -803,5 +789,4 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 			}
 		}
 	}
-
 }
