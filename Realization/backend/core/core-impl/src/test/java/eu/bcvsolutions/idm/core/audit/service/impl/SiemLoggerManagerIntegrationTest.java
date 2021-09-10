@@ -152,13 +152,7 @@ public class SiemLoggerManagerIntegrationTest extends AbstractIntegrationTest {
 		IdmRoleDto roleDto = getHelper().createRole();
 		IdmRoleRequestDto roleRequestDto = getHelper().createRoleRequest(identityDto, roleDto);
 		RoleRequestEvent event = new RoleRequestEvent(RoleRequestEventType.CREATE, roleRequestDto);
-		
-		IdmConceptRoleRequestFilter filter = new IdmConceptRoleRequestFilter();
-		filter.setRoleRequestId(roleRequestDto.getId());
-		List<IdmConceptRoleRequestDto> concepts = conceptRoleRequestService.find(filter, null).getContent();
-		Assert.assertEquals(1, concepts.size());
-		IdmConceptRoleRequestDto conceptDto = concepts.get(0);
-		
+
 		String expectedAction = String.format("%s.%s.%s", SiemLoggerManager.ROOT_LEVEL_KEY, SiemLoggerManager.ROLE_REQUEST_LEVEL_KEY, event.getType().toString());
 		String transactionId = Objects.toString(roleRequestDto.getTransactionId(),"");
 		
@@ -174,7 +168,7 @@ public class SiemLoggerManagerIntegrationTest extends AbstractIntegrationTest {
 		}
 		String out = stdOut.toString();
 		setOriginalStandardOut();
-		String pattern = createPattern(expectedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, "", conceptDto.getId().toString(), roleDto.getCode(), roleDto.getId().toString(), transactionId, conceptDto.getState().toString());
+		String pattern = createPattern(expectedAction, SiemLoggerManager.SUCCESS_ACTION_STATUS, "", roleRequestDto.getId().toString(), "", "", transactionId, roleRequestDto.getState().toString());
 		isLogPatternValid(out, pattern);		
 	}
 	
