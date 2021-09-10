@@ -19,7 +19,10 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.DefaultAccTestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
+import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceValueDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -364,6 +367,80 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 		Assert.assertEquals(1, attributes.size());
 		Assert.assertEquals(icAttributeOne.getName(), attributes.get(0).getName());
 		Assert.assertTrue(attributes.get(0).isRemoved());
+	}
+
+	@Test
+	public void differenceObjectAddSingleTest () {
+		String attrName = getHelper().createName();
+		IcAttributeImpl icAttributeOne = new IcAttributeImpl(attrName, "TEST1");
+		IcConnectorObject connObjectNew = new IcConnectorObjectImpl(getHelper().createName(),
+				new IcObjectClassImpl("__mock__"), ImmutableList.of(icAttributeOne));
+		
+		IcConnectorObject connObjectOld = new IcConnectorObjectImpl(getHelper().createName(),
+				new IcObjectClassImpl("__mock__"), ImmutableList.of());
+				
+		
+		List<SysAttributeDifferenceDto> diffs = service.evaluateProvisioningDifferences(connObjectOld, connObjectNew);
+		Assert.assertEquals(1, diffs.size());
+		Assert.assertFalse(diffs.get(0).isMultivalue());
+		Assert.assertEquals(SysValueChangeType.ADDED, diffs.get(0).getValue().getChange());
+		Assert.assertEquals(null, diffs.get(0).getValue().getOldValue());
+		Assert.assertEquals("TEST1", diffs.get(0).getValue().getValue());
+	}
+
+	@Test
+	public void differenceObjectUpdateSingleTest () {
+		String attrName = getHelper().createName();
+		IcAttributeImpl icAttributeOne = new IcAttributeImpl(attrName, "TEST1");
+		IcConnectorObject connObjectOld = new IcConnectorObjectImpl(getHelper().createName(),
+				new IcObjectClassImpl("__mock__"), ImmutableList.of(icAttributeOne));
+		
+		IcAttributeImpl icAttributeTwo = new IcAttributeImpl(attrName, "TEST2");
+		IcConnectorObject connObjectNew = new IcConnectorObjectImpl(getHelper().createName(),
+				new IcObjectClassImpl("__mock__"), ImmutableList.of(icAttributeTwo));
+		
+		List<SysAttributeDifferenceDto> diffs = service.evaluateProvisioningDifferences(connObjectOld, connObjectNew);
+		Assert.assertEquals(1, diffs.size());
+		Assert.assertFalse(diffs.get(0).isMultivalue());
+		Assert.assertEquals(SysValueChangeType.UPDATED, diffs.get(0).getValue().getChange());
+		Assert.assertEquals("TEST1", diffs.get(0).getValue().getOldValue());
+		Assert.assertEquals("TEST2", diffs.get(0).getValue().getValue());
+	}
+
+	@Test
+	public void differenceObjectMultipleTest () {
+		String attrName = getHelper().createName();
+		IcAttributeImpl icAttributeOne = new IcAttributeImpl(attrName, Lists.newArrayList("TESTExisting", "TESTRemoved"));
+		IcConnectorObject connObjectOld = new IcConnectorObjectImpl(getHelper().createName(),
+				new IcObjectClassImpl("__mock__"), ImmutableList.of(icAttributeOne));
+		
+		IcAttributeImpl icAttributeTwo = new IcAttributeImpl(attrName, Lists.newArrayList("TESTExisting", "TESTNew"));
+		IcConnectorObject connObjectNew = new IcConnectorObjectImpl(getHelper().createName(),
+				new IcObjectClassImpl("__mock__"), ImmutableList.of(icAttributeTwo));
+		
+		List<SysAttributeDifferenceDto> diffs = service.evaluateProvisioningDifferences(connObjectOld, connObjectNew);
+		List<SysAttributeDifferenceValueDto> values = diffs.get(0).getValues();
+		Assert.assertEquals(1, diffs.size());
+		Assert.assertTrue(diffs.get(0).isMultivalue());
+		Assert.assertTrue(diffs.get(0).isChanged());
+		Assert.assertNotNull(values);
+		Assert.assertEquals(3, values.size());
+		
+		SysAttributeDifferenceValueDto value;
+		value = values.stream().filter(item-> item.getChange() == null).findFirst().orElse(null);
+		Assert.assertNotNull(value);
+		Assert.assertEquals("TESTExisting", value.getValue());
+		Assert.assertEquals("TESTExisting", value.getOldValue());
+		
+		value = values.stream().filter(item-> item.getChange() == SysValueChangeType.ADDED).findFirst().orElse(null);
+		Assert.assertNotNull(value);
+		Assert.assertEquals("TESTNew", value.getValue());
+		Assert.assertEquals(null, value.getOldValue());
+		
+		value = values.stream().filter(item-> item.getChange() == SysValueChangeType.REMOVED).findFirst().orElse(null);
+		Assert.assertNotNull(value);
+		Assert.assertEquals("TESTRemoved", value.getValue());
+		Assert.assertEquals("TESTRemoved", value.getOldValue());
 	}
 
 	private SysSystemDto createSystem() {
