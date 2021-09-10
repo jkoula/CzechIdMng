@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
   - default maximum image file size is ``512KB``. Change configuration property ``idm.sec.core.identity.profile.image.max-file-size`` if needed.
 _Example ``idm.sec.core.identity.profile.image.max-file-size=200KB``._
 - 🟢 [#813](https://redmine.czechidm.com/issues/813) - Configuration property ``idm.pub.core.identity.create.defaultContract.enabled`` for enable / disable creating default contract for newly created identity is deprecated and will be removed in future releases. Use new configuration property ``idm.sec.core.identity.create.defaultContract.enabled=false`` (property name changed only).
+- 🟡 [#2717](https://redmine.czechidm.com/issues/2717) - Enhance audit logging in the text log of CzechIdM:
+  - in order to work this feature properly it is necessary to override the setting of log formats in the project logback.xml file. See the wiki [doc](https://wiki.czechidm.com/devel/documentation/audit/dev/audit_logging_for_siem_tools?s[]=%2Asiem%2A#audit_logger_configuration) page for details.
 
 ### Developer
 
