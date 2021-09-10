@@ -723,7 +723,8 @@ function select(state, component) {
       || Utils.Ui.isShowLoading(state, AuthorizationPolicyManager.UI_KEY_SUPPORTED_EVALUATORS)
       || Utils.Ui.isShowLoading(state, AuthorizationPolicyManager.UI_KEY_AUTHORIZABLE_TYPES)
       || Utils.Ui.isShowLoading(state, RoleManager.UI_KEY_ALL_AUTHORITIES_UIKEY),
-    _permissions: Utils.Permission.getPermissions(state, `${ component.uiKey }-detail`)
+    _permissions: Utils.Permission.getPermissions(state, `${ component.uiKey }-detail`),
+    _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey)
   };
 }
 
@@ -757,7 +758,12 @@ class Filter extends Advanced.Filter {
             <Basic.Col lg={ 4 }>
               <Basic.EnumSelectBox
                 ref="groupPermission"
-                options={ _authorizableTypes }
+                options={
+                  _authorizableTypes.map(authorizableType => ({
+                    niceLabel: authorizableType.niceLabel,
+                    value: authorizableType.group
+                  }))
+                }
                 placeholder={ this.i18n('entity.AuthorizationPolicy.authorizableType.label') }
                 searchable/>
             </Basic.Col>
