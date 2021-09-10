@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
@@ -98,4 +100,10 @@ public class DefaultConfigurationServiceIntegrationTest extends AbstractIntegrat
 	public void testDefaultDateTimeFormat() {
 		assertEquals(ConfigurationService.DEFAULT_APP_DATETIME_FORMAT, configurationService.getDateTimeFormat());
 	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testSaveWrongContractState() {
+		configurationService.setValue(PrivateIdentityConfiguration.PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_STATE, "wrong");
+	}
+	
 }

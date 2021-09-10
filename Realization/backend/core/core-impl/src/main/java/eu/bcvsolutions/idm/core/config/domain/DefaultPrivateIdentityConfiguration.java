@@ -20,6 +20,8 @@ import eu.bcvsolutions.idm.core.api.domain.ContractState;
 @Component("privateIdentityConfiguration")
 public class DefaultPrivateIdentityConfiguration extends AbstractConfiguration implements PrivateIdentityConfiguration {	
 	
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultPrivateIdentityConfiguration.class);
+	//
 	@Autowired private IdentityConfiguration publicConfiguration;
 	
 	@Override
@@ -71,6 +73,12 @@ public class DefaultPrivateIdentityConfiguration extends AbstractConfiguration i
 			return null;
 		}
 		//
-		return ContractState.valueOf(contractState.trim().toUpperCase());
+		try {
+			return ContractState.valueOf(contractState.trim().toUpperCase());
+		} catch (IllegalArgumentException ex) {
+			LOG.warn("Default contract state [{}] is wrongly configured. Contract will be valid by default, fix configuration property [{}]", 
+					contractState, PROPERTY_IDENTITY_CREATE_DEFAULT_CONTRACT_STATE,  ex);
+			return null;
+		}
 	}
 }
