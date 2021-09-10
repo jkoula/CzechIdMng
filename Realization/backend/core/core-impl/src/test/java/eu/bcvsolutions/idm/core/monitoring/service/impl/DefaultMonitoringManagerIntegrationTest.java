@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.Transactional;
 
+import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
@@ -16,6 +18,8 @@ import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.MonitoringEvaluatorDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringResultFilter;
+import eu.bcvsolutions.idm.core.monitoring.api.event.MonitoringEvent;
+import eu.bcvsolutions.idm.core.monitoring.api.event.MonitoringEvent.MonitoringEventType;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringResultService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
@@ -231,6 +235,28 @@ public class DefaultMonitoringManagerIntegrationTest extends AbstractIntegration
 			//
 			List<IdmMonitoringResultDto> results = monitoringResultService.find(filter, null).getContent();
 			Assert.assertTrue(results.isEmpty()); // executed only once => 0 check period		
+		} finally {
+			monitoringService.delete(monitoring);
+		}
+	}
+	
+	@Test
+	@Transactional
+	public void testExecuteMonitoringAfterSave() {
+		IdmMonitoringDto monitoring = new IdmMonitoringDto();
+		monitoring.setCheckPeriod(0L);
+		monitoring.setEvaluatorType(AutowireHelper.getTargetType(h2DatabaseMonitoringEvaluator));
+		monitoring.setInstanceId(configurationService.getInstanceId());
+		monitoring.setDisabled(false);
+		//
+		MonitoringEvent event = new MonitoringEvent(MonitoringEventType.CREATE, monitoring);
+		event.setPriority(PriorityType.HIGH);
+		monitoring = monitoringService.publish(event).getContent();
+		try {
+			IdmMonitoringResultFilter filter = new IdmMonitoringResultFilter();
+			filter.setMonitoring(monitoring.getId());
+			List<IdmMonitoringResultDto> results = monitoringResultService.find(filter, null).getContent();
+			Assert.assertFalse(results.isEmpty());		
 		} finally {
 			monitoringService.delete(monitoring);
 		}
