@@ -1,6 +1,17 @@
 package eu.bcvsolutions.idm.acc.event.processor.provisioning;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
+
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
@@ -20,7 +31,6 @@ import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.event.AbstractEntityEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
@@ -38,17 +48,9 @@ import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 import eu.bcvsolutions.idm.ic.impl.IcAttributeImpl;
 import eu.bcvsolutions.idm.ic.impl.IcPasswordAttributeImpl;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 /**
- * Execute provisioning
+ * Execute provisioning.
  * 
  * @author Radek Tomiška
  *
@@ -64,7 +66,6 @@ public abstract class AbstractProvisioningProcessor extends AbstractEntityEventP
 	@Autowired private SysSystemAttributeMappingService systemAttributeMappingService;
 	@Autowired private AccAccountService accountService;
 	@Autowired private PasswordFilterManager passwordFilterManager;
-	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
 	@Autowired private ConnectorManager connectorManager;
 
 	public AbstractProvisioningProcessor(

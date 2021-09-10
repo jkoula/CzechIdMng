@@ -1,6 +1,33 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.util.Asserts;
+import org.identityconnectors.framework.common.objects.OperationOptions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
+
 import eu.bcvsolutions.idm.acc.connector.DefaultConnectorType;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
@@ -20,7 +47,6 @@ import eu.bcvsolutions.idm.acc.entity.SysRemoteServer_;
 import eu.bcvsolutions.idm.acc.entity.SysSystem;
 import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.repository.SysSystemRepository;
-import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.FormPropertyManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
@@ -65,29 +91,6 @@ import eu.bcvsolutions.idm.ic.impl.IcConnectorKeyImpl;
 import eu.bcvsolutions.idm.ic.impl.IcObjectPoolConfigurationImpl;
 import eu.bcvsolutions.idm.ic.service.api.IcConfigurationFacade;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.util.Asserts;
-import org.identityconnectors.framework.common.objects.OperationOptions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * Default target system configuration service.
@@ -110,7 +113,6 @@ public class DefaultSysSystemService
 	private final SysSyncConfigService synchronizationConfigService;
 	private final FormPropertyManager formPropertyManager;
 	private final ConfidentialStorage confidentialStorage;
-	private final IcConnectorFacade connectorFacade;
 	private final SysSystemFormValueService systemFormValueService;
 	private final SysSystemMappingService systemMappingService;
 	private final SysSystemAttributeMappingService systemAttributeMappingService;
@@ -118,8 +120,6 @@ public class DefaultSysSystemService
 	@Autowired
 	@Qualifier("default-connector-type")
 	private DefaultConnectorType defaultConnectorType;
-	@Autowired
-	private ConnectorManager connectorManager;
 
 	@Autowired
 	public DefaultSysSystemService(
@@ -145,7 +145,6 @@ public class DefaultSysSystemService
 		Assert.notNull(synchronizationConfigService, "Service is required.");
 		Assert.notNull(formPropertyManager, "Manager is required.");
 		Assert.notNull(confidentialStorage, "Confidential storage is required.");
-		Assert.notNull(connectorFacade, "Connector facade is required.");
 		Assert.notNull(systemFormValueService, "Service is required.");
 		Assert.notNull(systemMappingService, "Service is required.");
 		Assert.notNull(systemAttributeMappingService, "Service is required.");
@@ -158,7 +157,6 @@ public class DefaultSysSystemService
 		this.synchronizationConfigService = synchronizationConfigService;
 		this.formPropertyManager = formPropertyManager;
 		this.confidentialStorage = confidentialStorage;
-		this.connectorFacade = connectorFacade;
 		this.systemFormValueService = systemFormValueService;
 		this.systemMappingService = systemMappingService;
 		this.systemAttributeMappingService = systemAttributeMappingService;

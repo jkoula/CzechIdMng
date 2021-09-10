@@ -75,11 +75,10 @@ import org.springframework.util.CollectionUtils;
 
 /**
  * Prepare provisioning - resolve connector object properties from account and
- * resolve create or update operations
+ * resolve create or update operations.
  * 
  * @author Radek Tomiška
  * @author Ondrej Husnik
- *
  */
 @Component(PrepareConnectorObjectProcessor.PROCESSOR_NAME)
 @Enabled(AccModuleDescriptor.MODULE_ID)
@@ -91,7 +90,6 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	//
 	private final SysSystemMappingService systemMappingService;
 	private final SysSystemAttributeMappingService attributeMappingService;
-	private final IcConnectorFacade connectorFacade;
 	private final SysSystemService systemService;
 	private final SysProvisioningOperationService provisioningOperationService;
 	private final SysSchemaAttributeService schemaAttributeService;
@@ -123,7 +121,6 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 		Assert.notNull(systemEntityService, "Service is required.");
 		Assert.notNull(systemMappingService, "Service is required.");
 		Assert.notNull(attributeMappingService, "Service is required.");
-		Assert.notNull(connectorFacade, "Connector facade is required.");
 		Assert.notNull(systemService, "Service is required.");
 		Assert.notNull(provisioningOperationService, "Service is required.");
 		Assert.notNull(schemaAttributeService, "Service is required.");
@@ -133,7 +130,6 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 		//
 		this.systemMappingService = systemMappingService;
 		this.attributeMappingService = attributeMappingService;
-		this.connectorFacade = connectorFacade;
 		this.systemService = systemService;
 		this.provisioningOperationService = provisioningOperationService;
 		this.schemaAttributeService = schemaAttributeService;

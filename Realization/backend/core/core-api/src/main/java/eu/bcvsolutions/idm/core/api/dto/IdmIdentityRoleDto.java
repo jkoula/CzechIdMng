@@ -5,10 +5,8 @@ import java.io.ObjectInputStream.GetField;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import javax.persistence.Column;
 import javax.validation.constraints.Size;
 
-import org.hibernate.envers.Audited;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.util.Assert;
 
@@ -22,7 +20,7 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * IdentityRole DTO
+ * IdentityRole DTO.
  *
  * @author svanda
  * @author Radek Tomiška

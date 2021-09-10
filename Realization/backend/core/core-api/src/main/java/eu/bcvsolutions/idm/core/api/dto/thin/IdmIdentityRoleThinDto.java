@@ -1,9 +1,7 @@
 package eu.bcvsolutions.idm.core.api.dto.thin;
 
-import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import java.util.UUID;
 
-import javax.persistence.Column;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;

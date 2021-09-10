@@ -49,9 +49,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class IdmRoleSystemController extends AbstractReadDtoController<IdmRoleSystemDto, IdmRoleSystemFilter> {
 
 	protected static final String TAG = "IdM role-system controller - (we need to work with role-system also in the core module).";
-
-	@SuppressWarnings(value = "unchecked,rawtypes")
+	
 	@Autowired
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public IdmRoleSystemController(IdmRoleSystemService service) {
 		super((ReadDtoService) service);
 	}

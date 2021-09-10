@@ -89,6 +89,7 @@ public class DefaultIdmIdentityRoleService
 	@Autowired private LookupService lookupService;
 	@Autowired private IdmAutomaticRoleRepository automaticRoleRepository;
 	@Autowired private IdmRoleService roleService;
+	@SuppressWarnings("rawtypes")
 	@Autowired private IdmRoleSystemService roleSystemService;
 	@Autowired private FilterManager filterManager;
 

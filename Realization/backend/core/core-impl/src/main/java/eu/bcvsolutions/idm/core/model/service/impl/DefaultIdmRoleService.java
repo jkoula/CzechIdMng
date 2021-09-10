@@ -83,6 +83,7 @@ public class DefaultIdmRoleService
 	@Autowired @Lazy private IdmIdentityService identityService;
 	@Autowired private IdmRoleFormAttributeService roleFormAttributeService;
 	@Autowired private RequestConfiguration requestConfiguration;
+	@SuppressWarnings("rawtypes")
 	@Autowired(required = false) private IdmRoleSystemService roleSystemService;
 	
 	@Autowired
@@ -181,6 +182,7 @@ public class DefaultIdmRoleService
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected IdmRoleDto toDto(IdmRole entity, IdmRoleDto dto, IdmRoleFilter context) {
 		IdmRoleDto roleDto = super.toDto(entity, dto, context);
 		// Adds to result count of systems for this role, which are in cross-domain group.
