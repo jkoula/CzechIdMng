@@ -4,13 +4,14 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 //
 import * as Basic from '../../components/basic';
+import * as Advanced from '../../components/advanced';
+import * as Utils from '../../utils';
 import ConfigLoader from '../../utils/ConfigLoader';
 import ComponentLoader from '../../utils/ComponentLoader';
 import { BackendModuleManager, ConfigurationManager } from '../../redux';
-import * as Utils from '../../utils';
 
 /**
- * FE modules administration
+ * FE modules administration.
  *
  * @author Radek Tomiška
  */
@@ -44,13 +45,13 @@ class FrontendModules extends Basic.AbstractContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs[`confirm-${enable ? '' : 'de'}activate`].show(
-      this.i18n(`action.${enable ? '' : 'de'}activate.message`, { count: 1, record: entity.name }),
-      this.i18n(`action.${enable ? '' : 'de'}activate.header`, { count: 1 })
+    this.refs[`confirm-${ enable ? '' : 'de' }activate`].show(
+      this.i18n(`action.${ enable ? '' : 'de' }activate.message`, { count: 1, record: entity.name }),
+      this.i18n(`action.${ enable ? '' : 'de' }activate.header`, { count: 1 })
     ).then(() => {
       this.context.store.dispatch(this.backendModuleManager.setEnabled(entity.id, enable, (patchedEntity, error) => {
         if (!error) {
-          this.addMessage({ message: this.i18n(`action.${enable ? '' : 'de'}activate.success`, { count: 1, record: patchedEntity.id }) });
+          this.addMessage({ message: this.i18n(`action.${ enable ? '' : 'de' }activate.success`, { count: 1, record: patchedEntity.id }) });
           // reload is needed - react routes has to be reloaded
           window.location.reload();
         } else {
@@ -70,8 +71,8 @@ class FrontendModules extends Basic.AbstractContent {
     const { _showLoading } = this.state;
     //
     return (
-      <div className="tab-pane-panel-body">
-        <Helmet title={this.i18n('title')} />
+      <Basic.Div className="tab-pane-panel-body">
+        <Helmet title={ this.i18n('title') } />
         <Basic.Confirm ref="confirm-deactivate" level="warning"/>
         <Basic.Confirm ref="confirm-activate" level="success"/>
 
@@ -91,11 +92,13 @@ class FrontendModules extends Basic.AbstractContent {
               //
               return (
                 <Basic.Panel>
-                  <Basic.PanelHeader>
+                  <Advanced.Panel.Header
+                    collapsible
+                    collapsed>
                     <div className="pull-left">
-                      <h2 className={ConfigLoader.isEnabledModule(moduleDescriptor.id) ? '' : 'disabled'} style={{ display: 'inline-block' }}>
+                      <h2 className={ ConfigLoader.isEnabledModule(moduleDescriptor.id) ? '' : 'disabled' } style={{ display: 'inline-block' }}>
                         <span>
-                          {moduleDescriptor.name}
+                          { moduleDescriptor.name }
                           <small>
                             {' '}
                             { moduleDescriptor.id }
@@ -109,23 +112,23 @@ class FrontendModules extends Basic.AbstractContent {
                         style={{ marginLeft: 5 }}/>
                     </div>
 
-                    <div className="pull-right" style={{ marginTop: 4}}>
+                    <div className="pull-right" style={{ marginTop: 4, marginRight: 15 }}>
                       {
                         ConfigLoader.isEnabledModule(moduleDescriptor.id)
                         ?
                         <Basic.Button
                           level="warning"
-                          onClick={this.onEnable.bind(this, moduleDescriptor, false)}
+                          onClick={ this.onEnable.bind(this, moduleDescriptor, false) }
                           className="btn-xs"
-                          title={this.i18n('button.deactivate')}
+                          title={ this.i18n('button.deactivate') }
                           titlePlacement="bottom"
-                          rendered={moduleDescriptor.disableable !== false}>
-                          {this.i18n('button.deactivate')}
+                          rendered={ moduleDescriptor.disableable !== false }>
+                          { this.i18n('button.deactivate') }
                         </Basic.Button>
                         :
                         <Basic.Button
                           level="success"
-                          onClick={this.onEnable.bind(this, moduleDescriptor, true)}
+                          onClick={ this.onEnable.bind(this, moduleDescriptor, true) }
                           className="btn-xs"
                           title={
                             enableable
@@ -135,73 +138,71 @@ class FrontendModules extends Basic.AbstractContent {
                             this.i18n('activate.disabled', { backendId: moduleDescriptor.backendId })
                           }
                           titlePlacement="bottom"
-                          disabled={!enableable}>
-                          {this.i18n('button.activate')}
+                          disabled={ !enableable }>
+                          { this.i18n('button.activate') }
                         </Basic.Button>
                       }
                     </div>
                     <div className="clearfix" />
-                  </Basic.PanelHeader>
+                  </Advanced.Panel.Header>
 
                   <Basic.PanelBody>
-                    {moduleDescriptor.description}
-                  </Basic.PanelBody>
+                    { moduleDescriptor.description }
 
-                  <Basic.PanelHeader>
-                    <h2>{this.i18n('components.header')}</h2>
-                  </Basic.PanelHeader>
+                    <Basic.ContentHeader text={ this.i18n('components.header') } className="marginable"/>
 
-                  <Basic.Table
-                    data={componentDescriptor ? componentDescriptor.components : null}
-                    rowClass={({rowIndex, data}) => {
-                      const componentDefinition = ComponentLoader.getComponentDefinition(data[rowIndex].id);
-                      return (!componentDefinition || data[rowIndex].module !== componentDefinition.module) ? 'disabled' : '';
-                    }}>
-                    <Basic.Column
-                      property="id"
-                      header={this.i18n('label.id')}
-                      cell={({rowIndex, data}) => {
+                    <Basic.Table
+                      data={componentDescriptor ? componentDescriptor.components : null}
+                      rowClass={({rowIndex, data}) => {
                         const componentDefinition = ComponentLoader.getComponentDefinition(data[rowIndex].id);
-                        const overridedInModule = componentDefinition ? componentDefinition.module : null;
-                        const overrided = overridedInModule && data[rowIndex].module !== overridedInModule;
-                        const textStyle = {};
-                        if (overrided) {
-                          textStyle.textDecoration = 'line-through';
-                        }
-                        return (
-                          <span
-                            title={overrided ? this.i18n('', { moduleId: overridedInModule }) : ''}>
-                            <span style={textStyle}>{data[rowIndex].id}</span>
-                            {
-                              !overrided
-                              ||
-                              <span>
-                                {` (${ overridedInModule })`}
-                              </span>
-                            }
+                        return (!componentDefinition || data[rowIndex].module !== componentDefinition.module) ? 'disabled' : '';
+                      }}>
+                      <Basic.Column
+                        property="id"
+                        header={ this.i18n('label.id') }
+                        cell={ ({ rowIndex, data }) => {
+                          const componentDefinition = ComponentLoader.getComponentDefinition(data[rowIndex].id);
+                          const overridedInModule = componentDefinition ? componentDefinition.module : null;
+                          const overrided = overridedInModule && data[rowIndex].module !== overridedInModule;
+                          const textStyle = {};
+                          if (overrided) {
+                            textStyle.textDecoration = 'line-through';
+                          }
+                          return (
+                            <span
+                              title={overrided ? this.i18n('', { moduleId: overridedInModule }) : ''}>
+                              <span style={textStyle}>{data[rowIndex].id}</span>
+                              {
+                                !overrided
+                                ||
+                                <span>
+                                  {` (${ overridedInModule })`}
+                                </span>
+                              }
+                            </span>
+                          );
+                        }}/>
+                      <Basic.Column property="priority" header={ this.i18n('components.priority') } width={ 100 }/>
+                      <Basic.Column property="type" header={ this.i18n('components.type') } width={ 100 }/>
+                      <Basic.Column property="order" header={ this.i18n('components.order') } width={ 100 }/>
+                      <Basic.Column
+                        property="span"
+                        header={
+                          <span>
+                            Span
+                            <small> col-lg</small>
                           </span>
-                        );
-                      }}/>
-                    <Basic.Column property="priority" header={this.i18n('components.priority')} width="100px"/>
-                    <Basic.Column property="type" header={this.i18n('components.type')} width="100px"/>
-                    <Basic.Column property="order" header={this.i18n('components.order')} width="100px"/>
-                    <Basic.Column
-                      property="span"
-                      header={
-                        <span>
-                          Span
-                          <small> col-lg</small>
-                        </span>
-                      }
-                      width={ 100 }
-                    />
-                  </Basic.Table>
+                        }
+                        width={ 100 }
+                      />
+                    </Basic.Table>
+                  </Basic.PanelBody>
                 </Basic.Panel>
               );
             }).values()]
         }
 
-      </div>
+      </Basic.Div>
     );
   }
 }
