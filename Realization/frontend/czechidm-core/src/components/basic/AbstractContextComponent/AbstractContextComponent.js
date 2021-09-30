@@ -322,7 +322,6 @@ class AbstractContextComponent extends AbstractComponent {
   _getRouteDefinitions(match) {
     const routes = this.context.routes;
 
-
     const topLevelPath = routes.childRoutes[0].path;
     let currentPath = match.path;
     if (currentPath.startsWith(topLevelPath)) {
@@ -466,7 +465,11 @@ class AbstractContextComponent extends AbstractComponent {
         // First: I use match.url from parent route (good for agendas with tabs as Identity, Role ...).
         // Second: But this doesn't work for details without parent component (AuditDetail, RoleRequestDetil, ...), because key will be not changed
         // if ID of entity changed in URL (parent match.url is doesn't contains ID of entity). So I add full url to key if route doesn't have child routes.
-        keyUrl = location.pathname;
+
+        // Since version 11.3.0 - I use search parameters in key too (location.search). Because we need to create component if search parameters change too.
+        // For example for universal search, in situation when identity table is already opened and we want to set different filter value (by change URL).
+        // Beware, this can be dangerous change (performance).
+        keyUrl = `${location.pathname}-${location.search}`;
       }
       const key = `${route.id}${keyUrl}${activeLng}`;
       routes.push(<Route
