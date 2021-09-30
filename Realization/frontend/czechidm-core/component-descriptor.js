@@ -714,6 +714,13 @@ module.exports = {
       manager: require('./src/redux').PasswordManager
     },
     {
+      id: 'profile-info',
+      type: 'entity-info',
+      entityType: ['profile', 'IdmProfile', 'IdmProfileDto'],
+      component: require('./src/components/advanced/ProfileInfo/ProfileInfo').default,
+      manager: require('./src/redux').ProfileManager
+    },
+    {
       id: 'password-icon',
       type: 'icon',
       entityType: ['password', 'password-policies', 'password-policy'],
