@@ -19,12 +19,15 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
+import org.springframework.core.GenericTypeResolver;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import eu.bcvsolutions.idm.core.api.domain.AuditSearchable;
+import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
@@ -40,7 +43,9 @@ import eu.bcvsolutions.idm.core.ecm.api.entity.AttachableEntity;
  * @param <O> Owner entity class
  */
 @MappedSuperclass
-public abstract class AbstractFormValue<O extends FormableEntity> extends AbstractEntity implements AttachableEntity {
+public abstract class AbstractFormValue<O extends FormableEntity> 
+		extends AbstractEntity 
+		implements AttachableEntity, AuditSearchable {
 
 	private static final long serialVersionUID = -5914285774914667917L;
 
@@ -103,20 +108,37 @@ public abstract class AbstractFormValue<O extends FormableEntity> extends Abstra
 	@Max(Short.MAX_VALUE)
 	@Column(name = "seq")
 	private short seq;
+	//
+	private final transient String ownerType;
 
 	public AbstractFormValue() {
+		this(null, null);
 	}
 
 	public AbstractFormValue(UUID id) {
-		super(id);
+		this(id, null);
 	}
 
 	public AbstractFormValue(IdmFormAttribute formAttribute) {
+		this(null, formAttribute);
+		// ~ backward compatibility
 		Assert.notNull(formAttribute, "Form attribute is required for form value construction.");
+	}
+	
+	/**
+	 * @since 11.3.0
+	 */
+	public AbstractFormValue(UUID id, IdmFormAttribute formAttribute) {
+		super(id);
 		//
-		this.formAttribute = formAttribute;
-		this.persistentType = formAttribute.getPersistentType();
-		this.confidential = formAttribute.isConfidential();
+		Class<?>[] genericTypes = GenericTypeResolver.resolveTypeArguments(getClass(), AbstractFormValue.class);
+		ownerType = ((Class<?>) genericTypes[0]).getCanonicalName();
+		//
+		if (formAttribute != null) {
+			this.formAttribute = formAttribute;
+			this.persistentType = formAttribute.getPersistentType();
+			this.confidential = formAttribute.isConfidential();
+		}
 	}
 
 	/**
@@ -247,5 +269,56 @@ public abstract class AbstractFormValue<O extends FormableEntity> extends Abstra
 	
 	public void setShortTextValue(String shortTextValue) {
 		this.shortTextValue = shortTextValue;
+	}
+	
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerId() {
+		return this.getOwner().getId().toString();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerCode() {
+		if (this.getOwner() instanceof Codeable) {
+			return ((Codeable) this.getOwner()).getCode();
+		}
+		return null;
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerType() {
+		return ownerType;
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerId() {
+		return getFormAttribute().getId().toString();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerCode() {
+		return getFormAttribute().getCode();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerType() {
+		return IdmFormAttribute.class.getCanonicalName();
 	}
 }

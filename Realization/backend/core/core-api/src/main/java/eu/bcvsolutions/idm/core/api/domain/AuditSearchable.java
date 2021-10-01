@@ -7,7 +7,6 @@ package eu.bcvsolutions.idm.core.api.domain;
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
-
 public interface AuditSearchable {
 	
 	/**
@@ -32,17 +31,23 @@ public interface AuditSearchable {
 	 * ID of sub entity of this relation. If return null entity isn't relation. 
 	 * @return
 	 */
-	String getSubOwnerId();
+	default String getSubOwnerId() {
+		return null;
+	}
 
 	/**
 	 * Code (see {@link Codeable}) of sub entity.
 	 * @return
 	 */
-	String getSubOwnerCode();
+	default String getSubOwnerCode() {
+		return null;
+	}
 
 	/**
 	 * Type of sub owner {@link Class.getName()}
 	 * @return
 	 */
-	String getSubOwnerType();
+	default String getSubOwnerType() {
+		return null;
+	}
 }

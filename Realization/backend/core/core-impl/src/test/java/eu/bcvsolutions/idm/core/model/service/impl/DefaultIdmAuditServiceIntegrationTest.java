@@ -53,6 +53,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.entity.IdmProfile;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
+import eu.bcvsolutions.idm.core.model.entity.eav.IdmIdentityFormValue;
 import eu.bcvsolutions.idm.core.security.api.authentication.AuthenticationManager;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
@@ -918,7 +919,6 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		Assert.assertEquals("", formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
 		//
 		// update 2
-		confidentialValue = m.get(attributeName).get(0);
 		confidentialValue.setValue(valueOne);
 		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(confidentialValue));
 		Assert.assertEquals(valueOne, formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
@@ -926,7 +926,27 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		// two revisions in audit
 		IdmAuditFilter filter = new IdmAuditFilter();
 		filter.setEntityId(confidentialValue.getId());
-		Assert.assertEquals(3, auditService.find(filter, null).getTotalElements()); // create + 2 updates
+		List<IdmAuditDto> revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(3, revisions.size()); // create + 2 updates
+		Assert.assertTrue(revisions.stream().allMatch(r -> r.getEntityId().equals(confidentialValue.getId())));
+		//
+		// test find by related entity
+	    filter = new IdmAuditFilter();
+	    filter.setType(IdmIdentityFormValue.class.getCanonicalName());
+	    filter.setRelatedOwnerId(confidentialValue.getId());
+	    revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(3, revisions.size());
+		Assert.assertTrue(revisions.stream().allMatch(r -> r.getEntityId().equals(confidentialValue.getId())));
+		//
+		filter.setRelatedOwnerId(owner.getId());
+	    revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(3, revisions.size());
+		Assert.assertTrue(revisions.stream().allMatch(r -> r.getEntityId().equals(confidentialValue.getId())));
+		//
+		filter.setRelatedOwnerId(confidentialValue.getFormAttribute());
+	    revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(3, revisions.size());
+		Assert.assertTrue(revisions.stream().allMatch(r -> r.getEntityId().equals(confidentialValue.getId())));
 		//
 		confidentialValue.setValue(null);
 		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(confidentialValue));

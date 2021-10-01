@@ -129,7 +129,7 @@ export class AuditTable extends Advanced.AbstractTableContent {
     }
     //
     return (
-      <Advanced.Filter onSubmit={this.useFilter.bind(this)}>
+      <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
         <Basic.AbstractForm ref="filterForm">
           <Basic.Row>
             <Basic.Col lg={ 8 } rendered={ _.includes(columns, 'revisionDate') }>
@@ -162,23 +162,31 @@ export class AuditTable extends Advanced.AbstractTableContent {
                 returnProperty="username"/>
             </Basic.Col>
           </Basic.Row>
-          <Basic.Row className="last">
+          <Basic.Row className={ _.includes(columns, 'changedAttributes') ? '' : 'last' }>
             <Basic.Col lg={ 4 } rendered={ _.includes(columns, 'entityId') }>
               <Advanced.Filter.TextField
                 ref="entityId"
                 placeholder={ entityType ? this.i18n('filter.entityId.codeable') : this.i18n('filter.entityId.placeholder') }
                 help={ this.i18n('filter.entityId.help') }/>
             </Basic.Col>
-            <Basic.Col lg={ !_showTransactionId ? 8 : 4 } rendered={ _.includes(columns, 'changedAttributes') }>
-              <Advanced.Filter.CreatableSelectBox
-                ref="changedAttributesList"
-                placeholder={this.i18n('entity.Audit.changedAttributes.placeholder')}
-                tooltip={this.i18n('entity.Audit.changedAttributes.tooltip')}/>
+            <Basic.Col lg={ !_showTransactionId ? 8 : 4 } rendered={ _.includes(columns, 'relatedOwnerId') }>
+              <Advanced.Filter.TextField
+                ref="relatedOwnerId"
+                placeholder={ this.i18n('filter.relatedOwnerId.placeholder') }
+                help={ this.i18n('filter.relatedOwnerId.help') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 } rendered={ _showTransactionId }>
               <Advanced.Filter.TextField
                 ref="transactionId"
                 placeholder={ this.i18n('filter.transactionId.placeholder') }/>
+            </Basic.Col>
+          </Basic.Row>
+          <Basic.Row className="last" rendered={ _.includes(columns, 'changedAttributes') }>
+            <Basic.Col lg={ 12 }>
+              <Advanced.Filter.CreatableSelectBox
+                ref="changedAttributesList"
+                placeholder={this.i18n('entity.Audit.changedAttributes.placeholder')}
+                tooltip={this.i18n('entity.Audit.changedAttributes.tooltip')}/>
             </Basic.Col>
           </Basic.Row>
         </Basic.AbstractForm>
@@ -338,7 +346,7 @@ AuditTable.propTypes = {
 };
 
 AuditTable.defaultProps = {
-  columns: ['id', 'type', 'modification', 'modifier', 'revisionDate', 'entityId', 'changedAttributes'],
+  columns: ['id', 'type', 'modification', 'modifier', 'revisionDate', 'entityId', 'relatedOwnerId', 'changedAttributes'],
   isDetail: false
 };
 

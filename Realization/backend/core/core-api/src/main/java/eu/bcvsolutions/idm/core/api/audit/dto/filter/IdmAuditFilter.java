@@ -19,7 +19,7 @@ public class IdmAuditFilter implements BaseFilter {
 
     private Long id;
     private String text;
-    private String type;
+    private String type; // entity class canonical name
     private ZonedDateTime from;
     private ZonedDateTime till;
     private String modification;
@@ -27,8 +27,6 @@ public class IdmAuditFilter implements BaseFilter {
     private List<String> changedAttributesList;
     private UUID entityId;
     private Boolean withVersion;
-    
-    // owner + sub owner attributes
     private String ownerId;
     private List<String> ownerIds;
 	private String ownerCode;
@@ -37,6 +35,7 @@ public class IdmAuditFilter implements BaseFilter {
 	private String subOwnerCode;
 	private String subOwnerType;
 	private UUID transactionId;
+	private UUID relatedOwnerId; // entityId + ownerId + subOwnerId
 
 	public String getModifier() {
         return modifier;
@@ -62,10 +61,20 @@ public class IdmAuditFilter implements BaseFilter {
         this.modification = modification;
     }
 
+    /**
+     * Entity class canonical name.
+     * 
+     * @return class canonical name
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Entity class canonical name.
+     * 
+     * @param type class canonical name.
+     */
     public void setType(String type) {
         this.type = type;
     }
@@ -200,6 +209,26 @@ public class IdmAuditFilter implements BaseFilter {
 	 */
 	public void setTransactionId(UUID transactionId) {
 		this.transactionId = transactionId;
+	}
+	
+	/**
+	 * entityId OR ownerId OR subOwnerId
+	 * 
+	 * @return uuid
+	 * @since 11.3.0
+	 */
+	public UUID getRelatedOwnerId() {
+		return relatedOwnerId;
+	}
+	
+	/**
+	 * entityId OR ownerId OR subOwnerId
+	 * 
+	 * @param relatedOwnerId uuid
+	 * @since 11.3.0
+	 */
+	public void setRelatedOwnerId(UUID relatedOwnerId) {
+		this.relatedOwnerId = relatedOwnerId;
 	}
 	
 }

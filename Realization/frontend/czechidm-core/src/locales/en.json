@@ -4009,6 +4009,10 @@
         "dateTill": {
           "label": "Till",
           "placeholder": "Date till"
+        },
+        "relatedOwnerId": {
+          "placeholder": "Related entity or owner (uuid)",
+          "help": "Entity, owner or sub owner identifier (uuid)."
         }
       },
       "identities": {

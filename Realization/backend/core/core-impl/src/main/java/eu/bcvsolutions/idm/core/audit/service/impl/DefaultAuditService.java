@@ -135,8 +135,7 @@ public class DefaultAuditService extends AbstractReadWriteDtoService<IdmAuditDto
 		if (transactionId != null) {
 			predicates.add(builder.equal(root.get(IdmAudit_.transactionId), transactionId));
 		}
-		// Text filtering is by id, is this really mandatory?
-		// TODO: thing about it
+		// TODO: Text filtering is by id, is this really mandatory?
 		if (StringUtils.isNotEmpty(filter.getText())) {
 			predicates.add(builder.like(root.get(IdmAudit_.id).as(String.class), "%" + filter.getText().toLowerCase() + "%"));
 		}
@@ -201,6 +200,18 @@ public class DefaultAuditService extends AbstractReadWriteDtoService<IdmAuditDto
 		if (StringUtils.isNotEmpty(filter.getSubOwnerType())) {
 			predicates.add(builder.equal(root.get(IdmAudit_.subOwnerType), filter.getSubOwnerType()));
 		}
+		
+		UUID relatedOwnerId = filter.getRelatedOwnerId();
+		if (relatedOwnerId != null) {
+			predicates.add(
+					builder.or(
+							builder.equal(root.get(IdmAudit_.entityId), relatedOwnerId),
+							builder.equal(root.get(IdmAudit_.ownerId), relatedOwnerId.toString()),
+							builder.equal(root.get(IdmAudit_.subOwnerId), relatedOwnerId.toString())
+					)
+			);
+		}
+		//
 		return predicates;
 	}
 

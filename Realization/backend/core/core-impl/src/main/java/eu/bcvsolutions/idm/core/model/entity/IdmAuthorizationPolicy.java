@@ -20,6 +20,7 @@ import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import eu.bcvsolutions.idm.core.api.domain.AuditSearchable;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Disableable;
@@ -38,7 +39,9 @@ import eu.bcvsolutions.idm.core.security.api.domain.AuthorizationPolicy;
 		@Index(name = "idx_idm_author_policy_role", columnList = "role_id"),
 		@Index(name = "idx_idm_author_policy_a_t", columnList = "authorizable_type")
 })
-public class IdmAuthorizationPolicy extends AbstractEntity implements AuthorizationPolicy, Disableable {
+public class IdmAuthorizationPolicy 
+		extends AbstractEntity 
+		implements AuthorizationPolicy, Disableable, AuditSearchable {
 	
 	private static final long serialVersionUID = -5925961560301302926L;
 
@@ -168,5 +171,29 @@ public class IdmAuthorizationPolicy extends AbstractEntity implements Authorizat
 	@Override
 	public String getGroupPermission() {
 		return groupPermission;
+	}
+	
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerId() {
+		return getRole().getId().toString();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerCode() {
+		return getRole().getCode();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerType() {
+		return IdmRole.class.getCanonicalName();
 	}
 }

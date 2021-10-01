@@ -33,7 +33,9 @@ import eu.bcvsolutions.idm.core.api.entity.EntityComposition;
 		@Index(name = "idx_idm_role_composition_super", columnList = "superior_id"),
 		@Index(name = "idx_idm_role_composition_e_id", columnList = "external_id")
 })
-public class IdmRoleComposition extends AbstractEntity implements ExternalIdentifiable, EntityComposition<IdmRole> {
+public class IdmRoleComposition 
+		extends AbstractEntity 
+		implements ExternalIdentifiable, EntityComposition<IdmRole> {
 
 	private static final long serialVersionUID = -1594762884461330895L;
 	

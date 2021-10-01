@@ -51,35 +51,4 @@ public class IdmIdentityFormValue extends AbstractFormValue<IdmIdentity> impleme
 	public void setOwner(IdmIdentity owner) {
 		this.owner = owner;
 	}
-
-	@Override
-	public String getOwnerId() {
-		return this.getOwner().getId().toString();
-	}
-
-	@Override
-	public String getOwnerCode() {
-		return this.getOwner().getCode();
-	}
-
-	@Override
-	public String getOwnerType() {
-		return IdmIdentity.class.getName();
-	}
-
-	@Override
-	public String getSubOwnerId() {
-		return this.getFormAttribute().getId().toString();
-	}
-
-	@Override
-	public String getSubOwnerCode() {
-		return this.getFormAttribute().getCode();
-	}
-
-	@Override
-	public String getSubOwnerType() {
-		return IdmFormAttribute.class.getName();
-	}
-
 }

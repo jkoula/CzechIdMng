@@ -224,28 +224,4 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity, Audi
 	public String getOwnerType() {
 		return IdmIdentity.class.getName();
 	}
-
-	/**
-	 * @since 11.3.0
-	 */
-	@Override
-	public String getSubOwnerId() {
-		return null;
-	}
-
-	/**
-	 * @since 11.3.0
-	 */
-	@Override
-	public String getSubOwnerCode() {
-		return null;
-	}
-
-	/**
-	 * @since 11.3.0
-	 */
-	@Override
-	public String getSubOwnerType() {
-		return null;
-	}
 }
