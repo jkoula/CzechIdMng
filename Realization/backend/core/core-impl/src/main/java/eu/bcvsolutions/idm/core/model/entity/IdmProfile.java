@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
+import eu.bcvsolutions.idm.core.api.domain.AuditSearchable;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.dto.PanelDto;
@@ -33,7 +34,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.TwoFactorAuthenticationType;
  */
 @Entity
 @Table(name = "idm_profile")
-public class IdmProfile extends AbstractEntity implements AttachableEntity {
+public class IdmProfile extends AbstractEntity implements AttachableEntity, AuditSearchable {
 	
 	private static final long serialVersionUID = 1L;
 	//
@@ -198,5 +199,53 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity {
 	 */
 	public void setSetting(ConfigurationMap setting) {
 		this.setting = setting;
+	}
+	
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerId() {
+		return identity.getId().toString();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerCode() {
+		return identity.getCode();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerType() {
+		return IdmIdentity.class.getName();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerId() {
+		return null;
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerCode() {
+		return null;
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerType() {
+		return null;
 	}
 }

@@ -31,12 +31,12 @@ import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditEntityDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmAuditFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
-import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmPasswordDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
@@ -49,6 +49,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.model.entity.IdmProfile;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.security.api.authentication.AuthenticationManager;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
@@ -877,7 +878,7 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 	
 	@Test
 	public void testUpdateConfidentialProperty() {
-		Identifiable owner = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
 		//
 		// create definition with confidential parameter
 		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
@@ -928,6 +929,28 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		confidentialValue.setValue(null);
 		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(confidentialValue));
 		Assert.assertNull(formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
+		//
+		// non transactional test => cleanup
+		identityService.delete(owner);
+		formService.deleteDefinition(formDefinitionOne);
+	}
+	
+	@Test
+	public void testProfileOwner() {
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		IdmProfileDto profile = getHelper().createProfile(identity);
+		//
+		IdmAuditFilter filter = new IdmAuditFilter();
+		filter.setOwnerId(identity.getId().toString());
+		filter.setType(IdmProfile.class.getCanonicalName());
+		//
+		List<IdmAuditDto> revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(1, revisions.size());
+		Assert.assertEquals(RevisionType.ADD.name(), revisions.get(0).getModification());
+		Assert.assertEquals(profile.getId(), revisions.get(0).getEntityId());
+		//
+		// non transactional test => cleanup
+		identityService.delete(identity);
 	}
 
 	private IdmRoleDto constructRole() {
