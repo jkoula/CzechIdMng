@@ -32,6 +32,7 @@ import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditEntityDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmAuditFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
+import eu.bcvsolutions.idm.core.api.dto.IdmContractGuaranteeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -47,6 +48,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.model.entity.IdmContractGuarantee;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.entity.IdmProfile;
@@ -951,6 +953,28 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		//
 		// non transactional test => cleanup
 		identityService.delete(identity);
+	}
+	
+	@Test
+	public void testContractGuaranteeOwner() {
+		IdmIdentityDto subordinate = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto manager = getHelper().createIdentity((GuardedString) null);
+		IdmContractGuaranteeDto contractGuarantee = getHelper().createContractGuarantee(getHelper().getPrimeContract(subordinate), manager);
+		//
+		IdmAuditFilter filter = new IdmAuditFilter();
+		filter.setOwnerId(subordinate.getId().toString());
+		filter.setType(IdmContractGuarantee.class.getCanonicalName());
+		//
+		List<IdmAuditDto> revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(1, revisions.size());
+		Assert.assertEquals(RevisionType.ADD.name(), revisions.get(0).getModification());
+		Assert.assertEquals(contractGuarantee.getId(), revisions.get(0).getEntityId());
+		Assert.assertEquals(subordinate.getId().toString(), revisions.get(0).getOwnerId());
+		Assert.assertEquals(manager.getId().toString(), revisions.get(0).getSubOwnerId());
+		//
+		// non transactional test => cleanup
+		identityService.delete(subordinate);
+		identityService.delete(manager);
 	}
 
 	private IdmRoleDto constructRole() {

@@ -80,31 +80,31 @@ public class IdmContractGuarantee extends AbstractEntity implements ExternalIden
 
 	@Override
 	public String getOwnerId() {
-		return this.getGuarantee().getId().toString();
+		return getIdentityContract().getIdentity().getId().toString();
 	}
 
 	@Override
 	public String getOwnerCode() {
-		return this.getGuarantee().getCode();
+		return getIdentityContract().getIdentity().getCode();
 	}
 
 	@Override
 	public String getOwnerType() {
-		return IdmIdentity.class.getName();
+		return IdmIdentity.class.getCanonicalName();
 	}
 
 	@Override
 	public String getSubOwnerId() {
-		return this.getIdentityContract().getId().toString();
+		return getGuarantee().getId().toString();
 	}
 
 	@Override
 	public String getSubOwnerCode() {
-		return this.getIdentityContract().getPosition();
+		return getGuarantee().getCode();
 	}
 
 	@Override
 	public String getSubOwnerType() {
-		return IdmIdentityContract.class.getName();
+		return IdmIdentity.class.getCanonicalName();
 	}
 }
