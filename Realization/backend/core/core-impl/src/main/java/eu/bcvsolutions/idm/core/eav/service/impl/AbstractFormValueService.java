@@ -181,9 +181,10 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 		if (dto.isConfidential()) {
 			dto.clearValues();
 			if (formValue != null) {
-				// we need only to know, if value was filled
+				// we need only to know, if value was filled and when (~ for audit)
 				dto.setStringValue(GuardedString.SECRED_PROXY_STRING);
 				dto.setShortTextValue(GuardedString.SECRED_PROXY_STRING);
+				dto.setDateValue(ZonedDateTime.now()); // visible change in audit
 			}
 		}
 		//

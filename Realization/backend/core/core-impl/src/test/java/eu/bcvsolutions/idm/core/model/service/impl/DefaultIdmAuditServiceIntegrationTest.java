@@ -31,6 +31,7 @@ import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditEntityDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmAuditFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -41,6 +42,11 @@ import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
@@ -59,14 +65,11 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  */
 public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTest {
 
-	@Autowired
-	private IdmAuditService auditService;
-	@Autowired
-	private IdmRoleService roleService;
-	@Autowired
-	private IdmIdentityService identityService;
-	@Autowired
-	private AuthenticationManager authenticationManager;
+	@Autowired private IdmAuditService auditService;
+	@Autowired private IdmRoleService roleService;
+	@Autowired private IdmIdentityService identityService;
+	@Autowired private AuthenticationManager authenticationManager;
+	@Autowired private FormService formService;
 
 	@Test
 	public void roleAuditTestCreateModify() {
@@ -870,6 +873,61 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		IdmIdentity findLastPersistedVersion = auditService.findLastPersistedVersion(IdmIdentity.class, identity.getId());
 		Assert.assertNotNull(findLastPersistedVersion);
 		Assert.assertEquals(identity.getUsername(), findLastPersistedVersion.getUsername());
+	}
+	
+	@Test
+	public void testUpdateConfidentialProperty() {
+		Identifiable owner = getHelper().createIdentity((GuardedString) null);
+		//
+		// create definition with confidential parameter
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		String attributeName = getHelper().createName();
+		attribute.setCode(attributeName);
+		attribute.setName(attribute.getCode());
+		attribute.setPersistentType(PersistentType.SHORTTEXT);
+		attribute.setConfidential(true);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attribute));
+		attribute = formDefinitionOne.getMappedAttributeByCode(attribute.getCode());
+		//
+		// fill values
+		IdmFormValueDto value1 = new IdmFormValueDto(attribute);
+		String valueOne = getHelper().createName();
+		value1.setValue(valueOne);
+		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(value1));
+		Map<String, List<IdmFormValueDto>> m = formService.getFormInstance(owner, formDefinitionOne).toValueMap();
+		//
+		// check
+		Assert.assertEquals(1, m.get(attributeName).size());
+		Assert.assertEquals(GuardedString.SECRED_PROXY_STRING, (m.get(attributeName).get(0)).getValue());
+		Assert.assertTrue(m.get(attributeName).get(0).isConfidential());
+		//
+		// check confidential value
+		Assert.assertEquals(valueOne, formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
+		//
+		// save other values - confidential will not be included
+		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList());
+		Assert.assertEquals(valueOne, formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
+		//
+		// update
+		IdmFormValueDto confidentialValue = m.get(attributeName).get(0);
+		confidentialValue.setValue("");
+		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(confidentialValue));
+		Assert.assertEquals("", formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
+		//
+		// update 2
+		confidentialValue = m.get(attributeName).get(0);
+		confidentialValue.setValue(valueOne);
+		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(confidentialValue));
+		Assert.assertEquals(valueOne, formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
+		//
+		// two revisions in audit
+		IdmAuditFilter filter = new IdmAuditFilter();
+		filter.setEntityId(confidentialValue.getId());
+		Assert.assertEquals(3, auditService.find(filter, null).getTotalElements()); // create + 2 updates
+		//
+		confidentialValue.setValue(null);
+		formService.saveValues(owner, formDefinitionOne, Lists.newArrayList(confidentialValue));
+		Assert.assertNull(formService.getConfidentialPersistentValue(m.get(attributeName).get(0)));
 	}
 
 	private IdmRoleDto constructRole() {
