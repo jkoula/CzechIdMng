@@ -996,6 +996,25 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		identityService.delete(subordinate);
 		identityService.delete(manager);
 	}
+	
+	@Test
+	public void testFindByTypes() {
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		IdmProfileDto profile = getHelper().createProfile(identity);
+		//
+		IdmAuditFilter filter = new IdmAuditFilter();
+		filter.setRelatedOwnerId(identity.getId());
+		filter.setTypes(Lists.newArrayList(IdmProfile.class.getCanonicalName(), IdmIdentity.class.getCanonicalName()));
+		//
+		List<IdmAuditDto> revisions = auditService.find(filter, null).getContent();
+		Assert.assertEquals(2, revisions.size());
+		Assert.assertEquals(RevisionType.ADD.name(), revisions.get(0).getModification());
+		Assert.assertTrue(revisions.stream().anyMatch(r -> r.getEntityId().equals(profile.getId())));
+		Assert.assertTrue(revisions.stream().anyMatch(r -> r.getEntityId().equals(identity.getId())));
+		//
+		// non transactional test => cleanup
+		identityService.delete(identity);
+	}
 
 	private IdmRoleDto constructRole() {
 		IdmRoleDto role = new IdmRoleDto();
