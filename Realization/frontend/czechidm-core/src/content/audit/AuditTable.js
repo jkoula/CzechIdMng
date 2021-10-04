@@ -23,6 +23,7 @@ export class AuditTable extends Advanced.AbstractTableContent {
     super(props, context);
     this.state = {
       transactionId: this._getTransactionId(props._searchParameters),
+      ownerIdType: this._getOwnerIdType(props._searchParameters),
       entityId: this._getEntityId(props._searchParameters),
       entityType: props._searchParameters && props._searchParameters.getFilters().has('type')
         ? props._searchParameters.getFilters().get('type')
@@ -40,12 +41,15 @@ export class AuditTable extends Advanced.AbstractTableContent {
     //  filters from redux
     if (nextProps._searchParameters) {
       const newTransactionId = this._getTransactionId(nextProps._searchParameters);
+      const newOwnerIdType = this._getOwnerIdType(nextProps._searchParameters);
       const newEntityId = this._getEntityId(nextProps._searchParameters);
       if ((newTransactionId && this.state.transactionId !== newTransactionId)
+          || (newOwnerIdType && this.state.ownerIdType !== newOwnerIdType)
           || (newEntityId && this.state.entityId !== newEntityId)) {
         this.setState({
           transactionId: newTransactionId,
-          entityId: newEntityId
+          entityId: newEntityId,
+          ownerIdType: newOwnerIdType
         }, () => {
           //
           const filterData = {};
@@ -63,6 +67,14 @@ export class AuditTable extends Advanced.AbstractTableContent {
     return 'content.audit';
   }
 
+  getDefaultSearchParameters() {
+    let searchParameters = auditManager.getDefaultSearchParameters();
+    //
+    searchParameters = searchParameters.setFilter('ownerIdType', 'relatedOwnerId');
+    //
+    return searchParameters;
+  }
+
   useFilter(event) {
     if (event) {
       event.preventDefault();
@@ -75,13 +87,34 @@ export class AuditTable extends Advanced.AbstractTableContent {
       event.preventDefault();
     }
     if (this.refs.table !== undefined) {
-      this.refs.table.cancelFilter(this.refs.filterForm);
+      this.setState({
+        ownerIdType: 'entityId'
+      }, () => {
+        this.refs.table.cancelFilter(this.refs.filterForm);
+      });
     }
   }
 
   onEntityTypeChange(entityType) {
     this.setState({
       entityType: entityType ? entityType.value : null
+    });
+  }
+
+  _onChangeOwnerIdType(option) {
+    const { ownerIdType } = this.state;
+    const value = this.refs[ownerIdType] ? this.refs[ownerIdType].getValue() : null;
+    const newOwnerIdType = option.value;
+    //
+    this.setState({
+      ownerIdType: newOwnerIdType
+    }, () => {
+      if (this.refs[ownerIdType]) {
+        this.refs[ownerIdType].setValue(null);
+      }
+      if (this.refs[newOwnerIdType]) {
+        this.refs[newOwnerIdType].setValue(value);
+      }
     });
   }
 
@@ -107,6 +140,13 @@ export class AuditTable extends Advanced.AbstractTableContent {
     return searchParameters.getFilters().get('entityId');
   }
 
+  _getOwnerIdType(searchParameters) {
+    if (!searchParameters || !searchParameters.getFilters().has('ownerIdType')) {
+      return 'entityId'; // ~ backward compatible
+    }
+    return searchParameters.getFilters().get('ownerIdType');
+  }
+
   /**
   * Method get last string of arrays split string by dot.
   * Used method _getType
@@ -122,7 +162,7 @@ export class AuditTable extends Advanced.AbstractTableContent {
 
   _getAdvancedFilter(auditedEntities, columns) {
     const { showTransactionId, forceSearchParameters } = this.props;
-    const { entityType } = this.state;
+    const { entityType, ownerIdType } = this.state;
     let _showTransactionId = showTransactionId;
     if (forceSearchParameters && forceSearchParameters.getFilters().has('transactionId')) {
       _showTransactionId = false;
@@ -167,13 +207,48 @@ export class AuditTable extends Advanced.AbstractTableContent {
               <Advanced.Filter.TextField
                 ref="entityId"
                 placeholder={ entityType ? this.i18n('filter.entityId.codeable') : this.i18n('filter.entityId.placeholder') }
-                help={ this.i18n('filter.entityId.help') }/>
-            </Basic.Col>
-            <Basic.Col lg={ !_showTransactionId ? 8 : 4 } rendered={ _.includes(columns, 'relatedOwnerId') }>
+                help={ this.i18n('filter.entityId.help') }
+                hidden={ !ownerIdType || ownerIdType !== 'entityId' }/>
+              <Advanced.Filter.TextField
+                ref="ownerId"
+                placeholder={ this.i18n('filter.ownerId.placeholder') }
+                help={ this.i18n('filter.ownerId.help') }
+                hidden={ ownerIdType !== 'ownerId' }/>
+              <Advanced.Filter.TextField
+                ref="subOwnerId"
+                placeholder={ this.i18n('filter.subOwnerId.placeholder') }
+                help={ this.i18n('filter.subOwnerId.help') }
+                hidden={ ownerIdType !== 'subOwnerId' }/>
               <Advanced.Filter.TextField
                 ref="relatedOwnerId"
                 placeholder={ this.i18n('filter.relatedOwnerId.placeholder') }
-                help={ this.i18n('filter.relatedOwnerId.help') }/>
+                help={ this.i18n('filter.relatedOwnerId.help') }
+                hidden={ ownerIdType !== 'relatedOwnerId' }/>
+            </Basic.Col>
+            <Basic.Col lg={ 4 } rendered={ _.includes(columns, 'entityId') }>
+              <Advanced.Filter.EnumSelectBox
+                ref="ownerIdType"
+                placeholder={ this.i18n('filter.ownerIdType.placeholder') }
+                clearable={ false }
+                options={[
+                  {
+                    value: 'entityId',
+                    niceLabel: this.i18n('filter.entityId.placeholder')
+                  },
+                  {
+                    value: 'ownerId',
+                    niceLabel: this.i18n('filter.ownerId.placeholder')
+                  },
+                  {
+                    value: 'subOwnerId',
+                    niceLabel: this.i18n('filter.subOwnerId.placeholder')
+                  },
+                  {
+                    value: 'relatedOwnerId',
+                    niceLabel: this.i18n('filter.relatedOwnerId.placeholder')
+                  },
+                ]}
+                onChange={ this._onChangeOwnerIdType.bind(this) }/>
             </Basic.Col>
             <Basic.Col lg={ 4 } rendered={ _showTransactionId }>
               <Advanced.Filter.TextField

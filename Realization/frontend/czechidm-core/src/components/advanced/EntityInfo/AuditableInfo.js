@@ -29,7 +29,9 @@ export class AuditableInfo extends Basic.AbstractContextComponent {
     }
     const propertyValue = property === 'entityId' ? entity.id : entity[property];
     // set search parameters in redux
-    const searchParameters = auditManager.getDefaultSearchParameters().setFilter(property, propertyValue);
+    const searchParameters = auditManager.getDefaultSearchParameters()
+      .setFilter(property === 'entityId' ? 'relatedOwnerId' : property, propertyValue)
+      .setFilter('ownerIdType', property === 'entityId' ? 'relatedOwnerId' : null);
     // co conctete audit table
     this.context.store.dispatch(auditManager.requestEntities(searchParameters, 'audit-table'));
     // prevent to show loading, when transaction id is the same

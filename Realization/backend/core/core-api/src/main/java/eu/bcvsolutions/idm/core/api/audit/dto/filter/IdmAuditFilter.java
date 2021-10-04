@@ -17,6 +17,8 @@ import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
  * Filter must have only interface base filter is not
  * {@link DataFilter} because audit has long ID.
  * 
+ * TODO: If DataFilter will be used, add ownerIdType final string property (used on FE only).
+ * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */

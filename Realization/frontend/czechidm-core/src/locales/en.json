@@ -4010,9 +4010,21 @@
           "label": "Till",
           "placeholder": "Date till"
         },
+        "ownerIdType": {
+          "label": "Identifier type",
+          "placeholder": "Identifier type"
+        },
         "relatedOwnerId": {
           "placeholder": "Related entity or owner (uuid)",
-          "help": "Entity, owner or sub owner identifier (uuid)."
+          "help": "Entity, owner or sub owner identifier (uuid). Example: Revision owner for extended attribute is related identity - all revisions of extended attributes for given identity uuid identifier will be found."
+        },
+        "ownerId": {
+          "placeholder": "Owner (uuid)",
+          "help": "Owner identifier (uuid). Example: Revision owner for extended attribute is related identity - all revisions of extended attributes for given identity uuid identifier will be found."
+        },
+        "subOwnerId": {
+          "placeholder": "Sub owner (uuid)",
+          "help": "Sub owner identifier (uuid). Example: Revision subowner owner for extended attribute is related form attribute - all revisions of extended attributes for given attribute uuid identifier will be found."
         }
       },
       "identities": {

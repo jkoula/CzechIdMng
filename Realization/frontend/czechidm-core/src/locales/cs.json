@@ -4063,9 +4063,21 @@
           "label": "Do",
           "placeholder": "Datum do"
         },
+        "ownerIdType": {
+          "label": "Typ identifikátoru",
+          "placeholder": "Typ identifikátoru"
+        },
         "relatedOwnerId": {
           "placeholder": "Entita nebo vlastník (uuid)",
-          "help": "Identifikátor (uuid) entity, vlastníka nebo druhého (sub) vlastníka revize v auditu."
+          "help": "Identifikátor (uuid) entity, vlastníka nebo druhého (sub) vlastníka revize v auditu. Příklad: Pokud je zadán uuid identifikátor identity, jsou nalezeny všechny revize dalších attributů identity spolu s revizemi zadané identity a dalších revizí záznamů vztažených k identitě (kontrakty, přířazené role atd.)."
+        },
+        "ownerId": {
+          "placeholder": "Vlastník (uuid)",
+          "help": "Identifikátor (uuid) vlastníka revize v auditu. Příklad: Pokud je zadán uuid identifikátor identity, jsou nalezeny všechny revize dalších attributů identity spolu s revizemi dalších záznamů vztažených k identitě (kontrakty, přířazené role atd.)."
+        },
+        "subOwnerId": {
+          "placeholder": "Druhý (sub) vlastník (uuid)",
+          "help": "Identifikátor (uuid) druhého (sub) vlastníka revize v auditu. Příklad: Pokud je zadán uuid identifikátor atributu formuláře, jsou nalezeny všechny revize hodnot dalších attributů s daným atributem."
         }
       },
       "identities": {
