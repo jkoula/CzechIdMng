@@ -4,6 +4,11 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 
@@ -19,7 +24,7 @@ public class IdmAuditFilter implements BaseFilter {
 
     private Long id;
     private String text;
-    private String type; // entity class canonical name
+    private List<String> types; // entity class canonical name
     private ZonedDateTime from;
     private ZonedDateTime till;
     private String modification;
@@ -67,7 +72,10 @@ public class IdmAuditFilter implements BaseFilter {
      * @return class canonical name
      */
     public String getType() {
-        return type;
+    	if (CollectionUtils.isEmpty(types)) {
+    		return null;
+    	}
+        return types.get(0);
     }
 
     /**
@@ -76,8 +84,31 @@ public class IdmAuditFilter implements BaseFilter {
      * @param type class canonical name.
      */
     public void setType(String type) {
-        this.type = type;
+    	if (StringUtils.isEmpty(type)) {
+    		types = null;
+    	}
+        types = Lists.newArrayList(type);
     }
+    
+    /**
+     * Entity class canonical name (OR).
+     * 
+     * @param types Entity class canonical name OR
+     * @since 11.3.0
+     */
+    public void setTypes(List<String> types) {
+		this.types = types;
+	}
+    
+    /**
+     * Entity class canonical name (OR).
+     * 
+     * @return Entity class canonical name OR
+     * @since 11.3.0
+     */
+    public List<String> getTypes() {
+		return types;
+	}
 
     public ZonedDateTime getFrom() {
         return from;

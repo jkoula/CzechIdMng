@@ -12,7 +12,9 @@ import org.hibernate.envers.Audited;
 
 import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
+import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 
 /**
  * Identity role extended attributes
@@ -51,5 +53,51 @@ public class IdmIdentityRoleFormValue extends AbstractFormValue<IdmIdentityRole>
 		this.owner = owner;
 	}
 
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerId() {
+		return this.getOwner().getIdentityContract().getIdentity().getId().toString();
+	}
 
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerCode() {
+		return this.getOwner().getIdentityContract().getIdentity().getCode();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getOwnerType() {
+		return IdmIdentity.class.getCanonicalName();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerId() {
+		return this.getOwner().getRole().getId().toString();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerCode() {
+		return this.getOwner().getRole().getCode();
+	}
+
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public String getSubOwnerType() {
+		return IdmRole.class.getCanonicalName();
+	}
 }

@@ -95,7 +95,13 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
     let forceSearchParameters = auditManager
       .getDefaultSearchParameters()
       .setFilter('withVersion', true)
-      .setFilter('type', 'eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole');
+      .setFilter(
+        'type',
+        [
+          'eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole',
+          'eu.bcvsolutions.idm.core.model.entity.eav.IdmIdentityRoleFormValue'
+        ]
+      );
     if (id) {
       forceSearchParameters = forceSearchParameters.setFilter('ownerId', id);
     }
@@ -141,7 +147,8 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
                     level={ AuditModificationEnum.getLevel(data[rowIndex][property]) }
                     text={ this.i18n(`content.audit.identityRoles.modification.${ data[rowIndex][property] }`) }/>
                 );
-              }}/>
+              }
+            }/>
           <Advanced.Column
             property="modifier"
             width={ 50 }
@@ -152,6 +159,33 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
             sort
             width={ 150 }
             face="datetime"/>
+          <Advanced.Column
+            property="entityId"
+            header={ this.i18n('entity.Audit.entity') }
+            cell={
+              /* eslint-disable react/no-multi-comp */
+              ({ rowIndex, data, property }) => {
+                const value = data[rowIndex][property];
+                //
+                if (data[rowIndex]._embedded && data[rowIndex]._embedded[property]) {
+                  return (
+                    <Advanced.EntityInfo
+                      entityType={ Utils.Ui.getSimpleJavaType(data[rowIndex].type) }
+                      entityIdentifier={ value }
+                      entity={ data[rowIndex]._embedded[property] }
+                      face="popover"
+                      showEntityType={ false }
+                      showLink={ !data[rowIndex].deleted }
+                      deleted={ data[rowIndex].deleted }
+                      showIcon/>
+                  );
+                }
+                //
+                return (
+                  <Advanced.UuidInfo value={ value } />
+                );
+              }
+            }/>
           <Advanced.Column
             property="changedAttributes"
             width={ 100 }
@@ -229,6 +263,8 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
                 let identityContract = null;
                 if (embeddedEntity && embeddedEntity._embedded.identityContract) {
                   identityContract = embeddedEntity._embedded.identityContract;
+                } else if (embeddedEntity && embeddedEntity._embedded.owner && embeddedEntity._embedded.owner._embedded) {
+                  identityContract = embeddedEntity._embedded.owner._embedded.identityContract;
                 }
                 if (!embeddedEntity && !identityContract) {
                   identityContract = data[rowIndex]._embedded.identityContract;

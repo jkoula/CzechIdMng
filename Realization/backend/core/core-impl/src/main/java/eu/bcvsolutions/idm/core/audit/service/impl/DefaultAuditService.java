@@ -26,6 +26,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -168,11 +169,12 @@ public class DefaultAuditService extends AbstractReadWriteDtoService<IdmAuditDto
 		if (filter.getTill() != null) {
 			predicates.add(builder.lessThanOrEqualTo(root.get(IdmAudit_.timestamp), filter.getTill().toInstant().toEpochMilli()));
 		}
-
-		if (StringUtils.isNotEmpty(filter.getType())) {
-			predicates.add(builder.equal(root.get(IdmAudit_.type), filter.getType()));
+		//
+		List<String> types = filter.getTypes();
+		if (CollectionUtils.isNotEmpty(types)) {
+			predicates.add(root.get(IdmAudit_.type).in(types));
 		}
-
+		//
 		if (StringUtils.isNotEmpty(filter.getOwnerCode())) {
 			predicates.add(builder.equal(root.get(IdmAudit_.ownerCode), filter.getOwnerCode()));
 		}

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -371,7 +372,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 							getLookupService().toDto((BaseEntity) lastPersistedVersion, null, context)
 					);
 				}
-			} catch (IllegalArgumentException | ClassNotFoundException ex) {
+			} catch (Exception ex) {
 				LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getType(), ex);
 			}
 		}
@@ -426,10 +427,11 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 		}
 		// entity id decorator
 		String entityId = getParameterConverter().toString(parameters, "entityId");
-		String entityType = getParameterConverter().toString(parameters, "type");
+		List<String> entityTypes = getParameterConverter().toStrings(parameters, "type");
 		UUID entityUuid = null;
-		if (StringUtils.isNotEmpty(entityType) && StringUtils.isNotEmpty(entityId)) {
+		if (CollectionUtils.isNotEmpty(entityTypes) && StringUtils.isNotEmpty(entityId)) {
 			// try to find entity by Codeable identifier
+			String entityType = entityTypes.get(0);
 			AbstractDto entity = getLookupService().lookupDto(entityType, entityId);
 			if (entity != null) {
 				entityUuid = entity.getId();
@@ -446,6 +448,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 			}
 		}
 		IdmAuditFilter filter = super.toFilter(parameters);
+		filter.setTypes(entityTypes);
 		filter.setChangedAttributesList(changedAttributesList);
 		if (entityUuid != null) {
 			filter.setEntityId(entityUuid);
