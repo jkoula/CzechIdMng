@@ -1784,6 +1784,7 @@ public class DefaultFormService implements FormService {
 		IdmFormValueFilter<FormableEntity> valueFilter = new IdmFormValueFilter<>();
 		valueFilter.setOwner(ownerEntity);
 		valueFilter.setDefinitionId(formDefinition.getId());
+		valueFilter.setAddSecredProxyString(true);
 		if (filter == null) {
 			// filter is not given => all attributes
 			return valueFilter;

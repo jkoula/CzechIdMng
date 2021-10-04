@@ -10,6 +10,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.eav.api.service.FormValueService;
 import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 
 /**
  * Map form value to dto.
@@ -44,8 +45,8 @@ public class IdmFormValueDtoMapper
 		dto.setOwnerType(entity.getOwner().getClass());
 		//
 		// try to put owner to embedded (FE usage)
-		if (entity.getOwner() != null 
-				&& context != null
+		if (context != null
+				&& entity.getOwner() != null 
 				&& getParameterConverter().toBoolean(context.getData(), IdmFormValueFilter.PARAMETER_ADD_OWNER_DTO, false)) {
 			try {
 				dto.getEmbedded().put(
@@ -57,6 +58,12 @@ public class IdmFormValueDtoMapper
 				LOG.debug("Failed to convert owner [{}] into dto, Owner dto will be not set in embedded.",
 						entity.getOwner().getId(), ex);
 			}
+		}
+		//
+		// apply confidential context, if needed
+		if (dto.isConfidential() && (context == null || context.isAddSecredProxyString())) {
+			dto.setStringValue(GuardedString.SECRED_PROXY_STRING);
+			dto.setShortTextValue(GuardedString.SECRED_PROXY_STRING);
 		}
 		//
 		return dto;

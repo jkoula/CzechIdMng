@@ -214,6 +214,9 @@ public class IdmFormValueController extends AbstractReadWriteDtoController<IdmFo
 	
 	@Override
 	protected IdmFormValueFilter<?> toFilter(MultiValueMap<String, Object> parameters) {	
-		return new IdmFormValueFilter<FormableEntity>(parameters, getParameterConverter());
+		IdmFormValueFilter<?> filter =  new IdmFormValueFilter<FormableEntity>(parameters, getParameterConverter());
+		filter.setAddSecredProxyString(true);
+		//
+		return filter;
 	}
 }

@@ -477,6 +477,9 @@ public class IdmConfigurationController extends AbstractEventableDtoController<I
 
 	@Override
 	protected DataFilter toFilter(MultiValueMap<String, Object> parameters) {
-		return new DataFilter(getDtoClass(), parameters);
+		DataFilter filter = new DataFilter(getDtoClass(), parameters, getParameterConverter());
+		filter.setAddSecredProxyString(true);
+		//
+		return filter;
 	}
 }

@@ -4,6 +4,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.acc.dto.SysConnectorServerDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.ConfidentialContext;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 
@@ -16,8 +17,10 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 public class SysRemoteServerFilter extends DataFilter {
 	
 	/**
-	 * ~ password is filled info
+	 * ~ Fill secret proxy string, if password is filled. 
+	 * @deprecated use {@link ConfidentialContext#PARAMETER_ADD_SECRED_PROXY_STRING} instead
 	 */
+	@Deprecated(since = "11.3.0")
 	public static final String PARAMETER_CONTAINS_PASSWORD = "containsPassword";
 	
 	public SysRemoteServerFilter() {
@@ -38,7 +41,7 @@ public class SysRemoteServerFilter extends DataFilter {
 	 * @param containsPassword include proxy chars in dto
 	 */
 	public void setContainsPassword(Boolean containsPassword) {
-		set(PARAMETER_CONTAINS_PASSWORD, containsPassword);
+		set(PARAMETER_ADD_SECRED_PROXY_STRING, containsPassword);
 	}
 
 	/**
@@ -47,6 +50,6 @@ public class SysRemoteServerFilter extends DataFilter {
 	 * @return true - include proxy chars in dto
 	 */
 	public Boolean getContainsPassword() {
-		return getParameterConverter().toBoolean(getData(), PARAMETER_CONTAINS_PASSWORD);
+		return getParameterConverter().toBoolean(getData(), PARAMETER_ADD_SECRED_PROXY_STRING);
 	}
 }

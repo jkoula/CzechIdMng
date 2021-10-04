@@ -20,7 +20,7 @@ import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 
 /**
- * Application scope configuration
+ * Application scope configuration.
  * 
  * @author Radek Tomiška 
  *

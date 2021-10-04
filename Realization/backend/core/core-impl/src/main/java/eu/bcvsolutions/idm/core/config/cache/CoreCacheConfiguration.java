@@ -15,10 +15,10 @@ import eu.bcvsolutions.idm.core.api.config.cache.LocalIdMCacheConfiguration;
 import eu.bcvsolutions.idm.core.api.dto.IdmAuthorizationPolicyDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTokenDto;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.eav.api.domain.FormDefinitionCache;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.service.impl.DefaultConfigurationService;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultGroovyScriptService;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
 import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
@@ -43,7 +43,7 @@ public class CoreCacheConfiguration {
 	@Bean
 	public IdMCacheConfiguration configurationServiceCacheConfiguration() {
 		return DistributedIdMCacheConfiguration.<String, String> builder()
-			.withName(DefaultConfigurationService.CACHE_NAME)
+			.withName(IdmConfigurationService.CACHE_NAME)
 				.withKeyType(String.class)
 				.withValueType(String.class)
 				.build();

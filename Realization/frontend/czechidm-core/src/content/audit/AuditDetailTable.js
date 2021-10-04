@@ -112,6 +112,15 @@ export class AuditDetailTable extends Basic.AbstractContent {
                 return Utils.Ui.toStringValue(null);
               }
               //
+              // confidential value decorator - confidential value is randomm uuid - show asterix instead
+              if (((propertyName === 'value' && detail.type === 'eu.bcvsolutions.idm.core.model.entity.IdmConfiguration') // => configuration property
+                || ((propertyName === 'stringValue' || propertyName === 'shortTextValue') && detail.revisionValues.persistentType)) // => eav
+                && detail.revisionValues.confidential === true) { // => is confidential value
+                return (
+                  <span>********</span>
+                );
+              }
+              //
               // reserved audit constants
               if ((propertyName === 'modifier'
                     || propertyName === 'creator'

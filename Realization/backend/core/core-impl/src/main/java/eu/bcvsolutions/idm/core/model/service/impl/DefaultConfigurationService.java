@@ -27,13 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import eu.bcvsolutions.idm.core.api.CoreModule;
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.config.cache.domain.ValueWrapper;
 import eu.bcvsolutions.idm.core.api.domain.comparator.CodeableComparator;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
@@ -44,6 +44,7 @@ import eu.bcvsolutions.idm.core.config.domain.DynamicCorsConfiguration;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.entity.IdmConfiguration;
 import eu.bcvsolutions.idm.core.model.entity.IdmConfiguration_;
+import eu.bcvsolutions.idm.core.model.event.processor.configuration.ConfigurationSaveProcessor;
 import eu.bcvsolutions.idm.core.model.repository.IdmConfigurationRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
@@ -54,7 +55,7 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
  * Default implementation finds configuration in database, if configuration for
  * given key is not found, then configuration in property file will be returned. 
  * Public (not secured) configuration could be read without authentication. 
- * Confidential properties are saved to confidential storage.
+ * Confidential properties are saved to confidential storage in ({@link ConfigurationSaveProcessor}).
  * 
  * Cache manager is used directly without annotations - its easier for overloaded methods and internal cache usage.
  * 
@@ -65,7 +66,6 @@ public class DefaultConfigurationService
 		extends AbstractEventableDtoService<IdmConfigurationDto, IdmConfiguration, DataFilter> 
 		implements IdmConfigurationService, ConfigurationService {
 
-	public static final String CACHE_NAME = String.format("%s:configuration-cache", CoreModule.MODULE_ID);
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultConfigurationService.class);
 	//
 	private final IdmConfigurationRepository repository;
@@ -90,6 +90,14 @@ public class DefaultConfigurationService
 	@Override
 	public AuthorizableType getAuthorizableType() {
 		return new AuthorizableType(CoreGroupPermission.CONFIGURATION, getEntityClass());
+	}
+	
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	public boolean supportsToDtoWithFilter() {
+		return true;
 	}
 	
 	@Override
@@ -189,35 +197,52 @@ public class DefaultConfigurationService
 	@Transactional
 	public IdmConfigurationDto saveInternal(IdmConfigurationDto dto) {
 		Assert.notNull(dto, "Entity is required.");
-		// check confidential option
-		if (shouldBeConfidential(dto.getName())) {
-			dto.setConfidential(true);
-		}
 		// check secured option
 		if (shouldBeSecured(dto.getName())) {
 			dto.setSecured(true);
 		}
-		// save confidential properties to confidential storage
-		String value = dto.getValue();
-		if (dto.isConfidential()) {
-			String previousValue = dto.getId() == null ? null : confidentialStorage.get(dto.getId(), getEntityClass(), CONFIDENTIAL_PROPERTY_VALUE, String.class);
-			if (StringUtils.isNotEmpty(value) || (value == null && previousValue != null)) {
-				// we need only to know, if value was filled
-				dto.setValue(GuardedString.SECRED_PROXY_STRING);
-			} else {
-				dto.setValue(null);
-			}
-		}
-		dto = super.saveInternal(dto);
 		//
-		// save new value to confidential storage - empty string should be given for saving empty value. We are leaving previous value otherwise
-		if (dto.isConfidential() && value != null) {
-			confidentialStorage.save(dto.getId(), getEntityClass(), CONFIDENTIAL_PROPERTY_VALUE, value);
-			LOG.debug("Configuration value [{}] is persisted in confidential storage", dto.getName());
+		dto = super.saveInternal(dto);
+		if (dto.isConfidential()
+				&& dto.getValue() != null) {
+			dto.setValue(GuardedString.SECRED_PROXY_STRING);
 		}
-		evictCache(dto.getCode());
 		//
 		return dto;
+	}
+	
+	/**
+	 * @since 11.3.0
+	 */
+	@Override
+	protected IdmConfigurationDto applyContext(IdmConfigurationDto dto, DataFilter context, BasePermission... permission) {
+		dto = super.applyContext(dto, context, permission);
+		//
+		if (dto != null 
+				&& StringUtils.isNotEmpty(dto.getValue())
+				&& dto.isConfidential()
+				&& context != null
+				&& context.isAddSecredProxyString()) {
+			dto.setValue(GuardedString.SECRED_PROXY_STRING);
+		}
+		//
+		return dto;
+	}
+	
+	@Override
+	@Transactional
+	public EventContext<IdmConfigurationDto> publish(EntityEvent<IdmConfigurationDto> event, EntityEvent<?> parentEvent, BasePermission... permission) {
+		Assert.notNull(event, "Event must be not null!");
+		IdmConfigurationDto content = event.getContent();
+		Assert.notNull(content, "Content (dto) in event must be not null!");
+		// 
+		// load original source without confidential proxy string to support audit changes
+		if (!isNew(content)) {
+			DataFilter context = new DataFilter(getDtoClass());
+			context.setAddSecredProxyString(false);
+			event.setOriginalSource(get(content.getId(), context));
+		}
+		return super.publish(event, parentEvent, permission);
 	}
 	
 	@Override
@@ -230,7 +255,6 @@ public class DefaultConfigurationService
 			LOG.debug("Configuration value [{}] was removed from confidential storage", dto.getName());
 		}
 		super.deleteInternal(dto);
-		evictCache(dto.getCode());
 	}
 	
 	@Override
@@ -258,7 +282,7 @@ public class DefaultConfigurationService
 		} else if (env != null) {
 			// try to find value in property configuration
 			value = env.getProperty(key);
-			confidential = shouldBeConfidential(key);
+			confidential = GuardedString.shouldBeGuarded(key);
 		}
 		// fill default value
 		if (value == null) { // TODO: null vs. isEmpty?
@@ -502,7 +526,7 @@ public class DefaultConfigurationService
 		String stringValue = value == null ? null : value.toString();
 		IdmConfigurationDto configuration = new IdmConfigurationDto(key, stringValue);
 		// password etc. has to be guarded - can be used just in BE
-		if (shouldBeConfidential(configuration.getName())) {
+		if (GuardedString.shouldBeGuarded(configuration.getCode())) {
 			LOG.debug("Configuration value for property [{}] is guarded.", configuration.getName());
 			configuration.setValue(GuardedString.SECRED_PROXY_STRING);
 			configuration.setConfidential(true);
@@ -547,27 +571,13 @@ public class DefaultConfigurationService
 	}
 	
 	/**
-	 * Returns true, if key should be confidential by naming convention
-	 * 
-	 * @param key
-	 * @return
-	 */
-	private static boolean shouldBeConfidential(String key) {
-		return GuardedString.shouldBeGuarded(key);
-	}
-	
-	/**
 	 * Returns true, if key should be secured by naming convention. Confidential properties are always secured.
 	 * 
 	 * @param key
 	 * @return
 	 */
 	private static boolean shouldBeSecured(String key) {
-		return key.startsWith(ConfigurationService.IDM_PRIVATE_PROPERTY_PREFIX) || shouldBeConfidential(key);
-	}
-	
-	private void evictCache(String key) {
-		cacheManager.evictValue(CACHE_NAME, key);
+		return key.startsWith(ConfigurationService.IDM_PRIVATE_PROPERTY_PREFIX) || GuardedString.shouldBeGuarded(key);
 	}
 	
 	private ValueWrapper getCachedValue(String key) {

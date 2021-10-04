@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -46,7 +47,6 @@ import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
 import eu.bcvsolutions.idm.core.eav.repository.AbstractFormValueRepository;
 import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
@@ -149,19 +149,28 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	protected AbstractFormValueRepository<O, E> getRepository() {
 		return repository;
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public IdmFormValueDto get(Serializable id, BasePermission... permission) {
+		IdmFormValueFilter<O> context = new IdmFormValueFilter<>();
+		context.setAddSecredProxyString(true); // proxy string by default
+		//
+		return this.get(id, context, permission);
+	}
 
 	/**
 	 * Returns entity by given id. Returns null, if entity is not exists. For AbstractEntity uuid or string could be given.
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public IdmFormValueDto get(Serializable id, BasePermission... permission) {
+	public IdmFormValueDto get(Serializable id, IdmFormValueFilter<O> context, BasePermission... permission) {
 		E formValue = getEntity(id, permission);
 		// leave reading from confidential store to client
 		if (formValue != null && formValue.isConfidential()) {
 			LOG.debug("FormValue [{}] is persisted id confidential storage, returning proxy string only", formValue.getId());
 		}
-		return toDto(formValue);
+		return toDto(formValue, null, context);
 	}
 
 	/**
@@ -175,23 +184,39 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 	@Transactional
 	public IdmFormValueDto saveInternal(IdmFormValueDto dto) {
 		Assert.notNull(dto, "DTO is required to be saved.");
-		//
-		// check, if value has to be persisted in confidential storage
 		Serializable formValue = dto.getValue();
-		if (dto.isConfidential()) {
-			dto.clearValues();
-			if (formValue != null) {
-				// we need only to know, if value was filled and when (~ for audit)
-				dto.setStringValue(GuardedString.SECRED_PROXY_STRING);
-				dto.setShortTextValue(GuardedString.SECRED_PROXY_STRING);
-				dto.setDateValue(ZonedDateTime.now()); // visible change in audit
-			}
-		}
 		//
 		E persistedEntity = null;
 		if (dto.getId() != null) {
 			persistedEntity = this.getEntity(dto.getId());
 		}
+		// check, if value has to be persisted in confidential storage
+		if (dto.isConfidential()) {
+			dto.clearValues();
+			if (formValue != null) {
+				String previousFormValue;
+				if (dto.getId() != null) {
+					previousFormValue = confidentialStorage.get(
+							dto.getId(), 
+							getEntityClass(), 
+							getConfidentialStorageKey(dto.getFormAttribute()),
+							String.class
+					);
+				} else {
+					previousFormValue = null;
+				}
+				if (Objects.equals(formValue, previousFormValue) && persistedEntity != null) {
+					dto.setStringValue(persistedEntity.getStringValue());
+					dto.setShortTextValue(persistedEntity.getShortTextValue());
+				} else {				
+					String proxyValue = String.format("%s-%s", CONFIDENTIAL_STORAGE_VALUE_PREFIX, UUID.randomUUID());
+					// we need only to know, if value was filled and when (~ for audit)
+					dto.setStringValue(proxyValue);
+					dto.setShortTextValue(proxyValue);
+				}
+			}
+		}
+		// persist entity
 		E entity = getRepository().save(toEntity(dto, persistedEntity));
 		//
 		// save values to confidential storage
@@ -199,7 +224,10 @@ public abstract class AbstractFormValueService<O extends FormableEntity, E exten
 			confidentialStorage.save(entity.getId(), entity.getClass(), getConfidentialStorageKey(entity.getFormAttribute().getId()), formValue);
 			LOG.debug("FormValue [{}] is persisted in confidential storage", entity.getId());
 		}
-		return toDto(entity);
+		// return actual dto with proxy string
+		IdmFormValueFilter<O> context = new IdmFormValueFilter<>();
+		context.setAddSecredProxyString(true);
+		return toDto(entity, null, context);
 	}
 
 	@Override

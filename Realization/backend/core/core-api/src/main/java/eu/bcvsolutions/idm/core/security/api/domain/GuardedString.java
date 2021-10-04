@@ -119,10 +119,16 @@ public final class GuardedString {
 		return gs;
 	}
 	
+	/**
+	 * Returns true, if key should be confidential by naming convention.
+	 * 
+	 * @param propertyName ~ key
+	 * @return true ~ confidential 
+	 */
 	public static boolean shouldBeGuarded(String propertyName) {
 		Assert.notNull(propertyName, "Property name is required");
 		//
-		if(CollectionUtils.containsAny(
+		if (CollectionUtils.containsAny(
 				Arrays.asList(propertyName.split(ConfigurationService.SPLIT_PROPERTY_SEPARATOR)),
 				Arrays.asList(GuardedString.GUARDED_PROPERTY_NAMES))) {
 			return true;
