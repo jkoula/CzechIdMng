@@ -28,6 +28,13 @@ public interface MonitoringManager {
 	 * Last monitoring results - results are evaluated on different instances, so synchronized cache is needed.
 	 */
 	String LAST_RESULT_CACHE_NAME = String.format("%s:monitoring-last-result-cache", CoreModule.MODULE_ID);
+	
+	/**
+	 * Init monitoring manager - load last results into cache etc.
+	 * 
+	 * @since 11.2.1 called manually after application is fully initialized.
+	 */
+	void init();
 
 	/**
 	 * Execute monitoring by publishing entity event.

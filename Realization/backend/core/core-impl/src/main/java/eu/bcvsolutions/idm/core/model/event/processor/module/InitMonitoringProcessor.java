@@ -23,6 +23,7 @@ import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.IdmMonitoringFilter;
 import eu.bcvsolutions.idm.core.monitoring.api.service.IdmMonitoringService;
+import eu.bcvsolutions.idm.core.monitoring.api.service.MonitoringManager;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.DatabaseTableMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.DemoAdminMonitoringEvaluator;
 import eu.bcvsolutions.idm.core.monitoring.service.impl.EntityEventMonitoringEvaluator;
@@ -32,13 +33,13 @@ import eu.bcvsolutions.idm.core.monitoring.service.impl.LongRunningTaskMonitorin
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowHistoricProcessInstanceService;
 
 /**
- * Init product provided monitoring evaluators.
+ * Init monitoring manager and product provided monitoring evaluators.
  * 
  * @author Radek Tomiška
  * @since 11.1.0
  */
 @Component(InitMonitoringProcessor.PROCESSOR_NAME)
-@Description("Init product provided monitoring evaluators.")
+@Description("Init monitoring manager and product provided monitoring evaluators.")
 public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(InitMonitoringProcessor.class);
@@ -46,6 +47,7 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 	public static final String PRODUCT_PROVIDED_MONITORING_DESCRIPTION = "Product provided monitoring. Monitoring configured automatically.";
 	//
 	@Autowired private ApplicationContext applicationContext;
+	@Autowired private MonitoringManager monitoringManager;
 	@Autowired private IdmMonitoringService monitoringService;
 	@Autowired private ConfigurationService configurationService;
 	@Autowired private DatabaseTableMonitoringEvaluator databaseTableMonitoringEvaluator;
@@ -62,6 +64,9 @@ public class InitMonitoringProcessor extends AbstractInitApplicationProcessor {
 	
 	@Override
 	public EventResult<ModuleDescriptorDto> process(EntityEvent<ModuleDescriptorDto> event) {
+		// init monitoring manager
+		monitoringManager.init();
+		//
 		// h2 database warning
 		initH2DatabaseMonitoring();
 		//
