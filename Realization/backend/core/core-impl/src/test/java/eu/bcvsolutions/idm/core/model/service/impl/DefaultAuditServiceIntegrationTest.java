@@ -67,7 +67,7 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Ondrej Kopr
  * @author Radek Tomiška
  */
-public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTest {
+public class DefaultAuditServiceIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired private IdmAuditService auditService;
 	@Autowired private IdmRoleService roleService;
@@ -687,16 +687,22 @@ public class DefaultIdmAuditServiceIntegrationTest extends AbstractIntegrationTe
 		IdmAuditFilter filter = new IdmAuditFilter();
 		filter.setEntityId(identity.getId());
 		List<IdmAuditDto> audits = auditService.find(filter, null).getContent();
-		assertEquals(1, audits.size());
+		Assert.assertEquals(1, audits.size());
 		IdmAuditDto auditDto = audits.get(0);
-
-		// This is little bit dangerous because is possible found by text another audit logs.
+		// 
 		filter = new IdmAuditFilter();
+		filter.setType(IdmIdentity.class.getCanonicalName());
 		filter.setText(auditDto.getId().toString());
 		audits = auditService.find(filter, null).getContent();
-
-		assertEquals(1, audits.size());
-		assertEquals(auditDto.getId(), audits.get(0).getId());
+		Assert.assertEquals(1, audits.size());
+		Assert.assertEquals(auditDto.getId(), audits.get(0).getId());
+		// 
+		filter = new IdmAuditFilter();
+		filter.setType(IdmIdentity.class.getCanonicalName());
+		filter.setText(identity.getUsername());
+		audits = auditService.find(filter, null).getContent();
+		Assert.assertEquals(1, audits.size());
+		Assert.assertEquals(auditDto.getId(), audits.get(0).getId());
 	}
 
 	@Test

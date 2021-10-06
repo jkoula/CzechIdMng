@@ -4063,6 +4063,14 @@
           "label": "Do",
           "placeholder": "Datum do"
         },
+        "identity": {
+          "placeholder": "$t(entity.Identity._type)",
+          "help": "Zadejte celé uživatelské jméno."
+        },
+        "modifier": {
+          "placeholder": "Akci provedl",
+          "help": "Zadejte celé uživatelské jméno."
+        },
         "ownerIdType": {
           "label": "Typ identifikátoru",
           "placeholder": "Typ identifikátoru"
@@ -4082,7 +4090,7 @@
       },
       "identities": {
         "username": "Uživatelské jméno",
-        "modifier": "Upravil",
+        "modifier": "Akci provedl",
         "identityId": "Id identity",
         "entityType": "Typ entity"
       }

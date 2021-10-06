@@ -111,11 +111,13 @@ public abstract class AbstractIntegrationTest {
 			.findEvents(eventFilter, null)
 			.forEach(event -> {
 				try {
-					entityEventManager.deleteEvent(event);
+					if (entityEventManager.getEvent(event.getId()) != null) {
+						entityEventManager.deleteEvent(event);
+					}
 				} catch (EmptyResultDataAccessException ex) {
 					// ok - already deleted asynchronously
 				} catch (Exception ex) {
-					LOG.error("Event [{}] cannot be deleted.", event.getId(), ex);
+					LOG.warn("Event [{}] cannot be deleted.", event.getId(), ex);
 				}
 			});
 		// clean up created long running tasks by executed method
@@ -130,14 +132,16 @@ public abstract class AbstractIntegrationTest {
 						longRunningTaskManager.interrupt(task.getId());
 						task = longRunningTaskService.get(task);
 					} catch(ResultCodeException ex) {
-						LOG.error("Task [{}] cannot be interrupted.", task.getId(), ex);
+						LOG.warn("Task [{}] cannot be interrupted.", task.getId(), ex);
 					}
 					if (task.isRunning()) {
 						task.setRunning(false);
 						task = longRunningTaskService.save(task);
 					}
 				}
-				longRunningTaskService.delete(task);
+				if (longRunningTaskService.get(task) != null) {
+					longRunningTaskService.delete(task);
+				}
 			});
 	}
 	

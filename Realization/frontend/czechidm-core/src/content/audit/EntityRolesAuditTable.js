@@ -3,21 +3,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 //
-import * as Utils from '../../../utils';
-import * as Basic from '../../../components/basic';
-import * as Advanced from '../../../components/advanced';
-import { AuditManager } from '../../../redux';
-import AuditModificationEnum from '../../../enums/AuditModificationEnum';
+import * as Utils from '../../utils';
+import * as Basic from '../../components/basic';
+import * as Advanced from '../../components/advanced';
+import { AuditManager } from '../../redux';
+import AuditModificationEnum from '../../enums/AuditModificationEnum';
 
 const auditManager = new AuditManager();
 
 /**
-* Table of assigned roles for identity.
+* Table of assigned roles for entity (identity / role).
 *
-* @author Ondřej Kopr
 * @author Radek Tomiška
+* @since 11.3.0
 */
-export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
+export class EntityRolesAuditTable extends Advanced.AbstractTableContent {
 
   getContentKey() {
     return 'content.audit.identityRoles';
@@ -40,34 +40,20 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
   }
 
   /**
-  * Method for show detail of revision, redirect to detail
+  * Method for show detail of revision, redirect to detail.
   *
   * @param entityId id of revision
   */
   showDetail(entityId) {
-    this.context.history.push(`/audit/entities/${entityId}/diff/`);
-  }
-
-  _getForceSearchParameters() {
-    const { id } = this.props;
-    let forceSearchParameters = auditManager
-      .getDefaultSearchParameters()
-      .setFilter('withVersion', true)
-      .setFilter(
-        'type',
-        [
-          'eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole',
-          'eu.bcvsolutions.idm.core.model.entity.eav.IdmIdentityRoleFormValue'
-        ]
-      );
-    if (id) {
-      forceSearchParameters = forceSearchParameters.setFilter('ownerId', id);
-    }
-    return forceSearchParameters;
+    this.context.history.push(`/audit/entities/${ entityId }/diff/`);
   }
 
   render() {
-    const { uiKey, singleUserMod } = this.props;
+    const { uiKey, forceSearchParameters } = this.props;
+    //
+    // TODO: add relatedOwnerType ~ support other entities than role / identity
+    const showRole = !forceSearchParameters.getFilters().has('relatedOwnerId');
+    const showIdentity = !forceSearchParameters.getFilters().has('ownerId');
     //
     return (
       <div>
@@ -76,7 +62,7 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
           filterOpened
           uiKey={ uiKey }
           manager={ auditManager }
-          forceSearchParameters={ this._getForceSearchParameters() }
+          forceSearchParameters={ forceSearchParameters }
           rowClass={ ({rowIndex, data}) => { return Utils.Ui.getRowClass(data[rowIndex]); } }
           showId
           filter={
@@ -105,13 +91,13 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
                   </Basic.Col>
                 </Basic.Row>
                 <Basic.Row className="last">
-                  <Basic.Col lg={ 4 } rendered={ !singleUserMod }>
+                  <Basic.Col lg={ 4 } rendered={ showIdentity }>
                     <Advanced.Filter.TextField
                       ref="ownerCode"
                       placeholder={ this.i18n('entity.Identity._type') }
                       help={ this.i18n('content.audit.filter.identity.help') }/>
                   </Basic.Col>
-                  <Basic.Col lg={ 4 }>
+                  <Basic.Col lg={ 4 } rendered={ showRole }>
                     <Advanced.Filter.RoleSelect
                       ref="subOwnerId"
                       label={ null }
@@ -198,9 +184,9 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
               }
             }/>
           <Advanced.Column
-            header={ this.i18n('entity.Identity._type') }
+            header={this.i18n('entity.Identity._type')}
             property="identity"
-            rendered={ !singleUserMod }
+            rendered={ showIdentity }
             cell={
               ({ rowIndex, data }) => {
                 const entity = data[rowIndex].entity;
@@ -227,8 +213,9 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
               }
             }/>
           <Advanced.Column
-            header={this.i18n('entity.IdentityRole.role')}
+            header={ this.i18n('entity.IdentityRole.role') }
             sortProperty="role.name"
+            rendered={ showRole }
             cell={
               ({ rowIndex, data }) => {
                 const entity = data[rowIndex].entity;
@@ -367,15 +354,12 @@ export class AuditIdentityRolesTable extends Advanced.AbstractTableContent {
   }
 }
 
-AuditIdentityRolesTable.propTypes = {
+EntityRolesAuditTable.propTypes = {
   uiKey: PropTypes.string.isRequired,
-  username: PropTypes.string,
-  singleUserMod: PropTypes.boolean,
-  id: PropTypes.string
-};
-
-AuditIdentityRolesTable.defaultProps = {
-  singleUserMod: false
+  /**
+   * Selected entity force search parameters.
+   */
+  forceSearchParameters: PropTypes.object.isRequired
 };
 
 function select(state, component) {
@@ -384,4 +368,4 @@ function select(state, component) {
   };
 }
 
-export default connect(select)(AuditIdentityRolesTable);
+export default connect(select)(EntityRolesAuditTable);

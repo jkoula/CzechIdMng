@@ -10,15 +10,12 @@ import { PasswordHistoryManager } from '../../../redux';
 const passwordHistoryManager = new PasswordHistoryManager();
 
 /**
-* Table of Audit for password change
+* Table of Audit for password change.
 *
 * @author Ondřej Kopr
+* @author Radek Tomiška
 */
 export class AuditIdentityPasswordChangeTable extends Advanced.AbstractTableContent {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   getContentKey() {
     return 'content.audit.identityPasswordChange';
@@ -40,39 +37,6 @@ export class AuditIdentityPasswordChangeTable extends Advanced.AbstractTableCont
     }
   }
 
-  _getAdvancedFilter() {
-    const { singleUserMod } = this.props;
-    return (
-      <Advanced.Filter onSubmit={this.useFilter.bind(this)}>
-        <Basic.AbstractForm ref="filterForm">
-          <Basic.Row>
-            <Basic.Col lg={ 8 }>
-              <Advanced.Filter.FilterDate ref="fromTill"/>
-            </Basic.Col>
-            <div className="col-lg-4 text-right">
-              <Advanced.Filter.FilterButtons cancelFilter={this.cancelFilter.bind(this)}/>
-            </div>
-          </Basic.Row>
-          <Basic.Row className="last">
-            <div className="col-lg-4">
-              <Advanced.Filter.TextField
-                className="pull-right"
-                ref="creator"
-                placeholder={this.i18n('content.audit.identities.modifier')}/>
-            </div>
-            <div className="col-lg-4">
-              <Advanced.Filter.TextField
-                className="pull-right"
-                rendered={!singleUserMod}
-                ref="identityUsername"
-                placeholder={this.i18n('content.audit.identities.username')}/>
-            </div>
-          </Basic.Row>
-        </Basic.AbstractForm>
-      </Advanced.Filter>
-    );
-  }
-
   _getForceSearchParameters() {
     const { id } = this.props;
     let forceSearchParameters = passwordHistoryManager.getDefaultSearchParameters()
@@ -89,13 +53,42 @@ export class AuditIdentityPasswordChangeTable extends Advanced.AbstractTableCont
     return (
       <div>
         <Advanced.Table
-          header={<Basic.Alert level="warning" showHtmlText text={this.i18n('idmOnlyInfo')} style={{ fontSize: 14, margin: 0 }}/>}
+          header={
+            <Basic.Alert level="warning" showHtmlText text={ this.i18n('idmOnlyInfo') } style={{ fontSize: 14, margin: 0 }}/>
+          }
           ref="table"
           filterOpened
           uiKey={ uiKey }
           manager={ passwordHistoryManager }
           forceSearchParameters={ this._getForceSearchParameters() }
-          filter={ this._getAdvancedFilter() }
+          filter={
+            <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
+              <Basic.AbstractForm ref="filterForm">
+                <Basic.Row>
+                  <Basic.Col lg={ 8 }>
+                    <Advanced.Filter.FilterDate ref="fromTill"/>
+                  </Basic.Col>
+                  <Basic.Col lg={ 4 } className="text-right">
+                    <Advanced.Filter.FilterButtons cancelFilter={ this.cancelFilter.bind(this) }/>
+                  </Basic.Col>
+                </Basic.Row>
+                <Basic.Row className="last">
+                  <Basic.Col lg={ 4 } rendered={ !singleUserMod }>
+                    <Advanced.Filter.TextField
+                      ref="identityUsername"
+                      placeholder={ this.i18n('entity.Identity._type') }
+                      help={ this.i18n('content.audit.filter.identity.help') }/>
+                  </Basic.Col>
+                  <Basic.Col lg={ 4 }>
+                    <Advanced.Filter.TextField
+                      ref="creator"
+                      placeholder={ this.i18n('content.audit.identityPasswordChange.creator') }
+                      help={ this.i18n('content.audit.filter.modifier.help') }/>
+                  </Basic.Col>
+                </Basic.Row>
+              </Basic.AbstractForm>
+            </Advanced.Filter>
+          }
           _searchParameters={ this.getSearchParameters() }>
           <Advanced.Column
             header={ this.i18n('entity.Identity._type') }

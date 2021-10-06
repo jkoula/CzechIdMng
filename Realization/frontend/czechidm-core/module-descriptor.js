@@ -668,17 +668,17 @@ module.exports = {
                 id: 'role-audit',
                 labelKey: 'content.audit.label',
                 order: 500,
-                path: '/identity/:entityId/audit/identity',
+                path: '/role/:entityId/audit/detail',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUDIT_READ'] } ],
                 icon: 'component:audit',
                 items: [
                   {
-                    id: 'role-audit-profile',
+                    id: 'role-audit-detail',
                     icon: '',
                     type: 'TAB',
                     labelKey: 'content.audit.label',
                     order: 100,
-                    path: '/identity/:entityId/audit/identity',
+                    path: '/role/:entityId/audit/detail',
                     access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUDIT_READ'] } ]
                   },
                   {
@@ -687,7 +687,7 @@ module.exports = {
                     type: 'TAB',
                     labelKey: 'content.audit.identityRoles.label',
                     order: 200,
-                    path: '/identity/:entityId/audit/roles',
+                    path: '/role/:entityId/audit/roles',
                     access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUDIT_READ'] } ]
                   }
                 ]

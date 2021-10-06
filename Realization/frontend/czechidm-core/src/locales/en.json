@@ -4010,6 +4010,14 @@
           "label": "Till",
           "placeholder": "Date till"
         },
+        "identity": {
+          "placeholder": "$t(entity.Identity._type)",
+          "help": "Fill user login."
+        },
+        "modifier": {
+          "placeholder": "Executed by",
+          "help": "Fill user login / username."
+        },
         "ownerIdType": {
           "label": "Identifier type",
           "placeholder": "Identifier type"
@@ -4029,7 +4037,7 @@
       },
       "identities": {
         "username": "Login",
-        "modifier": "Modifier",
+        "modifier": "Executed by",
         "identityId": "Identity Id",
         "entityType": "Entity type"
       }
@@ -5201,7 +5209,7 @@
     "Audit": {
       "label": "Audit",
       "id": "Revision ID",
-      "modification": "Actions",
+      "modification": "Action",
       "modifier": "Executed by",
       "revisionDate": "Date of revision",
       "changedAttributes": {

@@ -12,7 +12,7 @@ import AuditModificationEnum from '../../enums/AuditModificationEnum';
 const auditManager = new AuditManager();
 
 /**
-* Table of Audit for entities
+* Table of Audit for entities.
 *
 * @author Ondřej Kopr
 * @author Radek Tomiška
@@ -196,10 +196,9 @@ export class AuditTable extends Advanced.AbstractTableContent {
             </Basic.Col>
             <Basic.Col lg={ 4 } rendered={ _.includes(columns, 'modifier') }>
               <Advanced.Filter.TextField
-                className="pull-right"
                 ref="modifier"
-                placeholder={ this.i18n('entity.Audit.modifier') }
-                returnProperty="username"/>
+                placeholder={ this.i18n('content.audit.filter.modifier.placeholder') }
+                help={ this.i18n('content.audit.filter.modifier.help') }/>
             </Basic.Col>
           </Basic.Row>
           <Basic.Row className={ _.includes(columns, 'changedAttributes') ? '' : 'last' }>

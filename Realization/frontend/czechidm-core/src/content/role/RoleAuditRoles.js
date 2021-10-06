@@ -3,19 +3,19 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 //
 import * as Basic from '../../components/basic';
-import EntityAuditTable from '../audit/EntityAuditTable';
 import SearchParameters from '../../domain/SearchParameters';
-import { IdentityManager } from '../../redux/data';
+import { RoleManager } from '../../redux/data';
+import EntityRolesAuditTable from '../audit/EntityRolesAuditTable';
 //
-const identityManager = new IdentityManager();
+const roleManager = new RoleManager();
 
 /**
- * Identity audit tab.
+ * Audit of roles on role detail.
  *
- * @author Ondřej Kopr
  * @author Radek Tomiška
+ * @since 11.3.0
  */
-class Audit extends Basic.AbstractContent {
+class RoleAuditRoles extends Basic.AbstractContent {
 
   getContentKey() {
     return 'content.audit';
@@ -25,49 +25,49 @@ class Audit extends Basic.AbstractContent {
     super.componentDidMount();
     //
     const { entityId } = this.props.match.params;
-    this.context.store.dispatch(identityManager.fetchEntityIfNeeded(entityId));
+    this.context.store.dispatch(roleManager.fetchEntityIfNeeded(entityId));
   }
 
   getNavigationKey() {
-    return 'profile-audit-profile';
+    return 'role-audit-roles';
   }
 
   render() {
-    const { identity } = this.props; // ~ codeable support
+    const { entity } = this.props; // ~ codeable support
     //
-    if (!identity) {
+    if (!entity) {
       return (
         <Basic.Loading isStatic show/>
       );
     }
-    //
     const forceSearchParameters = new SearchParameters()
       .setFilter('withVersion', true)
-      .setFilter('ownerType', 'eu.bcvsolutions.idm.core.model.entity.IdmIdentity')
-      .setFilter('ownerId', identity.id);
+      .setFilter('relatedOwnerId', entity.id)
+      .setFilter(
+        'type',
+        [
+          'eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole',
+          'eu.bcvsolutions.idm.core.model.entity.eav.IdmIdentityRoleFormValue'
+        ]
+      );
     //
     return (
       <div>
         <Helmet title={ this.i18n('title') } />
-        <EntityAuditTable
-          uiKey="identity-audit-table"
+        <EntityRolesAuditTable
+          uiKey={ `role-roles-audit-table-${ entity.id }` }
           forceSearchParameters={ forceSearchParameters }/>
       </div>
     );
   }
 }
 
-Audit.propTypes = {
-};
-
-Audit.defaultProps = {
-};
-
 function select(state, component) {
   const { entityId } = component.match.params;
+  //
   return {
-    identity: identityManager.getEntity(state, entityId)
+    entity: roleManager.getEntity(state, entityId)
   };
 }
 
-export default connect(select)(Audit);
+export default connect(select)(RoleAuditRoles);

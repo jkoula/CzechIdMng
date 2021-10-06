@@ -84,7 +84,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 
 /**
- * Implementation of service for auditing
+ * Implementation of service for auditing.
  * 
  * @see IdmAuditListener
  * @see IdmAudit
@@ -136,9 +136,17 @@ public class DefaultAuditService extends AbstractReadWriteDtoService<IdmAuditDto
 		if (transactionId != null) {
 			predicates.add(builder.equal(root.get(IdmAudit_.transactionId), transactionId));
 		}
-		// TODO: Text filtering is by id, is this really mandatory?
-		if (StringUtils.isNotEmpty(filter.getText())) {
-			predicates.add(builder.like(root.get(IdmAudit_.id).as(String.class), "%" + filter.getText().toLowerCase() + "%"));
+		// Text filtering is by id and ownerCode
+		String text = filter.getText();
+		if (StringUtils.isNotEmpty(text)) {
+			text = text.toLowerCase();
+			//
+			predicates.add(
+					builder.or(
+							builder.like(root.get(IdmAudit_.id).as(String.class), "%" + text + "%"),
+							builder.like(root.get(IdmAudit_.ownerCode), "%" + text + "%")
+					)
+			);
 		}
 
 		if (StringUtils.isNotEmpty(filter.getModification())) {

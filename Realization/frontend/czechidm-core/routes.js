@@ -484,6 +484,23 @@ module.exports = {
           path: 'authorization-policies',
           component: require('./src/content/role/AuthorizationPolicies'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUTHORIZATIONPOLICY_READ'] } ]
+        },
+        {
+          path: 'audit',
+          component: require('./src/content/role/RoleAuditRoutes'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUDIT_READ'] } ],
+          childRoutes: [
+            {
+              path: 'detail',
+              component: require('./src/content/role/RoleAudit'),
+              access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUDIT_READ'] } ]
+            },
+            {
+              path: 'roles',
+              component: require('./src/content/role/RoleAuditRoles'),
+              access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUDIT_READ'] } ]
+            }
+          ]
         }
       ]
     },

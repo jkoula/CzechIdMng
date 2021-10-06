@@ -5,17 +5,17 @@ import { connect } from 'react-redux';
 import * as Basic from '../../components/basic';
 import EntityAuditTable from '../audit/EntityAuditTable';
 import SearchParameters from '../../domain/SearchParameters';
-import { IdentityManager } from '../../redux/data';
-//
-const identityManager = new IdentityManager();
+import { RoleManager } from '../../redux/data';
+
+const roleManager = new RoleManager();
 
 /**
- * Identity audit tab.
+ * Role audit tab.
  *
- * @author Ondřej Kopr
  * @author Radek Tomiška
+ * @since 11.3.0
  */
-class Audit extends Basic.AbstractContent {
+class RoleAudit extends Basic.AbstractContent {
 
   getContentKey() {
     return 'content.audit';
@@ -25,17 +25,17 @@ class Audit extends Basic.AbstractContent {
     super.componentDidMount();
     //
     const { entityId } = this.props.match.params;
-    this.context.store.dispatch(identityManager.fetchEntityIfNeeded(entityId));
+    this.context.store.dispatch(roleManager.fetchEntityIfNeeded(entityId));
   }
 
   getNavigationKey() {
-    return 'profile-audit-profile';
+    return 'role-audit-detail';
   }
 
   render() {
-    const { identity } = this.props; // ~ codeable support
+    const { entity } = this.props; // ~ codeable support
     //
-    if (!identity) {
+    if (!entity) {
       return (
         <Basic.Loading isStatic show/>
       );
@@ -43,31 +43,24 @@ class Audit extends Basic.AbstractContent {
     //
     const forceSearchParameters = new SearchParameters()
       .setFilter('withVersion', true)
-      .setFilter('ownerType', 'eu.bcvsolutions.idm.core.model.entity.IdmIdentity')
-      .setFilter('ownerId', identity.id);
+      .setFilter('relatedOwnerId', entity.id);
     //
     return (
       <div>
         <Helmet title={ this.i18n('title') } />
         <EntityAuditTable
-          uiKey="identity-audit-table"
+          uiKey={ `role-audit-table-${ entity.id }` }
           forceSearchParameters={ forceSearchParameters }/>
       </div>
     );
   }
 }
 
-Audit.propTypes = {
-};
-
-Audit.defaultProps = {
-};
-
 function select(state, component) {
   const { entityId } = component.match.params;
   return {
-    identity: identityManager.getEntity(state, entityId)
+    entity: roleManager.getEntity(state, entityId)
   };
 }
 
-export default connect(select)(Audit);
+export default connect(select)(RoleAudit);

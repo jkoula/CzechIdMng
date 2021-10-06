@@ -20,10 +20,6 @@ const FAILED_LOGIN = 'unsuccessfulAttempts';
 */
 export class AuditIdentityLoginTable extends Advanced.AbstractTableContent {
 
-  constructor(props, context) {
-    super(props, context);
-  }
-
   getContentKey() {
     return 'content.audit.identityLogin';
   }
@@ -61,23 +57,15 @@ export class AuditIdentityLoginTable extends Advanced.AbstractTableContent {
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.TextField
                 className="pull-right"
-                rendered={!singleUserMod}
+                rendered={ !singleUserMod }
                 ref="ownerCode"
-                placeholder={this.i18n('content.audit.identities.username')}/>
+                placeholder={ this.i18n('entity.Identity._type') }
+                help={ this.i18n('content.audit.filter.identity.help') }/>
             </Basic.Col>
           </Basic.Row>
         </Basic.AbstractForm>
       </Advanced.Filter>
     );
-  }
-
-  /**
-  * Method for show detail of revision, redirect to detail
-  *
-  * @param entityId id of revision
-  */
-  showDetail(entityId) {
-    this.context.history.push(`/audit/entities/${entityId}/diff/`);
   }
 
   /**
@@ -120,16 +108,16 @@ export class AuditIdentityLoginTable extends Advanced.AbstractTableContent {
               ({ rowIndex, data }) => {
                 return (
                   <Advanced.DetailButton
-                    title={this.i18n('button.detail')}
-                    onClick={this.showDetail.bind(this, data[rowIndex].id)}/>
+                    title={ this.i18n('button.detail') }
+                    onClick={ this.showDetail.bind(this, data[rowIndex].id) }/>
                 );
               }
             }
-            sort={false}/>
+            sort={ false }/>
           <Advanced.Column
-            header={this.i18n('entity.Identity._type')}
+            header={ this.i18n('entity.Identity._type') }
             property="identity"
-            rendered={!singleUserMod}
+            rendered={ !singleUserMod }
             cell={
               ({ rowIndex, data }) => {
                 const identity = {

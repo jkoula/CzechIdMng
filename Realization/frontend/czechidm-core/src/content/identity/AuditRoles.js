@@ -8,7 +8,7 @@ import { IdentityManager } from '../../redux/data';
 const identityManager = new IdentityManager();
 
 /**
- * Audit of roles
+ * Audit of roles.
  *
  * @author Ondrej Kopr
  * @since 9.5.0
@@ -20,14 +20,19 @@ class AuditRoles extends Basic.AbstractContent {
   }
 
   componentDidMount() {
+    super.componentDidMount();
     const { entityId } = this.props.match.params;
-    this.selectNavigationItems(['identities', 'profile-audit', 'profile-audit-roles']);
-    this.context.store.dispatch(identityManager.fetchEntity(entityId));
+    //
+    this.context.store.dispatch(identityManager.fetchEntityIfNeeded(entityId));
+  }
+
+  getNavigationKey() {
+    return 'profile-audit-roles';
   }
 
   render() {
     const { identity } = this.props;
-
+    //
     if (!identity) {
       return (
         <Basic.Div showLoading>
@@ -35,13 +40,14 @@ class AuditRoles extends Basic.AbstractContent {
         </Basic.Div>
       );
     }
+    //
     return (
       <div>
         <Helmet title={this.i18n('title')} />
         <AuditIdentityRolesTable
           singleUserMod
-          id={identity.id}
-          uiKey={`identity-roles-audit-table-${identity.id}`}/>
+          id={ identity.id }
+          uiKey={ `identity-roles-audit-table-${ identity.id }` }/>
       </div>
     );
   }

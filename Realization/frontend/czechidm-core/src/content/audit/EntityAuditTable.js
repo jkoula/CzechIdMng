@@ -3,22 +3,21 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 //
-import * as Utils from '../../../utils';
-import * as Basic from '../../../components/basic';
-import * as Advanced from '../../../components/advanced';
-import { AuditManager } from '../../../redux';
-import AuditModificationEnum from '../../../enums/AuditModificationEnum';
-import SearchParameters from '../../../domain/SearchParameters';
+import * as Utils from '../../utils';
+import * as Basic from '../../components/basic';
+import * as Advanced from '../../components/advanced';
+import { AuditManager } from '../../redux';
+import AuditModificationEnum from '../../enums/AuditModificationEnum';
 
 const auditManager = new AuditManager();
 
 /**
-* Table of Audit for identities.
+* Audit for selected entity / owner. Used on entity detail.
 *
-* @author Ondřej Kopr
 * @author Radek Tomiška
+* @since 11.3.0
 */
-export class AuditIdentityTable extends Advanced.AbstractTableContent {
+export class EntityAuditTable extends Advanced.AbstractTableContent {
 
   getContentKey() {
     return 'content.audit';
@@ -52,21 +51,7 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
   * @param entityId id of revision
   */
   showDetail(entityId) {
-    this.context.history.push(`/audit/entities/${entityId}/diff/`);
-  }
-
-  _getForceSearchParameters() {
-    const { username, id } = this.props;
-    let forceSearchParameters = new SearchParameters('entity')
-      .setFilter('withVersion', true)
-      .setFilter('ownerType', 'eu.bcvsolutions.idm.core.model.entity.IdmIdentity'); // TODO: this isn't best way, hard writen class
-    if (username) {
-      forceSearchParameters = forceSearchParameters.setFilter('ownerCode', username);
-    }
-    if (id) {
-      forceSearchParameters = forceSearchParameters.setFilter('ownerId', id);
-    }
-    return forceSearchParameters;
+    this.context.history.push(`/audit/entities/${ entityId }/diff/`);
   }
 
   _getNiceLabelForOwner(ownerType, ownerCode) {
@@ -77,7 +62,7 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
   }
 
   render() {
-    const { uiKey, singleUserMod, auditedEntities, columns } = this.props;
+    const { uiKey, auditedEntities, forceSearchParameters } = this.props;
     //
     return (
       <div>
@@ -86,8 +71,8 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
           filterOpened
           uiKey={ uiKey }
           manager={ auditManager }
-          forceSearchParameters={ this._getForceSearchParameters() }
-          rowClass={({rowIndex, data}) => { return Utils.Ui.getRowClass(data[rowIndex]); }}
+          forceSearchParameters={ forceSearchParameters }
+          rowClass={({ rowIndex, data }) => { return Utils.Ui.getRowClass(data[rowIndex]); }}
           showId
           filter={
             <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
@@ -109,29 +94,11 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
                       options={ auditedEntities }/>
                   </Basic.Col>
                   <Basic.Col lg={ 4 }>
-                    <Advanced.Filter.EnumSelectBox
-                      ref="modification"
-                      placeholder={ this.i18n('entity.Audit.modification') }
-                      enum={ AuditModificationEnum }/>
-                  </Basic.Col>
-                  <Basic.Col lg={ 4 }>
                     <Advanced.Filter.TextField
+                      className="pull-right"
                       ref="modifier"
-                      placeholder={ this.i18n('entity.Audit.modifier') }
+                      placeholder={ this.i18n('content.audit.identities.modifier') }
                       help={ this.i18n('content.audit.filter.modifier.help') }/>
-                  </Basic.Col>
-                </Basic.Row>
-                <Basic.Row rendered={ !singleUserMod }>
-                  <Basic.Col lg={ 4 }>
-                    <Advanced.Filter.TextField
-                      ref="ownerCode"
-                      placeholder={ this.i18n('entity.Identity._type') }
-                      help={ this.i18n('content.audit.filter.identity.help') }/>
-                  </Basic.Col>
-                  <Basic.Col lg={ 4 }>
-                    <Advanced.Filter.TextField
-                      ref="entityId"
-                      placeholder={ this.i18n('content.audit.identities.identityId') }/>
                   </Basic.Col>
                 </Basic.Row>
                 <Basic.Row className="last">
@@ -153,19 +120,19 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
               ({ rowIndex, data }) => {
                 return (
                   <Advanced.DetailButton
-                    title={this.i18n('button.detail')}
-                    onClick={this.showDetail.bind(this, data[rowIndex].id)}/>
+                    title={ this.i18n('button.detail') }
+                    onClick={ this.showDetail.bind(this, data[rowIndex].id) }/>
                 );
               }
             }
-            sort={false}/>
+            sort={ false }/>
           <Advanced.Column
             property="type"
             width={ 200 }
             cell={
               ({ rowIndex, data, property }) => {
                 return (
-                  <span title={data[rowIndex][property]}>
+                  <span title={ data[rowIndex][property] }>
                     { Utils.Ui.getSimpleJavaType(data[rowIndex][property]) }
                   </span>
                 );
@@ -210,17 +177,6 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
               }
             }/>
           <Advanced.Column
-            property="ownerCode"
-            header={ this.i18n('entity.Identity._type') }
-            face="text"
-            rendered={ !singleUserMod }
-            cell={
-              ({ rowIndex, data }) => {
-                return this._getNiceLabelForOwner(data[rowIndex].ownerType, data[rowIndex].ownerCode);
-              }
-            }
-          />
-          <Advanced.Column
             property="subOwnerCode"
             face="text"
             cell={
@@ -237,8 +193,8 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
               ({ rowIndex, data, property }) => {
                 return (
                   <Basic.Label
-                    level={AuditModificationEnum.getLevel(data[rowIndex][property])}
-                    text={AuditModificationEnum.getNiceLabel(data[rowIndex][property])}/>
+                    level={ AuditModificationEnum.getLevel(data[rowIndex][property]) }
+                    text={ AuditModificationEnum.getNiceLabel(data[rowIndex][property]) }/>
                 );
               }
             }/>
@@ -259,15 +215,12 @@ export class AuditIdentityTable extends Advanced.AbstractTableContent {
   }
 }
 
-AuditIdentityTable.propTypes = {
+EntityAuditTable.propTypes = {
   uiKey: PropTypes.string.isRequired,
-  username: PropTypes.string,
-  singleUserMod: PropTypes.boolean,
-  id: PropTypes.string
-};
-
-AuditIdentityTable.defaultProps = {
-  singleUserMod: false
+  /**
+   * Selected entity force search parameters.
+   */
+  forceSearchParameters: PropTypes.object.isRequired
 };
 
 function select(state, component) {
@@ -277,4 +230,4 @@ function select(state, component) {
   };
 }
 
-export default connect(select)(AuditIdentityTable);
+export default connect(select)(EntityAuditTable);
