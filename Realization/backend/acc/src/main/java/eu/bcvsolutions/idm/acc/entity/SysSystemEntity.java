@@ -14,6 +14,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.envers.Audited;
+
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
@@ -35,21 +37,25 @@ public class SysSystemEntity extends AbstractEntity {
 	
 	private static final long serialVersionUID = -8243399066902498023L;
 
+	@Audited
 	@NotEmpty
 	@Size(min = 1, max = DefaultFieldLengths.UID)
 	@Column(name = "uid", length = DefaultFieldLengths.UID, nullable = false)
 	private String uid;
 	
+	@Audited
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type", nullable = false)
 	private SystemEntityType entityType;
 	
+	@Audited
 	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "system_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private SysSystem system;
 	
+	@Audited
 	@NotNull
 	@Column(name = "wish", nullable = false)
 	private boolean wish = true; // prepared system entity for provisioning. wish = false, then entity exists on target system
