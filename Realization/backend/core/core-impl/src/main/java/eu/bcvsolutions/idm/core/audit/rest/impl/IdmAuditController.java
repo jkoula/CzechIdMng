@@ -391,7 +391,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 			} catch (IllegalArgumentException ex) {
 				LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getSubOwnerType(), ex);
 			} catch (Exception ex) {
-				LOG.debug("Type [{}] cannot be mapped to dto.", dto.getType(), ex);
+				LOG.debug("Type [{}] cannot be mapped to dto.", dto.getSubOwnerId(), ex);
 			}
 		}
 		// For owner, some entities doesn't support owner and subowner.
@@ -405,7 +405,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 			} catch (IllegalArgumentException ex) {
 				LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getSubOwnerType(), ex);
 			} catch (Exception ex) {
-				LOG.debug("Type [{}] cannot be mapped to dto.", dto.getType(), ex);
+				LOG.debug("Entity [{}] cannot be mapped to dto.", dto.getOwnerId(), ex);
 			}
 		}
 		// Fill embedded contract for FE agenda (prevent to load contract for each row).
