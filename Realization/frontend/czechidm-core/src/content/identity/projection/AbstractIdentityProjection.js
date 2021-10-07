@@ -702,6 +702,9 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
       data._eav = this.refs.eav.getValues();
     }
     // construct projection
+    if (isNew) {
+      data.id = uuid.v1(); // generate new uuid to support permalink to new identity content
+    }
     const _identityProjection = {
       id: data.id,
       identity: data
