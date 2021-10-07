@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -84,8 +82,8 @@ public class DefaultMonitoringManager implements MonitoringManager {
 	/**
 	 * Init last result cache, when instance is started
 	 */
-	@PostConstruct
-	protected void init() {
+	@Override
+	public void init() {
 		String instanceId = configurationService.getInstanceId();
 		int counter = 0;
 		//

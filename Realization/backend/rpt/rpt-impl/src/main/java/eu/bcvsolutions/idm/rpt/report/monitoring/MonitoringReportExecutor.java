@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonEncoding;
@@ -41,7 +42,7 @@ public class MonitoringReportExecutor extends AbstractReportExecutor {
 
 	public static final String REPORT_NAME = "core-monitoring-report"; // report ~ executor name
 	//
-	@Autowired private MonitoringManager monitoringManager;
+	@Autowired @Lazy private MonitoringManager monitoringManager;
 
 	@Override
 	public String getName() {
