@@ -374,7 +374,7 @@ public class IdmAuditController extends AbstractReadWriteDtoController<IdmAuditD
 							getLookupService().toDto((BaseEntity) lastPersistedVersion, null, context)
 					);
 				}
-			} catch (Exception ex) {
+			} catch (IllegalArgumentException | ClassNotFoundException ex) {
 				LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getType(), ex);
 			} catch (Exception ex) {
 				LOG.debug("Type [{}] cannot be mapped to dto.", dto.getType(), ex);
