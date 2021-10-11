@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.rpt.report.general;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
  * @param <D>
  * @param <F>
  */
-public abstract class AbstractFormableEntityExport<D extends FormableDto, F extends BaseFilter> extends AbstractEntityExport<D, F> {
+public abstract class AbstractFormableEntityExport<D extends AbstractDto, F extends BaseFilter> extends AbstractEntityExport<D, F> {
 
 	private final FormService formService;
 
@@ -44,13 +45,16 @@ public abstract class AbstractFormableEntityExport<D extends FormableDto, F exte
 	protected Map<String, String> tramsformToMap(D dto) {
 		Map<String, String> map = super.tramsformToMap(dto);
 		//
-		List<IdmFormDefinitionDto> definitions = formService.getDefinitions(dto, IdmBasePermission.AUTOCOMPLETE);
-		List<IdmFormInstanceDto> formInstances = definitions
-				.stream()
-				.map(d -> formService.getFormInstance(dto, d, IdmBasePermission.READ))
-				.collect(Collectors.toList());
-		//
-		formInstances.forEach(formInstance -> processFormInstance(map, formInstance, dto.getEavs().size() > 1));
+		if (dto instanceof FormableDto) {
+			List<IdmFormDefinitionDto> definitions = formService.getDefinitions(dto, IdmBasePermission.AUTOCOMPLETE);
+			List<IdmFormInstanceDto> formInstances = definitions
+					.stream()
+					.map(d -> formService.getFormInstance(dto, d, IdmBasePermission.READ))
+					.collect(Collectors.toList());
+			//
+			FormableDto formableDto = (FormableDto) dto;
+			formInstances.forEach(formInstance -> processFormInstance(map, formInstance, formableDto.getEavs().size() > 1));
+		}
 		return map;
 	}
 

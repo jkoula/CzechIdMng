@@ -13,6 +13,11 @@ const uiKeyLogs = 'system-synchronization-item-logs';
 const syncItemLogManager = new SyncItemLogManager();
 const syncActionLogManager = new SyncActionLogManager();
 
+/**
+ * Detail for sync action.
+ *
+ * @author Vít Švanda
+ */
 class SystemSyncActionLogDetail extends Advanced.AbstractTableContent {
 
   constructor(props, context) {
@@ -64,7 +69,8 @@ class SystemSyncActionLogDetail extends Advanced.AbstractTableContent {
 
   render() {
     const { _showLoading, _syncActionLog} = this.props;
-    const forceSearchParameters = new Domain.SearchParameters().setFilter('syncActionLogId', _syncActionLog ? _syncActionLog.id : Domain.SearchParameters.BLANK_UUID);
+    const forceSearchParameters = new Domain.SearchParameters()
+      .setFilter('syncActionLogId', _syncActionLog ? _syncActionLog.id : Domain.SearchParameters.BLANK_UUID);
     const syncActionLog = _syncActionLog;
 
     return (
@@ -75,29 +81,31 @@ class SystemSyncActionLogDetail extends Advanced.AbstractTableContent {
         <Basic.ContentHeader>
           <span dangerouslySetInnerHTML={{ __html: this.i18n('header') }}/>
         </Basic.ContentHeader>
-          <Basic.Panel className="no-border">
-            <Basic.AbstractForm readOnly ref="form" data={syncActionLog} showLoading={_showLoading}>
-              <Basic.EnumSelectBox
-                ref="syncAction"
-                enum={SynchronizationActionTypeEnum}
-                label={this.i18n('acc:entity.SyncActionLog.syncAction')}/>
-              <Basic.EnumSelectBox
-                ref="operationResult"
-                enum={OperationResultTypeEnum}
-                label={this.i18n('acc:entity.SyncActionLog.operationResult')}/>
-              <Basic.TextField
-                ref="operationCount"
-                label={this.i18n('acc:entity.SyncActionLog.operationCount')}/>
-            </Basic.AbstractForm>
-            <Basic.PanelFooter>
-              <Basic.Button type="button" level="link"
-                onClick={this.context.history.goBack}
-                showLoading={_showLoading}>
-                {this.i18n('button.back')}
-              </Basic.Button>
-            </Basic.PanelFooter>
-          </Basic.Panel>
-        <Basic.ContentHeader rendered={syncActionLog} style={{ marginBottom: 0 }}>
+        <Basic.Panel className="no-border">
+          <Basic.AbstractForm readOnly ref="form" data={syncActionLog} showLoading={_showLoading}>
+            <Basic.EnumSelectBox
+              ref="syncAction"
+              enum={SynchronizationActionTypeEnum}
+              label={this.i18n('acc:entity.SyncActionLog.syncAction')}/>
+            <Basic.EnumSelectBox
+              ref="operationResult"
+              enum={OperationResultTypeEnum}
+              label={this.i18n('acc:entity.SyncActionLog.operationResult')}/>
+            <Basic.TextField
+              ref="operationCount"
+              label={this.i18n('acc:entity.SyncActionLog.operationCount')}/>
+          </Basic.AbstractForm>
+          <Basic.PanelFooter>
+            <Basic.Button
+              type="button"
+              level="link"
+              onClick={this.context.history.goBack}
+              showLoading={_showLoading}>
+              {this.i18n('button.back')}
+            </Basic.Button>
+          </Basic.PanelFooter>
+        </Basic.Panel>
+        <Basic.ContentHeader rendered={syncActionLog}>
           <Basic.Icon value="transfer"/>
           {' '}
           <span dangerouslySetInnerHTML={{ __html: this.i18n('syncItemLogsHeader') }}/>
@@ -106,6 +114,7 @@ class SystemSyncActionLogDetail extends Advanced.AbstractTableContent {
           <Advanced.Table
             ref="table"
             uiKey={uiKeyLogs}
+            showRowSelection
             manager={syncItemLogManager}
             forceSearchParameters={forceSearchParameters}
             filter={
@@ -125,7 +134,7 @@ class SystemSyncActionLogDetail extends Advanced.AbstractTableContent {
                 </Basic.AbstractForm>
               </Advanced.Filter>
             }
-            >
+          >
             <Advanced.Column
               property=""
               header=""
@@ -140,28 +149,27 @@ class SystemSyncActionLogDetail extends Advanced.AbstractTableContent {
                 }
               }/>
             <Advanced.Column
-               property="displayName"
-               header={this.i18n('acc:entity.SyncItemLog.displayName')}
-               sort/>
+              property="displayName"
+              header={this.i18n('acc:entity.SyncItemLog.displayName')}
+              sort/>
             <Advanced.Column
-               property="message"
-               header={this.i18n('acc:entity.SyncItemLog.message')}
-               sort/>
+              property="message"
+              header={this.i18n('acc:entity.SyncItemLog.message')}
+              sort/>
             <Advanced.Column
-               property="type"
-               header={this.i18n('acc:entity.SyncItemLog.type')}
-               sort/>
+              property="type"
+              header={this.i18n('acc:entity.SyncItemLog.type')}
+              sort/>
             <Advanced.Column
-               property="identification"
-               header={this.i18n('acc:entity.SyncItemLog.identification')}
-               sort/>
-            </Advanced.Table>
-          </Basic.Panel>
-        </div>
+              property="identification"
+              header={this.i18n('acc:entity.SyncItemLog.identification')}
+              sort/>
+          </Advanced.Table>
+        </Basic.Panel>
+      </div>
     );
   }
 }
-
 
 SystemSyncActionLogDetail.propTypes = {
   _showLoading: PropTypes.bool,

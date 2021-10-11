@@ -81,8 +81,11 @@ public class FormableEntityXlsxRenderer extends AbstractXlsxRenderer implements 
 		Row row = sheet.createRow(rowNum++);
 
 		item.forEach((key, val) -> {
-			Cell cell = row.createCell(header.indexOf(key));
-			cell.setCellValue(val == null ? "" : val.toString());
+			int index = header.indexOf(key);
+			if (index >= 0) {
+				Cell cell = row.createCell(index);
+				cell.setCellValue(val == null ? "" : val.toString());
+			}
 		});
 
 		return rowNum;

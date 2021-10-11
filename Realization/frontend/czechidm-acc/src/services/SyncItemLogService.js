@@ -1,11 +1,6 @@
-import { Services } from 'czechidm-core';
-import { Domain } from 'czechidm-core';
+import { Services, Domain } from 'czechidm-core';
 
 export default class SyncItemLogService extends Services.AbstractService {
-
-  constructor() {
-    super();
-  }
 
   // dto
   supportsPatch() {
@@ -21,6 +16,10 @@ export default class SyncItemLogService extends Services.AbstractService {
 
   getApiPath() {
     return '/system-synchronization-item-logs';
+  }
+
+  supportsBulkAction() {
+    return true;
   }
 
   getDefaultSearchParameters() {

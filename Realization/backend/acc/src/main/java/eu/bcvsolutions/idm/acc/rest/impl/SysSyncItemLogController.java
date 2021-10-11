@@ -1,5 +1,9 @@
 package eu.bcvsolutions.idm.acc.rest.impl;
 
+import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
+import eu.bcvsolutions.idm.core.api.dto.ResultModels;
+import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -139,6 +144,64 @@ public class SysSyncItemLogController
 			@PathVariable @NotNull String backendId) {
 		return super.delete(backendId);
 	}
+
+
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/bulk/actions", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
+	@ApiOperation(
+			value = "Get available bulk actions",
+			nickname = "availableBulkAction",
+			tags = { SysSyncItemLogController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "") })
+			})
+	public List<IdmBulkActionDto> getAvailableBulkActions() {
+		return super.getAvailableBulkActions();
+	}
+
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/action", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
+	@ApiOperation(
+			value = "Process bulk action for sync log",
+			nickname = "bulkAction",
+			response = IdmBulkActionDto.class,
+			tags = { SysSyncItemLogController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")})
+			})
+	public ResponseEntity<IdmBulkActionDto> bulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.bulkAction(bulkAction);
+	}
+
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/prevalidate", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
+	@ApiOperation(
+			value = "Prevalidate bulk action for sync log",
+			nickname = "prevalidateBulkAction",
+			response = IdmBulkActionDto.class,
+			tags = { SysSyncItemLogController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")})
+			})
+	public ResponseEntity<ResultModels> prevalidateBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.prevalidateBulkAction(bulkAction);
+	}
+
 
 	@Override
 	protected SysSyncItemLogFilter toFilter(MultiValueMap<String, Object> parameters) {
