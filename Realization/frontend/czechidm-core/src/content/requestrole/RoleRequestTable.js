@@ -152,9 +152,9 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
               <Basic.AbstractForm ref="filterForm">
                 <Basic.Row>
                   <Basic.Col lg={ 3 }>
-                    <Advanced.Filter.TextField
-                      ref="applicant"
-                      placeholder={this.i18n('filter.applicant.placeholder')}/>
+                    <Advanced.Filter.IdentitySelect
+                      ref="creator"
+                      placeholder={this.i18n('filter.creator.placeholder')}/>
                   </Basic.Col>
                   <Basic.Col lg={ 3 }>
                     <Advanced.Filter.EnumSelectBox

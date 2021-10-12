@@ -2651,7 +2651,7 @@
       },
       "filter": {
         "applicant":{
-          "placeholder": "Vyhledání dle celého uživatelského jména žadatele"
+          "placeholder": "Vyhledání dle celého uživatelského jména toho pro koho se žádá"
         },
         "states":{
           "placeholder": "Stav v IdM"
@@ -2664,6 +2664,9 @@
         },
         "applicants":{
           "placeholder": "Žádost pro"
+        },
+        "creator":{
+          "placeholder": "Žadatel (kdo vytvořil žádost)"
         },
         "systemStates":{
           "placeholder": "Stav na systémech"

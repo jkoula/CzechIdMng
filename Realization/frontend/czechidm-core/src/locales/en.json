@@ -2601,7 +2601,7 @@
       },
       "filter": {
         "applicant":{
-          "placeholder": "Search by whole username applicant."
+          "placeholder": "Search by whole username (requested for)"
         },
         "states":{
           "placeholder": "States in IdM"
@@ -2613,10 +2613,13 @@
           "placeholder": "Created to"
         },
         "applicants":{
-          "placeholder": "Applicants"
+          "placeholder": "Requested for"
         },
         "systemStates":{
           "placeholder": "States in systems"
+        },
+        "creator":{
+          "placeholder": "Applicant (who created a request)"
         }
       }
     },
