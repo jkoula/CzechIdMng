@@ -388,6 +388,10 @@
           "text": {
             "label": "Identifier",
             "placeholder": "$t(acc:entity.SystemEntity.uid)"
+          },
+          "attributeName": {
+            "label": "Attributes filter",
+            "placeholder": "Filter by attribute name"
           }
         }
       },

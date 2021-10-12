@@ -388,6 +388,10 @@
           "text": {
             "label": "Identifikátor",
             "placeholder": "$t(acc:entity.SystemEntity.uid)"
+          },
+          "attributeName": {
+            "label": "Filtr atributů",
+            "placeholder": "Filtr dle názvu atributu"
           }
         }
       },

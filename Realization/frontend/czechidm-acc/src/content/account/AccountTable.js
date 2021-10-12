@@ -24,7 +24,8 @@ export class AccountTable extends Advanced.AbstractTableContent {
     super(props, context);
     this.state = {
       ...this.state,
-      systemEntity: null
+      systemEntity: null,
+      attributeNameFilter: null
     };
   }
 
@@ -99,6 +100,34 @@ export class AccountTable extends Advanced.AbstractTableContent {
     return Utils.Ui.getSimpleJavaType(name);
   }
 
+  _useAttributesFilter(event) {
+    const attributeNameFilterComponent = this.refs.attributeNameFilter;
+    if (attributeNameFilterComponent) {
+      const attributeNameFilter = attributeNameFilterComponent.getValue();
+      this.setState({attributeNameFilter});
+    }
+  }
+
+  _cancelAttributesFilter(event) {
+    this.setState({attributeNameFilter: null});
+  }
+
+  /**
+   * Filter of attributes by name (only on FE).
+   * @param connectorObject
+   */
+  _applyAttributeFilter(connectorObject) {
+    const {attributeNameFilter} = this.state;
+
+    if (!connectorObject || !connectorObject.attributes || !attributeNameFilter) {
+      return connectorObject;
+    }
+    let attributes = connectorObject.attributes;
+    attributes = attributes.filter(attribute => attribute.name.toLowerCase().includes(attributeNameFilter.toLowerCase()));
+
+    return {attributes};
+  }
+
   renderTargetEntity({rowIndex, data}) {
     return (
       <Advanced.EntityInfo
@@ -129,7 +158,9 @@ export class AccountTable extends Advanced.AbstractTableContent {
     if (forceSearchParameters.getFilters().has('systemId')) {
       systemId = forceSearchParameters.getFilters().get('systemId');
     }
-    //
+
+    const _connectorObject = this._applyAttributeFilter(connectorObject);
+
     return (
       <Basic.Div>
         <Basic.Confirm ref="confirm-delete" level="danger"/>
@@ -312,8 +343,7 @@ export class AccountTable extends Advanced.AbstractTableContent {
                 <Basic.Checkbox
                   ref="inProtection"
                   label={ this.i18n('acc:entity.Account.inProtection') }
-                  readOnly>
-                </Basic.Checkbox>
+                  readOnly />
                 <Basic.DateTimePicker
                   mode="datetime"
                   ref="endOfProtection"
@@ -323,11 +353,24 @@ export class AccountTable extends Advanced.AbstractTableContent {
               </Basic.AbstractForm>
 
               <Basic.Div rendered={ Managers.SecurityManager.hasAuthority('SYSTEM_READ')}>
-                <Basic.ContentHeader text={ this.i18n('acc:entity.SystemEntity.attributes') } rendered={ !Utils.Entity.isNew(detail.entity) }/>
-
+                <Basic.ContentHeader text={this.i18n('acc:entity.SystemEntity.attributes')} rendered={!Utils.Entity.isNew(detail.entity)}/>
+                <Basic.AbstractForm ref="filterForm">
+                  <Basic.Row>
+                    <Basic.Col lg={8}>
+                      <Advanced.Filter.TextField
+                        ref="attributeNameFilter"
+                        placeholder={this.i18n('acc:content.system.accounts.filter.attributeName.placeholder')}/>
+                    </Basic.Col>
+                    <Basic.Col lg={4} className="text-right">
+                      <Advanced.Filter.FilterButtons
+                        useFilter={this._useAttributesFilter.bind(this)}
+                        cancelFilter={this._cancelAttributesFilter.bind(this)}/>
+                    </Basic.Col>
+                  </Basic.Row>
+                </Basic.AbstractForm>
                 <Basic.Table
                   showLoading={ !connectorObject && !this.state.hasOwnProperty('connectorObject') }
-                  data={ connectorObject ? connectorObject.attributes : null }
+                  data={ _connectorObject ? _connectorObject.attributes : null }
                   noData={ this.i18n('component.basic.Table.noData') }
                   className="table-bordered"
                   rendered={ !Utils.Entity.isNew(detail.entity) }>
@@ -438,9 +481,7 @@ class Filter extends Advanced.Filter {
                 enum={ SystemEntityTypeEnum }
                 rendered={ !forceSearchParameters.getFilters().has('entityType') }/>
             </Basic.Col>
-            <Basic.Col lg={ 4 }>
-
-            </Basic.Col>
+            <Basic.Col lg={ 4 } />
           </Basic.Row>
         </Basic.AbstractForm>
       </Advanced.Filter>
