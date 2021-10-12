@@ -86,7 +86,7 @@ function MaterialPopover(props) {
     if (onExit) {
       onExit();
     }
-    handlePopoverClose();
+    handlePopoverClose(event);
   };
   //
   const classNames = classnames(
@@ -126,6 +126,10 @@ function MaterialPopover(props) {
         { children }
       </Typography>
       <Popover
+        disableEnforceFocus={ hasHoverTrigger }
+        disableAutoFocus={ hasHoverTrigger}
+        disableScrollLock={ hasHoverTrigger }
+        disableRestoreFocus={ hasHoverTrigger }
         id={ _id }
         open={ open }
         onEnter={ onEnter }
@@ -142,13 +146,49 @@ function MaterialPopover(props) {
         className={ classNames }
         classes={{
           paper: classes.paper,
-        }}
-        disableRestoreFocus={ hasHoverTrigger }>
+        }}>
         { content }
       </Popover>
     </>
   );
 }
+MaterialPopover.propTypes = {
+  ...AbstractContextComponent.propTypes,
+  /**
+   * Popover identifier
+   */
+  id: PropTypes.string,
+  /**
+   * Popover position
+   */
+  placement: PropTypes.oneOf(['top', 'bottom', 'right', 'left']),
+  /**
+   * Popover header
+   */
+  title: PropTypes.string,
+  /**
+   * Popover level / css / class
+   */
+  level: PropTypes.oneOf(['default', 'warning']),
+  /**
+   * Popover value / text
+   */
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  /**
+   * Popover value / text - alias to value
+   */
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  /**
+   * Specify which action or actions trigger popover visibility.
+   *
+   * - hover has higher priority
+   */
+  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover'])),
+  /**
+   * Specify whether the overlay should trigger onHide when the user clicks outside the overlay
+   */
+  rootClose: PropTypes.bool
+};
 MaterialPopover.defaultProps = {
   ...AbstractContextComponent.defaultProps,
   level: 'default',
@@ -278,7 +318,7 @@ BasicPopover.propTypes = {
   /**
    * Specify which action or actions trigger popover visibility
    */
-  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover'])),
+  trigger: PropTypes.oneOf(['click', 'hover']),
   /**
    * Specify whether the overlay should trigger onHide when the user clicks outside the overlay
    */

@@ -30,7 +30,9 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
       error: null,
       showAuditableInfo: false,
       expandInfo,
-      showSystemInformation: !context.store ? false : ConfigurationManager.showSystemInformation(context.store.getState())
+      showSystemInformation: (
+        props.showSystemInformation && (!context.store ? false : ConfigurationManager.showSystemInformation(context.store.getState()))
+      )
     };
   }
 
@@ -381,11 +383,11 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
    * Renders popover info card
    */
   _renderPopover(entity) {
-    const { style } = this.props;
+    const { style, trigger } = this.props;
     //
     return (
       <Basic.Popover
-        trigger={ ['click'] }
+        trigger={ trigger }
         value={ this._renderFull(entity) }
         className="abstract-entity-info-popover"
         onEnter={ this.onEnter.bind(this) }>
@@ -577,7 +579,19 @@ AbstractEntityInfo.propTypes = {
   /**
    * Directly set level.
    */
-  level: PropTypes.oneOf(['warning', 'success', 'info'])
+  level: PropTypes.oneOf(['warning', 'success', 'info']),
+  /**
+   * Specify which action or actions trigger popover visibility
+   *
+   * @since 12.0.0
+   */
+  trigger: PropTypes.oneOf(['click', 'hover']),
+  /**
+   * Show system information.
+   *
+   * @since 12.0.0
+   */
+  showSystemInformation: PropTypes.bool
 };
 AbstractEntityInfo.defaultProps = {
   ...Basic.AbstractContextComponent.defaultProps,
@@ -585,5 +599,7 @@ AbstractEntityInfo.defaultProps = {
   showLink: true,
   showIcon: false,
   collapsable: false,
-  collapse: false
+  collapse: false,
+  trigger: 'click',
+  showSystemInformation: true
 };

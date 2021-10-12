@@ -261,7 +261,15 @@ export class IdentityInfo extends AbstractEntityInfo {
                     )
                   }
                   {
-                    !this.isDevelopment() || this.isDisabled(_entity) || !_permissions || !Utils.Permission.hasPermission(_permissions, 'SWITCHUSER')
+                    !this.isDevelopment()
+                    ||
+                    !this.showLink()
+                    ||
+                    this.isDisabled(_entity)
+                    ||
+                    !_permissions
+                    ||
+                    !Utils.Permission.hasPermission(_permissions, 'SWITCHUSER')
                     ||
                     this.renderRow(null, (
                       <a

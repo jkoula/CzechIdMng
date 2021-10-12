@@ -93,9 +93,7 @@ function NavigationSearch(props, context) {
       event.stopPropagation();
     }
 
-    if (event && event.target &&
-      (event.target.className.includes('entity-info')
-        || event.target.className.includes('basic-icon'))) {
+    if (event && event.target && event.target.className.includes('basic-icon')) {
       // User clicked on info component, select event will be stopped now.
       // Workaround: The 'basic-icon' is here only because three in role-info (I need to stop select event if user clicked on tree).
       return;
@@ -155,8 +153,10 @@ function NavigationSearch(props, context) {
                     entityType={UiUtils.getSimpleJavaType(fullObject.ownerType)}
                     entityIdentifier={fullObject.ownerId}
                     face="popover"
+                    trigger="hover"
                     entity={fullObject.ownerDto}
-                    showLink
+                    showLink={ false }
+                    showSystemInformation={ false }
                     showEntityType
                     showIcon/>
                 </Div>
