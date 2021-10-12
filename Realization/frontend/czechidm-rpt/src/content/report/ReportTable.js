@@ -257,13 +257,13 @@ export class ReportTable extends Advanced.AbstractTableContent {
           [...enabledRenderers.map(renderer => {
             return (
               <a
-                key={ `rep-${renderer.id}-${entity.id}` }
+                key={ `rep-${ renderer.id }-${ entity.id }` }
                 href={ this.getManager().getService().getDownloadUrl(entity.id, renderer.name) }
                 target="_blank"
                 rel="noopener noreferrer"
                 download
                 title={ this.i18n('action.download.title', { report: entity.name, renderer: renderer.description }) }
-                className={ `btn btn-primary ${className}` }
+                className={ `btn btn-primary ${ className }` }
                 style={{ color: 'white', marginLeft: 3 }}>
                 <Basic.Icon value="fa:download" />
                 {' '}
@@ -553,102 +553,101 @@ export class ReportTable extends Advanced.AbstractTableContent {
           backdrop="static"
           keyboard={ !showLoadingDetail }
           showLoading={ showLoadingDetail }>
-          {
-            showLoadingDetail
-            ||
+          <Basic.Modal.Header
+            closeButton={ !showLoadingDetail }
+            buttons={[
+              <Advanced.AuditableInfo entity={ recover ? null : detail.entity } placement="bottom" />
+            ]}
+            text={ this._getModalHeader(detail.entity, recover) }/>
+          <Basic.Modal.Body>
             <form onSubmit={ this.createReport.bind(this, recover) }>
-              <Basic.Modal.Header
-                closeButton={ !showLoadingDetail }
-                buttons={[
-                  <Advanced.AuditableInfo entity={ recover ? null : detail.entity } placement="bottom" />
-                ]}
-                text={ this._getModalHeader(detail.entity, recover) }/>
-              <Basic.Modal.Body>
-                <Basic.Loading isStatic show={ showLoadingDetail }/>
-                <Basic.AbstractForm
-                  ref="form"
-                  readOnly={ recover ? false : !Utils.Entity.isNew(detail.entity) }
-                  className={ showLoadingDetail ? 'hidden' : '' }>
-                  <Basic.EnumSelectBox
-                    ref="executorName"
-                    label={ this.i18n('rpt:entity.Report._type') }
-                    options={ _supportedReports }
-                    onChange={ this.onChangeReport.bind(this) }
-                    readOnly={ recover ? true : !Utils.Entity.isNew(detail.entity) }
-                    required
-                    positionRelative
-                    searchable/>
-                  {
-                    !report || !report.formDefinition
-                    ||
-                    <Advanced.EavForm
-                      key={ `form-instance-detail-${ detail.entity.id }` }
-                      ref="reportFilter"
-                      formInstance={
-                        new Domain.FormInstance(
-                          report.formDefinition,
-                          detail.entity && detail.entity.filter ? detail.entity.filter.values : null
-                        )
-                      }
-                      readOnly={ !recover && !Utils.Entity.isNew(detail.entity) }
-                      useDefaultValue={ recover || Utils.Entity.isNew(detail.entity) }/>
-                  }
-                  {
-                    !longRunningTask || recover
-                    ||
-                    <Basic.Div>
-                      <Basic.Row>
-                        <Basic.Col lg={ 6 }>
-                          <Basic.LabelWrapper label={this.i18n('entity.LongRunningTask.counter')}>
-                            { longRunningTaskManager.getProcessedCount(longRunningTask) }
-                          </Basic.LabelWrapper>
-                        </Basic.Col>
-                        <Basic.Col lg={ 6 }>
-                          {
-                            !longRunningTask.taskStarted
-                            ||
-                            <Basic.LabelWrapper label={ this.i18n('entity.LongRunningTask.duration') }>
-                              <Basic.TimeDuration
-                                start={ longRunningTask.taskStarted }
-                                end={ longRunningTask.taskEnded || longRunningTask.modified }
-                                humanized/>
-                            </Basic.LabelWrapper>
-                          }
-                        </Basic.Col>
-                      </Basic.Row>
-
-                      <Advanced.OperationResult value={ longRunningTask.result } face="full"/>
-                    </Basic.Div>
-                  }
-                </Basic.AbstractForm>
-              </Basic.Modal.Body>
-
-              <Basic.Modal.Footer>
-                <Basic.Button
-                  level="link"
-                  onClick={ this.closeDetail.bind(this) }
-                  showLoading={ showLoadingDetail }>
-                  { this.i18n('button.close') }
-                </Basic.Button>
-
+              <Basic.Loading isStatic show={ showLoadingDetail }/>
+              <Basic.AbstractForm
+                ref="form"
+                readOnly={ recover ? false : !Utils.Entity.isNew(detail.entity) }
+                className={ showLoadingDetail ? 'hidden' : '' }>
+                <Basic.EnumSelectBox
+                  ref="executorName"
+                  label={ this.i18n('rpt:entity.Report._type') }
+                  options={ _supportedReports }
+                  onChange={ this.onChangeReport.bind(this) }
+                  readOnly={ recover ? true : !Utils.Entity.isNew(detail.entity) }
+                  required
+                  positionRelative
+                  searchable/>
                 {
-                  recover || Utils.Entity.isNew(detail.entity)
-                  ?
-                  <Basic.Button
-                    type="submit"
-                    level="success"
-                    showLoading={ showLoadingDetail }
-                    showLoadingIcon
-                    showLoadingText={ this.i18n('button.saving') }
-                    rendered={ Managers.SecurityManager.hasAnyAuthority(['REPORT_CREATE']) }>
-                    { this.i18n('button.generate.label') }
-                  </Basic.Button>
-                  :
-                  this.renderDownloadButtons(detail.entity)
+                  !report || !report.formDefinition
+                  ||
+                  <Advanced.EavForm
+                    key={ `form-instance-detail-${ detail.entity.id }` }
+                    ref="reportFilter"
+                    formInstance={
+                      new Domain.FormInstance(
+                        report.formDefinition,
+                        detail.entity && detail.entity.filter ? detail.entity.filter.values : null
+                      )
+                    }
+                    readOnly={ !recover && !Utils.Entity.isNew(detail.entity) }
+                    useDefaultValue={ recover || Utils.Entity.isNew(detail.entity) }/>
                 }
-              </Basic.Modal.Footer>
+                {
+                  !longRunningTask || recover
+                  ||
+                  <Basic.Div>
+                    <Basic.Row>
+                      <Basic.Col lg={ 6 }>
+                        <Basic.LabelWrapper label={this.i18n('entity.LongRunningTask.counter')}>
+                          { longRunningTaskManager.getProcessedCount(longRunningTask) }
+                        </Basic.LabelWrapper>
+                      </Basic.Col>
+                      <Basic.Col lg={ 6 }>
+                        {
+                          !longRunningTask.taskStarted
+                          ||
+                          <Basic.LabelWrapper label={ this.i18n('entity.LongRunningTask.duration') }>
+                            <Basic.TimeDuration
+                              start={ longRunningTask.taskStarted }
+                              end={ longRunningTask.taskEnded || longRunningTask.modified }
+                              humanized/>
+                          </Basic.LabelWrapper>
+                        }
+                      </Basic.Col>
+                    </Basic.Row>
+
+                    <Advanced.OperationResult value={ longRunningTask.result } face="full"/>
+                  </Basic.Div>
+                }
+              </Basic.AbstractForm>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
             </form>
-          }
+          </Basic.Modal.Body>
+
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ showLoadingDetail }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+
+            {
+              recover || Utils.Entity.isNew(detail.entity)
+              ?
+              <Basic.Button
+                type="submit"
+                level="success"
+                showLoading={ showLoadingDetail }
+                showLoadingIcon
+                showLoadingText={ this.i18n('button.saving') }
+                rendered={ Managers.SecurityManager.hasAnyAuthority(['REPORT_CREATE']) }
+                onClick={ this.createReport.bind(this, recover) }>
+                { this.i18n('button.generate.label') }
+              </Basic.Button>
+              :
+              this.renderDownloadButtons(detail.entity)
+            }
+          </Basic.Modal.Footer>
         </Basic.Modal>
       </Basic.Div>
     );
