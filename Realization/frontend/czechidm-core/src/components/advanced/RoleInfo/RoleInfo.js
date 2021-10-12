@@ -104,6 +104,7 @@ export class RoleInfo extends AbstractEntityInfo {
     return (
       <Tree
         uiKey={ `role-info-${ this.getEntityId() }` }
+        onMouseDown={this._stopPropagationMouseDown.bind(this)}
         manager={ this.getManager() }
         roots={[ _entity ]}
         header={ null }

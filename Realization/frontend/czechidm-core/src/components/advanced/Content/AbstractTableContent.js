@@ -1,5 +1,6 @@
 import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
+import {SearchParameters} from "../../../domain";
 
 /**
 * Advance table content with entity CRUD methods id modal.
@@ -28,6 +29,11 @@ export default class AbstractTableContent extends Basic.AbstractContent {
     super.componentDidMount();
     // loads filter from redux state
     this.loadFilter();
+    const location = this.context.history.location;
+    if (location && location.query && (!!location.query.text || location.query.text !== undefined)) {
+      // Search by URL parameter.
+      this.useFilter();
+    }
   }
 
   /**
@@ -246,7 +252,13 @@ export default class AbstractTableContent extends Basic.AbstractContent {
    * @return {SearchParameters}
    */
   getSearchParameters() {
-    return this.props._searchParameters || this.getDefaultSearchParameters();
+    let _searchParameters = this.props._searchParameters || this.getDefaultSearchParameters();
+    // Search by URL parameter.
+    const location = this.context.history.location;
+    if (location && location.query && (!!location.query.text || location.query.text !== undefined)) {
+      _searchParameters = new SearchParameters().setFilter('text', location.query.text);
+    }
+    return _searchParameters;
   }
 
   /**

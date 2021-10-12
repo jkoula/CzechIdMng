@@ -93,6 +93,7 @@ import TokenService from './TokenService';
 import MonitoringService from './MonitoringService';
 import MonitoringResultService from './MonitoringResultService';
 import RoleSystemService from './RoleSystemService';
+import UniversalSearchService from './UniversalSearchService';
 
 const ServiceRoot = {
   RestApiService,
@@ -182,7 +183,8 @@ const ServiceRoot = {
   TokenService,
   MonitoringService,
   MonitoringResultService,
-  RoleSystemService
+  RoleSystemService,
+  UniversalSearchService
 };
 
 ServiceRoot.version = '11.1.0';

@@ -1,202 +1,227 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
+import Select from 'react-select';
+import {useHistory} from 'react-router';
 import SearchIcon from '@material-ui/icons/Search';
-import RefreshIcon from '@material-ui/icons/Refresh';
-import InputBase from '@material-ui/core/InputBase';
-import { alpha, makeStyles } from '@material-ui/core/styles';
-import { i18n } from '../../../services/LocalizationService';
+import {alpha, makeStyles} from '@material-ui/core/styles';
+import {i18n} from '../../../services/LocalizationService';
+import OptionDecorator from '../../basic/SelectBox/OptionDecorator';
+import EntityInfo from '../EntityInfo/EntityInfo';
+import UiUtils from '../../../utils/UiUtils';
+import ComponentService from '../../../services/ComponentService';
+import UniversalSearchManager from '../../../redux/data/UniversalSearchManager';
+import Div from '../../basic/Div/Div';
+import SelectBox from '../../basic/SelectBox/SelectBox';
 //
-import {
-  IdentityManager,
-  RoleManager,
-  SecurityManager,
-  FlashMessagesManager
-} from '../../../redux';
-import SearchParameters from '../../../domain/SearchParameters';
 //
-const identityManager = new IdentityManager();
-const roleManager = new RoleManager();
-const flashMessagesManager = new FlashMessagesManager();
+const universalSearchManager = new UniversalSearchManager();
+const componentService = new ComponentService();
 
 /**
  * Search box in navigation.
- * @FIXME: Search single identity and role is supported now only (implement service registration).
- * @FIXME: both READ authorities are required now to show search box - search by permission.
  *
  * @author Radek Tomiška
+ * @author Vít Švanda
  * @since 10.3.0
  */
-const useStyles = makeStyles((theme) => ({
-  search: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto'
-    },
-    [theme.breakpoints.down('xs')]: {
-      display: 'none'
-    }
-  },
-  searchIcon: {
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    // pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  inputRoot: {
-    color: 'inherit'
-  },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '24ch',
-      '&:focus': {
-        width: '34ch'
+const useStyles = makeStyles((theme) => {
+  return (
+    {
+      search: {
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: alpha(theme.palette.common.white, 0.05),
+        '&:hover': {
+          backgroundColor: alpha(theme.palette.common.white, 0.15),
+        },
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+          marginLeft: theme.spacing(1),
+          width: 'auto'
+        },
+        [theme.breakpoints.down('xs')]: {
+          display: 'none'
+        }
+      },
+      searchIcon: {
+        padding: theme.spacing(0, 2),
+        height: '100%',
+        position: 'absolute',
+        // pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      },
+      selectBoxRoot: {
+        '& .Select-control': {
+          width: 600,
+          border: 0,
+          color: theme.palette.common.white,
+          fontSize: '1rem'
+        },
+        '& .Select-value-label': {
+          color: theme.palette.common.white
+        },
+        '& .Select-placeholder': {
+          color: alpha(theme.palette.common.white, 0.42)
+        },
+        '& .Select-option': {
+          backgroundColor: theme.palette.background.paper,
+          '&:hover': {
+            backgroundColor: theme.palette.type === 'dark' ? '#515151' : theme.palette.action.hover
+          }
+        },
+        '& .Select-menu-outer': {
+          backgroundColor: theme.palette.background.paper
+        },
+        '& .MuiSvgIcon-root': {
+          color: theme.palette.common.white
+        }
       }
-    }
-  }
-}));
+    });
+});
 
-function NavigationSearch(props) {
-  const { userContext } = props;
-  const [ showLoading, setShowLoading ] = React.useState(false);
-  const [ text, setText ] = React.useState('');
-  const dispatch = useDispatch();
+function NavigationSearch(props, context) {
+  const [selectedItem, setSelectedItem] = React.useState(null);
   const history = useHistory();
   const classes = useStyles();
-  //
-  if (!SecurityManager.hasAllAuthorities(['IDENTITY_READ', 'ROLE_READ'], userContext)) {
-    return null;
-  }
-  //
-  const search = (event) => {
+  const universalSearch = React.createRef();
+
+  const handleMouseDown = (onSelect, fullObject, event) => {
     if (event) {
       event.preventDefault();
+      event.stopPropagation();
     }
-    if (!text) {
+
+    if (event && event.target &&
+      (event.target.className.includes('entity-info')
+        || event.target.className.includes('basic-icon'))) {
+      // User clicked on info component, select event will be stopped now.
+      // Workaround: The 'basic-icon' is here only because three in role-info (I need to stop select event if user clicked on tree).
       return;
     }
-    //
-    setShowLoading(true);
+    if (onSelect) {
+      onSelect(fullObject, event);
+    }
+  };
 
-    let counter = 0;
-    dispatch(identityManager.fetchEntity(text, 'search', (identity, e1) => {
-      if (e1 && (e1.statusCode === 404 || e1.statusCode === 403)) {
-        dispatch(roleManager.fetchEntity(text, 'search2', (role, e2) => {
-          if (e2 && (e2.statusCode === 404 || e2.statusCode === 403)) {
-            // text search is used => when at least record is found, then first detial is shown. Warning message is shown otherwise.
-            identityManager.getService()
-              .search(new SearchParameters().setFilter('text', text).setSort('disabled', true).setSort('username', true))
-              .then(json => {
-                // ok
-                const entities = json._embedded[identityManager.getCollectionType()] || [];
-                if (entities.length === 1) {
-                  history.push(identityManager.getDetailLink(entities[0]));
-                  setShowLoading(false);
-                } else {
-                  counter += entities.length;
-                  roleManager.getService()
-                    .search(new SearchParameters().setFilter('text', text).setSort('disabled', true).setSort('code', true))
-                    .then(json2 => {
-                      // ok
-                      const entities2 = json2._embedded[roleManager.getCollectionType()] || [];
-                      if (entities2.length === 1) {
-                        history.push(`/role/${ encodeURIComponent(entities2[0].id) }/detail`);
-                        setText('');
-                      } else if (entities2.length > 1) {
-                        counter += entities2.length;
-                        // find more
-                        dispatch(flashMessagesManager.addMessage({
-                          key: 'search-result',
-                          level: 'info',
-                          title: i18n('component.advanced.NavigationSearch.message.foundMore.title'),
-                          message: i18n('component.advanced.NavigationSearch.message.foundMore.message', { counter, text })
-                        }));
-                      } else {
-                        // not found message
-                        dispatch(flashMessagesManager.addMessage({
-                          key: 'search-result',
-                          level: 'info',
-                          title: i18n('component.advanced.NavigationSearch.message.notFound.title'),
-                          message: i18n('component.advanced.NavigationSearch.message.notFound.message', { text })
-                        }));
-                      }
-                      setShowLoading(false);
-                    })
-                    .catch(error => {
-                      dispatch(flashMessagesManager.addError(error));
-                      setShowLoading(false);
-                    });
-                }
-              })
-              .catch(error => {
-                dispatch(flashMessagesManager.addError(error));
-                setShowLoading(false);
-              });
-          } else if (e2) {
-            dispatch(flashMessagesManager.addError(e2));
-          } else {
-            history.push(`/role/${ encodeURIComponent(role.id) }/detail`);
-            setText('');
-          }
-          setShowLoading(false);
-        }));
-      } else if (e1) {
-        dispatch(flashMessagesManager.addError(e1));
-        setShowLoading(false);
-      } else {
-        setText('');
-        setShowLoading(false);
-        //
-        history.push(identityManager.getDetailLink(identity));
+  const menuRenderer = (params) => {
+    // Use default renderer in a hacky way.
+    const menu = Select.defaultProps.menuRenderer(params);
+    const result = [];
+    const types = new Map();
+
+    menu
+      .filter(item => item.props.option && item.props.option.type)
+      .forEach(item => {
+        const type = item.props.option.type;
+        types.set(type.id, type);
+      });
+
+    types.forEach(type => {
+      // Find and render a header component.
+      const universalSearchTypeComponent = componentService
+        .getUniversalSearchTypeComponent(type.id);
+      if (universalSearchTypeComponent) {
+        result.push(
+          <OptionDecorator key={`${type.id}-header`} className="Select-option" option={{disable: true}}>
+            <universalSearchTypeComponent.component
+              universalSearchType={type}
+              searchValue={params.inputValue}
+            />
+          </OptionDecorator>
+        );
       }
-    }));
+      menu
+        .filter(item => item.props.option && item.props.option.type && item.props.option.type.id === type.id)
+        .forEach(item => {
+          const fullObject = item.props.option;
+          result.push(
+            <OptionDecorator
+              key={item.key}
+              className={item.props.className}
+              option={fullObject}
+              onFocus={item.props.onFocus}
+              focusOption={item.props.focusOption}
+            >
+              {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+              <div
+                onMouseDown={handleMouseDown.bind(this, item.props.onSelect, fullObject)}
+              >
+                <Div
+                  rendered={!!fullObject.ownerType}
+                >
+                  <EntityInfo
+                    entityType={UiUtils.getSimpleJavaType(fullObject.ownerType)}
+                    entityIdentifier={fullObject.ownerId}
+                    face="popover"
+                    entity={fullObject.ownerDto}
+                    showLink
+                    showEntityType
+                    showIcon/>
+                </Div>
+              </div>
+              <Div rendered={!fullObject.ownerType}>
+                {item.props.children}
+              </Div>
+            </OptionDecorator>
+          );
+        });
+    });
+
+    return result;
+  };
+
+  const _onOpenSelect = () => {
+    if (universalSearch) {
+      setSelectedItem(null);
+      universalSearch.current.setValue(null);
+      universalSearch.current.resetInputValue();
+    }
+  };
+
+  const _onSelectChange = (dto) => {
+    setSelectedItem(dto);
+    if (!dto) {
+      return;
+    }
+    // We need to obtain link to the detail. We will use info component for this.
+    const InfoComponent = EntityInfo.getComponent(UiUtils.getSimpleJavaType(dto.ownerType)).component.WrappedComponent;
+    const InfoComponentInstance = (new InfoComponent({entityIdentifier: dto.ownerId}, context));
+
+    const link = InfoComponentInstance.getLink(dto.ownerDto);
+    // Push link only if is different then current location -> prevent of warning.
+    if (history.location.pathname !== link) {
+      history.push(link);
+    }
   };
   //
   return (
-    <form className={ classes.search } onSubmit={ search }>
-      <div className={ classes.searchIcon }>
-        {
-          showLoading
-          ?
-          <RefreshIcon />
-          :
-          <SearchIcon />
-        }
+    <>
+      <div className={classes.search}>
+        <SelectBox
+          ref={universalSearch}
+          classes={{
+            root: classes.selectBoxRoot
+          }}
+          style={{marginBottom: 0}}
+          onChange={_onSelectChange.bind(this)}
+          onOpen={_onOpenSelect.bind(this)}
+          menuStyle={{maxHeight: 800}}
+          menuContainerStyle={{maxHeight: 800}}
+          manager={universalSearchManager}
+          label={null}
+          onSelectResetsInput
+          menuRenderer={menuRenderer.bind(this)}
+          placeholder={
+            <Div rendered={!selectedItem}>
+              <SearchIcon style={{marginTop: 8}} titleAccess={i18n('component.advanced.NavigationSearch.search.placeholder')}/>
+              <span style={{marginLeft: 5, verticalAlign: 'top'}}>{i18n('component.advanced.NavigationSearch.search.placeholder')} ...</span>
+            </Div>
+          }/>
       </div>
-      <InputBase
-        placeholder={ `${ i18n('component.advanced.NavigationSearch.search.placeholder') } ...` }
-        classes={{
-          root: classes.inputRoot,
-          input: classes.inputInput,
-        }}
-        value={ text }
-        inputProps={{ 'aria-label': 'search' }}
-        onChange={ e => setText(e.target.value) }
-        disabled={ showLoading }
-      />
-    </form>
+    </>
   );
 }
-
-NavigationSearch.propTypes = {
-  userContext: PropTypes.object.isRequired
-};
 
 export default NavigationSearch;

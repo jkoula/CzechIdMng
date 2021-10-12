@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
+import {withStyles} from '@material-ui/core/styles';
 import CreatableSelectBox from '../CreatableSelectBox/CreatableSelectBox';
+import {SelectBox} from '../../basic/SelectBox/SelectBox';
 
 /**
  * Select box supports creating new options used in filters.
  *
  * @author Ondřej Kopr
  */
-export default class FilterCreatableSelectBox extends CreatableSelectBox {
+export class FilterCreatableSelectBox extends CreatableSelectBox {
 
   getValue() {
     const value = super.getValue();
@@ -37,3 +39,5 @@ FilterCreatableSelectBox.defaultProps = {
   ...otherDefaultProps,
   relation: 'EQ'
 };
+
+export default withStyles(SelectBox.STYLES, { withTheme: true })(FilterCreatableSelectBox);

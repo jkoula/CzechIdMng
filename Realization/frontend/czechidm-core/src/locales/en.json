@@ -471,6 +471,12 @@
           }
         }
       },
+      "IdentityUniversalSearchType": {
+        "label": "Users"
+      },
+      "RoleUniversalSearchType": {
+        "label": "Roles"
+      },
       "UuidInfo": {
         "copy": {
           "message": "Identifier copied into clipboard."

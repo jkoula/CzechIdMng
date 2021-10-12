@@ -1,17 +1,19 @@
 import PropTypes from 'prop-types';
-import * as Basic from '../../basic';
+import {withStyles} from '@material-ui/core/styles';
+import {SelectBox} from '../../basic/SelectBox/SelectBox';
+import {EnumSelectBox} from '../../basic/EnumSelectBox/EnumSelectBox';
 
 /**
- * Enum select box used in filters
+ * Enum select box used in filters.
  *
  * @author Radek Tomiška
  */
-export default class FilterEnumSelectBox extends Basic.EnumSelectBox {
+export class FilterEnumSelectBox extends EnumSelectBox {
 
 }
 
 FilterEnumSelectBox.propTypes = {
-  ...Basic.EnumSelectBox.propTypes,
+  ...EnumSelectBox.propTypes,
   /**
    * Field name - if is not set, then ref is used
    * @type {[type]}
@@ -23,8 +25,10 @@ FilterEnumSelectBox.propTypes = {
    */
   relation: PropTypes.oneOf(['EQ', 'NEQ'])
 };
-const { labelSpan, componentSpan, ...otherDefaultProps } = Basic.EnumSelectBox.defaultProps; // labelSpan etc. override
+const { labelSpan, componentSpan, ...otherDefaultProps } = EnumSelectBox.defaultProps; // labelSpan etc. override
 FilterEnumSelectBox.defaultProps = {
   ...otherDefaultProps,
   relation: 'EQ'
 };
+
+export default withStyles(SelectBox.STYLES, { withTheme: true })(FilterEnumSelectBox);

@@ -106,6 +106,10 @@ class AbstractForm extends AbstractContextComponent {
       if (type && type.WrappedComponent) {
         type = type.WrappedComponent;
       }
+      // If component is connected to the Material styles, then we need to extract our component.
+      if (type && type.Naked) {
+        type = type.Naked;
+      }
       // We will add only AbstractFormComponent
       if (type && type.prototype instanceof AbstractFormComponent) {
         if (child.ref && (!child.props || !child.props.notControlled)) {
@@ -233,7 +237,6 @@ class AbstractForm extends AbstractContextComponent {
       component.setState({showValidationError: show});
     }
   }
-
 
   /**
    * Method for compile data from all component

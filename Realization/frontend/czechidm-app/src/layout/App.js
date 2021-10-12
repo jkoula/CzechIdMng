@@ -157,6 +157,7 @@ export class App extends Basic.AbstractContent {
       { collapsed: navigationCollapsed }
     );
     const theme = createTheme(userContext.theme);
+    this.context.theme = theme;
     // @todo-upgrade-10 - FlashMessages throw warning "Function components cannot be given refs.
     // Attempts to access this ref will fail. Did you mean to use React.forwardRef()?"
     return (

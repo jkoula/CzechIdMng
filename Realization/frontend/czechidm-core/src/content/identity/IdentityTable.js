@@ -33,10 +33,11 @@ export class IdentityTable extends Advanced.AbstractTableContent {
 
   constructor(props, context) {
     super(props, context);
-    //
+    const _forceSearchParameters = props.forceSearchParameters || new SearchParameters();
     this.state = {
       filterOpened: props.filterOpened,
-      showAddModal: false
+      showAddModal: false,
+      _forceSearchParameters
     };
   }
 
@@ -144,7 +145,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
 
   getDefaultSearchParameters() {
     let searchParameters = this.getManager().getDefaultSearchParameters();
-    //
+
     searchParameters = searchParameters.setFilter('disabled', ConfigLoader.getConfig('identity.table.filter.disabled', false));
     searchParameters = searchParameters.setFilter('recursively', ConfigLoader.getConfig('identity.table.filter.recursively', true));
     //
@@ -261,7 +262,6 @@ export class IdentityTable extends Advanced.AbstractTableContent {
     const {
       uiKey,
       identityManager,
-      forceSearchParameters,
       showAddButton,
       showDetailButton,
       showFilter,
@@ -277,13 +277,13 @@ export class IdentityTable extends Advanced.AbstractTableContent {
       skipDashboard
     } = this.props;
     const { filterOpened, showAddModal } = this.state;
+    let { _forceSearchParameters } = this.state;
     const columns = this.getColumns();
     //
     if (!rendered) {
       return null;
     }
     //
-    let _forceSearchParameters = forceSearchParameters || new SearchParameters();
     let forceTreeNodeSearchParams = new SearchParameters();
     if (treeType) {
       forceTreeNodeSearchParams = forceTreeNodeSearchParams.setFilter('treeTypeId', treeType.id);
@@ -296,6 +296,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
     const roleDisabled = _forceSearchParameters.getFilters().has('role');
     const treeNodeDisabled = _forceSearchParameters.getFilters().has('treeNodeId');
     const canCreateIdentity = showAddButton && this.getManager().canSave() && (isDefaultFormProjection || projections.length > 0);
+    const textIsForced = _forceSearchParameters.getFilters().has('text');
     //
     return (
       <Basic.Div>
@@ -313,6 +314,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
                   <Basic.Col lg={ 6 }>
                     <Basic.TextField
                       ref="text"
+                      readOnly={textIsForced}
                       placeholder={ this.i18n('filter.name.placeholder') }
                       help={ Advanced.Filter.getTextHelp() }/>
                   </Basic.Col>

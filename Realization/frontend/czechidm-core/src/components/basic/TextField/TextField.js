@@ -237,7 +237,8 @@ class BasicTextField extends AbstractFormComponent {
       size,
       multiline,
       rows,
-      help
+      help,
+      classes
     } = this.props;
     const { inputType, value, disabled, readOnly, autoFocus } = this.state;
     //
@@ -320,6 +321,7 @@ class BasicTextField extends AbstractFormComponent {
                 autoFocus={ autoFocus }
                 required={ required }
                 type={ inputType }
+                classes={classes}
                 autoComplete={ !pwdAutocomplete ? 'new-password' : null }
                 className={ className }
                 label={

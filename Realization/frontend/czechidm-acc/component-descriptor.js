@@ -251,6 +251,12 @@ module.exports = {
       type: 'monitoring-result-button',
       entityType: ['ProvisioningOperationMonitoringEvaluator'],
       component: require('./src/content/monitoring/button/ProvisioningOperationMonitoringResultButton').default
-    }
+    },
+    {
+      id: 'system-universal-search-type',
+      type: 'universal-search-type',
+      entityType: ['system-universal-search-type'],
+      component: require('./src/components/SystemUniversalSearchType/SystemUniversalSearchType').default
+    },
   ]
 };

@@ -972,6 +972,18 @@ module.exports = {
       type: 'monitoring-result-button',
       entityType: ['EntityEventMonitoringEvaluator'],
       component: require('./src/content/monitoring/button/EntityEventMonitoringResultButton').default
+    },
+    {
+      id: 'identity-universal-search-type',
+      type: 'universal-search-type',
+      entityType: ['identity-universal-search-type'],
+      component: require('./src/content/unisearch/IdentityUniversalSearchType').default
+    },
+    {
+      id: 'role-universal-search-type',
+      type: 'universal-search-type',
+      entityType: ['role-universal-search-type'],
+      component: require('./src/content/unisearch/RoleUniversalSearchType').default
     }
   ]
 };

@@ -90,6 +90,7 @@ import TokenManager from './TokenManager';
 import MonitoringManager from './MonitoringManager';
 import MonitoringResultManager from './MonitoringResultManager';
 import RoleSystemManager from './RoleSystemManager';
+import UniversalSearchManager from './UniversalSearchManager';
 
 const ManagerRoot = {
   EntityManager,
@@ -176,7 +177,8 @@ const ManagerRoot = {
   TokenManager,
   MonitoringManager,
   MonitoringResultManager,
-  RoleSystemManager
+  RoleSystemManager,
+  UniversalSearchManager
 };
 
 ManagerRoot.version = '11.1.0';

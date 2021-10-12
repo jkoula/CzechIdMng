@@ -351,6 +351,13 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
     );
   }
 
+  _stopPropagationMouseDown(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
   /**
    * Renders link face
    */
@@ -464,7 +471,9 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
           !this.showLink()
           ||
           <Basic.PanelFooter>
-            <Link to={ this.getLink(_entity) }>
+            <Link
+              onMouseDown={this._stopPropagationMouseDown.bind(this)}
+              to={ this.getLink(_entity) }>
               <Basic.Icon value="fa:angle-double-right"/>
               { ' ' }
               { this.i18n('component.advanced.EntityInfo.link.detail.label') }

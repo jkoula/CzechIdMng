@@ -576,6 +576,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
                     onChange={ this.onChangeReport.bind(this) }
                     readOnly={ recover ? true : !Utils.Entity.isNew(detail.entity) }
                     required
+                    positionRelative
                     searchable/>
                   {
                     !report || !report.formDefinition

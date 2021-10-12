@@ -264,7 +264,10 @@ export class IdentityInfo extends AbstractEntityInfo {
                     !this.isDevelopment() || this.isDisabled(_entity) || !_permissions || !Utils.Permission.hasPermission(_permissions, 'SWITCHUSER')
                     ||
                     this.renderRow(null, (
-                      <a href="#" onClick={ this.switchUser.bind(this, _entity) }>
+                      <a
+                        onMouseDown={this._stopPropagationMouseDown.bind(this)}
+                        href="#"
+                        onClick={ this.switchUser.bind(this, _entity) }>
                         <Basic.Icon value="component:switch-user"/>
                         {' '}
                         { this.i18n('link.switchUser.label') }
@@ -275,7 +278,10 @@ export class IdentityInfo extends AbstractEntityInfo {
                     !this.showLink()
                     ||
                     this.renderRow(null, (
-                      <a href="#" onClick={ this.showDetail.bind(this, _entity) }>
+                      <a
+                        onMouseDown={this._stopPropagationMouseDown.bind(this)}
+                        href="#"
+                        onClick={ this.showDetail.bind(this, _entity) }>
                         <Basic.Icon value="fa:angle-double-right"/>
                         {' '}
                         { this.i18n('link.profile.label') }

@@ -154,6 +154,17 @@ export default class ComponentService {
     return this.getComponentByEntityType(ComponentService.MONITORING_RESULT_BUTTON_COMPONENT_TYPE, monitoringType);
   }
 
+  /**
+   * Returns registered universal search type component by entity type.
+   * @since 11.3.0
+   */
+  getUniversalSearchTypeComponent(entityType) {
+    if (!entityType) {
+      return null;
+    }
+    return this.getComponentByEntityType(ComponentService.UNIVERSAL_SEARCH_TYPE, entityType);
+  }
+
 }
 // reserved component types
 ComponentService.ENTITY_INFO_COMPONENT_TYPE = 'entity-info';
@@ -167,3 +178,4 @@ ComponentService.ICON_COMPONENT_TYPE = 'icon';
 ComponentService.CONNECTOR_TYPE = 'connector-type';
 ComponentService.MODAL_COMPONENT_TYPE = 'modal';
 ComponentService.MONITORING_RESULT_BUTTON_COMPONENT_TYPE = 'monitoring-result-button';
+ComponentService.UNIVERSAL_SEARCH_TYPE = 'universal-search-type';

@@ -2,14 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Creatable } from 'react-select';
 import _ from 'lodash';
-import * as Basic from '../../basic';
+import {EnumSelectBox} from '../../basic/EnumSelectBox/EnumSelectBox';
 
 /**
  * Creatable component.
  *
  * @author Ondrej Kopr
  */
-class CreatableSelectBox extends Basic.EnumSelectBox {
+class CreatableSelectBox extends EnumSelectBox {
 
   constructor(props) {
     super(props);
@@ -150,13 +150,14 @@ class CreatableSelectBox extends Basic.EnumSelectBox {
 
   getSelectComponent() {
     const { options } = this.state;
-    const { placeholder, fieldLabel, optionComponent, valueComponent } = this.props;
+    const { placeholder, fieldLabel, optionComponent, valueComponent, classes } = this.props;
     const showLoading = this._evaluateShowLoading();
     return (
       <Creatable
         ref="selectComponent"
         multi
         value={ options }
+        className={classes ? classes.root : null}
         options={ this.getOptions() }
         onChange={ this._onChange.bind(this) }
         onInputChange={ this._onInputChange.bind(this) }
@@ -174,7 +175,7 @@ class CreatableSelectBox extends Basic.EnumSelectBox {
 }
 
 CreatableSelectBox.propTypes = {
-  ...Basic.EnumSelectBox.propTypes,
+  ...EnumSelectBox.propTypes,
   /**
    * Seperator for separate values
    */
@@ -220,7 +221,7 @@ CreatableSelectBox.propTypes = {
 };
 
 CreatableSelectBox.defaultProps = {
-  ...Basic.EnumSelectBox.defaultProps,
+  ...EnumSelectBox.defaultProps,
   separator: ',',
   manager: null,
   filterColumnName: 'identifiers',

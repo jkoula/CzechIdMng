@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
+import {withStyles} from '@material-ui/core/styles';
 //
 import * as Basic from '../../basic';
+import {SelectBox} from '../../basic/SelectBox/SelectBox';
 
 /**
  * Boolean select box used in filters
  *
  * @author Radek Tomiška
  */
-export default class FilterBooleanSelectBox extends Basic.BooleanSelectBox {
+export class FilterBooleanSelectBox extends Basic.BooleanSelectBox {
 
 }
 
@@ -29,3 +31,5 @@ FilterBooleanSelectBox.defaultProps = {
   ...otherDefaultProps,
   relation: 'EQ'
 };
+
+export default withStyles(SelectBox.STYLES, { withTheme: true })(FilterBooleanSelectBox);

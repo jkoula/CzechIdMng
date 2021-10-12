@@ -6,6 +6,7 @@ import Joi from 'joi';
 import _ from 'lodash';
 import Waypoint from 'react-waypoint';
 import $ from 'jquery';
+import { withStyles } from '@material-ui/core/styles';
 //
 import * as Utils from '../../../utils';
 import Icon from '../Icon/Icon';
@@ -22,13 +23,46 @@ const NICE_LABEL = 'niceLabel';
 const ITEM_FULL_KEY = 'itemFullKey';
 const ITEM_VALUE = 'value';
 
+const styles = theme => ({
+  root: {
+    '&.is-focused': {
+      '& .Select-control': {
+        boxShadow: 'none',
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2
+      }
+    },
+    '& .Select-option': {
+      backgroundColor: theme.palette.background.paper,
+      '&.is-focused': {
+        backgroundColor: theme.palette.action.hover
+      },
+      '&:hover': {
+        backgroundColor: theme.palette.action.hover
+      }
+    },
+    '& .Select-menu-outer': {
+      backgroundColor: theme.palette.background.paper,
+      marginTop: 1
+    },
+    '& .Select-control': {
+      WebkitBoxShadow: 'none !important'
+    }
+  },
+  positionRelative: {
+    '& .Select-menu-outer': {
+      position: 'relative'
+    },
+  }
+});
+
 /**
  * A Select control - async loads option from BE.
  *
  * @author Vít Švanda
  * @author Radek Tomiška
  */
-class SelectBox extends AbstractFormComponent {
+export class SelectBox extends AbstractFormComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -658,10 +692,21 @@ class SelectBox extends AbstractFormComponent {
     return this.i18n('label.searchSelect');
   }
 
+  resetInputValue() {
+    // Beware! I did not found another way how reset input value, then use a inner state.
+    if (this.refs.selectComponent) {
+      this.refs.selectComponent.setState({inputValue: ''});
+    }
+  }
+
   /**
    * Load first page on input is opened
    */
-  onOpen() {
+  onOpen(event) {
+    const {onOpen} = this.props;
+    if (onOpen) {
+      onOpen(event);
+    }
     // OnOpen function is called for first change in the input.
     // This call invokes redundant search. We skip that call (if some typing timeout exists)
     if (this.typingTimeoutId) {
@@ -704,7 +749,14 @@ class SelectBox extends AbstractFormComponent {
       showLoading,
       optionComponent,
       valueComponent,
-      disableable
+      disableable,
+      menuRenderer,
+      menuStyle,
+      menuContainerStyle,
+      onSelectResetsInput,
+      onFocus,
+      positionRelative,
+      classes
     } = this.props;
     const {
       isLoading,
@@ -713,6 +765,12 @@ class SelectBox extends AbstractFormComponent {
       disabled,
       value
     } = this.state;
+
+    let className = classes ? classes.root : '';
+
+    if (positionRelative && classes) {
+      className = `${className} ${classes.positionRelative}`;
+    }
     //
     // from new version react-select is necessary turn off onBlurResetsInput and closeOnSelect
     // onBlurResetsInput made problems with submit form and focus
@@ -724,13 +782,14 @@ class SelectBox extends AbstractFormComponent {
         onChange={ this.onChange }
         disabled={ readOnly || disabled }
         ignoreCase
+        menuRenderer={menuRenderer}
         ignoreAccents={false}
         multi={ multiSelect }
         valueKey={ ITEM_FULL_KEY }
         labelKey={ fieldLabel }
         onBlurResetsInput={ false }
         closeOnSelect={ !multiSelect }
-        onSelectResetsInput={ false }
+        onSelectResetsInput={ onSelectResetsInput }
         noResultsText={ this.i18n('component.basic.SelectBox.noResultsText') }
         placeholder={ this.getPlaceholder(placeholder) }
         searchingText={ this.i18n('component.basic.SelectBox.searchingText') }
@@ -747,7 +806,11 @@ class SelectBox extends AbstractFormComponent {
           //
           return _option;
         })}
+        className={className}
+        menuStyle={menuStyle}
+        menuContainerStyle={menuContainerStyle}
         onOpen={ this.onOpen.bind(this) }
+        onFocus={onFocus}
         onClose={ () => {
           const { selectBoxOuter } = this.state;
           if (selectBoxOuter) {
@@ -864,8 +927,10 @@ SelectBox.defaultProps = {
   valueComponent: ValueDecorator,
   disableable: true,
   additionalOptions: [],
+  onSelectResetsInput: false,
   size: 'small',
   fullWidth: true,
+  positionRelative: false
 };
 
 SelectBox.NICE_LABEL = NICE_LABEL;
@@ -874,5 +939,6 @@ SelectBox.ITEM_VALUE = ITEM_VALUE;
 //
 SelectBox.OptionDecorator = OptionDecorator;
 SelectBox.ValueDecorator = ValueDecorator;
+SelectBox.STYLES = styles;
 
-export default SelectBox;
+export default withStyles(styles, { withTheme: true })(SelectBox);

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 //
 import * as Basic from '../../basic';
+import {SelectBox} from '../../basic/SelectBox/SelectBox';
 import ComponentService from '../../../services/ComponentService';
 //
 const componentService = new ComponentService();
@@ -190,7 +191,7 @@ export default class EntitySelectBox extends Basic.AbstractFormComponent {
   }
 }
 EntitySelectBox.propTypes = {
-  ...Basic.SelectBox.propTypes,
+  ...SelectBox.propTypes,
   /**
    * Entity type (e.g. identity, role ...) for more info see README or component-descriptor
    */
@@ -203,6 +204,6 @@ EntitySelectBox.propTypes = {
   showDefaultHelpBlock: PropTypes.bool
 };
 EntitySelectBox.defaultProps = {
-  ...Basic.SelectBox.defaultProps,
+  ...SelectBox.defaultProps,
   showDefaultHelpBlock: false
 };

@@ -7,6 +7,7 @@ import Joi from 'joi';
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 import Icon from '../Icon/Icon';
 import HelpIcon from '../HelpIcon/HelpIcon';
+import ReportProblemOutlinedIcon from  '@material-ui/icons/ReportProblemOutlined';
 
 /**
  * @author Vít Švanda
@@ -414,7 +415,7 @@ class AbstractFormComponent extends AbstractContextComponent {
         validationClass = this.getValidationResult().class;
       }
       if (this.state.showValidationError && this.getValidationResult().status === 'error') {
-        feedback = <Icon icon="warning-sign" className="form-control-feedback" />;
+        feedback = <ReportProblemOutlinedIcon color="error" style={{marginRight: 3, marginTop: 5, color: 'red'}} className="form-control-feedback"/>;
       }
       if (this.getValidationResult().status === 'warning') {
         feedback = <Icon icon="warning-sign" className="form-control-feedback" />;

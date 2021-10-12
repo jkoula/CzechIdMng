@@ -74,6 +74,7 @@ import CronGenerator from './CronGenerator/CronGenerator';
 import CodeableField from './CodeableField/CodeableField';
 import ReadDtoServiceSelect from './ReadDtoServiceSelect/ReadDtoServiceSelect';
 import PanelHeader from './Panel/PanelHeader';
+import AbstractUniversalSearchType from './AbstractUniversalSearchType/AbstractUniversalSearchType';
 
 const Components = {
   Table,
@@ -155,7 +156,8 @@ const Components = {
   ReadDtoServiceSelect,
   Panel: {
     Header: PanelHeader
-  }
+  },
+  AbstractUniversalSearchType
 };
 
 Components.version = '12.0.0';

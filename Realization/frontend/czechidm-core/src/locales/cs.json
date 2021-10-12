@@ -503,6 +503,12 @@
           }
         }
       },
+      "IdentityUniversalSearchType": {
+        "label": "Uživatelé"
+      },
+      "RoleUniversalSearchType": {
+        "label": "Role"
+      },
       "UuidInfo": {
         "copy": {
           "message": "Identifikátor zkopírován do schránky."

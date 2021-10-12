@@ -14,6 +14,9 @@
           "SYSTEM-SELECT": "System select (SelectBox)",
           "SYNCHRONIZATION-CONFIG-SELECT": "Synchronization configuration select (SelectBox)"
         }
+      },
+      "SystemUniversalSearchType": {
+        "label": "Systems"
       }
     }
   },

@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import EnumSelectBox from '../EnumSelectBox/EnumSelectBox';
+import {EnumSelectBox} from '../EnumSelectBox/EnumSelectBox';
 
 /**
  * Select boolean value
