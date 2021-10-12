@@ -3,43 +3,57 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { AutoAffix } from 'react-overlays';
 //
+import { makeStyles } from '@material-ui/core/styles';
+//
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import Loading from '../Loading/Loading';
 
+//
+const useStyles = makeStyles((theme) => {
+  return {
+    root: {
+      backgroundColor: theme.palette.background.paper,
+      borderTopLeftRadius: theme.shape.borderRadius,
+      borderTopRightRadius: theme.shape.borderRadius
+    }
+  };
+});
 
 /**
  * Toolbar panel.
  *
  * @author Radek Tomiška
  */
-export default class Toolbar extends AbstractComponent {
-
-  render() {
-    const { className, rendered, showLoading, viewportOffsetTop, container, ...other } = this.props;
-    if (!rendered) {
-      return null;
-    }
-    const classNames = classnames(
-      'basic-toolbar',
-      'form-inline',
-      className
-    );
-    let render = (
-      <div className={ classNames } { ...other }>
-        <Loading className="simple" showLoading={ showLoading } showAnimation={ false }>
-          { this.props.children }
-        </Loading>
-      </div>
-    );
-    if (viewportOffsetTop !== undefined) { // affix decorator, when viewportOffsetTop is defined
-      render = (
-        <AutoAffix viewportOffsetTop={ viewportOffsetTop } container={ container }>
-          {render}
-        </AutoAffix>
-      );
-    }
-    return render;
+export default function Toolbar(props) {
+  const { className, rendered, showLoading, viewportOffsetTop, container, children, style } = props;
+  const classes = useStyles();
+  //
+  if (!rendered) {
+    return null;
   }
+  //
+  const classNames = classnames(
+    'basic-toolbar',
+    'form-inline',
+    classes.root,
+    className,
+  );
+  let render = (
+    <div className={ classNames } style={ style }>
+      <Loading className="simple" showLoading={ showLoading } showAnimation={ false } >
+        { children }
+      </Loading>
+    </div>
+  );
+  if (viewportOffsetTop !== undefined) { // affix decorator, when viewportOffsetTop is defined
+    render = (
+      <AutoAffix viewportOffsetTop={ viewportOffsetTop || 64 } container={ container }>
+        { render }
+      </AutoAffix>
+    );
+  }
+  //
+  return render;
 }
 
 Toolbar.propTypes = {

@@ -289,7 +289,7 @@ class Pagination extends AbstractContextComponent {
     const pagination = this.renderPagination();
     const records = this.renderRecords();
     return (
-      <div className="panel-footer basic-pagination">
+      <div className="panel-footer basic-pagination" style={{ display: 'block' }}>
         {
           paginationHandler
           ?
@@ -300,7 +300,7 @@ class Pagination extends AbstractContextComponent {
             <div className="col-sm-6">
               { pagination }
             </div>
-            <div className="col-sm-3">
+            <div className="col-sm-3 text-right">
               { records }
             </div>
           </div>

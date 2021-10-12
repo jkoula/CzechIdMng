@@ -1,8 +1,36 @@
 import React from 'react';
 import classNames from 'classnames';
 //
+import { makeStyles } from '@material-ui/core/styles';
+//
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 import Icon from '../Icon/Icon';
+
+const useStyles = makeStyles((theme) => {
+  return {
+    root: {
+      color: theme.palette.text.primary
+    }
+  };
+});
+
+function Label(props) {
+  const { value, icon, removeIcon, children } = props;
+  const classes = useStyles();
+  //
+  return (
+    <div
+      className={ classNames('Select-value', classes.root, value.className) }
+      style={ value.style }
+      title={ value.title }>
+      { removeIcon }
+      <span className={ classNames('Select-value-label', classes.root, value.className) }>
+        { icon }
+        { children }
+      </span>
+    </div>
+  );
+}
 
 /**
  * Base selectbox value decorator (~selected value). Reuses react-select component behavior.
@@ -118,16 +146,12 @@ export default class ValueDecorator extends AbstractContextComponent {
     const { children, value } = this.props;
     //
     return (
-      <div
-        className={ classNames('Select-value', this.props.value.className) }
-        style={ this.props.value.style }
-        title={ this.props.value.title }>
-        { this.renderRemoveIcon() }
-        <span className="Select-value-label">
-          { this.renderIcon(value) }
-          { children }
-        </span>
-      </div>
+      <Label
+        value={ value}
+        icon={ this.renderIcon(value) }
+        removeIcon={ this.renderRemoveIcon() }>
+        { children }
+      </Label>
     );
   }
 }

@@ -38,13 +38,13 @@ const FORBIDDEN_CHARACTER_BASE = 'forbiddenCharacterBase';
 
 /**
  * Forbidden character at the beginning of passwords base for each required policies
- * @type {String} 
+ * @type {String}
  */
 const FORBIDDEN_BEGIN_CHARACTER_BASE = 'forbiddenBeginCharacterBase';
 
 /**
  * Forbidden character at the end of passwords base for each required policies
- * @type {String} 
+ * @type {String}
  */
 const FORBIDDEN_END_CHARACTER_BASE = 'forbiddenEndCharacterBase';
 
@@ -284,7 +284,6 @@ export default class ValidationMessage extends Basic.AbstractFormComponent {
   _preparePreValidationComponent(errorMessage) {
     return (
       <Basic.Alert
-        icon="info-sign"
         style={{ margin: '15px 0' }}>
         <Basic.Popover
           ref="popover"
@@ -302,13 +301,13 @@ export default class ValidationMessage extends Basic.AbstractFormComponent {
           className="abstract-entity-info-popover"
           placement="right">
           {
-            <Basic.Button
-              level="link"
-              style={{ padding: 0, whiteSpace: 'normal', verticalAlign: 'baseline', textDecoration: 'underline' }}
+            <a
+              href="#"
+              onClick={ (e) => e.preventDefault() }
               title={ this.i18n('content.passwordPolicies.validation.prevalidationLink.title') }>
               { this.i18n('content.passwordPolicies.validation.passwordHintPreValidate') }
               { this.i18n('content.passwordPolicies.validation.passwordHintPreValidatePwd') }
-            </Basic.Button>
+            </a>
           }
         </Basic.Popover>
       </Basic.Alert>

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import Joi from 'joi';
 import _ from 'lodash';
+import Fab from '@material-ui/core/Fab';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
@@ -353,19 +354,21 @@ class Profile extends Basic.AbstractContent {
           onHide={ onHide }
           keyboard
           backdrop="static"
+          bsSize="sm"
+          fullWidth={ false }
           onEnter={ () => this.context.store.dispatch(identityManager.fetchProfile(userContext.username)) }>
-          <form onSubmit={ showTwoFactorConfirm ? this.onTwoFactorConfirm.bind(this, showTwoFactorConfirm) : this.onSave.bind(this) }>
-            <Basic.Modal.Header
-              closeButton
-              icon="user"
-              text={
-                showTwoFactorConfirm
-                ?
-                this.i18n('entity.Profile.twoFactorAuthenticationType.label')
-                :
-                this.i18n('content.identity.profile-setting.header')
-              }/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header
+            closeButton
+            icon="user"
+            text={
+              showTwoFactorConfirm
+              ?
+              this.i18n('entity.Profile.twoFactorAuthenticationType.label')
+              :
+              this.i18n('content.identity.profile-setting.header')
+            }/>
+          <Basic.Modal.Body>
+            <form onSubmit={ showTwoFactorConfirm ? this.onTwoFactorConfirm.bind(this, showTwoFactorConfirm) : this.onSave.bind(this) }>
               <Basic.AbstractForm
                 ref="form"
                 data={ profile }
@@ -387,23 +390,29 @@ class Profile extends Basic.AbstractContent {
                         readOnly={ !profileManager.canSave(profile, _permissions) }>
                         <img className="img-thumbnail" alt="profile" src={ _imageUrl } />
                       </Advanced.ImageDropzone>
-                      <Basic.Button
-                        type="button"
-                        rendered={ !!(cropperSrc && _imageUrl) }
-                        titlePlacement="right"
-                        onClick={ this._showCropper.bind(this) }
-                        className="btn-xs btn-edit">
-                        <Basic.Icon icon="edit"/>
-                      </Basic.Button>
-                      <Basic.Button
-                        type="button"
-                        level="danger"
-                        rendered={ !!(_imageUrl && profileManager.canSave(profile, _permissions)) }
-                        titlePlacement="left"
-                        onClick={ this.deleteImage.bind(this) }
-                        className="btn-xs btn-remove">
-                        <Basic.Icon type="fa" icon="trash"/>
-                      </Basic.Button>
+                      <Basic.Fab color="inherit" className={ cropperSrc && _imageUrl ? 'btn-edit' : 'hidden' } size="small">
+                        <Basic.Button
+                          type="button"
+                          buttonSize="xs"
+                          rendered={ !!(cropperSrc && _imageUrl) }
+                          titlePlacement="right"
+                          onClick={ this._showCropper.bind(this) }
+                          icon="edit"/>
+                      </Basic.Fab>
+                      <Basic.Fab
+                        color="secondary"
+                        className={ _imageUrl && profileManager.canSave(profile, _permissions) ? 'btn-remove' : 'hidden' }
+                        size="small">
+                        <Basic.Button
+                          type="button"
+                          level="danger"
+                          buttonSize="xs"
+                          style={{ color: 'white' }}
+                          rendered={ !!(_imageUrl && profileManager.canSave(profile, _permissions)) }
+                          titlePlacement="left"
+                          onClick={ this.deleteImage.bind(this) }
+                          icon="fa:trash"/>
+                      </Basic.Fab>
                     </Basic.Div>
                   </Basic.Div>
 
@@ -543,32 +552,35 @@ class Profile extends Basic.AbstractContent {
                     }/>
                 </Basic.Div>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                showLoading={ showLoading }
-                onClick={ onHide }
-                rendered={ !showTwoFactorConfirm }>
-                { this.i18n('button.close') }
-              </Basic.Button>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              showLoading={ showLoading }
+              onClick={ onHide }
+              rendered={ !showTwoFactorConfirm }>
+              { this.i18n('button.close') }
+            </Basic.Button>
 
-              <Basic.Button
-                level="link"
-                showLoading={ showLoading }
-                onClick={ () => this.setState({ showTwoFactorConfirm: null }, () => this.refs.verificationCode.setValue('')) }
-                rendered={ showTwoFactorConfirm }>
-                { this.i18n('button.cancel') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={ showLoading }
-                rendered={ showTwoFactorConfirm }>
-                { this.i18n('button.enable.label') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+            <Basic.Button
+              level="link"
+              showLoading={ showLoading }
+              onClick={ () => this.setState({ showTwoFactorConfirm: null }, () => this.refs.verificationCode.setValue('')) }
+              rendered={ showTwoFactorConfirm }>
+              { this.i18n('button.cancel') }
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={ showLoading }
+              onSubmit={ this.onTwoFactorConfirm.bind(this, showTwoFactorConfirm) }
+              rendered={ showTwoFactorConfirm }>
+              { this.i18n('button.enable.label') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
 
         <Basic.Modal

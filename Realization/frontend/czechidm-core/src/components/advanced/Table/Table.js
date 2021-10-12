@@ -6,7 +6,12 @@ import _ from 'lodash';
 import Immutable from 'immutable';
 import moment from 'moment';
 import classnames from 'classnames';
-import { Dropdown, MenuItem } from 'react-bootstrap';
+//
+import Menu from '@material-ui/core/Menu';
+import MenuList from '@material-ui/core/MenuList';
+import Divider from '@material-ui/core/Divider';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import IconButton from '@material-ui/core/IconButton';
 //
 import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
@@ -63,6 +68,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       removedRows: new Immutable.Set(),
       showBulkActionDetail: false,
       bulkActionShowLoading: false,
+      anchorEl: null,
       _actions
     };
     this.attributeManager = new FormAttributeManager();
@@ -457,7 +463,16 @@ class AdvancedTable extends Basic.AbstractContextComponent {
 
   _handlePagination(page, size) {
     const { uiKey, manager } = this.props;
-    this.context.store.dispatch(manager.handlePagination(page, size, uiKey));
+    this.context.store.dispatch(manager.handlePagination(page, size, uiKey, (json, error) => {
+      // croll top - new page of items
+      if (!error) {
+        /*
+        TODO: table top is not visible only
+        $('html, body').animate({
+          scrollTop: 0
+        }, 'fast'); */
+      }
+    }));
   }
 
   _handleSort(property, order, shiftKey) {
@@ -668,9 +683,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       }, () => {
         // @todo-upgrade-10 This is brutal hack!
         // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
-        // This problem occured after update on React 16, but primary bug is in react-bootstap.
-        // Problem should be fixed, but still doesn't works (in 0.32.4).
-        // https://github.com/react-bootstrap/react-bootstrap/issues/2841#issuecomment-378017284.
+        // This problem occured after update on React 16
+        // @todo-upgrade-12 still occurs with material-ui modals
         setTimeout(() => {
           this.prevalidateBulkAction(backendBulkAction);
         }, 10);
@@ -878,6 +892,18 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     return true;
   }
 
+  _handleOpenBulkActionMenu(event) {
+    this.setState({
+      anchorEl: event.currentTarget
+    });
+  }
+
+  _handleCloseBulkActionMenu(cb = null) {
+    this.setState({
+      anchorEl: null
+    }, cb);
+  }
+
   _renderPrevalidateMessages(backendBulkAction) {
     if (!backendBulkAction.prevalidateResult) {
       return null;
@@ -920,56 +946,65 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     if (removedRows.size > 0) {
       removedEnties = manager.getEntitiesByIds(this.props._state, removedRows.toArray());
     }
-    let modalContent = null;
+    const modalContent = [];
+    let bsSize = 'md';
+    let fullWidth = false;
     if (backendBulkAction && backendBulkAction.longRunningTaskId) {
       if (SecurityManager.hasAuthority('SCHEDULER_AUTOCOMPLETE')) {
-        modalContent = (
-          <Basic.Modal.Body style={ {padding: 0, marginBottom: -20} }>
-            <LongRunningTask
-              entityIdentifier={ backendBulkAction.longRunningTaskId }
-              header={ this.i18n(`${backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`)}
-              showProperties={ false }
-              onComplete={ () => this._afterBulkAction(backendBulkAction) }
-              footerButtons={
-                <Basic.Button
-                  level="link"
-                  onClick={ this.showBulkActionDetail.bind(this) }>
-                  { this.i18n('button.close') }
-                </Basic.Button>
-              }/>
-          </Basic.Modal.Body>
-        );
-      } else {
-        modalContent = (
-          <Basic.Div>
-            <Basic.Modal.Header
-              icon={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.icon`, { defaultValue: '' }) }
-              text={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`) }/>
-            <Basic.Modal.Body>
-              <Basic.Alert
-                level="info"
-                text={ this.i18n('bulkAction.insufficientReadPermission') }/>
-            </Basic.Modal.Body>
-            <Basic.Modal.Footer>
+        fullWidth = true;
+        bsSize = 'sm';
+        modalContent.push(
+          <LongRunningTask
+            entityIdentifier={ backendBulkAction.longRunningTaskId }
+            header={ this.i18n(`${backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`)}
+            showProperties={ false }
+            onComplete={ () => this._afterBulkAction(backendBulkAction) }
+            style={{ marginBottom: 0 }}
+            footerButtons={
               <Basic.Button
                 level="link"
                 onClick={ this.showBulkActionDetail.bind(this) }>
                 { this.i18n('button.close') }
               </Basic.Button>
-            </Basic.Modal.Footer>
-          </Basic.Div>
+            }/>
+        );
+      } else {
+        modalContent.push(
+          <Basic.Modal.Header
+            icon={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.icon`, { defaultValue: '' }) }
+            text={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`) }
+            closeButton/>
+        );
+        modalContent.push(
+          <Basic.Modal.Body>
+            <Basic.Alert
+              level="info"
+              text={ this.i18n('bulkAction.insufficientReadPermission') }/>
+          </Basic.Modal.Body>
+        );
+        modalContent.push(
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.showBulkActionDetail.bind(this) }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         );
       }
     } else if (backendBulkAction) {
       const helpKey = `${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.help`;
       const help = this.i18n(helpKey);
       //
-      modalContent = (
-        <form onSubmit={this.processBulkAction.bind(this, backendBulkAction)}>
-          <Basic.Modal.Header
-            icon={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.icon`, { defaultValue: '' }) }
-            text={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`) }/>
-          <Basic.Modal.Body>
+      modalContent.push(
+        <Basic.Modal.Header
+          icon={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.icon`, { defaultValue: '' }) }
+          text={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`) }
+          closeButton/>
+      );
+      modalContent.push(
+        <Basic.Modal.Body>
+          <form onSubmit={ this.processBulkAction.bind(this, backendBulkAction) }>
             <Basic.AbstractForm ref="bulkActionForm" showLoading={bulkActionShowLoading}>
               <Basic.Alert
                 level="warning"
@@ -1017,31 +1052,39 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                 formInstance={ formInstance }
                 localizationType="bulk-action"/>
             </Basic.AbstractForm>
-          </Basic.Modal.Body>
-          <Basic.Modal.Footer>
-            <Basic.Button
-              level="link"
-              onClick={ this.showBulkActionDetail.bind(this) }>
-              { this.i18n('button.close') }
-            </Basic.Button>
-            <Basic.Button
-              type="submit"
-              level={ backendBulkAction.level ? backendBulkAction.level.toLowerCase() : 'success' }
-              showLoading={ bulkActionShowLoading }
-              showLoadingIcon
-              showLoadingText={ this.i18n('button.saving') }>
-              { this.i18n('bulkAction.button.execute') }
-            </Basic.Button>
-          </Basic.Modal.Footer>
-        </form>
+            {/* onEnter action - is needed because footer submit button is outside form */}
+            <input type="submit" className="hidden"/>
+          </form>
+        </Basic.Modal.Body>
+      );
+      modalContent.push(
+        <Basic.Modal.Footer>
+          <Basic.Button
+            level="link"
+            onClick={ this.showBulkActionDetail.bind(this) }>
+            { this.i18n('button.close') }
+          </Basic.Button>
+          <Basic.Button
+            type="submit"
+            variant="contained"
+            level={ backendBulkAction.level ? backendBulkAction.level.toLowerCase() : 'success' }
+            showLoading={ bulkActionShowLoading }
+            showLoadingIcon
+            showLoadingText={ this.i18n('button.saving') }
+            onClick={ this.processBulkAction.bind(this, backendBulkAction) }>
+            { this.i18n('bulkAction.button.execute') }
+          </Basic.Button>
+        </Basic.Modal.Footer>
       );
     }
-
+    //
     return (
       <Basic.Modal
         show={ showBulkActionDetail }
         onHide={ this.showBulkActionDetail.bind(this) }
-        backdrop="static">
+        backdrop="static"
+        bsSize={ bsSize }
+        fullWidth={ fullWidth }>
         { modalContent }
       </Basic.Modal>
     );
@@ -1090,6 +1133,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       filterOpened,
       selectedRows,
       removedRows,
+      anchorEl,
       _actions,
       hideTableShowLoading
     } = this.state;
@@ -1315,7 +1359,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     let buttonMenuIncludedActions = null;
     if (_menuIncluded && buttonActions.length > 0) {
       buttonMenuIncludedActions = buttonActions.map(action => (
-        <MenuItem
+        <Basic.MenuItem
           title={ this.isDevelopment() ? `Action order: ${ action.order }, Action key: ${ action.actionKey }` : null }
           onClick={
             (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
@@ -1324,30 +1368,36 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             ?
             null
             :
-            this.onBulkAction.bind(this, action)
+            () => {
+              this._handleCloseBulkActionMenu(() => {
+                this.onBulkAction(action);
+              });
+            }
           }
           disabled={
             (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
             ||
             (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+          }
+          icon={
+            <Basic.Icon icon={ action.icon } level={ action.level }/>
           }>
-          <Basic.Icon icon={ action.icon } level={ action.level }/>
           { action.label || action.niceLabel }
-        </MenuItem>
+        </Basic.MenuItem>
       ));
       if (menuActions.length > 0 || deleteActions.length > 0) {
-        buttonMenuIncludedActions.push(<MenuItem divider />);
+        buttonMenuIncludedActions.push(<Divider />);
         buttonMenuIncludedActions.push(
-          <MenuItem header>
+          <Basic.MenuItem disabled>
             { this.i18n(`bulkAction.button.next`) }
-          </MenuItem>
+          </Basic.MenuItem>
         );
-        buttonMenuIncludedActions.push(<MenuItem divider />);
+        buttonMenuIncludedActions.push(<Divider />);
       }
     }
     //
     return (
-      <Basic.Div
+      <div
         className={
           classnames(
             'advanced-table',
@@ -1370,8 +1420,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                 { filter }
               </Basic.Div>
             </Basic.Collapse>
-            <Basic.Div className="advanced-table-heading">
-              <Basic.Div className="bulk-action-container">
+            <div className="advanced-table-heading">
+              <div className="bulk-action-container">
                 {
                   showBulkActionSelect
                   ?
@@ -1402,7 +1452,6 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                       buttonActions.map(action => {
                         return (
                           <Basic.Button
-                            buttonSize="xs"
                             className="bulk-action-button"
                             title={
                               this.isDevelopment()
@@ -1417,87 +1466,111 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                               (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
                             }
                             titlePlacement="bottom"
-                            onClick={ this.onBulkAction.bind(this, action) }>
-                            <Basic.Icon icon={ action.icon } level={ action.level }/>
-                          </Basic.Button>
+                            onClick={ this.onBulkAction.bind(this, action) }
+                            icon={ action.icon }
+                            level={ action.level }/>
                         );
                       })
                     }
                     {
                       (menuActions.length === 0 && deleteActions.length === 0 && (!_menuIncluded || buttonActions.length === 0))
                       ||
-                      <Dropdown>
-                        <Basic.Icon
-                          className="dropdown-toogle-icon"
+                      <>
+                        <IconButton
                           bsRole="toggle"
-                          value="fa:ellipsis-v"
-                          title={ _menuIncluded ? this.i18n(`bulkAction.button.all`) : this.i18n(`bulkAction.button.next`) }/>
+                          aria-label="more"
+                          aria-controls="bulk-action-menu"
+                          aria-haspopup="true"
+                          title={ _menuIncluded ? this.i18n(`bulkAction.button.all`) : this.i18n(`bulkAction.button.next`) }
+                          onClick={ (event) => {
+                            this._handleOpenBulkActionMenu(event);
+                          }}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          id="bulk-action-menu"
+                          anchorEl={ anchorEl }
+                          keepMounted
+                          open={ Boolean(anchorEl) }
+                          onClose={ this._handleCloseBulkActionMenu.bind(this, null) }>
+                          <MenuList>
+                            <Basic.MenuItem disabled>
+                              { this.i18n(`bulk-action.selection${ selectedRows.length === 0 ? '_empty' : '' }`, { count }) }
+                            </Basic.MenuItem>
+                            <Divider />
 
-                        <Dropdown.Menu>
-                          <MenuItem header>
-                            { this.i18n(`bulk-action.selection${ selectedRows.length === 0 ? '_empty' : '' }`, { count }) }
-                          </MenuItem>
-                          <MenuItem divider />
-                          {
-                            buttonMenuIncludedActions
-                          }
-                          {
-                            menuActions.map(action => {
-                              return (
-                                <MenuItem
-                                  title={ this.isDevelopment() ? `Action order: ${ action.order }, Action key: ${ action.actionKey }` : null }
-                                  onClick={
-                                    (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                                    ||
-                                    (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                                    ?
-                                    null
-                                    : this.onBulkAction.bind(this, action)
-                                  }
-                                  disabled={
-                                    (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                                    ||
-                                    (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                                  }>
-                                  <Basic.Icon icon={ action.icon } level={ action.level }/>
-                                  { action.label || action.niceLabel }
-                                </MenuItem>
-                              );
-                            })
-                          }
-                          {
-                            deleteActions.length === 0 || menuActions.length === 0
-                            ||
-                            <MenuItem divider />
-                          }
-                          {
-                            deleteActions.map(action => {
-                              return (
-                                <MenuItem
-                                  title={ this.isDevelopment() ? `Action order: ${ action.order }` : null }
-                                  onClick={
-                                    (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                                    ||
-                                    (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                                    ?
-                                    null
-                                    :
-                                    this.onBulkAction.bind(this, action)
-                                  }
-                                  disabled={ (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection) }>
-                                  <Basic.Icon icon={ action.icon } level={ action.level }/>
-                                  { action.label || action.niceLabel }
-                                </MenuItem>
-                              );
-                            })
-                          }
-                        </Dropdown.Menu>
-                      </Dropdown>
+                            {
+                              buttonMenuIncludedActions
+                            }
+                            {
+                              menuActions.map(action => {
+                                return (
+                                  <Basic.MenuItem
+                                    title={ this.isDevelopment() ? `Action order: ${ action.order }, Action key: ${ action.actionKey }` : null }
+                                    onClick={
+                                      (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                      ||
+                                      (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+                                      ?
+                                      null
+                                      :
+                                      () => {
+                                        this._handleCloseBulkActionMenu(() => {
+                                          this.onBulkAction(action);
+                                        });
+                                      }
+                                    }
+                                    disabled={
+                                      (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                      ||
+                                      (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+                                    }
+                                    icon={
+                                      <Basic.Icon icon={ action.icon } level={ action.level }/>
+                                    }>
+                                    { action.label || action.niceLabel }
+                                  </Basic.MenuItem>
+                                );
+                              })
+                            }
+                            {
+                              deleteActions.length === 0 || menuActions.length === 0
+                              ||
+                              <Divider />
+                            }
+                            {
+                              deleteActions.map(action => {
+                                return (
+                                  <Basic.MenuItem
+                                    title={ this.isDevelopment() ? `Action order: ${ action.order }` : null }
+                                    onClick={
+                                      (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                      ||
+                                      (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+                                      ?
+                                      null
+                                      :
+                                      () => {
+                                        this._handleCloseBulkActionMenu(() => {
+                                          this.onBulkAction(action);
+                                        });
+                                      }
+                                    }
+                                    disabled={ (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection) }>
+                                    <Basic.Icon icon={ action.icon } level={ action.level }/>
+                                    { action.label || action.niceLabel }
+                                  </Basic.MenuItem>
+                                );
+                              })
+                            }
+                          </MenuList>
+                        </Menu>
+                      </>
                     }
                   </Basic.Div>
                 }
-              </Basic.Div>
-              <Basic.Div className="button-container">
+              </div>
+              <div className="button-container">
                 { buttons }
 
                 <Filter.ToogleButton
@@ -1514,8 +1587,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                   title={ this.i18n('button.refresh') }
                   showLoading={ _showLoading }
                   rendered={ showRefreshButton }/>
-              </Basic.Div>
-            </Basic.Div>
+              </div>
+            </div>
           </Basic.Toolbar>
         }
         {
@@ -1536,7 +1609,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             </div>
           </Basic.Alert>
           :
-          <Basic.Div>
+          <>
             <Basic.BasicTable.Table
               ref="table"
               uiKey={ uiKey ? `sub-basic-table-${ uiKey }` : null }
@@ -1576,13 +1649,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                     const content = [];
                     //
                     content.push(
-                      <Basic.Div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
                         {
                           !_showTransactionId
                           ||
-                          <span title={ this.i18n('entity.id.help') }>
+                          <div title={ this.i18n('entity.id.help') }>
                             { this.i18n('entity.id.short') }:
-                          </span>
+                          </div>
                         }
                         <UuidInfo
                           header={ this.i18n('entity.id.help') }
@@ -1607,15 +1680,14 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                             :
                             null
                           }/>
-                      </Basic.Div>
+                      </div>
                     );
                     if (_showTransactionId) {
                       content.push(
-                        <Basic.Div>
-                          <span title={ this.i18n('entity.transactionId.help') }>
-                            { this.i18n('entity.transactionId.short') }
-                            :
-                          </span>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div title={ this.i18n('entity.transactionId.help') }>
+                            { this.i18n('entity.transactionId.short') }:
+                          </div>
                           <UuidInfo
                             value={ transactionId }
                             uuidEnd={ uuidEnd }
@@ -1638,7 +1710,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                               :
                               null
                             }/>
-                        </Basic.Div>
+                        </div>
                       );
                     }
                     //
@@ -1653,10 +1725,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               total={ pagination ? _total : _entities.length }
               sizeOptions={ sizeOptions }
               { ...range } />
-          </Basic.Div>
+          </>
         }
         { this._renderBulkActionDetail() }
-      </Basic.Div>
+      </div>
     );
   }
 }

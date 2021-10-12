@@ -88,6 +88,9 @@ export class FormValueTable extends Advanced.AbstractTableContent {
         this.setState({
           persistentType: filterData.persistentType
         }, () => {
+          if (filterData.persistentType === PersistentTypeEnum.findKeyBySymbol(PersistentTypeEnum.INT)) {
+            filterData.intValue = filterData.longValue;
+          }
           this.refs.filterForm.setData(filterData);
         });
       } else {

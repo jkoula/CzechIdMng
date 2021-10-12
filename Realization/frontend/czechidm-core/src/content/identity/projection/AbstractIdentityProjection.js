@@ -950,30 +950,27 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
           entity={ isNew ? null : identityProjection }
           back="/identities"
           buttons={[
-            <Basic.Icon
-              value="fa:angle-double-right"
-              style={{ marginRight: 5, cursor: 'pointer' }}
+            <Basic.Button
+              icon="fa:angle-double-right"
               title={ this.i18n('component.advanced.IdentityInfo.link.detail.default.label') }
               onClick={ () => this.context.history.push(`/identity/${ encodeURIComponent(identityProjection.username) }/profile`) }
               rendered={ !isNew }/>
           ]}>
-          {
-            _imageUrl
-            ?
-            <img src={ _imageUrl } alt="profile" className="img-circle img-thumbnail" style={{ height: 40, padding: 0 }} />
-            :
-            <Basic.Icon
-              icon={ formProjection ? formProjectionManager.getLocalization(formProjection, 'icon', 'component:identity') : 'component:identity' }
-              identity={ identityProjection }/>
-          }
-          <Basic.ShortText
-            value={ identityProjectionManager.getNiceLabel(identityProjection) }
-            maxLength={ 60 }
-            cutChar=""
-            style={{ marginLeft: 7, marginRight: 7 }}/>
-          <small>
-            { isNew ? this.i18n('create.title') : this.i18n('edit.title') }
-          </small>
+          <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
+            <Basic.Avatar src={ _imageUrl } alt="profile" >
+              <Basic.Icon
+                icon={ formProjection ? formProjectionManager.getLocalization(formProjection, 'icon', 'component:identity') : 'component:identity' }
+                identity={ identityProjection }/>
+            </Basic.Avatar>
+            <Basic.ShortText
+              value={ identityProjectionManager.getNiceLabel(identityProjection) }
+              maxLength={ 60 }
+              cutChar=""
+              style={{ marginLeft: 7 }}/>
+            <small style={{ marginLeft: 7 }}>
+              { !isNew || this.i18n('create.title') }
+            </small>
+          </Basic.Div>
         </Advanced.DetailHeader>
 
         <OrganizationPosition identity={ entityId } rendered={ !isNew }/>

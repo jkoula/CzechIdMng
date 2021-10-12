@@ -28,9 +28,9 @@ class ProvisioningOperations extends Basic.AbstractContent {
     this.state = {
       detail: {
         show: false,
-        entity: null,
-        activeKey: 1
-      }
+        entity: null
+      },
+      activeKey: 1
     };
   }
 
@@ -326,12 +326,10 @@ class ProvisioningOperations extends Basic.AbstractContent {
         <span> {headerDesc} </span>
         <Basic.Popover
           ref="popover"
-          trigger={['click', 'hover']}
+          trigger="hover"
           value={ helpText }
           className="abstract-entity-info-popover">
-          <span>
-            <Basic.Icon level="success" icon="question-sign" />
-          </span>
+          <Basic.Icon level="success" icon="question-sign" />
         </Basic.Popover>
       </div>
     );

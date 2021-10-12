@@ -3,30 +3,21 @@
 @import "node_modules/@fortawesome/fontawesome-free/less/fontawesome.less"; // TODO: move to icon.less
 @import "node_modules/@fortawesome/fontawesome-free/less/solid.less"; // TODO: move to icon.less
 @import "node_modules/@fortawesome/fontawesome-free/less/regular.less"; // TODO: move to icon.less
-@import "node_modules/@fortawesome/fontawesome-free/less/v4-shims.less"; // TODO: remove in version 10.x
+@import "node_modules/@fortawesome/fontawesome-free/less/v4-shims.less"; // TODO: fas / far / fab icons are mixed
 @import "variables.less";
+@import (inline) "./roboto.css";
 /* inject:imports */
 
 /* endinject */
 
-//fixme
-
-* {
-  margin: 0;
-  padding: 0;
-}
-
-*, *:before, *:after {
-  box-sizing: border-box;
+html {
+  font-size: 1rem;
 }
 
 body {
-  background-color: #fcfcfc;
   text-align: left;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Roboto";
   font-style: normal;
-  font-size: 14px;
-  color: #333;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -86,11 +77,6 @@ h6 {
   text-transform: uppercase;
 }
 
-.content-footer {
-
-}
-
-
 a {
   color: @idm-link-color;
   text-decoration: none;
@@ -117,25 +103,28 @@ a {
   margin: 0 !important;
 }
 
-#content-wrapper {
-  width: 100%;
-}
-
 #content-container {
-  margin-top: 20px;
-  padding: 0 15px 0px 15px;
-  min-height: 568px;
+  margin-top: 15px;
+
+  &.with-sidebar {
+    margin-top: 0;
+  }
 }
 
-@media(min-width:768px) {
-  #content-container.with-sidebar {
-    position: inherit;
-    margin: 0 0 0 250px;
-    padding: 20px 30px 0px 30px;
-    border-left: 1px solid #bbb;
+#content-wrapper {
+}
 
-    &.collapsed {
-      margin: 0 0 0 50px;
+.app-footer {
+  text-align: center;
+  margin-top: 64px;
+  //
+  a {
+    opacity: .6;
+    filter: alpha(opacity=60);
+
+    &:hover {
+      opacity: 1;
+      filter: alpha(opacity=100);
     }
   }
 }
@@ -156,8 +145,7 @@ footer {
 * Login page
 */
 .login-container {
-  max-width: 400px;
-  margin: 70px auto 0 auto;
+  margin-top: 70px;
 }
 
 /**
@@ -165,4 +153,8 @@ footer {
  */
 .huge {
   font-size: 40px;
+}
+
+.hidden {
+  display: none;
 }

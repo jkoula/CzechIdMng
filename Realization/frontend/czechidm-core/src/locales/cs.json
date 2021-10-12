@@ -47,6 +47,8 @@
     "selectAll": "Vybrat vše / nic",
     "validFrom": "$t(entity.validFrom)",
     "validTill": "$t(entity.validTill)",
+    "show": "Zobrazit",
+    "hide": "Skrýt",
     "select": "Vyberte ...",
     "selected": "Vybraný záznam",
     "default": "Výchozí",
@@ -1397,7 +1399,7 @@
         },
         "help": {
           "header": "Změna hesla",
-          "body": "<div class=\"alert alert-info\">Formulář pro změnu hesla je určen pouze pro externí zaměstnance. Interní zaměstnanec si může změnit heslo po přihlášení ve svém profilu.</div>Změnu hesla provedete vyplněním formuláře. Do tohoto formuláře zadáte své uživatelské jméno, stávající heslo, požadované nové heslo a nakonec ještě jednou své nové heslo pro kontrolu. Poté můžete změnu potvrdit kliknutím na tlačítko <button class=\"btn btn-xs btn-success disabled soft-disabled\">Změna hesla</button>."
+          "body": "<div class=\"alert alert-info\">Formulář pro změnu hesla je určen pouze pro externí zaměstnance. Interní zaměstnanec si může změnit heslo po přihlášení ve svém profilu.</div>Změnu hesla provedete vyplněním formuláře. Do tohoto formuláře zadáte své uživatelské jméno, stávající heslo, požadované nové heslo a nakonec ještě jednou své nové heslo pro kontrolu. Poté můžete změnu potvrdit kliknutím na tlačítko <button class=\"basic-button btn btn-xs btn-success disabled soft-disabled\">Změna hesla</button>."
         }
       },
       "strength" : {
@@ -2548,7 +2550,7 @@
       },
       "filter": {
         "text": {
-          "placeholder": "Název, kód, prostředí či popis"
+          "placeholder": "Název, kód či popis"
         },
         "roleCatalogue": {
           "option": {
@@ -4287,7 +4289,7 @@
       },
       "formProjection": {
         "label": "Typ uživatele",
-        "help": "Typu uživatele definuje formulř, který bude použit po jeho detail a editaci."
+        "help": "Typ uživatele definuje formulář, který bude použit pro jeho detail a editaci."
       },
       "passwordExpiration": {
         "label": "Expirace hesla",

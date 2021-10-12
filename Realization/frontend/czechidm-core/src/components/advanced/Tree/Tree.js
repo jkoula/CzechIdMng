@@ -794,7 +794,7 @@ class Tree extends Basic.AbstractContextComponent {
               );
             }
             //
-            let expandIcon = 'fa:plus-square-o';
+            let expandIcon = 'far:plus-square';
             let expandAction = this.onExpand.bind(this, node.id);
             let expandTitle = this.i18n('expand.expand');
             if (renderedNodes.has(node.id)) {
@@ -802,7 +802,7 @@ class Tree extends Basic.AbstractContextComponent {
               expandAction = null;
               expandTitle = this.i18n('expand.cycle');
             } else if (nodes.has(node.id)) {
-              expandIcon = 'fa:minus-square-o';
+              expandIcon = 'far:minus-square';
               expandAction = this.onCollapse.bind(this, node.id);
               expandTitle = this.i18n('expand.collapse');
             }
@@ -933,7 +933,8 @@ class Tree extends Basic.AbstractContextComponent {
 
                 {/* RT: search prepare  */}
                 <Basic.Button
-                  className="btn-xs hidden"
+                  className="hidden"
+                  buttonSize="xs"
                   showLoading={ _showLoading }
                   icon="filter"
                   style={{ marginLeft: 3 }}
@@ -944,7 +945,7 @@ class Tree extends Basic.AbstractContextComponent {
                 <Basic.Button
                   title={ this.i18n('reload') }
                   titlePlacement="bottom"
-                  className="btn-xs"
+                  buttonSize="xs"
                   onClick={ this.reload.bind(this, null) }
                   showLoading={ _showLoading }
                   rendered={ showRefreshButton }

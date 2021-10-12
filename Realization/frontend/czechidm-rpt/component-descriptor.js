@@ -12,7 +12,7 @@ module.exports = {
       id: 'report-icon',
       type: 'icon',
       entityType: ['report', 'reports'],
-      component: 'fa:line-chart'
+      component: 'fa:chart-line'
     }
   ]
 };

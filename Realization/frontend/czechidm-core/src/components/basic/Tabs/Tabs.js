@@ -1,10 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Tab, Tabs } from 'react-bootstrap';
 import classnames from 'classnames';
-import _ from 'lodash';
+//
+import { makeStyles } from '@material-ui/core/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
+
+const useStyles = makeStyles((theme) => ({
+  tabContent: {
+    borderColor: theme.palette.divider,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderBottomLeftRadius: theme.shape.borderRadius,
+    borderBottomRightRadius: theme.shape.borderRadius
+  },
+  activeTab: {
+  }
+}));
 
 /**
  * Wrapped bootstrap Tabbs
@@ -13,98 +26,95 @@ import AbstractComponent from '../AbstractComponent/AbstractComponent';
  *
  * @author Radek Tomiška
  */
-export default class BasicTabs extends AbstractComponent {
-
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      activeKey: 1
-    };
+export default function BasicTabs(props) {
+  const { rendered, activeKey, onSelect, className, style, unmountOnExit, children } = props;
+  const [ _activeKey, setActiveKey ] = React.useState(0);
+  const classes = useStyles();
+  //
+  if (!rendered) {
+    return null;
   }
-
-  _getRenderedChildren(children) {
-    return children.filter(child => {
-      return child.props.rendered;
-    });
-  }
-
-  /**
-   * Default method handle a activeKey.
-   */
-  _onChangeSelectTabs(activeKey) {
-    this.setState({
-      activeKey
-    });
-  }
-
-  render() {
-    const { id, rendered, position, activeKey, onSelect, className, style, unmountOnExit } = this.props;
-    if (!rendered) {
-      return null;
+  //
+  const _mergedActiveKey = onSelect ? activeKey : _activeKey;
+  //
+  const handleChange = (event, newValue) => {
+    if (onSelect) {
+      onSelect(newValue);
+    } else {
+      setActiveKey(newValue);
     }
-
-    // Since our all componnets are React.PureComponent
-    // must be activeKey handle in all causes (if onSelect component is not used).
-    const _activeKey = !onSelect ? (activeKey || this.state.activeKey) : undefined;
-
-    const classNames = classnames(
-      {'tab-horizontal': !position || position === 'top'},
-      {'tab-vertical': position && position === 'left'}, // TODO: not implemened
-      className
-    );
-    //
-    let _id = id;
-    if (!_id) {
-      _id = _.uniqueId('tooltip_');
-    }
-    //
-    return (
+  };
+  // resolve valid Tab component as children
+  const _children = children.filter(child => {
+    return child.props.rendered && React.isValidElement(child);
+  });
+  if (_children.length === 0) { // no valid and rendered child found => nothing to render
+    return null;
+  }
+  const value = onSelect ? activeKey : _mergedActiveKey;
+  //
+  return (
+    <div>
       <Tabs
-        id={ _id }
-        key={ _activeKey }
-        animation={false}
-        unmountOnExit={unmountOnExit}
-        onSelect={ onSelect || this._onChangeSelectTabs.bind(this)}
-        activeKey={ onSelect ? activeKey : _activeKey }
-        className={ classNames }
+        value={ value }
+        indicatorColor="primary"
+        textColor="primary"
+        onChange={ handleChange }
+        aria-label="basic tabs"
+        className={ className }
         style={ style }>
-        { this._getRenderedChildren(this.props.children) }
+        {
+          _children.map((child, index) => {
+            const eventKey = child.props.eventKey || index;
+            //
+            return (
+              <Tab
+                id={ `basic-tab-${ eventKey }` }
+                value={ eventKey }
+                aria-controls={ `basic-tabpanel-${ eventKey }` }
+                disabled={ child.props.disabled }
+                className={
+                  classnames(
+                    { [classes.activeTab]: value === eventKey },
+                    className
+                  )
+                }
+                style={ child.props.style }
+                label={ child.props.title }/>
+            );
+          })
+        }
       </Tabs>
-    );
-  }
+      {
+        _children.map((child, index) => {
+          const eventKey = child.props.eventKey || index;
+          //
+          return (
+            <div
+              role="tabpanel"
+              hidden={ value !== eventKey }
+              id={ `basic-tabpanel-${ eventKey }` }
+              aria-labelledby={ `basic-tab-${ eventKey }` }
+              className={ classes.tabContent }>
+              {
+                value === eventKey || !unmountOnExit
+                ?
+                child
+                :
+                null
+              }
+            </div>
+          );
+        })
+      }
+    </div>
+  );
 }
 
 BasicTabs.propTypes = {
-  rendered: PropTypes.bool
+  ...AbstractComponent.propTypes
 };
 
 BasicTabs.defaultProps = {
-  rendered: true
+  ...AbstractComponent.defaultProps
 };
-
-/**
- * Adds rendered to react bootstrap Tab.
- */
-export class BasicTab extends AbstractComponent {
-
-  render() {
-    const { rendered, ...others } = this.props;
-    if (!rendered) {
-      return null;
-    }
-
-    return (
-      <Tab {...others} />
-    );
-  }
-}
-
-BasicTab.propTypes = {
-  rendered: PropTypes.bool
-};
-
-BasicTab.defaultProps = {
-  rendered: true
-};
-
-BasicTabs.Tab = BasicTab;

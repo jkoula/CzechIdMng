@@ -305,7 +305,7 @@ class AbstractFormComponent extends AbstractContextComponent {
   renderHelpIcon() {
     // FIXME: layout has wrong padding => use flexbox instead
     return (
-      <HelpIcon content={ this.props.help } style={{ marginLeft: 1 }}/>
+      <HelpIcon content={ this.props.help } style={{ marginLeft: 2, marginTop: 10 }}/>
     );
   }
 
@@ -441,8 +441,6 @@ AbstractFormComponent.propTypes = {
   label: PropTypes.string,
   disabled: PropTypes.bool,
   hidden: PropTypes.bool,
-  labelSpan: PropTypes.string, // defined span for label
-  componentSpan: PropTypes.string, // defined span for component
   required: PropTypes.bool, // add default required validation and asterix
   readOnly: PropTypes.bool, // html readonly
   onChange: PropTypes.func,
@@ -461,8 +459,6 @@ AbstractFormComponent.propTypes = {
 };
 
 AbstractFormComponent.defaultProps = {
-  labelSpan: null,
-  componentSpan: null,
   required: false,
   hidden: false,
   readOnly: false,

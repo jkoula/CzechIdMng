@@ -17,6 +17,7 @@ import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.vs.VirtualSystemModuleDescriptor;
@@ -95,5 +96,10 @@ public class VsRequestCancelBulkAction extends AbstractBulkAction<VsRequestDto, 
 	@Override
 	public ReadWriteDtoService<VsRequestDto, VsRequestFilter> getService() {
 		return requestService;
+	}
+	
+	@Override
+	public NotificationLevel getLevel() {
+		return NotificationLevel.WARNING;
 	}
 }

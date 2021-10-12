@@ -157,27 +157,24 @@ export class VsRequestTable extends Advanced.AbstractTableContent {
           type="button"
           level="success"
           rendered={Managers.SecurityManager.hasAnyAuthority(['VSREQUEST_UPDATE'])}
-          style={{marginRight: '2px', maxWidth: '21px', paddingLeft: '4px'}}
           title={this.i18n('vs:content.vs-request.detail.button.request.realize')}
           titlePlacement="bottom"
+          style={{ marginRight: 5 }}
           onClick={this.realize.bind(this, 'realize', [data[rowIndex].id])}
           disabled={ data[rowIndex].state !== 'IN_PROGRESS' }
-          className="btn-xs">
-          <Basic.Icon type="fa" icon="check"/>
-        </Basic.Button>
+          buttonSize="xs"
+          icon="fa:check"/>
         <Basic.Button
           ref="cancelButton"
           type="button"
           level="danger"
           rendered={Managers.SecurityManager.hasAnyAuthority(['VSREQUEST_UPDATE'])}
-          style={{marginRight: '2px'}}
           title={this.i18n('vs:content.vs-request.detail.button.request.cancel')}
           titlePlacement="bottom"
           onClick={this.cancel.bind(this, 'cancel', [data[rowIndex].id])}
           disabled={ data[rowIndex].state !== 'IN_PROGRESS' }
-          className="btn-xs">
-          <Basic.Icon type="fa" icon="remove"/>
-        </Basic.Button>
+          buttonSize="xs"
+          icon="fa:remove"/>
       </span>
     );
   }
@@ -310,31 +307,29 @@ export class VsRequestTable extends Advanced.AbstractTableContent {
             property="targetEntity"
             rendered={ _.includes(columns, 'targetEntity') }
             header={ this.i18n('vs:content.vs-request.detail.accountOwner') }
-            width="25%"
             cell={ this.renderTargetEntity.bind(this) }
           />
           <Advanced.Column
             header={this.i18n('acc:entity.System.name')}
             rendered={_.includes(columns, 'systemId')}
-            width="15%"
             cell={this._getSystemCell.bind(this)}/>
           <Advanced.Column
             property="operationType"
-            width="15%"
+            width={ 125 }
             sort
             face="enum"
             enumClass={VsOperationType}
             rendered={_.includes(columns, 'operationType')}/>
           <Advanced.Column
             property="state"
-            width="15%"
+            width={ 125 }
             sort
             face="enum"
             enumClass={VsRequestState}
             rendered={_.includes(columns, 'state')}/>
           <Advanced.Column
             property="executeImmediately"
-            width="5%"
+            width={ 75 }
             sort
             face="bool"
             rendered={_.includes(columns, 'executeImmediately')}/>
@@ -344,25 +339,25 @@ export class VsRequestTable extends Advanced.AbstractTableContent {
             cell={this._getImplementersCell.bind(this)}/>
           <Advanced.Column
             property="created"
-            width="30%"
+            width={ 125 }
             sort
             face="datetime"
             rendered={_.includes(columns, 'created')}/>
           <Advanced.Column
             property="creator"
-            width="15%"
+            width={ 125 }
             sort
             face="text"
             rendered={_.includes(columns, 'creator')}/>
           <Advanced.Column
             property="modified"
-            width="30%"
+            width={ 125 }
             sort
             face="datetime"
             rendered={_.includes(columns, 'modified')}/>
           <Advanced.Column
             property="modifier"
-            width="15%"
+            width={ 125 }
             sort
             face="text"
             rendered={_.includes(columns, 'modifier')}/>
@@ -390,7 +385,6 @@ export class VsRequestTable extends Advanced.AbstractTableContent {
             header=""
             rendered={_.includes(columns, 'operations')}
             width={ 75 }
-            className="detail-button"
             cell={this._getButtonsCell.bind(this)}/>
         </Advanced.Table>
       </Basic.Div>

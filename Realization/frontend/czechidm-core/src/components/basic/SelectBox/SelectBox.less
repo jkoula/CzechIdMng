@@ -3,42 +3,97 @@
 
 @select-primary-color: @idm-base-color;
 
+.basic-select-box {
+
+  position: relative;
+
+  .Select-control {
+    height: 40px;
+    background-color: transparent;
+    // min-width: 300px;
+
+    .Select-input {
+      background-color: transparent;
+    }
+  }
+
+  .Select--multi .Select-value {
+    margin-top: 8px;
+  }
+
+  .Select--single > .Select-control .Select-value, .Select-placeholder {
+    line-height: 40px;
+  }
+
+  .Select.is-disabled {
+    color: rgba(0, 0, 0, 0.26);;
+
+    > .Select-control {
+        background-color: transparent;
+        border-color: rgba(0, 0, 0, 0.26);
+
+        .Select-value .Select-value-label {
+          color: inherit;
+        }
+    }
+  }
+
+  .is-focused {
+    .Select-control {
+      .colorDefs(#3f51b5);
+      border-color: @select-primary-color;
+      background-color: transparent;
+      box-shadow: 0px 0px 5px 0px rgba(63, 81, 181, 0.7);
+    }
+  }
+
+  .Select.is-focused:not(.is-open) > .Select-control {
+    background-color: transparent;
+  }
+}
+
+.basic-modal-scroll-paper, .basic-modal-scroll-body {
+  .basic-select-box {
+    .Select-control {
+      min-width: 350px;
+    }
+  }
+}
+
 .colorDefs(@c1: #222) {
     @select-primary-color: @c1;
 }
 
 .has-error {
 	.Select-control{
-		border-color: #a94442;
+		border-color: #f44336;
 	}
 }
 
-.has-feedback{
-	.Select-arrow{
+.has-feedback {
+	.Select-arrow {
 		margin-left: -27px;
 	}
-}
 
-.has-feedback{
-  .is-loading{
-	   .Select-arrow{
-		     display: none;
-	 }
+  .is-loading {
+    .Select-arrow{
+      display: none;
+    }
   }
 }
 
-.Select-menu-outer{
-   z-index: 10;
+.Select-menu-outer {
+  z-index: 1301;
 }
 
 .has-error {
-		.is-focused{
-				.Select-control{
-					.colorDefs(#a94442);
-						border-color: @select-primary-color;
-						box-shadow: 0px 0px 5px 0px rgba(193, 66, 66, 0.7);
-		}
-	}
+	.is-focused {
+			.Select-control {
+				.colorDefs(#a94442);
+				border-color: @select-primary-color;
+				box-shadow: 0px 0px 5px 0px rgba(193, 66, 66, 0.7);
+      }
+   }
 }
 
 .small {

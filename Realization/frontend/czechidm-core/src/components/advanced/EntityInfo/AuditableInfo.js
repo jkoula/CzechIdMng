@@ -62,7 +62,7 @@ export class AuditableInfo extends Basic.AbstractContextComponent {
                 type="text"
                 value={ entity.id }
                 readOnly
-                style={{ fontSize: '0.85em', width: '100%' }}
+                style={{ fontSize: '0.85em', width: '100%', backgroundColor: 'transparent' }}
                 onClick={ () => {
                   // ~ctrl+c
                   this.refs['input-id'].select();
@@ -136,7 +136,7 @@ export class AuditableInfo extends Basic.AbstractContextComponent {
                   type="text"
                   value={ entity.transactionId }
                   readOnly
-                  style={{ fontSize: '0.85em', width: '100%' }}
+                  style={{ fontSize: '0.85em', width: '100%', backgroundColor: 'transparent' }}
                   onClick={ () => {
                     // ~ctrl+c
                     this.refs['input-transaction-id'].select();
@@ -186,7 +186,7 @@ export class AuditableInfo extends Basic.AbstractContextComponent {
         className="abstract-entity-info-popover">
         {
           <span className="popover-link" title={ this.i18n('link.title') }>
-            <Basic.Icon value="fa:cog" style={{ color: '#ccc' }} />
+            <Basic.Button icon="fa:cog" style={{ color: '#ccc' }} />
           </span>
         }
       </Basic.Popover>
@@ -195,7 +195,7 @@ export class AuditableInfo extends Basic.AbstractContextComponent {
 
   _renderFull(entity) {
     return (
-      <Basic.Panel className="panel-success" style={{ width: 300 }}>
+      <Basic.Panel level="success" style={{ width: 300 }}>
         <Basic.PanelHeader>
           <Basic.Icon value="fa:cog" style={{ marginRight: 5 }}/>
           { this.i18n('header') }

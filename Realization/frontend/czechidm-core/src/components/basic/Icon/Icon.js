@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import _ from 'lodash';
 //
+import { makeStyles } from '@material-ui/core/styles';
+//
+import * as Utils from '../../../utils';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import ComponentService from '../../../services/ComponentService';
 
@@ -10,142 +13,209 @@ const componentService = new ComponentService();
 //
 export const TYPE_GLYPHICON = 'glyph';
 export const TYPE_FONT_AWESOME = 'fa'; // https://fortawesome.github.io/Font-Awesome/examples/
+export const TYPE_FONT_AWESOME_FAR = 'far';
+export const TYPE_FONT_AWESOME_FAS = 'fas';
 export const TYPE_COMPONENT = 'component';
+const TYPE_ELEMENT = 'element';
+
+/**
+ * Returns resolved type and icon from given parameters
+ *
+ * @param  {string} type  icon type
+ * @param  {string} icon  requested icon - could contain type definition e.g. `fa:group`
+ * @param  {string} value parameter icon alias
+ * @return {{_type, _icon}}  object represents resolved type and icon
+ * @author Radek Tomiška
+ */
+function resolveParams(type, icon, value) {
+  // value could contain type definition
+  //
+  const _iconValue = icon || value;
+  if (!_iconValue) {
+    return {};
+  }
+  if (!_.isString(_iconValue)) {
+    return {
+      _type: TYPE_ELEMENT,
+      _icon: _iconValue
+    };
+  }
+  const _iconValues = _iconValue.split(':');
+  let _type = type;
+  let _icon = _iconValue;
+  if (_iconValues.length === 2) {
+    _type = _iconValues[0];
+    _icon = _iconValues[1];
+  }
+  return {
+    _type,
+    _icon
+  };
+}
+
+/**
+ * Theme decorator.
+ *
+ * @author Radek Tomiška
+ * @since 12.0.0
+ */
+const useStyles = makeStyles((theme) => {
+  if (!theme) {
+    // FIXME: react hook v react bootstrap popover doesnt work
+    return {};
+  }
+  //
+  return {
+    default: {
+      // nothing
+    },
+    info: {
+      color: theme.palette.info.main
+    },
+    warning: {
+      color: theme.palette.warning.main
+    },
+    error: {
+      color: theme.palette.error.main
+    },
+    success: {
+      color: theme.palette.success.main
+    },
+    primary: {
+      color: theme.palette.primary.main
+    },
+    secondary: {
+      color: theme.palette.secondary.main
+    }
+  };
+});
 
 /**
  * Icon
- * - it's a little advanced icon now (component usage)
- *
- * TODO: use FontAwesomeIcon for the fa type
- * TODO: fas, fab, far
+ * - it's a little advanced icon now (component usage).
  *
  * @author Radek Tomiška
  */
-export default class Icon extends AbstractComponent {
-
-  /**
-   * Returns resolved type and icon from given parameters
-   *
-   * @param  {string} type  icon type
-   * @param  {string} icon  requested icon - could contain type definition e.g. `fa:group`
-   * @param  {string} value parameter icon alias
-   * @return {{_type, _icon}}  object represents resolved type and icon
-   */
-  resolveParams(type, icon, value) {
-    // value could contain type definition
-    //
-    const _iconValue = icon || value;
-    if (!_iconValue) {
-      return {};
-    }
-    const _iconValues = _iconValue.split(':');
-    let _type = type;
-    let _icon = _iconValue;
-    if (_iconValues.length === 2) {
-      _type = _iconValues[0];
-      _icon = _iconValues[1];
-    }
-    return {
-      _type,
-      _icon
-    };
+export default function BasicIcon(props) {
+  const {
+    rendered,
+    type,
+    icon,
+    value,
+    ...other
+  } = props;
+  const classes = useStyles();
+  //
+  if (!rendered) {
+    return null;
   }
-
-  render() {
-    const {
-      rendered,
-      type,
-      icon,
-      value,
-      ...other
-    } = this.props;
-    //
-    if (!rendered) {
-      return null;
-    }
-    //
-    // value could contain type definition
-    const { _type, _icon } = this.resolveParams(type, icon, value);
-    if (_type === TYPE_COMPONENT) {
-      const component = componentService.getIconComponent(_icon);
-      if (component) {
-        const IconComponent = component.component;
-        if (_.isString(IconComponent)) {
-          // recursive - basic icon
-          return (
-            <Icon value={ IconComponent } { ...other } />
-          );
-        }
+  //
+  // value could contain type definition
+  const { _type, _icon } = resolveParams(type, icon, value);
+  if (_type === TYPE_COMPONENT) {
+    const component = componentService.getIconComponent(_icon);
+    if (component) {
+      const IconComponent = component.component;
+      if (_.isString(IconComponent)) {
+        // recursive - basic icon
         return (
-          <IconComponent { ...other }/>
+          <BasicIcon value={ IconComponent } { ...other } />
         );
       }
       return (
-        <span title="Icon not found in component library">
-          {' '}
-          { _icon }
-          {' '}
-        </span>
+        <IconComponent { ...other }/>
       );
     }
-    // Basic icon will be rendered
-    const {
-      className,
-      showLoading,
-      color,
-      style,
-      disabled,
-      title,
-      onClick,
-      level,
-      iconSize
-    } = this.props;
-    //
-    // without icon defined returns null
-    if (!_icon) {
-      return null;
-    }
-    //
-    let classNames = classnames(
-      `icon-${ level }`,
+    return (
+      <span title="Icon not found in component library">
+        {' '}
+        { _icon }
+        {' '}
+      </span>
     );
-    if (showLoading) {
-      classNames = classnames(
-        classNames,
-        'fa',
-        'fa-refresh',
-        'fa-spin',
-        className
-      );
-    } else {
-      classNames = classnames(
-        classNames,
-        { glyphicon: _type === TYPE_GLYPHICON },
-        { [`glyphicon-${ _icon}`]: _type === TYPE_GLYPHICON },
-        { fa: _type === TYPE_FONT_AWESOME },
-        { [`fa-${ _icon}`]: _type === TYPE_FONT_AWESOME },
-        { disabled: disabled === true },
-        { 'fa-2x': iconSize === 'sm' },
-        { 'fa-6x': iconSize === 'lg' },
-        className,
-      );
-    }
-    const _style = _.merge({}, style);
-    if (color) {
-      _style.color = color;
-    }
+  }
+  //
+  // Basic icon will be rendered
+  const {
+    className,
+    showLoading,
+    color,
+    style,
+    disabled,
+    title,
+    onClick,
+    level,
+    iconSize
+  } = props;
+  //
+  // without icon defined returns null
+  if (!_icon) {
+    return null;
+  }
+  //
+  let classNames = classnames(
+    classes[Utils.Ui.toLevel(level)],
+  );
+  if (_type === TYPE_ELEMENT) {
+    // FIXME: support other props
+    classNames = classnames(
+      classNames,
+      'basic-icon',
+      { disabled: disabled === true },
+      { 'fa-2x': iconSize === 'sm' },
+      { 'fa-6x': iconSize === 'lg' },
+      className,
+    );
     return (
       <span
         title={ title }
         className={ classNames }
-        aria-hidden="true"
-        style={ _style }
-        onClick={ disabled ? null : onClick } />
+        style={ style }>
+        { _icon }
+      </span>
     );
   }
+  //
+  if (showLoading) {
+    classNames = classnames(
+      classNames,
+      'basic-icon',
+      'fa',
+      'fa-refresh',
+      'fa-spin',
+      className
+    );
+  } else {
+    classNames = classnames(
+      classNames,
+      'basic-icon',
+      { glyphicon: _type === TYPE_GLYPHICON },
+      { [`glyphicon-${ _icon}`]: _type === TYPE_GLYPHICON },
+      { fa: _type === TYPE_FONT_AWESOME },
+      { far: _type === TYPE_FONT_AWESOME_FAR },
+      { fas: _type === TYPE_FONT_AWESOME_FAS },
+      { [`fa-${ _icon}`]: _type === TYPE_FONT_AWESOME || _type === TYPE_FONT_AWESOME_FAR || _type === TYPE_FONT_AWESOME_FAS },
+      { disabled: disabled === true },
+      { 'fa-2x': iconSize === 'sm' },
+      { 'fa-6x': iconSize === 'lg' },
+      className,
+    );
+  }
+  const _style = _.merge({}, style);
+  if (color) {
+    _style.color = color;
+  }
+  return (
+    <span
+      title={ title }
+      className={ classNames }
+      aria-hidden="true"
+      style={ _style }
+      onClick={ disabled ? null : onClick }/>
+  );
 }
 
-Icon.propTypes = {
+BasicIcon.propTypes = {
   ...AbstractComponent.propTypes,
   /**
    * glyphicon or font-awesome, default glyph
@@ -182,7 +252,7 @@ Icon.propTypes = {
   iconSize: PropTypes.oneOf(['default', 'sm', 'lg'])
 };
 
-Icon.defaultProps = {
+BasicIcon.defaultProps = {
   ...AbstractComponent.defaultProps,
   type: TYPE_GLYPHICON,
   disabled: false,

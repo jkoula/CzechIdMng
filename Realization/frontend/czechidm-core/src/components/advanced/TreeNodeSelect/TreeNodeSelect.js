@@ -346,22 +346,19 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
   }
 
   _renderShowTreeIcon() {
-    const { showTreeType } = this.props;
     const { readOnly } = this.state;
     //
     return (
-      <Basic.Div>
-        <Basic.LabelWrapper label={ showTreeType || this.getLabel() ? (<span style={{ visibility: 'hidden' }}>T</span>) : null }>
-          <Basic.Button
-            level="default"
-            icon="fa:folder-open"
-            style={{ marginLeft: 5 }}
-            onClick={ this.showTree.bind(this) }
-            title={ this.i18n('showTree.link.title') }
-            titlePlacement="bottom"
-            disabled={ readOnly }/>
-        </Basic.LabelWrapper>
-      </Basic.Div>
+      <div className="form-group" style={{ width: 'auto' }}>
+        <Basic.Button
+          level="default"
+          icon="fa:folder-open"
+          buttonSize="xs"
+          onClick={ this.showTree.bind(this) }
+          title={ this.i18n('showTree.link.title') }
+          titlePlacement="bottom"
+          disabled={ readOnly }/>
+      </div>
     );
   }
 
@@ -434,7 +431,7 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
         {
           !showTreeType || _forceTreeType
           ||
-          <Basic.Div style={{ display: 'flex' }}>
+          <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
             <Basic.Div style={{ flex: 1 }}>
               <EntitySelectBox
                 entityType="treeType"
@@ -453,7 +450,7 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
           </Basic.Div>
         }
 
-        <Basic.Div style={ showTreeType ? {} : { display: 'flex' } }>
+        <Basic.Div style={ showTreeType ? {} : { display: 'flex', alignItems: 'center' } }>
           <Basic.Div style={ showTreeType ? {} : { flex: 1 } }>
             <EntitySelectBox
               entityType="treeNode"
@@ -483,6 +480,7 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
         <Basic.Modal
           show={ showTree }
           onHide={ this.hideTree.bind(this) }
+          bsSize="sm"
           backdrop="static"
           keyboard>
           <Basic.Modal.Header text={ this.getHeader() } closeButton/>

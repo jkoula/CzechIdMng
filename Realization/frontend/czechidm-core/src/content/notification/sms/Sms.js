@@ -1,18 +1,19 @@
 import React from 'react';
-import Helmet from 'react-helmet';
 import * as Basic from '../../../components/basic';
 import { SmsManager } from '../../../redux';
 import SmsTable from './SmsTable';
 
 /**
- * List of sms logs
+ * List of sms logs.
  *
  * @author Peter Sourek
+ * @author Radek Tomiška
  */
 export default class Sms extends Basic.AbstractContent {
 
   constructor(props, context) {
     super(props, context);
+    //
     this.manager = new SmsManager();
   }
 
@@ -20,29 +21,21 @@ export default class Sms extends Basic.AbstractContent {
     return 'content.sms';
   }
 
-  componentDidMount() {
-    this.selectNavigationItem('notification-sms');
+  getNavigationKey() {
+    return 'notification-sms';
   }
 
   render() {
     return (
-      <div>
-        <Helmet title={this.i18n('title')} />
+      <Basic.Div>
 
-        <Basic.PageHeader>
-          {this.i18n('header')}
-        </Basic.PageHeader>
+        { this.renderPageHeader() }
 
         <Basic.Panel>
-          <SmsTable uiKey="sms-table" manager={this.manager} filterOpened/>
+          <SmsTable uiKey="sms-table" manager={ this.manager } filterOpened/>
         </Basic.Panel>
 
-      </div>
+      </Basic.Div>
     );
   }
 }
-
-Sms.propTypes = {
-};
-Sms.defaultProps = {
-};

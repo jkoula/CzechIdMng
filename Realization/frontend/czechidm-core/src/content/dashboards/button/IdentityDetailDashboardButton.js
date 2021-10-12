@@ -32,6 +32,10 @@ class IdentityDetailDashboardButton extends Advanced.AbstractIdentityDashboardBu
     // detail by projection
     this.context.history.push(identityManager.getDetailLink(identity));
   }
+
+  getLevel() {
+    return 'info';
+  }
 }
 
 function select(state) {

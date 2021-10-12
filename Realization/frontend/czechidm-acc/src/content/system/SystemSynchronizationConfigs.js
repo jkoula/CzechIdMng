@@ -285,33 +285,35 @@ class SystemSynchronizationConfigs extends Advanced.AbstractTableContent {
     const data = {};
     data[`automaticRefreshSwitch-${key}`] = automaticRefreshOn && longPollingEnabled;
     return (
-      <Basic.Toolbar>
-        <div className="pull-left">
-          <Basic.AbstractForm
-            ref={`automaticRefreshForm-${key}`}
-            readOnly={!longPollingEnabled}
-            style={{padding: '0px'}}
-            data={data}>
-            <Basic.ToggleSwitch
-              ref={`automaticRefreshSwitch-${key}`}
-              label={this.i18n('content.identity.roles.automaticRefreshSwitch')}
-              onChange={this._toggleAutomaticRefresh.bind(this, key)}
-            />
-          </Basic.AbstractForm>
-        </div>
-        <div className="pull-right">
-          <Basic.Button
-            level="success"
-            key="add_button"
-            className="btn-xs"
-            onClick={ this.showDetail.bind(this, { }, true) }
-            rendered={ Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE']) }
-            icon="fa:plus">
-            { this.i18n('button.add') }
-          </Basic.Button>
-          <Advanced.RefreshButton
-            rendered={!automaticRefreshOn || !longPollingEnabled}
-            onClick={ this._refreshAll.bind(this) }/>
+      <Basic.Toolbar style={{ padding: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            <Basic.AbstractForm
+              ref={`automaticRefreshForm-${key}`}
+              readOnly={!longPollingEnabled}
+              style={{padding: '15px 0px'}}
+              data={data}>
+              <Basic.ToggleSwitch
+                ref={`automaticRefreshSwitch-${key}`}
+                label={this.i18n('content.identity.roles.automaticRefreshSwitch')}
+                onChange={this._toggleAutomaticRefresh.bind(this, key)}
+              />
+            </Basic.AbstractForm>
+          </div>
+          <div>
+            <Basic.Button
+              level="success"
+              key="add_button"
+              className="btn-xs"
+              onClick={ this.showDetail.bind(this, { }, true) }
+              rendered={ Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE']) }
+              icon="fa:plus">
+              { this.i18n('button.add') }
+            </Basic.Button>
+            <Advanced.RefreshButton
+              rendered={!automaticRefreshOn || !longPollingEnabled}
+              onClick={ this._refreshAll.bind(this) }/>
+          </div>
         </div>
       </Basic.Toolbar>
     );

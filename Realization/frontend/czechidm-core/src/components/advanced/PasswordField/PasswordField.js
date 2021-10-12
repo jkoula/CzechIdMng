@@ -167,7 +167,7 @@ class PasswordField extends Basic.AbstractFormComponent {
           componentSpan={ componentSpan }
           disabled={ disabled }
           style={{ marginBottom: 0 }}/>
-        <Basic.Div className="form-group" style={{ margin: 0 }}>
+        <Basic.Div className="form-group" style={{ margin: '5px 0px 10px 0px' }}>
           {
             !labelSpan
             ||

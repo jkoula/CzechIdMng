@@ -15,7 +15,10 @@ import FlashMessages from './FlashMessages/FlashMessages';
 import HelpIcon from './HelpIcon/HelpIcon';
 import Icon from './Icon/Icon';
 import Loading from './Loading/Loading';
-import { Panel, PanelHeader, PanelBody, PanelFooter } from './Panel/Panel';
+import Panel from './Panel/Panel';
+import PanelHeader from './Panel/PanelHeader';
+import PanelBody from './Panel/PanelBody';
+import PanelFooter from './Panel/PanelFooter';
 import Toolbar from './Toolbar/Toolbar';
 import { BasicTable } from './Table';
 import Button from './Button/Button';
@@ -32,6 +35,7 @@ import Row from './Row/Row';
 import Col from './Row/Column';
 import Well from './Well/Well';
 import Tabs from './Tabs/Tabs';
+import Tab from './Tabs/Tab';
 import PageHeader from './PageHeader/PageHeader';
 import ContentHeader from './ContentHeader/ContentHeader';
 import LabelWrapper from './LabelWrapper/LabelWrapper';
@@ -50,6 +54,10 @@ import Div from './Div/Div';
 import ToggleSwitch from './ToggleSwitch/ToggleSwitch';
 import Wizard from './Wizard/Wizard';
 import TimeDuration from './TimeDuration/TimeDuration';
+import Avatar from './Avatar/Avatar';
+import Fab from './Fab/Fab';
+import Container from './Container/Container';
+import Typography from './Typography/Typography';
 
 const Components = {
   AbstractComponent,
@@ -99,7 +107,7 @@ const Components = {
   Col,
   Well,
   Tabs,
-  Tab: Tabs.Tab,
+  Tab: Tab,
   PageHeader,
   ContentHeader,
   LabelWrapper,
@@ -117,8 +125,12 @@ const Components = {
   Div,
   ToggleSwitch,
   Wizard,
-  TimeDuration
+  TimeDuration,
+  Avatar,
+  Fab,
+  Container,
+  Typography
 };
 
-Components.version = '10.6.0';
+Components.version = '12.0.0';
 module.exports = Components;

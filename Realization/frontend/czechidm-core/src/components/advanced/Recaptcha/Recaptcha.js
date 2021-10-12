@@ -82,31 +82,43 @@ export default class AdvancedRecaptcha extends Basic.AbstractFormComponent {
       });
   }
 
-  getBody() {
-    const { labelSpan, label, componentSpan } = this.props;
-    const { rendered, siteKey } = this.state;
-    const className = classNames(
-      labelSpan,
-      componentSpan
-    );
-    const labelClassName = classNames(labelSpan, 'control-label');
+  getBody(feedback) {
+    const { label, placeholder, required } = this.props;
+    const { rendered, siteKey, disabled, readOnly } = this.state;
+    const labelClassName = classNames('control-label');
     //
     if (!rendered || !siteKey) {
       return null;
     }
     //
+    const _label = [];
+    if (label) {
+      _label.push(label);
+    } else if (placeholder) {
+      _label.push(placeholder);
+    }
+    if (_label.length > 0 && required) {
+      _label.push(' *');
+    }
+    //
     return (
-      <div className={ className }>
+      <div className={
+        classNames(
+          'basic-form-component',
+          { 'has-feedback': feedback },
+          { disabled: disabled || readOnly }
+        )
+      }>
         {
-          !label
+          _label.length === 0
           ||
           <label
             className={ labelClassName }>
-            { label }
+            { _label }
             { this.renderHelpIcon() }
           </label>
         }
-        <div className={ componentSpan } style={{ whiteSpace: 'nowrap' }}>
+        <div style={{ whiteSpace: 'nowrap' }}>
           <Basic.Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
             <span>
               <Recaptcha
@@ -114,10 +126,10 @@ export default class AdvancedRecaptcha extends Basic.AbstractFormComponent {
                 sitekey={ siteKey }
                 onChange={ this.recaptchaChange.bind(this) }
                 className="advanced-recaptcha"
-                />
+              />
             </span>
           </Basic.Tooltip>
-          { !label ? this.renderHelpIcon() : null }
+          { _label.length === 0 ? this.renderHelpIcon() : null }
           { this.renderHelpBlock() }
         </div>
       </div>

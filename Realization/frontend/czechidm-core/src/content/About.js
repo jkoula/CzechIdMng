@@ -15,6 +15,10 @@ import { ConfigurationManager } from '../redux';
  */
 class About extends Basic.AbstractContent {
 
+  hideFooter() {
+    return true;
+  }
+
   render() {
     const { version, buildNumber, buildTimestamp } = this.props;
     //

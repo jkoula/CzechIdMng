@@ -4,7 +4,9 @@ import classNames from 'classnames';
 import $ from 'jquery';
 import ReactResizeDetector from 'react-resize-detector';
 //
+import * as Utils from '../../../utils';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
+import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 
 /**
  * Loading indicator.
@@ -13,12 +15,22 @@ import AbstractComponent from '../AbstractComponent/AbstractComponent';
  *
  * @author Radek Tomiška
  */
-class Loading extends AbstractComponent {
+class Loading extends AbstractContextComponent {
 
   constructor(props, context) {
     super(props, context);
     //
     this.containerRef = React.createRef();
+    this.state = {
+      ...this.state,
+      theme: (
+        context && context.store
+        ?
+        Utils.Ui.getTheme(context.store.getState())
+        :
+        null
+      )
+    };
   }
 
   componentDidMount() {
@@ -49,8 +61,8 @@ class Loading extends AbstractComponent {
     loading.css({
       top: panel.position().top,
       left: panel.position().left,
-      width: panel.width(),
-      height: panel.height()
+      width: panel.outerWidth(),
+      height: panel.outerHeight()
     });
   }
 
@@ -67,6 +79,7 @@ class Loading extends AbstractComponent {
       onClick,
       ...others
     } = this.props;
+    const { theme } = this.state;
     //
     if (!rendered) {
       return null;
@@ -99,7 +112,15 @@ class Loading extends AbstractComponent {
         {
           showLoading
           ?
-          <div className={ loaderClassNames }>
+          <div
+            className={ loaderClassNames }
+            style={
+              theme
+              ?
+              { backgroundColor: theme.palette.action.loading }
+              :
+              {}
+            }>
             <div className="loading-wave-top" />
             {
               showAnimation
@@ -149,7 +170,7 @@ class ResizeLoading extends AbstractComponent {
 }
 
 Loading.propTypes = {
-  ...AbstractComponent.propTypes,
+  ...AbstractContextComponent.propTypes,
   /**
    * Shows loading overlay (showLoadin alias)
    */
@@ -179,7 +200,7 @@ Loading.propTypes = {
   ])
 };
 Loading.defaultProps = {
-  ...AbstractComponent.defaultProps,
+  ...AbstractContextComponent.defaultProps,
   show: false,
   showAnimation: true,
   isStatic: false,

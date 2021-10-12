@@ -8,6 +8,8 @@ import AbstractIcon from './AbstractIcon';
 /**
  * Monitoring icon.
  *
+ * FIXME: use badge
+ *
  * @author Radek Tomiška
  * @since 11.1.0
  */
@@ -17,7 +19,7 @@ export default class MonitoringIcon extends AbstractIcon {
     const { counter, level } = this.props;
     //
     return (
-      <span className={ this.getClassName('fa-layers fa-fw') } style={ counter ? { fontSize: '1.3em' } : {} }>
+      <span className={ this.getClassName('fa-layers fa-fw') } style={ counter ? { fontSize: '1em' } : {} }>
         <FontAwesomeIcon icon={ faBell } transform={ counter ? 'down-2' : null } />
         {
           !counter

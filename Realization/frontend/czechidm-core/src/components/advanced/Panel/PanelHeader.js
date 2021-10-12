@@ -118,7 +118,7 @@ class PanelHeader extends Basic.AbstractContextComponent {
         ref={ this.containerRef }
         className={ classNames }
         style={{ display: 'flex', alignItems: 'center', ...style }}>
-        <Basic.Div style={{ flex: 1 }}>
+        <div style={{ flex: 1 }}>
           <Basic.Icon type="fa" icon="refresh" showLoading rendered={ showLoading }/>
           {
             showLoading
@@ -130,16 +130,17 @@ class PanelHeader extends Basic.AbstractContextComponent {
             null
           }
           { children }
-        </Basic.Div>
+        </div>
         {
           !buttons
           ||
-          <Basic.Div>
+          <div>
             { buttons }
-          </Basic.Div>
+          </div>
         }
-        <Basic.Icon
+        <Basic.Button
           icon={ !collapsed ? 'fa:angle-double-up' : 'fa:angle-double-down' }
+          buttonSize="xs"
           style={ _style }
           onClick={ (event) => this.toogleCollapse(event) }
           rendered={ collapsible }

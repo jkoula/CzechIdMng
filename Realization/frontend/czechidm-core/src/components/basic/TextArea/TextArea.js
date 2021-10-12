@@ -1,12 +1,9 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
 import Joi from 'joi';
 //
-import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
-import Tooltip from '../Tooltip/Tooltip';
+import TextField from '../TextField/TextField';
 
-class TextArea extends AbstractFormComponent {
+class TextArea extends TextField {
 
   constructor(props) {
     super(props);
@@ -42,7 +39,6 @@ class TextArea extends AbstractFormComponent {
     }
     return false;
   }
-
 
   getValidationDefinition(required) {
     const { min, max } = this.props;
@@ -99,72 +95,10 @@ class TextArea extends AbstractFormComponent {
       value
     }, this.validate.bind(this, false, cb));
   }
-
-  /**
-   * Focus input field
-   */
-  focus() {
-    if (this.refs.input) {
-      this.refs.input.focus();
-    }
-  }
-
-  getBody(feedback) {
-    const { labelSpan, label, componentSpan, placeholder, style, required } = this.props;
-    //
-    const className = classNames('form-control');
-    const labelClassName = classNames(labelSpan, 'control-label');
-    let showAsterix = false;
-    if (required && !feedback) {
-      showAsterix = true;
-    }
-    //
-    return (
-      <div className={ showAsterix ? 'has-feedback' : ''}>
-        {
-          !label
-          ||
-          <label
-            className={labelClassName}>
-            {label}
-            { this.renderHelpIcon() }
-          </label>
-        }
-
-        <div className={componentSpan}>
-          <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
-            <span>
-              <textarea
-                ref="input"
-                className={className}
-                title={this.getValidationResult() != null ? this.getValidationResult().message : ''}
-                disabled={this.state.disabled}
-                placeholder={placeholder}
-                rows={this.props.rows}
-                style={style}
-                readOnly={this.state.readOnly}
-                onChange={this.onChange}
-                value={this.state.value || ''}/>
-              {
-                feedback
-                ||
-                !showAsterix
-                ||
-                <span className="form-control-feedback" style={{color: 'red', zIndex: 0}}>*</span>
-              }
-            </span>
-          </Tooltip>
-          { !label ? this.renderHelpIcon() : null }
-          { this.renderHelpBlock() }
-        </div>
-      </div>
-    );
-  }
 }
 
 TextArea.propTypes = {
-  ...AbstractFormComponent.propTypes,
-  placeholder: PropTypes.string,
+  ...TextField.propTypes,
   rows: PropTypes.number,
   min: PropTypes.number,
   max: PropTypes.number,
@@ -172,9 +106,10 @@ TextArea.propTypes = {
 };
 
 TextArea.defaultProps = {
-  ...AbstractFormComponent.defaultProps,
+  ...TextField.defaultProps,
   rows: 3,
-  warnIfTrimmable: false
+  warnIfTrimmable: false,
+  multiline: true
 };
 
 export default TextArea;

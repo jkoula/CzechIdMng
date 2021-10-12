@@ -260,23 +260,29 @@ class IdentityDetail extends Advanced.AbstractFormableContent {
                       readOnly={ !profileManager.canSave(identity, _profilePermissions) }>
                       <img className="img-thumbnail" alt="profile" src={ _imageUrl } />
                     </Advanced.ImageDropzone>
-                    <Basic.Button
-                      type="button"
-                      rendered={ !!(cropperSrc && _imageUrl) }
-                      titlePlacement="right"
-                      onClick={ this._showCropper.bind(this) }
-                      className="btn-xs btn-edit">
-                      <Basic.Icon icon="edit"/>
-                    </Basic.Button>
-                    <Basic.Button
-                      type="button"
-                      level="danger"
-                      rendered={ !!(_imageUrl && profileManager.canSave(identity, _profilePermissions)) }
-                      titlePlacement="left"
-                      onClick={ this.deleteImage.bind(this) }
-                      className="btn-xs btn-remove">
-                      <Basic.Icon type="fa" icon="trash"/>
-                    </Basic.Button>
+                    <Basic.Fab color="inherit" className={ cropperSrc && _imageUrl ? 'btn-edit' : 'hidden' } size="small">
+                      <Basic.Button
+                        type="button"
+                        buttonSize="xs"
+                        rendered={ !!(cropperSrc && _imageUrl) }
+                        titlePlacement="right"
+                        onClick={ this._showCropper.bind(this) }
+                        icon="edit"/>
+                    </Basic.Fab>
+                    <Basic.Fab
+                      color="secondary"
+                      className={ _imageUrl && profileManager.canSave(identity, _profilePermissions) ? 'btn-remove' : 'hidden' }
+                      size="small">
+                      <Basic.Button
+                        type="button"
+                        level="danger"
+                        buttonSize="xs"
+                        style={{ color: 'white' }}
+                        rendered={ !!(_imageUrl && profileManager.canSave(identity, _profilePermissions)) }
+                        titlePlacement="left"
+                        onClick={ this.deleteImage.bind(this) }
+                        icon="fa:trash"/>
+                    </Basic.Fab>
                   </Basic.Div>
                 </Basic.Div>
                 <Basic.Div className="field-col">
@@ -316,20 +322,20 @@ class IdentityDetail extends Advanced.AbstractFormableContent {
                     validationErrors={
                       this.getInvalidBasicField(validationErrors, 'lastName')
                     }/>
+                  <Basic.TextField
+                    ref="externalCode"
+                    label={ this.getLabel(formInstance, 'externalCode', this.i18n('content.identity.profile.externalCode')) }
+                    placeholder={ this.getPlaceholder(formInstance, 'externalCode') }
+                    readOnly={ this.isReadOnly(formInstance, 'externalCode', _readOnlyExternalCode) }
+                    required={ this.isRequired(formInstance, 'externalCode', _readOnlyExternalCode) }
+                    min={ this.getMin(formInstance, 'externalCode', _readOnlyExternalCode) }
+                    max={ this.getMax(formInstance, 'externalCode', _readOnlyExternalCode, 255) }
+                    validationMessage={ this.getValidationMessage(formInstance, 'externalCode') }
+                    validationErrors={
+                      this.getInvalidBasicField(validationErrors, 'externalCode')
+                    }/>
                 </Basic.Div>
               </Basic.Div>
-              <Basic.TextField
-                ref="externalCode"
-                label={ this.getLabel(formInstance, 'externalCode', this.i18n('content.identity.profile.externalCode')) }
-                placeholder={ this.getPlaceholder(formInstance, 'externalCode') }
-                readOnly={ this.isReadOnly(formInstance, 'externalCode', _readOnlyExternalCode) }
-                required={ this.isRequired(formInstance, 'externalCode', _readOnlyExternalCode) }
-                min={ this.getMin(formInstance, 'externalCode', _readOnlyExternalCode) }
-                max={ this.getMax(formInstance, 'externalCode', _readOnlyExternalCode, 255) }
-                validationMessage={ this.getValidationMessage(formInstance, 'externalCode') }
-                validationErrors={
-                  this.getInvalidBasicField(validationErrors, 'externalCode')
-                }/>
               <Basic.Row>
                 <Basic.Col lg={ 6 }>
                   <Basic.TextField
@@ -404,13 +410,6 @@ class IdentityDetail extends Advanced.AbstractFormableContent {
                 validationErrors={
                   this.getInvalidBasicField(validationErrors, 'description')
                 }/>
-              <Basic.EnumSelectBox
-                ref="state"
-                enum={ IdentityStateEnum }
-                useSymbol={ false }
-                label={ this.i18n('entity.Identity.state.label') }
-                helpBlock={ <span>{ this.i18n('entity.Identity.state.help') }</span> }
-                readOnly/>
               {
                 !SecurityManager.hasAllAuthorities(['FORMPROJECTION_AUTOCOMPLETE'], userContext)
                 ||
@@ -421,6 +420,13 @@ class IdentityDetail extends Advanced.AbstractFormableContent {
                   readOnly={ _readOnly || !Utils.Permission.hasPermission(_permissions, 'CHANGEPROJECTION') }
                   showIcon/>
               }
+              <Basic.EnumSelectBox
+                ref="state"
+                enum={ IdentityStateEnum }
+                useSymbol={ false }
+                label={ this.i18n('entity.Identity.state.label') }
+                helpBlock={ <span>{ this.i18n('entity.Identity.state.help') }</span> }
+                readOnly/>
               <Basic.Checkbox
                 ref="disabled"
                 label={ this.i18n('entity.Identity.disabledReadonly.label') }

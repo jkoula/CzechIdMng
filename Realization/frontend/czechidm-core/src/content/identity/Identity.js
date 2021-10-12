@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
+import Avatar from '@material-ui/core/Avatar';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
@@ -63,24 +64,21 @@ class IdentityContent extends Basic.AbstractContent {
           entity={ identity }
           back="/identities"
           buttons={[
-            <Basic.Icon
-              value="fa:angle-double-left"
-              style={{ marginRight: 5, cursor: 'pointer' }}
+            <Basic.Button
+              icon="fa:angle-double-left"
               title={ this.i18n('component.advanced.IdentityInfo.link.projection.label') }
               onClick={ () => this.context.history.push(formProjectionRoute) }
               rendered={ formProjectionRoute !== null }/>
           ]}>
-          {
-            _imageUrl
-            ?
-            <img src={ _imageUrl } alt="profile" className="img-circle img-thumbnail" style={{ height: 40, padding: 0 }} />
-            :
-            <Basic.Icon icon="component:identity" identity={ identity }/>
-          }
-          <Basic.ShortText value={ identityManager.getNiceLabel(identity) } maxLength={ 75 } cutChar="" style={{ marginLeft: 7, marginRight: 7 }}/>
-          <small>
-            { this.i18n('content.identity.profile.userDetail') }
-          </small>
+          <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
+            <Basic.Avatar src={ _imageUrl } alt="profile" >
+              <Basic.Icon icon="component:identity" identity={ identity } />
+            </Basic.Avatar>
+            <Basic.ShortText value={ identityManager.getNiceLabel(identity) } maxLength={ 75 } cutChar="" style={{ marginLeft: 7, marginRight: 7 }}/>
+            <small>
+              { this.i18n('content.identity.profile.userDetail') }
+            </small>
+          </Basic.Div>
         </Advanced.DetailHeader>
 
         <OrganizationPosition identity={ entityId }/>

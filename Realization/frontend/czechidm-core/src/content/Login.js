@@ -3,8 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import Joi from 'joi';
+import { Link } from 'react-router-dom';
+//
 import * as Basic from '../components/basic';
 import { SecurityManager, DataManager } from '../redux';
+import {
+  getNavigationItems,
+} from '../redux/config/actions';
 import { HelpContent } from '../domain';
 
 const securityManager = new SecurityManager();
@@ -49,7 +54,6 @@ class Login extends Basic.AbstractContent {
     super.componentDidMount();
     //
     this.refs.form.setData({});
-    this.refs.username.focus();
     //
     const { userContext } = this.props;
     if (!SecurityManager.isAuthenticated(userContext) && userContext.isTryRemoteLogin) {
@@ -160,8 +164,9 @@ class Login extends Basic.AbstractContent {
   }
 
   render() {
-    const { userContext } = this.props;
+    const { userContext, navigation } = this.props;
     const { showTwoFactor } = this.state;
+    const items = getNavigationItems(navigation, null, 'main', userContext, null, true);
     //
     return (
       <Basic.Div>
@@ -169,66 +174,135 @@ class Login extends Basic.AbstractContent {
 
         <Basic.Div rendered={ showTwoFactor }>
           <form onSubmit={ this.handleTwoFactor.bind(this) }>
-            <Basic.Panel className="login-container" showLoading={ userContext.showLoading } style={{ maxWidth: 450 }}>
-              <Basic.PanelHeader
-                text={ this.i18n('content.login.twoFactor.header') }
-                help={ this.getHelp() }/>
-              <Basic.PanelBody>
-                <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0, backgroundColor: '#fff' }}>
-                  <Basic.TextField
-                    ref="verificationCode"
-                    labelSpan="col-sm-5"
-                    componentSpan="col-sm-7"
-                    className="last"
-                    label={ this.i18n('content.login.twoFactor.verificationCode.label') }
-                    placeholder={ this.i18n('content.login.twoFactor.verificationCode.placeholder') }
-                    required
-                    validation={ Joi.number().integer().min(0).max(999999) }/>
-                </Basic.AbstractForm>
-              </Basic.PanelBody>
-              <Basic.PanelFooter>
-                <Basic.Button level="link" onClick={ () => this.setState({ showTwoFactor: false }) }>
-                  { this.i18n('button.cancel') }
-                </Basic.Button>
-                <Basic.Button type="submit" level="success">
-                  { this.i18n('button.verify.label') }
-                </Basic.Button>
-              </Basic.PanelFooter>
-            </Basic.Panel>
+            <Basic.Container component="main" maxWidth="xs">
+              <Basic.Panel className="login-container" showLoading={ userContext.showLoading } style={{ maxWidth: 450 }}>
+                <Basic.PanelHeader
+                  text={ this.i18n('content.login.twoFactor.header') }
+                  help={ this.getHelp() }/>
+                <Basic.PanelBody>
+                  <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0, backgroundColor: '#fff' }}>
+                    <Basic.TextField
+                      ref="verificationCode"
+                      labelSpan="col-sm-5"
+                      componentSpan="col-sm-7"
+                      className="last"
+                      label={ this.i18n('content.login.twoFactor.verificationCode.label') }
+                      placeholder={ this.i18n('content.login.twoFactor.verificationCode.placeholder') }
+                      required
+                      validation={ Joi.number().integer().min(0).max(999999) }/>
+                  </Basic.AbstractForm>
+                </Basic.PanelBody>
+                <Basic.PanelFooter>
+                  <Basic.Button level="link" onClick={ () => this.setState({ showTwoFactor: false }) }>
+                    { this.i18n('button.cancel') }
+                  </Basic.Button>
+                  <Basic.Button type="submit" level="success">
+                    { this.i18n('button.verify.label') }
+                  </Basic.Button>
+                </Basic.PanelFooter>
+              </Basic.Panel>
+            </Basic.Container>
           </form>
         </Basic.Div>
 
         <Basic.Div rendered={ !showTwoFactor }>
           <form onSubmit={ this.handleSubmit.bind(this) }>
-            <Basic.Panel className="login-container" showLoading={ userContext.showLoading }>
-              <Basic.PanelHeader text={ this.i18n('header') }/>
-              <Basic.PanelBody>
-                <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0, backgroundColor: '#fff' }}>
+            <Basic.Container component="main" maxWidth="xs">
+              <div className="login-container">
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <Basic.Avatar level="secondary">
+                    <Basic.Icon icon="component:password" />
+                  </Basic.Avatar>
+                  <h1 style={{ marginTop: 7, marginBottom: 15, fontWeight: 'normal' }}>
+                    { this.i18n('header') }
+                  </h1>
+                </div>
+                <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0 }} showLoading={ userContext.showLoading }>
                   <Basic.TextField
                     ref="username"
-                    labelSpan="col-sm-5"
-                    componentSpan="col-sm-7"
                     label={ this.i18n('username') }
-                    placeholder={ this.i18n('username') }
-                    required/>
+                    required
+                    fullWidth
+                    size="normal"/>
                   <Basic.TextField
                     type="password"
                     ref="password"
-                    labelSpan="col-sm-5"
-                    componentSpan="col-sm-7"
                     label={ this.i18n('password') }
-                    placeholder={ this.i18n('password') }
-                    required/>
+                    required
+                    fullWidth
+                    size="normal"/>
+
+                  <Basic.Button
+                    type="submit"
+                    level="success"
+                    fullWidth
+                    variant="contained"
+                    showLoading={ userContext.showLoading }>
+                    { this.i18n('button.login') }
+                  </Basic.Button>
+
+                  <div style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
+                    {
+                      items.map(item => {
+                        if (item.to) {
+                          return (
+                            <Link
+                              to={ item.to }
+                              key={ `nav-item-${ item.id }` }
+                              onClick={ item.onClick }>
+                              <Basic.Icon value={ item.icon } style={{ marginRight: 5 }}/>
+                              { this.i18n(item.labelKey || item.label) }
+                            </Link>
+                          );
+                        }
+                        //
+                        if (item.onClick) {
+                          return (
+                            <a
+                              href="#"
+                              key={ `nav-item-${ item.id }` }
+                              onClick={ item.onClick }>
+                              <Basic.Icon value={ item.icon } style={{ marginRight: 5 }}/>
+                              { this.i18n(item.labelKey || item.label) }
+                            </a>
+                          );
+                        }
+                        //
+                        return null;
+                      })
+                    }
+                  </div>
                 </Basic.AbstractForm>
-              </Basic.PanelBody>
-              <Basic.PanelFooter>
-                <Basic.Button type="submit" level="success">
-                  { this.i18n('button.login') }
-                </Basic.Button>
-              </Basic.PanelFooter>
-            </Basic.Panel>
+              </div>
+            </Basic.Container>
           </form>
         </Basic.Div>
+
+        <div className="app-footer">
+          <Link
+            href={ `${ this.i18n('app.documentation.url') }/start`}
+            target="_blank"
+            rel="noopener noreferrer">
+            { this.i18n('app.helpDesk') }
+          </Link>
+
+          <span style={{ margin: '0 10px' }}>|</span>
+
+          <Link
+            href="http://redmine.czechidm.com/projects/czechidmng"
+            target="_blank"
+            rel="noopener noreferrer">
+            { this.i18n('app.serviceDesk') }
+          </Link>
+
+          <span style={{ margin: '0 10px' }}>|</span>
+
+          <Link
+            to="/about"
+            title={ this.i18n('content.about.link') }>
+            { this.i18n('content.about.link') }
+          </Link>
+        </div>
       </Basic.Div>
     );
   }
@@ -247,7 +321,8 @@ Login.defaultProps = {
 function select(state) {
   return {
     i18nReady: state.config.get('i18nReady'),
-    userContext: state.security.userContext
+    userContext: state.security.userContext,
+    navigation: state.config.get('navigation')
   };
 }
 

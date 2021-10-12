@@ -6,6 +6,9 @@ import classNames from 'classnames';
 import { Route } from 'react-router-dom';
 import Joi from 'joi';
 //
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
+//
 import { Basic, Advanced, Managers } from 'czechidm-core';
 import Dashboard from 'czechidm-core/src/content/Dashboard';
 import Footer from './Footer';
@@ -153,129 +156,138 @@ export class App extends Basic.AbstractContent {
       { 'with-sidebar': !userContext.isExpired && Managers.SecurityManager.isAuthenticated(userContext) },
       { collapsed: navigationCollapsed }
     );
+    const theme = createTheme(userContext.theme);
     // @todo-upgrade-10 - FlashMessages throw warning "Function components cannot be given refs.
     // Attempts to access this ref will fail. Did you mean to use React.forwardRef()?"
     return (
-      <div id="content-wrapper">
-        <Basic.FlashMessages ref="messages" />
-        {
-          !appReady
-          ?
-          <Basic.Loading className="global" showLoading />
-          :
-          <Basic.Div>
-            <Helmet title={ this.i18n('navigation.menu.home') } titleTemplate={ titleTemplate } />
-            <Advanced.Navigation location={ location } />
-            <div id="content-container" className={ classnames }>
-              {
-                userContext.isExpired
-                ||
-                isLogout
-                ||
-                (
-                  <Basic.Div>
-                    { /* Childrens are hiden, when token expires =>
-                      all components are loaded (componentDidMount) after identity is logged again */ }
-                    { this.getRoutes() }
-                    <Footer rendered={ !hideFooter } />
-                  </Basic.Div>
-                )
-              }
-              <Advanced.ModalProgressBar
-                show={ bulk.showLoading }
-                text={ bulk.action.title }
-                count={ bulk.size }
-                counter={ bulk.counter }
-              />
-              <Basic.Modal dialogClassName="login-container" show={ userContext.isExpired }>
-                <Basic.Div rendered={ showTwoFactor }>
-                  <form onSubmit={ this.handleTwoFactor.bind(this) }>
-                    <Basic.Modal.Header text={ this.i18n('content.login.twoFactor.header') }/>
-                    <Basic.Modal.Body>
-                      <Basic.Loading showLoading={ userContext.showLoading }>
-                        <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0, backgroundColor: '#fff' }}>
-                          <Basic.TextField
-                            ref="verificationCode"
-                            labelSpan="col-sm-5"
-                            componentSpan="col-sm-7"
-                            className="last"
-                            label={ this.i18n('content.login.twoFactor.verificationCode.label') }
-                            placeholder={ this.i18n('content.login.twoFactor.verificationCode.placeholder') }
-                            required
-                            validation={ Joi.number().integer().min(0).max(999999) }/>
-                        </Basic.AbstractForm>
-                      </Basic.Loading>
-                    </Basic.Modal.Body>
-                    <Basic.Modal.Footer>
-                      <Basic.Button
-                        level="link"
-                        onClick={ () => this.logout() }
-                        title={ this.i18n('content.login.button.logout.title') }
-                        titlePlacement="bottom">
-                        { this.i18n('content.login.button.logout.value') }
-                      </Basic.Button>
-                      <Basic.Button type="submit" level="success" showLoading={ userContext.showLoading }>
-                        { this.i18n('button.verify.label') }
-                      </Basic.Button>
-                    </Basic.Modal.Footer>
-                  </form>
-                </Basic.Div>
+      <ThemeProvider theme={ theme }>
+        <CssBaseline/>
+        <div id="content-wrapper">
+          <Basic.FlashMessages ref="messages" />
+          {
+            !appReady
+            ?
+            <Basic.Loading className="global" showLoading />
+            :
+            <Basic.Div>
+              <Helmet title={ this.i18n('navigation.menu.home') } titleTemplate={ titleTemplate } />
+              <Advanced.Navigation location={ location }>
+                <div id="content-container" className={ classnames }>
+                  {
+                    userContext.isExpired
+                    ||
+                    isLogout
+                    ||
+                    (
+                      <Basic.Div>
+                        { /* Childrens are hiden, when token expires =>
+                          all components are loaded (componentDidMount) after identity is logged again */ }
+                        { this.getRoutes() }
+                        <Footer rendered={ !hideFooter } />
+                      </Basic.Div>
+                    )
+                  }
+                  <Advanced.ModalProgressBar
+                    show={ bulk.showLoading }
+                    text={ bulk.action.title }
+                    count={ bulk.size }
+                    counter={ bulk.counter }
+                  />
+                  <Basic.Modal
+                    dialogClassName="login-container"
+                    show={ userContext.isExpired }
+                    bsSize="sm"
+                    fullWidth={ false }>
+                    <Basic.Div rendered={ showTwoFactor }>
+                      <form onSubmit={ this.handleTwoFactor.bind(this) }>
+                        <Basic.Modal.Header text={ this.i18n('content.login.twoFactor.header') }/>
+                        <Basic.Modal.Body>
+                          <Basic.Loading showLoading={ userContext.showLoading }>
+                            <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0 }}>
+                              <Basic.TextField
+                                ref="verificationCode"
+                                labelSpan="col-sm-5"
+                                componentSpan="col-sm-7"
+                                className="last"
+                                label={ this.i18n('content.login.twoFactor.verificationCode.label') }
+                                placeholder={ this.i18n('content.login.twoFactor.verificationCode.placeholder') }
+                                required
+                                validation={ Joi.number().integer().min(0).max(999999) }/>
+                            </Basic.AbstractForm>
+                          </Basic.Loading>
+                        </Basic.Modal.Body>
+                        <Basic.Modal.Footer>
+                          <Basic.Button
+                            level="link"
+                            onClick={ () => this.logout() }
+                            title={ this.i18n('content.login.button.logout.title') }
+                            titlePlacement="bottom">
+                            { this.i18n('content.login.button.logout.value') }
+                          </Basic.Button>
+                          <Basic.Button type="submit" level="success" showLoading={ userContext.showLoading }>
+                            { this.i18n('button.verify.label') }
+                          </Basic.Button>
+                        </Basic.Modal.Footer>
+                      </form>
+                    </Basic.Div>
 
-                <Basic.Div rendered={ !showTwoFactor }>
-                  <form onSubmit={ this.login.bind(this) }>
-                    <Basic.Modal.Header text={ this.i18n('error.LOG_IN.title') } />
-                    <Basic.Modal.Body>
-                      <Basic.Loading showLoading={ userContext.showLoading }>
-                        <Basic.Alert text={ this.i18n('error.LOG_IN.message') } />
-                        <Basic.AbstractForm
-                          ref="form"
-                          data={{
-                            username: userContext.username,
-                            password: this.refs.password ? this.refs.password.getValue() : null
-                          }}
-                          className="form-horizontal"
-                          style={{ padding: 0, backgroundColor: '#fff' }}>
-                          <Basic.TextField
-                            ref="username"
-                            labelSpan="col-sm-5"
-                            componentSpan="col-sm-7"
-                            label={ this.i18n('content.login.username') }
-                            placeholder={ this.i18n('content.login.username') }
-                            required
-                            readOnly
-                          />
-                          <Basic.TextField
-                            type="password"
-                            ref="password"
-                            labelSpan="col-sm-5"
-                            componentSpan="col-sm-7"
-                            className="last"
-                            label={ this.i18n('content.login.password') }
-                            placeholder={ this.i18n('content.login.password') }
-                            required
-                          />
-                        </Basic.AbstractForm>
-                      </Basic.Loading>
-                    </Basic.Modal.Body>
-                    <Basic.Modal.Footer>
-                      <Basic.Button
-                        level="link"
-                        onClick={ () => this.logout() }
-                        title={ this.i18n('content.login.button.logout.title') }
-                        titlePlacement="bottom">
-                        { this.i18n('content.login.button.logout.value') }
-                      </Basic.Button>
-                      <Basic.Button type="submit" level="success" showLoading={ userContext.showLoading }>
-                        { this.i18n('content.login.button.login') }
-                      </Basic.Button>
-                    </Basic.Modal.Footer>
-                  </form>
-                </Basic.Div>
-              </Basic.Modal>
-            </div>
-          </Basic.Div>
-        }
-      </div>
+                    <Basic.Div rendered={ !showTwoFactor }>
+                      <form onSubmit={ this.login.bind(this) }>
+                        <Basic.Modal.Header text={ this.i18n('error.LOG_IN.title') } bsSize="sm"/>
+                        <Basic.Modal.Body>
+                          <Basic.Loading showLoading={ userContext.showLoading }>
+                            <Basic.Alert text={ this.i18n('error.LOG_IN.message') } />
+                            <Basic.AbstractForm
+                              ref="form"
+                              data={{
+                                username: userContext.username,
+                                password: this.refs.password ? this.refs.password.getValue() : null
+                              }}
+                              className="form-horizontal"
+                              style={{ padding: 0 }}>
+                              <Basic.TextField
+                                ref="username"
+                                labelSpan="col-sm-5"
+                                componentSpan="col-sm-7"
+                                label={ this.i18n('content.login.username') }
+                                placeholder={ this.i18n('content.login.username') }
+                                required
+                                readOnly
+                              />
+                              <Basic.TextField
+                                type="password"
+                                ref="password"
+                                labelSpan="col-sm-5"
+                                componentSpan="col-sm-7"
+                                className="last"
+                                label={ this.i18n('content.login.password') }
+                                placeholder={ this.i18n('content.login.password') }
+                                required
+                              />
+                            </Basic.AbstractForm>
+                          </Basic.Loading>
+                        </Basic.Modal.Body>
+                        <Basic.Modal.Footer>
+                          <Basic.Button
+                            level="link"
+                            onClick={ () => this.logout() }
+                            title={ this.i18n('content.login.button.logout.title') }
+                            titlePlacement="bottom">
+                            { this.i18n('content.login.button.logout.value') }
+                          </Basic.Button>
+                          <Basic.Button type="submit" level="success" showLoading={ userContext.showLoading }>
+                            { this.i18n('content.login.button.login') }
+                          </Basic.Button>
+                        </Basic.Modal.Footer>
+                      </form>
+                    </Basic.Div>
+                  </Basic.Modal>
+                </div>
+              </Advanced.Navigation>
+            </Basic.Div>
+          }
+        </div>
+      </ThemeProvider>
     );
   }
 }

@@ -68,7 +68,7 @@ class PasswordChangeForm extends Basic.AbstractContent {
     // if no one components exists show warning
     if (_.size(components) === 0) {
       components = (
-        <Basic.Alert level="warning" text={this.i18n('message.noContent')}/>
+        <Basic.Alert level="warning" text={ this.i18n('message.noContent') }/>
       );
     }
     //

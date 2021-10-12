@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.service.IdmAuthorizationPolicyService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
+import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
 
 /**
  * Disable authorization policy.
@@ -65,5 +66,10 @@ public class AuthorizationPolicyDisableBulkAction extends AbstractBulkAction<Idm
 	@Override
 	protected boolean requireNewTransaction() {
 		return true;
+	}
+	
+	@Override
+	public NotificationLevel getLevel() {
+		return NotificationLevel.WARNING;
 	}
 }

@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 //
-import {Basic} from 'czechidm-core';
+import { Basic } from 'czechidm-core';
 import packageInfo from '../../package.json';
 
 /**
- * IdM footer with links
+ * IdM footer with links.
  *
  * @author Radek Tomiška
  */
@@ -38,43 +38,40 @@ class Footer extends Basic.AbstractContent {
       <footer>
         <div className="pull-left">
           {/* RT: version is visible on about page only */}
-          <span title={ this.i18n('app.version.backend') + ': ' + backendVersion } className="hidden">
-            {this.i18n('app.version.frontend')} {packageInfo.version}
+          <span title={ `${ this.i18n('app.version.backend') }: ${ backendVersion }` } className="hidden">
+            { this.i18n('app.version.frontend') } { packageInfo.version }
           </span>
-          <span style={{margin: '0 10px'}} className="hidden">|</span>
+          <span style={{ margin: '0 10px' }} className="hidden">|</span>
           <a
             href={this.i18n('app.author.homePage')}
             target="_blank"
             rel="noopener noreferrer">
             { this.i18n('app.author.name') }
           </a>
-          <span style={{margin: '0 10px'}}>|</span>
+          <span style={{ margin: '0 10px' }}>|</span>
           <a
             href={ `${ this.i18n('app.documentation.url') }/start`}
             target="_blank"
             rel="noopener noreferrer">
             { this.i18n('app.helpDesk') }
           </a>
-          <span style={{margin: '0 10px'}}>|</span>
+          <span style={{ margin: '0 10px' }}>|</span>
           <a
             href="http://redmine.czechidm.com/projects/czechidmng"
             target="_blank"
             rel="noopener noreferrer">
             { this.i18n('app.serviceDesk') }
           </a>
-          <span style={{margin: '0 10px'}}>|</span>
+          <span style={{ margin: '0 10px' }}>|</span>
           <a href="#" onClick={ this.showAbout.bind(this) } title={ this.i18n('content.about.link') }>
             { this.i18n('content.about.link') }
           </a>
         </div>
         <div className="pull-right">
           <Basic.Button
-            type="button"
-            className="btn-xs"
+            icon="chevron-up"
             aria-label="Left Align"
-            onClick={ this.jumpTop.bind(this) }>
-            <Basic.Icon icon="chevron-up"/>
-          </Basic.Button>
+            onClick={ this.jumpTop.bind(this) }/>
         </div>
         <div className="clearfix" />
       </footer>

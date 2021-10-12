@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import * as Basic from '../../basic';
 
 /**
- * Single navigation item
+ * Single navigation item.
  *
  * @author Radek Tomiška
  */
@@ -26,7 +26,8 @@ export default class NavigationItem extends Basic.AbstractContextComponent {
       rendered,
       showLoading,
       onClick,
-      children
+      children,
+      face
     } = this.props;
     const itemClassNames = classnames(className, { active });
     const linkClassNames = classnames({ active });
@@ -42,11 +43,37 @@ export default class NavigationItem extends Basic.AbstractContextComponent {
       return null;
     }
     // icon resolving
-    let iconContent = null;
-    let _icon = icon === undefined || icon === null ? 'fa:circle-o' : icon;
+    let _icon = icon === undefined || icon === null ? 'far:circle' : icon;
     if (showLoading) {
       _icon = 'refresh';
     }
+    if (face === 'button') {
+      return (
+        <Basic.Button
+          level="link"
+          edge="end"
+          color="inherit"
+          icon={ _icon }
+          onClick={ () => {
+            if (to) {
+              this.context.history.push(to);
+            } else if (onClick) {
+              onClick();
+            }
+          }}>
+          {
+            text
+            ?
+            <span className="item-text">{ text }</span>
+            :
+            null
+          }
+        </Basic.Button>
+      );
+    }
+    //
+    // ~ menu and sidebars
+    let iconContent = null;
     if (_icon) {
       iconContent = (
         <Basic.Icon icon={ _icon } color={ iconColor } showLoading={ showLoading }/>
@@ -96,14 +123,21 @@ NavigationItem.propTypes = {
   active: PropTypes.bool,
   text: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.node,
-    PropTypes.arrayOf(PropTypes.object)
-  ])
+    PropTypes.node
+  ]),
+  /**
+   * link - sidebar or menu item usage
+   * button - main or system menu usage
+   *
+   * @since 12.0.0
+   */
+  face: PropTypes.oneOf(['list', 'button']),
 };
 
 NavigationItem.defaultProps = {
   ...Basic.AbstractComponent.defaultProps,
   active: false,
   icon: null,
-  text: null
+  text: null,
+  face: 'list'
 };

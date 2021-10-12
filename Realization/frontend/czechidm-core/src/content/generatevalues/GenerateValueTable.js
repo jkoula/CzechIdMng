@@ -315,16 +315,17 @@ export class GenerateValueTable extends Advanced.AbstractTableContent {
           backdrop="static"
           keyboard={ !_showLoading }>
 
-          <form onSubmit={ this.save.bind(this, {}) }>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('create.header') }
-              rendered={ Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('edit.header') }
-              rendered={ !Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('create.header') }
+            rendered={ Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('edit.header') }
+            rendered={ !Utils.Entity.isNew(detail.entity) }/>
+
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this, {}) }>
               <Basic.AbstractForm
                 ref="form"
                 readOnly={ !manager.canSave(detail.entity, _permissions) }
@@ -403,26 +404,30 @@ export class GenerateValueTable extends Advanced.AbstractTableContent {
                 </Basic.Row>
 
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeDetail.bind(this) }
-                showLoading={ _showLoading }>
-                {this.i18n('button.close')}
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                rendered={ this.getManager().canSave(detail.entity, _permissions) }
-                showLoading={ _showLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }>
-                { this.i18n('button.save') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ _showLoading }>
+              {this.i18n('button.close')}
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              rendered={ this.getManager().canSave(detail.entity, _permissions) }
+              showLoading={ _showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              onClick={ this.save.bind(this, {}) }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
+
         </Basic.Modal>
       </Basic.Div>
     );
@@ -471,7 +476,7 @@ class Filter extends Advanced.Filter {
     return (
       <Advanced.Filter onSubmit={ onSubmit }>
         <Basic.AbstractForm ref="filterForm">
-          <Basic.Row>
+          <Basic.Row className="last">
             <Basic.Col lg={ 6 }>
               <Advanced.Filter.EnumSelectBox
                 ref="dtoType"

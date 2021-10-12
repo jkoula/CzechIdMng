@@ -26,5 +26,6 @@ FilterTextField.propTypes = {
 const { labelSpan, componentSpan, ...otherDefaultProps } = Basic.TextField.defaultProps; // labelSpan etc. override
 FilterTextField.defaultProps = {
   ...otherDefaultProps,
-  relation: 'LIKE'
+  relation: 'LIKE',
+  size: 'small'
 };

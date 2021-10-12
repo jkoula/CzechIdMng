@@ -5,6 +5,14 @@ import Joi from 'joi';
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import Tooltip from '../Tooltip/Tooltip';
 
+/**
+ * Checkbox form component.
+ *
+ * TODO: use material-ui ... label doesn't work by default
+ *
+ * @author Vít Švanda
+ * @author Radek Tomiška
+ */
 class Checkbox extends AbstractFormComponent {
 
   onChange(event) {
@@ -57,8 +65,7 @@ class Checkbox extends AbstractFormComponent {
     return (
       <div className={className}>
         <div className="checkbox">
-          {/* focus can not be added for checkbox - event colision when checkbox  */}
-          <Tooltip trigger={['click', 'hover']} ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
+          <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
             <label>
               <input
                 type="checkbox"
@@ -73,7 +80,7 @@ class Checkbox extends AbstractFormComponent {
               { this.renderHelpIcon() }
             </label>
           </Tooltip>
-          {this.props.children}
+          { this.props.children }
           { this.renderHelpBlock() }
         </div>
       </div>

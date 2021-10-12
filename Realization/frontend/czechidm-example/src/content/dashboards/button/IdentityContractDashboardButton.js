@@ -33,6 +33,10 @@ class IdentityContractDashboardButton extends Advanced.AbstractIdentityDashboard
   onClick() {
     this.context.history.push(`/identity/${ encodeURIComponent(this.getIdentityIdentifier()) }/contracts`);
   }
+
+  getLevel() {
+    return 'info';
+  }
 }
 
 function select(state) {

@@ -2,11 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Joi from 'joi';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
+import InputLabel from '@material-ui/core/InputLabel';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import FormControl from '@material-ui/core/FormControl';
+import IconButton from '@material-ui/core/IconButton';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Edit from '@material-ui/icons/Edit';
+import ReportProblemOutlinedIcon from '@material-ui/icons/ReportProblemOutlined';
 //
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import Tooltip from '../Tooltip/Tooltip';
-import Icon from '../Icon/Icon';
-import Button from '../Button/Button';
+import HelpIcon from '../HelpIcon/HelpIcon';
 
 const CONFIDENTIAL_VALUE = '*****';
 
@@ -17,7 +25,7 @@ const CONFIDENTIAL_VALUE = '*****';
  * @author Radek Tomiška
  * @author Ondrej Husnik
  */
-class TextField extends AbstractFormComponent {
+class BasicTextField extends AbstractFormComponent {
 
   constructor(props) {
     super(props);
@@ -29,7 +37,8 @@ class TextField extends AbstractFormComponent {
       inputType: props.type,
       isTrimmableWarning: this.isTrimmable(props.value)
     };
-
+    //
+    this.inputRef = React.createRef();
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -97,18 +106,18 @@ class TextField extends AbstractFormComponent {
   }
 
   /**
-   * Focus input field
+   * Focus input field.
    */
   focus() {
-    if (this.refs.input) {
-      this.refs.input.focus();
+    if (this.inputRef.current) {
+      this.inputRef.current.focus();
     }
   }
 
   onChange(event) {
     super.onChange(event);
-    if (this.refs.popover) {
-      this.refs.popover.show();
+    if (this.refs.tooltip) {
+      this.refs.tooltip.show();
     }
     this.setState({
       confidentialState: {
@@ -194,9 +203,9 @@ class TextField extends AbstractFormComponent {
     this.setState({ value: null }, () => { this.validate(); });
   }
 
-/**
- *  Sets value and calls validations
- */
+  /**
+   *  Sets value and calls validations
+   */
   setValue(value, cb) {
     this.setState({
       isTrimmableWarning: this.isTrimmable(value),
@@ -216,18 +225,25 @@ class TextField extends AbstractFormComponent {
   }
 
   getBody(feedback) {
-    const { type, labelSpan, label, componentSpan, placeholder, style, required, pwdAutocomplete, onKeyPress } = this.props;
-    const { inputType, value, disabled, readOnly } = this.state;
+    const {
+      type,
+      label,
+      placeholder,
+      style,
+      required,
+      pwdAutocomplete,
+      onKeyPress,
+      fullWidth,
+      size,
+      multiline,
+      rows,
+      help
+    } = this.props;
+    const { inputType, value, disabled, readOnly, autoFocus } = this.state;
     //
     const className = classNames(
-      'form-control',
       { confidential: this._showConfidentialWrapper() }
     );
-    const labelClassName = classNames(labelSpan, 'control-label');
-    let showAsterix = false;
-    if (required && !feedback && !this._showConfidentialWrapper()) {
-      showAsterix = true;
-    }
     //
     // value and readonly properties depends on confidential wrapper
     let _value = '';
@@ -243,94 +259,102 @@ class TextField extends AbstractFormComponent {
       }
       _readOnly = true;
     }
-    // input component
-    const component = (
-      <input
-        ref="input"
-        type={ inputType }
-        autoComplete={!pwdAutocomplete ? 'new-password' : null}
-        className={ className }
-        disabled={ disabled }
-        placeholder={ placeholder }
-        onChange={ this.onChange.bind(this) }
-        onClick={ this.toogleConfidentialState.bind(this, true) }
-        value={ _value }
-        style={ style }
-        readOnly={ _readOnly }
-        onKeyPress={ onKeyPress }/>
-    );
+    const endAdornment = [];
     //
-    // show confidential wrapper, when confidential value could be changed
-    let confidentialWrapper = component;
-    let hasAdditionalButton = false;
-    if (this._showConfidentialWrapper()) {
-      hasAdditionalButton = true;
-      confidentialWrapper = (
-        <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.i18n('confidential.edit') }>
-          <div className="input-group">
-            { component }
-            <span className="input-group-btn">
-              <Button
-                type="button"
-                level="default"
-                className="btn-sm"
-                style={{ marginTop: 0, height: 34, borderLeft: 0, borderRadius: '0px 3px 3px 0px' }}
-                onClick={ this.toogleConfidentialState.bind(this, true) }>
-                <Icon icon="fa:edit"/>
-              </Button>
-            </span>
-          </div>
-        </Tooltip>
-      );
-    } else if (type === 'password' && !_readOnly) {
-      hasAdditionalButton = true;
-      confidentialWrapper = (
-        <div style={{ position: 'relative' }}>
-          { component }
-          <div className="password-eye">
-            <Icon
-              type="fa"
-              icon={ inputType === 'password' ? 'eye-slash' : 'eye' }
-              onClick={ this.toogleInputType.bind(this, inputType === 'password' ? 'text' : 'password') }
-              title={ inputType === 'password' ? this.i18n('password.show.title') : this.i18n('password.hide.title') }/>
-          </div>
-        </div>
+    if (feedback) {
+      endAdornment.push(
+        <ReportProblemOutlinedIcon color="error"/>
       );
     }
-
+    if (this._showConfidentialWrapper()) {
+      endAdornment.push(
+        <IconButton
+          aria-label="toggle password visibility"
+          onClick={ this.toogleConfidentialState.bind(this, true) }
+          title={ this.i18n('confidential.edit') }
+          tabIndex={ -1 }>
+          <Edit />
+        </IconButton>
+      );
+    } else if (type === 'password' && !_readOnly) {
+      endAdornment.push(
+        <IconButton
+          aria-label="toggle password visibility"
+          onClick={ this.toogleInputType.bind(this, inputType === 'password' ? 'text' : 'password') }
+          title={ inputType === 'password' ? this.i18n('label.show') : this.i18n('label.hide') }
+          tabIndex={ -1 }>
+          { inputType !== 'password' ? <Visibility /> : <VisibilityOff />}
+        </IconButton>
+      );
+    }
+    if (help) {
+      endAdornment.push(
+        <HelpIcon content={ help } tabIndex={ -1 }/>
+      );
+    }
+    //
+    const _label = !label ? placeholder : label;
+    let _title = this.getTitle();
+    if (_label === _title) {
+      _title = null;
+    }
+    //
     return (
-      <div className={ showAsterix ? 'has-feedback' : '' }>
-        {
-          !label
-          ||
-          <label
-            className={ labelClassName }>
-            { label }
-            { this.renderHelpIcon() }
-          </label>
-        }
-        <div className={ componentSpan } style={{ whiteSpace: 'nowrap' }}>
-          <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
-            <span className={ hasAdditionalButton ? 'additional-button-1' : ''}>
-              { confidentialWrapper }
-              {
-                feedback
-                ||
-                !showAsterix
-                ||
-                <span className="form-control-feedback" style={{ color: 'red' }}>*</span>
-              }
-            </span>
-          </Tooltip>
-          { !label ? this.renderHelpIcon() : null }
-          { this.renderHelpBlock() }
-        </div>
+      <div
+        className="basic-form-component"
+        style={{ whiteSpace: 'nowrap' }}>
+        <Tooltip ref="tooltip" placement={ this.getTitlePlacement() } value={ _title }>
+          <span>
+            <FormControl
+              variant="outlined"
+              fullWidth={ fullWidth }
+              size={ size }
+              error={ !!feedback }
+              disabled={ _readOnly || disabled }
+              required={ required }>
+              <InputLabel required={ required }>
+                { _label }
+              </InputLabel>
+              <OutlinedInput
+                inputRef={ this.inputRef }
+                autoFocus={ autoFocus }
+                required={ required }
+                type={ inputType }
+                autoComplete={ !pwdAutocomplete ? 'new-password' : null }
+                className={ className }
+                label={
+                  <span>
+                    { !label ? placeholder : label }
+                    { required ? ' *' : '' }
+                  </span>
+                }
+                placeholder={ !label || label === placeholder ? null : placeholder }
+                onChange={ this.onChange.bind(this) }
+                value={ _value }
+                style={ style }
+                onKeyPress={ onKeyPress }
+                multiline={ multiline }
+                rows={ rows }
+                endAdornment={
+                  endAdornment.length === 0
+                  ?
+                  null
+                  :
+                  <InputAdornment position="end">
+                    { endAdornment }
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </span>
+        </Tooltip>
+        { this.renderHelpBlock() }
       </div>
     );
   }
 }
 
-TextField.propTypes = {
+BasicTextField.propTypes = {
   ...AbstractFormComponent.propTypes,
   type: PropTypes.string,
   placeholder: PropTypes.string,
@@ -358,12 +382,15 @@ TextField.propTypes = {
   onKeyPress: PropTypes.func
 };
 
-TextField.defaultProps = {
+BasicTextField.defaultProps = {
   ...AbstractFormComponent.defaultProps,
   type: 'text',
   confidential: false,
   warnIfTrimmable: true,
-  pwdAutocomplete: true
+  pwdAutocomplete: true,
+  size: 'small',
+  fullWidth: true,
+  multiline: false
 };
 
-export default TextField;
+export default BasicTextField;

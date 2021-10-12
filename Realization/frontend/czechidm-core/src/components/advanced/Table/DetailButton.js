@@ -29,10 +29,9 @@ class DetailButton extends Basic.AbstractContextComponent {
         title={ _title }
         titlePlacement="bottom"
         onClick={ onClick }
-        className="btn-xs"
-        disabled={ disabled }>
-        <Basic.Icon type="fa" icon="search"/>
-      </Basic.Button>
+        buttonSize="xs"
+        disabled={ disabled }
+        icon="fa:search"/>
     );
   }
 }

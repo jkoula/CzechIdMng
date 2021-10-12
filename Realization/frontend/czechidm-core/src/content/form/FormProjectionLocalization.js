@@ -68,8 +68,8 @@ class FormProjectionLocalization extends Basic.AbstractContent {
       <Basic.Div>
         { this.renderContentHeader({ style: { marginBottom: 0 }}) }
 
-        <Basic.Alert level="success" text={ this.i18n('check.found')} icon="ok" rendered={ this._localeExists(entity) }/>
-        <Basic.Alert level="warning" text={ this.i18n('check.not-found')} icon="info-sign" rendered={ !this._localeExists(entity) }/>
+        <Basic.Alert level="success" text={ this.i18n('check.found')} rendered={ this._localeExists(entity) }/>
+        <Basic.Alert level="warning" text={ this.i18n('check.not-found')} rendered={ !this._localeExists(entity) }/>
 
         { this.i18n('how-to.message', { name: entity.module ? entity.module : 'core', escape: false }) }
         {/* it's ugly, but works */}

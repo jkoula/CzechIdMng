@@ -197,7 +197,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     const _columns = this.getColumns();
     //
     return (
-      <Basic.Div>
+      <>
         <Advanced.Table
           ref="table"
           uiKey={ this.getUiKey() }
@@ -365,9 +365,15 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             face="text"
             sort={false}
             rendered={ _.includes(columns, 'system') }
-            cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.roleSystem
-              ? data[rowIndex]._embedded.roleSystem._embedded.system.name
-              : null }
+            cell={
+              ({ rowIndex, data }) => {
+                if (data[rowIndex]._embedded.roleSystem) {
+                  return data[rowIndex]._embedded.roleSystem._embedded.system.name;
+                }
+                //
+                return null;
+              }
+            }
           />
           <Advanced.Column
             property="environment"
@@ -485,25 +491,24 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
           backdrop="static"
           keyboard={ !_showLoading }
           rendered={ showDetailButton }>
-
-          <form onSubmit={ this.save.bind(this) }>
-            <Basic.Modal.Header
-              icon="component:identity-role"
-              closeButton={ !_showLoading }
-              text={ this.i18n('create.header') }
-              rendered={ Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Header
-              icon={
-                detail.entity._embedded && detail.entity._embedded.role && detail.entity._embedded.role.childrenCount > 0
-                ?
-                'component:business-role'
-                :
-                'component:identity-role'
-              }
-              closeButton={ !_showLoading }
-              text={this.i18n('edit.header', { role: detail.entity._embedded ? roleManager.getNiceLabel(detail.entity._embedded.role) : null })}
-              rendered={ !Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header
+            icon="component:identity-role"
+            closeButton={ !_showLoading }
+            text={ this.i18n('create.header') }
+            rendered={ Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Header
+            icon={
+              detail.entity._embedded && detail.entity._embedded.role && detail.entity._embedded.role.childrenCount > 0
+              ?
+              'component:business-role'
+              :
+              'component:identity-role'
+            }
+            closeButton={ !_showLoading }
+            text={ this.i18n('edit.header', { role: detail.entity._embedded ? roleManager.getNiceLabel(detail.entity._embedded.role) : null }) }
+            rendered={ !Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this) }>
               <Basic.Tabs
                 activeKey={ activeKey }
                 onSelect={ this._onChangeSelectTabs.bind(this)}>
@@ -582,28 +587,31 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                   />
                 </Basic.Tab>
               </Basic.Tabs>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeDetail.bind(this) }
-                showLoading={ _showLoading }>
-                { this.i18n('button.close') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={ _showLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }
-                rendered={ TEST_ADD_ROLE_DIRECTLY }>
-                { this.i18n('button.save') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ _showLoading }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={ _showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              rendered={ TEST_ADD_ROLE_DIRECTLY }
+              onClick={ this.save.bind(this) }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
-      </Basic.Div>
+      </>
     );
   }
 }

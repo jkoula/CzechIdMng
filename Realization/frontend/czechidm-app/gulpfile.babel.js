@@ -39,13 +39,12 @@ import packageDescriptor from './package.json';
 
 const paths = {
   bundle: 'app.js',
-  srcJs: ['node_modules/bootstrap-less/js/bootstrap.min.js', 'node_modules/jquery/dist/jquery.min.js'],
+  srcJs: ['node_modules/jquery/dist/jquery.min.js'],
   srcFont: ['node_modules/bootstrap-less/fonts/*', 'src/fonts/*'],
   srcWebFont: [ 'node_modules/@fortawesome/fontawesome-free/webfonts/*' ],
   srcJsx: 'src/Index.js',
   srcLess: ['src/css/main.less'],
   srcIncludedLess: [],
-  srcCssSeparate: ['src/css/google.fonts.css'], // this css will be add as separate files (not conacat to main.less)
   srcImg: 'images/**', // client images
   srcThemes: ['images/**'], // only images for now
   srcLocale: [], // will filled during compile (with locales from submodules)
@@ -392,7 +391,6 @@ function styles() {
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.distCss))
     .pipe(reload({stream: true}))
-    .pipe(gulp.src(paths.srcCssSeparate))
     .pipe(gulp.dest(paths.distCss));
 }
 
@@ -413,7 +411,7 @@ function useHtmlReplace() {
           tpl: '<link rel="icon" href="%s" type="image/gif" />'
         },
         css: ['css/main.css', 'css/google.fonts.css'],
-        js: ['js/jquery.min.js', 'js/bootstrap.min.js', 'config.js', 'js/app.js']
+        js: ['js/jquery.min.js', 'config.js', 'js/app.js']
       }
     ))
     .pipe(version({

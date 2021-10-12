@@ -12,7 +12,11 @@
     }
 
     .button-container {
-      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: right;
+      min-height: 46px;
+      _height: 46px;
     }
   }
 
@@ -35,27 +39,6 @@
     .Select-value, .Select-placeholder {
       line-height: 20px;
       color: @idm-text-color;
-    }
-
-    .dropdown {
-      .dropdown-toogle-icon {
-        cursor: pointer;
-        padding: 4px 10px 4px 10px;
-        margin-top: 1px;
-        margin-right: 7px;
-        color: #aaa;
-        border-radius: 3px;
-
-        &:hover {
-          background-color: #ddd;
-        }
-      }
-
-      &.open {
-        .dropdown-toogle-icon {
-          background-color: #ddd;
-        }
-      }
     }
 
     .dropdown-menu {
@@ -115,15 +98,5 @@
   td .column-face-bool,
   td .column-face-boolean {
     text-align: center;
-  }
-}
-
-.bulk-action-button {
-  margin-right: 7px;
-  padding-left: 10px;
-  padding-right: 10px;
-
-  .fa, .glyphicon {
-    width: 18px;
   }
 }

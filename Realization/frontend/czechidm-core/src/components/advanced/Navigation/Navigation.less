@@ -13,202 +13,112 @@
   &.en { background-image: url('../images/flags/en.gif'); }
 }
 
-header {
-  // padding-top: 70px;
+.home {
+  background-position: top left;
+  background-repeat: no-repeat;
+  text-decoration: none;
+  width: 128px;
+  margin-top: 5px;
+  height: 40px;
+  margin-left: 15px;
+  margin-right: 20px;
+  display: inline-block;
 
-  .home {
-    background-position: top left;
-    background-repeat: no-repeat;
+  &.light {
+    margin-left: 0px;
+  }
+
+  &:hover {
     text-decoration: none;
-    width: 128px;
-    margin-top: 5px;
-    height: 40px;
-    margin-left: 15px;
-    margin-right: 20px;
-    display: inline-block;
+  }
+}
 
-    &:hover {
-      text-decoration: none;
-    }
+.monitoring-result {
+  .alert {
+    margin: 5px 10px;
+    font-weight: normal;
+    font-size: 0.9em;
+    padding: 5px;
 
-    @media (max-width: 768px) {
-      // fixing problem in mobile view vith nav header
-      margin-left: 15px;
-    }
-
-    @media (min-width: 768px) {
-      &.active {
-        border-bottom-width: 3px;
-        border-bottom-style: solid;
-        border-bottom-color: @idm-base-color;
-      }
+    .buttons {
+      margin-top: 5px;
     }
   }
+}
 
-  .glyphicon {
-    margin-right: 3px;
-    padding: 0;
-    width: 18px;
+header {
+  .glyphicon, .fa, .far, .fas, .fab, .fa-layers {
+    font-size: 0.95rem;
   }
 
-  .fa, .fa-layers {
-    margin-right: 3px;
-    padding: 0;
-    width: 18px;
-  }
-
-  .navbar {
-    font-weight: bolder;
-    background: transparent;
-    background-color: rgb(255, 255, 255);
-    // background-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0px 0px 5px 0px rgba(150, 150, 150, 0.7);
-    border-bottom: 1px solid #bbb; // #2E8120
-
-    li a {
-      color: @idm-nav-color;
-      outline: 0;
-
-      &:hover, &:active, &:focus {
-        outline: 0;
-      }
-    }
-
-    @media (min-width: 768px) {
-      #navbar > * > .nav {
-        li.active a {
-          border-bottom-width: 3px;
-          border-bottom-style: solid;
-          border-bottom-color: @idm-base-color;
-          // color: @idm-link-color;
-          background-color: transparent;
-          padding-bottom: 12px;
-        }
-      }
-    }
-
-    .glyphicon, .fa {
-      margin-right: 0px;
-      font-size: 12px;
-    }
-  }
-
-  .navbar-text {
-    margin-bottom: 12px;
-  }
-
-  .navbar-right {
-    margin-right: 0px;
-  }
-
-  .navbar-right li:last-child {
-    //
-  }
-
-  /**
-   * Localization control
-   */
-  .flags-container {
-
-    margin-top: 2px;
-    margin-bottom: -4px;
-
-    .flags {
-      .flag {
-        text-decoration: none;
-        padding: 0px 12px 0px 12px;
-        background-position: center center;
-        background-repeat: no-repeat;
-        margin-right: 5px;
-        border: 1px solid @idm-base-color;
-        display: inline-block;
-        height: 20px;
-        cursor: pointer;
-
-        &.active {
-          background-color: @idm-base-color;
-          border-color: @idm-link-color;
-          cursor: default;
-        }
-
-        &:hover {
-          background-color: @idm-base-color;
-        }
-
-        &.last {
-          margin-right: 0px;
-        }
-      }
-    }
+  // @FIXME -- theme
+  .MuiButton-endIcon {
+      margin-left: 0px;
   }
 
   .dropdown-menu {
 
     min-width: 300px;
 
-    li {
-      a {
-        padding: 7px 15px;
-      }
-
-      &.identity-image {
-        padding: 0px 15px 5px 15px;
-        border-bottom: 1px solid lighten(@idm-base-color, 15%);
-        margin-bottom: 5px;
-
-        >.profile-default-icon {
-          height: 50px;
-        }
-      }
+    .glyphicon, .fa, .far, .fas, .fab, .fa-layers {
+      margin-right: 3px;
+      padding: 0;
+      width: 18px;
+      font-size: 1rem;
     }
   }
+}
 
-  .navigation-search {
-    .input-group {
-      input.form-control {
-        border-radius: 4px 0px 0px 4px;
-      }
+.identity-menu {
 
-      .btn {
-        border-radius: 0px 4px 4px 0px;
-        border-left: 0px;
-      }
-    }
+  min-width: 300px;
+
+  .glyphicon, .fa, .far, .fas, .fab, .fa-layers {
+    margin-right: 3px;
+    padding: 0;
+    width: 18px;
+    font-size: 1rem;
   }
 
-  .monitoring-result {
-    .alert {
-      margin: 5px 10px;
-      font-weight: normal;
-      font-size: 0.9em;
-      padding: 5px;
+  .identity-image {
+    padding: 0px 15px 5px 15px;
 
-      .buttons {
-        margin-top: 5px;
-      }
+    >.profile-default-icon {
+      height: 50px;
     }
   }
 }
 
 .sidebar {
-  .nav-separator {
-    color: #aaa;
-    padding: 10px 15px 10px 15px;
-    // border-bottom: @idm-border-color 2px solid;
-    font-weight: normal;
-    display: none;
+
+  font-size: 1.10em;
+  font-weight: 400;
+  line-height: 1.5;
+
+  a {
+    color: inherit;
+
+    &:visited {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    &:hover {
+      text-decoration: none;
+      color: inherit;
+    }
   }
 
+  .glyphicon, .fa, .far, .fas, .fab, .fa-layers {
+    margin-right: 15px;
+    padding: 0;
+    width: 18px;
+    font-size: 1.15rem;
+  }
   .nav {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 400ms, visibility 400ms;
 
-    &.collapse {
-      position: absolute;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0ms, visibility 0ms;
+    li > a {
+      padding: 10px 4px 10px 15px;
     }
   }
 }
@@ -218,18 +128,10 @@ header {
   padding-left: 0;
 }
 
-.sidebar .sidebar-search {
-  padding: 15px;
-}
-
 .sidebar ul li {
   border-bottom: 1px solid #e7e7e7;
 
   &.active {
-    > a {
-      background-color: #eee;
-    }
-
     &.has-children {
       border-bottom: none;
     }
@@ -257,22 +159,16 @@ header {
   }
 }
 
-.sidebar ul li a.active {
-  background-color: #eee;
-  border-left-color: @idm-base-color;
-}
-
-.sidebar ul li a:focus {
-
-}
-.sidebar ul li a:hover {
-  color: #000;
-  // text-decoration: underline;
+.nav > li > a:focus, .nav > li > a:hover {
+  background-color: transparent;
 }
 
 .sidebar .arrow-icon {
   float: right;
-  line-height: 1.42857;
+  margin-right: 0;
+  margin-top: 5px;
+  width: 18px;
+  font-size: 1em;
 }
 
 .sidebar .nav-second-level li,
@@ -280,22 +176,17 @@ header {
 }
 
 .sidebar .nav-second-level li a {
-  padding-left: 37px;
+  padding-left: 30px;
 }
 
 .sidebar .nav-third-level li a {
-  padding-left: 52px;
+  padding-left: 45px;
 }
 
 @media(min-width:768px) {
   .sidebar {
-    z-index: 1;
-    position: absolute;
-    width: 250px;
-    margin-top: 1px;
 
     &.collapsed {
-      width: 50px;
 
       .item-text {
         display: none;

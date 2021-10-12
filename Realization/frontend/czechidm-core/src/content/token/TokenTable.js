@@ -298,44 +298,44 @@ export class TokenTable extends Advanced.AbstractTableContent {
           backdrop="static"
           keyboard={ !_showLoading }>
 
-          <form onSubmit={ this.save.bind(this) }>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('create.header') }
-              rendered={ Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('edit.header') }
-              rendered={ !Utils.Entity.isNew(detail.entity) }
-              buttons={[
-                <Advanced.AuditableInfo entity={ detail.entity }/>
-              ]}/>
-            <Basic.Modal.Body>
-              <Basic.Alert level="info" rendered={ token !== null } text={ this.i18n('create.success', { escape: false })}/>
-              <Basic.Alert
-                title="Token"
-                level="success"
-                rendered={ token !== null }
-                buttons={[
-                  <Basic.Button
-                    icon="fa:clipboard"
-                    onClick={ () => {
-                      // ~ctrl+c
-                      this.refs['created-token'].select();
-                      document.execCommand('copy');
-                      this.addMessage({ level: 'success', message: this.i18n('button.copy.success') });
-                    }}>
-                    { this.i18n('button.copy.label') }
-                  </Basic.Button>
-                ]}>
-                <textarea
-                  ref="created-token"
-                  style={{ wordBreak: 'break-all', width: '100%', border: 'none', background: 'transparent', resize: 'none' }}
-                  readOnly
-                  rows={ 6 }
-                  value={ token }/>
-              </Basic.Alert>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('create.header') }
+            rendered={ Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('edit.header') }
+            rendered={ !Utils.Entity.isNew(detail.entity) }
+            buttons={[
+              <Advanced.AuditableInfo entity={ detail.entity }/>
+            ]}/>
 
+          <Basic.Modal.Body>
+            <Basic.Alert level="info" rendered={ token !== null } text={ this.i18n('create.success', { escape: false })}/>
+            <Basic.Alert
+              title="Token"
+              level="success"
+              rendered={ token !== null }
+              buttons={[
+                <Basic.Button
+                  icon="fa:clipboard"
+                  onClick={ () => {
+                    // ~ctrl+c
+                    this.refs['created-token'].select();
+                    document.execCommand('copy');
+                    this.addMessage({ level: 'success', message: this.i18n('button.copy.success') });
+                  }}>
+                  { this.i18n('button.copy.label') }
+                </Basic.Button>
+              ]}>
+              <textarea
+                ref="created-token"
+                style={{ wordBreak: 'break-all', width: '100%', border: 'none', background: 'transparent', resize: 'none' }}
+                readOnly
+                rows={ 6 }
+                value={ token }/>
+            </Basic.Alert>
+            <form onSubmit={ this.save.bind(this) }>
               <Basic.AbstractForm
                 ref="form"
                 readOnly={ !manager.canSave(detail.entity, _permissions) }
@@ -428,26 +428,30 @@ export class TokenTable extends Advanced.AbstractTableContent {
                     readOnly/>
                 </Basic.Div>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeDetail.bind(this) }
-                showLoading={ _showLoading }>
-                { this.i18n('button.close') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                rendered={ Utils.Entity.isNew(detail.entity) && this.getManager().canSave(detail.entity, _permissions) }
-                showLoading={ _showLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }>
-                { this.i18n('button.generate.label') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ _showLoading }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              rendered={ Utils.Entity.isNew(detail.entity) && this.getManager().canSave(detail.entity, _permissions) }
+              showLoading={ _showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              onClick={ this.save.bind(this) }>
+              { this.i18n('button.generate.label') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
+
         </Basic.Modal>
       </Basic.Div>
     );
@@ -550,8 +554,7 @@ class Filter extends Advanced.Filter {
                 optionComponent={ EnumOptionDecorator }
                 valueComponent={ EnumValueDecorator }/>
             </Basic.Col>
-            <Basic.Col lg={ 8 }>
-            </Basic.Col>
+            <Basic.Col lg={ 8 }/>
           </Basic.Row>
         </Basic.AbstractForm>
       </Advanced.Filter>

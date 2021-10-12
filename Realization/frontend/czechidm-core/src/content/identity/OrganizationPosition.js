@@ -51,7 +51,7 @@ class OrganizationPosition extends Basic.AbstractContextComponent {
     if (showLoading || _showLoading) {
       /* TODO: UI jumping, when position is null ...);*/
       return (
-        <ol className="breadcrumb">
+        <ol className="breadcrumb" style={{ backgroundColor: 'rgba(0, 0, 0, 0.05)' }}>
           <li><Basic.Icon value="refresh" showLoading/></li>
         </ol>
       );
@@ -92,7 +92,7 @@ class OrganizationPosition extends Basic.AbstractContextComponent {
     );
     //
     return (
-      <ol className="breadcrumb" style={{ marginBottom: 10 }}>
+      <ol className="breadcrumb" style={{ marginBottom: 10, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}>
         { items }
       </ol>
     );

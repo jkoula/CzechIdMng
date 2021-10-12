@@ -2,6 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 //
+import Menu from '@material-ui/core/Menu';
+import MenuList from '@material-ui/core/MenuList';
+import Divider from '@material-ui/core/Divider';
+import IconButton from '@material-ui/core/IconButton';
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import Badge from '@material-ui/core/Badge';
+//
 import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
 import ComponentService from '../../../services/ComponentService';
@@ -11,8 +18,6 @@ import {
   MonitoringResultManager,
   LongPollingManager
 } from '../../../redux';
-import NavigationItem from './NavigationItem';
-import NavigationSeparator from './NavigationSeparator';
 //
 const monitoringResultManager = new MonitoringResultManager();
 const componentService = new ComponentService();
@@ -30,7 +35,8 @@ class NavigationMonitoring extends Basic.AbstractContent {
     //
     this.state = {
       longPollingInprogress: false,
-      requestControllers: [] // Contains array of requests controllers for abort a request.
+      requestControllers: [], // Contains array of requests controllers for abort a request.
+      anchorEl: null
     };
     this.canSendLongPollingRequest = false;
   }
@@ -87,6 +93,18 @@ class NavigationMonitoring extends Basic.AbstractContent {
     this._fetchLastMonitoringResults();
   }
 
+  _handleClick(event) {
+    this.setState({
+      anchorEl: event.currentTarget
+    });
+  }
+
+  _handleClose() {
+    this.setState({
+      anchorEl: null
+    });
+  }
+
   render() {
     const {
       rendered,
@@ -94,6 +112,7 @@ class NavigationMonitoring extends Basic.AbstractContent {
       location,
       _lastMonitoringResultTotal
     } = this.props;
+    const { anchorEl } = this.state;
     //
     if (!rendered) {
       return null;
@@ -106,23 +125,26 @@ class NavigationMonitoring extends Basic.AbstractContent {
     }
     //
     return (
-      <li>
-        <a
-          href="#"
-          className="dropdown-toggle"
-          data-toggle="dropdown"
+      <>
+        <IconButton
           role="button"
+          color="inherit"
+          aria-controls="monitoring-menu"
           aria-haspopup="true"
-          aria-expanded="false">
-          <span>
-            <Basic.Icon
-              value="component:monitoring-results"
-              counter={ counter }
-              level={ (lastMonitoringResults && lastMonitoringResults.find(result => result.level === 'ERROR')) ? 'error' : 'warning'}/>
-          </span>
-        </a>
-        <ul className="dropdown-menu">
-          <li className="monitoring-result">
+          onClick={ (event) => {
+            this._handleClick(event);
+          }}>
+          <Badge badgeContent={ counter} color="error">
+            <NotificationsIcon/>
+          </Badge>
+        </IconButton>
+        <Menu
+          id="monitoring-menu"
+          anchorEl={ anchorEl }
+          keepMounted
+          open={ Boolean(anchorEl) }
+          onClose={ this._handleClose.bind(this) }>
+          <div className="monitoring-result">
             {
               !lastMonitoringResults || lastMonitoringResults.length === 0
               ?
@@ -152,7 +174,10 @@ class NavigationMonitoring extends Basic.AbstractContent {
                       [
                         <monitoringResultButton.component
                           monitoringResult={ result }
-                          buttonSize="xs"/>
+                          buttonSize="xs"
+                          onClick={ () => {
+                            this._handleClose();
+                          }}/>
                       ]
                       :
                       [
@@ -162,6 +187,7 @@ class NavigationMonitoring extends Basic.AbstractContent {
                           buttonSize="xs"
                           text={ this.i18n('component.advanced.EntityInfo.link.detail.label') }
                           onClick={ () => {
+                            this._handleClose();
                             this.context.history.push(`/monitoring/monitoring-results/${ result.id }`);
                           }}
                           rendered={
@@ -172,18 +198,29 @@ class NavigationMonitoring extends Basic.AbstractContent {
                 );
               })
             }
-          </li>
-          <NavigationSeparator rendered={ location && location.pathname !== '/monitoring/monitoring-results' }/>
-          <NavigationItem
-            id="nav-item-monitoring-detail"
-            key="nav-item-monitoring-detail"
-            to="/monitoring/monitoring-results"
-            titlePlacement="bottom"
-            icon="fa:angle-double-right"
-            text={ this.i18n('link.all.label') }
-            rendered={ location && location.pathname !== '/monitoring/monitoring-results' }/>
-        </ul>
-      </li>
+          </div>
+          {
+            location && location.pathname !== '/monitoring/monitoring-results'
+            ?
+            <MenuList>
+              <Divider />
+              <Basic.MenuItem
+                id="nav-item-monitoring-detail"
+                key="nav-item-monitoring-detail"
+                icon="fa:angle-double-right"
+                onClick={ () => {
+                  this._handleClose();
+                  this.context.history.push('/monitoring/monitoring-results');
+                }}
+                titlePlacement="bottom">
+                { this.i18n('link.all.label') }
+              </Basic.MenuItem>
+            </MenuList>
+            :
+            null
+          }
+        </Menu>
+      </>
     );
   }
 }

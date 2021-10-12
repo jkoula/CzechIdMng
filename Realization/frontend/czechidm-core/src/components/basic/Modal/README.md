@@ -1,9 +1,7 @@
 # Modal Component
 
-Wrapped react bootstrap modal
-* adds backdrop fix
-* https://github.com/react-bootstrap/react-bootstrap/blob/v0.28.3/src/Modal.js
-* https://react-bootstrap.github.io/components/modal/
+Wrapped Material-UI dialog
+* https://v4.mui.com/api/dialog/
 
 
 ## Usage

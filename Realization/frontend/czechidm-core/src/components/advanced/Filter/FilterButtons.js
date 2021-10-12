@@ -47,14 +47,35 @@ export default class FilterButtons extends Basic.AbstractContextComponent {
     if (!rendered || showLoading) {
       return null;
     }
+    const buttons = [
+      <Basic.Button
+        onClick={ this._cancelFilter.bind(this) }
+        icon={ showIcon ? 'fa:remove' : null }
+        title={ this.i18n('button.filter.cancel') }
+        level={ showIcon ? null : 'link' }
+        titlePlacement="bottom"
+        text={ showText ? this.i18n('button.filter.cancel') : null }/>,
+      <Basic.Button
+        level="primary"
+        type="submit"
+        onClick={ this._useFilter.bind(this) }
+        icon={ showIcon ? 'fa:check' : null }
+        title={ this.i18n('button.filter.use') }
+        titlePlacement="bottom"
+        text={ showText ? this.i18n('button.filter.use') : null }/>
+    ];
+    if (!style && !className) {
+      return buttons;
+    }
     //
     return (
       <span style={ style } className={ className }>
         <Basic.Button
           onClick={ this._cancelFilter.bind(this) }
           style={{ marginRight: 5 }}
-          icon={ showIcon ? 'remove' : null }
+          icon={ showIcon ? 'fa:remove' : null }
           title={ this.i18n('button.filter.cancel') }
+          level="link"
           titlePlacement="bottom"
           text={ showText ? this.i18n('button.filter.cancel') : null }/>
         <Basic.Button

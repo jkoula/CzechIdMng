@@ -234,13 +234,14 @@ class LongRunningTask extends Basic.AbstractContent {
       footerButtons,
       showProperties,
       supportedTasks,
-      _supportedTasks
+      _supportedTasks,
+      style
     } = this.props;
     const _entity = this.getEntity();
     //
     const active = OperationStateEnum.findSymbolByKey(_entity.resultState) === OperationStateEnum.RUNNING;
     return (
-      <Basic.Panel showLoading={ _showLoading }>
+      <Basic.Panel showLoading={ _showLoading } style={ style }>
         <Basic.Confirm ref="confirm-cancel" level="warning"/>
         <Basic.Confirm ref="confirm-interrupt" level="danger"/>
         <Basic.PanelHeader text={
@@ -282,8 +283,8 @@ class LongRunningTask extends Basic.AbstractContent {
                   'danger'
                   :
                   'success'
-              }]
-            }/>
+              }
+            ]}/>
           { this._renderInfoComponent(_entity ? _entity.result : null)}
         </Basic.PanelBody>
         <Basic.PanelFooter>

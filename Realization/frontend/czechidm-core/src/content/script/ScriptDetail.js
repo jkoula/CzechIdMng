@@ -169,7 +169,11 @@ export default class ScriptDetail extends Basic.AbstractContent {
                   onChange={ this._onChangeCategory.bind(this) }
                   max={ 255 }
                   required/>
-                <Advanced.RichTextArea ref="description" label={ this.i18n('entity.Script.description') } />
+
+                <Advanced.RichTextArea
+                  ref="description"
+                  label={ this.i18n('entity.Script.description') } />
+
                 <Basic.ScriptArea
                   ref="script"
                   mode="groovy"

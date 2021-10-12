@@ -48,7 +48,7 @@ class Messages extends Basic.AbstractContent {
     const isEmpty = !this.props.messages || !this.props.messages.length;
     if (isEmpty) {
       messages.push(
-        <Basic.Alert icon="ok" level="success" text={ this.i18n('content.messages.empty') }/>
+        <Basic.Alert level="success" text={ this.i18n('content.messages.empty') }/>
       );
     } else {
       for (let i = 0; i < this.props.messages.length; i++) {

@@ -5,12 +5,14 @@ import classNames from 'classnames';
 import Joi from 'joi';
 import moment from 'moment';
 import Datetime from 'react-datetime';
+import $ from 'jquery';
 //
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
+import FormComponentLabel from '../AbstractFormComponent/FormComponentLabel';
 import LocalizationService from '../../../services/LocalizationService';
 import Button from '../Button/Button';
-import Icon from '../Icon/Icon';
 import Tooltip from '../Tooltip/Tooltip';
+import * as Utils from '../../../utils';
 
 const INVALID_DATE = 'Invalid date';
 
@@ -27,6 +29,8 @@ class DateTimePicker extends AbstractFormComponent {
     this.state = {
       positionUp: false
     };
+    //
+    this.containerRef = React.createRef();
   }
 
   getRequiredValidationSchema() {
@@ -235,7 +239,28 @@ class DateTimePicker extends AbstractFormComponent {
 
     // Should be dialog show above the component?
     const positionUp = (positionY + heightOfDialog) > pageHeight;
-    this.setState({positionUp}, () => (callback ? callback() : null));
+    this.setState({
+      positionUp
+    }, () => {
+      if (callback) {
+        callback();
+      }
+      //
+      const container = $(this.containerRef.current);
+      const isModal = container.closest('.basic-modal-scroll-paper').length > 0;
+      const picker = container.find('.rdtPicker');
+      if (picker) {
+        const style = {
+          backgroundColor: Utils.Ui.getTheme(this.context.store.getState()).palette.background.paper
+        };
+        if (isModal) {
+          style.top = positionUp ? rect.top - heightOfDialog : rect.bottom;
+          style.bottom = 'auto';
+          style.position = 'fixed';
+        }
+        picker.css(style);
+      }
+    });
   }
 
   getValue() {
@@ -288,6 +313,7 @@ class DateTimePicker extends AbstractFormComponent {
       dateFormat,
       timeFormat,
       isValidDate,
+      required
     } = this.props;
 
     const { readOnly, disabled, value, positionUp } = this.state;
@@ -298,23 +324,34 @@ class DateTimePicker extends AbstractFormComponent {
     const _timeFormat = this._getTimeFormat(timeFormat);
     //
     const labelClassName = classNames(labelSpan, 'control-label');
-
+    const _label = [];
+    if (label) {
+      _label.push(label);
+    } else if (placeholder) {
+      _label.push(placeholder);
+    }
+    if (_label.length > 0 && required) {
+      _label.push(' *');
+    }
     // VS: I added value attribute to Datetime component. External set value (in setValue method) now set only empty string if value is null.
     // Without value attribute is in some case (detail of contract) value not show after first render.
     return (
-      <div>
-        {
-          !label
-          ||
-          <label
-            className={labelClassName}>
-            {label}
-            { this.renderHelpIcon() }
-          </label>
-        }
-        <div className={componentSpan}>
+      <div className={
+        classNames(
+          'basic-form-component',
+          { 'has-feedback': feedback },
+          { disabled: disabled || readOnly }
+        )
+      }>
+        <FormComponentLabel
+          className={ labelClassName }
+          label={ _label }
+          helpIcon={ this.renderHelpIcon() }/>
+        <div className={ componentSpan }>
           <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
-            <div className="btn-group input-group basic-date-time-picker">
+            <div
+              ref={ this.containerRef }
+              className="basic-date-time-picker">
               {
                 (disabled || readOnly)
                 ?
@@ -332,7 +369,6 @@ class DateTimePicker extends AbstractFormComponent {
                   disabled={disabled}
                   readOnly={readOnly}
                   className={positionUp ? 'rdtPickerOpenUpwards' : '' }
-                  style={style}
                   closeOnSelect
                   onFocus={this.resolvePosition.bind(this, null)}
                   locale={_locale === 'cs' ? 'cs' : 'en'}
@@ -349,30 +385,23 @@ class DateTimePicker extends AbstractFormComponent {
               }
               <Button
                 type="button"
+                buttonSize="xs"
                 level="default"
-                className="btn-sm"
                 disabled={disabled || readOnly}
-                style={{marginTop: 0, height: '34px', borderLeftWidth: 0, borderRadius: 0 }}
-                onClick={this._openDialog.bind(this)}>
-                <Icon type="fa" icon="calendar"/>
-              </Button>
+                style={{ marginTop: 0 }}
+                onClick={this._openDialog.bind(this)}
+                icon={ feedback ? 'fa:calendar' : 'fa:calendar' }/>
               <Button
                 type="button"
+                buttonSize="xs"
                 level="default"
-                className="btn-sm"
                 disabled={disabled || readOnly}
-                style={{marginTop: 0, height: '34px', borderLeftWidth: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-                onClick={this._clear.bind(this)}>
-                <Icon type="fa" icon="remove"/>
-              </Button>
-              {
-                !feedback
-                ||
-                <Icon icon="warning-sign" className="form-control-feedback" style={{ right: -30, top: 0, zIndex: 0 }}/>
-              }
+                style={{ marginTop: 0 }}
+                icon="fa:remove"
+                onClick={this._clear.bind(this)}/>
             </div>
           </Tooltip>
-          { !label ? this.renderHelpIcon() : null }
+          { _label.length === 0 ? this.renderHelpIcon() : null }
           { this.renderHelpBlock() }
         </div>
       </div>

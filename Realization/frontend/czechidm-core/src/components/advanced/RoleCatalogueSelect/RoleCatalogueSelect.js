@@ -240,18 +240,16 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
     const { readOnly } = this.state;
     //
     return (
-      <Basic.Div>
-        <Basic.LabelWrapper label={ this.getLabel() ? (<span style={{ visibility: 'hidden' }}>T</span>) : null }>
-          <Basic.Button
-            level="default"
-            icon="fa:folder-open"
-            style={{ marginLeft: 5 }}
-            onClick={ this.showTree.bind(this) }
-            title={ this.i18n('showTree.link.title') }
-            titlePlacement="bottom"
-            disabled={ readOnly }/>
-        </Basic.LabelWrapper>
-      </Basic.Div>
+      <div className="form-group" style={{ width: 'auto' }}>
+        <Basic.Button
+          level="default"
+          icon="fa:folder-open"
+          buttonSize="xs"
+          onClick={ this.showTree.bind(this) }
+          title={ this.i18n('showTree.link.title') }
+          titlePlacement="bottom"
+          disabled={ readOnly }/>
+      </div>
     );
   }
 
@@ -281,7 +279,7 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
     //
     return (
       <span>
-        <Basic.Div style={{ display: 'flex' }}>
+        <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
           <Basic.Div style={{ flex: 1 }}>
             <EntitySelectBox
               entityType="roleCatalogue"
@@ -307,6 +305,7 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
           show={ showTree }
           onHide={ this.hideTree.bind(this) }
           backdrop="static"
+          bsSize="sm"
           keyboard>
           <Basic.Modal.Header text={ this.getHeader() } closeButton/>
           <Basic.Modal.Body style={{ padding: 0 }}>

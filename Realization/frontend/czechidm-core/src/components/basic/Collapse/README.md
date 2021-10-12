@@ -1,7 +1,7 @@
 # Collapse Component
 
-Wrapped react bootstrap Collapse
-* https://react-bootstrap.github.io/components.html#transitions-collapse
+Wrapped Material-UI Collapse
+* https://v4.mui.com/api/collapse/#collapse-api
 
 
 ## Usage

@@ -317,8 +317,7 @@ class PasswordChangeComponent extends Basic.AbstractFormComponent {
     if (this._canPasswordChange(_permissions) && !preload) {
       content.push(
         <Basic.Alert
-          icon="info-sign"
-          text={this.i18n('message.isAdmin')}
+          text={ this.i18n('message.isAdmin') }
           rendered={ SecurityManager.isAdmin(userContext) }
           style={{ margin: '15px 0' }}/>
       );
@@ -350,7 +349,7 @@ class PasswordChangeComponent extends Basic.AbstractFormComponent {
             onChange={ this._preValidate.bind(this) }/>
 
           <Basic.Div className={ allOnlyWarningClassNames }>
-            <Basic.Alert key="changeAllOnly" icon="exclamation-sign" text={ this.i18n('changeType.ALL_ONLY') } className="last no-margin"/>
+            <Basic.Alert key="changeAllOnly" text={ this.i18n('changeType.ALL_ONLY') } className="last no-margin"/>
           </Basic.Div>
         </Basic.AbstractForm>
       );
@@ -373,12 +372,10 @@ class PasswordChangeComponent extends Basic.AbstractFormComponent {
           <Basic.Loading className="static" showLoading={ preload && this._canPasswordChange(_permissions) }/>
           <Basic.Alert
             level="warning"
-            icon="exclamation-sign"
             text={ this.i18n('changeType.DISABLED') }
             rendered={ passwordChangeType === IdentityManager.PASSWORD_DISABLED && !SecurityManager.isAdmin(userContext) }/>
           <Basic.Alert
             level="warning"
-            icon="exclamation-sign"
             text={ this.i18n('permission.failed') }
             rendered={
               _permissions !== undefined
@@ -387,7 +384,6 @@ class PasswordChangeComponent extends Basic.AbstractFormComponent {
             }/>
           <Basic.Alert
             level="info"
-            icon="exclamation-sign"
             rendered={ !accountsExits }
             text={ this.i18n('message.noAccounts') }/>
           { content }

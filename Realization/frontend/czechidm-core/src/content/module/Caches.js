@@ -114,7 +114,6 @@ class Caches extends Basic.AbstractContent {
               <Basic.Button
                 level="warning"
                 onClick={ this.onEvictAll.bind(this) }
-                className="btn-xs"
                 title={ this.i18n('button.evictAll') }
                 titlePlacement="bottom">
                 { this.i18n('button.evictAll') }
@@ -176,7 +175,7 @@ class Caches extends Basic.AbstractContent {
                   <Basic.Button
                     level="warning"
                     onClick={ this.onEvict.bind(this, data[rowIndex]) }
-                    className="btn-xs"
+                    buttonSize="xs"
                     title={ this.i18n('button.evict') }
                     titlePlacement="bottom">
                     { this.i18n('button.evict') }

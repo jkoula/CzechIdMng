@@ -158,5 +158,5 @@ const Components = {
   }
 };
 
-Components.version = '11.2.0';
+Components.version = '12.0.0';
 module.exports = Components;

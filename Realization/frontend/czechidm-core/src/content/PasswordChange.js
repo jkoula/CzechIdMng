@@ -56,8 +56,6 @@ class PasswordChange extends Basic.AbstractContent {
       this.refs.passwords.focus();
     } else if (data.username) {
       this.refs.passwordOld.focus();
-    } else {
-      this.refs.username.focus();
     }
     this._preValidate();
   }

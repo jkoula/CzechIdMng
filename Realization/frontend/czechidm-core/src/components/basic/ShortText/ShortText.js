@@ -10,36 +10,32 @@ import AbstractComponent from '../AbstractComponent/AbstractComponent';
  * @author Marek Klement
  * @author Radek Tomiška
  */
-class ShortText extends AbstractComponent {
-
-  render() {
-    const { text, value, maxLength, cutPointEnd, cutChar, className, rendered, style } = this.props;
-    const _text = text || value;
-    //
-    if (!rendered || !_text) {
-      return null;
-    }
-    let shortText = '';
-    if (maxLength !== null && _text.length > maxLength) {
-      if (cutPointEnd) {
-        shortText = UiUtils.substringBegin(_text, maxLength, cutChar, '...');
-      } else {
-        shortText = UiUtils.substringEnd(_text, maxLength, cutChar, '...');
-      }
-    } else {
-      shortText = _text;
-    }
-    return (
-      // <Tooltip value={ _text }>
-      <span title={_text} className={ className } style={ style }>
-        { shortText }
-      </span>
-      // </Tooltip>
-    );
+export default function ShortText(props) {
+  const { text, value, maxLength, cutPointEnd, cutChar, className, rendered, style, title } = props;
+  const _text = text || value;
+  //
+  if (!rendered || !_text) {
+    return null;
   }
+  let shortText = '';
+  if (maxLength !== null && _text.length > maxLength) {
+    if (cutPointEnd) {
+      shortText = UiUtils.substringBegin(_text, maxLength, cutChar, '...');
+    } else {
+      shortText = UiUtils.substringEnd(_text, maxLength, cutChar, '...');
+    }
+  } else {
+    shortText = _text;
+  }
+  return (
+    <span title={ title || _text} className={ className } style={ style }>
+      { shortText }
+    </span>
+  );
 }
 
 ShortText.propTypes = {
+  rendered: PropTypes.bool,
   /**
    * String to be shorten
    */
@@ -59,7 +55,13 @@ ShortText.propTypes = {
   /**
    * Boolean that indicates if you cut from begining or ending
    */
-  cutPointEnd: PropTypes.bool
+  cutPointEnd: PropTypes.bool,
+  /**
+   * Html title.
+   *
+   * @since 12.0.0
+   */
+  title: PropTypes.string
 };
 
 ShortText.defaultProps = {
@@ -77,5 +79,3 @@ ShortText.defaultProps = {
    */
   cutPointEnd: true
 };
-
-export default ShortText;

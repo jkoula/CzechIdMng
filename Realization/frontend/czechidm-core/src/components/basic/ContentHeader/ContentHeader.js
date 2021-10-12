@@ -56,6 +56,10 @@ class ContentHeader extends AbstractComponent {
 ContentHeader.propTypes = {
   ...AbstractComponent.propTypes,
   /**
+   * Header text.
+   */
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+  /**
    * help content
    * @type {[type]}
    */

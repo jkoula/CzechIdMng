@@ -55,17 +55,6 @@ class AuditDetail extends Basic.AbstractContent {
     return 'audit-entities';
   }
 
-  /**
-   * After change props is necessary to reload tables with data
-   */
-  // UNSAFE_componentWillReceiveProps(nextProps) {
-  //   const { entityId, revID } = this.props.match.params;
-  //
-  //   if (entityId !== nextProps.match.params.entityId || revID !== nextProps.match.params.revID) {
-  //     this._reloadComponent(nextProps);
-  //   }
-  // }
-
   _reloadComponent(props) {
     const { entityId, revID } = props.match.params;
     // fetch first audit detail
@@ -129,7 +118,7 @@ class AuditDetail extends Basic.AbstractContent {
     const auditDetailSecondFinal = auditDetailSecond !== null ? auditDetailSecond : previousVersion;
     //
     return (
-      <Basic.Row>
+      <Basic.Div>
         <Helmet title={ this.i18n('title') } />
 
         <Advanced.DetailHeader
@@ -200,7 +189,7 @@ class AuditDetail extends Basic.AbstractContent {
             </Basic.Button>
           </Basic.PanelFooter>
         </Basic.Panel>
-      </Basic.Row>
+      </Basic.Div>
     );
   }
 }

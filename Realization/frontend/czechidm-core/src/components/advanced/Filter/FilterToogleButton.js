@@ -78,11 +78,11 @@ class FilterToogleButton extends AbstractContextComponent {
             onClick={ this._filterOpen.bind(this, !filterOpened) }
             showLoading={ showLoading }
             icon="filter"
-            { ...others }>
-            { this.i18n('button.filter.toogle') }
-            {' '}
-            <Basic.Icon icon={ !filterOpened ? 'triangle-bottom' : 'triangle-top' } style={{ fontSize: '0.85em'}}/>
-          </Basic.Button>
+            endIcon={
+              <Basic.Icon value={ !filterOpened ? 'triangle-bottom' : 'triangle-top' } style={{ fontSize: '0.8em' }}/>
+            }
+            text={ this.i18n('button.filter.toogle') }
+            { ...others }/>
         </span>
       </Basic.Tooltip>
     );

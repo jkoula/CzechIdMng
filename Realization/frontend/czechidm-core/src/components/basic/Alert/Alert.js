@@ -1,20 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import Alert from '@material-ui/lab/Alert';
+import AlertTitle from '@material-ui/lab/AlertTitle';
 //
+import * as Utils from '../../../utils';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import Icon from '../Icon/Icon';
-import Button from '../Button/Button';
 
 /**
  * Alert box.
  *
  * @author Radek Tomiška
  */
-class Alert extends AbstractComponent {
+class BasicAlert extends AbstractComponent {
 
   constructor(props) {
     super(props);
+    //
     this.state = {
       closed: false
     };
@@ -32,15 +35,27 @@ class Alert extends AbstractComponent {
   }
 
   render() {
-    const { level, title, text, className, icon, onClose, rendered, showLoading, children, style, buttons, showHtmlText } = this.props;
+    const {
+      level,
+      title,
+      text,
+      className,
+      icon,
+      onClose,
+      rendered,
+      showLoading,
+      children,
+      style,
+      buttons,
+      showHtmlText
+    } = this.props;
     const { closed } = this.state;
     if (!rendered || closed || (!text && !title && !children)) {
       return null;
     }
     const classNames = classnames(
       'alert',
-      `alert-${ (level === 'error' ? 'danger' : level) }`,
-      { 'alert-dismissible': (onClose !== null) },
+      'basic-alert',
       { 'text-center': showLoading },
       className
     );
@@ -51,48 +66,34 @@ class Alert extends AbstractComponent {
         </div>
       );
     }
-
+    //
     return (
-      <div className={ classNames } style={ style }>
+      <Alert
+        severity={ Utils.Ui.toLevel(level) }
+        className={ classNames }
+        style={ style }
+        onClose={ onClose ? this._onClose.bind(this) : null }
+        icon={ icon ? <Icon icon={ icon }/> : null }>
         {
-          !onClose
+          !title
           ||
-          <Button
-            ref="close"
-            type="button"
-            className="close"
-            aria-label="Close"
-            onClick={ this._onClose.bind(this) }>
-            <span aria-hidden="true">&times;</span>
-          </Button>
+          <AlertTitle>{ title }</AlertTitle>
         }
+        { showHtmlText ? <span dangerouslySetInnerHTML={{ __html: text}}/> : text }
+        { children }
         {
-          !icon
+          (!buttons || buttons.length === 0)
           ||
-          <div className="alert-icon"><Icon icon={ icon }/></div>
+          <div className="buttons">
+            { buttons }
+          </div>
         }
-        <div className={ icon ? 'alert-desc' : '' }>
-          {
-            !title
-            ||
-            <div className="alert-title">{ title }</div>
-          }
-          { showHtmlText ? <span dangerouslySetInnerHTML={{ __html: text}}/> : text }
-          { children }
-          {
-            (!buttons || buttons.length === 0)
-            ||
-            <div className="buttons">
-              { buttons }
-            </div>
-          }
-        </div>
-      </div>
+      </Alert>
     );
   }
 }
 
-Alert.propTypes = {
+BasicAlert.propTypes = {
   ...AbstractComponent.propTypes,
   /**
    * Alert level / css / class
@@ -130,7 +131,7 @@ Alert.propTypes = {
   showHtmlText: PropTypes.bool
 };
 
-Alert.defaultProps = {
+BasicAlert.defaultProps = {
   ...AbstractComponent.defaultProps,
   level: 'info',
   onClose: null,
@@ -138,4 +139,4 @@ Alert.defaultProps = {
   showHtmlText: false
 };
 
-export default Alert;
+export default BasicAlert;

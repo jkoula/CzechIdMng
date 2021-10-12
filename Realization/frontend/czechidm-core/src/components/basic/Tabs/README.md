@@ -1,10 +1,8 @@
 # Tabs Component
 
-Wrapped react bootstrap Tabs and Tab
-* https://react-bootstrap.github.io/components.html#tabs
+Wrapped Material-UI Tabs and Tab
 
 * Parameter `unmountOnExit`, can be use for situations when we want to construct content of a tab on every focus. Default value is `false`.
-
 
 ## Usage
 

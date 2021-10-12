@@ -1,17 +1,24 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import classnames from 'classnames';
+import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
+import SearchIcon from '@material-ui/icons/Search';
+import RefreshIcon from '@material-ui/icons/Refresh';
+import InputBase from '@material-ui/core/InputBase';
+import { alpha, makeStyles } from '@material-ui/core/styles';
+import { i18n } from '../../../services/LocalizationService';
 //
-import * as Basic from '../../basic';
 import {
   IdentityManager,
   RoleManager,
-  SecurityManager
+  SecurityManager,
+  FlashMessagesManager
 } from '../../../redux';
 import SearchParameters from '../../../domain/SearchParameters';
-
+//
 const identityManager = new IdentityManager();
 const roleManager = new RoleManager();
+const flashMessagesManager = new FlashMessagesManager();
 
 /**
  * Search box in navigation.
@@ -21,170 +28,175 @@ const roleManager = new RoleManager();
  * @author Radek Tomiška
  * @since 10.3.0
  */
-class NavigationSearch extends Basic.AbstractContextComponent {
-
-  constructor(props, context) {
-    super(props, context);
-    //
-    this.state = {
-      searchShowLoading: false
-    };
+const useStyles = makeStyles((theme) => ({
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto'
+    },
+    [theme.breakpoints.down('xs')]: {
+      display: 'none'
+    }
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    // pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  inputRoot: {
+    color: 'inherit'
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '24ch',
+      '&:focus': {
+        width: '34ch'
+      }
+    }
   }
+}));
 
-  getComponentKey() {
-    return 'component.advanced.NavigationSearch';
+function NavigationSearch(props) {
+  const { userContext } = props;
+  const [ showLoading, setShowLoading ] = React.useState(false);
+  const [ text, setText ] = React.useState('');
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const classes = useStyles();
+  //
+  if (!SecurityManager.hasAllAuthorities(['IDENTITY_READ', 'ROLE_READ'], userContext)) {
+    return null;
   }
-
-  /**
-   * Seach identity or role:
-   * - by codeable identifier
-   * - then by text usage.
-   */
-  search(event) {
+  //
+  const search = (event) => {
     if (event) {
       event.preventDefault();
     }
-    //
-    const text = this.refs['input-search'].getValue();
     if (!text) {
       return;
     }
     //
-    // FIXME: implement service registration
-    // FIXME: service vs manager usage - try to rewire na e.g.  Promise.All
-    this.setState({
-      searchShowLoading: true
-    }, () => {
-      let counter = 0;
-      this.context.store.dispatch(identityManager.fetchEntity(text, 'search', (identity, e1) => {
-        if (e1 && (e1.statusCode === 404 || e1.statusCode === 403)) {
-          this.context.store.dispatch(roleManager.fetchEntity(text, 'search2', (role, e2) => {
-            if (e2 && (e2.statusCode === 404 || e2.statusCode === 403)) {
-              // text search is used => when at least record is found, then first detial is shown. Warning message is shown otherwise.
-              identityManager.getService()
-                .search(new SearchParameters().setFilter('text', text).setSort('disabled', true).setSort('username', true))
-                .then(json => {
-                  // ok
-                  const entities = json._embedded[identityManager.getCollectionType()] || [];
-                  if (entities.length === 1) {
-                    this.context.history.push(identityManager.getDetailLink(entities[0]));
-                    this.setState({
-                      searchShowLoading: false
+    setShowLoading(true);
+
+    let counter = 0;
+    dispatch(identityManager.fetchEntity(text, 'search', (identity, e1) => {
+      if (e1 && (e1.statusCode === 404 || e1.statusCode === 403)) {
+        dispatch(roleManager.fetchEntity(text, 'search2', (role, e2) => {
+          if (e2 && (e2.statusCode === 404 || e2.statusCode === 403)) {
+            // text search is used => when at least record is found, then first detial is shown. Warning message is shown otherwise.
+            identityManager.getService()
+              .search(new SearchParameters().setFilter('text', text).setSort('disabled', true).setSort('username', true))
+              .then(json => {
+                // ok
+                const entities = json._embedded[identityManager.getCollectionType()] || [];
+                if (entities.length === 1) {
+                  history.push(identityManager.getDetailLink(entities[0]));
+                  setShowLoading(false);
+                } else {
+                  counter += entities.length;
+                  roleManager.getService()
+                    .search(new SearchParameters().setFilter('text', text).setSort('disabled', true).setSort('code', true))
+                    .then(json2 => {
+                      // ok
+                      const entities2 = json2._embedded[roleManager.getCollectionType()] || [];
+                      if (entities2.length === 1) {
+                        history.push(`/role/${ encodeURIComponent(entities2[0].id) }/detail`);
+                        setText('');
+                      } else if (entities2.length > 1) {
+                        counter += entities2.length;
+                        // find more
+                        dispatch(flashMessagesManager.addMessage({
+                          key: 'search-result',
+                          level: 'info',
+                          title: i18n('component.advanced.NavigationSearch.message.foundMore.title'),
+                          message: i18n('component.advanced.NavigationSearch.message.foundMore.message', { counter, text })
+                        }));
+                      } else {
+                        // not found message
+                        dispatch(flashMessagesManager.addMessage({
+                          key: 'search-result',
+                          level: 'info',
+                          title: i18n('component.advanced.NavigationSearch.message.notFound.title'),
+                          message: i18n('component.advanced.NavigationSearch.message.notFound.message', { text })
+                        }));
+                      }
+                      setShowLoading(false);
+                    })
+                    .catch(error => {
+                      dispatch(flashMessagesManager.addError(error));
+                      setShowLoading(false);
                     });
-                  } else {
-                    counter += entities.length;
-                    roleManager.getService()
-                      .search(new SearchParameters().setFilter('text', text).setSort('disabled', true).setSort('code', true))
-                      .then(json2 => {
-                        // ok
-                        const entities2 = json2._embedded[roleManager.getCollectionType()] || [];
-                        if (entities2.length === 1) {
-                          this.context.history.push(`/role/${ encodeURIComponent(entities2[0].id) }/detail`);
-                          this.refs['input-search'].setValue(null);
-                        } else if (entities2.length > 1) {
-                          counter += entities2.length;
-                          // find more
-                          this.addMessage({
-                            key: 'search-result',
-                            level: 'info',
-                            title: this.i18n('message.foundMore.title'),
-                            message: this.i18n('message.foundMore.message', { counter, text })
-                          });
-                        } else {
-                          // not found message
-                          this.addMessage({
-                            key: 'search-result',
-                            level: 'info',
-                            title: this.i18n('message.notFound.title'),
-                            message: this.i18n('message.notFound.message', { text })
-                          });
-                        }
-                        this.setState({
-                          searchShowLoading: false
-                        });
-                      })
-                      .catch(error => {
-                        this.addError(error);
-                        this.setState({
-                          searchShowLoading: false
-                        });
-                      });
-                  }
-                })
-                .catch(error => {
-                  this.addError(error);
-                  this.setState({
-                    searchShowLoading: false
-                  });
-                });
-            } else if (e2) {
-              this.addError(e2);
-            } else {
-              this.context.history.push(`/role/${ encodeURIComponent(role.id) }/detail`);
-              this.refs['input-search'].setValue(null);
-            }
-            this.setState({
-              searchShowLoading: false
-            });
-          }));
-        } else if (e1) {
-          this.addError(e1);
-          this.setState({
-            searchShowLoading: false
-          });
-        } else {
-          this.context.history.push(identityManager.getDetailLink(identity));
-          this.refs['input-search'].setValue(null);
-          this.setState({
-            searchShowLoading: false
-          });
-        }
-      }));
-    });
-  }
-
-  render() {
-    const { rendered, showLoading, className, userContext } = this.props;
-    const { searchShowLoading } = this.state;
-    //
-    if (!rendered) {
-      return null;
-    }
-    // FIXME - by registered services
-    if (!SecurityManager.hasAllAuthorities(['IDENTITY_READ', 'ROLE_READ'], userContext)) {
-      return null;
-    }
-    //
-    return (
-      <form
-        className={ classnames(className, 'navigation-search') }
-        onSubmit={ this.search.bind(this) }>
-        <Basic.Div className="input-group">
-          <Basic.TextField
-            label={ null }
-            ref="input-search"
-            placeholder={ this.i18n('search.placeholder') }/>
-          <span className="input-group-btn">
-            <Basic.Button
-              showLoading={ searchShowLoading || showLoading }
-              title={ this.i18n('button.title') }
-              showLoadingIcon
-              level="default"
-              type="submit"
-              icon="search"/>
-          </span>
-        </Basic.Div>
-      </form>
-    );
-  }
-}
-
-function select(state) {
-  //
-  return {
-    userContext: state.security.userContext,
-    i18nReady: state.config.get('i18nReady')
+                }
+              })
+              .catch(error => {
+                dispatch(flashMessagesManager.addError(error));
+                setShowLoading(false);
+              });
+          } else if (e2) {
+            dispatch(flashMessagesManager.addError(e2));
+          } else {
+            history.push(`/role/${ encodeURIComponent(role.id) }/detail`);
+            setText('');
+          }
+          setShowLoading(false);
+        }));
+      } else if (e1) {
+        dispatch(flashMessagesManager.addError(e1));
+        setShowLoading(false);
+      } else {
+        setText('');
+        setShowLoading(false);
+        //
+        history.push(identityManager.getDetailLink(identity));
+      }
+    }));
   };
+  //
+  return (
+    <form className={ classes.search } onSubmit={ search }>
+      <div className={ classes.searchIcon }>
+        {
+          showLoading
+          ?
+          <RefreshIcon />
+          :
+          <SearchIcon />
+        }
+      </div>
+      <InputBase
+        placeholder={ `${ i18n('component.advanced.NavigationSearch.search.placeholder') } ...` }
+        classes={{
+          root: classes.inputRoot,
+          input: classes.inputInput,
+        }}
+        value={ text }
+        inputProps={{ 'aria-label': 'search' }}
+        onChange={ e => setText(e.target.value) }
+        disabled={ showLoading }
+      />
+    </form>
+  );
 }
 
-export default connect(select)(NavigationSearch);
+NavigationSearch.propTypes = {
+  userContext: PropTypes.object.isRequired
+};
+
+export default NavigationSearch;

@@ -1,12 +1,55 @@
 /**
 * Forms
 */
-.required {
-  label:after {
-    content:" *"; color: red;
+
+.basic-form-component {
+  position: relative;
+
+  label.control-label {
+    margin-left: -5px;
+    padding: 0 5px;
+    font-size: 1rem;
+    transform: translate(14px, -6px) scale(0.75);
+    z-index: 5;
+    pointer-events: none;
+    transform-origin: top left;
+    top: 0;
+    left: 0;
+    position: absolute;
+    display: block;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.00938em;
+    border-radius: 3px;
   }
-  input {
-    // background-color: #FFC;
+
+  &.disabled {
+    label.control-label {
+      color: rgba(0, 0, 0, 0.26);
+    }
+
+    .form-control {
+			background-color: transparent;
+			border-color: rgba(0, 0, 0, 0.26);
+			color: rgba(0, 0, 0, 0.26);
+		}
+  }
+
+  &.has-feedback {
+    label.control-label {
+      color: #f44336;
+    }
+  }
+}
+
+.form-control {
+  background-color: transparent;
+  color: inherit;
+}
+
+.has-feedback {
+  .form-control {
+    padding-right: 12px;
   }
 }
 
@@ -23,6 +66,10 @@ input[readonly].confidential {
   }
 }
 
+.form-group {
+  margin-bottom: 15px;
+}
+
 .additional-button-1 {
   .form-control-feedback {
     right: 20px;
@@ -31,8 +78,8 @@ input[readonly].confidential {
 
 .password-eye {
   position: absolute;
-  top: 6px;
-  right: -10px;
+  top: 18px;
+  right: 0px;
   width: 34px;
   color: #bbb;
   cursor: pointer;
@@ -46,9 +93,9 @@ input[readonly].confidential {
     margin-bottom: 5px;
   }
 
-  .form-control-feedback {
+  /*.form-control-feedback {
     top: 28px;
-  }
+  }*/
 
   .checkbox {
     margin-top: 2px;
@@ -62,17 +109,18 @@ input[readonly].confidential {
 
   .form-group {
     &.last {
-      margin-bottom: 0;
+      margin-bottom: 5px;
     }
   }
 
   &.form-horizontal {
     .form-group {
-      margin-bottom: 7px;
+      margin-bottom: 15px;
+      margin-left: 0;
+      margin-right: 0;
 
       &.has-error {
         label.control-label {
-          // color: #333; // @panel-default-text;
         }
       }
       .form-text {
@@ -85,25 +133,25 @@ input[readonly].confidential {
       padding-top: 2px;
     }
 
-    .form-control-feedback {
+    /*.form-control-feedback {
       top: 0px;
-    }
+    }*/
 
     .additional-button-1 {
-      .form-control-feedback {
+      /*.form-control-feedback {
         right: 30px;
-      }
+      }*/
     }
 
     .password-eye {
       position: absolute;
-      top: 5px;
+      top: 18px;
     }
   }
 
   &.condensed {
     .form-group {
-      margin-bottom: 2px;
+      margin-bottom: 20px;
 
       .form-control {
         height: 25px;
@@ -135,9 +183,9 @@ input[readonly].confidential {
       }
     }
 
-    .form-control-feedback {
+    /*.form-control-feedback {
       top: 18px;
-    }
+    }*/
   }
 }
 

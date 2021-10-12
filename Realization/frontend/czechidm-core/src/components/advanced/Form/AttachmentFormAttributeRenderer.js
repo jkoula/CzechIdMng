@@ -213,7 +213,7 @@ export default class AttachmentFormAttributeRenderer extends UuidFormAttributeRe
   getContent(originalValues) {
     const { values, formableManager } = this.props;
     const { showValidationError, previewUrl, previewLoading, cleared } = this.state;
-    const showOriginalValue = originalValues ? true : false;
+    const showOriginalValue = !!originalValues;
     const _values = showOriginalValue ? originalValues : values;
     const formValue = this._getSingleValue(_values);
     const result = [];
@@ -257,19 +257,29 @@ export default class AttachmentFormAttributeRenderer extends UuidFormAttributeRe
                       className="fa-2x" />
                   </Basic.Div>
                   <Basic.Div rendered={ !previewLoading && previewUrl !== null } style={{ position: 'relative' }}>
-                    <img src={ previewUrl } className="img-thumbnail" style={{ height: 100, padding: 0 }} title={ this.i18n('label.download') } />
-                    <Basic.Button
-                      type="button"
-                      level="danger"
-                      title={ this.i18n('button.clear.title') }
-                      titlePlacement="left"
-                      titleDelayShow={ 0 }
-                      className="btn-xs"
-                      style={{ position: 'absolute', right: 5, bottom: 5 }}
-                      onClick={ this._onClear.bind(this) }
-                      rendered={ showOriginalValue ? false : !this.isReadOnly() }>
-                      <Basic.Icon type="fa" icon="trash"/>
-                    </Basic.Button>
+                    <img
+                      src={ previewUrl }
+                      className="img-thumbnail"
+                      style={{ height: 100, padding: 0 }}
+                      title={ this.i18n('label.download') }
+                      alt={ this.i18n('label.download') } />
+                    <div style={{ position: 'absolute', right: 5, bottom: 5 }}>
+                      <Basic.Fab
+                        color="secondary"
+                        size="small">
+                        <Basic.Button
+                          type="button"
+                          level="danger"
+                          style={{ color: 'white' }}
+                          title={ this.i18n('button.clear.title') }
+                          titlePlacement="left"
+                          titleDelayShow={ 0 }
+                          buttonSize="xs"
+                          onClick={ this._onClear.bind(this) }
+                          rendered={ showOriginalValue ? false : !this.isReadOnly() }
+                          icon="fa:close"/>
+                      </Basic.Fab>
+                    </div>
                   </Basic.Div>
                 </Basic.Div>
                 <div style={{ marginTop: 5 }} title={ this.i18n('label.download') }>
@@ -319,13 +329,15 @@ export default class AttachmentFormAttributeRenderer extends UuidFormAttributeRe
     const { isLoading, showValidationError } = this.state;
     const showOriginalValue = !!originalValues;
     //
-    const dropyoneStyle = {};
+    const dropzoneStyle = {};
     const _showError = showValidationError || (validationErrors && validationErrors.length > 0);
     if (_showError) {
-      dropyoneStyle.borderColor = '#a94442'; // FIXME: move to less, use variable
+      dropzoneStyle.borderColor = '#a94442'; // FIXME: move to less, use variable
     }
     const _className = classNames(
-      className, {
+      'basic-form-component',
+      className,
+      {
         'has-feedback': _showError,
         'has-error': _showError
       }
@@ -344,7 +356,7 @@ export default class AttachmentFormAttributeRenderer extends UuidFormAttributeRe
           onDrop={ this._onDrop.bind(this) }
           showLoading={ isLoading }
           required={ this.isRequired() }
-          style={ dropyoneStyle }>
+          style={ dropzoneStyle }>
           { this.getContent(originalValues) }
         </Dropzone>
 

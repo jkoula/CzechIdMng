@@ -1,107 +1,83 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ProgressBar } from 'react-bootstrap';
 import classnames from 'classnames';
+//
+import LinearProgress from '@material-ui/core/LinearProgress';
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import Icon from '../Icon/Icon';
+import Typography from '../Typography/Typography';
 
 /**
- * Wrapped bootstrap progress bar
+ * Wrapped progress bar.
  *
  * @author Radek Tomiška
  */
-export default class BasicProgressBar extends AbstractComponent {
-
-  /**
-   * Resolves label className - when progress is small, then label needs to be inversed - will be visible
-   *
-   * @return {string}
-   */
-  _resolveLabel() {
-    const { label, now, min } = this.props;
-    if (!label) {
-      // nothing to decorate
-      return null;
-    }
-    //
-    const max = this._resolveMax();
-    //
-    let percent = 0;
-    if ((max - min) > 0) {
-      percent = (now / (max - min)) * 100;
-    }
-    //
-    const classNames = classnames(
-      { 'label-inverse': (percent <= 12) } // less than 12%
-    );
+export default function BasicProgressBar(props) {
+  const {
+    rendered,
+    showLoading,
+    label,
+    min,
+    max,
+    now,
+    active,
+    style,
+    className,
+    bsStyle,
+    children
+  } = props;
+  //
+  if (!rendered) {
+    return null;
+  }
+  if (showLoading) {
     return (
-      <span className={classNames}>{ label }</span>
+      <Icon value="fa:refresh" showLoading/>
     );
   }
-
-  /**
-   * Automatic max resolving
-   *
-   * @return {number}
-   */
-  _resolveMax() {
-    const { now, max } = this.props;
-    //
-    let _max = max;
-    if (_max === null) {
-      if (now > 0) {
-        _max = now * 2;
+  // add component className
+  const classNames = classnames(
+    'basic-progress-bar',
+    className
+  );
+  //
+  let _max = max;
+  if (_max === null && now > 0) {
+    _max = now * 2;
+  }
+  //
+  let percent = 0;
+  if ((_max - min) > 0) {
+    percent = (now / (_max - min)) * 100;
+  }
+  //
+  const _style = style || {};
+  _style.display = _style.display || 'flex';
+  _style.alignItems = _style.alignItems || 'center';
+  //
+  return (
+    <div
+      style={ _style }
+      classNames={ classNames }>
+      <div style={{ flex: 1 }}>
+        <LinearProgress
+          variant={ max === null && active ? 'indeterminate' : 'determinate'}
+          value={ percent }
+          color={ bsStyle === 'warning' || bsStyle === 'error' ? 'secondary' : 'primary' } />
+      </div>
+      {
+        !label
+        ||
+        <div style={{ whiteSpace: 'nowrap', minWidth: 50, textAlign: 'right' }}>
+          <Typography variant="body2" color="textSecondary">
+            { label }
+          </Typography>
+        </div>
       }
-    }
-    return _max;
-  }
-
-  render() {
-    const { rendered, showLoading, min, now, active, style, className, bsStyle, children, isChild } = this.props;
-    if (!rendered) {
-      return null;
-    }
-    if (showLoading) {
-      return (
-        <Icon value="fa:refresh" showLoading/>
-      );
-    }
-    // add component className
-    const classNames = classnames(
-      'basic-progress-bar',
-      className
-    );
-    //
-    if (children) {
-      return (
-        <ProgressBar
-          min={ min }
-          max={ this._resolveMax() }
-          now={ now }
-          label={ this._resolveLabel() }
-          active={ active }
-          style={ style }
-          bsStyle={ bsStyle }>
-          { children }
-        </ProgressBar>
-      );
-    }
-    //
-    return (
-      <span className={ classNames }>
-        <ProgressBar
-          min={ min }
-          max={ this._resolveMax() }
-          now={ now }
-          label={ this._resolveLabel() }
-          active={ active }
-          style={ style }
-          bsStyle={ bsStyle }
-          isChild={ isChild }/>
-      </span>
-    );
-  }
+      { children }
+    </div>
+  );
 }
 
 BasicProgressBar.propTypes = {

@@ -77,9 +77,9 @@ export default class UuidInfo extends Basic.AbstractContextComponent {
         }
         value={
           <Basic.Panel
+            level="success"
             className={
               classnames(
-                'panel-success',
                 { 'no-border': (!header && (buttons === null || buttons.length === 0)) }
               )
             }>
@@ -97,7 +97,8 @@ export default class UuidInfo extends Basic.AbstractContextComponent {
                   this.refs.input.select();
                   document.execCommand('copy');
                   this.addMessage({ level: 'success', message: this.i18n('copy.message') });
-                }}/>
+                }}
+                style={{ backgroundColor: 'transparent' }}/>
             </Basic.PanelBody>
             <Basic.PanelFooter rendered={ buttons !== null && buttons.length > 0 }>
               { buttons }

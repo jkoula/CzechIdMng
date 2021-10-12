@@ -446,6 +446,25 @@ export default class UiUtils {
   }
 
   /**
+   * Normalize level value.
+   *
+   * @param  {string} level
+   * @return {string}      oneOf(['default', 'success', 'warning', 'info', 'error', 'link', 'primary', 'secondary'])
+   * @since 12.0.0
+   */
+  static toLevel(level) {
+    let _level = level || 'default';
+    if (_level) {
+      _level = _level.toLowerCase();
+    }
+    if (_level === 'danger') {
+      _level = 'error';
+    }
+    //
+    return _level;
+  }
+
+  /**
    * Returns true, if given value is filled - usable for boolean values - false is not empty.
    *
    * @param  {object}  objectValue
@@ -550,6 +569,38 @@ export default class UiUtils {
     }
     //
     return `${ latestDto.id || uuid.v1() }-${ this.spinalCase(latestDto.modified || latestDto.created) }`;
+  }
+
+  static getTheme(state) {
+    if (!state || !state.security || !state.security.userContext || !state.security.userContext.theme) {
+      // FIXME: initial theme
+      return {
+        palette: {
+          type: 'light',
+          action: {
+            loading: 'rgba(255, 255, 255, 0.7)'
+          },
+          background: {
+            paper: '#fff',
+            default: '#fafafa'
+          }
+        }
+      };
+    }
+    return state.security.userContext.theme;
+  }
+
+  static trimSlash(routePath) {
+    // Trim start of path from slash.
+    if (routePath.startsWith('/')) {
+      routePath = routePath.substring(1, routePath.length);
+    }
+    // Trim end of path from slash.
+    if (routePath.endsWith('/')) {
+      routePath = routePath.substring(0, routePath.length - 1);
+    }
+    //
+    return routePath;
   }
 }
 

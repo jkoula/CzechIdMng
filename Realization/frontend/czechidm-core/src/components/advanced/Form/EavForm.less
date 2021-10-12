@@ -12,7 +12,8 @@
 .eav-form {
 
   &.condensed { // shorten design - just values, without hepls etc
-    .help-block {
+
+    .MuiFormHelperText-root, .help-block {
       display: none;
     }
 
@@ -25,17 +26,15 @@
       cursor: default;
     }
 
-    .btn {
+    .btn, button {
       display: none;
     }
 
     .form-group {
-      margin-bottom: 2px;
+      margin-bottom: 7px;
 
       .form-control {
         height: 25px;
-        border: none;
-        border-radius: none;
         box-shadow: none;
         padding: 0;
       }
@@ -49,20 +48,7 @@
         margin-bottom: 1px;
       }
 
-      .help-block {
-        margin-top: 1px;
-      }
-
-      .Select-input {
-        height: 24px;
-        vertical-align: top;
-        font-size: 0.9em;
-        line-height: 14px;
-      }
-
       .Select-control {
-        height: 25px;
-        border: none;
         background-color: transparent;
       }
 
@@ -71,13 +57,12 @@
       }
 
       .Select-value, .Select-placeholder {
-        line-height: 1.4em;
         color: @idm-text-color;
-        padding-left: 0;
       }
 
       .Select--multi .Select-value {
-        margin-left: 0;
+        line-height: 16px;
+        margin-left: 3px;
         margin-right: 3px;
       }
 

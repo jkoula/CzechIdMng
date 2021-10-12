@@ -289,13 +289,14 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
     }
     //
     return (
-      <Basic.Icon
-        value="fa:cog"
+      <Basic.Button
+        icon="fa:cog"
         style={{
           color: showAuditableInfo ? '#000' : '#ccc',
           marginLeft: 10,
           cursor: 'pointer'
         }}
+        buttonSize="xs"
         title={ this.i18n('component.advanced.AuditableInfo.link.title') }
         onClick={ this.onShowAuditableInfo.bind(this, !showAuditableInfo) }
         rendered={ showSystemInformation }/>
@@ -307,13 +308,14 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
     const { collapsable, face } = this.props;
     //
     return (
-      <Basic.Icon
-        value={ expandInfo ? 'fa:angle-down arrow-icon' : 'fa:angle-left arrow-icon' }
+      <Basic.Button
+        icon={ expandInfo ? 'fa:angle-down arrow-icon' : 'fa:angle-left arrow-icon' }
         style={{
           color: '#000',
           marginLeft: 10,
           cursor: 'pointer'
         }}
+        buttonSize="xs"
         onClick={ this.onExpandInfo.bind(this, !expandInfo) }
         rendered={ collapsable && face === 'full'}/>
     );
@@ -380,29 +382,26 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
         value={ this._renderFull(entity) }
         className="abstract-entity-info-popover"
         onEnter={ this.onEnter.bind(this) }>
-        {
-          <span
-            style={ style }
-            onClick={
-              (event) => {
-                if (event && event.ctrlKey) {
-                  const link = this.getLink(entity);
-                  if (link) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    this.showDetail(entity, event);
-                  }
+        <span
+          style={ style }
+          onClick={
+            (event) => {
+              if (event && event.ctrlKey) {
+                const link = this.getLink(entity);
+                if (link) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  this.showDetail(entity, event);
                 }
               }
-            }>
-            { this._renderIcon(entity) }
-            <span
-              className="popover-link"
-              title={ this.i18n('component.advanced.EntityInfo.link.popover.title') }>
-              { this._renderNiceLabel(entity) }
-            </span>
+            }
+          }>
+          { this._renderIcon(entity) }
+          <span
+            className="popover-link">
+            { this._renderNiceLabel(entity) }
           </span>
-        }
+        </span>
       </Basic.Popover>
     );
   }
@@ -417,9 +416,6 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
     //
     const panelClassNames = classNames(
       'abstract-entity-info',
-      { 'panel-success': level === 'success' || (_entity && !this.isDisabled(_entity)) },
-      { 'panel-warning': level === 'warning' || (_entity && this.isDisabled(_entity)) },
-      { 'panel-info': level === 'info' },
       { deleted },
       className
     );
@@ -430,7 +426,10 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
     _titleStyle.flex = 1;
     //
     return (
-      <Basic.Panel className={ panelClassNames } style={ style }>
+      <Basic.Panel
+        level={ _entity && this.isDisabled(_entity) ? 'warning' : level || 'success' }
+        className={ panelClassNames }
+        style={ style }>
         <Basic.PanelHeader>
           <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
             <Basic.Div style={ _titleStyle }>

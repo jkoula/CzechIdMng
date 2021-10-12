@@ -1,18 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Helmet from 'react-helmet';
+//
 import * as Basic from '../../components/basic';
 import AuditTable from './AuditTable';
-import Helmet from 'react-helmet';
 
 /**
+ * Audet contenr entry point.
  *
  * @author Ondřej Kopr
+ * @author Radek Tomiška
  */
 class AuditContent extends Basic.AbstractContent {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   getContentKey() {
     return 'content.audit';
@@ -25,7 +24,7 @@ class AuditContent extends Basic.AbstractContent {
   render() {
     return (
       <Basic.Div>
-        <Helmet title={this.i18n('title')} />
+        <Helmet title={ this.i18n('title') } />
         <AuditTable uiKey="audit-table"/>
       </Basic.Div>
     );

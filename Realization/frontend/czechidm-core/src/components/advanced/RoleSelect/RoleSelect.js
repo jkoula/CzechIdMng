@@ -469,18 +469,16 @@ export default class RoleSelect extends Basic.AbstractFormComponent {
     const { readOnly } = this.state;
     //
     return (
-      <Basic.Div>
-        <Basic.LabelWrapper label={ this.getLabel() ? (<span style={{ visibility: 'hidden' }}>T</span>) : null }>
-          <Basic.Button
-            level="default"
-            icon="fa:folder-open"
-            style={{ marginLeft: 5 }}
-            onClick={ this.showRoleCatalogue.bind(this) }
-            title={ this.i18n('content.roles.select.showRoleCatalogue') }
-            titlePlacement="bottom"
-            disabled={ readOnly } />
-        </Basic.LabelWrapper>
-      </Basic.Div>
+      <div className="form-group" style={{ width: 'auto' }}>
+        <Basic.Button
+          level="default"
+          icon="fa:folder-open"
+          buttonSize="xs"
+          onClick={ this.showRoleCatalogue.bind(this) }
+          title={ this.i18n('content.roles.select.showRoleCatalogue') }
+          titlePlacement="bottom"
+          disabled={ readOnly } />
+      </div>
     );
   }
 
@@ -527,7 +525,7 @@ export default class RoleSelect extends Basic.AbstractFormComponent {
     // TODO: add onRowClick={this._onRowClick.bind(this)}
     return (
       <span className={ classNames({ hidden }) }>
-        <Basic.Div style={{ display: 'flex' }}>
+        <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
           <Basic.Div style={{ flex: 1 }}>
             <EntitySelectBox
               ref="role"
@@ -558,7 +556,7 @@ export default class RoleSelect extends Basic.AbstractFormComponent {
         <Basic.Modal
           show={ showRoleCatalogue }
           onHide={ this.hideRoleCatalogue.bind(this) }
-          bsSize="large"
+          bsSize="lg"
           backdrop="static"
           keyboard>
           <Basic.Modal.Header text={ this.getHeader() } closeButton/>
@@ -605,13 +603,13 @@ export default class RoleSelect extends Basic.AbstractFormComponent {
                     <Filter className="condensed">
                       <Basic.AbstractForm ref="filterForm">
                         <Basic.Row className="last">
-                          <Basic.Col lg={ 4 }>
+                          <Basic.Col lg={ 5 }>
                             <Filter.TextField
                               ref="text"
                               placeholder={this.i18n('content.roles.filter.text.placeholder')}
                               help={ Filter.getTextHelp() }/>
                           </Basic.Col>
-                          <Basic.Col lg={ 5 }>
+                          <Basic.Col lg={ 4 }>
                             <CodeListSelect
                               ref="environment"
                               code="environment"

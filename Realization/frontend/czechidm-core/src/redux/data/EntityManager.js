@@ -968,12 +968,12 @@ export default class EntityManager {
    * @param  {string} uiKey - ui key for loading indicator etc.
    * @return {action}       - action
    */
-  handlePagination(page, size, uiKey = null) {
+  handlePagination(page, size, uiKey = null, cb = null) {
     uiKey = this.resolveUiKey(uiKey);
     return (dispatch, getState) => {
       let searchParameters = this.getSearchParameters(getState().data.ui[uiKey].searchParameters);
       searchParameters = searchParameters.setSize(size).setPage(page);
-      dispatch(this.fetchEntities(searchParameters, uiKey));
+      dispatch(this.fetchEntities(searchParameters, uiKey, cb));
     };
   }
 

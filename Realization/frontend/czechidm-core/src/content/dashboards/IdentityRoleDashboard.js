@@ -11,7 +11,7 @@ import IdentityRoleTableComponent, { IdentityRoleTable } from '../identity/Ident
 const identityManager = new IdentityManager();
 
 /**
- * Assigned roles to identity
+ * Assigned roles to identity.
  *
  * @author Radek Tomiška
  * @since 9.4.0

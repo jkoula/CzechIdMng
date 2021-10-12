@@ -5,32 +5,29 @@ import * as Basic from '../../basic';
 import ProgressBar from '../ProgressBar/ProgressBar';
 
 /**
- * Progressbar in modal window
+ * Progressbar in modal window.
  *
  * @author Radek Tomiška
  */
-export default class ModalProgressBar extends Basic.AbstractContextComponent {
-
-  render() {
-    const { rendered, showLoading, show, counter, count, text, ...others } = this.props;
-    if (!rendered) {
-      return null;
-    }
-    //
-    return (
-      <Basic.Modal
-        show={show}
-        showLoading={showLoading}
-        bsSize="large"
-        backdrop="static"
-        {...others}>
-        <Basic.Modal.Header text={text}/>
-        <Basic.Modal.Body>
-          <ProgressBar max={count} now={counter} style={{ marginBottom: 0}} rendered={!showLoading}/>
-        </Basic.Modal.Body>
-      </Basic.Modal>
-    );
+export default function ModalProgressBar(props) {
+  const { rendered, showLoading, show, counter, count, text } = props;
+  //
+  if (!rendered) {
+    return null;
   }
+  //
+  return (
+    <Basic.Modal
+      show={ show }
+      showLoading={ showLoading }
+      bsSize="large"
+      backdrop="static">
+      <Basic.Modal.Header text={ text }/>
+      <Basic.Modal.Body>
+        <ProgressBar max={ count } now={ counter } rendered={ !showLoading }/>
+      </Basic.Modal.Body>
+    </Basic.Modal>
+  );
 }
 
 ModalProgressBar.propTypes = {

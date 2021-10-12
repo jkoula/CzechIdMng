@@ -10,7 +10,7 @@ import * as Basic from '../../basic';
 export default class RefreshButton extends Basic.AbstractContextComponent {
 
   render() {
-    const { rendered, showLoading, waiting, title, onClick, readOnly } = this.props;
+    const { rendered, showLoading, title, onClick, readOnly } = this.props;
     if (!rendered) {
       return null;
     }
@@ -19,20 +19,13 @@ export default class RefreshButton extends Basic.AbstractContextComponent {
     //
     return (
       <Basic.Button
-        className="btn-xs"
         title={ _title }
         onClick={ onClick }
-        disabled={readOnly}
+        disabled={ readOnly }
         titlePlacement="bottom"
         showLoading={ showLoading }
-        style={{ marginLeft: 3}}>
-        <Basic.Icon value="fa:refresh" color={waiting ? '#2d6ca2' : undefined} showLoading={ showLoading || waiting }/>
-        {
-          onClick
-          ||
-          <span>Please, define onClick method on detail button</span>
-        }
-      </Basic.Button>
+        style={{ marginLeft: 5 }}
+        icon="fa:refresh"/>
     );
   }
 }

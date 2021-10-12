@@ -3,9 +3,10 @@
 .loading {
 	position: absolute;
 	z-index: 1030;
-	background-color:#fff;
+	background-color: rgba(255, 255, 255, 0.6); // default only
 	opacity: 0.7;
   filter: alpha(opacity=70);
+	border-radius: 5px;
 
   .title {
 		position: relative;
@@ -70,7 +71,7 @@
 }
 
 .loading-wave > div {
-	background-color: #333;
+	background-color: rgba(0, 0, 0, 0.25);
 	height: 100%;
 	width: 5px;
 	display: inline-block;
@@ -124,7 +125,7 @@
 	width: 12px;
 	height: 12px;
 	border-radius: 50%;
-	background: lighten(@idm-base-color, 15%);
+	background: lighten(#3f51b5, 15%);
 	animation: loading-logo 1.2s linear infinite;
 }
 .loading-logo div:nth-child(1) {

@@ -4,24 +4,22 @@ import classNames from 'classnames';
 import Joi from 'joi';
 //
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
+import FormComponentLabel from '../AbstractFormComponent/FormComponentLabel';
 import Tooltip from '../Tooltip/Tooltip';
 import Button from '../Button/Button';
-import Icon from '../Icon/Icon';
 import Modal from '../Modal/Modal';
 
 /**
- * Script Area
+ * Script Area.
  *
  * @author Vít Švanda
  */
 class ScriptArea extends AbstractFormComponent {
 
-
   componentDidMount() {
     super.componentDidMount();
     this.initCompleters();
   }
-
 
   initCompleters() {
     const {completers} = this.props;
@@ -97,7 +95,6 @@ class ScriptArea extends AbstractFormComponent {
     });
   }
 
-
   _getCustomCompleter(completers) {
     if (!completers) {
       return null;
@@ -158,12 +155,11 @@ class ScriptArea extends AbstractFormComponent {
     return (
       <Button
         type="button"
-        className="btn-xs"
+        buttonSize="xs"
         level="success"
         rendered={showMaximalizationBtn}
-        onClick={this._showModalEditor.bind(this)}>
-        <Icon icon="fullscreen"/>
-      </Button>
+        onClick={ this._showModalEditor.bind(this) }
+        icon="fullscreen"/>
     );
   }
 
@@ -172,13 +168,14 @@ class ScriptArea extends AbstractFormComponent {
     return (
       <div className="pull-right script-area-btn-max">
         { this._getMaximalizationButton(showMaximalizationBtn) }
+        { this.renderHelpIcon() }
       </div>
     );
   }
 
   _getComponent(feedback) {
-    const { labelSpan, label, componentSpan, required, mode, height } = this.props;
-    const {showModalEditor} = this.state;
+    const { labelSpan, label, placeholder, componentSpan, required, mode, height } = this.props;
+    const { showModalEditor, disabled, readOnly } = this.state;
     //
     const className = classNames('form-control');
     const labelClassName = classNames(labelSpan, 'control-label');
@@ -197,18 +194,27 @@ class ScriptArea extends AbstractFormComponent {
     require('brace/theme/tomorrow');
     require('brace/ext/language_tools');
     const AceEditorInstance = this._getAceEditor(AceEditor, mode, className, height, showModalEditor);
+    const _label = [];
+    if (label) {
+      _label.push(label);
+    } else if (placeholder) {
+      _label.push(placeholder);
+    }
+    if (_label.length > 0 && required) {
+      _label.push(' *');
+    }
+    //
     return (
-      <div className={ showAsterix ? 'has-feedback' : ''}>
-        {
-          !label
-          ||
-          <label
-            className={labelClassName}>
-            {label}
-            { this.renderHelpIcon() }
-          </label>
-        }
-
+      <div className={
+        classNames(
+          'basic-form-component',
+          { 'has-feedback': feedback },
+          { disabled: disabled || readOnly }
+        )
+      }>
+        <FormComponentLabel
+          className={ labelClassName }
+          label={ _label }/>
         <div className={componentSpan}>
           <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
             <span>
@@ -236,7 +242,6 @@ class ScriptArea extends AbstractFormComponent {
               </Modal>
             </span>
           </Tooltip>
-          { !label ? this.renderHelpIcon() : null }
           { this.renderHelpBlock() }
         </div>
       </div>

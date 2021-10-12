@@ -11,6 +11,36 @@ import {
 } from './SecurityManager';
 import { Actions } from '../config/constants';
 
+function INITIAL_THEME(themeType) {
+  return {
+    palette: {
+      type: themeType,
+      primary: {
+        main: themeType === 'dark' ? '#90caf9' : '#1976d2', // #5cb85c
+        contrastText: '#ffffff'
+      },
+      success: {
+        main: '#4caf50',
+        contrastText: '#ffffff'
+      },
+      warning: {
+        main: '#ff9800',
+        contrastText: '#ffffff'
+      },
+      action: {
+        loading: themeType === 'dark' ? 'rgba(0, 0, 0, 0.26)' : 'rgba(255, 255, 255, 0.7)'
+      },
+      background: {
+        paper: themeType === 'dark' ? '#424242' : '#fff',
+        default: themeType === 'dark' ? '#303030' : '#fafafa'
+      }
+    },
+    shape: {
+      borderRadius: 4
+    }
+  };
+}
+
 // TODO: integrate immutable map with redux-localstorage
 const INITIAL_STATE = {
   userContext: { // logged userContext {id, username, token, isGuest etc .}
@@ -26,7 +56,8 @@ const INITIAL_STATE = {
     profile: null, // identity profile @since 9.3.0
     navigationCollapsed: false,
     originalUsername: null, // before switch
-    twoFactorToken: null
+    twoFactorToken: null,
+    theme: INITIAL_THEME('light')
   }
 };
 
@@ -104,6 +135,13 @@ export default function reduce(state = INITIAL_STATE, action) {
       return _.merge({}, state, {
         userContext: _.merge({}, state.userContext, {
           navigationCollapsed: action.collapsed
+        })
+      });
+    }
+    case 'THEME': {
+      return _.merge({}, state, {
+        userContext: _.merge({}, state.userContext, {
+          theme: INITIAL_THEME(action.theme)
         })
       });
     }

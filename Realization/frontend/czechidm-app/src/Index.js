@@ -27,8 +27,9 @@ store.dispatch(ConfigActions.appInit(config, moduleDescriptors, componentDescrip
     // We need to init routes after configuration will be loaded
     const routes = require('./routes').default;
     // App entry point
+    // https://material-ui.com/customization/palette/
     ReactDOM.render(
-      <Provider store={store}>
+      <Provider store={ store }>
         <IdmContext.Provider value={{ store, routes }}>
           <Router>
             <Route path="/" component={ App } />

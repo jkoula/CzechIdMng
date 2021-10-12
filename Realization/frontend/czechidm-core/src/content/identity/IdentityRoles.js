@@ -268,36 +268,38 @@ class IdentityRoles extends Basic.AbstractContent {
     const data = {};
     data[`automaticRefreshSwitch-${key}`] = automaticRefreshOn && longPollingEnabled;
     return (
-      <Basic.Toolbar>
-        <Basic.Div className="pull-left">
-          <Basic.AbstractForm
-            ref={`automaticRefreshForm-${key}`}
-            readOnly={!longPollingEnabled}
-            style={{ padding: 0 }}
-            data={data}>
-            <Basic.ToggleSwitch
-              ref={`automaticRefreshSwitch-${key}`}
-              label={this.i18n('automaticRefreshSwitch')}
-              onChange={this._toggleAutomaticRefresh.bind(this, key)}
-            />
-          </Basic.AbstractForm>
-        </Basic.Div>
-        <Basic.Div className="pull-right">
-          <Basic.Button
-            level="warning"
-            className="btn-xs"
-            icon="component:role-request"
-            rendered={ contracts.length > 0 }
-            onClick={ this._changePermissions.bind(this) }
-            disabled={ !this._canChangePermissions() }
-            title={ this._canChangePermissions() ? null : this.i18n('security.access.denied') }
-            titlePlacement="bottom">
-            { this.i18n('changePermissions') }
-          </Basic.Button>
-          <Advanced.RefreshButton
-            rendered={ !automaticRefreshOn || !longPollingEnabled }
-            onClick={ this._refreshAll.bind(this) }/>
-        </Basic.Div>
+      <Basic.Toolbar style={{ paddingTop: 0, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ flex: 1 }}>
+            <Basic.AbstractForm
+              ref={ `automaticRefreshForm-${key}` }
+              readOnly={!longPollingEnabled}
+              style={{ padding: '15px 0px' }}
+              data={data}>
+              <Basic.ToggleSwitch
+                ref={`automaticRefreshSwitch-${key}`}
+                label={this.i18n('automaticRefreshSwitch')}
+                onChange={this._toggleAutomaticRefresh.bind(this, key)}
+              />
+            </Basic.AbstractForm>
+          </div>
+          <div>
+            <Basic.Button
+              level="warning"
+              className="btn-xs"
+              icon="component:role-request"
+              rendered={ contracts.length > 0 }
+              onClick={ this._changePermissions.bind(this) }
+              disabled={ !this._canChangePermissions() }
+              title={ this._canChangePermissions() ? null : this.i18n('security.access.denied') }
+              titlePlacement="bottom">
+              { this.i18n('changePermissions') }
+            </Basic.Button>
+            <Advanced.RefreshButton
+              rendered={ !automaticRefreshOn || !longPollingEnabled }
+              onClick={ this._refreshAll.bind(this) }/>
+          </div>
+        </div>
       </Basic.Toolbar>
     );
   }
@@ -315,7 +317,7 @@ class IdentityRoles extends Basic.AbstractContent {
     roleRequestsForceSearch = roleRequestsForceSearch.setFilter('executed', 'false');
     //
     return (
-      <Basic.Div style={{ paddingTop: 15 }}>
+      <div style={{ paddingTop: 15 }}>
         <Basic.Confirm ref="confirm-delete" level="danger"/>
         {
           !!embedded
@@ -477,7 +479,7 @@ class IdentityRoles extends Basic.AbstractContent {
             </Advanced.Table>
           </Basic.Tab>
         </Basic.Tabs>
-      </Basic.Div>
+      </div>
     );
   }
 }

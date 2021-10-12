@@ -212,13 +212,14 @@ export class IdentityInfo extends AbstractEntityInfo {
     const panelClassNames = classNames(
       'abstract-entity-info',
       'identity-info',
-      { 'panel-success': _entity && !this.isDisabled(_entity) },
-      { 'panel-warning': _entity && this.isDisabled(_entity) },
       className
     );
     //
     return (
-      <Basic.Panel className={ panelClassNames } style={ style }>
+      <Basic.Panel
+        level={ _entity && this.isDisabled(_entity) ? 'warning' : 'success' }
+        className={ panelClassNames }
+        style={ style }>
         <Basic.PanelHeader>
           <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
             <Basic.Div style={{ flex: 1 }}>

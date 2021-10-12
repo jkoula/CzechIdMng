@@ -169,7 +169,8 @@ export class AuthoritiesPanel extends Basic.AbstractContextComponent {
                     </Basic.Div>
                     <Basic.Div className="pull-right">
                       <Basic.Button
-                        className="btn-xs"
+                        buttonSize="xs"
+                        icon={ openedAuthorities.has(authorityGroupName) ? 'fa:angle-double-up' : 'fa:angle-double-down' }
                         onClick={
                           this.onAuthorityGroupToogle.bind(this, authorityGroupName)
                         }
@@ -182,9 +183,7 @@ export class AuthoritiesPanel extends Basic.AbstractContextComponent {
                           this.i18n('content.roles.setting.authority.group.show')
                         }
                         titleDelayShow={ 500 }
-                        titlePlacement="bottom">
-                        <Basic.Icon value={ openedAuthorities.has(authorityGroupName) ? 'fa:angle-double-up' : 'fa:angle-double-down' }/>
-                      </Basic.Button>
+                        titlePlacement="bottom"/>
                     </Basic.Div>
                     <Basic.Div className="clearfix"/>
                   </Basic.PanelHeader>

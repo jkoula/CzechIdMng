@@ -311,7 +311,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
               <Basic.AbstractForm ref="filterForm">
                 <Basic.Row>
                   <Basic.Col lg={ 6 }>
-                    <Advanced.Filter.TextField
+                    <Basic.TextField
                       ref="text"
                       placeholder={ this.i18n('filter.name.placeholder') }
                       help={ Advanced.Filter.getTextHelp() }/>
@@ -397,11 +397,11 @@ export class IdentityTable extends Advanced.AbstractTableContent {
             [
               <Basic.Button
                 level="success"
+                buttonSize="xs"
                 showLoading={ showAddLoading }
                 showLoadingIcon
                 key="add_button"
                 type="submit"
-                className="btn-xs"
                 onClick={ this.showDetail.bind(this, {}) }
                 rendered={ canCreateIdentity }
                 icon="fa:user-plus">

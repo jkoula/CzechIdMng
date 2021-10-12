@@ -7,7 +7,7 @@ import TaskInstanceTable from '../task/TaskInstanceTable';
 const uiKeyPrefix = 'task-instance-dashboard-';
 
 /**
- * Assigned workflow tasks
+ * Assigned workflow tasks.
  *
  * @author Vít Švanda
  * @author Radek Tomiška
@@ -41,12 +41,11 @@ class AssignedTaskDashboard extends Basic.AbstractContent {
           :
           <Basic.Loading isStatic show />
         }
-        <Basic.Alert rendered={ !_total && !_showLoading } level="success" style={{ paddingTop: 15, paddingBottom: 15 }}>
-          <Basic.Div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left' }}>
-            <Basic.Icon value="fa:check" style={{ marginRight: 10 }} className="fa-2x"/>
-            <span>{ this.i18n('content.tasks-assigned.empty.message') }</span>
-          </Basic.Div>
-        </Basic.Alert>
+        <Basic.Alert
+          rendered={ !_total && !_showLoading }
+          level="success"
+          style={{ paddingTop: 15, paddingBottom: 15 }}
+          text={ this.i18n('content.tasks-assigned.empty.message') } />
         <Basic.Panel className={ _total ? '' : 'hidden' }>
           <TaskInstanceTable
             uiKey={ `${ uiKeyPrefix }${ identity.username }` }

@@ -1,118 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
-import Icon from '../Icon/Icon';
-import Tooltip from '../Tooltip/Tooltip';
-
+import ButtonMaterial from './ButtonMaterial';
 /**
  * Basic button.
  *
  * @author Radek Tomiška
  */
-class Button extends AbstractComponent {
+class BasicButton extends AbstractComponent {
 
   focus() {
-    this.refs.button.focus();
+    // TODO ... but is not used till now
   }
 
   render() {
-    const {
-      level,
-      buttonSize,
-      text,
-      className,
-      children,
-      showLoading,
-      showLoadingIcon,
-      showLoadingText,
-      disabled,
-      hidden,
-      type,
-      rendered,
-      title,
-      titlePlacement,
-      titleDelayShow,
-      style,
-      onClick,
-      onDoubleClick,
-      icon,
-      tabIndex
-    } = this.props;
-    //
-    if (!rendered) {
-      return null;
-    }
-    let _level = level;
-    if (_level) {
-      _level = _level.toLowerCase();
-    }
-    //
-    const classNames = classnames(
-      'btn',
-      `btn-${ (_level === 'error' ? 'danger' : _level) }`,
-      { [`btn-${ buttonSize }`]: buttonSize !== 'default' },
-      { hidden },
-      className
-    );
-    let _showLoadingText = text || children;
-    if (showLoadingText !== null) {
-      _showLoadingText = showLoadingText;
-    }
-    //
+    // map to material button only ...TODO: focus to material button
     return (
-      <Tooltip placement={ titlePlacement } value={ title } delayShow={ titleDelayShow }>
-        <span>
-          {/* button type is given dynamicaly */}
-          {/* eslint-disable react/button-has-type */}
-          <button
-            ref="button"
-            type={ type || 'button' }
-            disabled={ disabled || showLoading }
-            className={ classNames }
-            style={ style }
-            onClick={ onClick }
-            onDoubleClick={ onDoubleClick }
-            tabIndex={ tabIndex }>
-            {
-              showLoading
-              ?
-              <span>
-                {
-                  showLoadingIcon
-                  ?
-                  <Icon type="fa" icon="refresh" showLoading/>
-                  :
-                  <Icon value={ icon } className="icon-left"/>
-                }
-                {
-                  showLoadingIcon && _showLoadingText
-                  ?
-                  '\u00a0'
-                  :
-                  null
-                }
-                {_showLoadingText}
-              </span>
-              :
-              <span>
-                <Icon
-                  value={ icon }
-                  className="icon-left"
-                  style={ (text || (children && React.Children.count(children) > 0)) ? { marginRight: 5 } : {} }/>
-                { text }
-                { children }
-              </span>
-            }
-          </button>
-        </span>
-      </Tooltip>
+      <ButtonMaterial
+        ref="button"
+        { ...this.props }/>
     );
   }
 }
 
-Button.propTypes = {
+BasicButton.propTypes = {
   ...AbstractComponent.propTypes,
   /**
    * Button level / css / class
@@ -151,9 +63,15 @@ Button.propTypes = {
    *
    * @since 10.3.0
    */
-  buttonSize: PropTypes.oneOf(['default', 'xs', 'sm', 'lg'])
+  buttonSize: PropTypes.oneOf(['default', 'xs', 'sm', 'lg']),
+  /**
+   * Button color
+   *
+   * @since 12.0.0
+   */
+  color: PropTypes.string
 };
-Button.defaultProps = {
+BasicButton.defaultProps = {
   ...AbstractComponent.defaultProps,
   type: 'button',
   level: 'default',
@@ -162,7 +80,8 @@ Button.defaultProps = {
   showLoadingIcon: false,
   showLoadingText: null,
   titlePlacement: 'right',
-  icon: null
+  icon: null,
+  color: null
 };
 
-export default Button;
+export default BasicButton;

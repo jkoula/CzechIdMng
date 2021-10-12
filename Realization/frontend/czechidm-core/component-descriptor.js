@@ -651,7 +651,7 @@ module.exports = {
       id: 'identities-icon',
       type: 'icon',
       entityType: ['identities'],
-      component: 'fa:group'
+      component: 'fa:users'
     },
     {
       id: 'enabled-identity-icon',
@@ -681,7 +681,7 @@ module.exports = {
       id: 'scheduled-task-icon',
       type: 'icon',
       entityType: ['scheduled-task', 'scheduled-tasks', 'long-running-task', 'long-running-tasks'],
-      component: 'fa:calendar-times-o'
+      component: 'far:calendar-times'
     },
     {
       id: 'role-request-info',

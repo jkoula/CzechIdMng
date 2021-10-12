@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 //
-import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import Label from '../Label/Label';
 import Icon from '../Icon/Icon';
 
@@ -10,42 +9,39 @@ import Icon from '../Icon/Icon';
  *
  * @author Radek Tomiška
  */
-class EnumValue extends AbstractComponent {
-
-  render() {
-    const { rendered, value, style, label, level, title } = this.props;
-    const enumClass = this.props.enum;
-    //
-    if (!rendered || !value) {
-      return null;
-    }
-
-    let content = (
-      <span>{ label || value }</span>
-    );
-    if (value && enumClass) {
-      content = (
-        <span>{ label || enumClass.getNiceLabel(value) }</span>
-      );
-      //
-      const icon = enumClass.getIcon(value);
-      if (icon) {
-        content = (
-          <span>
-            <Icon value={icon} style={{ marginRight: 3 }}/>
-            { content }
-          </span>
-        );
-      }
-      const _level = level || enumClass.getLevel(value);
-      if (_level) {
-        content = (
-          <Label style={ style } title={ title } level={ _level } text={ content }/>
-        );
-      }
-    }
-    return content;
+export default function EnumValue(props) {
+  const { rendered, value, style, label, level, title } = props;
+  const enumClass = props.enum;
+  //
+  if (!rendered || !value) {
+    return null;
   }
+
+  let content = (
+    <span>{ label || value }</span>
+  );
+  if (value && enumClass) {
+    content = (
+      <span>{ label || enumClass.getNiceLabel(value) }</span>
+    );
+    //
+    const icon = enumClass.getIcon(value);
+    if (icon) {
+      content = (
+        <span>
+          <Icon value={icon} style={{ marginRight: 3 }}/>
+          { content }
+        </span>
+      );
+    }
+    const _level = level || enumClass.getLevel(value);
+    if (_level) {
+      content = (
+        <Label style={ style } title={ title } level={ _level } text={ content }/>
+      );
+    }
+  }
+  return content;
 }
 
 EnumValue.propTypes = {
@@ -76,5 +72,3 @@ EnumValue.defaultProps = {
   rendered: true,
   label: null
 };
-
-export default EnumValue;

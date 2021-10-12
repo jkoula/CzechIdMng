@@ -28,8 +28,8 @@ export default class CloseButton extends Basic.AbstractContextComponent {
     }
     //
     return (
-      <Basic.Icon
-        value="fa:close"
+      <Basic.Button
+        icon="fa:times"
         style={{ color: '#ccc', marginLeft: 5, cursor: 'pointer' }}
         title={ this.i18n('title') }
         onClick={ () => this.context.history.push(to) } />

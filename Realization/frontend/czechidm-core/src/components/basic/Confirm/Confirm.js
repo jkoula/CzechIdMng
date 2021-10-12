@@ -95,7 +95,7 @@ class Confirm extends AbstractContextComponent {
           </Modal.Body>
           <Modal.Footer>
             <Button level="link" onClick={this.reject.bind(this)}>{this.i18n('button.no')}</Button>
-            <Button ref="yesButton" level={level} onClick={this.confirm.bind(this)}>{this.i18n('button.yes')}</Button>
+            <Button ref="yesButton" variant="contained" level={level} onClick={this.confirm.bind(this)}>{this.i18n('button.yes')}</Button>
           </Modal.Footer>
         </Modal>
       </span>

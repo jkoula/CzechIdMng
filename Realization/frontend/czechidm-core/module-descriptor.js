@@ -60,7 +60,7 @@ module.exports = {
         type: 'DYNAMIC',
         labelKey: 'navigation.menu.identities.label',
         titleKey: 'navigation.menu.identities.title',
-        icon: 'fa:group',
+        icon: 'component:identities',
         order: 1010,
         path: '/identities',
         access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['IDENTITY_READ', 'DELEGATIONDEFINITION_READ'] } ],
@@ -69,7 +69,7 @@ module.exports = {
             id: 'identities',
             labelKey: 'navigation.menu.identities.label',
             titleKey: 'navigation.menu.identities.title',
-            icon: 'fa:group',
+            icon: 'component:identities',
             type: 'MAIN-MENU',
             order: 1010,
             path: '/identities',
@@ -474,7 +474,7 @@ module.exports = {
                 labelKey: 'content.tree.node.identities.label',
                 titleKey: 'content.tree.node.identities.title',
                 order: 40,
-                icon: 'fa:group',
+                icon: 'component:identities',
                 path: '/tree/nodes/:entityId/identities',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['IDENTITY_READ'] } ]
               }
@@ -562,7 +562,7 @@ module.exports = {
                 id: 'role-guarantees',
                 type: 'TAB',
                 labelKey: 'content.role.guarantees.title',
-                icon: 'fa:group',
+                icon: 'component:identities',
                 order: 130,
                 path: '/role/:entityId/guarantees',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLEGUARANTEE_READ', 'ROLEGUARANTEEROLE_READ'] } ]
@@ -661,7 +661,7 @@ module.exports = {
                 labelKey: 'content.role.identities.title',
                 order: 400,
                 path: '/role/:entityId/identities',
-                icon: 'fa:group',
+                icon: 'component:identities',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['IDENTITY_READ'] } ]
               },
               {
@@ -736,7 +736,7 @@ module.exports = {
                 id: 'request-role-guarantees',
                 type: 'TAB',
                 labelKey: 'content.role.guarantees.title',
-                icon: 'fa:group',
+                icon: 'component:identities',
                 order: 130,
                 path: 'requests/:requestId/role/:entityId/guarantees',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLEGUARANTEE_READ', 'ROLEGUARANTEEROLE_READ'] } ]
@@ -919,7 +919,7 @@ module.exports = {
             id: 'requests',
             labelKey: 'content.requests.header',
             titleKey: 'content.requests.title',
-            icon: 'fa:exchange',
+            icon: 'fas:exchange-alt',
             order: 25,
             iconColor: '#419641',
             path: '/requests',
@@ -1091,7 +1091,7 @@ module.exports = {
             labelKey: 'content.emails.title',
             order: 35,
             path: '/notification/emails',
-            icon: 'fa:envelope-o',
+            icon: 'far:envelope',
             access: [
               {
                 type: 'HAS_ANY_AUTHORITY',
@@ -1116,7 +1116,7 @@ module.exports = {
             labelKey: 'content.sms.title',
             order: 200,
             path: '/notification/sms',
-            icon: 'fa:commenting-o',
+            icon: 'far:comment-alt',
             access: [
               {
                 type: 'HAS_ANY_AUTHORITY',
@@ -1619,7 +1619,7 @@ module.exports = {
                     type: 'TAB',
                     labelKey: 'content.form-projections.identities.label',
                     order: 40,
-                    icon: 'fa:group',
+                    icon: 'component:identities',
                     path: '/form-projections/:entityId/identities',
                     access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['FORMPROJECTION_READ', 'IDENTITY_READ'] } ]
                   },
@@ -1680,7 +1680,7 @@ module.exports = {
         id: 'messages',
         section: 'system',
         titleKey: 'navigation.menu.messages',
-        icon: 'envelope',
+        icon: 'fa:envelope',
         order: 20,
         path: '/messages'
       },
@@ -1688,7 +1688,7 @@ module.exports = {
         id: 'logout',
         section: 'system',
         titleKey: 'navigation.menu.logout',
-        icon: 'off',
+        icon: 'fa:power-off',
         order: 100,
         path: '/logout'
       },

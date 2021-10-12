@@ -60,7 +60,7 @@ export default class AbstractMonitoringResultButton extends Basic.AbstractContex
   }
 
   render() {
-    const { monitoringResult, buttonSize } = this.props;
+    const { monitoringResult, buttonSize, onClick } = this.props;
     //
     return (
       <Basic.Button
@@ -68,7 +68,12 @@ export default class AbstractMonitoringResultButton extends Basic.AbstractContex
         level={ this.getLevel(monitoringResult) || 'default' }
         buttonSize={ buttonSize }
         text={ this.getLabel(monitoringResult) }
-        onClick={ this.onClick.bind(this, monitoringResult) }/>
+        onClick={ (event) => {
+          if (onClick) {
+            onClick();
+          }
+          this.onClick(monitoringResult, event);
+        }}/>
     );
   }
 }

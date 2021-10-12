@@ -12,7 +12,6 @@
   padding: 4px;
   margin-top: 1px;
   z-index: 99999 !important;
-  background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,.1);
   border: 1px solid #f9f9f9;
 }
@@ -45,7 +44,7 @@
 .rdtPicker td.rdtMinute:hover,
 .rdtPicker td.rdtSecond:hover,
 .rdtPicker .rdtTimeToggle:hover {
-  background: #eeeeee;
+  background-color: rgba(0, 0, 0, 0.26);
   cursor: pointer;
 }
 .rdtPicker td.rdtOld,
@@ -128,7 +127,7 @@
   cursor: pointer;
 }
 .rdtPicker thead tr:first-child th:hover {
-  background: #eeeeee;
+  background-color: rgba(0, 0, 0, 0.26);
 }
 
 .rdtPicker tfoot {
@@ -141,7 +140,7 @@
   cursor: pointer;
 }
 .rdtPicker button:hover {
-  background-color: #eee;
+  background-color: rgba(0, 0, 0, 0.26);
 }
 
 .rdtPicker thead button {
@@ -157,7 +156,7 @@ td.rdtYear {
 }
 td.rdtMonth:hover,
 td.rdtYear:hover {
-  background: #eee;
+  background-color: rgba(0, 0, 0, 0.26);
 }
 
 .rdtCounters {
@@ -194,7 +193,7 @@ td.rdtYear:hover {
   user-select: none;
 }
 .rdtCounter .rdtBtn:hover {
-  background: #eee;
+  background-color: rgba(0, 0, 0, 0.26);
 }
 .rdtCounter .rdtCount {
   height: 20%;

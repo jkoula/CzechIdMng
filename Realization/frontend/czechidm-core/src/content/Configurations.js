@@ -436,17 +436,19 @@ class Configurations extends Advanced.AbstractTableContent {
           onHide={ this.closeDetail.bind(this) }
           backdrop="static"
           keyboard={ !_showLoading }>
-
-          <form onSubmit={ this.save.bind(this) }>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('create.header') }
-              rendered={ detail.entity.id === undefined }/>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('edit.header', { name: detail.entity.name }) }
-              rendered={ detail.entity.id !== undefined }/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('create.header') }
+            rendered={ detail.entity.id === undefined }/>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('edit.header', { name: detail.entity.name }) }
+            rendered={ detail.entity.id !== undefined }
+            buttons={[
+              <Advanced.AuditableInfo entity={ detail.entity }/>
+            ]}/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this) }>
               <Basic.AbstractForm
                 ref="form"
                 data={ detail.entity }
@@ -481,26 +483,29 @@ class Configurations extends Advanced.AbstractTableContent {
                   readOnly={ isSecured }
                   helpBlock={ this.i18n('secured.help') }/>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeDetail.bind(this) }
-                showLoading={ _showLoading }>
-                { this.i18n('button.close') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={ _showLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }
-                rendered={ manager.canSave(detail.entity, _permissions) }>
-                { this.i18n('button.save') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ _showLoading }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={ _showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              rendered={ manager.canSave(detail.entity, _permissions) }
+              onClick={ this.save.bind(this) }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
 
         <Basic.Modal

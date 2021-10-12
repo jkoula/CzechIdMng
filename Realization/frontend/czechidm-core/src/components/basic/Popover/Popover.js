@@ -1,39 +1,242 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
 import _ from 'lodash';
 import classnames from 'classnames';
-import { HashRouter as Router } from 'react-router-dom';
-import { Provider } from 'react-redux';
 //
-import IdmContext from '../../../context/idm-context';
+import { makeStyles } from '@material-ui/core/styles';
+import Popover from '@material-ui/core/Popover';
+//
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
-import Icon from '../Icon/Icon';
-import Tooltip from '../Tooltip/Tooltip';
+import Loading from '../Loading/Loading';
+import Panel from '../Panel/Panel';
+import PanelHeader from '../Panel/PanelHeader';
+import PanelBody from '../Panel/PanelBody';
+import Typography from '../Typography/Typography';
+
+const useStyles = makeStyles(() => ({
+  popover: {
+    cursor: 'pointer',
+    '& .basic-alert': {
+      minWidth: 400
+    }
+  },
+  popoverHover: {
+    pointerEvents: 'none',
+  },
+  paper: {
+    minWidth: 300,
+    padding: 3 // ~ backward compatible
+  },
+  typography: {
+    display: 'inline-block'
+  }
+}));
 
 /**
- * Overlay with popover
+ * Material popover.
+ *
+ * @author Radek Tomiška
+ * @since 12.0.0
+ */
+function MaterialPopover(props) {
+  const {
+    id,
+    open,
+    onOpen,
+    onClose,
+    level,
+    rendered,
+    children,
+    value,
+    text,
+    title,
+    placement,
+    showLoading,
+    trigger,
+    className,
+    icon,
+    rootClose,
+    onEnter,
+    onExit
+  } = props;
+  const classes = useStyles();
+  const [ anchorEl, setAnchorEl ] = React.useState(null);
+  const [ _id ] = React.useState(id);
+  const hasClickTrigger = (trigger === 'click' || _.includes(trigger, 'click'));
+  const hasHoverTrigger = (trigger === 'hover' || _.includes(trigger, 'hover'));
+  //
+  if (!rendered || (!children)) {
+    return null;
+  }
+  //
+  const handlePopoverOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+    onOpen();
+  };
+  //
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    onClose();
+  };
+  //
+  const _onClose = (event, reason) => {
+    if (reason === 'backdropClick' && !rootClose) {
+      return;
+    }
+    if (onExit) {
+      onExit();
+    }
+    handlePopoverClose();
+  };
+  //
+  const classNames = classnames(
+    'basic-popover',
+    classes.popover,
+    { [classes.popoverHover]: hasHoverTrigger },
+    className
+  );
+  let content;
+  if (showLoading) {
+    content = (
+      <Loading isStatic show/>
+    );
+  } else {
+    content = value || text;
+  }
+  if (title) {
+    content = (
+      <Panel level={ level }>
+        <PanelHeader text={ title } icon={ icon } showLoading={ showLoading }/>
+        <PanelBody>
+          { content }
+        </PanelBody>
+      </Panel>
+    );
+  }
+  //
+  return (
+    <>
+      <Typography
+        onClick={ hasClickTrigger && !hasHoverTrigger ? handlePopoverOpen : undefined }
+        aria-owns={ open ? _id : undefined }
+        aria-haspopup="true"
+        onMouseEnter={ hasHoverTrigger ? handlePopoverOpen : undefined }
+        onMouseLeave={ hasHoverTrigger ? handlePopoverClose : undefined }
+        className={ classes.typography }>
+        { children }
+      </Typography>
+      <Popover
+        id={ _id }
+        open={ open }
+        onEnter={ onEnter }
+        onClose={ _onClose }
+        anchorEl={ anchorEl }
+        anchorOrigin={{
+          vertical: placement === 'top' ? 'top' : 'bottom',
+          horizontal: placement === 'right' ? 'right' : 'left',
+        }}
+        transformOrigin={{
+          vertical: placement === 'top' ? 'bottom' : 'top',
+          horizontal: placement === 'right' ? 'right' : 'left',
+        }}
+        className={ classNames }
+        classes={{
+          paper: classes.paper,
+        }}
+        disableRestoreFocus={ hasHoverTrigger }>
+        { content }
+      </Popover>
+    </>
+  );
+}
+
+MaterialPopover.propTypes = {
+  ...AbstractContextComponent.propTypes,
+  /**
+   * Popover identifier
+   */
+  id: PropTypes.string,
+  /**
+   * Popover position
+   */
+  placement: PropTypes.oneOf(['top', 'bottom', 'right', 'left']),
+  /**
+   * Popover header
+   */
+  title: PropTypes.string,
+  /**
+   * Popover level / css / class
+   */
+  level: PropTypes.oneOf(['default', 'warning']),
+  /**
+   * Popover value / text
+   */
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  /**
+   * Popover value / text - alias to value
+   */
+  text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  /**
+   * Specify which action or actions trigger popover visibility.
+   *
+   * - hover has higher priority
+   */
+  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover'])),
+  /**
+   * Specify whether the overlay should trigger onHide when the user clicks outside the overlay
+   */
+  rootClose: PropTypes.bool
+};
+
+MaterialPopover.defaultProps = {
+  ...AbstractContextComponent.defaultProps,
+  level: 'default',
+  placement: 'bottom',
+  trigger: 'hover',
+  rootClose: true
+};
+
+/**
+ * Overlay with popover.
  *
  * @author Radek Tomiška
  */
 export default class BasicPopover extends AbstractContextComponent {
 
-  /**
-   * Close popover
-   */
-  close() {
-    if (this.refs.popover) {
-      this.refs.popover.hide();
-    }
+  constructor(props, context) {
+    super(props, context);
+    //
+    this.state = {
+      open: undefined
+    };
   }
 
+  /**
+   * Close / hide popover
+   */
+  close() {
+    this.setState({
+      open: false
+    });
+  }
+
+  open() {
+    this.setState({
+      open: true
+    });
+  }
+
+  /**
+   * Close / hide popover
+   */
   hide() {
-    this.refs.popover.hide();
+    this.close();
   }
 
   render() {
     const {
       id,
+      level,
       rendered,
       children,
       value,
@@ -42,79 +245,38 @@ export default class BasicPopover extends AbstractContextComponent {
       placement,
       showLoading,
       trigger,
-      delayShow,
-      level,
       className,
       icon,
       rootClose,
-      ...others
-    } = this.props;
+      onEnter,
+      onExit } = this.props;
+    const { open } = this.state;
+    //
     if (!rendered || (!children)) {
       return null;
     }
-    let _id = id;
-    if (!_id) {
-      _id = _.uniqueId('tooltip_');
-    }
-    // text - value alias
-    const _value = value || text;
     //
-    const classNames = classnames(
-      'basic-popover',
-      `popover-${ level }`,
-      className
-    );
-
     return (
-      <OverlayTrigger
-        ref="popover"
-        trigger={ trigger }
-        rootClose={ rootClose }
+      <MaterialPopover
+        open={ open }
+        onOpen={ this.open.bind(this) }
+        onClose={ this.close.bind(this) }
+        id={ id }
+        level={ level }
+        rendered={ rendered }
+        value={ value }
+        text={ text }
+        title={ title }
         placement={ placement }
-        overlay={
-          <Popover
-            id={ _id }
-            className={ classNames }
-            title={
-              !title
-              ?
-              null
-              :
-              <div>
-                {
-                  !icon
-                  ||
-                  <div className="basic-popover-icon"><Icon icon={ icon }/></div>
-                }
-                <div className={ icon ? 'basic-popover-title' : '' }>
-                  { title }
-                </div>
-              </div>
-            }>
-            {
-              showLoading
-              ?
-              <Icon value="Refresh" showLoading/>
-              :
-              ( // @todo-upgrade-10 - I had to wrapp the value to the Redux provider and Router,
-                // because React-bootstrap Popover uses for generating value new instance of React.
-                // So Redux and Router wrapping doesn't work!
-              <Provider store={ this.context.store }>
-                <IdmContext.Provider value={{ ...this.context }}>
-                  <Router>
-                    { _value }
-                  </Router>
-                </IdmContext.Provider>
-              </Provider>
-              )
-
-            }
-          </Popover>
-        }
-        delayShow={ delayShow }
-        { ...others }>
+        showLoading={ showLoading }
+        trigger={ trigger }
+        className={ className }
+        icon={ icon }
+        rootClose={ rootClose }
+        onEnter={ onEnter }
+        onExit={ onExit }>
         { children }
-      </OverlayTrigger>
+      </MaterialPopover>
     );
   }
 }
@@ -148,11 +310,7 @@ BasicPopover.propTypes = {
   /**
    * Specify which action or actions trigger popover visibility
    */
-  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover', 'focus'])),
-  /**
-   * A millisecond delay amount before showing the Popover once triggered.
-   */
-  delayShow: PropTypes.number,
+  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover'])),
   /**
    * Specify whether the overlay should trigger onHide when the user clicks outside the overlay
    */
@@ -163,7 +321,6 @@ BasicPopover.defaultProps = {
   ...AbstractContextComponent.defaultProps,
   level: 'default',
   placement: 'bottom',
-  trigger: ['hover', 'focus', 'click'],
-  delayShow: Tooltip.defaultProps.delayShow,
+  trigger: 'hover',
   rootClose: true
 };

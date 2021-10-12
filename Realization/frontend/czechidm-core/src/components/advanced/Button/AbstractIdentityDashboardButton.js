@@ -115,7 +115,7 @@ export default class AbstractIdentityDashboardButton extends Basic.AbstractConte
     const { buttonSize, style, showLoading } = this.props;
     //
     const _style = {
-      marginRight: 3,
+      marginRight: 7,
       minWidth: 150,
       ...style
     };

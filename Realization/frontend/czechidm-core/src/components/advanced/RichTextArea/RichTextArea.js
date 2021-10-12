@@ -5,6 +5,7 @@ import Joi from 'joi';
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, ContentState, convertFromHTML, DefaultDraftBlockRenderMap, getSafeBodyFromHTML } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
+import FormComponentLabel from '../../basic/AbstractFormComponent/FormComponentLabel';
 //
 import * as Basic from '../../basic';
 
@@ -146,31 +147,42 @@ class RichTextArea extends Basic.AbstractFormComponent {
 
   getBody(feedback) {
     const { labelSpan, label, componentSpan, placeholder, style, required, showToolbar, mentions } = this.props;
-    const { editorState, readOnly } = this.state;
+    const { editorState, disabled, readOnly } = this.state;
     const labelClassName = classNames(
       labelSpan,
       'control-label'
     );
     const containerClassName = classNames(
       'basic-richtextarea',
-      { 'readOnly': readOnly === true}
+      { readOnly: readOnly === true}
     );
     let showAsterix = false;
     if (required && !feedback) {
       showAsterix = true;
     }
     //
+    const _label = [];
+    if (label) {
+      _label.push(label);
+    } else if (placeholder) {
+      _label.push(placeholder);
+    }
+    if (_label.length > 0 && required) {
+      _label.push(' *');
+    }
+    //
     return (
-      <div className={ showAsterix ? 'has-feedback' : ''}>
-        {
-          !label
-          ||
-          <label
-            className={labelClassName}>
-            {label}
-            { this.renderHelpIcon() }
-          </label>
-        }
+      <div className={
+        classNames(
+          'basic-form-component',
+          { 'has-feedback': feedback },
+          { disabled: disabled || readOnly }
+        )
+      }>
+        <FormComponentLabel
+          className={ labelClassName }
+          label={ _label }
+          helpIcon={ this.renderHelpIcon() }/>
         <div className={componentSpan}>
           <Basic.Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
             <div className={containerClassName}>
@@ -195,7 +207,7 @@ class RichTextArea extends Basic.AbstractFormComponent {
               }
             </div>
           </Basic.Tooltip>
-          { !label ? this.renderHelpIcon() : null }
+          { _label.length === 0 ? this.renderHelpIcon() : null }
         </div>
         { this.renderHelpBlock() }
       </div>
@@ -219,7 +231,9 @@ RichTextArea.propTypes = {
 RichTextArea.defaultProps = {
   ...Basic.AbstractFormComponent.defaultProps,
   showToolbar: false,
-  toolbarOptions: ['inline', 'blockType', 'list', 'emoji', 'remove', 'history', 'link'], // + order of component  ; remove: 'image', 'embedded', 'fontSize', 'fontFamily', 'colorPicker', 'textAlign',
+  toolbarOptions: [
+    'inline', 'blockType', 'list', 'emoji', 'remove', 'history', 'link'
+  ], // + order of component  ; remove: 'image', 'embedded', 'fontSize', 'fontFamily', 'colorPicker', 'textAlign',
   fontSizeOptions: {
     options: [7, 8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48, 60, 72, 96],
     className: undefined,

@@ -53,7 +53,7 @@ module.exports = {
               {
                 id: 'system-provisioning-break-config',
                 type: 'TAB',
-                icon: 'fa:stop-circle-o',
+                icon: 'far:stop-circle',
                 labelKey: 'acc:content.provisioningBreakConfig.title',
                 order: 10,
                 path: '/system/:entityId/break-configs',

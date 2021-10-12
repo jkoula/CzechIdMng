@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 //
 import ConfigLoader from 'czechidm-core/src/utils/ConfigLoader';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
+import * as Utils from '../../../utils';
 import { FlashMessagesManager, ConfigurationManager, SecurityManager} from '../../../redux';
 import { i18n } from '../../../services/LocalizationService';
 import IdmContext from '../../../context/idm-context';
@@ -351,15 +352,7 @@ class AbstractContextComponent extends AbstractComponent {
   }
 
   trimSlash(routePath) {
-    // Trim start of path from slash
-    if (routePath.startsWith('/')) {
-      routePath = routePath.substring(1, routePath.length);
-    }
-    // Trim end of path from slash
-    if (routePath.endsWith('/')) {
-      routePath = routePath.substring(0, routePath.length - 1);
-    }
-    return routePath;
+    return Utils.Ui.trimSlash(routePath);
   }
 
   /**

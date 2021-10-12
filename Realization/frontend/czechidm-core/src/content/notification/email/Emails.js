@@ -1,11 +1,10 @@
 import React from 'react';
-import Helmet from 'react-helmet';
 import * as Basic from '../../../components/basic';
 import { EmailManager } from '../../../redux';
 import EmailTable from './EmailTable';
 
 /**
- * List of email in audit log
+ * List of email in audit log.
  *
  * @author Radek Tomiška
  */
@@ -27,16 +26,10 @@ export default class Emails extends Basic.AbstractContent {
   render() {
     return (
       <Basic.Div>
-        <Helmet title={this.i18n('title')} />
-
-        <Basic.PageHeader>
-          <Basic.Icon value="fa:envelope-o"/>
-          {' '}
-          {this.i18n('header')}
-        </Basic.PageHeader>
+        { this.renderPageHeader() }
 
         <Basic.Panel>
-          <EmailTable uiKey="email_table" emailManager={this.emailManager} filterOpened/>
+          <EmailTable uiKey="email_table" emailManager={ this.emailManager } filterOpened/>
         </Basic.Panel>
 
       </Basic.Div>

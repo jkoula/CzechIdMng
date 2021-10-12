@@ -1,6 +1,7 @@
 @import '../../variables.less';
 
 .panel {
+
   &.last {
     margin-bottom: 0;
   }
@@ -9,8 +10,8 @@
     border: none;
     box-shadow: none;
 
-    > .loader-container > .panel-heading,
-    > .loader-container > .panel-footer {
+    > .panel-heading,
+    > .panel-footer {
       padding-left: 0;
       padding-right: 0;
     }
@@ -30,8 +31,8 @@
     }
 
     &.panel-default {
-      > div > .panel-heading {
-        border-color: lighten(@idm-base-color, 15%);
+      > .panel-heading {
+        border-color: @idm-base-color;
       }
     }
 
@@ -89,21 +90,30 @@
       font-size: 1.2em;
     }
   }
+
+  &.panel-default {
+    > .panel-heading {
+      color: inherit;
+      background-color: transparent;
+    }
+
+    > .panel-footer {
+      color: inherit;
+      background-color: transparent;
+    }
+  }
 }
 
 .panel-body {
   .alert.last {
     margin-bottom: 0px;
   }
-
-  .panel-default {
-    .panel-heading {
-      font-size: 0.9em;
-    }
-  }
 }
 
 .panel-heading {
+  color: inherit;
+  background-color: transparent;
+
   h1 {
     margin: 0;
     padding: 0;
@@ -127,7 +137,11 @@
 }
 
 .panel-footer {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  color: inherit;
+  background-color: transparent;
 
   /* extends border to parent border */
   &.marginable {
@@ -138,42 +152,9 @@
   }
 }
 
-.panel-default > div > .panel-heading {
-  color: @panel-default-text;
-  border-color: @idm-border-color;
-}
 .panel-hover {
   &:hover {
     background-color: #f8f6f6;
-    border-color: #bbb;
+    cursor: pointer;
   }
-}
-.panel-primary > div > .panel-heading {
-  color: #FFF;
-  background-color: #337AB7;
-  border-color: #337AB7;
-}
-
-.panel-success > div > .panel-heading {
-  color: #3C763D;
-  background-color: #DFF0D8;
-  border-color: #D6E9C6;
-}
-
-.panel-info > div > .panel-heading {
-  color: #31708F;
-  background-color: #D9EDF7;
-  border-color: #BCE8F1;
-}
-
-.panel-warning > div > .panel-heading {
-  color: #8A6D3B;
-  background-color: #FCF8E3;
-  border-color: #FAEBCC;
-}
-
-.panel-danger > div > .panel-heading {
-  color: #A94442;
-  background-color: #F2DEDE;
-  border-color: #EBCCD1;
 }

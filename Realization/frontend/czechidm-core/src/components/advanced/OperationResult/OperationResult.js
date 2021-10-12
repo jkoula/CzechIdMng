@@ -59,7 +59,8 @@ export default class OperationResult extends Basic.AbstractContextComponent {
           {
             <span>
               <Basic.Button
-                level="link"
+                level="info"
+                buttonSize="xs"
                 style={{ padding: 0, marginLeft: 3 }}
                 title={ this.i18n('link.popover.title') }
                 icon="fa:info-circle"/>

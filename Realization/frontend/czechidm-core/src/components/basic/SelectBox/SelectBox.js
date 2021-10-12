@@ -5,6 +5,7 @@ import Select from 'react-select';
 import Joi from 'joi';
 import _ from 'lodash';
 import Waypoint from 'react-waypoint';
+import $ from 'jquery';
 //
 import * as Utils from '../../../utils';
 import Icon from '../Icon/Icon';
@@ -13,9 +14,10 @@ import OptionDecorator from './OptionDecorator';
 import ValueDecorator from './ValueDecorator';
 import FlashMessage from '../FlashMessages/FlashMessage';
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
+import FormComponentLabel from '../AbstractFormComponent/FormComponentLabel';
 import EntityManager from '../../../redux/data/EntityManager';
 import SearchParameters from '../../../domain/SearchParameters';
-
+//
 const NICE_LABEL = 'niceLabel';
 const ITEM_FULL_KEY = 'itemFullKey';
 const ITEM_VALUE = 'value';
@@ -28,8 +30,8 @@ const ITEM_VALUE = 'value';
  */
 class SelectBox extends AbstractFormComponent {
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.getOptions = this.getOptions.bind(this);
     this.state = {
       ...this.state,
@@ -39,6 +41,8 @@ class SelectBox extends AbstractFormComponent {
     };
     // Timer identifier
     this.typingTimeoutId = null;
+    // container for fixed display
+    this.containerRef = React.createRef();
   }
 
   getComponentKey() {
@@ -583,27 +587,38 @@ class SelectBox extends AbstractFormComponent {
   }
 
   getBody(feedback) {
-    const { labelSpan, label, componentSpan, required } = this.props;
-    const { value, disabled, isLoading, error } = this.state;
+    const { labelSpan, label, componentSpan, required, placeholder } = this.props;
+    const { value, disabled, readOnly, isLoading, error } = this.state;
     //
     const labelClassName = classNames(labelSpan, 'control-label');
     //
-    let showAsterix = false;
-    if (required && !value) {
-      showAsterix = true;
+    const _label = [];
+    if (label) {
+      _label.push(label);
+    } else if (placeholder && value && !readOnly && !disabled) {
+      _label.push(placeholder);
+    }
+    if (_label.length > 0 && required) {
+      _label.push(' *');
+    }
+    let _title = this.getTitle();
+    if ((!label ? placeholder : label) === _title) { // without asterix and value comparison
+      _title = null;
     }
     //
     return (
-      <div className={ showAsterix ? 'has-feedback' : '' }>
-        {
-          !label
-          ||
-          <label
-            className={ labelClassName }>
-            { label }
-            { this.renderHelpIcon() }
-          </label>
-        }
+      <div
+        className={
+          classNames(
+            'basic-form-component',
+            { 'has-feedback': feedback },
+            { disabled: disabled || readOnly }
+          )
+        }>
+        <FormComponentLabel
+          className={ labelClassName }
+          label={ _label }
+          helpIcon={ this.renderHelpIcon() }/>
         <div className={ componentSpan }>
           {
             (disabled === true && this.props.multiSelect !== true)
@@ -613,34 +628,22 @@ class SelectBox extends AbstractFormComponent {
               <Icon type="fa" icon="refresh" className="icon-loading" rendered={ isLoading === true } showLoading/>
             </div>
             :
-            <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
-              <span>
+            <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ _title }>
+              <div
+                ref={ this.containerRef }
+                className="basic-select-box">
                 {
                   !error
                   ||
                   <FlashMessage message={ this.flashMessagesManager.convertFromError(error) } className="no-margin" />
                 }
                 { this.getSelectComponent() }
-                {
-                  feedback != null
-                  ?
-                  feedback
-                  :
-                  <span>
-                    {
-                      showAsterix
-                      ?
-                      <span className="form-control-feedback" style={{ color: 'red', zIndex: 0 }}>*</span>
-                      :
-                      ''
-                    }
-                  </span>
-                }
-              </span>
+                { feedback }
+              </div>
             </Tooltip>
           }
           { this.props.children }
-          { !label ? this.renderHelpIcon() : null }
+          { _label.length === 0 ? this.renderHelpIcon() : null }
           { this.renderHelpBlock() }
         </div>
       </div>
@@ -664,10 +667,29 @@ class SelectBox extends AbstractFormComponent {
     if (this.typingTimeoutId) {
       return;
     }
+    // FIXME: works, when input is empty only ...
+    const container = $(this.containerRef.current);
+    const isModal = container.closest('.basic-modal-scroll-paper').length > 0;
+    let selectBoxOuter = null;
+    if (isModal) {
+      selectBoxOuter = container.find('.Select-menu-outer');
+    }
     // it is neccessary set actualPage to zero and remove all options, after open
     this.setState({
       actualPage: 0,
-      options: []
+      options: [],
+      selectBoxOuter
+    }, () => {
+      selectBoxOuter = this.state.selectBoxOuter;
+      if (selectBoxOuter) {
+        const rect = this.containerRef.current.getBoundingClientRect();
+        selectBoxOuter.css({
+          top: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          position: 'fixed'
+        });
+      }
     });
     // loads default first page.
     this.getOptions('', this.props.forceSearchParameters);
@@ -726,6 +748,15 @@ class SelectBox extends AbstractFormComponent {
           return _option;
         })}
         onOpen={ this.onOpen.bind(this) }
+        onClose={ () => {
+          const { selectBoxOuter } = this.state;
+          if (selectBoxOuter) {
+            selectBoxOuter.css({
+              top: 'auto',
+              position: 'relative'
+            });
+          }
+        }}
         optionComponent={ optionComponent }
         valueComponent={ valueComponent }/>
     );
@@ -832,7 +863,9 @@ SelectBox.defaultProps = {
   optionComponent: OptionDecorator,
   valueComponent: ValueDecorator,
   disableable: true,
-  additionalOptions: []
+  additionalOptions: [],
+  size: 'small',
+  fullWidth: true,
 };
 
 SelectBox.NICE_LABEL = NICE_LABEL;

@@ -60,6 +60,10 @@ class ChangePermissionDashboardButton extends Advanced.AbstractIdentityDashboard
     const uuidId = uuid.v1();
     this.context.history.push(`/role-requests/${uuidId}/new?new=1&applicantId=${identity.id}`);
   }
+
+  getLevel() {
+    return 'warning';
+  }
 }
 
 function select(state, component) {

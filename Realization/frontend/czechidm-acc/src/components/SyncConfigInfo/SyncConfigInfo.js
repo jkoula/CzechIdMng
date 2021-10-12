@@ -47,7 +47,7 @@ export class SyncConfigInfo extends Advanced.AbstractEntityInfo {
    * @param  {object} entity
    */
   getEntityIcon() {
-    return 'fa:exchange';
+    return 'fas:exchange-alt';
   }
 
   /**

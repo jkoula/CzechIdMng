@@ -65,9 +65,8 @@ export default class AbstractTableContent extends Basic.AbstractContent {
     }, () => {
       // @todo-upgrade-10 This is brutal hack!
       // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
-      // This problem occured after update on React 16, but primary bug is in react-bootstap.
-      // Problem should be fixed, but still doesn't works (in 0.32.4).
-      // https://github.com/react-bootstrap/react-bootstrap/issues/2841#issuecomment-378017284.
+      // This problem occured after update on React 16
+      // @todo-upgrade-12 still occurs with material-ui modals
       setTimeout(() => {
         if (this.getFormComponent()) {
           this.getFormComponent().setData(entity);

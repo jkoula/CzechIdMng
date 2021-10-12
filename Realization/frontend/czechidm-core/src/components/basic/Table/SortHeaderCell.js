@@ -51,21 +51,19 @@ class SortHeaderCell extends AbstractComponent {
     );
     return (
       <div className={ classNames } title={ title }>
-        {
-          <a
-            href="#"
-            onClick={ this._handleSort.bind(this, active === 'ASC' ? 'DESC' : 'ASC') }
-            className={ !sortHandler ? 'disabled' : '' }>
-            { content }
-            {
-              (sortHandler || active !== null)
-              ?
-              <SortIcon active={ active } showLoading={ showLoading }/>
-              :
-              null
-            }
-          </a>
-        }
+        <a
+          href="#"
+          onClick={ this._handleSort.bind(this, active === 'ASC' ? 'DESC' : 'ASC') }
+          className={ !sortHandler ? 'disabled' : '' }>
+          { content }
+          {
+            (sortHandler || active !== null)
+            ?
+            <SortIcon active={ active } showLoading={ showLoading }/>
+            :
+            null
+          }
+        </a>
       </div>
     );
   }
@@ -123,7 +121,8 @@ class SortIcon extends AbstractComponent {
 
     return (
       <span className="sort-icons">
-        {(showLoading && active)
+        {
+          (showLoading && active)
           ?
           <Icon type="fa" icon="refresh" showLoading className="sort-icon active"/>
           :

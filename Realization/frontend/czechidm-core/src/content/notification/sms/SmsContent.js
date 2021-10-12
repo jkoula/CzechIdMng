@@ -34,7 +34,7 @@ class SmsContent extends Basic.AbstractContent {
         <Helmet title={this.i18n('title')} />
 
         <Basic.PageHeader>
-          <Basic.Icon value="fa:envelope-o"/>
+          <Basic.Icon value="far:comment-alt"/>
           {' '}
           {this.i18n('header')}
         </Basic.PageHeader>

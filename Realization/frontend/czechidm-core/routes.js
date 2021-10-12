@@ -1175,6 +1175,7 @@ module.exports = {
     {
       path: 'about',
       component: require('./src/content/About'),
+      access: [ { type: 'PERMIT_ALL' } ],
       priority: 5
     },
     // error pages

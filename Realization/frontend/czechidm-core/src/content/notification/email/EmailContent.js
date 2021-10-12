@@ -19,8 +19,12 @@ class EmailContent extends Basic.AbstractContent {
     return 'content.email';
   }
 
+  getNavigationKey() {
+    return 'notification-emails';
+  }
+
   componentDidMount() {
-    this.selectNavigationItem('notification-emails');
+    super.componentDidMount();
     const { entityId } = this.props.match.params;
     //
     this.getLogger().debug(`[EmailContent] loading entity detail [id:${entityId}]`);
@@ -31,15 +35,9 @@ class EmailContent extends Basic.AbstractContent {
     const { email, showLoading } = this.props;
     return (
       <Basic.Div>
-        <Helmet title={this.i18n('title')} />
+        { this.renderPageHeader() }
 
-        <Basic.PageHeader>
-          <Basic.Icon value="fa:envelope-o"/>
-          {' '}
-          {this.i18n('header')}
-        </Basic.PageHeader>
-
-        <Basic.Loading isStatic showLoading={showLoading} />
+        <Basic.Loading isStatic showLoading={ showLoading } />
         {
           !email
           ||

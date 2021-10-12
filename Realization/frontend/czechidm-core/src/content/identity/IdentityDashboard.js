@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import uuid from 'uuid';
+import Avatar from '@material-ui/core/Avatar';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
@@ -148,14 +149,10 @@ class IdentityDashboard extends Basic.AbstractContent {
       <Basic.Div>
         <Basic.PageHeader>
           <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
-            <Basic.Div style={{ flex: 1 }}>
-              {
-                _imageUrl
-                ?
-                <img src={ _imageUrl } alt="profile" className="img-circle img-thumbnail" style={{ height: 40, padding: 0 }} />
-                :
+            <Basic.Div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+              <Basic.Avatar src={ _imageUrl } alt="profile">
                 <Basic.Icon icon="component:identity" identity={ identity } />
-              }
+              </Basic.Avatar>
               <Basic.ShortText
                 value={ identityManager.getNiceLabel(identity) }
                 maxLength={ 75 }

@@ -74,7 +74,7 @@ class AbstractIcon extends Basic.AbstractComponent {
     //
     return (
       <span
-        className={ classnames({ disabled: disabled === true }, className) }
+        className={ classnames('basic-icon', { disabled: disabled === true }, className) }
         style={ _style }
         title={ title }
         { ...others }>

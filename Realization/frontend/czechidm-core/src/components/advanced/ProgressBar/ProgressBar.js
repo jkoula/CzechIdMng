@@ -2,83 +2,106 @@ import React from 'react';
 import classnames from 'classnames';
 //
 import * as Basic from '../../basic';
+import { i18n } from '../../../services/LocalizationService';
 
 /**
- * ProgressBar with default label from localization
+ * ProgressBar with default label from localization.
  *
  * @author Radek Tomiška
  */
-export default class ProgressBar extends Basic.AbstractContextComponent {
-
-  /**
-   * Resolves default label from localization
-   *
-   * @return {string}
-   */
-  _resolveLabel() {
-    const { label, now, min, max, active } = this.props;
-    //
-    if (label) { // label was given
-      return label;
-    }
-    // resolve default label from localization
-    if ((now === 0 || max === 0) && active) {
-      // start label
-      return this.i18n('component.basic.ProgressBar.start');
-    }
-    return this.i18n('component.basic.ProgressBar.label', { min, max: (max === null ? '?' : max), now: (now === null ? '?' : now) });
+export default function ProgressBar(props) {
+  const {
+    rendered,
+    active,
+    className,
+    bars,
+    showLoading,
+    label,
+    min,
+    max,
+    now,
+    style,
+    bsStyle,
+    children
+  } = props;
+  //
+  if (!rendered) {
+    return null;
   }
-
-  render() {
-    const { rendered, active, className, bars, ...others } = this.props;
-    if (!rendered) {
-      return null;
-    }
-    // add component className
-    const classNames = classnames(
-      'advanced-progress-bar',
-      className
-    );
-    if (bars) {
-      const stackedBars = [];
-      bars.forEach(bar => {
-        stackedBars.push(
-          <Basic.ProgressBar
-            isChild
-            min={ bar.min }
-            max={ this.props.max }
-            now={ bar.now }
-            bsStyle={ bar.bsStyle }
-            active={ active } />
+  //
+  // add component className
+  const classNames = classnames(
+    'advanced-progress-bar',
+    className
+  );
+  //
+  //
+  let _label = label;
+  const _barLabels = [];
+  let _now = now || 0;
+  let _bsStyle = bsStyle;
+  if (bars) {
+    bars.forEach(bar => {
+      if (bar.now > 0) {
+        _now += bar.now;
+        if (bar.bsStyle === 'warning' || bar.bsStyle === 'danger') {
+          _bsStyle = 'error';
+        }
+        _barLabels.push(
+          <Basic.Label
+            level={ bar.bsStyle }
+            value={ bar.now }
+            style={{ marginLeft: 3 }}/>
         );
+      }
+    });
+    if (_barLabels.length > 0) {
+      _label = [];
+      _label.push(i18n('component.basic.ProgressBar.start'));
+      _barLabels.forEach(barLabel => {
+        _label.push(barLabel);
       });
-      return (
-        <span className={ classNames }>
-          <Basic.ProgressBar style={{ marginBottom: 0 }}>
-            { stackedBars }
-          </Basic.ProgressBar>
-          <div className="text-center">
-            { this._resolveLabel() }
-          </div>
-        </span>
-      );
+      _label.push(` / ${ max || '?' }`);
     }
-    //
-    return (
-      <span className={ classNames }>
-        <Basic.ProgressBar { ...others }/>
-        <div className="text-center">
-          { this._resolveLabel() }
-        </div>
-      </span>
-    );
   }
+  if (!_label) { // label was not given
+    // resolve default label from localization
+    if ((_now === 0 || max === 0) && active) {
+      // start label
+      _label = i18n('component.basic.ProgressBar.start');
+    } else {
+      _label = i18n('component.basic.ProgressBar.label', {
+        escape: false,
+        min,
+        max: (max === null ? '?' : max || '?'),
+        now: (_now === null ? '?' : _now)
+      });
+    }
+  }
+  //
+  return (
+    <span className={ classNames }>
+      <Basic.ProgressBar
+        showLoading={ showLoading }
+        min={ min }
+        max={ max }
+        now={ _now }
+        active={ active }
+        style={ style }
+        bsStyle={ _bsStyle }>
+        { children }
+      </Basic.ProgressBar>
+      <div className="text-center" style={{ marginTop: 10 }}>
+        { _label }
+      </div>
+    </span>
+  );
 }
 
 ProgressBar.propTypes = {
-  ...Basic.DateValue.propTypes
+  ...Basic.ProgressBar.propTypes
 };
 
 ProgressBar.defaultProps = {
-  ...Basic.DateValue.defaultProps
+  ...Basic.ProgressBar.defaultProps
 };

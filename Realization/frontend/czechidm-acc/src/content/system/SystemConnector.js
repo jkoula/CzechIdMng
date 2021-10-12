@@ -486,15 +486,16 @@ class SystemConnectorContent extends Basic.AbstractContent {
             readOnly={ !Managers.SecurityManager.hasAuthority('SYSTEM_UPDATE') }
             style={{ paddingBottom: 0 }}>
 
-            <Basic.Div style={{ display: 'inline-flex', width: '100%'}}>
-              <Basic.EnumSelectBox
-                ref="connector"
-                placeholder={ this.i18n('acc:entity.System.connectorKey.connectorName') }
-                options={ _availableConnectors }
-                readOnly={ !Managers.SecurityManager.hasAuthority('SYSTEM_UPDATE') || remoteConnectorError }
-                clearable={ false }
-                onChange={ this.saveConnector.bind(this) }
-                style={{ width: '100%'}} />
+            <Basic.Div style={{ display: 'flex'}}>
+              <div style={{ flex: 1 }}>
+                <Basic.EnumSelectBox
+                  ref="connector"
+                  placeholder={ this.i18n('acc:entity.System.connectorKey.connectorName') }
+                  options={ _availableConnectors }
+                  readOnly={ !Managers.SecurityManager.hasAuthority('SYSTEM_UPDATE') || remoteConnectorError }
+                  clearable={ false }
+                  onChange={ this.saveConnector.bind(this) }/>
+              </div>
 
               <Basic.Button
                 style={{ marginLeft: 5 }}

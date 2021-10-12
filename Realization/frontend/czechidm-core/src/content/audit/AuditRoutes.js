@@ -18,7 +18,7 @@ export default class AuditRoutes extends Basic.AbstractContent {
   render() {
     return (
       <Basic.Div>
-        { this.renderPageHeader() }
+        { this.renderPageHeader({ icon: 'component:audit' }) }
 
         <Advanced.TabPanel position="top" parentId="audits" match={ this.props.match }>
           { this.getRoutes() }

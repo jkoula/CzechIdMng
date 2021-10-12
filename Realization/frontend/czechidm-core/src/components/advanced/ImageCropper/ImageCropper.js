@@ -4,6 +4,7 @@ import Cropper from 'react-cropper';
 //
 import * as Basic from '../../basic';
 import Well from '../../basic/Well/Well';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 /**
 * Component for image crop.
@@ -97,8 +98,9 @@ export default class ImageCropper extends Basic.AbstractContextComponent {
           autoCropArea={ 0.6 }
           aspectRatio={ 1 / 1 } />
 
-        <Basic.Div
-          className="btn-group"
+        <ButtonGroup
+          color="primary"
+          aria-label="contained button group"
           role="group"
           style={{
             padding: 10,
@@ -110,53 +112,53 @@ export default class ImageCropper extends Basic.AbstractContextComponent {
           <Basic.Button
             type="button"
             level="info"
-            onClick={ this.setDragMode.bind(this, 'move') }
-            className="btn-sm" >
+            variant="contained"
+            onClick={ this.setDragMode.bind(this, 'move') }>
             <Basic.Icon type="fa" icon="arrows" />
           </Basic.Button>
           <Basic.Button
             type="button"
+            variant="contained"
             level="info"
-            onClick={ this.setDragMode.bind(this, 'crop') }
-            className="btn-sm" >
+            onClick={ this.setDragMode.bind(this, 'crop') }>
             <Basic.Icon type="fa" icon="crop" />
           </Basic.Button>
           <Basic.Button
             type="button"
+            variant="contained"
             level="info"
-            onClick={ this.zoomIn.bind(this) }
-            className="btn-sm" >
+            onClick={ this.zoomIn.bind(this) }>
             <Basic.Icon type="fa" icon="search-plus" />
           </Basic.Button>
           <Basic.Button
             type="button"
+            variant="contained"
             level="info"
-            onClick={ this.zoomOut.bind(this) }
-            className="btn-sm" >
+            onClick={ this.zoomOut.bind(this) }>
             <Basic.Icon type="fa" icon="search-minus" />
           </Basic.Button>
           <Basic.Button
             type="button"
+            variant="contained"
             level="info"
-            onClick={ this.rotateLeft.bind(this) }
-            className="btn-sm" >
+            onClick={ this.rotateLeft.bind(this) }>
             <Basic.Icon type="fa" icon="rotate-left" />
           </Basic.Button>
           <Basic.Button
             type="button"
+            variant="contained"
             level="info"
-            onClick={ this.rotateRight.bind(this) }
-            className="btn-sm" >
+            onClick={ this.rotateRight.bind(this) }>
             <Basic.Icon type="fa" icon="rotate-right" />
           </Basic.Button>
           <Basic.Button
             type="button"
+            variant="contained"
             level="info"
-            onClick={ this.reset.bind(this) }
-            className="btn-sm" >
+            onClick={ this.reset.bind(this) }>
             <Basic.Icon type="fa" icon="reply-all" />
           </Basic.Button>
-        </Basic.Div>
+        </ButtonGroup>
       </Basic.Div>
     );
   }
