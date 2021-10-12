@@ -298,7 +298,7 @@ public class RptReportController extends AbstractReadWriteDtoController<RptRepor
 				contentType = result.getRenderer().getFormat();
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 				reportName = String.format(
-						"\"%s-%s.%s\"",
+						"%s-%s.%s",
 						SpinalCase.format(report.getExecutorName()),
 						report.getCreated().format(formatter),
 						result.getRenderer().getExtension()
