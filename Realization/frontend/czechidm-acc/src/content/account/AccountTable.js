@@ -7,6 +7,7 @@ import { Basic, Advanced, Managers, Utils, Domain } from 'czechidm-core';
 import { AccountManager, SystemEntityManager, SystemManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
 import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
+import AttributeTable from './AttributeTable';
 
 const manager = new AccountManager();
 const systemEntityManager = new SystemEntityManager();
@@ -100,34 +101,6 @@ export class AccountTable extends Advanced.AbstractTableContent {
     return Utils.Ui.getSimpleJavaType(name);
   }
 
-  _useAttributesFilter(event) {
-    const attributeNameFilterComponent = this.refs.attributeNameFilter;
-    if (attributeNameFilterComponent) {
-      const attributeNameFilter = attributeNameFilterComponent.getValue();
-      this.setState({attributeNameFilter});
-    }
-  }
-
-  _cancelAttributesFilter(event) {
-    this.setState({attributeNameFilter: null});
-  }
-
-  /**
-   * Filter of attributes by name (only on FE).
-   * @param connectorObject
-   */
-  _applyAttributeFilter(connectorObject) {
-    const {attributeNameFilter} = this.state;
-
-    if (!connectorObject || !connectorObject.attributes || !attributeNameFilter) {
-      return connectorObject;
-    }
-    let attributes = connectorObject.attributes;
-    attributes = attributes.filter(attribute => attribute.name.toLowerCase().includes(attributeNameFilter.toLowerCase()));
-
-    return {attributes};
-  }
-
   renderTargetEntity({rowIndex, data}) {
     return (
       <Advanced.EntityInfo
@@ -158,8 +131,6 @@ export class AccountTable extends Advanced.AbstractTableContent {
     if (forceSearchParameters.getFilters().has('systemId')) {
       systemId = forceSearchParameters.getFilters().get('systemId');
     }
-
-    const _connectorObject = this._applyAttributeFilter(connectorObject);
 
     return (
       <Basic.Div>
@@ -349,47 +320,15 @@ export class AccountTable extends Advanced.AbstractTableContent {
                   ref="endOfProtection"
                   label={ this.i18n('acc:entity.Account.endOfProtection') }
                   readOnly={ !detail.entity.inProtection }/>
-
               </Basic.AbstractForm>
-
               <Basic.Div rendered={ Managers.SecurityManager.hasAuthority('SYSTEM_READ')}>
                 <Basic.ContentHeader text={this.i18n('acc:entity.SystemEntity.attributes')} rendered={!Utils.Entity.isNew(detail.entity)}/>
-                <Basic.AbstractForm ref="filterForm">
-                  <Basic.Row>
-                    <Basic.Col lg={8}>
-                      <Advanced.Filter.TextField
-                        ref="attributeNameFilter"
-                        placeholder={this.i18n('acc:content.system.accounts.filter.attributeName.placeholder')}/>
-                    </Basic.Col>
-                    <Basic.Col lg={4} className="text-right">
-                      <Advanced.Filter.FilterButtons
-                        useFilter={this._useAttributesFilter.bind(this)}
-                        cancelFilter={this._cancelAttributesFilter.bind(this)}/>
-                    </Basic.Col>
-                  </Basic.Row>
-                </Basic.AbstractForm>
-                <Basic.Table
-                  showLoading={ !connectorObject && !this.state.hasOwnProperty('connectorObject') }
-                  data={ _connectorObject ? _connectorObject.attributes : null }
-                  noData={ this.i18n('component.basic.Table.noData') }
-                  className="table-bordered"
-                  rendered={ !Utils.Entity.isNew(detail.entity) }>
-                  <Basic.Column property="name" header={ this.i18n('label.property') }/>
-                  <Basic.Column
-                    property="values"
-                    header={ this.i18n('label.value') }
-                    cell={
-                      ({ rowIndex, data }) => {
-                        return (
-                          Utils.Ui.toStringValue(data[rowIndex].values)
-                        );
-                      }
-                    }/>
-                </Basic.Table>
+                <AttributeTable
+                  connectorObject={ connectorObject }
+                  rendered={ !Utils.Entity.isNew(detail.entity) }
+                />
               </Basic.Div>
-
             </Basic.Modal.Body>
-
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"

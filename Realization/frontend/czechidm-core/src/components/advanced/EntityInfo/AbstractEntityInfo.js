@@ -85,7 +85,7 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
   }
 
   /**
-   * Load permissions if needed if pover is opened
+   * Load permissions if needed if popover is opened
    *
    * @return {[type]} [description]
    */

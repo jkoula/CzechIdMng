@@ -392,6 +392,10 @@
           "attributeName": {
             "label": "Filtr atributů",
             "placeholder": "Filtr dle názvu atributu"
+          },
+          "attributeValue": {
+            "label": "Filtr hodnoty atributu",
+            "placeholder": "Filtr dle hodnoty atributu"
           }
         }
       },

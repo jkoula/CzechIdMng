@@ -390,8 +390,12 @@
             "placeholder": "$t(acc:entity.SystemEntity.uid)"
           },
           "attributeName": {
-            "label": "Attributes filter",
+            "label": "Attribute filter",
             "placeholder": "Filter by attribute name"
+          },
+          "attributeValue": {
+            "label": "Attribute value filter",
+            "placeholder": "Filter by attribute value"
           }
         }
       },

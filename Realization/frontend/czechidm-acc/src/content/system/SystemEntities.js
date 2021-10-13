@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
 import { SystemEntityManager, SystemManager } from '../../redux';
 import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
+import AttributeTable from '../account/AttributeTable';
 
 const uiKey = 'system-entities-table';
 const manager = new SystemEntityManager();
@@ -197,29 +198,12 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
                   label={ this.i18n('acc:entity.SystemEntity.wish.label') }
                   helpBlock={ this.i18n('acc:entity.SystemEntity.wish.help', { escape: false }) }/>
               </Basic.AbstractForm>
-
               <Basic.ContentHeader text={ this.i18n('acc:entity.SystemEntity.attributes') } rendered={ !Utils.Entity.isNew(detail.entity) }/>
-
-              <Basic.Table
-                showLoading={ !detail || !detail.hasOwnProperty('connectorObject') }
-                data={detail && detail.connectorObject ? detail.connectorObject.attributes : null}
-                noData={this.i18n('component.basic.Table.noData')}
-                className="table-bordered"
-                rendered={ !Utils.Entity.isNew(detail.entity) }>
-                <Basic.Column property="name" header={this.i18n('label.property')}/>
-                <Basic.Column
-                  property="values"
-                  header={this.i18n('label.value')}
-                  cell={
-                    ({ rowIndex, data }) => {
-                      return (
-                        Utils.Ui.toStringValue(data[rowIndex].values)
-                      );
-                    }
-                  }/>
-              </Basic.Table>
+              <AttributeTable
+                connectorObject={ detail ? detail.connectorObject : null }
+                rendered={ !Utils.Entity.isNew(detail.entity) }
+              />
             </Basic.Modal.Body>
-
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"
