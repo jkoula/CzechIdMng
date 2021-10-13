@@ -99,7 +99,28 @@ function NavigationSearch(props, context) {
       return;
     }
     if (onSelect) {
-      onSelect(fullObject, event);
+      onSelect(false, fullObject);
+    }
+  };
+
+  const _onSelectChange = (selectItem, dto) => {
+    if (!dto) {
+      return;
+    }
+    // Clear input.
+    universalSearch.current.setValue(null);
+    universalSearch.current.resetInputValue();
+    universalSearch.current.isOpen(false);
+    setSelectedItem(selectItem ? dto : null);
+
+    // We need to obtain link to the detail. We will use info component for this.
+    const InfoComponent = EntityInfo.getComponent(UiUtils.getSimpleJavaType(dto.ownerType)).component.WrappedComponent;
+    const InfoComponentInstance = (new InfoComponent({entityIdentifier: dto.ownerId}, context));
+
+    const link = InfoComponentInstance.getLink(dto.ownerDto);
+    // Push link only if is different then current location -> prevent of warning in console.
+    if (history.location.pathname !== link) {
+      history.push(link);
     }
   };
 
@@ -144,7 +165,7 @@ function NavigationSearch(props, context) {
             >
               {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
               <div
-                onMouseDown={handleMouseDown.bind(this, item.props.onSelect, fullObject)}
+                onMouseDown={handleMouseDown.bind(this, _onSelectChange, fullObject)}
               >
                 <Div
                   rendered={!!fullObject.ownerType}
@@ -180,21 +201,6 @@ function NavigationSearch(props, context) {
     }
   };
 
-  const _onSelectChange = (dto) => {
-    setSelectedItem(dto);
-    if (!dto) {
-      return;
-    }
-    // We need to obtain link to the detail. We will use info component for this.
-    const InfoComponent = EntityInfo.getComponent(UiUtils.getSimpleJavaType(dto.ownerType)).component.WrappedComponent;
-    const InfoComponentInstance = (new InfoComponent({entityIdentifier: dto.ownerId}, context));
-
-    const link = InfoComponentInstance.getLink(dto.ownerDto);
-    // Push link only if is different then current location -> prevent of warning.
-    if (history.location.pathname !== link) {
-      history.push(link);
-    }
-  };
   //
   return (
     <>
@@ -205,8 +211,8 @@ function NavigationSearch(props, context) {
             root: classes.selectBoxRoot
           }}
           style={{marginBottom: 0}}
-          onChange={_onSelectChange.bind(this)}
           onOpen={_onOpenSelect.bind(this)}
+          onChange={_onSelectChange.bind(this, true)}
           menuStyle={{maxHeight: 800}}
           menuContainerStyle={{maxHeight: 800}}
           manager={universalSearchManager}

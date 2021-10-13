@@ -699,6 +699,13 @@ export class SelectBox extends AbstractFormComponent {
     }
   }
 
+  isOpen(isOpen) {
+    // Beware! I did not found another way how close a menu, then use a inner state.
+    if (this.refs.selectComponent) {
+      this.refs.selectComponent.setState({isOpen});
+    }
+  }
+
   /**
    * Load first page on input is opened
    */
