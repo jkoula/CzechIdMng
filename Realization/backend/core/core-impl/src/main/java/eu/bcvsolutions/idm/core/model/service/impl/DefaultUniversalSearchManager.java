@@ -4,12 +4,9 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.UniversalSearchTypeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
-import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.UniversalSearchManager;
 import eu.bcvsolutions.idm.core.eav.api.service.UniversalSearchType;
-import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,18 +25,16 @@ import org.springframework.stereotype.Service;
 @Service("universalSearchManager")
 public class DefaultUniversalSearchManager implements UniversalSearchManager {
 
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultUniversalSearchManager.class);
-	
 	@Autowired
 	private ApplicationContext context;
 	@Lazy
 	@Autowired
 	private EnabledEvaluator enabledEvaluator;
-	
 
 	@Override
+	@SuppressWarnings(value = "rawtypes")
 	public List<UniversalSearchType<? extends AbstractDto, ? extends BaseFilter>> getSupportedTypes() {
-		List<UniversalSearchType<?,?>> results = Lists.newArrayList();
+		List<UniversalSearchType<?, ?>> results = Lists.newArrayList();
 		List<UniversalSearchType> types = context
 				.getBeansOfType(UniversalSearchType.class)
 				.values()
@@ -50,7 +45,6 @@ public class DefaultUniversalSearchManager implements UniversalSearchManager {
 		for (UniversalSearchType type : types) {
 			results.add(type);
 		}
-		
 		return results;
 	}
 
@@ -63,16 +57,6 @@ public class DefaultUniversalSearchManager implements UniversalSearchManager {
 			universalSearchTypeDto.setOwnerType(universalSearchType.getOwnerType().getCanonicalName());
 		}
 		universalSearchTypeDto.setModule(universalSearchType.getModule());
-//		universalSearchTypeDto.setDisabled(universalSearchType.i);
-		//
 		return universalSearchTypeDto;
 	}
-
-	public UniversalSearchType<? extends  AbstractDto, ? extends BaseFilter> getUniversalSearchType(String id) {
-		return this.getSupportedTypes().stream()
-				.filter(type -> type.getId().equals(id))
-				.findFirst()
-				.orElse(null);
-	}
-	
 }

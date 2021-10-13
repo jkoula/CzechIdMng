@@ -1,23 +1,16 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import com.google.common.collect.Maps;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.UniversalSearchDto;
 import eu.bcvsolutions.idm.core.api.dto.UniversalSearchTypeDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmUniversalSearchFilter;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmUniversalSearchService;
 import eu.bcvsolutions.idm.core.api.service.UniversalSearchManager;
-import eu.bcvsolutions.idm.core.eav.api.service.UniversalSearchType;
-import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.rest.AbstractBaseDtoService;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,15 +27,11 @@ import org.springframework.util.Assert;
  */
 @Service("universalSearchService")
 public class DefaultIdmUniversalSearchService extends
-			AbstractBaseDtoService<UniversalSearchDto, IdmUniversalSearchFilter>
+		AbstractBaseDtoService<UniversalSearchDto, IdmUniversalSearchFilter>
 		implements IdmUniversalSearchService {
-
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory
-			.getLogger(DefaultIdmUniversalSearchService.class);
 
 	@Autowired
 	private UniversalSearchManager universalSearchManager;
-
 
 	@Override
 	public Page<UniversalSearchDto> find(IdmUniversalSearchFilter filter, Pageable pageable,
@@ -54,20 +43,13 @@ public class DefaultIdmUniversalSearchService extends
 			pageable = PageRequest.of(0, Integer.MAX_VALUE);
 		}
 
-		long total = 0;
-
-		Map<UniversalSearchType<?, ?>, Long> counts = Maps.newHashMap();
-
-		universalSearchManager.getSupportedTypes().forEach(type -> {
-			counts.put(type, type.count(filter.getText(), IdmBasePermission.READ));
-		});
+		long total;
 		List<UniversalSearchDto> results = new ArrayList<>();
-		Pageable finalPageable = pageable;
 		universalSearchManager.getSupportedTypes().forEach(type -> {
 			Page<? extends AbstractDto> dtosPage = type.find(filter.getText(), PageRequest.of(0, 5), IdmBasePermission.READ);
 			UniversalSearchTypeDto universalSearchTypeDto = universalSearchManager.convertUniversalSearchTypeToDto(type);
 			universalSearchTypeDto.setCount(dtosPage.getTotalElements());
-			
+
 			// Transform DTO to universal search DTO.
 			dtosPage.getContent().forEach(dto -> {
 				UniversalSearchDto universalSearchDto = type.dtoToUniversalSearchDto(dto);
@@ -77,13 +59,10 @@ public class DefaultIdmUniversalSearchService extends
 			});
 
 		});
-		
+
 		total = results.size();
 		PageRequest pageableRequest = PageRequest.of(pageable.getPageNumber(),
 				Math.max(results.size(), pageable.getPageSize()), pageable.getSort());
 		return new PageImpl<>(results, pageableRequest, total);
 	}
-	
-
-
 }
