@@ -909,7 +909,12 @@ SelectBox.propTypes = {
   /**
    * Additional select box options - extend options wit custom behavior.
    */
-  additionalOptions: PropTypes.arrayOf(PropTypes.object)
+  additionalOptions: PropTypes.arrayOf(PropTypes.object),
+
+  /**
+   * Defines if the menu with options should be opened with relative position (inside of a panel).
+   */
+  positionRelative: PropTypes.bool
 };
 
 SelectBox.defaultProps = {

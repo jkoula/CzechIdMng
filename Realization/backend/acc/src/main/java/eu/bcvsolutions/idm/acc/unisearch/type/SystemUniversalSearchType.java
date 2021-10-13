@@ -1,13 +1,18 @@
 package eu.bcvsolutions.idm.acc.unisearch.type;
 
+import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractUniversalSearchType;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
+import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +33,8 @@ public class SystemUniversalSearchType extends AbstractUniversalSearchType<SysSy
 	public static final String NAME = "system-universal-search-type";
 	@Autowired
 	private SysSystemService systemService;
+	@Autowired
+	private SecurityService securityService;
 
 	@Override
 	public Class<SysSystemDto> getOwnerType() {
@@ -43,6 +50,11 @@ public class SystemUniversalSearchType extends AbstractUniversalSearchType<SysSy
 	@Override
 	protected ReadDtoService<SysSystemDto, SysSystemFilter> getService() {
 		return systemService;
+	}
+
+	@Override
+	protected boolean hasPermissions(BasePermission[] permission) {
+		return securityService.hasAnyAuthority(AccGroupPermission.SYSTEM_READ);
 	}
 
 	@Override

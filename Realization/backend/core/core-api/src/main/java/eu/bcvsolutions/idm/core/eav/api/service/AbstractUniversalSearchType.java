@@ -1,15 +1,15 @@
 package eu.bcvsolutions.idm.core.eav.api.service;
 
+import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.UniversalSearchDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -35,6 +35,9 @@ public abstract class AbstractUniversalSearchType<DTO extends AbstractDto, F ext
 
 	@Override
 	public long count(String text, BasePermission... permission) {
+		if (!hasPermissions(permission)) {
+			return 0;
+		}
 		F filter = createFilter(text);
 		
 		return getService().count(filter, permission);
@@ -42,9 +45,16 @@ public abstract class AbstractUniversalSearchType<DTO extends AbstractDto, F ext
 	
 	@Override
 	public Page<DTO> find(String text, Pageable pageable, BasePermission... permission) {
+		if (!hasPermissions(permission)) {
+			return new PageImpl<>(Lists.newArrayList(), pageable, 0);
+		}
 		F filter = createFilter(text);
 		
 		return getService().find(filter, pageable, permission);
+	}
+	
+	protected boolean hasPermissions(BasePermission[] permission) {
+		return true;
 	}
 	
 	protected String getNiceLabel(AbstractDto dto) {
