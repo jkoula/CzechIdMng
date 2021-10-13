@@ -109,7 +109,7 @@ public abstract class AbstractFormValue<O extends FormableEntity>
 	@Column(name = "seq")
 	private short seq;
 	//
-	private final String ownerType;
+	private transient String ownerType;
 
 	public AbstractFormValue() {
 		this(null, null);
