@@ -323,7 +323,7 @@ class DateTimePicker extends AbstractFormComponent {
     const _dateFormat = this._getDateFormat(dateFormat);
     const _timeFormat = this._getTimeFormat(timeFormat);
     //
-    const labelClassName = classNames(labelSpan, 'control-label');
+    const labelClassName = classNames(labelSpan);
     const _label = [];
     if (label) {
       _label.push(label);
@@ -346,6 +346,7 @@ class DateTimePicker extends AbstractFormComponent {
         <FormComponentLabel
           className={ labelClassName }
           label={ _label }
+          readOnly={disabled || readOnly}
           helpIcon={ this.renderHelpIcon() }/>
         <div className={ componentSpan }>
           <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>

@@ -5,40 +5,12 @@
 .basic-form-component {
   position: relative;
 
-  label.control-label {
-    margin-left: -5px;
-    padding: 0 5px;
-    font-size: 1rem;
-    transform: translate(14px, -6px) scale(0.75);
-    z-index: 5;
-    pointer-events: none;
-    transform-origin: top left;
-    top: 0;
-    left: 0;
-    position: absolute;
-    display: block;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: 0.00938em;
-    border-radius: 3px;
-  }
-
   &.disabled {
-    label.control-label {
-      color: rgba(0, 0, 0, 0.26);
-    }
-
     .form-control {
 			background-color: transparent;
 			border-color: rgba(0, 0, 0, 0.26);
 			color: rgba(0, 0, 0, 0.26);
 		}
-  }
-
-  &.has-feedback {
-    label.control-label {
-      color: #f44336 !important;
-    }
   }
 }
 
@@ -118,11 +90,6 @@ input[readonly].confidential {
       margin-bottom: 15px;
       margin-left: 0;
       margin-right: 0;
-
-      &.has-error {
-        label.control-label {
-        }
-      }
       .form-text {
         margin-top: 6px;
         margin-left: 2px;
@@ -155,10 +122,6 @@ input[readonly].confidential {
 
       .form-control {
         height: 25px;
-      }
-
-      label.control-label {
-        margin-bottom: 1px;
       }
 
       .help-block {

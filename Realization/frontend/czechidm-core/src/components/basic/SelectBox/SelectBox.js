@@ -46,7 +46,26 @@ const styles = theme => ({
       marginTop: 1
     },
     '& .Select-control': {
-      WebkitBoxShadow: 'none !important'
+      WebkitBoxShadow: 'none !important',
+      '&:hover': {
+        borderColor: theme.palette.text.primary
+      }
+    },
+    '&.is-disabled': {
+      '& .Select-control': {
+        borderColor: `${theme.palette.action.disabled} !important`
+      },
+      '& .Select-value': {
+        color: `${theme.palette.text.disabled} !important`
+      }
+    },
+    '&.is-searchable': {
+      '& .Select-control': {
+        borderColor: `${theme.palette.action.disabled}`
+      },
+      '&:hover': {
+        borderColor: theme.palette.action.hover
+      }
     }
   },
   positionRelative: {
@@ -624,7 +643,7 @@ export class SelectBox extends AbstractFormComponent {
     const { labelSpan, label, componentSpan, required, placeholder } = this.props;
     const { value, disabled, readOnly, isLoading, error } = this.state;
     //
-    const labelClassName = classNames(labelSpan, 'control-label');
+    const labelClassName = classNames(labelSpan);
     //
     const _label = [];
     if (label) {
@@ -651,6 +670,7 @@ export class SelectBox extends AbstractFormComponent {
         }>
         <FormComponentLabel
           className={ labelClassName }
+          readOnly={disabled || readOnly}
           label={ _label }
           helpIcon={ this.renderHelpIcon() }/>
         <div className={ componentSpan }>

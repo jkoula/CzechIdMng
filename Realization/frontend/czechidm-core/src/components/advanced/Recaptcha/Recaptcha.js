@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import * as Basic from '../../basic';
 import { RecaptchaService } from '../../../services';
 import ConfigLoader from '../../../utils/ConfigLoader';
+import FormComponentLabel from '../../basic/AbstractFormComponent/FormComponentLabel';
 
 const recaptchaService = new RecaptchaService();
 
@@ -85,7 +86,6 @@ export default class AdvancedRecaptcha extends Basic.AbstractFormComponent {
   getBody(feedback) {
     const { label, placeholder, required } = this.props;
     const { rendered, siteKey, disabled, readOnly } = this.state;
-    const labelClassName = classNames('control-label');
     //
     if (!rendered || !siteKey) {
       return null;
@@ -109,15 +109,10 @@ export default class AdvancedRecaptcha extends Basic.AbstractFormComponent {
           { disabled: disabled || readOnly }
         )
       }>
-        {
-          _label.length === 0
-          ||
-          <label
-            className={ labelClassName }>
-            { _label }
-            { this.renderHelpIcon() }
-          </label>
-        }
+        <FormComponentLabel
+          label={_label}
+          readOnly={disabled || readOnly}
+          helpIcon={this.renderHelpIcon()}/>
         <div style={{ whiteSpace: 'nowrap' }}>
           <Basic.Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
             <span>

@@ -149,8 +149,7 @@ class RichTextArea extends Basic.AbstractFormComponent {
     const { labelSpan, label, componentSpan, placeholder, style, required, showToolbar, mentions } = this.props;
     const { editorState, disabled, readOnly } = this.state;
     const labelClassName = classNames(
-      labelSpan,
-      'control-label'
+      labelSpan
     );
     const containerClassName = classNames(
       'basic-richtextarea',
@@ -182,6 +181,7 @@ class RichTextArea extends Basic.AbstractFormComponent {
         <FormComponentLabel
           className={ labelClassName }
           label={ _label }
+          readOnly={disabled || readOnly}
           helpIcon={ this.renderHelpIcon() }/>
         <div className={componentSpan}>
           <Basic.Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>

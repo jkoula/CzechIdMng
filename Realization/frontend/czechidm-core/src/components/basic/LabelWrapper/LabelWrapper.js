@@ -5,6 +5,7 @@ import Joi from 'joi';
 //
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import Tooltip from '../Tooltip/Tooltip';
+import FormComponentLabel from "../AbstractFormComponent/FormComponentLabel";
 
 /**
  * Form label decorator.
@@ -30,13 +31,13 @@ class LabelWrapper extends AbstractFormComponent {
   }
 
   getBody(feedback) {
-    const { labelSpan, label, componentSpan, required, rendered } = this.props;
+    const { labelSpan, label, componentSpan, required, rendered, disabled, readOnly } = this.props;
     //
     if (!rendered) {
       return null;
     }
     //
-    const labelClassName = classNames(labelSpan, 'control-label');
+    const labelClassName = classNames(labelSpan);
     let showAsterix = false;
     if (required && !this.state.value) {
       showAsterix = true;
@@ -56,15 +57,11 @@ class LabelWrapper extends AbstractFormComponent {
           { 'has-feedback': feedback }
         )
       }>
-        {
-          _label.length === 0
-          ||
-          <label
-            className={ labelClassName }>
-            { _label }
-            { this.renderHelpIcon() }
-          </label>
-        }
+        <FormComponentLabel
+          className={ labelClassName }
+          label={ label }
+          readOnly={disabled || readOnly}
+          helpIcon={ this.renderHelpIcon() }/>
         <div className={componentSpan}>
           <Tooltip ref="popover" placement="right" value={ title }>
             <span>

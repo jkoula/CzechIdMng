@@ -4,6 +4,7 @@ import classNames from 'classnames';
 //
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import EnumValue from '../EnumValue/EnumValue';
+import FormComponentLabel from '../AbstractFormComponent/FormComponentLabel';
 
 /**
  * Renders localized enum label -
@@ -16,22 +17,19 @@ import EnumValue from '../EnumValue/EnumValue';
 class EnumLabel extends AbstractFormComponent {
 
   getBody() {
-    const { labelSpan, label, componentSpan } = this.props;
+    const { labelSpan, label, componentSpan, disabled, readOnly } = this.props;
     const enumeration = this.props.enum;
     const { value } = this.state;
     //
-    const labelClassName = classNames(labelSpan, 'control-label');
+    const labelClassName = classNames(labelSpan);
 
     return (
       <div>
-        {
-          !label
-          ||
-          <label
-            className={labelClassName}>
-            {label}
-          </label>
-        }
+        <FormComponentLabel
+          className={ labelClassName }
+          label={ label }
+          readOnly={disabled || readOnly}
+          helpIcon={ this.renderHelpIcon() }/>
         <div className={componentSpan} style={{ whiteSpace: 'nowrap' }}>
           <div style={{marginTop: '5px'}}>
             <EnumValue

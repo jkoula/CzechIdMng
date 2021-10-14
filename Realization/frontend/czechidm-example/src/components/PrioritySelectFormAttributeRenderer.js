@@ -96,7 +96,7 @@ export default class PrioritySelectFormAttributeRenderer extends Advanced.Abstra
     // raw bootstrap styles are used in this example (Basic radio component should be created instead)
     return (
       <div className={ classNames(className, 'form-group') } style={ style }>
-        <label className="control-label">{ this.getLabel(null, showOriginalValue) }</label>
+        <label>{ this.getLabel(null, showOriginalValue) }</label>
         <div className="radio" onChange={ this.setValue.bind(this) }>
           { inputs }
         </div>

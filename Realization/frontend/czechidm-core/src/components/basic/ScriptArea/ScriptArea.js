@@ -178,7 +178,7 @@ class ScriptArea extends AbstractFormComponent {
     const { showModalEditor, disabled, readOnly } = this.state;
     //
     const className = classNames('form-control');
-    const labelClassName = classNames(labelSpan, 'control-label');
+    const labelClassName = classNames(labelSpan);
     let showAsterix = false;
     if (required && !this.state.value) {
       showAsterix = true;
@@ -214,6 +214,7 @@ class ScriptArea extends AbstractFormComponent {
       }>
         <FormComponentLabel
           className={ labelClassName }
+          readOnly={disabled || readOnly}
           label={ _label }/>
         <div className={componentSpan}>
           <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>

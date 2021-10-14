@@ -221,13 +221,14 @@ export default class StepCheckPermission extends AbstractWizardStep {
             <Basic.Div style={{flex: 1}}>
               <Basic.Div style={{display: 'flex'}}>
                 <Basic.Div style={{flex: 1, minWidth: 150, marginTop: 8}}>
-                  <label className="control-label">
+                  <label>
                     {this.i18n(`${locKey}.testCreateUserBtn.text`)}:
                   </label>
                 </Basic.Div>
                 <Basic.Div style={{flex: 1}}>
                   <Basic.Button
                     ref="testCreateUser"
+                    style={{minWidth: 160}}
                     level="success"
                     showLoading={ !!showLoadingTestUser }
                     showLoadingIcon
@@ -247,13 +248,14 @@ export default class StepCheckPermission extends AbstractWizardStep {
               </Basic.Div>
               <Basic.Div style={{marginTop: 15, display: 'flex'}}>
                 <Basic.Div style={{flex: 1, minWidth: 150, marginTop: 6}}>
-                  <label className="control-label">
+                  <label>
                     {this.i18n(`${locKey}.testAssignGroupBtn.text`)}:
                   </label>
                 </Basic.Div>
                 <Basic.Div style={{flex: 1}}>
                   <Basic.Button
                     ref="testAssignGroup"
+                    style={{minWidth: 160}}
                     level="info"
                     showLoading={ !!showLoadingTestUser }
                     showLoadingIcon
@@ -273,13 +275,14 @@ export default class StepCheckPermission extends AbstractWizardStep {
               </Basic.Div>
               <Basic.Div style={{marginTop: 15, display: 'flex'}}>
                 <Basic.Div style={{flex: 1, minWidth: 150, marginTop: 6}}>
-                  <label className="control-label">
+                  <label>
                     {this.i18n(`${locKey}.testDeleteUserBtn.text`)}:
                   </label>
                 </Basic.Div>
                 <Basic.Div style={{flex: 1}}>
                   <Basic.Button
                     ref="testDeleteUser"
+                    style={{minWidth: 160}}
                     level="danger"
                     showLoading={ !!showLoadingTestUser }
                     showLoadingIcon
