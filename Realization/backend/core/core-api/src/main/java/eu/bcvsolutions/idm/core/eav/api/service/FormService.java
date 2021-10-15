@@ -980,6 +980,18 @@ public interface FormService extends ScriptEnabled {
 	List<InvalidFormAttributeDto> validate(IdmFormInstanceDto formInstance);
 
 	/**
+	 * Validation for given form instance.
+	 *
+	 * Only validation on missing value is implemented now. TODO: regex ..
+	 * 
+	 * @param formInstance
+	 * @param validateOnlySameOwnerType If false, then is validation (only for unique attribute now) made for all owner types.
+	 *                                  Useful for unique value in ConceptRole vs IdentityRole (we need to validate both owner types).
+	 * @return
+	 */
+	List<InvalidFormAttributeDto> validate(IdmFormInstanceDto formInstance, boolean validateOnlySameOwnerType);
+
+	/**
 	 * Merge all EAV values for given definition from source DTO to target DTO.
 	 * Target DTO is not saved! Values are only set to list of EAVs.
 	 * 
@@ -1038,7 +1050,7 @@ public interface FormService extends ScriptEnabled {
 	 * @see IdmCacheManager#evictCache(String)
 	 */
 	void evictCache(IdmFormDefinitionDto definition);
-	
+
 	/**
 	 * Returns supported form attribute renderers.
 	 * 

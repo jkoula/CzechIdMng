@@ -1430,6 +1430,11 @@ public class DefaultFormService implements FormService {
 	
 	@Override
 	public List<InvalidFormAttributeDto> validate(IdmFormInstanceDto formInstance) {
+		return validate(formInstance, true);
+	}
+	
+	@Override
+	public List<InvalidFormAttributeDto> validate(IdmFormInstanceDto formInstance, boolean validateOnlySameOwnerType) {
 		Assert.notNull(formInstance, "Form instance cannot be null!");
 		IdmFormDefinitionDto formDefinition = formInstance.getFormDefinition();
 		Assert.notNull(formDefinition, "Form definition cannot be null!");
@@ -1448,7 +1453,7 @@ public class DefaultFormService implements FormService {
 							formValue.setPersistentType(formAttribute.getPersistentType());
 						})
 						.collect(Collectors.toList()); //
-				InvalidFormAttributeDto result = this.validateAttribute(formDefinition, formAttribute, formValueForAttributes);
+				InvalidFormAttributeDto result = this.validateAttribute(formDefinition, formAttribute, formValueForAttributes, validateOnlySameOwnerType);
 				if (!result.isValid()) {
 					// Invalid attributes for owner => more owners can be saved together (e.g. from projection).
 					result.setOwnerId(formInstance.getOwnerId()); // ~ identifiable
@@ -1498,7 +1503,8 @@ public class DefaultFormService implements FormService {
 	private InvalidFormAttributeDto validateAttribute(
 			IdmFormDefinitionDto formDefinition,
 			IdmFormAttributeDto formAttribute,
-			List<IdmFormValueDto> formValues) {
+			List<IdmFormValueDto> formValues,
+			boolean validateOnlySameOwnerType) {
 		Assert.notNull(formAttribute, "Form attribute is required.");
 		//
 		InvalidFormAttributeDto result = new InvalidFormAttributeDto(formAttribute);
@@ -1660,9 +1666,13 @@ public class DefaultFormService implements FormService {
 					//
 					if (existValues
 							.stream()
-							.filter(v -> formValue.getId() == null || !formValue.getId().equals(v.getId()))
-							.findFirst()
-							.isPresent()) {
+							.filter(v -> {
+								if (validateOnlySameOwnerType) {
+									return v.getOwnerType().equals(formValue.getOwnerType());
+								}
+								return true;
+							})
+							.anyMatch(v -> formValue.getId() == null || !formValue.getId().equals(v.getId()))) {
 						LOG.debug("Form attribute [{}] validation failed - given value [{}] is not unigue.",
 								formAttribute.getCode(), formValue.getValue());
 						//

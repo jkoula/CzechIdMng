@@ -552,7 +552,7 @@ public class DefaultIdmConceptRoleRequestService extends
 						value.setId(identityRoleValueDto.getId());
 					}
 				});
-				List<InvalidFormAttributeDto> validationErrors = formService.validate(formInstanceDto);
+				List<InvalidFormAttributeDto> validationErrors = formService.validate(formInstanceDto, false);
 
 				// Set IDs of concept back to values (formInstance is not immutable).
 				formInstanceDto.getValues().forEach(value -> {
@@ -562,7 +562,7 @@ public class DefaultIdmConceptRoleRequestService extends
 				});
 				return validationErrors;
 			}
-			return formService.validate(formInstanceDto);
+			return formService.validate(formInstanceDto, false);
 		}
 		return null;
 	}
