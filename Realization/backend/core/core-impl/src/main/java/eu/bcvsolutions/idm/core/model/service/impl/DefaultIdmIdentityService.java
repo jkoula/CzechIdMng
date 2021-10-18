@@ -218,6 +218,14 @@ public class DefaultIdmIdentityService
 		if (StringUtils.isNotEmpty(filter.getLastName())) {
 			predicates.add(builder.equal(root.get(IdmIdentity_.lastName), filter.getLastName()));
 		}
+		// Identity first name (case-insensitive, like)
+		if (StringUtils.isNotEmpty(filter.getFirstNameLike())) {
+			predicates.add(builder.like(builder.lower(root.get(IdmIdentity_.firstName)), "%" + filter.getFirstNameLike().toLowerCase() + "%"));
+		}
+		// Identity last name (case-insensitive, like)
+		if (StringUtils.isNotEmpty(filter.getLastNameLike())) {
+			predicates.add(builder.like(builder.lower(root.get(IdmIdentity_.lastName)), "%" + filter.getLastNameLike().toLowerCase() + "%"));
+		}
 		// identity with any of given role (OR)
 		List<UUID> roles = filter.getRoles();
 		if (!roles.isEmpty()) {

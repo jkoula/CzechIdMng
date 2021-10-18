@@ -8,6 +8,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractUniversalSearchType;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,16 @@ public class IdentityUniversalSearchType extends AbstractUniversalSearchType<Idm
 
 	protected IdmIdentityFilter createFilter(String text) {
 		IdmIdentityFilter filter = new IdmIdentityFilter();
+		if (StringUtils.isNotEmpty(text)) {
+			text = text.trim();
+			// Workaround for simulate an indexing. If text contains space, then we will search in first and last name separately.
+			String[] split = text.split(" ");
+			if (split.length == 2) {
+				filter.setFirstNameLike(split[0]);
+				filter.setLastNameLike(split[1]);
+				return filter;
+			}
+		}
 		filter.setText(text);
 		return filter;
 	}

@@ -69,6 +69,12 @@ const useStyles = makeStyles((theme) => {
           backgroundColor: theme.palette.background.paper,
           '&:hover': {
             backgroundColor: theme.palette.type === 'dark' ? '#515151' : theme.palette.action.hover
+          },
+          '&.Uni-search-footer': {
+            backgroundColor: theme.palette.background.default
+          },
+          '&.Uni-search-header': {
+            backgroundColor: theme.palette.background.paper
           }
         },
         '& .Select-menu-outer': {
@@ -137,16 +143,20 @@ function NavigationSearch(props, context) {
         types.set(type.id, type);
       });
 
+    const numberTypes = types.size;
+    let i = 0;
     types.forEach(type => {
+      i += 1;
       // Find and render a header component.
       const universalSearchTypeComponent = componentService
         .getUniversalSearchTypeComponent(type.id);
       if (universalSearchTypeComponent) {
         result.push(
-          <OptionDecorator key={`${type.id}-header`} className="Select-option" option={{disable: true}}>
+          <OptionDecorator key={`${type.id}-header`} className="Select-option Uni-search-header" option={{disable: true}}>
             <universalSearchTypeComponent.component
               universalSearchType={type}
               searchValue={params.inputValue}
+              header
             />
           </OptionDecorator>
         );
@@ -188,6 +198,18 @@ function NavigationSearch(props, context) {
             </OptionDecorator>
           );
         });
+      if (universalSearchTypeComponent) {
+        result.push(
+          <OptionDecorator key={`${type.id}-footer`} className="Select-option Uni-search-footer" option={{disable: true}}>
+            <universalSearchTypeComponent.component
+              universalSearchType={type}
+              isLast={i === numberTypes}
+              searchValue={params.inputValue}
+              header={false}
+            />
+          </OptionDecorator>
+        );
+      }
     });
 
     return result;
@@ -200,7 +222,6 @@ function NavigationSearch(props, context) {
       universalSearch.current.resetInputValue();
     }
   };
-
   //
   return (
     <>
@@ -213,8 +234,8 @@ function NavigationSearch(props, context) {
           style={{marginBottom: 0}}
           onOpen={_onOpenSelect.bind(this)}
           onChange={_onSelectChange.bind(this, true)}
-          menuStyle={{maxHeight: 800}}
-          menuContainerStyle={{maxHeight: 800}}
+          menuStyle={{maxHeight: 900}}
+          menuContainerStyle={{maxHeight: 900}}
           manager={universalSearchManager}
           label={null}
           onSelectResetsInput

@@ -40,23 +40,54 @@ export default class AbstractUniversalSearchType extends AbstractContextComponen
 
   render() {
     const {
-      universalSearchType
+      universalSearchType,
+      header,
+      isLast
     } = this.props;
 
+    if (header) {
+      // Header:
+      return (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div onMouseDown={this._stopPropagationMouseDown.bind(this)}>
+          <div style={{display: 'flex', marginBottom: -8}}>
+            <span style={{
+              width: '100%',
+              textAlign: 'center',
+              flex: 1
+            }}>
+              <Icon
+                level={this.getLevel()}
+                value={this.getIcon()}/>
+              {`\u00A0${this.getLabel()}:`}
+            </span>
+          </div>
+          <hr style={{marginTop: 8, marginBottom: 0}}/>
+        </div>
+      );
+    }
+    // Footer
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-      <span onMouseDown={this._stopPropagationMouseDown.bind(this)}>
-        <Icon level={ this.getLevel() } value={ this.getIcon() }/>
-        {`  ${this.getLabel()}  `}
-        (
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <a onClick={this._onClick.bind(this)} title={this.i18n('content.about.link')}>
-          {universalSearchType.count}
-        </a>
-          ):
-        <hr style={{marginTop: 0, marginBottom: -8}}/>
-      </span>
+      <div onMouseDown={this._stopPropagationMouseDown.bind(this)}>
+        <div style={{display: 'flex'}}>
+          <span style={{
+            width: '100%',
+            textAlign: 'center',
+            flex: 1
+          }}>
+            {this.i18n('component.advanced.AbstractUniversalSearchType.showAllLabel')}
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+            (
+            <a onClick={this._onClick.bind(this)}>
+              {universalSearchType.count}
+            </a>
+            )
+          </span>
+        </div>
+      </div>
     );
+
   }
 }
 
@@ -74,5 +105,7 @@ AbstractUniversalSearchType.propTypes = {
   searchValue: PropTypes.string
 };
 AbstractUniversalSearchType.defaultProps = {
-  ...AbstractContextComponent.defaultProps
+  ...AbstractContextComponent.defaultProps,
+  header: true,
+  isLast: false
 };

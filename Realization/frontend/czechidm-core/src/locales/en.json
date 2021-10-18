@@ -471,6 +471,9 @@
           }
         }
       },
+      "AbstractUniversalSearchType": {
+        "showAllLabel": "Show all records ..."
+      },
       "IdentityUniversalSearchType": {
         "label": "Users"
       },

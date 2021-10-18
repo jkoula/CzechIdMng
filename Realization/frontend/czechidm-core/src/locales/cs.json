@@ -503,6 +503,9 @@
           }
         }
       },
+      "AbstractUniversalSearchType": {
+        "showAllLabel": "Zobrazit všechny záznamy ..."
+      },
       "IdentityUniversalSearchType": {
         "label": "Uživatelé"
       },

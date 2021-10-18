@@ -110,9 +110,17 @@ public class IdmIdentityFilter
 	 */
 	public static final String PARAMETER_FIRSTNAME = "firstName";
 	/**
+	 * Identity first name - like and case-insensitive.
+	 */
+	public static final String PARAMETER_FIRSTNAME_LIKE = "firstNameLike";
+	/**
 	 * Identity last name - exact match.
 	 */
 	public static final String PARAMETER_LASTNAME = "lastName";
+	/**
+	 * Identity last name - like and case-insensitive.
+	 */
+	public static final String PARAMETER_LASTNAME_LIKE = "lastNameLike";
 	/**
 	 * Identity projection.
 	 */
@@ -242,6 +250,22 @@ public class IdmIdentityFilter
 
 	public void setFirstName(String firstName) {
 		set(PARAMETER_FIRSTNAME, firstName);
+	}
+	
+	public String getFirstNameLike() {
+		return getParameterConverter().toString(getData(), PARAMETER_FIRSTNAME_LIKE);
+	}
+
+	public void setFirstNameLike(String firstName) {
+		set(PARAMETER_FIRSTNAME_LIKE, firstName);
+	}
+	
+	public String getLastNameLike() {
+		return getParameterConverter().toString(getData(), PARAMETER_LASTNAME_LIKE);
+	}
+
+	public void setLastNameLike(String lastName) {
+		set(PARAMETER_LASTNAME_LIKE, lastName);
 	}
 
 	public String getLastName() {
@@ -396,8 +420,7 @@ public class IdmIdentityFilter
 	 * - false: ended contracts
 	 * 
 	 * Contract state (~DISABLED) is ignored. This filter works just with contract dates.
-	 * 
-	 * @param filter value
+	 *
 	 * @since 10.3.0
 	 */
 	public void setValidContractManagers(Boolean validContractManagers) {

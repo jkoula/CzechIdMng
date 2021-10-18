@@ -45,8 +45,9 @@ public class DefaultIdmUniversalSearchService extends
 
 		long total;
 		List<UniversalSearchDto> results = new ArrayList<>();
+		Pageable finalPageable = pageable;
 		universalSearchManager.getSupportedTypes().forEach(type -> {
-			Page<? extends AbstractDto> dtosPage = type.find(filter.getText(), PageRequest.of(0, 5), IdmBasePermission.READ);
+			Page<? extends AbstractDto> dtosPage = type.find(filter.getText(), PageRequest.of(0, 5, finalPageable.getSort()), IdmBasePermission.READ);
 			UniversalSearchTypeDto universalSearchTypeDto = universalSearchManager.convertUniversalSearchTypeToDto(type);
 			universalSearchTypeDto.setCount(dtosPage.getTotalElements());
 
