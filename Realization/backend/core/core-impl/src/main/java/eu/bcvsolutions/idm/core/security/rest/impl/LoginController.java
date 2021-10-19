@@ -250,12 +250,11 @@ public class LoginController implements BaseController {
 	/**
 	 * Redirect to FE, after CAS authentication.
 	 * 
-	 * @param input parameters (CAS ticket can be found there, if needed)
 	 * @return redirect to FE
 	 * @since 12.0.0
 	 */
 	@RequestMapping(path = CAS_LOGIN_RESPONSE_PATH, method = RequestMethod.GET)
-	public ResponseEntity<Void> casLoginResponse(@RequestParam Map<String,String> input) {
+	public ResponseEntity<Void> casLoginResponse() {
 		// process ticket + add token into url parameter
 		IdmTokenDto currentToken = tokenManager.getCurrentToken();
 		StringBuilder url = new StringBuilder(configurationService.getFrontendUrl(CAS_LOGIN_RESPONSE_PATH));
@@ -355,7 +354,6 @@ public class LoginController implements BaseController {
 	/**
 	 * Redirect to FE, after CAS authentication.
 	 * 
-	 * @param input parameters (CAS ticket can be found there, if needed)
 	 * @return redirect to FE
 	 * @since 12.0.0
 	 */
