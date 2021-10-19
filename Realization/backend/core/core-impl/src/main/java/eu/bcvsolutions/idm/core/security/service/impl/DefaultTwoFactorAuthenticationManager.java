@@ -125,7 +125,8 @@ public class DefaultTwoFactorAuthenticationManager implements TwoFactorAuthentic
 		Assert.notNull(identityId, "Identity identifier is required.");
 		Assert.notNull(registrationConfirm, "Two factor confirm request is required.");
 		//
-		IdmPasswordDto password = passwordService.findOneByIdentity(identityId);
+		// support two factor authentication, even when identity is not authenticated by IdM (secret is required to persist only)
+		IdmPasswordDto password = passwordService.findOrCreateByIdentity(identityId);
 		if (password == null) { 
 			throw new EntityNotFoundException(IdmIdentityDto.class, identityId);
 		}

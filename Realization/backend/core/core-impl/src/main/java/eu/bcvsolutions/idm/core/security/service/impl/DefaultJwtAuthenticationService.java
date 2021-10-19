@@ -12,11 +12,11 @@ import eu.bcvsolutions.idm.core.api.dto.IdmTokenDto;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmJwtAuthentication;
 import eu.bcvsolutions.idm.core.security.api.dto.IdmJwtAuthenticationDto;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityDisabledException;
 import eu.bcvsolutions.idm.core.security.api.exception.TwoFactorAuthenticationRequiredException;
 import eu.bcvsolutions.idm.core.security.api.service.JwtAuthenticationService;
 import eu.bcvsolutions.idm.core.security.api.service.TokenManager;
 import eu.bcvsolutions.idm.core.security.api.service.TwoFactorAuthenticationManager;
-import eu.bcvsolutions.idm.core.security.api.exception.IdmAuthenticationException;
 
 /**
  * Default implementation of {@link JwtAuthenticationService}.
@@ -47,7 +47,7 @@ public class DefaultJwtAuthenticationService implements JwtAuthenticationService
 		//
 		// check identity is valid
 		if (identity.isDisabled()) {
-			throw new IdmAuthenticationException(
+			throw new IdentityDisabledException(
 					MessageFormat.format("Check identity can login: The identity [{0}] is disabled.", identity.getUsername())
 			);
 		}

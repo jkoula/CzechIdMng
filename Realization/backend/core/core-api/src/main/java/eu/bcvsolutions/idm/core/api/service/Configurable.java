@@ -115,7 +115,7 @@ public interface Configurable {
 	 * Returns prefix to configuration for this configurable object. 
 	 * Under this prefix could be found all configurable object's properties.
 	 * 
-	 * @return
+	 * @return 
 	 */
 	default String getConfigurationPrefix() {
 		return (isSecured() ? ConfigurationService.IDM_PRIVATE_PROPERTY_PREFIX : ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX)

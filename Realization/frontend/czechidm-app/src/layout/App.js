@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import classNames from 'classnames';
 import { Route } from 'react-router-dom';
-import Joi from 'joi';
+import _ from 'lodash';
 //
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -14,7 +14,6 @@ import Dashboard from 'czechidm-core/src/content/Dashboard';
 import Footer from './Footer';
 //
 const securityManager = new Managers.SecurityManager();
-const dataManager = new Managers.DataManager();
 
 /**
  * Application entry point.
@@ -27,8 +26,6 @@ export class App extends Basic.AbstractContent {
     super(props, context);
     //
     this.state = {
-      isLogout: false,
-      showTwoFactor: false,
       token: null
     };
     context.history = props.history;
@@ -39,94 +36,25 @@ export class App extends Basic.AbstractContent {
   */
   componentDidUpdate() {
     const { location, userContext, appReady } = this.props;
+    if (userContext.isExpired && location.pathname !== '/login') {
+      // preserve path before logout
+      this.context.store.dispatch(securityManager.receiveLogin(
+        _.merge({}, userContext, {
+          loginTargetPath: location.pathname,
+          isTryRemoteLogin: true
+        }), () => {
+          this.context.history.replace('/login');
+        }
+      ));
+    }
+    //
     // select navigation
     if (location.pathname === '/') {
       this.selectNavigationItem('home');
     }
-    if (this.refs.form) { // when modal is closed, form is not defined
-      if (this.refs.password) {
-        this.refs.form.setData({
-          username: userContext.username,
-          password: this.refs.password.getValue() // preserve filled password
-        });
-        this.refs.password.focus();
-      }
-    }
-
     if (appReady) {
       this._handleTokenRefresh();
     }
-  }
-
-  login(event) {
-    if (event) {
-      event.preventDefault();
-    }
-    if (!this.refs.form.isFormValid()) {
-      return;
-    }
-    const formData = this.refs.form.getData();
-    // refresh login
-    this.context.store.dispatch(securityManager.login(formData.username, formData.password, (result, error) => {
-      if (error && error.statusEnum) {
-        if (error.statusEnum === 'MUST_CHANGE_IDM_PASSWORD') {
-          this.context.store.dispatch(dataManager.storeData(Managers.SecurityManager.PASSWORD_MUST_CHANGE, formData.password));
-          this.context.history.replace(`/password/change?username=${ formData.username }`);
-        }
-        if (error.statusEnum === 'TWO_FACTOR_AUTH_REQIURED') {
-          this.setState({
-            showTwoFactor: true,
-            token: error.parameters.token,
-            username: formData.username,
-            password: formData.password
-          });
-        }
-      }
-    }));
-  }
-
-  handleTwoFactor(event) {
-    if (event) {
-      event.preventDefault();
-    }
-    if (!this.refs.form.isFormValid()) {
-      return;
-    }
-    const formData = this.refs.form.getData();
-    const verificationCode = formData.verificationCode;
-    const token = this.props.userContext.twoFactorToken || this.state.token;
-    this.context.store.dispatch(securityManager.loginTwoFactor({ token, verificationCode }, (result, error) => {
-      if (error) {
-        if (error.statusEnum && error.statusEnum === 'MUST_CHANGE_IDM_PASSWORD') {
-          this.setState({
-            showTwoFactor: false
-          }, () => {
-            this.context.store.dispatch(dataManager.storeData(Managers.SecurityManager.PASSWORD_MUST_CHANGE, this.state.password));
-            this.context.history.replace(`/password/change?username=${ this.state.username }`);
-          });
-        }
-      } else {
-        this.setState({
-          showTwoFactor: false
-        });
-      }
-    }));
-  }
-
-  logout(event) {
-    if (event) {
-      event.preventDefault();
-    }
-    this.setState({
-      isLogout: true
-    }, () => {
-      this.context.store.dispatch(securityManager.logout(() => {
-        this.context.history.push('/login');
-        this.setState({
-          isLogout: false
-        });
-      }));
-    });
   }
 
   /**
@@ -149,11 +77,9 @@ export class App extends Basic.AbstractContent {
 
   render() {
     const { userContext, bulk, appReady, navigationCollapsed, hideFooter, location } = this.props;
-    const { isLogout } = this.state;
-    const showTwoFactor = this.state.showTwoFactor || userContext.twoFactorToken !== null;
     const titleTemplate = `%s | ${ this.i18n('app.name') }`;
     const classnames = classNames(
-      { 'with-sidebar': !userContext.isExpired && Managers.SecurityManager.isAuthenticated(userContext) },
+      { 'with-sidebar': Managers.SecurityManager.isAuthenticated(userContext) },
       { collapsed: navigationCollapsed }
     );
     const theme = createTheme(userContext.theme);
@@ -174,115 +100,16 @@ export class App extends Basic.AbstractContent {
               <Helmet title={ this.i18n('navigation.menu.home') } titleTemplate={ titleTemplate } />
               <Advanced.Navigation location={ location }>
                 <div id="content-container" className={ classnames }>
-                  {
-                    userContext.isExpired
-                    ||
-                    isLogout
-                    ||
-                    (
-                      <Basic.Div>
-                        { /* Childrens are hiden, when token expires =>
-                          all components are loaded (componentDidMount) after identity is logged again */ }
-                        { this.getRoutes() }
-                        <Footer rendered={ !hideFooter } />
-                      </Basic.Div>
-                    )
-                  }
+                  { /* Childrens are hiden, when token expires =>
+                    all components are loaded (componentDidMount) after identity is logged again */ }
+                  { this.getRoutes() }
+                  <Footer rendered={ !hideFooter } />
                   <Advanced.ModalProgressBar
                     show={ bulk.showLoading }
                     text={ bulk.action.title }
                     count={ bulk.size }
                     counter={ bulk.counter }
                   />
-                  <Basic.Modal
-                    dialogClassName="login-container"
-                    show={ userContext.isExpired }
-                    bsSize="sm"
-                    fullWidth={ false }>
-                    <Basic.Div rendered={ showTwoFactor }>
-                      <form onSubmit={ this.handleTwoFactor.bind(this) }>
-                        <Basic.Modal.Header text={ this.i18n('content.login.twoFactor.header') }/>
-                        <Basic.Modal.Body>
-                          <Basic.Loading showLoading={ userContext.showLoading }>
-                            <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0 }}>
-                              <Basic.TextField
-                                ref="verificationCode"
-                                labelSpan="col-sm-5"
-                                componentSpan="col-sm-7"
-                                className="last"
-                                label={ this.i18n('content.login.twoFactor.verificationCode.label') }
-                                placeholder={ this.i18n('content.login.twoFactor.verificationCode.placeholder') }
-                                required
-                                validation={ Joi.number().integer().min(0).max(999999) }/>
-                            </Basic.AbstractForm>
-                          </Basic.Loading>
-                        </Basic.Modal.Body>
-                        <Basic.Modal.Footer>
-                          <Basic.Button
-                            level="link"
-                            onClick={ () => this.logout() }
-                            title={ this.i18n('content.login.button.logout.title') }
-                            titlePlacement="bottom">
-                            { this.i18n('content.login.button.logout.value') }
-                          </Basic.Button>
-                          <Basic.Button type="submit" level="success" showLoading={ userContext.showLoading }>
-                            { this.i18n('button.verify.label') }
-                          </Basic.Button>
-                        </Basic.Modal.Footer>
-                      </form>
-                    </Basic.Div>
-
-                    <Basic.Div rendered={ !showTwoFactor }>
-                      <form onSubmit={ this.login.bind(this) }>
-                        <Basic.Modal.Header text={ this.i18n('error.LOG_IN.title') } bsSize="sm"/>
-                        <Basic.Modal.Body>
-                          <Basic.Loading showLoading={ userContext.showLoading }>
-                            <Basic.Alert text={ this.i18n('error.LOG_IN.message') } />
-                            <Basic.AbstractForm
-                              ref="form"
-                              data={{
-                                username: userContext.username,
-                                password: this.refs.password ? this.refs.password.getValue() : null
-                              }}
-                              className="form-horizontal"
-                              style={{ padding: 0 }}>
-                              <Basic.TextField
-                                ref="username"
-                                labelSpan="col-sm-5"
-                                componentSpan="col-sm-7"
-                                label={ this.i18n('content.login.username') }
-                                placeholder={ this.i18n('content.login.username') }
-                                required
-                                readOnly
-                              />
-                              <Basic.TextField
-                                type="password"
-                                ref="password"
-                                labelSpan="col-sm-5"
-                                componentSpan="col-sm-7"
-                                className="last"
-                                label={ this.i18n('content.login.password') }
-                                placeholder={ this.i18n('content.login.password') }
-                                required
-                              />
-                            </Basic.AbstractForm>
-                          </Basic.Loading>
-                        </Basic.Modal.Body>
-                        <Basic.Modal.Footer>
-                          <Basic.Button
-                            level="link"
-                            onClick={ () => this.logout() }
-                            title={ this.i18n('content.login.button.logout.title') }
-                            titlePlacement="bottom">
-                            { this.i18n('content.login.button.logout.value') }
-                          </Basic.Button>
-                          <Basic.Button type="submit" level="success" showLoading={ userContext.showLoading }>
-                            { this.i18n('content.login.button.login') }
-                          </Basic.Button>
-                        </Basic.Modal.Footer>
-                      </form>
-                    </Basic.Div>
-                  </Basic.Modal>
                 </div>
               </Advanced.Navigation>
             </Basic.Div>

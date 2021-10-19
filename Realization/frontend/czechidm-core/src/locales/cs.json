@@ -1315,6 +1315,9 @@
         "logout": {
           "value": "Odhlásit se",
           "title": "Odhlásit se úplně a pokračovat na nové přihlášení"
+        },
+        "loginIdm": {
+          "label": "$t(content.login.header) přes $t(app.name)"
         }
       },
       "twoFactor": {
@@ -1334,6 +1337,11 @@
       "title": "$t(content.logout.header)",
       "message": {
         "logout": "Odhlášení proběhlo"
+      },
+      "button": {
+        "login": {
+          "label": "Přihlásit se znovu"
+        }
       }
     },
     "password": {
@@ -7447,6 +7455,38 @@
     "LOG_IN": {
       "title": "Přihlášení vypršelo",
       "message": "Přihlaste se prosím znovu."
+    },
+    "LOG_OUT_SUCCESS": {
+      "title": "Odlášení",
+      "message": "Odlášení proběhlo úspěšně."
+    },
+    "LOG_IN_FAILED": {
+      "title": "Přihlášení se nezdařilo",
+      "message": "Přihlaste se prosím znovu."
+    },
+    "CAS_TICKET_VALIDATION_FAILED": {
+      "title": "Přihlášení se nezdařilo",
+      "message": "Nepodařilo se ověřit externí přihlášovací údaje (na CAS serveru). Odhlaste a přihlaste se prosím znovu."
+    },
+    "CAS_LOGIN_SERVER_NOT_AVAILABLE": {
+      "title": "Přihlášení se nezdařilo",
+      "message": "Externí server pro přihlášení (CAS server) není dostupný. Zkuste se prosím přihlásit později nebo kontaktujte správce aplikace. Pokud jste správce aplikace, můžete se přihlásit prostřednictím aplikace $t(app.name)."
+    },
+    "CAS_LOGOUT_SERVER_NOT_AVAILABLE": {
+      "title": "Odhlášení se nezdařilo",
+      "message": "Odhlášení z aplikace proběhlo, ale externí server pro odhlášení (CAS server) není dostupný. Zkuste se prosím odhlásit na externím (CAS) serveru později."
+    },
+    "CAS_LOGIN_SERVER_URL_NOT_CONFIGURED": {
+      "title": "Přihlášení se nezdařilo",
+      "message": "Je vyžadováno přihlášení přes externí server pro přihlášení (CAS server), ale server není nakonfigurovaný. Zkuste se prosím přihlásit později nebo kontaktujte správce aplikace. Pokud jste správce aplikace, můžete se přihlásit prostřednictím aplikace $t(app.name)."
+    },
+    "CAS_LOGOUT_SERVER_URL_NOT_CONFIGURED": {
+      "title": "Odlášení probělo",
+      "message": "Odhlášení z aplikace proběhlo. Odhlášení na externím serveru (CAS) neproběhlo. Použití CAS serveru je vyžadováno, ale server není nakonfigurovaný. Zkuste se prosím odhlásit na externím (CAS) serveru později nebo kontaktujte správce aplikace."
+    },
+    "CAS_IDM_LOGIN_ADMIN_ONLY": {
+      "title": "Přihlášení se nezdařilo",
+      "message": "Je vyžadováno přihlášení přes externí server pro přihlášení (CAS server). Prostřednictím aplikace $t(app.name) se může přihlásit pouze správce aplikace."
     },
     "XSRF": {
       "title": "Přihlášení vypršelo",

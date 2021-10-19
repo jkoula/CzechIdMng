@@ -50,6 +50,7 @@ const INITIAL_STATE = {
     username: null, // logged identity username
     isAuthenticated: false,
     isTryRemoteLogin: true,
+    loginTargetPath: null, // target path before login redirection
     tokenCSRF: null,
     tokenCIDMST: null,
     authorities: [], // identity authorities

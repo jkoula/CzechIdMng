@@ -67,19 +67,19 @@ class SwitchUser extends Basic.AbstractContent {
       <Basic.Modal
         show={ show }
         onHide={ onHide }
+        affixFooter={ false }
         keyboard
         backdrop="static"
         onEnter={ () => { this.refs.targetIdentity.focus(); } }>
-        <form onSubmit={ this.onSave.bind(this) }>
-          <Basic.Modal.Header
-            closeButton
-            icon="component:switch-user"
-            text={ this.i18n('content.identity.switch-user.header') }/>
-          <Basic.Modal.Body>
+        <Basic.Modal.Header
+          closeButton
+          icon="component:switch-user"
+          text={ this.i18n('content.identity.switch-user.header') }/>
+        <Basic.Modal.Body>
+          <form onSubmit={ this.onSave.bind(this) }>
             <Basic.AbstractForm
               ref="form"
               showLoading={ showLoading }>
-
               <Advanced.IdentitySelect
                 ref="targetIdentity"
                 label={ this.i18n('content.identity.switch-user.username.label') }
@@ -88,27 +88,29 @@ class SwitchUser extends Basic.AbstractContent {
                 returnProperty="username"
                 emptyOptionLabel={ false }
                 forceSearchParameters={ forceSearchParameters }/>
-
             </Basic.AbstractForm>
-          </Basic.Modal.Body>
-          <Basic.Modal.Footer>
-            <Basic.Button
-              level="link"
-              showLoading={ showLoading }
-              onClick={ onHide }>
-              { this.i18n('button.close') }
-            </Basic.Button>
-            <Basic.Button
-              type="submit"
-              level="success"
-              showLoading={ showLoading }
-              showLoadingIcon
-              showLoadingText={ this.i18n('content.identity.switch-user.button.saving') }
-              rendered={ SecurityManager.hasAuthority('IDENTITY_SWITCHUSER') }>
-              { this.i18n('content.identity.switch-user.button.save') }
-            </Basic.Button>
-          </Basic.Modal.Footer>
-        </form>
+            {/* onEnter action - is needed because footer submit button is outside form */}
+            <input type="submit" className="hidden"/>
+          </form>
+        </Basic.Modal.Body>
+        <Basic.Modal.Footer>
+          <Basic.Button
+            level="link"
+            showLoading={ showLoading }
+            onClick={ onHide }>
+            { this.i18n('button.close') }
+          </Basic.Button>
+          <Basic.Button
+            type="submit"
+            level="success"
+            showLoading={ showLoading }
+            showLoadingIcon
+            showLoadingText={ this.i18n('content.identity.switch-user.button.saving') }
+            rendered={ SecurityManager.hasAuthority('IDENTITY_SWITCHUSER') }
+            onClick={ this.onSave.bind(this) }>
+            { this.i18n('content.identity.switch-user.button.save') }
+          </Basic.Button>
+        </Basic.Modal.Footer>
       </Basic.Modal>
     );
   }

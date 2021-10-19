@@ -24,10 +24,12 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityDisabledException;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityNotFoundException;
+import eu.bcvsolutions.idm.core.security.api.exception.IdmAuthenticationException;
 import eu.bcvsolutions.idm.core.security.api.filter.AbstractAuthenticationFilter;
 import eu.bcvsolutions.idm.core.security.api.service.GrantedAuthoritiesFactory;
 import eu.bcvsolutions.idm.core.security.api.service.JwtAuthenticationService;
-import eu.bcvsolutions.idm.core.security.api.exception.IdmAuthenticationException;
 
 /**
  * Authentication filter which enables Single-Sign-On (SSO) to IdM by a specific
@@ -101,13 +103,13 @@ public class SsoIdmAuthenticationFilter extends AbstractAuthenticationFilter {
 			// Find the corresponding identity
 			IdmIdentityDto identity = (IdmIdentityDto) lookupService.lookupDto(IdmIdentityDto.class, userName);
 			if (identity == null) {
-				throw new IdmAuthenticationException(MessageFormat.format(
+				throw new IdentityNotFoundException(MessageFormat.format(
 						"Check identity can login: The identity [{0}] either doesn't exist or is deleted.",
 						userName));
 			}
 			// identity is valid
 			if (identity.isDisabled()) {
-				throw new IdmAuthenticationException(MessageFormat.format(
+				throw new IdentityDisabledException(MessageFormat.format(
 						"Check identity can login: The identity [{0}] is disabled.", 
 						userName));
 			}

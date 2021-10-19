@@ -7,6 +7,16 @@ module.exports = {
       access: [ { type: 'PERMIT_ALL' } ]
     },
     {
+      path: 'cas-login-response',
+      component: require('./src/content/cas/CasLoginResponse'),
+      access: [ { type: 'PERMIT_ALL' } ]
+    },
+    {
+      path: 'cas-logout-response',
+      component: require('./src/content/cas/CasLogoutResponse'),
+      access: [ { type: 'PERMIT_ALL' } ]
+    },
+    {
       path: 'logout',
       component: require('./src/content/Logout'),
       access: [ { type: 'PERMIT_ALL' } ]

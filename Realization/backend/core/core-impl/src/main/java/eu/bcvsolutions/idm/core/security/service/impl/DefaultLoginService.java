@@ -27,6 +27,8 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmJwtAuthentication;
 import eu.bcvsolutions.idm.core.security.api.dto.IdmJwtAuthenticationDto;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityDisabledException;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityNotFoundException;
 import eu.bcvsolutions.idm.core.security.api.exception.IdmAuthenticationException;
 import eu.bcvsolutions.idm.core.security.api.service.JwtAuthenticationService;
 import eu.bcvsolutions.idm.core.security.api.service.LoginService;
@@ -83,24 +85,31 @@ public class DefaultLoginService implements LoginService {
 		}
 		
 		String username = securityService.getAuthentication().getCurrentUsername();
-		
 		LOG.info("Identity with username [{}] authenticating", username);
-		
+		//
 		IdmIdentityDto identity = identityService.getByUsername(username);
 		// identity doesn't exist
 		if (identity == null) {			
-			throw new IdmAuthenticationException(MessageFormat.format(
+			throw new IdentityNotFoundException(MessageFormat.format(
 					"Check identity can login: The identity "
 					+ "[{0}] either doesn't exist or is deleted.",
 					username));
 		}
-		
+		//
+		// prevent to create duplicate token for logged identity
+		IdmTokenDto preparedToken = tokenManager.getCurrentToken();
+		if (preparedToken == null 
+				|| !Objects.equals(preparedToken.getOwnerId(), identity.getId())) {
+			preparedToken = new IdmTokenDto();
+			preparedToken.setModuleId(CoreModuleDescriptor.MODULE_ID);
+		}
+		//
 		LoginDto loginDto = new LoginDto();
 		loginDto.setUsername(username);
 		loginDto = jwtAuthenticationService.createJwtAuthenticationAndAuthenticate(
 				loginDto, 
 				identity,
-				CoreModuleDescriptor.MODULE_ID);
+				preparedToken);
 		
 		LOG.info("Identity with username [{}] is authenticated", username);
 
@@ -125,7 +134,7 @@ public class DefaultLoginService implements LoginService {
 				LOG.debug(validationMessage);
 				return null;
 			}
-			throw new IdmAuthenticationException(validationMessage);
+			throw new IdentityNotFoundException(validationMessage);
 		}
 		// identity is valid
 		if (identity.isDisabled()) {
@@ -134,7 +143,7 @@ public class DefaultLoginService implements LoginService {
 				LOG.debug(validationMessage);
 				return null;
 			}
-			throw new IdmAuthenticationException(validationMessage);
+			throw new IdentityDisabledException(validationMessage);
 		}
 		// GuardedString isn't necessary password is in hash.
 		IdmPasswordDto password = passwordService.findOneByIdentity(identity.getId());

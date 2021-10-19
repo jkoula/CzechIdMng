@@ -26,8 +26,8 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.security.api.authentication.AbstractAuthenticator;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityNotFoundException;
 import eu.bcvsolutions.idm.core.security.api.service.JwtAuthenticationService;
-import eu.bcvsolutions.idm.core.security.api.exception.IdmAuthenticationException;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
@@ -72,7 +72,7 @@ public abstract class AbstractAccAuthenticator extends AbstractAuthenticator {
 	protected IdmIdentityDto getIdentity(LoginDto loginDto) {
 		IdmIdentityDto identity = (IdmIdentityDto) lookupService.lookupDto(IdmIdentityDto.class, loginDto.getUsername());
 		if (identity == null) {	
-			throw new IdmAuthenticationException(MessageFormat.format("Check identity can login: The identity [{0}] either doesn't exist or is deleted.", loginDto.getUsername()));
+			throw new IdentityNotFoundException(MessageFormat.format("Check identity can login: The identity [{0}] either doesn't exist or is deleted.", loginDto.getUsername()));
 		}
 		return identity;
 	}

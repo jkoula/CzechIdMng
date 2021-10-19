@@ -184,6 +184,10 @@ class Profile extends Basic.AbstractContent {
               showTwoFactorConfirm: twoFactorAuthenticationType,
               twoFactorRegistration,
               profile
+            }, () => {
+              if (this.refs.verificationCode) {
+                this.refs.verificationCode.focus();
+              }
             });
           }
         ));
@@ -576,7 +580,7 @@ class Profile extends Basic.AbstractContent {
               type="submit"
               level="success"
               showLoading={ showLoading }
-              onSubmit={ this.onTwoFactorConfirm.bind(this, showTwoFactorConfirm) }
+              onClick={ this.onTwoFactorConfirm.bind(this, showTwoFactorConfirm) }
               rendered={ showTwoFactorConfirm }>
               { this.i18n('button.enable.label') }
             </Basic.Button>

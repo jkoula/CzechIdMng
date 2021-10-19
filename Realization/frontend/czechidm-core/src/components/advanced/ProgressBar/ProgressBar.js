@@ -57,7 +57,7 @@ export default function ProgressBar(props) {
     });
     if (_barLabels.length > 0) {
       _label = [];
-      _label.push(i18n('component.basic.ProgressBar.start'));
+      _label.push(i18n('component.basic.ProgressBar.processed'));
       _barLabels.forEach(barLabel => {
         _label.push(barLabel);
       });

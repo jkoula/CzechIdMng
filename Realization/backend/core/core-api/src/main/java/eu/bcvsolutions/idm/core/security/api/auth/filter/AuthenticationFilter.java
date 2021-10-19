@@ -123,6 +123,10 @@ public class AuthenticationFilter extends GenericFilterBean {
 				BaseDtoController.BASE_PATH, // endpoint with supported services list
 				BaseDtoController.BASE_PATH + "/authentication", // login
 				BaseDtoController.BASE_PATH + "/authentication/two-factor", // login two factor
+				BaseDtoController.BASE_PATH + "/authentication/cas-login-request",
+				BaseDtoController.BASE_PATH + "/authentication/cas-login-response",
+				BaseDtoController.BASE_PATH + "/authentication/cas-logout-request",
+				BaseDtoController.BASE_PATH + "/authentication/cas-logout-response",
 				"/error/**",
 				BaseDtoController.BASE_PATH + "/doc", // documentation is public
 				BaseDtoController.BASE_PATH + "/doc/**"); // websockets has their own security configuration
@@ -190,7 +194,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 		List<String> tokens = new ArrayList<>();
 		String token = request.getParameter(filter.getTokenParameterName());
 		if (StringUtils.isNotBlank(token)) {
-			LOG.trace("Authorization token found in url parameter [{}].", filter.getTokenParameterName());
+			LOG.debug("Authorization token found in url parameter [{}].", filter.getTokenParameterName());
 			tokens.add(token);
 		}
 		tokens.addAll(HttpFilterUtils.getHeaders(request, filter.getAuthorizationHeaderName()));

@@ -7,7 +7,8 @@ import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
-import eu.bcvsolutions.idm.core.security.api.exception.IdmAuthenticationException;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityDisabledException;
+import eu.bcvsolutions.idm.core.security.api.exception.IdentityNotFoundException;
 import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
 
 /**
@@ -51,7 +52,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
 		Assert.hasLength(username, "Identity username is required.");
 		IdmIdentityDto identity = (IdmIdentityDto) lookupService.lookupDto(IdmIdentityDto.class, username);
 		//
-		// identity exists
+		// check identity exists
 		if (identity == null) {	
 			String validationMessage = MessageFormat.format("Check identity can login: The identity "
 					+ "[{0}] either doesn't exist or is deleted.", username);
@@ -59,17 +60,17 @@ public abstract class AbstractAuthenticator implements Authenticator {
 				LOG.debug(validationMessage);
 				return null;
 			}
-			throw new IdmAuthenticationException(validationMessage);
+			throw new IdentityNotFoundException(validationMessage);
 		}
 		//
-		// valid identity
+		// check valid identity
 		if (identity.isDisabled()) {
 			String validationMessage = MessageFormat.format("Check identity can login: The identity [{0}] is disabled.", username);
 			if (!propagateException) {
 				LOG.debug(validationMessage);
 				return null;
 			}
-			throw new IdmAuthenticationException(validationMessage);
+			throw new IdentityDisabledException(validationMessage);
 		}
 		//
 		return identity;

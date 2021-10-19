@@ -76,7 +76,17 @@ class NavigationMonitoring extends Basic.AbstractContent {
   }
 
   _fetchLastMonitoringResults(cb = null) {
-    this.context.store.dispatch(monitoringResultManager.fetchLastMonitoringResults(cb));
+    this.context.store.dispatch(monitoringResultManager.fetchLastMonitoringResults((json, error) => {
+      if (error) {
+        if (error.statusCode === 401 || error.statusCode === 403) {
+          this.addErrorMessage(error, { hidden: true });
+        } else {
+          this.addError(error);
+        }
+      } else if (cb) {
+        cb();
+      }
+    }));
   }
 
   _sendLongPollingRequest() {

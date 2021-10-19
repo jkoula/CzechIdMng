@@ -94,11 +94,11 @@ export default class SecurityManager {
    * Tries to authenticate by remote authority token.
    * In case of successful authentication sets the tokenCIDMST into userContext.
    */
-  remoteLogin(redirect) {
+  remoteLogin(redirect, token = null) {
     return (dispatch, getState) => {
       dispatch(this.requestRemoteLogin());
       //
-      authenticateService.remoteLogin()
+      authenticateService.remoteLogin(token)
         .then(json => this._handleUserAuthSuccess(dispatch, getState, redirect, json))
         .catch(error => dispatch(this.receiveRemoteLoginError(error, redirect)));
     };
@@ -154,6 +154,7 @@ export default class SecurityManager {
         return null;
       })
       .then(profile => {
+        const previousUserContext = getState().security.userContext || {};
         // construct logged user context
         const userContext = {
           id: json.authentication.currentIdentityId,
@@ -163,7 +164,8 @@ export default class SecurityManager {
           tokenCSRF: authenticateService.getCookie(TOKEN_COOKIE_NAME),
           authorities: json.authorities.map(authority => authority.authority),
           originalUsername: json.authentication.originalUsername,
-          isTryRemoteLogin: false
+          isTryRemoteLogin: true,
+          loginTargetPath: previousUserContext.loginTargetPath // preserve requested url before login
         };
         //
         // remove all messages (only logout could be fond in messages after logout)
@@ -232,14 +234,14 @@ export default class SecurityManager {
 
   receiveLogin(userContext, redirect) {
     return dispatch => {
-      // redirect after login, if needed
-      if (redirect) {
-        redirect(userContext.isAuthenticated);
-      }
       dispatch({
         type: RECEIVE_LOGIN,
         userContext
       });
+      // redirect after login, if needed
+      if (redirect) {
+        redirect(userContext.isAuthenticated, null, userContext);
+      }
     };
   }
 
@@ -263,12 +265,13 @@ export default class SecurityManager {
   receiveRemoteLoginError(error, redirect) {
     return (dispatch) => {
       // redirect after login, if needed
-      if (redirect) {
-        redirect(false, error);
-      }
       dispatch({
         type: RECEIVE_REMOTE_LOGIN_ERROR
       });
+      //
+      if (redirect) {
+        redirect(false, error);
+      }
     };
   }
 

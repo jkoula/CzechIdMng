@@ -1282,6 +1282,9 @@
         "logout": {
           "value": "Logout",
           "title": "Log out completely and continue on new logging"
+        },
+        "loginIdm": {
+          "label": "$t(content.login.header) by $t(app.name)"
         }
       },
       "twoFactor": {
@@ -1301,6 +1304,11 @@
       "title": "$t(content.logout.header)",
       "message": {
         "logout": "Log Out."
+      },
+      "button": {
+        "login": {
+          "label": "Sign in again"
+        }
       }
     },
     "password": {
@@ -7393,7 +7401,39 @@
     },
     "LOG_IN": {
       "title": "Session timeout",
-      "message": "Please log-in again."
+      "message": "Please sign in again."
+    },
+    "LOG_OUT_SUCCESS": {
+      "title": "Log out",
+      "message": "Log out was successful."
+    },
+    "LOG_IN_FAILED": {
+      "title": "Login failed",
+      "message": "Try to sign in again, please."
+    },
+    "CAS_TICKET_VALIDATION_FAILED": {
+      "title": "Login failed",
+      "message": "External login validation failed (CAS server). Try to log out and sign in again, please."
+    },
+    "CAS_LOGIN_SERVER_NOT_AVAILABLE": {
+      "title": "Login failed",
+      "message": "External authentication server (CAS server) is not available. Try to sign in again later or try to contact application administrator. If you are application administrator, you can sign in by $t(app.name)."
+    },
+    "CAS_LOGOUT_SERVER_NOT_AVAILABLE": {
+      "title": "Log out failed",
+      "message": "Log out from $t(app.name) was successful, but external authentication server (CAS server) is not available. Try to log out from external server (CAS) later, please."
+    },
+    "CAS_LOGIN_SERVER_URL_NOT_CONFIGURED": {
+      "title": "Login failed",
+      "message": "External authentication server (CAS server) is required, but not fully configured. Try to sign in again later or try to contact application administrator. If you are application administrator, you can sign in by $t(app.name)."
+    },
+    "CAS_LOGOUT_SERVER_URL_NOT_CONFIGURED": {
+      "title": "Log out",
+      "message": "Log out from $t(app.name) was successful. Log out from external authentication sercer (CAS) failed. External authentication server (CAS server) is required, but not fully configured. Try to log out again later or try to contact application administrator."
+    },
+    "CAS_IDM_LOGIN_ADMIN_ONLY": {
+      "title": "Login failed",
+      "message": "External authentication server (CAS server) is required. Application administrator can sign in by $t(app.name) only."
     },
     "XSRF": {
       "title": "Session timeout",

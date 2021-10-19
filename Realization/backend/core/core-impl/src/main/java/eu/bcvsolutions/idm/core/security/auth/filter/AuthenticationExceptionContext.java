@@ -22,7 +22,7 @@ import eu.bcvsolutions.idm.core.security.api.dto.IdmJwtAuthenticationDto;
  * necessary to parse the token again from the request.
  * 
  * @author Jan Helbich
- *
+ * @author Radek Tomiška
  */
 @Component
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)

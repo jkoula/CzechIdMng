@@ -4,9 +4,11 @@ import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import Joi from 'joi';
 import { Link } from 'react-router-dom';
+import _ from 'lodash';
 //
 import * as Basic from '../components/basic';
-import { SecurityManager, DataManager } from '../redux';
+import { SecurityManager, DataManager, ConfigurationManager } from '../redux';
+import { RestApiService } from '../services';
 import {
   getNavigationItems,
 } from '../redux/config/actions';
@@ -24,9 +26,12 @@ class Login extends Basic.AbstractContent {
 
   constructor(props, context) {
     super(props, context);
+    const { query } = this.props.location;
+    //
     this.state = {
       showTwoFactor: false,
-      token: null
+      token: null,
+      nocas: query && !!query.nocas
     };
   }
 
@@ -44,66 +49,122 @@ class Login extends Basic.AbstractContent {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.userContext !== this.props.userContext) {
-      if (nextProps.userContext.isAuthenticated) {
-        this._redirectLoggedUser();
-      }
+      this._tryRedirectLoggedUser();
     }
   }
 
   componentDidMount() {
     super.componentDidMount();
+    const { userContext, casEnabled, location } = this.props;
+    const { nocas } = this.state;
+    const _casEnabled = casEnabled && !nocas;
     //
-    this.refs.form.setData({});
+    if (!_casEnabled) {
+      const data = {};
+      if (userContext.isExpired) {
+        data.username = userContext.username;
+      }
+      this.refs.form.setData(data);
+    }
     //
-    const { userContext } = this.props;
     if (!SecurityManager.isAuthenticated(userContext) && userContext.isTryRemoteLogin) {
       this.context.store.dispatch(securityManager.remoteLogin((result, error) => {
-        if (error && error.statusEnum) {
-          if (error.statusEnum === 'MUST_CHANGE_IDM_PASSWORD') {
+        if (result) {
+          // ok - result = true
+          this._tryRedirectLoggedUser();
+        } else if (error && error.statusEnum && error.statusEnum === 'MUST_CHANGE_IDM_PASSWORD') {
+          // remember target url
+          this._rememberUrl(userContext, location);
+          // partialy ok - password has to be changed
+          this.context.store.dispatch(securityManager.receiveLogin(
+            _.merge({}, userContext, {
+              isTryRemoteLogin: true // cancel password change => try remote login again
+            })
+          ), () => {
             this.context.history.replace(`/password/change`);
-          }
-          if (error.statusEnum === 'TWO_FACTOR_AUTH_REQIURED') {
-            this.setState({
-              showTwoFactor: true,
-              token: error.parameters.token
-            }, () => {
-              if (this.refs.verificationCode) {
-                this.refs.verificationCode.focus();
-              }
-            });
-          }
+          });
+        } else if (error && error.statusEnum && error.statusEnum === 'TWO_FACTOR_AUTH_REQIURED') { // look out - remember url cannot be overiden
+          // partialy ok - two factor is required
+          this.setState({
+            showTwoFactor: true,
+            token: _casEnabled ? userContext.tokenCIDMST : error.parameters.token
+          }, () => {
+            this.context.store.dispatch(securityManager.receiveLogin(
+              _.merge({}, userContext, {
+                isTryRemoteLogin: true // cancel two factor => try remote login again
+              })
+            ));
+            if (this.refs.verificationCode) {
+              this.refs.verificationCode.focus();
+            }
+          });
+        } else if (_casEnabled) {
+          // remember target url
+          this._rememberUrl(userContext, location);
+          // redirect to cas login request
+          window.location.replace(RestApiService.getUrl('/authentication/cas-login-request'));
+        } else {
+          // remember target url
+          this._rememberUrl(userContext, location);
         }
-      }));
+      }, userContext.tokenCIDMST));
     } else {
-      // identity is logged => redirect to dashboard (#UNSAFE_componentWillReceiveProps is not called on the start)
-      this._redirectLoggedUser();
+      // redirect, if identity is logged => redirect to dashboard (#UNSAFE_componentWillReceiveProps is not called on the start)
+      this._tryRedirectLoggedUser();
     }
   }
 
-  _redirectLoggedUser() {
+  _tryRedirectLoggedUser() {
     // Redirection to requested page before login.
-    const { location } = this.props;
+    const { userContext, location } = this.props;
+    if (!SecurityManager.isAuthenticated(userContext)) {
+      return;
+    }
     // If current url is login, then redirect to main page.
-    if (location.pathname === '/login') {
+    const loginTargetPath = userContext.loginTargetPath || location.pathname;
+    if (loginTargetPath === '/login') {
       this.context.history.replace('/');
     } else {
-      this.context.history.replace(location.pathname);
+      this.context.history.replace(loginTargetPath);
     }
   }
 
-  handleSubmit(event) {
+  _rememberUrl(userContext, location) {
+    // remember target url
+    if (!userContext.isExpired) {
+      this.context.store.dispatch(securityManager.receiveLogin(
+        _.merge({}, userContext, {
+          loginTargetPath: location.pathname
+        })
+      ));
+    }
+  }
+
+  handleLogin(event) {
     if (event) {
       event.preventDefault();
     }
     if (!this.refs.form.isFormValid()) {
       return;
     }
+    const { userContext, location } = this.props;
     const formData = this.refs.form.getData();
     const username = formData.username;
     const password = formData.password;
+    //
+    // check userame is the same, after expiration =>   clear target path, if not
+    if (userContext.isExpired && username !== userContext.username) {
+      this.context.store.dispatch(securityManager.receiveLogin(
+        _.merge({}, userContext, { loginTargetPath: null })
+      ));
+    }
+    //
     this.context.store.dispatch(securityManager.login(username, password, (result, error) => {
       if (error && error.statusEnum) {
         if (error.statusEnum === 'MUST_CHANGE_IDM_PASSWORD') {
+          // remember target url
+          this._rememberUrl(userContext, location);
+          //
           this.context.store.dispatch(dataManager.storeData(SecurityManager.PASSWORD_MUST_CHANGE, password));
           this.context.history.replace(`/password/change?username=${ username }`);
         }
@@ -140,7 +201,11 @@ class Login extends Basic.AbstractContent {
             showTwoFactor: false
           }, () => {
             this.context.store.dispatch(dataManager.storeData(SecurityManager.PASSWORD_MUST_CHANGE, this.state.password));
-            this.context.history.replace(`/password/change?username=${ this.state.username }`);
+            if (this.state.username) {
+              this.context.history.replace(`/password/change?username=${ this.state.username }`);
+            } else {
+              this.context.history.replace(`/password/change`);
+            }
           });
         }
       } else {
@@ -149,6 +214,14 @@ class Login extends Basic.AbstractContent {
         });
       }
     }));
+  }
+
+  handleCancel(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    //
+    this.context.history.push('/logout');
   }
 
   getHelp() {
@@ -164,12 +237,13 @@ class Login extends Basic.AbstractContent {
   }
 
   render() {
-    const { userContext, navigation } = this.props;
-    const { showTwoFactor } = this.state;
+    const { userContext, navigation, casEnabled } = this.props;
+    const { showTwoFactor, nocas } = this.state;
+    const _casEnabled = casEnabled && !nocas;
     const items = getNavigationItems(navigation, null, 'main', userContext, null, true);
     //
     return (
-      <Basic.Div>
+      <div>
         <Helmet title={ this.i18n('title') } />
 
         <Basic.Div rendered={ showTwoFactor }>
@@ -193,7 +267,7 @@ class Login extends Basic.AbstractContent {
                   </Basic.AbstractForm>
                 </Basic.PanelBody>
                 <Basic.PanelFooter>
-                  <Basic.Button level="link" onClick={ () => this.setState({ showTwoFactor: false }) }>
+                  <Basic.Button level="link" onClick={ this.handleCancel.bind(this) }>
                     { this.i18n('button.cancel') }
                   </Basic.Button>
                   <Basic.Button type="submit" level="success">
@@ -205,105 +279,118 @@ class Login extends Basic.AbstractContent {
           </form>
         </Basic.Div>
 
-        <Basic.Div rendered={ !showTwoFactor }>
-          <form onSubmit={ this.handleSubmit.bind(this) }>
-            <Basic.Container component="main" maxWidth="xs">
-              <div className="login-container">
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <Basic.Avatar level="secondary">
-                    <Basic.Icon icon="component:password" />
-                  </Basic.Avatar>
-                  <h1 style={{ marginTop: 7, marginBottom: 15, fontWeight: 'normal' }}>
-                    { this.i18n('header') }
-                  </h1>
-                </div>
-                <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0 }} showLoading={ userContext.showLoading }>
-                  <Basic.TextField
-                    ref="username"
-                    label={ this.i18n('username') }
-                    required
-                    fullWidth
-                    size="normal"/>
-                  <Basic.TextField
-                    type="password"
-                    ref="password"
-                    label={ this.i18n('password') }
-                    required
-                    fullWidth
-                    size="normal"/>
+        {
+          !showTwoFactor && _casEnabled
+          ?
+          <Basic.Loading className="global" showLoading />
+          :
+          <>
+            <Basic.Div rendered={ !showTwoFactor }>
+              <form onSubmit={ this.handleLogin.bind(this) }>
+                <Basic.Container component="main" maxWidth="xs">
+                  <div className="login-container">
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <Basic.Avatar level="secondary">
+                        <Basic.Icon icon="component:password" />
+                      </Basic.Avatar>
+                      <h1 style={{ marginTop: 7, marginBottom: 15, fontWeight: 'normal' }}>
+                        { this.i18n('header') }
+                      </h1>
+                    </div>
+                    <Basic.Alert
+                      level="info"
+                      title={ this.i18n('error.LOG_IN.title') }
+                      text={ this.i18n('error.LOG_IN.message') }
+                      rendered={ userContext.isExpired }/>
+                    <Basic.AbstractForm ref="form" className="form-horizontal" style={{ padding: 0 }} showLoading={ userContext.showLoading }>
+                      <Basic.TextField
+                        ref="username"
+                        label={ this.i18n('username') }
+                        required
+                        fullWidth
+                        size="normal"/>
+                      <Basic.TextField
+                        type="password"
+                        ref="password"
+                        label={ this.i18n('password') }
+                        required
+                        fullWidth
+                        size="normal"/>
 
-                  <Basic.Button
-                    type="submit"
-                    level="success"
-                    fullWidth
-                    variant="contained"
-                    showLoading={ userContext.showLoading }>
-                    { this.i18n('button.login') }
-                  </Basic.Button>
+                      <Basic.Button
+                        type="submit"
+                        level="success"
+                        fullWidth
+                        variant="contained"
+                        showLoading={ userContext.showLoading }>
+                        { this.i18n('button.login') }
+                      </Basic.Button>
 
-                  <div style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
-                    {
-                      items.map(item => {
-                        if (item.to) {
-                          return (
-                            <Link
-                              to={ item.to }
-                              key={ `nav-item-${ item.id }` }
-                              onClick={ item.onClick }>
-                              <Basic.Icon value={ item.icon } style={{ marginRight: 5 }}/>
-                              { this.i18n(item.labelKey || item.label) }
-                            </Link>
-                          );
+                      <div style={{ marginTop: 15, display: 'flex', justifyContent: 'space-between' }}>
+                        {
+                          items.map(item => {
+                            if (item.to) {
+                              return (
+                                <Link
+                                  to={ item.to }
+                                  key={ `nav-item-${ item.id }` }
+                                  onClick={ item.onClick }>
+                                  <Basic.Icon value={ item.icon } style={{ marginRight: 5 }}/>
+                                  { this.i18n(item.labelKey || item.label) }
+                                </Link>
+                              );
+                            }
+                            //
+                            if (item.onClick) {
+                              return (
+                                <a
+                                  href="#"
+                                  key={ `nav-item-${ item.id }` }
+                                  onClick={ item.onClick }>
+                                  <Basic.Icon value={ item.icon } style={{ marginRight: 5 }}/>
+                                  { this.i18n(item.labelKey || item.label) }
+                                </a>
+                              );
+                            }
+                            //
+                            return null;
+                          })
                         }
-                        //
-                        if (item.onClick) {
-                          return (
-                            <a
-                              href="#"
-                              key={ `nav-item-${ item.id }` }
-                              onClick={ item.onClick }>
-                              <Basic.Icon value={ item.icon } style={{ marginRight: 5 }}/>
-                              { this.i18n(item.labelKey || item.label) }
-                            </a>
-                          );
-                        }
-                        //
-                        return null;
-                      })
-                    }
+                      </div>
+                    </Basic.AbstractForm>
                   </div>
-                </Basic.AbstractForm>
-              </div>
-            </Basic.Container>
-          </form>
-        </Basic.Div>
+                </Basic.Container>
+              </form>
+            </Basic.Div>
 
-        <div className="app-footer">
-          <Link
-            href={ `${ this.i18n('app.documentation.url') }/start`}
-            target="_blank"
-            rel="noopener noreferrer">
-            { this.i18n('app.helpDesk') }
-          </Link>
+            <div className="app-footer">
+              <Link
+                href={ `${ this.i18n('app.documentation.url') }/start`}
+                target="_blank"
+                rel="noopener noreferrer">
+                { this.i18n('app.helpDesk') }
+              </Link>
 
-          <span style={{ margin: '0 10px' }}>|</span>
+              <span style={{ margin: '0 10px' }}>|</span>
 
-          <Link
-            href="http://redmine.czechidm.com/projects/czechidmng"
-            target="_blank"
-            rel="noopener noreferrer">
-            { this.i18n('app.serviceDesk') }
-          </Link>
+              <Link
+                href="http://redmine.czechidm.com/projects/czechidmng"
+                target="_blank"
+                rel="noopener noreferrer">
+                { this.i18n('app.serviceDesk') }
+              </Link>
 
-          <span style={{ margin: '0 10px' }}>|</span>
+              <span style={{ margin: '0 10px' }}>|</span>
 
-          <Link
-            to="/about"
-            title={ this.i18n('content.about.link') }>
-            { this.i18n('content.about.link') }
-          </Link>
-        </div>
-      </Basic.Div>
+              <Link
+                to="/about"
+                title={ this.i18n('content.about.link') }>
+                { this.i18n('content.about.link') }
+              </Link>
+            </div>
+          </>
+        }
+      </div>
     );
   }
 }
@@ -322,7 +409,8 @@ function select(state) {
   return {
     i18nReady: state.config.get('i18nReady'),
     userContext: state.security.userContext,
-    navigation: state.config.get('navigation')
+    navigation: state.config.get('navigation'),
+    casEnabled: ConfigurationManager.getPublicValueAsBoolean(state, 'idm.pub.core.cas.enabled', false)
   };
 }
 

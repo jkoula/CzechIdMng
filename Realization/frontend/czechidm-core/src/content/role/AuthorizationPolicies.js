@@ -24,7 +24,7 @@ export default class AuthorizationPolicies extends Basic.AbstractContent {
     //
     return (
       <Basic.Div>
-        { this.renderContentHeader({ style: { marginBottom: 0 }}) }
+        { this.renderContentHeader() }
 
         <Basic.Panel className="no-border last">
           <AuthorizationPolicyTable

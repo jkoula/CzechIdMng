@@ -47,9 +47,20 @@ export default class AuthenticateService {
       .then(this._handleOptionalErrorModel);
   }
 
-  remoteLogin() {
+  /**
+   * Try remote login is available.
+   *
+   * @param  {string} cidmst token
+   * @return {promise}
+   */
+  remoteLogin(token = null) {
+    let _remoteAuthPath = remoteAuthPath;
+    if (token) {
+      _remoteAuthPath = `${ _remoteAuthPath }?cidmst=${ token }`;
+    }
+    //
     return RestApiService
-      .get(remoteAuthPath)
+      .get(_remoteAuthPath)
       .then(response => response.json())
       .then(this._handleOptionalErrorModel);
   }

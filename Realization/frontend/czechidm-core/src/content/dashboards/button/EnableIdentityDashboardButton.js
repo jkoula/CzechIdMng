@@ -72,8 +72,12 @@ class EnableIdentityDashboardButton extends Advanced.AbstractIdentityDashboardBu
 
   renderConfirm() {
     return (
-      <Basic.Confirm ref="confirm-enable" level="success" />
+      <Basic.Confirm ref="confirm-enable" level={ this.getLevel() } />
     );
+  }
+
+  getLevel() {
+    return 'success';
   }
 }
 
