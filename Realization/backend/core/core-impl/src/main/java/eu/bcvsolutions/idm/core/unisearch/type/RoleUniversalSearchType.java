@@ -7,8 +7,12 @@ import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractUniversalSearchType;
+import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,6 +36,13 @@ public class RoleUniversalSearchType extends AbstractUniversalSearchType<IdmRole
 	@Override
 	public Class<IdmRoleDto> getOwnerType() {
 		return IdmRoleDto.class;
+	}
+
+	@Override
+	protected Pageable getPageable(Pageable pageable) {
+		Sort sort = new Sort(Sort.Direction.ASC, IdmRole_.code.getName());
+
+		return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 	}
 
 	protected IdmRoleFilter createFilter(String text) {

@@ -67,6 +67,10 @@ const useStyles = makeStyles((theme) => {
         },
         '& .Select-option': {
           backgroundColor: theme.palette.background.paper,
+          paddingLeft: 8,
+          paddingRight: 8,
+          paddingTop: 4,
+          paddingBottom: 4,
           '&:hover': {
             backgroundColor: theme.palette.type === 'dark' ? '#515151' : theme.palette.action.hover
           },
@@ -75,6 +79,10 @@ const useStyles = makeStyles((theme) => {
           },
           '&.Uni-search-header': {
             backgroundColor: theme.palette.background.paper
+          },
+          '& .Uni-search-header': {
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.disabled
           }
         },
         '& .Select-menu-outer': {

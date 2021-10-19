@@ -23,7 +23,7 @@ export default class AbstractUniversalSearchType extends AbstractContextComponen
     return this.i18n('component.advanced.AbstractUniversalSearchType.label');
   }
 
-  getLink(searchValue) {
+  getLink() {
     return null;
   }
 
@@ -41,8 +41,7 @@ export default class AbstractUniversalSearchType extends AbstractContextComponen
   render() {
     const {
       universalSearchType,
-      header,
-      isLast
+      header
     } = this.props;
 
     if (header) {
@@ -50,19 +49,22 @@ export default class AbstractUniversalSearchType extends AbstractContextComponen
       return (
         // eslint-disable-next-line jsx-a11y/no-static-element-interactions
         <div onMouseDown={this._stopPropagationMouseDown.bind(this)}>
-          <div style={{display: 'flex', marginBottom: -8}}>
-            <span style={{
-              width: '100%',
-              textAlign: 'center',
-              flex: 1
-            }}>
+          <div style={{
+            paddingTop: 5}}>
+            <span
+              className="Uni-search-header"
+              style={{
+                paddingLeft: 3,
+                paddingRight: 3
+              }}>
               <Icon
                 level={this.getLevel()}
+                rendered={false}
                 value={this.getIcon()}/>
-              {`\u00A0${this.getLabel()}:`}
+              {`${this.getLabel()}`}
             </span>
           </div>
-          <hr style={{marginTop: 8, marginBottom: 0}}/>
+          <hr style={{marginTop: -10, marginBottom: 5, marginLeft: -8, marginRight: -8}}/>
         </div>
       );
     }
@@ -70,15 +72,15 @@ export default class AbstractUniversalSearchType extends AbstractContextComponen
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div onMouseDown={this._stopPropagationMouseDown.bind(this)}>
-        <div style={{display: 'flex'}}>
+        <div>
           <span style={{
             width: '100%',
             textAlign: 'center',
             flex: 1
           }}>
-            {this.i18n('component.advanced.AbstractUniversalSearchType.showAllLabel')}
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+            {`${this.i18n('component.advanced.AbstractUniversalSearchType.showAllLabel')}\u00A0`}
             (
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
             <a onClick={this._onClick.bind(this)}>
               {universalSearchType.count}
             </a>
@@ -95,8 +97,6 @@ AbstractUniversalSearchType.propTypes = {
   ...AbstractContextComponent.propTypes,
   /**
    * Universal search type.
-   *
-   * @type {UniversalSearchDto}
    */
   universalSearchType: PropTypes.object.isRequired,
   /**

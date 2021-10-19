@@ -50,9 +50,15 @@ public abstract class AbstractUniversalSearchType<DTO extends AbstractDto, F ext
 		}
 		F filter = createFilter(text);
 		
+		pageable = getPageable(pageable);
+		
 		return getService().find(filter, pageable, permission);
 	}
-	
+
+	protected Pageable getPageable(Pageable pageable){
+		return pageable;
+	}
+
 	protected boolean hasPermissions(BasePermission[] permission) {
 		return true;
 	}

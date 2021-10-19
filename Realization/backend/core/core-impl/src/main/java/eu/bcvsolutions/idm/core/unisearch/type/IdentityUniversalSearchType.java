@@ -7,9 +7,13 @@ import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractUniversalSearchType;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,6 +53,13 @@ public class IdentityUniversalSearchType extends AbstractUniversalSearchType<Idm
 		}
 		filter.setText(text);
 		return filter;
+	}
+
+	@Override
+	protected Pageable getPageable(Pageable pageable) {
+		Sort sort = new Sort(Sort.Direction.ASC, IdmIdentity_.username.getName());
+		
+		return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 	}
 
 	@Override
