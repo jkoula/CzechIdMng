@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 //
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+//
 import * as Basic from '../../basic';
 
 /**
@@ -28,11 +31,12 @@ export default class CloseButton extends Basic.AbstractContextComponent {
     }
     //
     return (
-      <Basic.Button
-        icon="fa:times"
-        style={{ color: '#ccc', marginLeft: 5, cursor: 'pointer' }}
+      <IconButton
+        style={{ color: '#ccc' }}
         title={ this.i18n('title') }
-        onClick={ () => this.context.history.push(to) } />
+        onClick={ () => this.context.history.push(to) }>
+        <CloseIcon/>
+      </IconButton>
     );
   }
 }

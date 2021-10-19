@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import AppBar from '@material-ui/core/AppBar';
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 
@@ -53,38 +54,40 @@ export default function BasicTabs(props) {
   }
   const value = onSelect ? activeKey : _mergedActiveKey;
   //
+  // indicatorColor="primary"
+  // textColor="primary"
   return (
     <div>
-      <Tabs
-        value={ value }
-        indicatorColor="primary"
-        textColor="primary"
-        onChange={ handleChange }
-        aria-label="basic tabs"
-        className={ className }
-        style={ style }>
-        {
-          _children.map((child, index) => {
-            const eventKey = child.props.eventKey || index;
-            //
-            return (
-              <Tab
-                id={ `basic-tab-${ eventKey }` }
-                value={ eventKey }
-                aria-controls={ `basic-tabpanel-${ eventKey }` }
-                disabled={ child.props.disabled }
-                className={
-                  classnames(
-                    { [classes.activeTab]: value === eventKey },
-                    className
-                  )
-                }
-                style={ child.props.style }
-                label={ child.props.title }/>
-            );
-          })
-        }
-      </Tabs>
+      <AppBar position="static">
+        <Tabs
+          value={ value }
+          onChange={ handleChange }
+          aria-label="basic tabs"
+          className={ className }
+          style={ style }>
+          {
+            _children.map((child, index) => {
+              const eventKey = child.props.eventKey || index;
+              //
+              return (
+                <Tab
+                  id={ `basic-tab-${ eventKey }` }
+                  value={ eventKey }
+                  aria-controls={ `basic-tabpanel-${ eventKey }` }
+                  disabled={ child.props.disabled }
+                  className={
+                    classnames(
+                      { [classes.activeTab]: value === eventKey },
+                      className
+                    )
+                  }
+                  style={ child.props.style }
+                  label={ child.props.title }/>
+              );
+            })
+          }
+        </Tabs>
+      </AppBar>
       {
         _children.map((child, index) => {
           const eventKey = child.props.eventKey || index;

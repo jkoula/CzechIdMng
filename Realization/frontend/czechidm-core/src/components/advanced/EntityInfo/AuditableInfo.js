@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 //
+import SettingsIcon from '@material-ui/icons/Settings';
+import IconButton from '@material-ui/core/IconButton';
+//
 import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
 import { ConfigurationManager, SecurityManager, AuditManager, DataManager } from '../../../redux';
@@ -180,15 +183,15 @@ export class AuditableInfo extends Basic.AbstractContextComponent {
     //
     return (
       <Basic.Popover
-        trigger={ ['click'] }
+        trigger="click"
         placement={ placement }
         value={ this._renderFull(entity) }
         className="abstract-entity-info-popover">
-        {
-          <span className="popover-link" title={ this.i18n('link.title') }>
-            <Basic.Button icon="fa:cog" style={{ color: '#ccc' }} />
-          </span>
-        }
+        <IconButton
+          style={{ color: '#ccc' }}
+          title={ this.i18n('link.title') }>
+          <SettingsIcon/>
+        </IconButton>
       </Basic.Popover>
     );
   }

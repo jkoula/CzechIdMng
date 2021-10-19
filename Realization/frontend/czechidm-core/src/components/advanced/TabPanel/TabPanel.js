@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router';
 import classnames from 'classnames';
 import _ from 'lodash';
 //
 import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 //
 import TabPanelItem from './TabPanelItem';
 import { getNavigationItems, resolveNavigationParameters } from '../../../redux/config/actions';
@@ -38,8 +42,10 @@ export default function TabPanel(props) {
   const userContext = useSelector((state) => state.security.userContext);
   const navigation = useSelector((state) => state.config.get('navigation'));
   const selectedNavigationItems = useSelector((state) => state.config.get('selectedNavigationItems'));
+  const history = useHistory();
   const classes = useStyles();
   //
+  let activeItemId = null;
   const navigationItems = [...getNavigationItems(navigation, parentId, null, userContext, match.params).map(item => {
     // resolve label
     const labelParams = resolveNavigationParameters(userContext, match.params);
@@ -58,17 +64,38 @@ export default function TabPanel(props) {
       item.to = `/${ Utils.Ui.trimSlash(item.to) }`;
     }
     const active = _.includes(selectedNavigationItems, item.id);
+    if (active) {
+      activeItemId = item.id;
+    }
     //
     switch (item.type) {
       case 'TAB':
       case 'DYNAMIC': {
+        if (position === 'top') {
+          return (
+            <Tab
+              id={ `advanced-tab-${ item.id }` }
+              label={ label }
+              value={ item.id }
+              disabled={ item.disabled }
+              icon={
+                item.icon
+                ?
+                <Basic.Icon icon={ item.icon } color={ item.iconColor }/>
+                :
+                null
+              }
+              title={ i18n(item.titleKey, { defaultValue: item.title }) }
+              onClick={ () => history.push(item.to) }/>
+          );
+        }
         return (
           <TabPanelItem
-            id={`nav-item-${item.id}`}
-            key={`nav-item-${item.id}`}
-            to={item.to}
-            icon={item.icon}
-            iconColor={item.iconColor}
+            id={ `nav-item-${item.id}` }
+            key={ `nav-item-${item.id}` }
+            to={ item.to }
+            icon={ item.icon }
+            iconColor={ item.iconColor }
             title={ i18n(item.titleKey, { defaultValue: item.title }) }
             active={ active }
             className={ active ? classes.activeItem : null }>
@@ -85,9 +112,13 @@ export default function TabPanel(props) {
   if (position === 'top') {
     return (
       <div className="tab-horizontal">
-        <ul className="nav nav-tabs">
-          { navigationItems }
-        </ul>
+        <AppBar position="static">
+          <Tabs
+            value={ activeItemId }
+            aria-label="advanced tabs">
+            { navigationItems }
+          </Tabs>
+        </AppBar>
         <div className={ classnames(classes.content, 'tab-content') }>
           <div className="tab-pane active">
             { children }

@@ -173,12 +173,11 @@ class RoleDetail extends Basic.AbstractContent {
     requestsForceSearch = requestsForceSearch.setFilter('states', ['IN_PROGRESS', 'CONCEPT', 'EXCEPTION']);
     //
     return (
-      <Basic.Div>
+      <Basic.Div style={{ paddingTop: 15 }}>
         <Helmet title={ Utils.Entity.isNew(entity) ? this.i18n('create.header') : this.i18n('edit.title') } />
         <Basic.Tabs
           activeKey={ activeKey }
-          onSelect={ this._onChangeSelectTabs.bind(this)}
-          style={{ paddingTop: 15 }}>
+          onSelect={ this._onChangeSelectTabs.bind(this)}>
           <Basic.Tab eventKey={ 1 } title={ this.i18n('entity.Role._type') } className="bordered">
             <form onSubmit={ this.save.bind(this, 'CONTINUE') }>
               <Basic.Panel className="no-border last">

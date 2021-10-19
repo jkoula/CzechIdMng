@@ -28,7 +28,8 @@ const useStyles = makeStyles(() => ({
     padding: 3 // ~ backward compatible
   },
   typography: {
-    display: 'inline-block'
+    display: 'inline-block',
+    fontSize: 'inherit'
   }
 }));
 
