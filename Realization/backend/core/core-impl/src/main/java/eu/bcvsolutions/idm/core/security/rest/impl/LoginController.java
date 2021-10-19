@@ -1,7 +1,5 @@
 package eu.bcvsolutions.idm.core.security.rest.impl;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
