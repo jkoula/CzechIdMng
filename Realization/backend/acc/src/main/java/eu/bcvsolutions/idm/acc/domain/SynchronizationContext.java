@@ -79,6 +79,7 @@ public class SynchronizationContext implements Serializable {
 	private SynchronizationActionType actionType;
 	private boolean skipEntityUpdate = false;
 	private boolean skipProvisioning = false;
+	private boolean onlyMissingAccount = false;
 	private Integer protectionInterval;
 	private AbstractDto entityDto;
 	// Properties - map for additionally data. Good as cache for contract ...
@@ -292,7 +293,22 @@ public class SynchronizationContext implements Serializable {
 		this.properties.put(key, object);
 		return this;
 	}
-	
+
+	/**
+	 * If true, then only 'missing account' action will be performed.
+	 * Goal is optimisation when 'missing entity', 'linked' and 'unlinked' actions are sets to 'IGNORE'.
+	 * 
+	 * This is implemented only for reconciliation!
+	 */
+	public SynchronizationContext addOnlyMissingAccount(boolean onlyMissingAccount) {
+		this.onlyMissingAccount = onlyMissingAccount;
+		return this;
+	}
+
+	public boolean isOnlyMissingAccount() {
+		return this.onlyMissingAccount;
+	}
+
 	public Map<String, Object> getProperties() {
 		return this.properties;
 	}
@@ -331,9 +347,9 @@ public class SynchronizationContext implements Serializable {
 		.addUid(context.getUid())
 		.addGeneratedUid(context.getGeneratedUid())
 		.addActionType(context.getActionType())
-		.addProtectionInterval(context.getProtectionInterval());
+		.addProtectionInterval(context.getProtectionInterval())
+		.addOnlyMissingAccount(context.isOnlyMissingAccount());
 		
 		return newContext;
 	}
-
 }

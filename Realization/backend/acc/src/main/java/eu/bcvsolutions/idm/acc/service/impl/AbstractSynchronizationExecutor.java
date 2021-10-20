@@ -273,6 +273,13 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 				IcFilter filter = resolveSynchronizationFilter(config);
 				log.addToLog(MessageFormat.format("Start search with filter [{0}].", filter != null ? filter : "NONE"));
 
+				if (SynchronizationMissingEntityActionType.IGNORE == config.getMissingEntityAction()
+						&& SynchronizationLinkedActionType.IGNORE == config.getLinkedAction()
+						&& SynchronizationUnlinkedActionType.IGNORE == config.getUnlinkedAction()) {
+					context.addOnlyMissingAccount(true);
+					log.addToLog("'Missing entity', 'linked' and 'unlinked' actions are sets to IGNORE. Only missing accounts action will be performed. No logs will be made for this three ignored actions.");
+				}
+				
 				connectorFacade.search(systemService.getConnectorInstance(system), connectorConfig, objectClass, filter,
 						new DefaultResultHandler(context, systemAccountsList));
 			} else {
@@ -698,85 +705,6 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 						syncItemLogService.save(itemLog);
 					}
 				}
-			}
-		}
-	}
-
-	/**
-	 * Start export item (entity) to target resource
-	 *
-	 * @param context
-	 * @param uidAttribute
-	 * @param entity
-	 */
-	protected void exportEntity(SynchronizationContext context, SysSystemAttributeMappingDto uidAttribute,
-			AbstractDto entity) {
-		SystemEntityType entityType = context.getEntityType();
-		AbstractSysSyncConfigDto config = context.getConfig();
-		SysSyncLogDto log = context.getLog();
-		List<SysSyncActionLogDto> actionsLog = context.getActionLogs();
-		SysSystemDto system = context.getSystem();
-		SysSyncItemLogDto itemLog = new SysSyncItemLogDto();
-		try {
-			// Default setting for log item
-			itemLog.setIdentification(entity.getId().toString());
-			itemLog.setDisplayName(this.getDisplayNameForEntity(entity));
-			itemLog.setType(entityType.getEntityType().getSimpleName());
-			itemLog.addToLog(
-					MessageFormat.format("Start export for entity [{0}].", this.getDisplayNameForEntity(entity)));
-
-			UUID accountId = this.getAccountByEntity(entity.getId(), system.getId());
-			if (accountId != null) {
-				initSyncActionLog(SynchronizationActionType.CREATE_ACCOUNT, OperationResultType.IGNORE, itemLog, log,
-						actionsLog);
-				itemLog.addToLog(MessageFormat.format(
-						"For entity [{0}] AccAccount [{1}] was found. Export for this entity ends (only entity without AccAccount can be exported)!",
-						this.getDisplayNameForEntity(entity), accountId));
-				return;
-			}
-
-			String uid = systemAttributeMappingService.generateUid(entity, uidAttribute);
-
-			// Do export for one item (produces event)
-			// Start in new Transaction
-			context.addUid(uid) //
-					.addConfig(config) //
-					.addSystem(system) //
-					.addEntityType(entityType) //
-					.addEntityId(entity.getId()).addLog(log) //
-					.addLogItem(itemLog) //
-					.addActionLogs(actionsLog) //
-					.addExportAction(true);
-
-			CoreEvent<SysSyncItemLogDto> event = new CoreEvent<>(SynchronizationEventType.START_ITEM,
-					itemLog);
-			event.getProperties().put(SynchronizationService.WRAPPER_SYNC_ITEM, context);
-			EventResult<SysSyncItemLogDto> lastResult = entityEventManager.process(event).getLastResult();
-			boolean result = false;
-			if (lastResult != null
-					&& lastResult.getEvent().getProperties().containsKey(SynchronizationService.RESULT_SYNC_ITEM)) {
-				result = (boolean) lastResult.getEvent().getProperties().get(SynchronizationService.RESULT_SYNC_ITEM);
-			}
-
-			// Update (increased counter) and check state of sync (maybe was cancelled from
-			// sync or LRT)
-			updateAndCheckState(result, log);
-
-		} catch (Exception ex) {
-			String message = MessageFormat.format("Export - error for entity [{0}]", entity.getId());
-			log.addToLog(message);
-			log.addToLog(Throwables.getStackTraceAsString(ex));
-			LOG.error(message, ex);
-		} finally {
-			synchronizationConfigService.save(config);
-			boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
-			actionsLog = (List<SysSyncActionLogDto>) syncActionLogService.saveAll(actionsLog);
-			//
-			if (!existingItemLog) {
-				addToItemLog(itemLog, MessageFormat.format("Missing action log for entity [{0}]!", entity.getId()));
-				initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
-						actionsLog);
-				syncItemLogService.save(itemLog);
 			}
 		}
 	}
@@ -2474,6 +2402,11 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			if (context.getConfig().isReconciliation()) {
 				systemAccountsList.add(uid);
 			}
+			
+			if (context.isOnlyMissingAccount()) {
+				// Only 'missing account' mode is activated.
+				return true;
+			}
 
 			SynchronizationContext itemContext = cloneItemContext(context);
 			itemContext //
@@ -2621,6 +2554,14 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	 * @return
 	 */
 	private List<SysSyncActionLogDto> saveActionLogs(List<SysSyncActionLogDto> actionsLog, UUID syncLogId) {
+		Assert.notNull(actionsLog, "Action logs cannot be null!");
+		// Log items for ignored actions will be not created (performance reason).
+//		actionsLog.stream()
+//				.filter(actionLog -> OperationResultType.IGNORE == actionLog.getOperationResult())
+//				.forEach(ignoredActionLog -> {
+//			ignoredActionLog.getLogItems().clear();
+//		});
+		
 		syncActionLogService.saveAll(actionsLog);
 		SysSyncActionLogFilter actionFilter = new SysSyncActionLogFilter();
 		actionFilter.setSynchronizationLogId(syncLogId);

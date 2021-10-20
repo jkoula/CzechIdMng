@@ -329,7 +329,7 @@ public class DefaultRoleSynchronizationServiceTest extends AbstractIntegrationTe
 		SysSyncActionLogFilter actionLogFilter = new SysSyncActionLogFilter();
 		actionLogFilter.setSynchronizationLogId(log.getId());
 		List<SysSyncActionLogDto> actions = syncActionLogService.find(actionLogFilter, null).getContent();
-		Assert.assertEquals(2, actions.size());
+		Assert.assertEquals(1, actions.size());
 
 		SysSyncActionLogDto actionLog = actions.stream().filter(action -> {
 			return SynchronizationActionType.DELETE_ENTITY == action.getSyncAction();
