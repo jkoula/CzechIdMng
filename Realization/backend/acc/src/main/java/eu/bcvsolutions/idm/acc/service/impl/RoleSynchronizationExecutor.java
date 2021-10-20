@@ -10,8 +10,29 @@ import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
-import eu.bcvsolutions.idm.acc.dto.*;
-import eu.bcvsolutions.idm.acc.dto.filter.*;
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccRoleAccountDto;
+import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
+import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncActionLogDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncItemLogDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncLogDto;
+import eu.bcvsolutions.idm.acc.dto.SysSyncRoleConfigDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccRoleAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.EntityAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysSyncRoleConfig_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
@@ -695,25 +716,31 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 		}
 		count[0]++;
 
-		// Need to find account using SysSystemEntityDto uid, because uid of AccIdentityAccountDto can be different
+		// Need to find account using SysSystemEntityDto uid, because uid of AccAccountDto can be different.
 		SysSystemEntityFilter entityFilter = new SysSystemEntityFilter();
 		entityFilter.setEntityType(SystemEntityType.IDENTITY);
 		entityFilter.setSystemId(userSystemDto.getId());
 		entityFilter.setUid(uid);
-		final UUID systemEntityUuid = systemEntityService.findIds(entityFilter, null).stream().findFirst().orElse(null);
-		if (systemEntityUuid == null) {
+		SysSystemEntityDto systemEntity = systemEntityService.find(entityFilter, null)
+				.stream()
+				.findFirst()
+				.orElse(null);
+		if (systemEntity == null) {
 			return;
 		}
 
 		AccAccountFilter accAccountFilter = new AccAccountFilter();
-		accAccountFilter.setSystemEntityId(systemEntityUuid);
-		final UUID accAccountUid = accountService.findIds(accAccountFilter, null).stream().findFirst().orElse(null);
-		if (accAccountUid == null) {
+		accAccountFilter.setSystemEntityId(systemEntity.getId());
+		final UUID accAccountId = accountService.findIds(accAccountFilter, null)
+				.stream()
+				.findFirst()
+				.orElse(null);
+		if (accAccountId == null) {
 			return;
 		}
 
 		AccIdentityAccountFilter identityAccountWithoutRelationFilter = new AccIdentityAccountFilter();
-		identityAccountWithoutRelationFilter.setAccountId(accAccountUid);
+		identityAccountWithoutRelationFilter.setAccountId(accAccountId);
 		AccIdentityAccountDto identityAccountDto = identityAccountService.find(identityAccountWithoutRelationFilter, null).getContent()
 				.stream()
 				.findFirst()
