@@ -1,4 +1,4 @@
-package eu.bcvsolutions.idm.core.security;
+package eu.bcvsolutions.idm.core.security.rest.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -19,31 +19,44 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import eu.bcvsolutions.idm.core.api.config.domain.CasConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.PublicCasConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmPasswordDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTokenDto;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
+import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmPasswordService;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
+import eu.bcvsolutions.idm.core.model.event.processor.module.InitTestDataProcessor;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.domain.IdentityBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.TwoFactorAuthenticationType;
 import eu.bcvsolutions.idm.core.security.api.dto.DefaultGrantedAuthorityDto;
+import eu.bcvsolutions.idm.core.security.api.dto.IdmJwtAuthenticationDto;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
 import eu.bcvsolutions.idm.core.security.api.dto.TwoFactorRegistrationResponseDto;
 import eu.bcvsolutions.idm.core.security.api.exception.TwoFactorAuthenticationRequiredException;
@@ -51,7 +64,6 @@ import eu.bcvsolutions.idm.core.security.api.filter.IdmAuthenticationFilter;
 import eu.bcvsolutions.idm.core.security.api.service.LoginService;
 import eu.bcvsolutions.idm.core.security.api.service.TokenManager;
 import eu.bcvsolutions.idm.core.security.api.service.TwoFactorAuthenticationManager;
-import eu.bcvsolutions.idm.core.security.rest.impl.LoginController;
 import eu.bcvsolutions.idm.core.security.service.impl.JwtAuthenticationMapper;
 import eu.bcvsolutions.idm.test.api.AbstractRestTest;
 import eu.bcvsolutions.idm.test.api.TestHelper;
@@ -67,18 +79,22 @@ public class LoginControllerRestTest extends AbstractRestTest {
 
 	@Autowired private IdmPasswordService passwordService;
 	@Autowired private LoginController loginController;
+	@Autowired private LogoutController logoutController;
 	@Autowired private LoginService loginService;
 	@Autowired private TokenManager tokenManager;
 	@Autowired private JwtAuthenticationMapper jwtTokenMapper;
 	@Autowired private IdmIdentityService identityService;
 	@Autowired private RoleConfiguration roleConfiguration;
 	@Autowired private TwoFactorAuthenticationManager twoFactorAuthenticationManager;
+	@Autowired private PublicCasConfiguration publicCasConfiguration;
 	//
-	private ObjectMapper mapper = new ObjectMapper();
+	@Mock private RestTemplate restTemplate;
 	
 	@Before
 	public void init() {
 		this.logout();
+		//
+		loginController.setRestTemplate(restTemplate);
 	}
 	
 	@After
@@ -114,7 +130,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", identity.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -148,7 +164,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", identity.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -184,7 +200,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", manager.getUsername());
 		login.put("password", manager.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -238,7 +254,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		getMockMvc()
 				.perform(post(BaseController.BASE_PATH + "/identities")
 						.param(IdmAuthenticationFilter.AUTHENTICATION_TOKEN_NAME, token)
-						.content(mapper.writeValueAsString(createIdentity))
+						.content(getMapper().writeValueAsString(createIdentity))
 						.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentType(TestHelper.HAL_CONTENT_TYPE))
@@ -286,7 +302,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", TestHelper.ADMIN_USERNAME);
 		login.put("password", TestHelper.ADMIN_PASSWORD);
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -322,7 +338,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", manager.getUsername());
 		login.put("password", manager.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -411,7 +427,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", identity.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -459,7 +475,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		//
 		// login as identity again
 		response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isUnauthorized())
@@ -468,7 +484,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
                 .getContentAsString();
 		//
 		// get token form response
-		token = mapper.readTree(response).get("_errors").get(0).get("parameters").get("token").asText();
+		token = getMapper().readTree(response).get("_errors").get(0).get("parameters").get("token").asText();
 		Assert.assertNotNull(token);
 		//
 		// two factor authentication
@@ -510,7 +526,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", identity.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -558,7 +574,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		//
 		// login as identity again
 		response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isUnauthorized())
@@ -567,7 +583,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
                 .getContentAsString();
 		//
 		// get token form response
-		token = mapper.readTree(response).get("_errors").get(0).get("parameters").get("token").asText();
+		token = getMapper().readTree(response).get("_errors").get(0).get("parameters").get("token").asText();
 		Assert.assertNotNull(token);
 		//
 		// try to load identities with invalid token
@@ -590,7 +606,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", identity.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -642,7 +658,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		//
 		// login as identity again
 		response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isUnauthorized())
@@ -651,7 +667,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
                 .getContentAsString();
 		//
 		// get token form response
-		token = mapper.readTree(response).get("_errors").get(0).get("parameters").get("token").asText();
+		token = getMapper().readTree(response).get("_errors").get(0).get("parameters").get("token").asText();
 		Assert.assertNotNull(token);
 		//
 		// two factor authentication
@@ -679,7 +695,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", identity.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -752,7 +768,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", identity.getUsername());
 		login.put("password", password.asString());
 		getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isUnauthorized());
@@ -769,7 +785,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		login.put("username", manager.getUsername());
 		login.put("password", manager.getPassword().asString());
 		String response = getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isOk())
@@ -795,29 +811,183 @@ public class LoginControllerRestTest extends AbstractRestTest {
 				.andExpect(status().is4xxClientError());
 	}
 	
+	@Test
+	public void testSuccesfulLogIn() throws Exception {
+		LoginDto loginDto = new LoginDto();
+		loginDto.setUsername(TestHelper.ADMIN_USERNAME);
+		loginDto.setPassword(new GuardedString(TestHelper.ADMIN_PASSWORD));
+		Resource<LoginDto> response = loginController.login(loginDto);
+		
+		IdmJwtAuthenticationDto authentication = response.getContent().getAuthentication();
+		
+		Assert.assertNotNull(authentication);
+		Assert.assertEquals(TestHelper.ADMIN_USERNAME, authentication.getCurrentUsername());
+		Assert.assertEquals(TestHelper.ADMIN_USERNAME, authentication.getOriginalUsername());
+	}
+	
+	@Test
+	public void testSuccesfulLogout() throws Exception {
+		LoginDto loginDto = new LoginDto();
+		loginDto.setUsername(TestHelper.ADMIN_USERNAME);
+		loginDto.setPassword(new GuardedString(TestHelper.ADMIN_PASSWORD));
+		Resource<LoginDto> response = loginController.login(loginDto);
+		
+		IdmJwtAuthenticationDto authentication = response.getContent().getAuthentication();
+		
+		Assert.assertNotNull(authentication.getId());
+		Assert.assertFalse(tokenManager.getToken(authentication.getId()).isDisabled());
+		//
+		logoutController.logout();
+		//
+		Assert.assertTrue(tokenManager.getToken(authentication.getId()).isDisabled());
+	}
+	
+	@Test(expected = AuthenticationException.class)
+	public void testBadCredentialsLogIn() {
+		LoginDto loginDto = new LoginDto();
+		loginDto.setUsername(InitTestDataProcessor.TEST_ADMIN_USERNAME);
+		loginDto.setPassword(new GuardedString("wrong_pass"));
+		loginController.login(loginDto);
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testLogInWithCasEnabledNoAdmin() throws Exception {
+		try {
+			getHelper().setConfigurationValue(
+					publicCasConfiguration.getConfigurationPropertyName(ConfigurationService.PROPERTY_ENABLED), true
+			);
+			IdmIdentityDto identity = getHelper().createIdentity();
+			
+			LoginDto loginDto = new LoginDto();
+			loginDto.setUsername(identity.getUsername());
+			loginDto.setPassword(identity.getPassword());
+			loginController.login(loginDto);
+		} finally {
+			getHelper().setConfigurationValue(
+					publicCasConfiguration.getConfigurationPropertyName(ConfigurationService.PROPERTY_ENABLED), false
+			);
+		}
+	}
+	
+	@Test
+	public void testLogInWithCasEnabledAdmin() throws Exception {
+		try {
+			getHelper().setConfigurationValue(
+					publicCasConfiguration.getConfigurationPropertyName(ConfigurationService.PROPERTY_ENABLED), true
+			);
+			LoginDto loginDto = new LoginDto();
+			loginDto.setUsername(TestHelper.ADMIN_USERNAME);
+			loginDto.setPassword(new GuardedString(TestHelper.ADMIN_PASSWORD));
+			Resource<LoginDto> response = loginController.login(loginDto);
+			
+			IdmJwtAuthenticationDto authentication = response.getContent().getAuthentication();
+			
+			Assert.assertNotNull(authentication);
+			Assert.assertEquals(TestHelper.ADMIN_USERNAME, authentication.getCurrentUsername());
+			Assert.assertEquals(TestHelper.ADMIN_USERNAME, authentication.getOriginalUsername());
+		} finally {
+			getHelper().setConfigurationValue(
+					publicCasConfiguration.getConfigurationPropertyName(ConfigurationService.PROPERTY_ENABLED), false
+			);
+		}
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testLogInWithoutPrincipal() throws Exception {
+		loginController.login(null);
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testLogInWithoutUsername() throws Exception {
+		LoginDto loginDto = new LoginDto();
+		loginDto.setUsername(null);
+		loginDto.setPassword(new GuardedString(TestHelper.ADMIN_PASSWORD));
+		//
+		loginController.login(null);
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testLogInWithoutPassword() throws Exception {
+		LoginDto loginDto = new LoginDto();
+		loginDto.setUsername(TestHelper.ADMIN_USERNAME);
+		loginDto.setPassword(null);
+		
+		loginController.login(null);
+	}
+	
+	@Test
+	public void testCasLogoutRequest() throws Exception {
+		getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound())
+				.andExpect(MockMvcResultMatchers.redirectedUrl("/cas-logout-response?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_URL_NOT_CONFIGURED.getCode().toLowerCase()));
+		//
+		try {
+			getHelper().setConfigurationValue(CasConfiguration.PROPERTY_URL, "http://mock-wrong-url:8080/cas");
+			//
+			Mockito
+				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
+				.thenReturn(new ResponseEntity<String>(HttpStatus.NOT_FOUND));
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound())
+				.andExpect(MockMvcResultMatchers.redirectedUrl("/cas-logout-response?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
+			//
+			Mockito
+				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
+				.thenThrow(new RuntimeException());
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound())
+				.andExpect(MockMvcResultMatchers.redirectedUrl("/cas-logout-response?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
+			// ok
+			Mockito
+				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
+				.thenReturn(new ResponseEntity<String>(HttpStatus.OK));
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound());
+		} finally {
+			getHelper().deleteConfigurationValue(CasConfiguration.PROPERTY_URL);
+		}
+	
+	}
+	
+	@Test
+	public void testCasLogoutResponse() throws Exception {
+		getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_RESPONSE_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound());
+	}
+	
 	private ResultActions tryLogin(String username, String password) throws Exception {
 		Map<String, String> login = new HashMap<>();
 		login.put("username", username);
 		login.put("password", "jkasldjkh");
 		return getMockMvc()
-				.perform(post(BaseController.BASE_PATH + "/authentication")
+				.perform(post(BaseController.BASE_PATH + LoginController.AUTH_PATH)
 				.content(serialize(login))
 				.contentType(TestHelper.HAL_CONTENT_TYPE));
 	}
 
 	private String serialize(Map<String,String> login) throws IOException {
 		StringWriter sw = new StringWriter();
-		ObjectWriter writer = mapper.writerFor(HashMap.class);
+		ObjectWriter writer = getMapper().writerFor(HashMap.class);
 		writer.writeValue(sw, login);
 		//
 		return sw.toString();
 	}
 	
 	private UUID getTokenId(String response) throws Exception {
-		return UUID.fromString(mapper.readTree(response).get("authentication").get("id").asText());
+		return UUID.fromString(getMapper().readTree(response).get("authentication").get("id").asText());
 	}
 	
 	private String getToken(String response) throws Exception {
-		return mapper.readTree(response).get("token").asText();
+		return getMapper().readTree(response).get("token").asText();
 	}
 }

@@ -97,7 +97,7 @@ public class LoginController implements BaseController {
 			throw new ResultCodeException(CoreResultCode.AUTH_FAILED, "Username and password must be filled");
 		}
 		LoginDto authenticate = authenticationManager.authenticate(new LoginDto(loginDto));
-		if (!securityService.isAdmin() && !casConfiguration.isDisabled()) {
+		if (!casConfiguration.isDisabled() && !securityService.isAdmin()) {
 			authenticationManager.logout();
 			//
 			throw new ResultCodeException(CoreResultCode.CAS_IDM_LOGIN_ADMIN_ONLY);
@@ -221,7 +221,7 @@ public class LoginController implements BaseController {
 		// check CAS server is available
 		try {
 			ResponseEntity<String> response = restTemplate.getForEntity(casLoginUrl, String.class);
-			if (!HttpStatus.OK.equals(response.getStatusCode())) {
+			if (HttpStatus.OK != response.getStatusCode()) {
 				frontendUrl.append("?status-code=");
 				frontendUrl.append(CoreResultCode.CAS_LOGIN_SERVER_NOT_AVAILABLE.getCode().toLowerCase());
 				return ResponseEntity
@@ -325,7 +325,7 @@ public class LoginController implements BaseController {
 				casConfiguration.getService(nativeRequest, false));
 		try {
 			ResponseEntity<String> response = restTemplate.getForEntity(casLogoutUrl, String.class);
-			if (!HttpStatus.OK.equals(response.getStatusCode())) {
+			if (HttpStatus.OK != response.getStatusCode()) {
 				frontendUrl.append("?status-code=");
 				frontendUrl.append(CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase());
 				return ResponseEntity
@@ -358,11 +358,14 @@ public class LoginController implements BaseController {
 	@RequestMapping(path = CAS_LOGOUT_RESPONSE_PATH, method = RequestMethod.GET)
 	public ResponseEntity<Void> casLogoutResponse() {
 		StringBuilder url = new StringBuilder(configurationService.getFrontendUrl(CAS_LOGOUT_RESPONSE_PATH));
-		
 		//
 		return ResponseEntity
 			.status(HttpStatus.FOUND)
 			.header(HttpHeaders.LOCATION, url.toString())
 			.build();
+	}
+	
+	protected void setRestTemplate(RestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
 	}
 }
