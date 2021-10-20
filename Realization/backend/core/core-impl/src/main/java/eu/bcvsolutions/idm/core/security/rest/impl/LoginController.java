@@ -258,11 +258,11 @@ public class LoginController implements BaseController {
 		StringBuilder url = new StringBuilder(configurationService.getFrontendUrl(CAS_LOGIN_RESPONSE_PATH));
 		// set token into url - ok
 		if (currentToken != null) {
-			IdmJwtAuthentication fromDto = jwtTokenMapper.fromDto(currentToken);
+			IdmJwtAuthentication authentication = jwtTokenMapper.fromDto(currentToken);
 			url.append('?');
 			url.append(JwtAuthenticationMapper.AUTHENTICATION_TOKEN_NAME.toLowerCase());
 			url.append('=');
-			url.append(jwtTokenMapper.writeToken(fromDto));
+			url.append(jwtTokenMapper.writeToken(authentication));
 		} else if (ctx != null) {
 			// not - ok => resolve exception
 			ResultCodeException resultCodeException = ctx.getCodeEx();

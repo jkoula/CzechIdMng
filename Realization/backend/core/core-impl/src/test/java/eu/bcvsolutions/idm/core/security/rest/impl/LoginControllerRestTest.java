@@ -54,6 +54,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.domain.IdentityBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmJwtAuthentication;
 import eu.bcvsolutions.idm.core.security.api.domain.TwoFactorAuthenticationType;
 import eu.bcvsolutions.idm.core.security.api.dto.DefaultGrantedAuthorityDto;
 import eu.bcvsolutions.idm.core.security.api.dto.IdmJwtAuthenticationDto;
@@ -92,14 +93,14 @@ public class LoginControllerRestTest extends AbstractRestTest {
 	
 	@Before
 	public void init() {
-		this.logout();
-		//
+		logout();
+		// set mock rest template into login controller ~ CAS server is not available in tests
 		loginController.setRestTemplate(restTemplate);
 	}
 	
 	@After
 	public void after() {
-		this.logout();
+		logout();
 	}
 
 	@Test
@@ -916,12 +917,78 @@ public class LoginControllerRestTest extends AbstractRestTest {
 	}
 	
 	@Test
-	public void testCasLogoutRequest() throws Exception {
+	public void testCasLoginRequest() throws Exception {
 		getMockMvc()
-				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
+		.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGIN_REQUEST_PATH)
+		.contentType(TestHelper.HAL_CONTENT_TYPE))
+		.andExpect(status().isFound())
+		.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGIN_RESPONSE_PATH + "?status-code=" + CoreResultCode.CAS_LOGIN_SERVER_URL_NOT_CONFIGURED.getCode().toLowerCase()));
+		//
+		try {
+			getHelper().setConfigurationValue(CasConfiguration.PROPERTY_URL, "http://mock-wrong-url:8080/cas");
+			//
+			Mockito
+				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
+				.thenReturn(new ResponseEntity<String>(HttpStatus.NOT_FOUND));
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGIN_REQUEST_PATH)
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isFound())
-				.andExpect(MockMvcResultMatchers.redirectedUrl("/cas-logout-response?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_URL_NOT_CONFIGURED.getCode().toLowerCase()));
+				.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGIN_RESPONSE_PATH +"?status-code=" + CoreResultCode.CAS_LOGIN_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
+			//
+			Mockito
+				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
+				.thenThrow(new RuntimeException());
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGIN_REQUEST_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound())
+				.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGIN_RESPONSE_PATH +"?status-code=" + CoreResultCode.CAS_LOGIN_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
+			// ok
+			Mockito
+				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
+				.thenReturn(new ResponseEntity<String>(HttpStatus.OK));
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGIN_REQUEST_PATH)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound());
+		} finally {
+			getHelper().deleteConfigurationValue(CasConfiguration.PROPERTY_URL);
+		}
+	}
+	
+	@Test
+	public void testCasLoginResponse() throws Exception {
+		// without login
+		getMockMvc()
+			.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGIN_RESPONSE_PATH)
+			.contentType(TestHelper.HAL_CONTENT_TYPE))
+			.andExpect(status().isFound())
+			.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGIN_RESPONSE_PATH + "?status-code=" + CoreResultCode.LOG_IN_FAILED.getCode().toLowerCase()));
+		// with login
+		try {
+			loginAsAdmin();
+			IdmTokenDto currentToken = tokenManager.getCurrentToken();
+			IdmJwtAuthentication authentication = jwtTokenMapper.fromDto(currentToken);
+			String token = jwtTokenMapper.writeToken(authentication);
+			//
+			getMockMvc()
+				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGIN_RESPONSE_PATH)
+				.header(JwtAuthenticationMapper.AUTHENTICATION_TOKEN_NAME, token)
+				.contentType(TestHelper.HAL_CONTENT_TYPE))
+				.andExpect(status().isFound());
+		} finally {
+			logout();
+		}
+	}
+	
+	@Test
+	public void testCasLogoutRequest() throws Exception {
+		getMockMvc()
+			.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
+			.contentType(TestHelper.HAL_CONTENT_TYPE))
+			.andExpect(status().isFound())
+			.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGOUT_RESPONSE_PATH + "?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_URL_NOT_CONFIGURED.getCode().toLowerCase()));
 		//
 		try {
 			getHelper().setConfigurationValue(CasConfiguration.PROPERTY_URL, "http://mock-wrong-url:8080/cas");
@@ -933,7 +1000,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isFound())
-				.andExpect(MockMvcResultMatchers.redirectedUrl("/cas-logout-response?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
+				.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGOUT_RESPONSE_PATH +"?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
 			//
 			Mockito
 				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
@@ -942,7 +1009,7 @@ public class LoginControllerRestTest extends AbstractRestTest {
 				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_REQUEST_PATH)
 				.contentType(TestHelper.HAL_CONTENT_TYPE))
 				.andExpect(status().isFound())
-				.andExpect(MockMvcResultMatchers.redirectedUrl("/cas-logout-response?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
+				.andExpect(MockMvcResultMatchers.redirectedUrl(LoginController.CAS_LOGOUT_RESPONSE_PATH +"?status-code=" + CoreResultCode.CAS_LOGOUT_SERVER_NOT_AVAILABLE.getCode().toLowerCase()));
 			// ok
 			Mockito
 				.when(restTemplate.getForEntity(Mockito.any(String.class), Mockito.eq(String.class)))
@@ -954,15 +1021,14 @@ public class LoginControllerRestTest extends AbstractRestTest {
 		} finally {
 			getHelper().deleteConfigurationValue(CasConfiguration.PROPERTY_URL);
 		}
-	
 	}
 	
 	@Test
 	public void testCasLogoutResponse() throws Exception {
 		getMockMvc()
-				.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_RESPONSE_PATH)
-				.contentType(TestHelper.HAL_CONTENT_TYPE))
-				.andExpect(status().isFound());
+			.perform(get(BaseController.BASE_PATH + LoginController.AUTH_PATH + LoginController.CAS_LOGOUT_RESPONSE_PATH)
+			.contentType(TestHelper.HAL_CONTENT_TYPE))
+			.andExpect(status().isFound());
 	}
 	
 	private ResultActions tryLogin(String username, String password) throws Exception {
