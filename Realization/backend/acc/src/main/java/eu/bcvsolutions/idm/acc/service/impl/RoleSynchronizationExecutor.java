@@ -24,12 +24,15 @@ import eu.bcvsolutions.idm.acc.dto.SysSyncLogDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncRoleConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccRoleAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.EntityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysSyncRoleConfig_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
@@ -713,9 +716,31 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 		}
 		count[0]++;
 
+		// Need to find account using SysSystemEntityDto uid, because uid of AccAccountDto can be different.
+		SysSystemEntityFilter entityFilter = new SysSystemEntityFilter();
+		entityFilter.setEntityType(SystemEntityType.IDENTITY);
+		entityFilter.setSystemId(userSystemDto.getId());
+		entityFilter.setUid(uid);
+		SysSystemEntityDto systemEntity = systemEntityService.find(entityFilter, null)
+				.stream()
+				.findFirst()
+				.orElse(null);
+		if (systemEntity == null) {
+			return;
+		}
+
+		AccAccountFilter accAccountFilter = new AccAccountFilter();
+		accAccountFilter.setSystemEntityId(systemEntity.getId());
+		final UUID accAccountId = accountService.findIds(accAccountFilter, null)
+				.stream()
+				.findFirst()
+				.orElse(null);
+		if (accAccountId == null) {
+			return;
+		}
+
 		AccIdentityAccountFilter identityAccountWithoutRelationFilter = new AccIdentityAccountFilter();
-		identityAccountWithoutRelationFilter.setUid(uid);
-		identityAccountWithoutRelationFilter.setSystemId(userSystemDto.getId());
+		identityAccountWithoutRelationFilter.setAccountId(accAccountId);
 		AccIdentityAccountDto identityAccountDto = identityAccountService.find(identityAccountWithoutRelationFilter, null).getContent()
 				.stream()
 				.findFirst()
