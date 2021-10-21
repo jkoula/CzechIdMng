@@ -52,7 +52,31 @@ export default function BasicTabs(props) {
   if (_children.length === 0) { // no valid and rendered child found => nothing to render
     return null;
   }
-  const value = onSelect ? activeKey : _mergedActiveKey;
+  //
+  // prepare rendered tabs
+  let value = onSelect ? activeKey : _mergedActiveKey;
+  const _tabs = _children.map((child, index) => {
+    const eventKey = child.props.eventKey || index;
+    if (!value) {
+      value = eventKey;
+    }
+    //
+    return (
+      <Tab
+        id={ `basic-tab-${ eventKey }` }
+        value={ eventKey }
+        aria-controls={ `basic-tabpanel-${ eventKey }` }
+        disabled={ child.props.disabled }
+        className={
+          classnames(
+            { [classes.activeTab]: value === eventKey },
+            className
+          )
+        }
+        style={ child.props.style }
+        label={ child.props.title }/>
+    );
+  });
   //
   // indicatorColor="primary"
   // textColor="primary"
@@ -65,27 +89,7 @@ export default function BasicTabs(props) {
           aria-label="basic tabs"
           className={ className }
           style={ style }>
-          {
-            _children.map((child, index) => {
-              const eventKey = child.props.eventKey || index;
-              //
-              return (
-                <Tab
-                  id={ `basic-tab-${ eventKey }` }
-                  value={ eventKey }
-                  aria-controls={ `basic-tabpanel-${ eventKey }` }
-                  disabled={ child.props.disabled }
-                  className={
-                    classnames(
-                      { [classes.activeTab]: value === eventKey },
-                      className
-                    )
-                  }
-                  style={ child.props.style }
-                  label={ child.props.title }/>
-              );
-            })
-          }
+          { _tabs }
         </Tabs>
       </AppBar>
       {
