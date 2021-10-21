@@ -67,7 +67,6 @@ class SwitchUser extends Basic.AbstractContent {
       <Basic.Modal
         show={ show }
         onHide={ onHide }
-        affixFooter={ false }
         keyboard
         backdrop="static"
         onEnter={ () => { this.refs.targetIdentity.focus(); } }>
