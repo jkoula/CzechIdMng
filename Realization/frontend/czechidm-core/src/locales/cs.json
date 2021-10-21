@@ -7457,8 +7457,8 @@
       "message": "Přihlaste se prosím znovu."
     },
     "LOG_OUT_SUCCESS": {
-      "title": "Odlášení",
-      "message": "Odlášení proběhlo úspěšně."
+      "title": "Odhlášení",
+      "message": "Odhlášení proběhlo úspěšně."
     },
     "LOG_IN_FAILED": {
       "title": "Přihlášení se nezdařilo",

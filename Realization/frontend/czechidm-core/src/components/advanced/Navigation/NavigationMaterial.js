@@ -102,7 +102,10 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen
     }),
     overflowX: 'hidden',
-    width: theme.spacing(7) + 1
+    width: theme.spacing(7) + 1,
+    '& .home.collapsed': {
+      display: 'none'
+    }
   },
   content: {
     flexGrow: 1,
@@ -226,7 +229,7 @@ function NavigationMaterial(props) {
   const drawer = (
     <div className={ clsx(classes.sidebar, { sidebar: true, collapsed: navigationCollapsed }) }>
       <div className={ classes.toolbar } style={{ display: 'flex', alignItems: 'center'}}>
-        <Link to="/" className={ !navigationCollapsed ? 'home' : 'hidden' }>
+        <Link to="/" className={ !navigationCollapsed ? 'home' : 'home collapsed' }>
           {' '}
         </Link>
         <div className={ !navigationCollapsed ? classes.grow : 'hidden' }/>

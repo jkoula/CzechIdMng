@@ -96,7 +96,11 @@ class CasLoginResponse extends Basic.AbstractContent {
             </Basic.Button>,
             <Basic.Button
               level="warning"
-              rendered={ statusCode === 'CAS_LOGIN_SERVER_URL_NOT_CONFIGURED' || statusCode === 'CAS_LOGIN_SERVER_NOT_AVAILABLE' }
+              rendered={
+                statusCode === 'CAS_LOGIN_SERVER_URL_NOT_CONFIGURED'
+                  || statusCode === 'CAS_LOGIN_SERVER_NOT_AVAILABLE'
+                  || statusCode === 'CAS_TICKET_VALIDATION_FAILED'
+              }
               onClick={ () => {
                 this.context.history.push('/login?nocas=true');
               }}>
