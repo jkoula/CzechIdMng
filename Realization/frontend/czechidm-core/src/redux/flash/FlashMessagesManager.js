@@ -291,9 +291,6 @@ export default class FlashMessagesManager {
   _logoutImmediatelly() {
     const authenticateService = new AuthenticateService();
     authenticateService.clearStorage();
-    return {
-      type: 'LOGOUT'
-    };
   }
 
   // TODO: cyclic dependency in configuration manager - refactor action constants to separate file

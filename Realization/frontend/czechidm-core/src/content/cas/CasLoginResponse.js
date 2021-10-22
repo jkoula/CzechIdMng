@@ -12,6 +12,7 @@ const securityManager = new SecurityManager();
  * Cas - process login response.
  *
  * @author Radek Tomiška
+ * @since 12.0.0
  */
 class CasLoginResponse extends Basic.AbstractContent {
 
@@ -115,8 +116,7 @@ class CasLoginResponse extends Basic.AbstractContent {
 function select(state) {
   return {
     i18nReady: state.config.get('i18nReady'),
-    userContext: state.security.userContext,
-    casEnabled: true
+    userContext: state.security.userContext
   };
 }
 

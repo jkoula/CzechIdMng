@@ -25,6 +25,16 @@ public interface ApplicationConfiguration extends Configurable {
 	String PROPERTY_STAGE = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.stage";
 	String DEFAULT_STAGE = STAGE_PRODUCTION;
 	
+	/**
+	 * Show logout content (~ page) with message, after user is logged out.
+	 * 
+	 * Default: false => login content will be shown automatically (~ backward compatible)
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_SHOW_LOGOUT_CONTENT = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.logout.content";
+	boolean DEFAULT_SHOW_LOGOUT_CONTENT = false;
+	
 	@Override
 	default String getConfigurableType() {
 		return AppModule.MODULE_ID;
@@ -55,6 +65,7 @@ public interface ApplicationConfiguration extends Configurable {
 	default List<String> getPropertyNames() {
 		List<String> properties = new ArrayList<>(); // we are not using superclass properties - enable and order does not make a sense here
 		properties.add(getPropertyName(PROPERTY_STAGE));
+		properties.add(getPropertyName(PROPERTY_SHOW_LOGOUT_CONTENT));
 		return properties;
 	}
 	
