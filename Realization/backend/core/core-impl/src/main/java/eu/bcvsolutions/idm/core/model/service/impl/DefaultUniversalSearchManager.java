@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,14 +34,21 @@ public class DefaultUniversalSearchManager implements UniversalSearchManager {
 	private EnabledEvaluator enabledEvaluator;
 
 	@Override
+	@SuppressWarnings(value = "rawtypes")
 	public List<UniversalSearchType<? extends AbstractDto, ? extends BaseFilter>> getSupportedTypes() {
-		return context
+		List<UniversalSearchType> types = context
 				.getBeansOfType(UniversalSearchType.class)
 				.values()
 				.stream()
 				.filter(enabledEvaluator::isEnabled)
 				.sorted(Comparator.comparing(UniversalSearchType::getOrder))
 				.collect(Collectors.toList());
+		//
+		List<UniversalSearchType<?, ?>> results = new ArrayList<>(types.size());
+		for (UniversalSearchType type : types) {
+			results.add(type);
+		}
+		return results;
 	}
 
 	@Override
