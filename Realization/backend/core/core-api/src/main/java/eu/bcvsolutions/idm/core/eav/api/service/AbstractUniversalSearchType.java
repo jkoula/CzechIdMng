@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
  * Abstract universal search type.
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 public abstract class AbstractUniversalSearchType<DTO extends AbstractDto, F extends BaseFilter> implements
 		UniversalSearchType<DTO, F>,

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controller for a universal search.
  *
- * @since 11.3.0
+ * @since 12.0.0
  * @author Vít Švanda
  *
  */

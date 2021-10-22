@@ -15,7 +15,7 @@ const auditManager = new AuditManager();
 * Table of assigned roles for entity (identity / role).
 *
 * @author Radek Tomiška
-* @since 11.3.0
+* @since 12.0.0
 */
 export class EntityRolesAuditTable extends Advanced.AbstractTableContent {
 

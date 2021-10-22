@@ -18,7 +18,7 @@ const identityManager = new IdentityManager();
  * Navigation - language selector.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 function NavigationLanguage(props) {
   const { userContext } = props;

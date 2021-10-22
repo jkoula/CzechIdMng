@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
  * Universal search type
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 public interface UniversalSearchType<E extends AbstractDto,  F extends BaseFilter> extends Ordered{
 

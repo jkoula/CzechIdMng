@@ -10,7 +10,7 @@ import java.util.List;
  * Universal search manager
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  *
  */
 public interface UniversalSearchManager {

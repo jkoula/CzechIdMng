@@ -94,7 +94,7 @@ public class DefaultConfigurationService
 	}
 	
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public boolean supportsToDtoWithFilter() {
@@ -213,7 +213,7 @@ public class DefaultConfigurationService
 	}
 	
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	protected IdmConfigurationDto applyContext(IdmConfigurationDto dto, DataFilter context, BasePermission... permission) {

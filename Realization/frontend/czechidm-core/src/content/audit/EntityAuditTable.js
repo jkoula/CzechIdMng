@@ -15,7 +15,7 @@ const auditManager = new AuditManager();
 * Audit for selected entity / owner. Used on entity detail.
 *
 * @author Radek Tomiška
-* @since 11.3.0
+* @since 12.0.0
 */
 export class EntityAuditTable extends Advanced.AbstractTableContent {
 

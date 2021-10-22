@@ -6,7 +6,7 @@ import * as Advanced from '../../components/advanced';
  * Role audit routes.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 export default class RoleAuditRoutes extends Basic.AbstractContent {
 

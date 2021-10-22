@@ -156,7 +156,7 @@ export default class ComponentService {
 
   /**
    * Returns registered universal search type component by entity type.
-   * @since 11.3.0
+   * @since 12.0.0
    */
   getUniversalSearchTypeComponent(entityType) {
     if (!entityType) {

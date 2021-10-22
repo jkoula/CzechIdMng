@@ -5,7 +5,7 @@ import { Advanced, Basic } from 'czechidm-core';
  * System universal search type
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 export default class SystemUniversalSearchType extends Advanced.AbstractUniversalSearchType {
 

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * Universal search for identities.
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 @Enabled(module = CoreModuleDescriptor.MODULE_ID, property = IdentityUniversalSearchType.PROPERTY_SEARCH_TYPE)
 @Component(IdentityUniversalSearchType.NAME)

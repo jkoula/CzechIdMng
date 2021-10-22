@@ -32,7 +32,7 @@ const drawerWidth = 240;
  * Nagigation - top + sidebar.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 const useStyles = makeStyles((theme) => ({
   grow: {

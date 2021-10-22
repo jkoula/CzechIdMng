@@ -6,7 +6,7 @@ import AbstractUniversalSearchType from '../../components/advanced/AbstractUnive
  * Identity universal search type
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 export default class IdentityUniversalSearchType extends AbstractUniversalSearchType {
 

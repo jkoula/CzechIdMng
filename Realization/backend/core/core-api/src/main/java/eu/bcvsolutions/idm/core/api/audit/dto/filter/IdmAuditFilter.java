@@ -96,7 +96,7 @@ public class IdmAuditFilter implements BaseFilter {
      * Entity class canonical name (OR).
      * 
      * @param types Entity class canonical name OR
-     * @since 11.3.0
+     * @since 12.0.0
      */
     public void setTypes(List<String> types) {
 		this.types = types;
@@ -106,7 +106,7 @@ public class IdmAuditFilter implements BaseFilter {
      * Entity class canonical name (OR).
      * 
      * @return Entity class canonical name OR
-     * @since 11.3.0
+     * @since 12.0.0
      */
     public List<String> getTypes() {
 		return types;
@@ -248,7 +248,7 @@ public class IdmAuditFilter implements BaseFilter {
 	 * entityId OR ownerId OR subOwnerId
 	 * 
 	 * @return uuid
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	public UUID getRelatedOwnerId() {
 		return relatedOwnerId;
@@ -258,7 +258,7 @@ public class IdmAuditFilter implements BaseFilter {
 	 * entityId OR ownerId OR subOwnerId
 	 * 
 	 * @param relatedOwnerId uuid
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	public void setRelatedOwnerId(UUID relatedOwnerId) {
 		this.relatedOwnerId = relatedOwnerId;

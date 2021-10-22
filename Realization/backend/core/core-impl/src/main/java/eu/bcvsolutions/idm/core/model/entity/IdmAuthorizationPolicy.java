@@ -174,7 +174,7 @@ public class IdmAuthorizationPolicy
 	}
 	
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public String getOwnerId() {
@@ -182,7 +182,7 @@ public class IdmAuthorizationPolicy
 	}
 
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public String getOwnerCode() {
@@ -190,7 +190,7 @@ public class IdmAuthorizationPolicy
 	}
 
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public String getOwnerType() {

@@ -202,7 +202,7 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity, Audi
 	}
 	
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public String getOwnerId() {
@@ -210,7 +210,7 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity, Audi
 	}
 
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public String getOwnerCode() {
@@ -218,7 +218,7 @@ public class IdmProfile extends AbstractEntity implements AttachableEntity, Audi
 	}
 
 	/**
-	 * @since 11.3.0
+	 * @since 12.0.0
 	 */
 	@Override
 	public String getOwnerType() {

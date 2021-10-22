@@ -4,7 +4,7 @@ package eu.bcvsolutions.idm.core.api.dto.filter;
  * Context (~filter) for load confidential metadata.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 public interface ConfidentialContext extends BaseDataFilter {
 

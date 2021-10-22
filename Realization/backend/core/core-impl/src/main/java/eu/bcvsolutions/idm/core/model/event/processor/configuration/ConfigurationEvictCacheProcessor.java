@@ -21,7 +21,7 @@ import eu.bcvsolutions.idm.core.model.event.ConfigurationEvent.ConfigurationEven
  * Clear configuration cache after configuration property is saved or deleted.
  * 
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 @Component(ConfigurationEvictCacheProcessor.PROCESSOR_NAME)
 @Description("Clear configuration cache after configuration property i saved or deleted.")

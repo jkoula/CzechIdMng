@@ -6,7 +6,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmUniversalSearchFilter;
 /**
  * Service for universal search
  * 
- * @since 11.3.0
+ * @since 12.0.0
  * @author Vít Švanda
  *
  */

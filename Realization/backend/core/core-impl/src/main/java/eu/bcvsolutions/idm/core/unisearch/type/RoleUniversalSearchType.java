@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * Universal search for roles.
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 @Enabled(module = CoreModuleDescriptor.MODULE_ID, property = RoleUniversalSearchType.PROPERTY_SEARCH_TYPE)
 @Component(RoleUniversalSearchType.NAME)

@@ -7,7 +7,7 @@ import Icon from '../../basic/Icon/Icon';
  * Abstract universal search type
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 export default class AbstractUniversalSearchType extends AbstractContextComponent {
 

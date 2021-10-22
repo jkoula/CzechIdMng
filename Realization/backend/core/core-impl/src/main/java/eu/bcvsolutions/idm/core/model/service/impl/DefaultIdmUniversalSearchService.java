@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 /**
  * Default implementation of service for universal search.
  *
- * @since 11.3.0
+ * @since 12.0.0
  * @author Vít Švanda
  */
 @Service("universalSearchService")

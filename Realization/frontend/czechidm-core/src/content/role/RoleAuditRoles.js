@@ -13,7 +13,7 @@ const roleManager = new RoleManager();
  * Audit of roles on role detail.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 class RoleAuditRoles extends Basic.AbstractContent {
 

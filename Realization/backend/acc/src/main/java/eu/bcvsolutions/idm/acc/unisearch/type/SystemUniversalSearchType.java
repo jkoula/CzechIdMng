@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * Universal search for systems.
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 @Enabled(module = CoreModuleDescriptor.MODULE_ID, property = SystemUniversalSearchType.PROPERTY_SEARCH_TYPE)
 @Component(SystemUniversalSearchType.NAME)

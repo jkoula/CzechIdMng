@@ -14,7 +14,7 @@ const manager = new ProfileManager();
  * Component for rendering information about identity profile.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 export class ProfileInfo extends AbstractEntityInfo {
 

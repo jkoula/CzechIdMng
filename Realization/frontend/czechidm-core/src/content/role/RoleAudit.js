@@ -13,7 +13,7 @@ const roleManager = new RoleManager();
  * Role audit tab.
  *
  * @author Radek Tomiška
- * @since 11.3.0
+ * @since 12.0.0
  */
 class RoleAudit extends Basic.AbstractContent {
 

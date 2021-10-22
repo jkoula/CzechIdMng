@@ -7,7 +7,7 @@ import * as Utils from '../utils';
  * Universal search service.
  *
  * @author Vít Švanda
- * @since 11.3.0
+ * @since 12.0.0
  */
 class UniversalSearchService extends AbstractService {
 
