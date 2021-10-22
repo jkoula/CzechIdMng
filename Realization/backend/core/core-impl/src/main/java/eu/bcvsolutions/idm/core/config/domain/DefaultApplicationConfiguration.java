@@ -1,6 +1,9 @@
 package eu.bcvsolutions.idm.core.config.domain;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import eu.bcvsolutions.idm.core.api.config.domain.AbstractConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
@@ -14,6 +17,8 @@ import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 public class DefaultApplicationConfiguration extends AbstractConfiguration implements ApplicationConfiguration {	
 	
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultApplicationConfiguration.class);
+	//
+	private String backendUrl = null;
 	
 	@Override
 	public String getStage() {
@@ -34,5 +39,35 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 	@Override
 	public boolean isProduction() {
 		return STAGE_PRODUCTION.equalsIgnoreCase(getStage());
+	}
+	
+	@Override
+	public String getFrontendUrl() {
+		return getConfigurationService().getFrontendUrl("");
+	}
+	
+	@Override
+	public String getBackendUrl(HttpServletRequest request) {
+		String configuredBackendUrl = getConfigurationService().getValue(PROPERTY_BACKEND_URL);
+		if (StringUtils.isNotBlank(configuredBackendUrl)) {
+			return configuredBackendUrl;
+		}
+		// from cache
+		if (StringUtils.isNotBlank(backendUrl)) {
+			return backendUrl;
+		}
+		// try to resolve from given request
+		if (request == null) {
+			return null;
+		}
+		//
+		backendUrl = ServletUriComponentsBuilder
+				.fromRequest(request)
+				.replacePath(request.getContextPath())
+				.replaceQuery(null)
+				.build()
+				.toUriString();
+		//
+		return backendUrl;
 	}
 }

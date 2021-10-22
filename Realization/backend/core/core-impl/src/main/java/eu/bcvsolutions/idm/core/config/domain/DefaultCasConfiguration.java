@@ -5,9 +5,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import eu.bcvsolutions.idm.core.api.config.domain.AbstractConfiguration;
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.CasConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.PublicCasConfiguration;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
@@ -25,9 +25,7 @@ public class DefaultCasConfiguration
 		implements CasConfiguration {
 	
 	@Autowired private PublicCasConfiguration publicCasConfiguration;
-	//
-	private String serverLoginPath = null;
-	private String serverLogoutPath = null;
+	@Autowired private ApplicationConfiguration applicationConfiguration;
 	
 	@Override
 	public PublicCasConfiguration getPublicConfiguration() {
@@ -49,34 +47,21 @@ public class DefaultCasConfiguration
 		if (!StringUtils.isBlank(value)) {
 			return value;
 		}
-		if (request == null) {
-			return null;
-		}
 		// service = login CAS response endpoint by default
-		if (serverLoginPath == null || serverLogoutPath == null) {
-			String serverPath = ServletUriComponentsBuilder
-					.fromRequest(request)
-					.replacePath(
-							String.format(
-								"%s%s%s%s",
-								request.getContextPath(),
-								BaseController.BASE_PATH, 
-								LoginController.AUTH_PATH, 
-								isLogin ? LoginController.CAS_LOGIN_RESPONSE_PATH : LoginController.CAS_LOGOUT_RESPONSE_PATH
-							)
-					)
-					.replaceQuery(null)
-					.build()
-					.toUriString();
-			// ~ cache
-			if (isLogin) {
-				serverLoginPath = serverPath;
-			} else {
-				serverLogoutPath = serverPath;
-			}
+		String backendUrl = applicationConfiguration.getBackendUrl(request);
+		if (backendUrl == null) {
+			backendUrl = ""; // ~ relative path will be returned as fallback
 		}
+		// append login / logout path 
+		String backendUrlPath = String.format(
+				"%s%s%s%s",
+				backendUrl,
+				BaseController.BASE_PATH, 
+				LoginController.AUTH_PATH, 
+				isLogin ? LoginController.CAS_LOGIN_RESPONSE_PATH : LoginController.CAS_LOGOUT_RESPONSE_PATH
+		);
 		//
-		return isLogin ? serverLoginPath : serverLogoutPath;
+		return backendUrlPath;
 	}
 
 	@Override

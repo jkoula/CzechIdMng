@@ -29,6 +29,7 @@ import org.springframework.util.ObjectUtils;
 
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.config.cache.domain.ValueWrapper;
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.comparator.CodeableComparator;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
@@ -452,25 +453,27 @@ public class DefaultConfigurationService
 		return configs;
 	}
 	
-	/**
-	 * TODO: Read allowed origins property now, use new property app.url ...
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public String getFrontendUrl(String path) {
-		// get url of application
-		String allowedOrigins = getValue(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN);
-		if (StringUtils.isBlank(allowedOrigins) || allowedOrigins.equals("*")) {
-			// relative url is returned, when allowed origin is not configured
-			return path;
+		String frontendUrl = getValue(ApplicationConfiguration.PROPERTY_FRONTEND_URL);
+		if (StringUtils.isBlank(frontendUrl)) {
+			// get url of application from allowed origin (~ backward compatible)
+			String allowedOrigins = getValue(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN);
+			if (StringUtils.isBlank(allowedOrigins) || allowedOrigins.equals("*")) {
+				// relative url is returned, when allowed origin is not configured
+				return path;
+			}
+			//
+			List<String> urls = Arrays.asList(allowedOrigins.replaceAll("\\s*", "").split(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN_SEPARATOR));
+			frontendUrl = urls.get(0);
 		}
 		//
-		List<String> urls = Arrays.asList(allowedOrigins.replaceAll("\\s*", "").split(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN_SEPARATOR));
-		String resultUrl = urls.get(0);
 		if (StringUtils.isEmpty(path)) {
-			return resultUrl;
+			return frontendUrl;
 		}
-		return String.format("%s/#/%s", resultUrl, path.startsWith("/") ? path.replaceFirst("/", "") : path);
+		// append path by FE conventions
+		return String.format("%s/#/%s", frontendUrl, path.startsWith("/") ? path.replaceFirst("/", "") : path);
 	}
 	
 	@Override

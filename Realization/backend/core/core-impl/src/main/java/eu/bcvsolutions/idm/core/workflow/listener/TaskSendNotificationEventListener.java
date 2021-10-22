@@ -19,7 +19,6 @@ import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
-import eu.bcvsolutions.idm.core.config.domain.DynamicCorsConfiguration;
 import eu.bcvsolutions.idm.core.notification.api.dto.IdmMessageDto;
 import eu.bcvsolutions.idm.core.notification.api.service.NotificationManager;
 import eu.bcvsolutions.idm.core.workflow.config.WorkflowConfig;
@@ -96,18 +95,16 @@ public class TaskSendNotificationEventListener implements ActivitiEventListener{
 	}
 	
 	/**
-	 * Get url from application properties
+	 * Get url from application properties.
+	 * 
 	 * @param taskEntity
 	 * @return
 	 */
 	private String getUrlToTask(TaskEntity taskEntity) {
-		 String origins = configurationService.getValue(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN);
-		 //
-		 if (origins != null && !origins.isEmpty()) {
-			 String origin = origins.trim().split(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN_SEPARATOR)[0];
-			 return origin + "/#/task/" + taskEntity.getId();
-		 }
-		 return null;
+		if (taskEntity == null) {
+			return null;
+		}
+		return configurationService.getFrontendUrl("/task/" + taskEntity.getId());
 	}
 	
 	/**

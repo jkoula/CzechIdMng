@@ -584,11 +584,7 @@ import java.time.format.DateTimeFormatter;
 def requestId = entityEvent.content.id;
 
 // get url of application
-def url = configurationService.getValue("idm.pub.security.allowed-origins");
-// TODO: move higher
-if (url != null) {
-	url = url.split(",")[0] + "/#/workflow/history/processes/" + execution.getVariable("processInstanceId");
-}
+def url = configurationService.getFrontendUrl("/workflow/history/processes/" + execution.getVariable("processInstanceId"));
 
 //to whom notification will be send
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
@@ -667,11 +663,7 @@ import java.time.format.DateTimeFormatter;
 def requestId = entityEvent.content.id;
 
 // get url of application
-def url = configurationService.getValue("idm.pub.security.allowed-origins");
-// TODO: move higher
-if (url != null) {
-	url = url.split(",")[0] + "/#/workflow/history/processes/" + execution.getVariable("processInstanceId");
-}
+def url = configurationService.getFrontendUrl("/workflow/history/processes/" + execution.getVariable("processInstanceId"));
 
 //to whom send notification
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
@@ -748,11 +740,7 @@ import java.time.format.DateTimeFormatter;
 def requestId = entityEvent.content.id;
 
 // get url of application
-def url = configurationService.getValue("idm.pub.security.allowed-origins");
-// TODO: move higher
-if (url != null) {
-	url = url.split(",")[0] + "/#/workflow/history/processes/" + execution.getVariable("processInstanceId");
-}
+def url = configurationService.getFrontendUrl("/workflow/history/processes/" + execution.getVariable("processInstanceId"));
 
 //to whom send notification
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
@@ -829,11 +817,7 @@ import java.time.format.DateTimeFormatter;
 def requestId = entityEvent.content.id;
 
 // get url of application
-def url = configurationService.getValue("idm.pub.security.allowed-origins");
-// TODO: move higher
-if (url != null) {
-	url = url.split(",")[0] + "/#/workflow/history/processes/" + execution.getVariable("processInstanceId");
-}
+def url = configurationService.getFrontendUrl("/workflow/history/processes/" + execution.getVariable("processInstanceId"));
 
 //to whom send notification
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);

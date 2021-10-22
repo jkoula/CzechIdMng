@@ -47,7 +47,7 @@ public interface UniversalSearchType<E extends AbstractDto,  F extends BaseFilte
 	}
 	
 	/**
-	 * Order of delegation (in select-box).
+	 * Order of results (in select-box).
 	 *
 	 * @return
 	 */

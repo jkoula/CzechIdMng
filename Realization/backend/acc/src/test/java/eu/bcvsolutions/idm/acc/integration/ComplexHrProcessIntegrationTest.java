@@ -179,7 +179,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	private static String getIdentityUuidByPersonalNumScript = "getIdentityUuidByPersonalNumber";
 	
 	private static String targetAdSystem = "AD-system"; // Ldap server used
-	private static String targetSystem2 = "System2";
+	// private static String targetSystem2 = "System2";
 	
 	// tree node name
 	private static String orgTreeTypeName = "ORGANIZATIONS";
@@ -224,7 +224,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	InMemoryDirectoryServer directoryServer = null;
 	LDAPConnection ldapConnectionInfo = null;
 	private static String ldapBaseOU = "dc=bcv,dc=cz";
-	private static String ldapGroupOU = "groups";
+	// private static String ldapGroupOU = "groups";
 	private static String ldapUserOU = "people";
 	private static String ldapAdminLogin = "uid=admin";
 	private static String ldapPassword = "password";
@@ -333,7 +333,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		getIdentityUuidByPersonalNumScript += getHelper().createName();
 		
 		targetAdSystem += getHelper().createName(); // Ldap server used
-		targetSystem2 += getHelper().createName();
+		// targetSystem2 += getHelper().createName();
 		
 		// tree node name
 		//orgTreeTypeName += getHelper().createName();

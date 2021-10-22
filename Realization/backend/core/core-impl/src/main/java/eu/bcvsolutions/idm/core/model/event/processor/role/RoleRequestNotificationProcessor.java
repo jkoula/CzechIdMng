@@ -29,7 +29,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
-import eu.bcvsolutions.idm.core.config.domain.DynamicCorsConfiguration;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleRequest_;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
@@ -187,7 +186,7 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 	}
 	
 	/**
-	 * Construct URL to frontend for given request
+	 * Construct URL to frontend for given request.
 	 * 
 	 * @param request
 	 * @return
@@ -196,13 +195,7 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 		if (request == null) {
 			return null;
 		}
-		String origins = configurationService.getValue(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN);
-		//
-		if (origins != null && !origins.isEmpty()) {
-			String origin = origins.trim().split(DynamicCorsConfiguration.PROPERTY_ALLOWED_ORIGIN_SEPARATOR)[0];
-			return MessageFormat.format("{0}/#/role-requests/{1}/detail", origin, request.getId());
-		}
-		return null;
+		return configurationService.getFrontendUrl(MessageFormat.format("/role-requests/{0}/detail", request.getId()));
 	}
 	
 	@Override

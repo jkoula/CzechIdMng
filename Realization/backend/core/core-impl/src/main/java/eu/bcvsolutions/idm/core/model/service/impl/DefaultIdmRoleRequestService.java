@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 
 import static eu.bcvsolutions.idm.core.api.dto.OperationResultDto.PROPERTY_STATE;
 
-import eu.bcvsolutions.idm.core.api.event.EventContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,7 +80,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmIncompatibleRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
-import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ValueGeneratorManager;
 import eu.bcvsolutions.idm.core.api.service.thin.IdmIdentityRoleThinService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -164,8 +162,6 @@ public class DefaultIdmRoleRequestService
 	private ValueGeneratorManager valueGeneratorManager;
 	@Autowired
 	private IdmIdentityRoleThinService identityRoleThinService;
-	@Autowired
-	private LookupService lookupService;
 	//
 	private IdmRoleRequestService roleRequestService;
 
@@ -1155,7 +1151,7 @@ public class DefaultIdmRoleRequestService
 			IdentityRoleEvent event = new IdentityRoleEvent(IdentityRoleEventType.DELETE, identityRole,
 					 ImmutableMap.of(IdmAccountDto.SKIP_PROPAGATE, Boolean.TRUE));
 
-			EventContext<IdmIdentityRoleDto> eventContext = identityRoleService.publish(event, requestEvent);
+			identityRoleService.publish(event, requestEvent);
 			// Add list of identity-accounts for delayed ACM to parent event
 			Set<UUID> subIdentityAccountsForAcm = event
 					.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);

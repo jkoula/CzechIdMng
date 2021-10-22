@@ -3,6 +3,8 @@ package eu.bcvsolutions.idm.core.api.config.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import eu.bcvsolutions.idm.core.api.AppModule;
 import eu.bcvsolutions.idm.core.api.service.Configurable;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
@@ -34,6 +36,25 @@ public interface ApplicationConfiguration extends Configurable {
 	 */
 	String PROPERTY_SHOW_LOGOUT_CONTENT = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.logout.content";
 	boolean DEFAULT_SHOW_LOGOUT_CONTENT = false;
+	
+	/**
+	 * Frontend server url. 
+	 * E.g. http://localhost:3000
+	 * Default: The first 'idm.pub.security.allowed-origins' configured value is used (~ backward compatible).
+	 * Use {@link ConfigurationService#getFrontendUrl(String)} to append path
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_FRONTEND_URL= ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.frontend.url";
+	
+	/**
+	 * Backend server url. 
+	 * E.g. http://localhost:8080/idm
+	 * Default: Url is resolved dynamically from current servlet request.
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_BACKEND_URL = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.backend.url";
 	
 	@Override
 	default String getConfigurableType() {
@@ -89,4 +110,26 @@ public interface ApplicationConfiguration extends Configurable {
 	 * @return true - production stage
 	 */
 	boolean isProduction();
+
+	/**
+	 * Frontend server url. 
+	 * E.g. http://localhost:3000
+	 * Default: The first 'idm.pub.security.allowed-origins' configured value is used (~ backward compatible).
+	 * Use {@link ConfigurationService#getFrontendUrl(String)} to append path
+	 * 
+	 * @return frontend url entry point
+	 * @since 12.0.0
+	 */
+	String getFrontendUrl();
+
+	/**
+	 * Backend server url. 
+	 * E.g. http://localhost:8080/idm
+	 * Default: Url is resolved dynamically from current servlet request.
+	 * 
+	 * @param request
+	 * @return backend url entry point
+	 * @since 12.0.0
+	 */
+	String getBackendUrl(HttpServletRequest request);
 }

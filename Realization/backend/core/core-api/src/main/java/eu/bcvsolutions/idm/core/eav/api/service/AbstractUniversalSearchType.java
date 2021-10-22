@@ -22,8 +22,6 @@ public abstract class AbstractUniversalSearchType<DTO extends AbstractDto, F ext
 		UniversalSearchType<DTO, F>,
 		BeanNameAware {
 
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AbstractUniversalSearchType.class);
-
 	private String beanName; // spring bean name - used as id
 
 	@Override
