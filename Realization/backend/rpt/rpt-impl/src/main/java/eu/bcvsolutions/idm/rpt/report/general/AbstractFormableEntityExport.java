@@ -35,9 +35,13 @@ public abstract class AbstractFormableEntityExport<D extends AbstractDto, F exte
 
 	private final FormService formService;
 
-	public AbstractFormableEntityExport(RptReportService reportService,
-										AttachmentManager attachmentManager, ObjectMapper mapper, FormService formService) {
+	public AbstractFormableEntityExport(
+			RptReportService reportService,
+			AttachmentManager attachmentManager,
+			ObjectMapper mapper,
+			FormService formService) {
 		super(reportService, attachmentManager, mapper);
+		//
 		this.formService = formService;
 	}
 

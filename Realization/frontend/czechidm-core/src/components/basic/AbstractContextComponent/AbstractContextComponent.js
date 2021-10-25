@@ -459,16 +459,16 @@ class AbstractContextComponent extends AbstractComponent {
         // Second: But this doesn't work for details without parent component (AuditDetail, RoleRequestDetil, ...), because key will be not changed
         // if ID of entity changed in URL (parent match.url is doesn't contains ID of entity). So I add full url to key if route doesn't have child routes.
 
-        // Since version 11.3.0 - I use search parameters in key too (location.search). Because we need to create component if search parameters change too.
+        // Since version 12.0.0 - I use search parameters in key too (location.search). Because we need to create component if search parameters change too.
         // For example for universal search, in situation when identity table is already opened and we want to set different filter value (by change URL).
         // Beware, this can be dangerous change (performance).
-        keyUrl = `${location.pathname}-${location.search}`;
+        keyUrl = `${ location.pathname }-${ location.search }`;
       }
-      const key = `${route.id}${keyUrl}${activeLng}`;
+      const key = `${ route.id }${ keyUrl }${ activeLng }`;
       routes.push(<Route
-        key={key}
-        path={this._getConcatPath(match.path, route.concatedPath ? route.concatedPath : route.path)}
-        render={(props) => {
+        key={ key }
+        path={ this._getConcatPath(match.path, route.concatedPath ? route.concatedPath : route.path) }
+        render={ (props) => {
           // Decode params
           if (props.match && props.match.params) {
             const params = props.match.params;
@@ -479,7 +479,7 @@ class AbstractContextComponent extends AbstractComponent {
               }
             }
           }
-          return <Component {...props}/>;
+          return <Component { ...props }/>;
         }}/>);
     });
     return routes;
