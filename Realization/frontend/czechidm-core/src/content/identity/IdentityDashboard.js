@@ -118,6 +118,7 @@ class IdentityDashboard extends Basic.AbstractContent {
         <Basic.Loading isStatic show/>
       );
     }
+    //
     const buttonsMap = componentService
       .getComponentDefinitions(ComponentService.IDENTITY_DASHBOARD_BUTTON_COMPONENT_TYPE)
       .map(component => {
@@ -127,10 +128,11 @@ class IdentityDashboard extends Basic.AbstractContent {
             key={`${ComponentService.IDENTITY_DASHBOARD_BUTTON_COMPONENT_TYPE}-${component.id}`}
             entityId={ identity.username }
             identity={ identity }
-            permissions={ _permissions }/>
+            permissions={ _permissions }
+            buttonSize="lg"/>
         );
       });
-
+    //
     const dashboardsMap = componentService
       .getComponentDefinitions(ComponentService.IDENTITY_DASHBOARD_COMPONENT_TYPE)
       .filter(component => !this.isDashboard() || component.dashboard !== false)

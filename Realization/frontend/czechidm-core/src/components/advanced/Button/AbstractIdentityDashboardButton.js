@@ -117,19 +117,23 @@ export default class AbstractIdentityDashboardButton extends Basic.AbstractConte
     const _style = {
       marginRight: 7,
       minWidth: 150,
-      paddingTop: 15,
-      paddingBottom: 15,
-      marginBottom: 15,
       ...style
     };
+    const disableButtonSize = !buttonSize || buttonSize === 'default';
+    if (!disableButtonSize) {
+      _style.paddingTop = 15;
+      _style.paddingBottom = 15;
+      _style.marginBottom = 15;
+    }
     //
     return (
       <div>
         { this.renderConfirm() }
 
         <Basic.Button
+          icon={ !disableButtonSize ? null : this.getIcon() }
           level={ this.getLevel() }
-          className={ !buttonSize || buttonSize === 'default' ? null : `btn-${ buttonSize }` }
+          className={ disableButtonSize ? null : `btn-${ buttonSize }` }
           onClick={ (event) => this.onClick(event) }
           style={ _style }
           title={ this.getTitle() }
@@ -138,9 +142,13 @@ export default class AbstractIdentityDashboardButton extends Basic.AbstractConte
           showLoading={ this.isShowLoading() }
           showLoadingIcon
           disabled={ showLoading }>
-          <div>
-            <Basic.Icon value={ this.getIcon() || 'fa:angle-double-right' } iconSize="sm"/>
-          </div>
+          {
+            disableButtonSize
+            ||
+            <div>
+              <Basic.Icon value={ this.getIcon() || 'fa:angle-double-right' } iconSize="sm"/>
+            </div>
+          }
           <div>{ this.renderContent() }</div>
         </Basic.Button>
       </div>
