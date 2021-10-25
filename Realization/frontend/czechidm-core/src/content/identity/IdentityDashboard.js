@@ -176,7 +176,7 @@ class IdentityDashboard extends Basic.AbstractContent {
 
         <OrganizationPosition identity={ identityIdentifier } showLink={ false }/>
 
-        <Basic.Div style={{ paddingBottom: 15 }}>
+        <Basic.Div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {
             [...buttonsMap.values()]
           }

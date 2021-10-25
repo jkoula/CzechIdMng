@@ -197,6 +197,7 @@ export default function BasicIcon(props) {
       { [`fa-${ _icon}`]: _type === TYPE_FONT_AWESOME || _type === TYPE_FONT_AWESOME_FAR || _type === TYPE_FONT_AWESOME_FAS },
       { disabled: disabled === true },
       { 'fa-2x': iconSize === 'sm' },
+      { 'fa-4x': iconSize === 'md' },
       { 'fa-6x': iconSize === 'lg' },
       className,
     );
@@ -249,7 +250,7 @@ BasicIcon.propTypes = {
    *
    * @since 10.8.0
    */
-  iconSize: PropTypes.oneOf(['default', 'sm', 'lg'])
+  iconSize: PropTypes.oneOf(['default', 'sm', 'md', 'lg'])
 };
 
 BasicIcon.defaultProps = {

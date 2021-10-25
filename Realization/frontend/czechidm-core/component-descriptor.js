@@ -86,6 +86,12 @@ module.exports = {
       component: require('./src/content/dashboards/button/EnableIdentityDashboardButton')
     },
     {
+      id: 'switch-user-dashboard-button',
+      type: 'identity-dashboard-button',
+      order: 1000,
+      component: require('./src/content/dashboards/button/SwitchUserDashboardButton')
+    },
+    {
       id: 'password-change-content',
       priority: 0,
       component: require('./src/content/identity/PasswordChangeContent')
