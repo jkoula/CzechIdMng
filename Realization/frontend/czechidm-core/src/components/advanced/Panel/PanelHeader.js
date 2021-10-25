@@ -196,4 +196,6 @@ function select(state) {
   };
 }
 
+PanelHeader.__PanelHeader__ = true;
+
 export default connect(select)(PanelHeader);

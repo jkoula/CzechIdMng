@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { useSelector } from 'react-redux';
 //
 import { makeStyles } from '@material-ui/core/styles';
 //
@@ -75,15 +76,35 @@ const useStyles = makeStyles((theme) => {
 export default function Panel(props) {
   const { className, rendered, showLoading, level, style, children, onClick } = props;
   const classes = useStyles();
+  const userContext = useSelector((state) => state.security.userContext);
   //
   if (rendered === null || rendered === undefined || rendered === '' || rendered === false) {
     return null;
   }
   //
+  // try to find panel header and its uiKey => resolve panel is collapsed or not
+  // lookout: is required here, because panel is rerendered, after profile is persisted and loaded into redux again
+  let _collapsed = false;
+  const _children = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      if (child.type
+        && child.type.__PanelHeader__
+        && child.props.uiKey
+        && userContext
+        && userContext.profile
+        && userContext.profile.setting
+        && userContext.profile.setting[child.props.uiKey]) { // or personalized by profile
+        _collapsed = !!userContext.profile.setting[child.props.uiKey].collapsed;
+      }
+    }
+    return child;
+  });
+  //
   const classNames = classnames(
     'basic-panel',
     'panel',
     `panel-${ level }`,
+    { collapsed: _collapsed },
     classes.root,
     classes[Utils.Ui.toLevel(level)],
     className,
@@ -91,7 +112,7 @@ export default function Panel(props) {
   //
   return (
     <Div className={ classNames } style={ style } onClick={ onClick } showLoading={ showLoading }>
-      { children }
+      { _children }
     </Div>
   );
 }
