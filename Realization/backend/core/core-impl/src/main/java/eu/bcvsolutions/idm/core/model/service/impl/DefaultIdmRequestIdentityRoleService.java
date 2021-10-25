@@ -494,6 +494,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	 * @param filter
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private IdmRequestIdentityRoleDto conceptToRequestIdentityRole(IdmConceptRoleRequestDto concept,
 			IdmRequestIdentityRoleFilter filter) {
 		IdmRequestIdentityRoleDto requestIdentityRoleDto = modelMapper.map(concept, IdmRequestIdentityRoleDto.class);
@@ -550,8 +551,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 			if (ConceptRoleRequestOperation.REMOVE != concept.getOperation()) {
 				IdmRoleDto roleDto = DtoUtils.getEmbedded(concept, IdmConceptRoleRequest_.role.getName(), IdmRoleDto.class, null);
 				if (roleDto != null && this.roleSystemService instanceof AbstractReadDtoService) {
-					@SuppressWarnings(value = "rawtypes")
-					AbstractReadDtoService roleSystemService = (AbstractReadDtoService) this.roleSystemService;
+					AbstractReadDtoService<?, ?, IdmRoleSystemFilter> roleSystemService = (AbstractReadDtoService<?, ?, IdmRoleSystemFilter>) this.roleSystemService;
 					BaseFilter roleSystemFilter = roleSystemService.createFilterInstance();
 					if (roleSystemFilter instanceof IdmRoleSystemFilter) {
 						IdmRoleSystemFilter idmRoleSystemFilter = (IdmRoleSystemFilter) roleSystemFilter;

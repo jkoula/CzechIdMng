@@ -349,7 +349,7 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 	 */
 	private void executeStepFour(ConnectorTypeDto connectorType) {
 		String systemId = connectorType.getMetadata().get(SYSTEM_DTO_KEY);
-		String groupSyncId = connectorType.getMetadata().get(GROUP_SYNC_ID);
+		connectorType.getMetadata().get(GROUP_SYNC_ID);
 		Assert.notNull(systemId, "System ID cannot be null!");
 		SysSystemDto systemDto = this.getSystemService().get(systemId);
 		connectorType.getEmbedded().put(SYSTEM_DTO_KEY, systemDto);
@@ -574,10 +574,10 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 
 	protected void initDefaultConnectorSettings(SysSystemDto systemDto, IdmFormDefinitionDto connectorFormDef) {
 		// Set the entry object classes.
-		List<Serializable> values = Lists.newArrayList(ENTRY_OBJECT_CLASSES_DEFAULT_VALUES);
+		List<Serializable> values = Lists.newArrayList((Serializable[]) ENTRY_OBJECT_CLASSES_DEFAULT_VALUES);
 		this.setValueToConnectorInstance(ENTRY_OBJECT_CLASSES_KEY, values, systemDto, connectorFormDef);
 		// Set the object classes to sync.
-		values = Lists.newArrayList(ENTRY_OBJECT_CLASSES_DEFAULT_VALUES);
+		values = Lists.newArrayList((Serializable[]) ENTRY_OBJECT_CLASSES_DEFAULT_VALUES);
 		this.setValueToConnectorInstance(OBJECT_CLASSES_TO_SYNC_KEY, values, systemDto, connectorFormDef);
 		// Set use VLV search.
 		this.setValueToConnectorInstance(USE_VLV_SORT_KEY, Boolean.TRUE, systemDto, connectorFormDef);

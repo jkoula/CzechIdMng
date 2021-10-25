@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<script>
+<script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="IdmScript.xsd">
     <code>resolveRoleCatalogueUnderMainCatalogue</code>
     <name>Put all role catalog items under main catalog from a sync</name>
-    <category>TRANSFORM_FROM</category>
-    <type>groovy</type>
     <body><![CDATA[import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncRoleConfigDto;
@@ -37,6 +36,10 @@ if (attributeMapping != null) {
 return null;
 
 ]]></body>
+	<type>groovy</type>
+	<category>TRANSFORM_FROM</category>
+	<description><![CDATA[<p>Returns main role catalog item from a sync configuration.</p>
+<p>This script returns list of IdmRoleCatalogueDto with max one item. This DTO is main catalog from sync configuration. This script doesn't make any save or update.</p>]]></description>
     <services>
         <service>
             <name>defaultSysSyncConfigService</name>
@@ -56,6 +59,4 @@ return null;
             <className>eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto</className>
         </allowClass>
     </allowClasses>
-    <description><![CDATA[<p>Returns main role catalog item from a sync configuration.</p>
-<p>This script returns list of IdmRoleCatalogueDto with max one item. This DTO is main catalog from sync configuration. This script doesn't make any save or update.</p>]]></description>
 </script>

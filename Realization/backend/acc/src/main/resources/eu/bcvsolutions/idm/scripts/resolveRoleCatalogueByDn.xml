@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<script>
+<script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="IdmScript.xsd">
     <code>resolveRoleCatalogueByDn</code>
     <name>Resolve a role catalogue by DN</name>
-    <category>TRANSFORM_FROM</category>
-    <type>groovy</type>
     <body><![CDATA[import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncRoleConfigDto;
@@ -36,6 +35,10 @@ if (roleCatalogue != null) {
 }
 
 return catalogs;]]></body>
+	<type>groovy</type>
+	<category>TRANSFORM_FROM</category>
+	<description><![CDATA[<p>Returns role catalog items base on organization units from given role DN.</p>
+<p>This script returns list of IdmRoleCatalogueDto with max one item. This DTO will contains whole org structure in embedded data. This script doesn't make any save or update.</p>]]></description>
     <services>
         <service>
             <name>defaultSysSyncConfigService</name>
@@ -55,6 +58,4 @@ return catalogs;]]></body>
             <className>eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto</className>
         </allowClass>
     </allowClasses>
-    <description><![CDATA[<p>Returns role catalog items base on organization units from given role DN.</p>
-<p>This script returns list of IdmRoleCatalogueDto with max one item. This DTO will contains whole org structure in embedded data. This script doesn't make any save or update.</p>]]></description>
 </script>

@@ -1,23 +1,24 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
+
 import eu.bcvsolutions.idm.acc.connector.AbstractJdbcConnectorType;
 import eu.bcvsolutions.idm.acc.connector.MsSqlConnectorType;
 import eu.bcvsolutions.idm.acc.connector.PostgresqlConnectorType;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
-import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.impl.mock.MockMsSqlConnectorType;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.ic.api.IcConnectorInstance;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Tests for MS SQL connector type.
@@ -147,7 +148,7 @@ public class MssqlConnectorTypeTest extends AbstractJdbcConnectorTypeTest {
 		SysSystemDto systemDto = systemService.get(system.getId());
 		assertNotNull(systemDto);
 
-		ConnectorType connectorTypeBySystem = connectorManager.findConnectorTypeBySystem(systemDto);
+		connectorManager.findConnectorTypeBySystem(systemDto);
 		ConnectorTypeDto reopenSystem = getConnectorTypeDto();
 		reopenSystem.setReopened(true);
 		reopenSystem.getEmbedded().put(PostgresqlConnectorType.SYSTEM_DTO_KEY, systemDto);

@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
+@SuppressWarnings("rawtypes")
 @Priority(Ordered.LOWEST_PRECEDENCE - 10)
 public class MockIdmRoleSystemService
 		implements IdmRoleSystemService, ReadDtoService {

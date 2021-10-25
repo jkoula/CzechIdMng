@@ -15,7 +15,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
  * @author Ondrej Kopr
  *
  */
-@SuppressWarnings({ "deprecation", "unused" })
 public interface AuthenticatorConfiguration extends Configurable  {
 
 	/**

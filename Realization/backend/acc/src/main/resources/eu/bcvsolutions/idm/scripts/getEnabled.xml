@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<script>
+<script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="IdmScript.xsd">
     <code>getEnabled</code>
     <name>Calculates a enable value from an identity and an account.</name>
-    <category>TRANSFORM_TO</category>
-    <type>groovy</type>
     <body><![CDATA[import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 
 org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger("getEnabled");
@@ -23,6 +22,10 @@ if(account && account.isInProtection()){
 }
 
 return true;]]></body>
+	<type>groovy</type>
+	<category>TRANSFORM_TO</category>
+	<description><![CDATA[<p>Calculates a enable value from an identity and an account.</p>
+<p>If the account in AD is deleted (is in the protected mode), but the identity is still valid then it returns false.</p>]]></description>
     <services>
         <service>
             <name>accAccountService</name>
@@ -36,6 +39,4 @@ return true;]]></body>
             <className>eu.bcvsolutions.idm.core.api.domain.IdentityState</className>
         </allowClass>
     </allowClasses>
-    <description><![CDATA[<p>Calculates a enable value from an identity and an account.</p>
-<p>If the account in AD is deleted (is in the protected mode), but the identity is still valid then it returns false.</p>]]></description>
 </script>

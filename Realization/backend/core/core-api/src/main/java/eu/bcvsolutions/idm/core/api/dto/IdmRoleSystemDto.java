@@ -11,6 +11,9 @@ import java.util.UUID;
  *
  */
 public class IdmRoleSystemDto extends AbstractDto {
+	
+	private static final long serialVersionUID = 8370614337014336679L;
+	//
 	@Embedded(dtoClass = IdmRoleDto.class)
 	private UUID role;
 	@Embedded(dtoClass = IdmSystemDto.class)
