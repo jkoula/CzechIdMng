@@ -1200,6 +1200,11 @@ module.exports = {
       access: [ { type: 'PERMIT_ALL' } ]
     },
     {
+      path: 'error/503',
+      component: require('./src/content/error/503'),
+      access: [ { type: 'PERMIT_ALL' } ]
+    },
+    {
       path: '*',
       component: require('./src/content/error/404'),
       access: [ { type: 'PERMIT_ALL' } ],

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import uuid from 'uuid';
-import Avatar from '@material-ui/core/Avatar';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';

@@ -1,12 +1,18 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import { AbstractContent, Icon } from '../../components/basic';
+//
+import * as Basic from '../../components/basic';
 
-
-export default class Error404 extends AbstractContent {
+/**
+ * 404 error content.
+ *
+ * @author Radek Tomiška
+ */
+export default class Error404 extends Basic.AbstractContent {
 
   constructor(props, context) {
     super(props, context);
+    //
     this.state = {
       id: null // 404 with record id
     };
@@ -19,7 +25,7 @@ export default class Error404 extends AbstractContent {
   UNSAFE_componentWillMount() {
     this.selectNavigationItem('home');
     const { query } = this.props.location;
-     // 404 with record id
+    // 404 with record id
     if (query) {
       this.setState({
         id: query.id
@@ -31,19 +37,16 @@ export default class Error404 extends AbstractContent {
     const { id } = this.state;
     return (
       <div>
-        <Helmet title={this.i18n('title')} />
-        <div className="alert alert-warning">
-          <div className="alert-icon"><Icon icon="exclamation-sign"/></div>
-          <div className="alert-desc">
-            {
-              !id
-              ?
-              this.i18n('description')
-              :
-              this.i18n('record', { id, escape: false })
-            }
-          </div>
-        </div>
+        <Helmet title={ this.i18n('title') } />
+        <Basic.Alert
+          level="warning"
+          text={
+            !id
+            ?
+            this.i18n('description')
+            :
+            this.i18n('record', { id, escape: false })
+          }/>
       </div>
     );
   }

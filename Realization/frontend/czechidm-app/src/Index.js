@@ -7,7 +7,7 @@ import { HashRouter as Router, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import Promise from 'es6-promise';
 //
-import { Managers, Basic, ConfigActions } from 'czechidm-core';
+import { Managers, Basic, ConfigActions, Services } from 'czechidm-core';
 //
 // this parts are genetater dynamicaly to dist - after build will be packed by browserify to sources
 import IdmContext from 'czechidm-core/src/context/idm-context';
@@ -47,9 +47,18 @@ store.dispatch(ConfigActions.appInit(config, moduleDescriptors, componentDescrip
     ReactDOM.render(
       <div style={{ margin: 15 }}>
         <Helmet title="503" />
-        <Basic.FlashMessage
-          icon="exclamation-sign"
-          message={ flashManager.convertFromError(error) }/>
+        <Basic.Container component="main" maxWidth="md">
+          <Basic.FlashMessage
+            icon="exclamation-sign"
+            message={ flashManager.convertFromError(error) }
+            buttons={[
+              <Basic.Button
+                icon="fa:refresh"
+                onClick={() => document.location.reload() }>
+                { Services.LocalizationService.i18n('button.refresh') }
+              </Basic.Button>
+            ]}/>
+        </Basic.Container>
       </div>,
       document.getElementById('content')
     );
