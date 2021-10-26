@@ -17,11 +17,11 @@ const INITIAL_STATE = new Immutable.Map({
 });
 
 /**
- * Config / layout storage
+ * Config / layout storage.
  *
  * @author Radek Tomiška
  */
-export function config(state = INITIAL_STATE, action) {
+export default function reduce(state = INITIAL_STATE, action) {
   switch (action.type) {
     case Actions.SELECT_NAVIGATION_ITEMS: {
       const prevState = state.get('selectedNavigationItems');
@@ -49,21 +49,21 @@ export function config(state = INITIAL_STATE, action) {
       return state.set('i18nReady', null);
     }
     case Actions.I18N_READY: {
-      LOGGER.debug('i18n ready [' + action.lng + ']');
+      LOGGER.debug(`i18n ready [${ action.lng }]`);
       return state.set('i18nReady', action.lng);
     }
     case Actions.MODULES_INIT: {
       return state.set('modulesReady', false);
     }
     case Actions.MODULES_READY: {
-      LOGGER.debug('modules ready [' + action.ready + ']');
+      LOGGER.debug(`modules ready [${ action.ready }]`);
       return state.set('modulesReady', action.ready);
     }
     case Actions.NAVIGATION_INIT: {
       return state.set('navigationReady', false);
     }
     case Actions.NAVIGATION_READY: {
-      LOGGER.debug('navigation ready [' + action.ready + ']');
+      LOGGER.debug(`navigation ready [${ action.ready }]`);
       let newState = state.set(Properties.NAVIGATION, action.navigation);
       newState = newState.set('navigationReady', action.ready);
       return newState;
@@ -72,7 +72,7 @@ export function config(state = INITIAL_STATE, action) {
       return state.set('configurationReady', false);
     }
     case Actions.CONFIGURATION_READY: {
-      LOGGER.debug('configuration ready [' + action.ready + ']');
+      LOGGER.debug(`configuration ready [${ action.ready }]`);
       const newState = state.set('configurationReady', action.ready);
       return newState;
     }
@@ -82,7 +82,7 @@ export function config(state = INITIAL_STATE, action) {
       return newState;
     }
     case Actions.APP_READY: {
-      LOGGER.debug('app ready [' + action.ready + ']');
+      LOGGER.debug(`app ready [${ action.ready }]`);
       return state.set('appReady', action.ready);
     }
     case Actions.APP_UNAVAILABLE: {
@@ -104,4 +104,11 @@ export function config(state = INITIAL_STATE, action) {
     default:
       return state;
   }
+}
+
+/**
+ * Simple function wrapper to assing name to default export
+ */
+export function config(state, action) {
+  return reduce(state, action);
 }
