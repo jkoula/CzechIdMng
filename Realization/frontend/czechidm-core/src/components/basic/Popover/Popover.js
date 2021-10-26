@@ -13,7 +13,7 @@ import PanelHeader from '../Panel/PanelHeader';
 import PanelBody from '../Panel/PanelBody';
 import Typography from '../Typography/Typography';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   popover: {
     cursor: 'pointer',
     '& .basic-alert': {
@@ -29,7 +29,8 @@ const useStyles = makeStyles(() => ({
   },
   typography: {
     display: 'inline-block',
-    fontSize: 'inherit'
+    fontSize: 'inherit',
+    color: theme.palette.primary.main,
   }
 }));
 
