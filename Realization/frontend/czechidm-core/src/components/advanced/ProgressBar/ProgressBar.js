@@ -38,9 +38,10 @@ export default function ProgressBar(props) {
   //
   let _label = label;
   const _barLabels = [];
-  let _now = now || 0;
+  let _now = now;
   let _bsStyle = bsStyle;
   if (bars) {
+    _now = 0;
     bars.forEach(bar => {
       if (bar.now > 0) {
         _now += bar.now;

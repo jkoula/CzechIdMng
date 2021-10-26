@@ -91,11 +91,6 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 	private IdmRoleCatalogueService roleCatalogueService;
 
 	@Override
-	public String getConnectorName() {
-		return "net.tirasa.connid.bundles.ad.ADConnector";
-	}
-
-	@Override
 	public String getIconKey() {
 		return "ad-group-connector-icon";
 	}
