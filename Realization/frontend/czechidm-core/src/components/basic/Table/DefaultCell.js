@@ -4,7 +4,7 @@ import _ from 'lodash';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 
 /**
- * Component that handles default cell
+ * Component that handles default cell.
  *
  * Example usage via from a `Column`:
  * ```

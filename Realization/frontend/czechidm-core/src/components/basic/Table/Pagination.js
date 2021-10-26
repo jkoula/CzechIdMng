@@ -173,14 +173,14 @@ class Pagination extends AbstractContextComponent {
     const prev = [];
     const activePrev = this.hasPrev();
     prev.push(
-      <li key="page-first" className={activePrev ? '' : 'disabled'}>
+      <li key="page-first" className={ activePrev ? '' : 'disabled' }>
         <a ref="page-first" href="#" aria-label="First" onClick={this.setPage.bind(this, 0)}>
           <span aria-hidden="true">&laquo;&laquo;</span>
         </a>
       </li>
     );
     prev.push(
-      <li key="page-prev" className={activePrev ? '' : 'disabled'}>
+      <li key="page-prev" className={ activePrev ? '' : 'disabled' }>
         <a ref="page-prev" href="#" aria-label="Previous" onClick={this.prev.bind(this)}>
           <span aria-hidden="true">&laquo;</span>
         </a>
@@ -272,6 +272,7 @@ class Pagination extends AbstractContextComponent {
             { this.i18n('component.basic.Table.Pagination.size') }
             <select
               value={ currentSize }
+              style={{ backgroundColor: 'inherit' }}
               onChange={ this._changeSize.bind(this) }>
               { sizes }
             </select>

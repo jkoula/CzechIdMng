@@ -188,6 +188,20 @@
 
   .pagination {
     margin: 0;
+
+    a {
+      background-color: inherit;
+      color: inherit;
+    }
+
+    li.disabled {
+      a {
+        &:focus, &:hover {
+          background-color: inherit;
+          color: inherit;
+        }
+      }
+    }
   }
 
   .record-info {

@@ -13,7 +13,7 @@ import { LocalizationService } from '../../../services';
 const TARGET_PARAMETER = '_target';
 
 /**
- * Fills href parameter values from ginen rowData / entity object
+ * Fills href parameter values from ginen rowData / entity object.
  *
  * @param  {string} to href
  * @param  {object} rowData entity
@@ -65,7 +65,7 @@ const LinkCell = ({ rowIndex, data, property, to, href, className, title, target
   const accessItems = (access && !Array.isArray(access)) ? [access] : access;
   // when is property and accessItems null, then return only default cell
   if (!propertyValue) {
-    return <DefaultCell {...props}/>;
+    return <DefaultCell { ...props }/>;
   }
   // construct html link href
   let _href = '#';
@@ -78,7 +78,7 @@ const LinkCell = ({ rowIndex, data, property, to, href, className, title, target
   }
   //
   return (
-    <DefaultCell {...props}>
+    <DefaultCell { ...props }>
       {
         (accessItems && !SecurityManager.hasAccess(accessItems))
         ?
@@ -90,7 +90,7 @@ const LinkCell = ({ rowIndex, data, property, to, href, className, title, target
             :
             <Popover
               level="warning"
-              title={LocalizationService.i18n('security.access.link.denied')}
+              title={ LocalizationService.i18n('security.access.link.denied') }
               value={
                 <span>
                   {
@@ -115,9 +115,7 @@ const LinkCell = ({ rowIndex, data, property, to, href, className, title, target
                   }
                 </span>
               }>
-              {
-                <Button level="link" style={{ padding: 0 }}>{ propertyValue }</Button>
-              }
+              <Button level="link" style={{ padding: 0 }}>{ propertyValue }</Button>
             </Popover>
           }
         </span>

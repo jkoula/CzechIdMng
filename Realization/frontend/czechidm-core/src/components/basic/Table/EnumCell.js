@@ -17,11 +17,11 @@ import EnumValue from '../EnumValue/EnumValue';
  *
  * @author Radek Tomiška
  */
-const EnumCell = ({rowIndex, data, property, enumClass, ...props}) => {
+const EnumCell = ({ rowIndex, data, property, enumClass, ...props }) => {
   const propertyValue = DefaultCell.getPropertyValue(data[rowIndex], property);
   //
   return (
-    <DefaultCell {...props}>
+    <DefaultCell { ...props }>
       <EnumValue value={propertyValue} enum={enumClass}/>
     </DefaultCell>
   );
