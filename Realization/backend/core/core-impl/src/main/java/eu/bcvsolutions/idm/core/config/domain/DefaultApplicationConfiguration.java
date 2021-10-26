@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.core.config.domain;
 
+import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import eu.bcvsolutions.idm.core.api.config.domain.AbstractConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 
 /**
  * Common application configuration.
@@ -69,5 +72,10 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 				.toUriString();
 		//
 		return backendUrl;
+	}
+	
+	@Override
+	public UUID getApplicationLogoId() {
+		return DtoUtils.toUuid(getConfigurationService().getValue(PROPERTY_APPLICATION_LOGO));
 	}
 }

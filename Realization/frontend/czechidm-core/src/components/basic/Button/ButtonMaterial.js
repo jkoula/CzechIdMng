@@ -52,6 +52,19 @@ const useStyles = makeStyles((theme) => {
       '&:hover': {
         backgroundColor: theme.palette.warning.dark,
       }
+    },
+    errorIcon: {
+      color: theme.palette.error.main,
+      '&:hover': {
+        color: theme.palette.error.dark,
+      }
+    },
+    error: {
+      color: theme.palette.error.contrastText,
+      backgroundColor: theme.palette.error.main,
+      '&:hover': {
+        backgroundColor: theme.palette.error.dark,
+      }
     }
   };
 });
@@ -113,16 +126,18 @@ function ButtonMaterial(props) {
   } else {
     _color = 'default';
     if (!disabled && !showLoading) {
-      if (_level === 'error' || _level === 'danger') {
-        _color = 'secondary';
-      } else if (_level === 'link' || _level === 'primary') {
+      if (_level === 'link' || _level === 'primary') {
         _color = 'primary';
+      } else if (_level === 'secondary') {
+        _color = 'secondary';
       } else if (_level === 'success') {
         _statusClasses = classes.success;
       } else if (_level === 'info') {
         _statusClasses = classes.info;
       } else if (_level === 'warning') {
         _statusClasses = classes.warning;
+      } else if (_level === 'error') {
+        _statusClasses = classes.error;
       }
     }
   }
@@ -143,6 +158,8 @@ function ButtonMaterial(props) {
         _statusClasses = classes.infoIcon;
       } else if (_level === 'warning') {
         _statusClasses = classes.warningIcon;
+      } else if (_level === 'error') {
+        _statusClasses = classes.errorIcon;
       }
     }
     //
@@ -222,7 +239,7 @@ ButtonMaterial.propTypes = {
   /**
    * Button level / css / class
    */
-  level: PropTypes.oneOf(['default', 'success', 'warning', 'info', 'danger', 'error', 'link', 'primary']),
+  level: PropTypes.oneOf(['default', 'success', 'warning', 'info', 'danger', 'error', 'link', 'primary', 'secondary']),
   /**
    * When showLoading is true, then showLoadingIcon is shown
    */

@@ -81,38 +81,40 @@ function navigationInit(cb) {
 export function backendConfigurationInit(cb = () => {}) {
   return (dispatch, getState) => {
     const configurationManager = new ConfigurationManager();
-    dispatch(configurationManager.fetchPublicConfigurations((data, error) => {
-      if (!error) {
-        // disable modules by configuration
-        ConfigLoader.getModuleDescriptors().forEach(moduleDescriptor => {
-          if (moduleDescriptor.backendId) { // FE module depends on be module
-            const isEnabled = ConfigurationManager.isModuleEnabled(getState(), moduleDescriptor.backendId) || false;
-            //
-            // FE module can be disabed sepatelly
-            if (isEnabled && (moduleDescriptor.backendId === moduleDescriptor.id
-              || ConfigurationManager.isModuleEnabled(getState(), moduleDescriptor.id))) {
-              ConfigLoader.enable(moduleDescriptor.id, true);
+    dispatch(configurationManager.downloadApplicationLogo(() => {
+      dispatch(configurationManager.fetchPublicConfigurations((data, error) => {
+        if (!error) {
+          // disable modules by configuration
+          ConfigLoader.getModuleDescriptors().forEach(moduleDescriptor => {
+            if (moduleDescriptor.backendId) { // FE module depends on be module
+              const isEnabled = ConfigurationManager.isModuleEnabled(getState(), moduleDescriptor.backendId) || false;
+              //
+              // FE module can be disabed sepatelly
+              if (isEnabled && (moduleDescriptor.backendId === moduleDescriptor.id
+                || ConfigurationManager.isModuleEnabled(getState(), moduleDescriptor.id))) {
+                ConfigLoader.enable(moduleDescriptor.id, true);
+              } else {
+                ConfigLoader.enable(moduleDescriptor.id, false);
+              }
             } else {
-              ConfigLoader.enable(moduleDescriptor.id, false);
+              const isEnabled = ConfigurationManager.isModuleEnabled(getState(), moduleDescriptor.id);
+              ConfigLoader.enable(moduleDescriptor.id, isEnabled === null || isEnabled);
             }
-          } else {
-            const isEnabled = ConfigurationManager.isModuleEnabled(getState(), moduleDescriptor.id);
-            ConfigLoader.enable(moduleDescriptor.id, isEnabled === null || isEnabled);
-          }
-        });
-        ComponentLoader.reloadComponents();
-        //
-        dispatch({
-          type: Actions.CONFIGURATION_READY,
-          ready: true
-        });
-        dispatch(navigationInit(cb));
-      } else {
-        dispatch({
-          type: Actions.APP_UNAVAILABLE
-        });
-        cb(error);
-      }
+          });
+          ComponentLoader.reloadComponents();
+          //
+          dispatch({
+            type: Actions.CONFIGURATION_READY,
+            ready: true
+          });
+          dispatch(navigationInit(cb));
+        } else {
+          dispatch({
+            type: Actions.APP_UNAVAILABLE
+          });
+          cb(error);
+        }
+      }));
     }));
   };
 }

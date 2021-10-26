@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Immutable from 'immutable';
 //
+import * as Utils from '../../utils';
 import EntityManager from './EntityManager';
 import { ConfigurationService } from '../../services';
 import DataManager from './DataManager';
@@ -32,6 +33,16 @@ export default class ConfigurationManager extends EntityManager {
 
   getCollectionType() {
     return 'configurations';
+  }
+
+  /**
+   * Application logo - key in redux storage.
+   *
+   * @return {string} key
+   * @since 12.0.0
+   */
+  getApplicationLogoKey() {
+    return `${ ConfigurationManager.PUBLIC_CONFIGURATIONS }-application-logo`;
   }
 
   fetchPublicConfigurations(cb = null) {
@@ -184,6 +195,58 @@ export default class ConfigurationManager extends EntityManager {
             dispatch(this.dataManager.receiveError(null, uiKey, error, cb));
           });
       }
+    };
+  }
+
+  /**
+   * Get application logo from BE.
+   *
+   * @param  {func} [cb=null] callback
+   * @return {action}
+   */
+  downloadApplicationLogo(cb = null) {
+    const uiKey = this.getApplicationLogoKey();
+    //
+    return (dispatch) => {
+      dispatch(this.dataManager.requestData(uiKey));
+      this
+        .getService()
+        .downloadApplicationLogo()
+        .then(response => {
+          if (response.status === 404 || response.status === 204) {
+            return null;
+          }
+          if (response.status === 200) {
+            return response.blob();
+          }
+          const json = response.json();
+          if (Utils.Response.hasError(json)) {
+            throw Utils.Response.getFirstError(json);
+          }
+          if (Utils.Response.hasInfo(json)) {
+            throw Utils.Response.getFirstInfo(json);
+          }
+          //
+          return null;
+        })
+        .then(blob => {
+          let imageUrl = false;
+          if (blob) {
+            imageUrl = URL.createObjectURL(blob);
+          }
+          //
+          // receive public configurations
+          dispatch({
+            type: Actions.LOGO_RECEIVED,
+            data: imageUrl
+          });
+          if (cb) {
+            cb(imageUrl);
+          }
+        })
+        .catch(error => {
+          dispatch(this.receiveError(null, uiKey, error, cb));
+        });
     };
   }
 
@@ -361,6 +424,17 @@ export default class ConfigurationManager extends EntityManager {
     }
     //
     return null; // TODO: config loaded default?
+  }
+
+  /**
+   * Get application logo.
+   *
+   * @param  {redux} state
+   * @return {blog}   logo in blob or null
+   * @since 12.0.0
+   */
+  static getApplicationLogo(state) {
+    return state.config.get(Properties.LOGO);
   }
 }
 

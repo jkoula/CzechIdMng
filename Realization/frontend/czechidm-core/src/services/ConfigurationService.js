@@ -175,4 +175,13 @@ export default class ConfigurationService extends AbstractService {
         return json;
       });
   }
+
+  /**
+   * Get application logo from BE.
+   *
+   * @since 12.0.0
+   */
+  downloadApplicationLogo() {
+    return RestApiService.download(`/public${ this.getApiPath() }/application/logo`);
+  }
 }

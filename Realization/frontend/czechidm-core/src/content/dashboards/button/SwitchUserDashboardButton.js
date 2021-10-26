@@ -48,7 +48,7 @@ class SwitchUserDashboardButton extends Advanced.AbstractIdentityDashboardButton
   }
 
   getLevel() {
-    return 'danger';
+    return 'secondary';
   }
 }
 

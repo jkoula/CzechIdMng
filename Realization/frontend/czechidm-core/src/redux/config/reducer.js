@@ -6,6 +6,8 @@ import { Actions, Properties } from './constants';
 const INITIAL_STATE = new Immutable.Map({
   [Properties.PROPERTIES]: null, // configuration propereties
   [Properties.NAVIGATION]: null, // all navigation items from enabled modules as Map
+  [Properties.LOGO]: null, // application logo (blob)
+  [Properties.THEME]: null, // application theme (json)
   selectedNavigationItems: ['home'], // homepage by default
   i18nReady: null, // localization language is ready
   modulesReady: false, // modules loaders is ready
@@ -97,6 +99,12 @@ export default function reduce(state = INITIAL_STATE, action) {
         return state.set(Properties.PROPERTIES, configs.merge(action.data));
       }
       return state.set(Properties.PROPERTIES, action.data);
+    }
+    case Actions.LOGO_RECEIVED: {
+      return state.set(Properties.LOGO, action.data);
+    }
+    case Actions.THEME_RECEIVED: {
+      return state.set(Properties.THEME, action.data);
     }
     case Actions.HIDE_FOOTER: {
       return state.set(Properties.HIDE_FOOTER, action.hideFooter);

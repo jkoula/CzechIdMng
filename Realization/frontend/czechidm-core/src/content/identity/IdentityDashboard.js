@@ -128,7 +128,7 @@ class IdentityDashboard extends Basic.AbstractContent {
             entityId={ identity.username }
             identity={ identity }
             permissions={ _permissions }
-            buttonSize="lg"/>
+            buttonSize="large"/>
         );
       });
     //

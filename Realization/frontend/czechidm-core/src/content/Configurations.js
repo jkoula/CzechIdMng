@@ -230,6 +230,13 @@ class Configurations extends Advanced.AbstractTableContent {
       this.context.store.dispatch(this.getManager().fetchPublicConfigurations());
       // reload all bulk actions
       this.context.store.dispatch(this.getManager().clearAllBulkActions());
+      // reload application logo
+      if (entity.code === 'idm.pub.app.show.logo') {
+        this.context.store.dispatch(this.getManager().downloadApplicationLogo());
+      }
+      if (entity.code === 'idm.pub.app.show.theme') {
+        // TODO: ...
+      }
     }
   }
 
@@ -403,6 +410,8 @@ class Configurations extends Advanced.AbstractTableContent {
                   this.context.store.dispatch(this.getManager().fetchPublicConfigurations());
                   // reload all bulk actions
                   this.context.store.dispatch(this.getManager().clearAllBulkActions());
+                  // reload application logo
+                  this.context.store.dispatch(this.getManager().downloadApplicationLogo());
                 } else if (processedBulkAction.id === 'core-configuration-switch-instance-bulk-action') {
                   // reload all bulk actions
                   this.context.store.dispatch(this.getManager().clearBulkActions());

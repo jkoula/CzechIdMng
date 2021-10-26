@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.api.config.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -56,6 +57,14 @@ public interface ApplicationConfiguration extends Configurable {
 	 */
 	String PROPERTY_BACKEND_URL = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.backend.url";
 	
+	/**
+	 * Application logo (attachment identifier).
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_APPLICATION_LOGO = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.logo";
+	
+	
 	@Override
 	default String getConfigurableType() {
 		return AppModule.MODULE_ID;
@@ -87,6 +96,9 @@ public interface ApplicationConfiguration extends Configurable {
 		List<String> properties = new ArrayList<>(); // we are not using superclass properties - enable and order does not make a sense here
 		properties.add(getPropertyName(PROPERTY_STAGE));
 		properties.add(getPropertyName(PROPERTY_SHOW_LOGOUT_CONTENT));
+		properties.add(getPropertyName(PROPERTY_FRONTEND_URL));
+		properties.add(getPropertyName(PROPERTY_BACKEND_URL));
+		properties.add(getPropertyName(PROPERTY_APPLICATION_LOGO));
 		return properties;
 	}
 	
@@ -132,4 +144,12 @@ public interface ApplicationConfiguration extends Configurable {
 	 * @since 12.0.0
 	 */
 	String getBackendUrl(HttpServletRequest request);
+	
+	/**
+	 * Application logo (attachment identifier).
+	 * 
+	 * @return attachment identifier
+	 * @since 12.0.0
+	 */
+	UUID getApplicationLogoId();
 }

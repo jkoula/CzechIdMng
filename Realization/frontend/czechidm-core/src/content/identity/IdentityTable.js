@@ -548,7 +548,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
                 ||
                 projections.map(projection => (
                   <Basic.Button
-                    className="btn-lg"
+                    buttonSize="large"
                     level={ projectionManager.getLocalization(projection, 'level', 'default') }
                     title={ projectionManager.getLocalization(projection, 'help') }
                     titlePlacement="bottom"

@@ -17,7 +17,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
 //
 import * as Utils from '../../../utils';
-import { IdentityManager, SecurityManager } from '../../../redux';
+import { IdentityManager, SecurityManager, ConfigurationManager } from '../../../redux';
 import { collapseNavigation } from '../../../redux/config/actions';
 import NavigationSearch from './NavigationSearch';
 import NavigationMonitoring from './NavigationMonitoring';
@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex'
   },
   appBarRoot: {
-    backgroundColor: theme.palette.type === 'dark' ? '#333' : theme.palette.primary.main,
+    backgroundColor: theme.palette.type === 'dark' ? '#333' : theme.palette.primary.main, // TODO: hardcoded #333 => from theme
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
     }),
     overflowX: 'hidden',
     width: theme.spacing(7) + 1,
-    '& .home.collapsed': {
+    '& .application-logo.collapsed': {
       display: 'none'
     }
   },
@@ -116,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   sidebar: {
-    backgroundColor: theme.palette.type === 'dark' ? '#333' : 'transparent',
+    backgroundColor: theme.palette.type === 'dark' ? '#333' : 'transparent', // TODO: hardcoded #333 => from theme
     '& .nav li': {
       '&:hover': {
         color: theme.palette.text.primary,
@@ -157,11 +157,14 @@ function NavigationMaterial(props) {
     location,
     children
   } = props;
+  const dispatch = useDispatch();
   const classes = useStyles();
   const [ mobileOpen, setMobileOpen ] = React.useState(false);
   const navigationCollapsed = userContext.navigationCollapsed;
   const themeType = useSelector((state) => Utils.Ui.getTheme(state).palette.type);
-  const dispatch = useDispatch();
+  const isDevelopment = useSelector((state) => ConfigurationManager.getEnvironmentStage(state) === 'development');
+  const applicationLogo = useSelector((state) => ConfigurationManager.getApplicationLogo(state));
+
   //
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -187,6 +190,21 @@ function NavigationMaterial(props) {
       }));
     }
   };
+  let toogleDarkButton = null;
+  if (isDevelopment) {
+    toogleDarkButton = (
+      <IconButton
+        color="inherit"
+        onClick={() => {
+          dispatch({
+            type: 'THEME',
+            theme: themeType === 'light' ? 'dark' : 'light'
+          });
+        }}>
+        { themeType === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+      </IconButton>
+    );
+  }
   //
   if (!SecurityManager.isAuthenticated(userContext)) {
     return (
@@ -196,27 +214,24 @@ function NavigationMaterial(props) {
             position="fixed"
             className={ classes.appBarRoot }>
             <Toolbar>
-              <Link to="/" className="home light">
-                {' '}
-              </Link>
-              { /*
-                userContext.isExpired
-                ||
-                mainItems
-              */}
+              {
+                applicationLogo
+                ?
+                <Link to="/" className="application-logo light">
+                  {/* lookout: alt is not defined => alr is rendered before image is fully inited otherwise */}
+                  <img src={ applicationLogo } alt=""/>
+                </Link>
+                :
+                <Link to="/" className="application-logo home light">
+                  {' '}
+                </Link>
+              }
               <div className={ classes.grow }/>
               <NavigationEnvironment />
               <NavigationLanguage />
-              <IconButton
-                color="inherit"
-                onClick={() => {
-                  dispatch({
-                    type: 'THEME',
-                    theme: themeType === 'light' ? 'dark' : 'light'
-                  });
-                }}>
-                { themeType === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
-              </IconButton>
+              {
+                toogleDarkButton
+              }
             </Toolbar>
           </AppBar>
           <Toolbar />
@@ -229,9 +244,18 @@ function NavigationMaterial(props) {
   const drawer = (
     <div className={ clsx(classes.sidebar, { sidebar: true, collapsed: navigationCollapsed }) }>
       <div className={ classes.toolbar } style={{ display: 'flex', alignItems: 'center'}}>
-        <Link to="/" className={ !navigationCollapsed ? 'home' : 'home collapsed' }>
-          {' '}
-        </Link>
+        {
+          applicationLogo
+          ?
+          <Link to="/" className={ !navigationCollapsed ? 'application-logo' : 'application-logo collapsed' }>
+            {/* lookout: alt is not defined => alr is rendered before image is fully inited otherwise */}
+            <img src={ applicationLogo } alt=""/>
+          </Link>
+          :
+          <Link to="/" className={ !navigationCollapsed ? 'application-logo home' : 'application-logo home collapsed' }>
+            {' '}
+          </Link>
+        }
         <div className={ !navigationCollapsed ? classes.grow : 'hidden' }/>
         <Hidden smDown>
           <IconButton
@@ -291,17 +315,9 @@ function NavigationMaterial(props) {
             <NavigationMonitoring location={ location }/>
           }
 
-          <IconButton
-            color="inherit"
-            onClick={() => {
-              dispatch({
-                type: 'THEME',
-                theme: themeType === 'light' ? 'dark' : 'light'
-              });
-            }}>
-            { themeType === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
-          </IconButton>
-
+          {
+            toogleDarkButton
+          }
           {
             userContext.isExpired
             ||
