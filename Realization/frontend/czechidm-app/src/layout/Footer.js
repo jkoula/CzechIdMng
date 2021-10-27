@@ -36,7 +36,20 @@ class Footer extends Basic.AbstractContent {
     //
     return (
       <footer>
-        <div className="pull-left">
+        {
+          /*
+          TODO: https://v4.mui.com/components/app-bar/#back-to-top
+
+          <div className="pull-right">
+            <Basic.Button
+              icon="chevron-up"
+              aria-label="Left Align"
+              onClick={ this.jumpTop.bind(this) }/>
+          </div>
+          <div className="clearfix" />
+          */
+        }
+        <div>
           {/* RT: version is visible on about page only */}
           <span title={ `${ this.i18n('app.version.backend') }: ${ backendVersion }` } className="hidden">
             { this.i18n('app.version.frontend') } { packageInfo.version }
@@ -67,13 +80,6 @@ class Footer extends Basic.AbstractContent {
             { this.i18n('content.about.link') }
           </a>
         </div>
-        <div className="pull-right">
-          <Basic.Button
-            icon="chevron-up"
-            aria-label="Left Align"
-            onClick={ this.jumpTop.bind(this) }/>
-        </div>
-        <div className="clearfix" />
       </footer>
     );
   }

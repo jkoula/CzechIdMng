@@ -19,6 +19,12 @@ function INITIAL_THEME(themeType) {
         main: themeType === 'dark' ? '#90caf9' : '#1976d2', // #5cb85c
         contrastText: '#ffffff'
       },
+      secondary: {
+        light: '#ff4081',
+        main: '#f50057',
+        dark: '#c51162',
+        contrastText: '#fff'
+      },
       success: {
         main: '#4caf50',
         contrastText: '#ffffff'
@@ -37,6 +43,28 @@ function INITIAL_THEME(themeType) {
     },
     shape: {
       borderRadius: 4
+    },
+    overrides: {
+      MuiCssBaseline: {
+        '@global': {
+          a: {
+            color: '#f50057', // ~ secondary
+            textDecoration: 'none',
+            '&:visited': {
+              color: '#f50057',
+              textDecoration: 'none',
+            },
+            '&:focus': {
+              color: '#c51162', // ~ secondary dark
+              textDecoration: 'underline',
+            },
+            '&:hover': {
+              color: '#c51162', // ~ secondary dark
+              textDecoration: 'underline',
+            }
+          }
+        }
+      }
     }
   };
 }

@@ -43,10 +43,6 @@ class Login extends Basic.AbstractContent {
     return 'home';
   }
 
-  hideFooter() {
-    return true;
-  }
-
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.userContext !== this.props.userContext) {
       this._tryRedirectLoggedUser();
@@ -362,32 +358,6 @@ class Login extends Basic.AbstractContent {
                 </Basic.Container>
               </form>
             </Basic.Div>
-
-            <div className="app-footer">
-              <Link
-                href={ `${ this.i18n('app.documentation.url') }/start`}
-                target="_blank"
-                rel="noopener noreferrer">
-                { this.i18n('app.helpDesk') }
-              </Link>
-
-              <span style={{ margin: '0 10px' }}>|</span>
-
-              <Link
-                href="http://redmine.czechidm.com/projects/czechidmng"
-                target="_blank"
-                rel="noopener noreferrer">
-                { this.i18n('app.serviceDesk') }
-              </Link>
-
-              <span style={{ margin: '0 10px' }}>|</span>
-
-              <Link
-                to="/about"
-                title={ this.i18n('content.about.link') }>
-                { this.i18n('content.about.link') }
-              </Link>
-            </div>
           </>
         }
       </div>

@@ -5,12 +5,31 @@ import Immutable from 'immutable';
 import classNames from 'classnames';
 import _ from 'lodash';
 //
+import { withStyles } from '@material-ui/core/styles';
+//
 import * as Basic from '../../basic';
 import * as Domain from '../../../domain';
 import * as Utils from '../../../utils';
 import DetailButton from '../Table/DetailButton';
 
 const BASE_ICON_WIDTH = 15; // TODO: how to get dynamic padding from css?
+
+const styles = theme => ({
+  treeNodeRow: {
+    '&.selected': {
+      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+      borderLeftColor: theme.palette.secondary.main,
+      borderLeftWidth: 3,
+      borderLeftStyle: 'solid',
+      paddingLeft: 12
+    },
+    '& .basic-button.embedded': {
+      textAlign: 'left',
+      padding: 0,
+      minWidth: 'auto'
+    }
+  },
+});
 
 /**
 * Advanced tree component
@@ -697,8 +716,9 @@ class Tree extends Basic.AbstractContextComponent {
    * @param {array(uuid)} renderedNodes - prevent to render cyclic nodes (when composition is rendered)
    */
   _renderNodes(parentId = null, level = 0, renderedNodes = null) {
-    const { traverse, nodeContent } = this.props;
+    const { traverse, nodeContent, classes } = this.props;
     const { nodes, ui, selected } = this.state;
+    const treeNodeRowClasses = classes ? classes.treeNodeRow : null;
     //
     // prevent to render cyclic compositions
     if (renderedNodes === null) {
@@ -750,6 +770,7 @@ class Tree extends Basic.AbstractContextComponent {
             const isDisabled = this._isDisabled(node);
             // selected item decorator
             const nodeClassNames = classNames(
+              treeNodeRowClasses,
               'tree-node-row',
               { selected: selected.has(node.id) },
               { disabled: isDisabled }
@@ -1180,5 +1201,4 @@ function select(state, component) {
     _showLoading: manager.isShowLoading(state, uiKey)
   };
 }
-
-export default connect(select, null, null, { forwardRef: true })(Tree);
+export default connect(select, null, null, { forwardRef: true })(withStyles(styles, { withTheme: true })(Tree));

@@ -20,14 +20,40 @@ const ITEM_HEIGTH = 45; // item heigth for dynamic content resize
 
 const useStyles = makeStyles((theme) => {
   return {
+    root: {
+      width: '100%'
+    },
     activeItem: {
       backgroundColor: theme.palette.background.paper,
       '& a.basic-item-active': {
         borderBottomColor: theme.palette.background.paper
       }
     },
+    sidebar: {
+      position: 'absolute',
+      width: 175,
+      '& a.basic-item-active': {
+        borderLeftColor: `${ theme.palette.secondary.main } !important`
+      }
+    },
     content: {
       backgroundColor: theme.palette.background.paper
+    },
+    sidebarContent: {
+      position: 'inherit',
+      margin: '0 0 0 175px',
+      padding: '0 15px',
+      borderLeftStyle: 'solid',
+      borderLeftWidth: 1,
+      borderLeftColor: '#bbb' // TODO: from theme
+    },
+    tabPane: {
+      backgroundColor: 'transparent',
+      borderLeft: '#bbb 1px solid', // TODO: from theme
+      borderRight: '#bbb 1px solid', // TODO: from theme
+      borderBottom: '#bbb 1px solid', // TODO: from theme
+      borderBottomRightRadius: theme.shape.borderRadius,
+      borderBottomLeftRadius: theme.shape.borderRadius
     }
   };
 });
@@ -120,7 +146,7 @@ export default function TabPanel(props) {
           </Tabs>
         </AppBar>
         <div className={ classnames(classes.content, 'tab-content') }>
-          <div className="tab-pane active">
+          <div className={ classnames(classes.tabPane, 'tab-pane', 'active') }>
             { children }
           </div>
         </div>
@@ -131,12 +157,12 @@ export default function TabPanel(props) {
   // left
   return (
     <Basic.Panel className="clearfix">
-      <div className="tab-panel tab-vertical clearfix">
-        <ul className="tab-panel-sidebar nav nav-pills nav-stacked">
+      <div className={ classnames(classes.root, 'tab-vertical', 'clearfix') }>
+        <ul className={ classnames(classes.sidebar, 'nav', 'nav-pills', 'nav-stacked') }>
           { navigationItems }
         </ul>
         <div
-          className={ classnames(classes.content, 'tab-panel-content', 'tab-content') }
+          className={ classnames(classes.content, classes.sidebarContent, 'tab-content') }
           style={{ minHeight: navigationItems.length * ITEM_HEIGTH }}>
           { children }
         </div>

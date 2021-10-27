@@ -77,25 +77,9 @@ h6 {
   text-transform: uppercase;
 }
 
-a {
-  color: @idm-link-color;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-    color: @idm-link-color-hover;
-  }
-
-  &:visited {
-    text-decoration: none;
-    color: @idm-link-color;
-  }
-}
-
 .list-group {
   a {
     font-weight: bolder;
-    color: @idm-nav-color;
   }
 }
 
@@ -114,9 +98,9 @@ a {
 #content-wrapper {
 }
 
-.app-footer {
+footer {
+  margin: 64px 0px 25px 0px;
   text-align: center;
-  margin-top: 64px;
   //
   a {
     opacity: .6;
@@ -125,18 +109,6 @@ a {
     &:hover {
       opacity: 1;
       filter: alpha(opacity=100);
-    }
-  }
-}
-
-footer {
-  margin: 10px 0px 25px 0px;
-
-  a {
-    color: @idm-nav-color !important;
-
-    &:hover {
-      color: @idm-link-color-hover !important;
     }
   }
 }
