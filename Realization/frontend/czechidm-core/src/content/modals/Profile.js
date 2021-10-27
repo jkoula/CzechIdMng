@@ -404,7 +404,7 @@ class Profile extends Basic.AbstractContent {
                           icon="edit"/>
                       </Basic.Fab>
                       <Basic.Fab
-                        color="secondary"
+                        level="danger"
                         className={ _imageUrl && profileManager.canSave(profile, _permissions) ? 'btn-remove' : 'hidden' }
                         size="small">
                         <Basic.Button

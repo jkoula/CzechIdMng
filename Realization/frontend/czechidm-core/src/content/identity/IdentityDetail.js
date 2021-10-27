@@ -270,7 +270,7 @@ class IdentityDetail extends Advanced.AbstractFormableContent {
                         icon="edit"/>
                     </Basic.Fab>
                     <Basic.Fab
-                      color="secondary"
+                      level="danger"
                       className={ _imageUrl && profileManager.canSave(identity, _profilePermissions) ? 'btn-remove' : 'hidden' }
                       size="small">
                       <Basic.Button

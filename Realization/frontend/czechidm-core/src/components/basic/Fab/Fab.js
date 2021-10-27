@@ -5,10 +5,11 @@ import clsx from 'clsx';
 import Fab from '@material-ui/core/Fab';
 import { makeStyles } from '@material-ui/core/styles';
 //
+import * as Utils from '../../../utils';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 
 /**
- * Fab decorator
+ * Fab decorator.
  *
  * @author Radek Tomiška
  * @since 12.0.0
@@ -20,11 +21,8 @@ const useStyles = makeStyles((theme) => ({
   secondary: {
     backgroundColor: theme.palette.secondary.main,
   },
-  danger: {
-    backgroundColor: theme.palette.secondary.main,
-  },
   error: {
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: theme.palette.error.main,
   },
   warning: {
     backgroundColor: theme.palette.warning.main,
@@ -44,12 +42,13 @@ function BasicAvatar(props) {
   if (!rendered) {
     return null;
   }
+  const _level = Utils.Ui.toLevel(level);
   //
   return (
     <Fab
       size={ size }
       color={ color }
-      className={ clsx(className, { [classes[level]]: level !== 'default' }) }>
+      className={ clsx(className, { [classes[_level]]: _level !== 'default' }) }>
       { children }
     </Fab>
   );

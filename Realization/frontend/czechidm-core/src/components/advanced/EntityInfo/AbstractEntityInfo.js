@@ -305,7 +305,7 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
     );
   }
 
-  _renderSystemCollapsIcon() {
+  _renderSystemCollapseIcon() {
     const { expandInfo } = this.state;
     const { collapsable, face } = this.props;
     //
@@ -449,7 +449,7 @@ export default class AbstractEntityInfo extends Basic.AbstractContextComponent {
               <Basic.Label text={ this.i18n('label.disabled') } className="label-disabled" rendered={ !deleted && this.isDisabled(_entity) }/>
               <Basic.Label text={ this.i18n('label.deleted') } className="label-deleted" rendered={ !!deleted }/>
               { this._renderSystemInformationIcon(_entity) }
-              { this._renderSystemCollapsIcon() }
+              { this._renderSystemCollapseIcon() }
             </Basic.Div>
           </Basic.Div>
         </Basic.PanelHeader>

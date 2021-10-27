@@ -230,7 +230,7 @@ export class IdentityInfo extends AbstractEntityInfo {
               <Basic.Label text={ this.i18n('label.disabled') } className="label-disabled" rendered={ !deleted && this.isDisabled(_entity) }/>
               <Basic.Label text={ this.i18n('label.deleted') } className="label-deleted" rendered={ !!deleted }/>
               { this._renderSystemInformationIcon() }
-              { this._renderSystemCollapsIcon() }
+              { this._renderSystemCollapseIcon() }
             </Basic.Div>
           </Basic.Div>
         </Basic.PanelHeader>

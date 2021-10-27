@@ -3,10 +3,28 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 //
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { makeStyles } from '@material-ui/core/styles';
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import Icon from '../Icon/Icon';
 import Typography from '../Typography/Typography';
+//
+const useStyles = makeStyles((theme) => {
+  return {
+    primary: {
+      '& .MuiLinearProgress-barColorPrimary': {
+        backgroundColor: theme.palette.success.main,
+        color: theme.palette.success.main
+      }
+    },
+    secondary: {
+      '& .MuiLinearProgress-barColorPrimary': {
+        backgroundColor: theme.palette.error.main,
+        color: theme.palette.error.main
+      }
+    }
+  };
+});
 
 /**
  * Wrapped progress bar.
@@ -27,6 +45,7 @@ export default function BasicProgressBar(props) {
     bsStyle,
     children
   } = props;
+  const classes = useStyles();
   //
   if (!rendered) {
     return null;
@@ -64,7 +83,7 @@ export default function BasicProgressBar(props) {
         <LinearProgress
           variant={ max === null && active ? 'indeterminate' : 'determinate'}
           value={ percent }
-          color={ bsStyle === 'warning' || bsStyle === 'error' ? 'secondary' : 'primary' } />
+          className={ classes[bsStyle === 'warning' || bsStyle === 'error' ? 'secondary' : 'primary'] }/>
       </div>
       {
         !label

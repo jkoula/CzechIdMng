@@ -136,7 +136,7 @@ const useStyles = makeStyles((theme) => ({
         '&.active': {
           color: theme.palette.text.primary,
           backgroundColor: theme.palette.action.selected,
-          borderLeftColor: theme.palette.primary.main
+          borderLeftColor: theme.palette.secondary.main
         }
       }
     }

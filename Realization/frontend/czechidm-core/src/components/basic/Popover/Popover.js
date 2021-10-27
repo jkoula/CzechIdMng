@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   typography: {
     display: 'inline-block',
     fontSize: 'inherit',
-    color: theme.palette.primary.main,
+    color: theme.palette.secondary.main,
   }
 }));
 

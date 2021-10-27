@@ -265,7 +265,7 @@ export default class AttachmentFormAttributeRenderer extends UuidFormAttributeRe
                       alt={ this.i18n('label.download') } />
                     <div style={{ position: 'absolute', right: 5, bottom: 5 }}>
                       <Basic.Fab
-                        color="secondary"
+                        color="danger"
                         size="small">
                         <Basic.Button
                           type="button"
