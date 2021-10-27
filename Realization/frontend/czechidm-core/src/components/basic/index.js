@@ -58,6 +58,7 @@ import Avatar from './Avatar/Avatar';
 import Fab from './Fab/Fab';
 import Container from './Container/Container';
 import Typography from './Typography/Typography';
+import TextDivider from './TextDivider/TextDivider';
 
 const Components = {
   AbstractComponent,
@@ -129,7 +130,8 @@ const Components = {
   Avatar,
   Fab,
   Container,
-  Typography
+  Typography,
+  TextDivider
 };
 
 Components.version = '12.0.0';

@@ -12,10 +12,14 @@ import Div from '../Div/Div';
 const useStyles = makeStyles((theme) => {
   return {
     root: {
-      backgroundColor: theme.palette.type === 'dark' ? '#333' : '#fff'
+      backgroundColor: theme.palette.background.paper
     },
     default: {
-      backgroundColor: theme.palette.background.paper
+      backgroundColor: theme.palette.background.paper,
+      borderColor: theme.palette.divider,
+      '& .panel-heading': {
+        borderColor: theme.palette.divider
+      }
     },
     info: {
       borderColor: theme.palette.info.main,
@@ -103,7 +107,6 @@ export default function Panel(props) {
   const classNames = classnames(
     'basic-panel',
     'panel',
-    `panel-${ level }`,
     { collapsed: _collapsed },
     classes.root,
     classes[Utils.Ui.toLevel(level)],

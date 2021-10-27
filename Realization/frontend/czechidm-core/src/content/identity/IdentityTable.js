@@ -579,10 +579,8 @@ export class IdentityTable extends Advanced.AbstractTableContent {
               }
             </Basic.Div>
             <Basic.Div style={{ margin: '0 75px' }} rendered={ isDefaultFormProjection }>
-              <Basic.Div className="text-divider">
-                <span>{ this.i18n('action.add.or') }</span>
-              </Basic.Div>
-              <Basic.Div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+              <Basic.TextDivider text={ this.i18n('action.add.or') }/>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
                 <Basic.Button
                   level="link"
                   onClick={ (event) => {
@@ -593,7 +591,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
                   }}>
                   { this.i18n('action.add.default') }
                 </Basic.Button>
-              </Basic.Div>
+              </div>
             </Basic.Div>
           </Basic.Modal.Body>
           <Basic.Modal.Footer>

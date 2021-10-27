@@ -3,73 +3,70 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
-import Icon from '../Icon/Icon';
+import SortIcon from './SortIcon';
 
 const ASC = 'ASC';
 const DESC = 'DESC';
 
+function _activeSort(searchParameters, sortProperty, property) {
+  //
+  if (!searchParameters) {
+    return null;
+  }
+  const sort = searchParameters.getSort(sortProperty || property);
+  if (sort === null) {
+    return null;
+  }
+  return sort === true ? ASC : DESC;
+}
+
+function _handleSort(props, order, event) {
+  if (event) {
+    event.preventDefault();
+  }
+  const { shiftKey } = event;
+  const { sortProperty, property, sortHandler } = props;
+  if (!sortHandler) {
+    // if handleSort is not set, then its nothing to do
+    return null;
+  }
+  return sortHandler(sortProperty || property, order, shiftKey);
+}
+
 /**
- * Header with sort action
+ * Header with sort action.
  *
  * @author Radek Tomiška
  */
-class SortHeaderCell extends AbstractComponent {
-
-  _activeSort() {
-    const { searchParameters, sortProperty, property } = this.props;
-    //
-    if (!searchParameters) {
-      return null;
-    }
-    const sort = searchParameters.getSort(sortProperty || property);
-    if (sort === null) {
-      return null;
-    }
-    return sort === true ? ASC : DESC;
-  }
-
-  _handleSort(order, event) {
-    if (event) {
-      event.preventDefault();
-    }
-    const { shiftKey } = event;
-    const { sortProperty, property, sortHandler } = this.props;
-    if (!sortHandler) {
-      // if handleSort is not set, then its nothing to do
-      return null;
-    }
-    return sortHandler(sortProperty || property, order, shiftKey);
-  }
-
-  render() {
-    const { header, title, property, sortHandler, showLoading, className } = this.props;
-    const active = this._activeSort();
-    const content = header || property;
-    const classNames = classnames(
-      'sort-header-cell',
-      className
-    );
-    return (
-      <div className={ classNames } title={ title }>
-        <a
-          href="#"
-          onClick={ this._handleSort.bind(this, active === 'ASC' ? 'DESC' : 'ASC') }
-          className={ !sortHandler ? 'disabled' : '' }>
-          { content }
-          {
-            (sortHandler || active !== null)
-            ?
-            <SortIcon active={ active } showLoading={ showLoading }/>
-            :
-            null
-          }
-        </a>
-      </div>
-    );
-  }
+export default function SortHeaderCell(props) {
+  const { header, title, property, sortHandler, showLoading, searchParameters, sortProperty, className } = props;
+  const active = _activeSort(searchParameters, sortProperty, property);
+  const content = header || property;
+  const classNames = classnames(
+    'sort-header-cell',
+    className
+  );
+  return (
+    <div className={ classNames } title={ title }>
+      <a
+        href="#"
+        onClick={ (event) => _handleSort(props, active === 'ASC' ? 'DESC' : 'ASC', event) }
+        className={ !sortHandler ? 'disabled' : '' }>
+        { content }
+        {
+          (sortHandler || active !== null)
+          ?
+          <SortIcon active={ active } showLoading={ showLoading }/>
+          :
+          null
+        }
+      </a>
+    </div>
+  );
 }
 
 SortHeaderCell.propTypes = {
+  ...AbstractComponent.propTypes,
   /**
    * Property for header and sorting
    */
@@ -99,60 +96,8 @@ SortHeaderCell.propTypes = {
    */
   showLoading: PropTypes.bool
 };
+
 SortHeaderCell.defaultProps = {
+  ...AbstractComponent.defaultProps,
   showLoading: false
 };
-
-/**
- * Sort icon
- */
-class SortIcon extends AbstractComponent {
-
-  render() {
-    const { active, showLoading } = this.props;
-    const ascClassName = classnames(
-      'sort-icon sort-asc',
-      { active: active === ASC}
-    );
-    const descClassName = classnames(
-      'sort-icon sort-desc',
-      { active: active === DESC }
-    );
-
-    return (
-      <span className="sort-icons">
-        {
-          (showLoading && active)
-          ?
-          <Icon type="fa" icon="refresh" showLoading className="sort-icon active"/>
-          :
-          <span>
-            <Icon icon="triangle-top" className={ascClassName}/>
-            <Icon icon="triangle-bottom" className={descClassName}/>
-          </span>
-        }
-      </span>
-    );
-  }
-}
-
-SortIcon.propTypes = {
-  /**
-   * current order for current property
-   */
-  active: PropTypes.oneOf([ASC, DESC]),
-  /**
-   * loadinig indicator
-   */
-  showLoading: PropTypes.bool
-};
-SortIcon.defaultProps = {
-  active: null,
-  showLoading: false
-};
-
-const SortHeader = ({ ...props }) => (
-  <SortHeaderCell { ...props }/>
-);
-
-export default SortHeader;

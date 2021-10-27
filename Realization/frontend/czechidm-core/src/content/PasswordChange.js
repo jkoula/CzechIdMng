@@ -60,10 +60,6 @@ class PasswordChange extends Basic.AbstractContent {
     this._preValidate();
   }
 
-  hideFooter() {
-    return true;
-  }
-
   cancel() {
     const { userContext } = this.props;
     if (!SecurityManager.isAuthenticated(userContext)) {
@@ -341,7 +337,7 @@ class PasswordChange extends Basic.AbstractContent {
     const { passwordChangeType, enabledPasswordChangeForIdm } = this.props;
     //
     return (
-      <Basic.Div>
+      <div>
         <Helmet title={this.i18n('title')} />
         <Basic.Container component="main" maxWidth="xs">
           <Basic.Alert
@@ -427,7 +423,7 @@ class PasswordChange extends Basic.AbstractContent {
             </form>
           </Basic.Div>
         </Basic.Container>
-      </Basic.Div>
+      </div>
     );
   }
 }

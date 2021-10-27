@@ -23,16 +23,20 @@ class About extends Basic.AbstractContent {
     const { version, buildNumber, buildTimestamp } = this.props;
     //
     return (
-      <Basic.Div>
+      <div>
         <Helmet title={ this.i18n('content.about.title') } />
 
-        <Basic.Row>
-          <Basic.Col lg={ 4 } className="col-lg-offset-4">
+        <Basic.Container component="main" maxWidth="xs">
+          <div className="login-container">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h1 style={{ marginTop: 7, marginBottom: 15, fontWeight: 'normal' }}>
+                { this.i18n('content.about.header') }
+              </h1>
+            </div>
             <Basic.Panel>
-              <Basic.PanelHeader text={ this.i18n('content.about.header') } />
               <Basic.PanelBody className="text-center">
-                <Basic.Div className="about-logo" />
-                <Basic.Div className="about-text">
+                <div className="about-logo" />
+                <div className="about-text">
                   <big>
                     { this.i18n('app.version.frontend') }
                     :
@@ -54,24 +58,22 @@ class About extends Basic.AbstractContent {
                       </Basic.Div>
                     )
                   }
-                  <a
+                  <Basic.Link
                     href={ this.i18n('app.author.homePage') }
-                    target="_blank"
-                    rel="noreferrer noopener">
-                    {this.i18n('app.author.name')}
-                  </a>
+                    isExternal
+                    text={ this.i18n('app.author.name') }/>
                   <br />
                   <big>
                     { this.i18n('content.about.sourceCodeOn') }
                     {' '}
                     <Basic.Link href="https://github.com/bcvsolutions/CzechIdMng" isExternal text="GitHub" />
                   </big>
-                </Basic.Div>
+                </div>
               </Basic.PanelBody>
             </Basic.Panel>
-          </Basic.Col>
-        </Basic.Row>
-      </Basic.Div>
+          </div>
+        </Basic.Container>
+      </div>
     );
   }
 }

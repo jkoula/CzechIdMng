@@ -45,13 +45,13 @@ const useStyles = makeStyles((theme) => {
       padding: '0 15px',
       borderLeftStyle: 'solid',
       borderLeftWidth: 1,
-      borderLeftColor: '#bbb' // TODO: from theme
+      borderLeftColor: theme.palette.divider
     },
     tabPane: {
       backgroundColor: 'transparent',
-      borderLeft: '#bbb 1px solid', // TODO: from theme
-      borderRight: '#bbb 1px solid', // TODO: from theme
-      borderBottom: '#bbb 1px solid', // TODO: from theme
+      borderLeft: `${ theme.palette.divider } 1px solid`,
+      borderRight: `${ theme.palette.divider } 1px solid`,
+      borderBottom: `${ theme.palette.divider } 1px solid`,
       borderBottomRightRadius: theme.shape.borderRadius,
       borderBottomLeftRadius: theme.shape.borderRadius
     }

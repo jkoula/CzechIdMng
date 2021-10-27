@@ -12,26 +12,23 @@ import Icon from '../Icon/Icon';
  *
  * @author Radek Tomiška
  */
-export default class Link extends AbstractComponent {
-
-  render() {
-    const { rendered, showLoading, isExternal, style, className, text, children, href } = this.props;
-    if (!rendered || !href || (!text && !children)) {
-      return null;
-    }
-    //
-    const classNames = classnames(
-      'basic-link',
-      className
-    );
-    return (
-      <a href={ href } className={ classNames } style={ style } target={ isExternal ? '_blank' : null }>
-        <Icon value="fa:globe" showLoading={ showLoading } style={{ marginRight: 2 }} rendered={ isExternal || showLoading }/>
-        { text }
-        { children }
-      </a>
-    );
+export default function Link(props) {
+  const { rendered, showLoading, isExternal, style, className, text, children, href } = props;
+  if (!rendered || !href || (!text && !children)) {
+    return null;
   }
+  //
+  const classNames = classnames(
+    'basic-link',
+    className
+  );
+  return (
+    <a href={ href } className={ classNames } style={ style } target={ isExternal ? '_blank' : null } rel="noreferrer noopener">
+      <Icon value="fa:globe" showLoading={ showLoading } style={{ marginRight: 2 }} rendered={ isExternal || showLoading }/>
+      { text }
+      { children }
+    </a>
+  );
 }
 
 Link.propTypes = {

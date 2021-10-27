@@ -344,7 +344,7 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 	 */
 	private void executeStepFour(ConnectorTypeDto connectorType) {
 		String systemId = connectorType.getMetadata().get(SYSTEM_DTO_KEY);
-		connectorType.getMetadata().get(GROUP_SYNC_ID);
+		// connectorType.getMetadata().get(GROUP_SYNC_ID);
 		Assert.notNull(systemId, "System ID cannot be null!");
 		SysSystemDto systemDto = this.getSystemService().get(systemId);
 		connectorType.getEmbedded().put(SYSTEM_DTO_KEY, systemDto);

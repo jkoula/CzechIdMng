@@ -20,10 +20,8 @@ function INITIAL_THEME(themeType) {
         contrastText: '#ffffff'
       },
       secondary: {
-        light: '#ff4081',
         main: '#f50057',
-        dark: '#c51162',
-        contrastText: '#fff'
+        contrastText: '#ffffff'
       },
       success: {
         main: '#4caf50',
