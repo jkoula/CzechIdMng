@@ -1,9 +1,6 @@
-@import '../../variables.less';
-
 /**
 * Tables
 */
-
 .basic-table {
   max-width: 100%;
 
@@ -52,7 +49,7 @@
 
 .basic-table .table > thead > tr > td, .basic-table .table > thead > tr > th {
   vertical-align: bottom;
-  border-bottom: 1px solid @idm-base-color;
+  border-bottom: 1px solid #ccc;
   font-weight: bolder;
 }
 
@@ -66,7 +63,7 @@
   font-weight: normal;
 
   small {
-    color: @idm-small-color;
+    color: #777;
   }
 }
 
@@ -116,7 +113,7 @@
           color: #ddd;
 
           &:hover {
-            color: @idm-text-color;
+            color: inherit;
           }
         }
 
@@ -132,7 +129,7 @@
 
         td {
           .handle {
-            color: @idm-text-color;
+            color: inherit;
           }
         }
       }
@@ -269,7 +266,7 @@
       display: inline-block;
       margin: -15px 0 -15px 7px;
       font-size: 0.7em;
-      color: @idm-border-color;
+      color: #ccc;
 
       .sort-icon {
         display: inline-block;
@@ -277,7 +274,7 @@
         position: relative;
 
         &.active {
-          color: @idm-nav-color;
+          color: inherit;
         }
 
         &.sort-asc {
