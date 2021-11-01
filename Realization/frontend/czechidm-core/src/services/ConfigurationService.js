@@ -184,4 +184,27 @@ export default class ConfigurationService extends AbstractService {
   downloadApplicationLogo() {
     return RestApiService.download(`/public${ this.getApiPath() }/application/logo`);
   }
+
+  /**
+   * Get configured application theme.
+   *
+   * @return {promise}
+   * @since 12.0.0
+   */
+  getApplicationTheme(type = 'light') {
+    return RestApiService
+      .get(`/public${ this.getApiPath() }/application/theme?type=${ type }`)
+      .then(response => {
+        if (response.status === 204) { // no content - ok
+          return {}; // empty theme
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        return json;
+      });
+  }
 }

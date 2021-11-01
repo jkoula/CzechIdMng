@@ -16,11 +16,14 @@ import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
@@ -28,6 +31,7 @@ import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * Provides public configurations.
@@ -116,4 +120,38 @@ public class PublicIdmConfigurationController implements BaseController {
 			throw new ResultCodeException(CoreResultCode.INTERNAL_SERVER_ERROR, e);
 		}
 	}
+	
+	/**
+	 * Get configured application theme.
+	 * 
+	 * @return configured theme
+	 * @since 12.0.0
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/application/theme", method = RequestMethod.GET)
+	@ApiOperation(
+			value = "Identity detail", 
+			nickname = "getApplicationTheme", 
+			response = ThemeDto.class, 
+			tags = { IdmConfigurationController.TAG })
+	public ResponseEntity<ThemeDto> getApplicationTheme(
+			@ApiParam(value = "Theme type.", required = false, defaultValue = "light")
+			@RequestParam(name = "type", required = false) String themeType) {
+		//
+		// TODO: dark theme can be configured on BE - only for development on FE now only
+		if (StringUtils.equalsIgnoreCase(themeType, "dark")) {
+			LOG.warn("Theme [{}] cannot be configured on BE. Static configuration is on FE for development purpose only.", themeType);
+			//
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		// not configured - ok, default will be used
+		ThemeDto theme = applicationConfiguration.getApplicationTheme();
+		if (theme == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		//
+		return new ResponseEntity<>(theme, HttpStatus.OK);
+	}
+	
+	
 }

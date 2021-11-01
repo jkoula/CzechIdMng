@@ -170,6 +170,17 @@ export default class ExampleComponents extends Basic.AbstractContent {
                 <Basic.Button level="danger" icon="fa:check"/>
               </Basic.PanelFooter>
             </Basic.Panel>
+            <Basic.Panel
+              level="secondary"
+              style={{ width: 200, marginLeft: 15, marginBottom: 15 }}>
+              <Basic.PanelHeader text="Secondary"/>
+              <Basic.PanelBody>
+                Panel Body
+              </Basic.PanelBody>
+              <Basic.PanelFooter>
+                <Basic.Button level="secondary" icon="fa:check"/>
+              </Basic.PanelFooter>
+            </Basic.Panel>
           </Basic.PanelBody>
         </Basic.Panel>
 

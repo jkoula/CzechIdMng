@@ -166,13 +166,13 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
           backdrop="static"
           keyboard={!_showLoading}>
 
-          <form onSubmit={this.save.bind(this, {})}>
-            <Basic.Modal.Header closeButton={!_showLoading} text={this.i18n('create.header')} rendered={ Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Header
-              closeButton={!_showLoading}
-              text={this.i18n('edit.header', { name: detail.entity.name })}
-              rendered={ !Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header closeButton={!_showLoading} text={this.i18n('create.header')} rendered={ Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Header
+            closeButton={!_showLoading}
+            text={this.i18n('edit.header', { name: detail.entity.name })}
+            rendered={ !Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this, {}) }>
               <Basic.AbstractForm
                 ref="form"
                 showLoading={ _showLoading }
@@ -198,30 +198,33 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
                   label={ this.i18n('acc:entity.SystemEntity.wish.label') }
                   helpBlock={ this.i18n('acc:entity.SystemEntity.wish.help', { escape: false }) }/>
               </Basic.AbstractForm>
-              <Basic.ContentHeader text={ this.i18n('acc:entity.SystemEntity.attributes') } rendered={ !Utils.Entity.isNew(detail.entity) }/>
-              <AttributeTable
-                connectorObject={ detail ? detail.connectorObject : null }
-                rendered={ !Utils.Entity.isNew(detail.entity) }
-              />
-            </Basic.Modal.Body>
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={this.closeDetail.bind(this)}
-                showLoading={_showLoading}>
-                {this.i18n('button.close')}
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={_showLoading}
-                showLoadingIcon
-                showLoadingText={this.i18n('button.saving')}
-                rendered={ Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE']) }>
-                {this.i18n('button.save')}
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+            <Basic.ContentHeader text={ this.i18n('acc:entity.SystemEntity.attributes') } rendered={ !Utils.Entity.isNew(detail.entity) }/>
+            <AttributeTable
+              connectorObject={ detail ? detail.connectorObject : null }
+              rendered={ !Utils.Entity.isNew(detail.entity) }
+            />
+          </Basic.Modal.Body>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={this.closeDetail.bind(this)}
+              showLoading={_showLoading}>
+              {this.i18n('button.close')}
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={_showLoading}
+              showLoadingIcon
+              showLoadingText={this.i18n('button.saving')}
+              rendered={ Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE']) }
+              onClick={ this.save.bind(this, {}) }>
+              {this.i18n('button.save')}
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
       </div>
     );

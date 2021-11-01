@@ -571,25 +571,6 @@ export default class UiUtils {
     return `${ latestDto.id || uuid.v1() }-${ this.spinalCase(latestDto.modified || latestDto.created) }`;
   }
 
-  static getTheme(state) {
-    if (!state || !state.security || !state.security.userContext || !state.security.userContext.theme) {
-      // FIXME: initial theme
-      return {
-        palette: {
-          type: 'light',
-          action: {
-            loading: 'rgba(255, 255, 255, 0.7)'
-          },
-          background: {
-            paper: '#fff',
-            default: '#fafafa'
-          }
-        }
-      };
-    }
-    return state.security.userContext.theme;
-  }
-
   static trimSlash(routePath) {
     // Trim start of path from slash.
     if (routePath.startsWith('/')) {

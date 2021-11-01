@@ -15,6 +15,7 @@ import HelpIcon from '../HelpIcon/HelpIcon';
  */
 export default function PanelHeader(props) {
   const { className, rendered, showLoading, text, help, children, style, icon, buttons } = props;
+  //
   if (rendered === null || rendered === undefined || rendered === '' || rendered === false) {
     return null;
   }

@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import eu.bcvsolutions.idm.core.api.AppModule;
+import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
 import eu.bcvsolutions.idm.core.api.service.Configurable;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 
@@ -64,6 +65,12 @@ public interface ApplicationConfiguration extends Configurable {
 	 */
 	String PROPERTY_APPLICATION_LOGO = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.logo";
 	
+	/**
+	 * Application theme.
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_APPLICATION_THEME = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.theme";
 	
 	@Override
 	default String getConfigurableType() {
@@ -152,4 +159,12 @@ public interface ApplicationConfiguration extends Configurable {
 	 * @since 12.0.0
 	 */
 	UUID getApplicationLogoId();
+	
+	/**
+	 * Configured application theme.
+	 * 
+	 * @return ~JSON theme
+	 * @since 12.0.0
+	 */
+	ThemeDto getApplicationTheme();
 }

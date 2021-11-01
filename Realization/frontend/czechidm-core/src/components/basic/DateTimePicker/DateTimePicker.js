@@ -7,12 +7,13 @@ import moment from 'moment';
 import Datetime from 'react-datetime';
 import $ from 'jquery';
 //
+
+import LocalizationService from '../../../services/LocalizationService';
+import { ConfigurationManager } from '../../../redux';
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import FormComponentLabel from '../AbstractFormComponent/FormComponentLabel';
-import LocalizationService from '../../../services/LocalizationService';
 import Button from '../Button/Button';
 import Tooltip from '../Tooltip/Tooltip';
-import * as Utils from '../../../utils';
 
 const INVALID_DATE = 'Invalid date';
 
@@ -251,7 +252,7 @@ class DateTimePicker extends AbstractFormComponent {
       const picker = container.find('.rdtPicker');
       if (picker) {
         const style = {
-          backgroundColor: Utils.Ui.getTheme(this.context.store.getState()).palette.background.paper
+          backgroundColor: ConfigurationManager.getApplicationTheme(this.context.store.getState()).palette.background.paper
         };
         if (isModal) {
           style.top = positionUp ? rect.top - heightOfDialog : rect.bottom;

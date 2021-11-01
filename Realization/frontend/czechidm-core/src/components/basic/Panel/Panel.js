@@ -12,7 +12,12 @@ import Div from '../Div/Div';
 const useStyles = makeStyles((theme) => {
   return {
     root: {
-      backgroundColor: theme.palette.background.paper
+      backgroundColor: theme.palette.background.paper,
+      borderRadius: theme.shape.borderRadius,
+      '& .panel-heading': {
+        borderTopRightRadius: theme.shape.borderRadius,
+        borderTopLeftRadius: theme.shape.borderRadius
+      }
     },
     default: {
       backgroundColor: theme.palette.background.paper,

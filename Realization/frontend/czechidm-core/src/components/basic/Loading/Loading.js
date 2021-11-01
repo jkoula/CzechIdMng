@@ -4,9 +4,19 @@ import classNames from 'classnames';
 import $ from 'jquery';
 import ReactResizeDetector from 'react-resize-detector';
 //
-import * as Utils from '../../../utils';
+import { withStyles } from '@material-ui/core/styles';
+//
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
+
+const styles = theme => ({
+  root: {
+    backgroundColor: theme.palette.action.loading,
+    '& .loading-logo div': {
+      backgroundColor: theme.palette.primary.light
+    }
+  }
+});
 
 /**
  * Loading indicator.
@@ -21,16 +31,6 @@ class Loading extends AbstractContextComponent {
     super(props, context);
     //
     this.containerRef = React.createRef();
-    this.state = {
-      ...this.state,
-      theme: (
-        context && context.store
-        ?
-        Utils.Ui.getTheme(context.store.getState())
-        :
-        null
-      )
-    };
   }
 
   componentDidMount() {
@@ -77,9 +77,9 @@ class Loading extends AbstractContextComponent {
       style,
       containerTitle,
       onClick,
+      classes,
       ...others
     } = this.props;
-    const { theme } = this.state;
     //
     if (!rendered) {
       return null;
@@ -95,7 +95,8 @@ class Loading extends AbstractContextComponent {
       className,
       'loading',
       { hidden: !showLoading },
-      { static: isStatic }
+      { static: isStatic },
+      classes ? classes.root : null
     );
     // onClick required props
     others.onClick = onClick;
@@ -112,15 +113,7 @@ class Loading extends AbstractContextComponent {
         {
           showLoading
           ?
-          <div
-            className={ loaderClassNames }
-            style={
-              theme
-              ?
-              { backgroundColor: theme.palette.action.loading }
-              :
-              {}
-            }>
+          <div className={ loaderClassNames }>
             <div className="loading-wave-top" />
             {
               showAnimation
@@ -207,4 +200,4 @@ Loading.defaultProps = {
   loadingTitle: 'Zpracovávám ...' // TODO: localization or undefined ?
 };
 
-export default ResizeLoading;
+export default withStyles(styles, { withTheme: true })(ResizeLoading);

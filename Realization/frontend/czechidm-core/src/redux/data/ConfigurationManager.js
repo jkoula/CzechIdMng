@@ -1,6 +1,8 @@
 import _ from 'lodash';
 import Immutable from 'immutable';
 //
+import { createTheme } from '@material-ui/core/styles';
+//
 import * as Utils from '../../utils';
 import EntityManager from './EntityManager';
 import { ConfigurationService } from '../../services';
@@ -43,6 +45,16 @@ export default class ConfigurationManager extends EntityManager {
    */
   getApplicationLogoKey() {
     return `${ ConfigurationManager.PUBLIC_CONFIGURATIONS }-application-logo`;
+  }
+
+  /**
+   * Application theme - key in redux storage.
+   *
+   * @return {string} key
+   * @since 12.0.0
+   */
+  getApplicationThemeKey() {
+    return `${ ConfigurationManager.PUBLIC_CONFIGURATIONS }-application-theme`;
   }
 
   fetchPublicConfigurations(cb = null) {
@@ -251,6 +263,99 @@ export default class ConfigurationManager extends EntityManager {
   }
 
   /**
+   * Get configured application theme.
+   *
+   * @return {action}
+   */
+  fetchApplicationTheme(themeType = 'light', cb = null) {
+    const uiKey = this.getApplicationThemeKey();
+    //
+    return (dispatch) => {
+      dispatch(this.dataManager.requestData(uiKey));
+      this.getService().getApplicationTheme(themeType)
+        .then(theme => {
+          // apply global styles by configured pallete
+          let secondaryMain = '#f50057'; // default value by default theme
+          let secondaryDark = '#c51162'; // default value by default theme
+          if (theme && theme.palette && theme.palette.secondary) {
+            secondaryMain = theme.palette.secondary.main;
+            if (theme.palette.secondary.dark) {
+              secondaryDark = theme.palette.secondary.dark;
+            }
+          }
+          let _theme = {
+            ...theme,
+            overrides: {
+              MuiCssBaseline: {
+                '@global': {
+                  a: {
+                    color: secondaryMain, // ~ secondary
+                    textDecoration: 'none',
+                    '&:visited': {
+                      color: secondaryMain,
+                      textDecoration: 'none',
+                    },
+                    '&:focus': {
+                      color: secondaryDark, // ~ secondary dark
+                      textDecoration: 'underline',
+                    },
+                    '&:hover': {
+                      color: secondaryDark, // ~ secondary dark
+                      textDecoration: 'underline',
+                    }
+                  }
+                }
+              }
+            }
+          };
+          //
+          // add IdM default values, if theme is not configured on BE
+          if (!_theme.palette) {
+            _theme.palette = {
+              type: themeType,
+              primary: {
+                main: themeType === 'dark' ? '#90caf9' : '#1976d2', // #5cb85c
+                contrastText: '#ffffff'
+              },
+              secondary: {
+                main: '#f50057',
+                contrastText: '#ffffff'
+              },
+              success: {
+                main: '#4caf50',
+                contrastText: '#ffffff'
+              },
+              warning: {
+                main: '#ff9800',
+                contrastText: '#ffffff'
+              },
+              action: {
+                loading: themeType === 'dark' ? 'rgba(0, 0, 0, 0.26)' : 'rgba(255, 255, 255, 0.7)'
+              },
+              background: {
+                paper: themeType === 'dark' ? '#424242' : '#fff',
+                default: themeType === 'dark' ? '#303030' : '#fafafa'
+              }
+            };
+          }
+          //
+          _theme = createTheme(_theme);
+          dispatch({
+            type: Actions.THEME_RECEIVED,
+            data: _theme
+          });
+          if (cb) {
+            cb(_theme);
+          }
+        })
+        .catch(error => {
+          // TODO: data uiKey
+          dispatch(this.dataManager.receiveError(null, uiKey, error, cb));
+        });
+    };
+  }
+
+  /**
    * Returns public setting value
    *
    * @deprecated @since 9.2.2 use getValue
@@ -435,6 +540,17 @@ export default class ConfigurationManager extends EntityManager {
    */
   static getApplicationLogo(state) {
     return state.config.get(Properties.LOGO);
+  }
+
+  /**
+   * Get application theme.
+   *
+   * @param  {redux} state
+   * @return {blog}   json theme
+   * @since 12.0.0
+   */
+  static getApplicationTheme(state) {
+    return state.config.get(Properties.THEME);
   }
 }
 

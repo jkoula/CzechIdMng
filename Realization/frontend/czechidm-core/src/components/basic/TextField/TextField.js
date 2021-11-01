@@ -243,7 +243,8 @@ class BasicTextField extends AbstractFormComponent {
     const { inputType, value, disabled, readOnly, autoFocus } = this.state;
     //
     const className = classNames(
-      { confidential: this._showConfidentialWrapper() }
+      { confidential: this._showConfidentialWrapper() },
+      { 'Mui-disabled': this._showConfidentialWrapper() }
     );
     //
     // value and readonly properties depends on confidential wrapper
@@ -251,14 +252,12 @@ class BasicTextField extends AbstractFormComponent {
     if (value !== undefined && value !== null) {
       _value = value;
     }
-    let _readOnly = readOnly;
     if (this._showConfidentialWrapper()) {
       if (value) {
         _value = CONFIDENTIAL_VALUE; // asterix will be shown, when value is filled
       } else {
         _value = '';
       }
-      _readOnly = true;
     }
     const endAdornment = [];
     //
@@ -277,7 +276,7 @@ class BasicTextField extends AbstractFormComponent {
           <Edit />
         </IconButton>
       );
-    } else if (type === 'password' && !_readOnly) {
+    } else if (type === 'password' && !readOnly) {
       endAdornment.push(
         <IconButton
           aria-label="toggle password visibility"
@@ -311,7 +310,7 @@ class BasicTextField extends AbstractFormComponent {
               fullWidth={ fullWidth }
               size={ size }
               error={ !!feedback }
-              disabled={ _readOnly || disabled }
+              disabled={ readOnly || disabled }
               required={ required }>
               <InputLabel required={ required }>
                 { _label }
@@ -346,6 +345,11 @@ class BasicTextField extends AbstractFormComponent {
                     { endAdornment }
                   </InputAdornment>
                 }
+                onClick={() => {
+                  if (this._showConfidentialWrapper()) {
+                    this.toogleConfidentialState(true);
+                  }
+                }}
               />
             </FormControl>
           </span>

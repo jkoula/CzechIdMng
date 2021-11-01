@@ -235,7 +235,7 @@ class Configurations extends Advanced.AbstractTableContent {
         this.context.store.dispatch(this.getManager().downloadApplicationLogo());
       }
       if (entity.code === 'idm.pub.app.show.theme') {
-        // TODO: ...
+        this.context.store.dispatch(this.getManager().fetchApplicationTheme());
       }
     }
   }
@@ -412,6 +412,8 @@ class Configurations extends Advanced.AbstractTableContent {
                   this.context.store.dispatch(this.getManager().clearAllBulkActions());
                   // reload application logo
                   this.context.store.dispatch(this.getManager().downloadApplicationLogo());
+                  // reload application theme
+                  this.context.store.dispatch(this.getManager().fetchApplicationTheme());
                 } else if (processedBulkAction.id === 'core-configuration-switch-instance-bulk-action') {
                   // reload all bulk actions
                   this.context.store.dispatch(this.getManager().clearBulkActions());

@@ -1,14 +1,19 @@
 package eu.bcvsolutions.idm.core.config.domain;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.bcvsolutions.idm.core.api.config.domain.AbstractConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
+import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 
 /**
@@ -22,6 +27,8 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultApplicationConfiguration.class);
 	//
 	private String backendUrl = null;
+	//
+	@Autowired private ObjectMapper mapper;
 	
 	@Override
 	public String getStage() {
@@ -77,5 +84,21 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 	@Override
 	public UUID getApplicationLogoId() {
 		return DtoUtils.toUuid(getConfigurationService().getValue(PROPERTY_APPLICATION_LOGO));
+	}
+	
+	@Override
+	public ThemeDto getApplicationTheme() {
+		String themeJson = getConfigurationService().getValue(PROPERTY_APPLICATION_THEME);
+		if (StringUtils.isBlank(themeJson)) {
+			return null; // ~ not configured
+		}
+		//
+		try {
+			return mapper.readValue(themeJson, ThemeDto.class);
+		} catch (IOException ex) {
+			LOG.warn("Application theme is wrongly configured. Fix configured application theme [{}], default theme will be used till then.",
+					PROPERTY_APPLICATION_THEME, ex);
+			return null;
+		}
 	}
 }

@@ -16,7 +16,6 @@ import Brightness7Icon from '@material-ui/icons/Brightness7';
 import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
 //
-import * as Utils from '../../../utils';
 import { IdentityManager, SecurityManager, ConfigurationManager } from '../../../redux';
 import { collapseNavigation } from '../../../redux/config/actions';
 import NavigationSearch from './NavigationSearch';
@@ -26,6 +25,7 @@ import NavigationIdentity from './NavigationIdentity';
 import NavigationEnvironment from './NavigationEnvironment';
 //
 const identityManager = new IdentityManager();
+const configurationManager = new ConfigurationManager();
 const drawerWidth = 240;
 
 /**
@@ -161,7 +161,7 @@ function NavigationMaterial(props) {
   const classes = useStyles();
   const [ mobileOpen, setMobileOpen ] = React.useState(false);
   const navigationCollapsed = userContext.navigationCollapsed;
-  const themeType = useSelector((state) => Utils.Ui.getTheme(state).palette.type);
+  const themeType = useSelector((state) => ConfigurationManager.getApplicationTheme(state).palette.type);
   const isDevelopment = useSelector((state) => ConfigurationManager.getEnvironmentStage(state) === 'development');
   const applicationLogo = useSelector((state) => ConfigurationManager.getApplicationLogo(state));
 
@@ -196,10 +196,7 @@ function NavigationMaterial(props) {
       <IconButton
         color="inherit"
         onClick={() => {
-          dispatch({
-            type: 'THEME',
-            theme: themeType === 'light' ? 'dark' : 'light'
-          });
+          dispatch(configurationManager.fetchApplicationTheme(themeType === 'light' ? 'dark' : 'light'));
         }}>
         { themeType === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
       </IconButton>

@@ -102,25 +102,27 @@ export class AttributeTable extends Basic.AbstractContent {
 
     return (
       <>
-        <Basic.AbstractForm ref="filterForm">
-          <Basic.Row>
-            <Basic.Col lg={4}>
-              <Advanced.Filter.TextField
-                ref="attributeNameFilter"
-                placeholder={this.i18n('acc:content.system.accounts.filter.attributeName.placeholder')}/>
-            </Basic.Col>
-            <Basic.Col lg={4}>
-              <Advanced.Filter.TextField
-                ref="attributeValueFilter"
-                placeholder={this.i18n('acc:content.system.accounts.filter.attributeValue.placeholder')}/>
-            </Basic.Col>
-            <Basic.Col lg={4} className="text-right">
-              <Advanced.Filter.FilterButtons
-                useFilter={this._useAttributesFilter.bind(this)}
-                cancelFilter={this._cancelAttributesFilter.bind(this)}/>
-            </Basic.Col>
-          </Basic.Row>
-        </Basic.AbstractForm>
+        <form onSubmit={ this._useAttributesFilter.bind(this) }>
+          <Basic.AbstractForm ref="filterForm">
+            <Basic.Row>
+              <Basic.Col lg={4}>
+                <Advanced.Filter.TextField
+                  ref="attributeNameFilter"
+                  placeholder={this.i18n('acc:content.system.accounts.filter.attributeName.placeholder')}/>
+              </Basic.Col>
+              <Basic.Col lg={4}>
+                <Advanced.Filter.TextField
+                  ref="attributeValueFilter"
+                  placeholder={this.i18n('acc:content.system.accounts.filter.attributeValue.placeholder')}/>
+              </Basic.Col>
+              <Basic.Col lg={4} className="text-right">
+                <Advanced.Filter.FilterButtons
+                  useFilter={this._useAttributesFilter.bind(this)}
+                  cancelFilter={this._cancelAttributesFilter.bind(this)}/>
+              </Basic.Col>
+            </Basic.Row>
+          </Basic.AbstractForm>
+        </form>
         <Basic.Table
           showLoading={!connectorObject && !this.state.hasOwnProperty('connectorObject')}
           data={_connectorObject ? _connectorObject.attributes : null}

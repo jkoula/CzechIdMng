@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import { Route } from 'react-router-dom';
 import _ from 'lodash';
 //
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 //
 import { Basic, Advanced, Managers } from 'czechidm-core';
@@ -76,13 +76,12 @@ export class App extends Basic.AbstractContent {
   }
 
   render() {
-    const { userContext, bulk, appReady, navigationCollapsed, hideFooter, location } = this.props;
+    const { userContext, bulk, appReady, navigationCollapsed, hideFooter, location, theme } = this.props;
     const titleTemplate = `%s | ${ this.i18n('app.name') }`;
     const classnames = classNames(
       { 'with-sidebar': Managers.SecurityManager.isAuthenticated(userContext) },
       { collapsed: navigationCollapsed }
     );
-    const theme = createTheme(userContext.theme);
     this.context.theme = theme;
     // @todo-upgrade-10 - FlashMessages throw warning "Function components cannot be given refs.
     // Attempts to access this ref will fail. Did you mean to use React.forwardRef()?"
@@ -155,6 +154,7 @@ function select(state) {
     bulk: state.data.bulk,
     appReady: state.config.get('appReady'),
     i18nReady: state.config.get('i18nReady'),
+    theme: Managers.ConfigurationManager.getApplicationTheme(state),
     navigationCollapsed: state.security.userContext.navigationCollapsed,
     hideFooter: state.config.get('hideFooter')
   };
