@@ -37,6 +37,10 @@ export default class ConfigurationManager extends EntityManager {
     return 'configurations';
   }
 
+  getIdentifierAlias() {
+    return 'name';
+  }
+
   /**
    * Application logo - key in redux storage.
    *
@@ -252,9 +256,11 @@ export default class ConfigurationManager extends EntityManager {
             type: Actions.LOGO_RECEIVED,
             data: imageUrl
           });
-          if (cb) {
-            cb(imageUrl);
-          }
+          dispatch(this.dataManager.stopRequest(uiKey, null, () => {
+            if (cb) {
+              cb(imageUrl);
+            }
+          }));
         })
         .catch(error => {
           dispatch(this.receiveError(null, uiKey, error, cb));
@@ -303,6 +309,9 @@ export default class ConfigurationManager extends EntityManager {
                       color: secondaryDark, // ~ secondary dark
                       textDecoration: 'underline',
                     }
+                  },
+                  pre: {
+                    borderRadius: theme && theme.shape && theme.shape.borderRadius ? theme.shape.borderRadius : 4
                   }
                 }
               }
@@ -344,9 +353,11 @@ export default class ConfigurationManager extends EntityManager {
             type: Actions.THEME_RECEIVED,
             data: _theme
           });
-          if (cb) {
-            cb(_theme);
-          }
+          dispatch(this.dataManager.stopRequest(uiKey, null, () => {
+            if (cb) {
+              cb(_theme);
+            }
+          }));
         })
         .catch(error => {
           // TODO: data uiKey

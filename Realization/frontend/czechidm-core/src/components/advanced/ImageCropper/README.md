@@ -12,6 +12,10 @@ All parameters from AbstractComponent are supported. Added parameters:
 | Parameter | Type | Description | Default  |
 | --- | :--- | :--- | :--- |
 | src | string |  url to image (objectUrl)  |  |
+| autoCropArea | nubmer |  It should be a number between 0 and 1. Define the automatic cropping area size (percentage).  | 0.6 |
+| fixedAspectRatio | bool |  Free or fixed crop box ratio.  | true |
+| width | nubmer | Crop box ratio width.  | 300 |
+| height | nubmer |  Crop box ratio height.  | 300 |
 
 ## Usage
 

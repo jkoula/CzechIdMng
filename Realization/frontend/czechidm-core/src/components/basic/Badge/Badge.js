@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 //
+import Badge from '@material-ui/core/Badge';
 import { makeStyles } from '@material-ui/core/styles';
 //
 import * as Utils from '../../../utils';
@@ -17,7 +17,8 @@ import Icon from '../Icon/Icon';
 const useStyles = makeStyles((theme) => {
   return {
     default: {
-      // nothing
+      color: theme.palette.text.primary,
+      backgroundColor: theme.palette.background.default,
     },
     info: {
       color: theme.palette.info.contrastText,
@@ -55,8 +56,8 @@ const useStyles = makeStyles((theme) => {
  *
  * @author Radek Tomiška
  */
-function Badge(props) {
-  const { level, title, text, value, className, rendered, showLoading, style, ...others } = props;
+export default function BasicBadge(props) {
+  const { level, title, text, value, className, rendered, showLoading, style, children, onClick } = props;
   const _text = text || value;
   const classes = useStyles();
   //
@@ -64,37 +65,39 @@ function Badge(props) {
     return null;
   }
   //
-  const classNames = classnames(
-    'badge',
-    classes[Utils.Ui.toLevel(level)],
-    className
-  );
-  //
   let _style = style;
-  if (others.onClick) {
+  if (onClick) {
     _style = {
       cursor: 'pointer',
       ...style
     };
   }
+  //
   return (
-    <span
-      className={ classNames }
-      title={ title }
-      style={ _style }
-      { ...others }>
-      {
+    <Badge
+      onClick={ onClick }
+      className={ className }
+      badgeContent={
         showLoading
         ?
         <Icon type="fa" icon="refresh" showLoading/>
         :
         _text
       }
-    </span>
+      title={ title }
+      style={ _style }
+      showZero
+      classes={{ badge: classes[Utils.Ui.toLevel(level)] }}>
+      {
+        children
+        ||
+        <span style={{ visibility: 'hidden' }}>i</span>
+      }
+    </Badge>
   );
 }
 
-Badge.propTypes = {
+BasicBadge.propTypes = {
   ...AbstractComponent.propTypes,
   /**
    * Badge level / css / class
@@ -118,9 +121,7 @@ Badge.propTypes = {
   ])
 };
 
-Badge.defaultProps = {
+BasicBadge.defaultProps = {
   ...AbstractComponent.defaultProps,
   level: 'default'
 };
-
-export default Badge;

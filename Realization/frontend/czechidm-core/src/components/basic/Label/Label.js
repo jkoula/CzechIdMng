@@ -16,6 +16,9 @@ import Icon from '../Icon/Icon';
  */
 const useStyles = makeStyles((theme) => {
   return {
+    root: {
+      borderRadius: theme.shape.borderRadius
+    },
     default: {
       // nothing
     },
@@ -56,6 +59,7 @@ export default function Label(props) {
   //
   const classNames = classnames(
     'label',
+    classes.root,
     classes[Utils.Ui.toLevel(level)],
     className
   );

@@ -60,11 +60,6 @@ function resolveParams(type, icon, value) {
  * @since 12.0.0
  */
 const useStyles = makeStyles((theme) => {
-  if (!theme) {
-    // FIXME: react hook v react bootstrap popover doesnt work
-    return {};
-  }
-  //
   return {
     default: {
       // nothing

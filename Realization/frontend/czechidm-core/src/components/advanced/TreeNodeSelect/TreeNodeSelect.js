@@ -349,7 +349,7 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
     const { readOnly } = this.state;
     //
     return (
-      <div className="form-group" style={{ width: 'auto' }}>
+      <div className="form-group" style={{ width: 'auto', marginTop: 7 }}>
         <Basic.Button
           level="default"
           icon="fa:folder-open"
@@ -431,7 +431,7 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
         {
           !showTreeType || _forceTreeType
           ||
-          <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
+          <Basic.Div style={{ display: 'flex', alignItems: 'top' }}>
             <Basic.Div style={{ flex: 1 }}>
               <EntitySelectBox
                 entityType="treeType"
@@ -450,7 +450,7 @@ export default class TreeNodeSelect extends Basic.AbstractFormComponent {
           </Basic.Div>
         }
 
-        <Basic.Div style={ showTreeType ? {} : { display: 'flex', alignItems: 'center' } }>
+        <Basic.Div style={ showTreeType ? {} : { display: 'flex', alignItems: 'top' } }>
           <Basic.Div style={ showTreeType ? {} : { flex: 1 } }>
             <EntitySelectBox
               entityType="treeNode"

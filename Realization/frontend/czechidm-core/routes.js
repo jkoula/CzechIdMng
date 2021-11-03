@@ -649,7 +649,12 @@ module.exports = {
     },
     {
       path: 'configurations',
-      component: require('./src/content/Configurations'),
+      component: require('./src/content/configuration/Configurations'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['CONFIGURATION_READ'] } ]
+    },
+    {
+      path: 'configurations/theme',
+      component: require('./src/content/configuration/ThemeConfiguration'),
       access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['CONFIGURATION_READ'] } ]
     },
     {

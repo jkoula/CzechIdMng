@@ -80,16 +80,17 @@ class Dropzone extends Basic.AbstractContextComponent {
     return (
       <Basic.Dropzone
         onDrop={ this._onDrop.bind(this) }
-        {...others}>
+        { ...others }>
         {
           !files || files.length === 0
           ?
           children
           :
-          files.map(file => {
-            return file.name;
-          })
-          .join(', ')
+          files
+            .map(file => {
+              return file.name;
+            })
+            .join(', ')
         }
       </Basic.Dropzone>
     );

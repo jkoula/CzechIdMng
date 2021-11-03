@@ -7,7 +7,6 @@ import MenuList from '@material-ui/core/MenuList';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-import Badge from '@material-ui/core/Badge';
 //
 import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
@@ -144,9 +143,9 @@ class NavigationMonitoring extends Basic.AbstractContent {
           onClick={ (event) => {
             this._handleClick(event);
           }}>
-          <Badge badgeContent={ counter} color="error">
+          <Basic.Badge text={ counter} level="error">
             <NotificationsIcon/>
-          </Badge>
+          </Basic.Badge>
         </IconButton>
         <Menu
           id="monitoring-menu"

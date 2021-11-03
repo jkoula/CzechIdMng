@@ -45,8 +45,9 @@ export default function ProgressBar(props) {
     bars.forEach(bar => {
       if (bar.now > 0) {
         _now += bar.now;
-        if (bar.bsStyle === 'warning' || bar.bsStyle === 'danger') {
-          _bsStyle = 'error';
+        if (_bsStyle !== 'error' && _bsStyle !== 'danger' && (bar.bsStyle === 'warning' || bar.bsStyle === 'danger' || bar.bsStyle === 'error')) {
+          // ~ error has higher priority
+          _bsStyle = bar.bsStyle;
         }
         _barLabels.push(
           <Basic.Label

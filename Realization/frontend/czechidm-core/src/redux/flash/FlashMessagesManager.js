@@ -80,6 +80,10 @@ export default class FlashMessagesManager {
     if (typeof message === 'string') {
       message = _.merge({}, _DEFAULT_MESSAGE, { message });
     }
+    //
+    if (message.level) {
+      message.level = message.level.toLowerCase();
+    }
     // errors are shown centered by default
     if (message.level && (message.level === 'error' /* || message.level === 'warning' */) && !message.position) {
       message.position = 'tc';

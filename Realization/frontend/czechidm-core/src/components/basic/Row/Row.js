@@ -1,32 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-//
-import AbstractComponent from '../AbstractComponent/AbstractComponent';
 
 /**
- * Bootstrap row
+ * Bootstrap row.
+ *
+ * TODO: clean up bootstrap styles, use material-ui grid.
  *
  * @author Radek Tomiška
  */
-class Row extends AbstractComponent {
-
-  render() {
-    const { rendered, children, className, ...others } = this.props;
-    if (!rendered) {
-      return null;
-    }
-
-    const classNames = classnames(
-      'row',
-      className
-    );
-    return (
-      <div className={classNames} {...others}>
-        {children}
-      </div>
-    );
+export default function Row(props) {
+  const { rendered, children, className, style } = props;
+  //
+  if (!rendered) {
+    return null;
   }
+  //
+  const classNames = classnames(
+    'row',
+    className
+  );
+  return (
+    <div className={ classNames } style={ style }>
+      { children }
+    </div>
+  );
 }
 
 Row.propTypes = {
@@ -39,6 +37,3 @@ Row.propTypes = {
 Row.defaultProps = {
   rendered: true
 };
-
-
-export default Row;

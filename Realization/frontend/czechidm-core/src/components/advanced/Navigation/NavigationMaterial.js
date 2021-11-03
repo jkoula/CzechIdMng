@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 //
@@ -13,6 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
+import InvertColors from '@material-ui/icons/InvertColors';
 import Toolbar from '@material-ui/core/Toolbar';
 import { makeStyles } from '@material-ui/core/styles';
 //
@@ -164,7 +166,7 @@ function NavigationMaterial(props) {
   const themeType = useSelector((state) => ConfigurationManager.getApplicationTheme(state).palette.type);
   const isDevelopment = useSelector((state) => ConfigurationManager.getEnvironmentStage(state) === 'development');
   const applicationLogo = useSelector((state) => ConfigurationManager.getApplicationLogo(state));
-
+  const history = useHistory();
   //
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -315,6 +317,14 @@ function NavigationMaterial(props) {
           {
             toogleDarkButton
           }
+          <IconButton
+            color="inherit"
+            title="Edit application theme"
+            onClick={() => {
+              history.push('/configurations/theme');
+            }}>
+            <InvertColors />
+          </IconButton>
           {
             userContext.isExpired
             ||

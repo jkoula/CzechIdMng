@@ -1,3 +1,5 @@
+import Immutable from 'immutable';
+//
 import FlashMessagesManager from '../flash/FlashMessagesManager';
 import * as Utils from '../../utils';
 /**
@@ -10,6 +12,8 @@ export const CLEAR_DATA = 'CLEAR_DATA';
 export const RECEIVE_ERROR = 'RECEIVE_ERROR';
 export const EXPAND_FILTER = 'EXPAND_FILTER';
 export const COLLAPSE_FILTER = 'COLLAPSE_FILTER';
+//
+const UIKEY_MODALS = 'modal-content-state';
 
 /**
  * Encapsulate redux action for form data (create, edit) etc.
@@ -73,6 +77,16 @@ export default class DataManager {
    */
   storeData(uiKey, data) {
     return this.receiveData(uiKey, data);
+  }
+
+  /**
+   * Set madals state.
+   *
+   * @param {Immutable.Map} modals
+   * @since 12.0.0
+   */
+  setModals(modals) {
+    return this.receiveData(UIKEY_MODALS, modals);
   }
 
   /**
@@ -175,6 +189,17 @@ export default class DataManager {
       return null;
     }
     return state.data.data.get(uiKey);
+  }
+
+  /**
+   * Returns modals state.
+   *
+   * @param  {state} state - application state
+   * @return {Immutable.Map} - modals state
+   * @since 12.0.0
+   */
+  static getModals(state) {
+    return DataManager.getData(state, UIKEY_MODALS) || new Immutable.Map({});
   }
 
   /**

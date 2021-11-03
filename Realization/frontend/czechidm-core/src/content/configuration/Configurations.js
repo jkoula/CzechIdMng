@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 //
-import * as Basic from '../components/basic';
-import * as Advanced from '../components/advanced';
-import { ConfigurationManager, DataManager, SecurityManager, IdentityManager } from '../redux';
-import * as Utils from '../utils';
+import * as Basic from '../../components/basic';
+import * as Advanced from '../../components/advanced';
+import { ConfigurationManager, DataManager, SecurityManager, IdentityManager } from '../../redux';
+import * as Utils from '../../utils';
 
 const uiKey = 'configuration-table';
 const manager = new ConfigurationManager();
@@ -56,13 +56,16 @@ class Configurations extends Advanced.AbstractTableContent {
   componentDidMount() {
     super.componentDidMount();
     //
-    this.selectNavigationItem('system-configuration');
     this.context.store.dispatch(this.getManager().fetchAllConfigurationsFromFile());
     this.context.store.dispatch(this.getManager().clearBulkActions()); // ~ reload bulk action default values
     if (SecurityManager.hasAuthority('CONFIGURATION_ADMIN')) {
       this.context.store.dispatch(this.getManager().fetchAllConfigurationsFromEnvironment());
     }
     this.refs.text.focus();
+  }
+
+  getNavigationKey() {
+    return 'system-configuration';
   }
 
   getManager() {

@@ -43,6 +43,14 @@ class Login extends Basic.AbstractContent {
     return 'home';
   }
 
+  hideFooter() {
+    const { casEnabled } = this.props;
+    const { showTwoFactor, nocas } = this.state;
+    const _casEnabled = casEnabled && !nocas;
+    //
+    return !showTwoFactor && _casEnabled;
+  }
+
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.userContext !== this.props.userContext) {
       this._tryRedirectLoggedUser();

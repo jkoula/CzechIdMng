@@ -240,7 +240,7 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
     const { readOnly } = this.state;
     //
     return (
-      <div className="form-group" style={{ width: 'auto' }}>
+      <div className="form-group" style={{ width: 'auto', marginTop: 7 }}>
         <Basic.Button
           level="default"
           icon="fa:folder-open"
@@ -279,7 +279,7 @@ export default class RoleCatalogueSelect extends Basic.AbstractFormComponent {
     //
     return (
       <span>
-        <Basic.Div style={{ display: 'flex', alignItems: 'center' }}>
+        <Basic.Div style={{ display: 'flex', alignItems: 'top' }}>
           <Basic.Div style={{ flex: 1 }}>
             <EntitySelectBox
               entityType="roleCatalogue"

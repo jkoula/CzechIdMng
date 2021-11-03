@@ -8,7 +8,7 @@ import Immutable from 'immutable';
 import * as Basic from '../../basic';
 import ComponentService from '../../../services/ComponentService';
 import ConfigLoader from '../../../utils/ConfigLoader';
-import { SecurityManager } from '../../../redux';
+import { SecurityManager, DataManager } from '../../../redux';
 import {
   getNavigationItems,
   resolveNavigationParameters,
@@ -19,6 +19,7 @@ import NavigationSeparator from './NavigationSeparator';
 import NavigationMaterial from './NavigationMaterial';
 //
 const componentService = new ComponentService();
+const dataManager = new DataManager();
 
 /**
  * Top navigation.
@@ -28,14 +29,6 @@ const componentService = new ComponentService();
  * @author Radek Tomiška
  */
 export class Navigation extends Basic.AbstractContent {
-
-  constructor(props, context) {
-    super(props, context);
-    //
-    this.state = {
-      modals: new Immutable.Map({})
-    };
-  }
 
   renderNavigationItems(section = 'main', dynamicOnly = true, face = 'list') {
     const { navigation, userContext, selectedNavigationItems } = this.props;
@@ -79,7 +72,7 @@ export class Navigation extends Basic.AbstractContent {
   renderNavigationItem(item, userContext, activeItem, titlePlacement = 'bottom', face = 'list') {
     switch (item.type) {
       case 'DYNAMIC': {
-        const { modals } = this.state;
+        const { modals } = this.props;
         //
         let ModalComponent = null;
         let onClick = null;
@@ -90,9 +83,7 @@ export class Navigation extends Basic.AbstractContent {
             if (event) {
               event.preventDefault();
             }
-            this.setState({
-              modals: modals.set(item.modal, { show: true })
-            });
+            this.context.store.dispatch(dataManager.setModals(modals.set(item.modal, { show: true })));
           };
         }
         //
@@ -114,7 +105,9 @@ export class Navigation extends Basic.AbstractContent {
               ||
               <ModalComponent
                 show={ modals.has(item.modal) ? modals.get(item.modal).show : false }
-                onHide={ () => { this.setState({ modals: modals.set(item.modal, { show: false }) }); } }/>
+                onHide={ () => {
+                  this.context.store.dispatch(dataManager.setModals(modals.set(item.modal, { show: false })));
+                }}/>
             }
           </NavigationItem>
         );
@@ -341,7 +334,8 @@ Navigation.defaultProps = {
   selectedNavigationItems: null,
   environment: null,
   userContext: null,
-  i18nReady: null
+  i18nReady: null,
+  modals: new Immutable.Map({})
 };
 
 function select(state) {
@@ -350,7 +344,8 @@ function select(state) {
     navigationCollapsed: state.security.userContext.navigationCollapsed,
     selectedNavigationItems: state.config.get('selectedNavigationItems'),
     userContext: state.security.userContext,
-    i18nReady: state.config.get('i18nReady')
+    i18nReady: state.config.get('i18nReady'),
+    modals: DataManager.getModals(state)
   };
 }
 

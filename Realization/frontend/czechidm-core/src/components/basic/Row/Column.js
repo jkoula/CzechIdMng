@@ -11,6 +11,7 @@ import classnames from 'classnames';
  */
 export default function Column(props) {
   const { rendered, children, className, style, lg, sm, md, xs } = props;
+  //
   if (!rendered) {
     return null;
   }

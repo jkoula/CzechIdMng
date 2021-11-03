@@ -1,6 +1,7 @@
 import React from 'react';
 //
 import { Basic, Advanced, Managers } from 'czechidm-core';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 
 const treeNodeManager = new Managers.TreeNodeManager();
 const roleCatalogueManager = new Managers.RoleCatalogueManager();
@@ -181,6 +182,33 @@ export default class ExampleComponents extends Basic.AbstractContent {
                 <Basic.Button level="secondary" icon="fa:check"/>
               </Basic.PanelFooter>
             </Basic.Panel>
+          </Basic.PanelBody>
+        </Basic.Panel>
+
+        <Basic.Panel>
+          <Basic.PanelHeader text="Badge"/>
+          <Basic.PanelBody>
+            <Basic.Badge text={ 3 } level="default" style={{ marginRight: 7 }} title="default">
+              <NotificationsIcon/>
+            </Basic.Badge>
+            <Basic.Badge text={ 3 } level="primary" style={{ marginRight: 7 }} title="primary">
+              <NotificationsIcon/>
+            </Basic.Badge>
+            <Basic.Badge text={ 3 } level="secondary" style={{ marginRight: 7 }} title="secondary">
+              <NotificationsIcon/>
+            </Basic.Badge>
+            <Basic.Badge text={ 3 } level="success" style={{ marginRight: 7 }} title="success">
+              <NotificationsIcon/>
+            </Basic.Badge>
+            <Basic.Badge text={ 3 } level="info" style={{ marginRight: 7 }} title="info">
+              <NotificationsIcon/>
+            </Basic.Badge>
+            <Basic.Badge text={ 3 } level="warning" style={{ marginRight: 7 }} title="warning">
+              <NotificationsIcon/>
+            </Basic.Badge>
+            <Basic.Badge text={ 3 } level="error" style={{ marginRight: 7 }} title="error">
+              <NotificationsIcon/>
+            </Basic.Badge>
           </Basic.PanelBody>
         </Basic.Panel>
 

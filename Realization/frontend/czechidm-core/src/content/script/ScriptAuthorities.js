@@ -296,69 +296,67 @@ class ScriptAuthorities extends Basic.AbstractContent {
           backdrop="static"
           keyboard={ !_showLoading }>
 
-          <form onSubmit={ this.save.bind(this, {}) }>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('create.header', { name: script.name }) }
-              rendered={ Utils.Entity.isNew(detail.entity)}/>
-            <Basic.Modal.Header
-              closeButton={!_showLoading}
-              text={ this.i18n('edit.header', { name: script.name }) }
-              rendered={ !Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('create.header', { name: script.name }) }
+            rendered={ Utils.Entity.isNew(detail.entity)}/>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('edit.header', { name: script.name }) }
+            rendered={ !Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this, {}) }>
               <Basic.AbstractForm
                 ref="form"
-                data={detail.entity}
-                _showLoading={_showLoading}>
-                <Basic.Row>
-                  <div className="col-lg-12">
-                    <Basic.EnumSelectBox
-                      ref="type"
-                      clearable={false}
-                      enum={ScriptAuthorityTypeEnum}
-                      onChange={ this.onChangeType.bind(this) }
-                      label={ this.i18n('entity.ScriptAuthority.type.label') }
-                      palceholder={ this.i18n('entity.ScriptAuthority.type.placeholder') }
-                      helpBlock={ this.i18n('entity.ScriptAuthority.type.help') }/>
-                    <Basic.EnumSelectBox
-                      required={detail.isService}
-                      searchable
-                      ref="service"
-                      hidden={!detail.isService}
-                      options={this.getOptions(availableServices)}
-                      label={ this.i18n('entity.ScriptAuthority.type.label') }
-                      palceholder={ this.i18n('entity.ScriptAuthority.type.placeholder') }
-                      helpBlock={ this.i18n('entity.ScriptAuthority.type.help') }/>
-                    <Basic.TextField
-                      required={!detail.isService}
-                      hidden={detail.isService}
-                      ref="className"
-                      label={this.i18n('entity.ScriptAuthority.className')}
-                      max={2000}/>
-                  </div>
-                </Basic.Row>
-
+                data={ detail.entity }
+                showLoading={ _showLoading }>
+                <Basic.EnumSelectBox
+                  ref="type"
+                  clearable={ false }
+                  enum={ ScriptAuthorityTypeEnum }
+                  onChange={ this.onChangeType.bind(this) }
+                  label={ this.i18n('entity.ScriptAuthority.type.label') }
+                  palceholder={ this.i18n('entity.ScriptAuthority.type.placeholder') }
+                  helpBlock={ this.i18n('entity.ScriptAuthority.type.help') }/>
+                <Basic.EnumSelectBox
+                  required={detail.isService}
+                  searchable
+                  ref="service"
+                  hidden={!detail.isService}
+                  options={this.getOptions(availableServices)}
+                  label={ this.i18n('entity.ScriptAuthority.type.label') }
+                  palceholder={ this.i18n('entity.ScriptAuthority.type.placeholder') }
+                  helpBlock={ this.i18n('entity.ScriptAuthority.type.help') }/>
+                <Basic.TextField
+                  required={!detail.isService}
+                  hidden={detail.isService}
+                  ref="className"
+                  label={this.i18n('entity.ScriptAuthority.className')}
+                  max={2000}/>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={this.closeDetail.bind(this)}
-                _showLoading={_showLoading}>
-                {this.i18n('button.close')}
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                _showLoading={_showLoading}
-                _showLoadingIcon
-                _showLoadingText={this.i18n('button.saving')}
-                rendered={SecurityManager.hasAuthority('SCRIPT_CREATE')}>
-                {this.i18n('button.save')}
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={_showLoading}>
+              {this.i18n('button.close')}
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              onClick={ this.save.bind(this, {}) }
+              level="success"
+              showLoading={ _showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              rendered={ SecurityManager.hasAuthority('SCRIPT_CREATE') }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
       </div>
     );

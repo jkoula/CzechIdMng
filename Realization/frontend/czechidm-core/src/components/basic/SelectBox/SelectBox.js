@@ -43,10 +43,11 @@ const styles = theme => ({
     },
     '& .Select-menu-outer': {
       backgroundColor: theme.palette.background.paper,
-      marginTop: 1
+      marginTop: 1,
     },
     '& .Select-control': {
       WebkitBoxShadow: 'none !important',
+      borderRadius: theme.shape.borderRadius,
       '&:hover': {
         borderColor: theme.palette.text.primary
       }

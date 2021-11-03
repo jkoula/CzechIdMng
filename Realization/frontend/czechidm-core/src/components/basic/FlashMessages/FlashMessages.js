@@ -108,28 +108,24 @@ export class FlashMessages extends AbstractContextComponent {
   _getNotificationSystemStyles() {
     const styles = {
       Containers: {
+        DefaultStyle: { // Applied to every notification, regardless of the notification level
+          margin: '10px 15px 2px 0px'
+        },
         tr: {
-          top: '50px',
+          top: '55px',
           bottom: 'auto',
           left: 'auto',
           right: '0px'
         },
         tc: {
           width: '600px',
-          margin: '0px auto 0px -300px'
+          marginLeft: -300
         },
         bl: {
           bottom: '0px'
         }
       },
       NotificationItem: { // Override the notification item
-        DefaultStyle: { // Applied to every notification, regardless of the notification level
-          margin: '10px 100px 2px 0px'
-        },
-
-        success: { // Applied only to the success notification item
-          // color: 'red'
-        }
       },
       ActionWrapper: {
         DefaultStyle: {
@@ -142,9 +138,10 @@ export class FlashMessages extends AbstractContextComponent {
 
   render() {
     const styles = this._getNotificationSystemStyles();
+    //
     return (
       <div id="flash-messages">
-        <NotificationSystem ref="messages" style={styles}/>
+        <NotificationSystem ref="messages" style={ styles }/>
       </div>
     );
   }

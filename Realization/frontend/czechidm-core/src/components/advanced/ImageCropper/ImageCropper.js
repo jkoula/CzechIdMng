@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Cropper from 'react-cropper';
 //
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+//
 import * as Basic from '../../basic';
 import Well from '../../basic/Well/Well';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 /**
 * Component for image crop.
@@ -61,12 +62,13 @@ export default class ImageCropper extends Basic.AbstractContextComponent {
       canvas.toBlob((blob) => {
         const formData = new FormData();
         formData.append('data', blob);
-        cb(formData);
+        cb(formData, blob);
       });
     } else if (canvas.msToBlob !== undefined) {
       const formData = new FormData();
-      formData.append('data', canvas.msToBlob());
-      cb(formData);
+      const msBlob = canvas.msToBlob();
+      formData.append('data', msBlob);
+      cb(formData, msBlob);
     } else {
       // TODO: manually convert Data-URI to Blob for older browsers https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Browser_compatibility
       LOGGER.error('[ImageCropper]: toBlog polyfill is not available');
@@ -78,7 +80,7 @@ export default class ImageCropper extends Basic.AbstractContextComponent {
   }
 
   render() {
-    const { showLoading, rendered, src } = this.props;
+    const { showLoading, rendered, src, width, height, fixedAspectRatio, autoCropArea } = this.props;
     //
     if (!rendered) {
       return null;
@@ -95,8 +97,9 @@ export default class ImageCropper extends Basic.AbstractContextComponent {
           viewMode={ 2 }
           dragMode="move"
           style={{ maxHeight: 568 }}
-          autoCropArea={ 0.6 }
-          aspectRatio={ 1 / 1 } />
+          autoCropArea={ autoCropArea }
+          aspectRatio={ fixedAspectRatio ? (width / height) : undefined }
+          initialAspectRatio={ fixedAspectRatio ? undefined : (width / height) } />
 
         <ButtonGroup
           color="primary"
@@ -173,9 +176,37 @@ ImageCropper.PropTypes = {
   * Show loading in component
   */
   showLoading: PropTypes.bool,
+  /**
+   * It should be a number between 0 and 1. Define the automatic cropping area size (percentage).
+   *
+   * @since 12.0.0
+   */
+  autoCropArea: PropTypes.number,
+  /**
+   * Free or fixed crop box ratio.
+   *
+   * @since 12.0.0
+   */
+  fixedAspectRatio: PropTypes.bool,
+  /**
+   * Crop box ratio width.
+   *
+   * @since 12.0.0
+   */
+  width: PropTypes.number,
+  /**
+   * Crop box ratio height.
+   *
+   * @since 12.0.0
+   */
+  height: PropTypes.number
 };
 
 ImageCropper.defaultProps = {
   rendered: true,
   showLoading: false,
+  autoCropArea: 0.6,
+  fixedAspectRatio: true,
+  width: 300,
+  height: 300
 };

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router';
-import Immutable from 'immutable';
 //
 import Hidden from '@material-ui/core/Hidden';
 import Button from '@material-ui/core/Button';
@@ -29,6 +28,7 @@ const identityManager = new IdentityManager();
 const flashMessagesManager = new FlashMessagesManager();
 const securityManager = new SecurityManager();
 const componentService = new ComponentService();
+const dataManager = new DataManager();
 
 /**
  * Identity menu in navigation.
@@ -49,7 +49,7 @@ function NavigationIdentity(props) {
   const isSwitchedUser = userContext.originalUsername && userContext.originalUsername !== userContext.username;
   const navigation = useSelector((state) => state.config.get('navigation'));
   const items = getNavigationItems(navigation, null, 'identity-menu', userContext, null, false);
-  const [ modals, setModals ] = React.useState(new Immutable.Map({}));
+  const modals = useSelector((state) => DataManager.getModals(state));
   //
   if (userContext.isExpired || !SecurityManager.isAuthenticated(userContext)) {
     return null;
@@ -194,7 +194,7 @@ function NavigationIdentity(props) {
                               event.preventDefault();
                               //
                               if (item.modal) {
-                                setModals(modals.set(item.modal, { show: true }));
+                                dispatch(dataManager.setModals(modals.set(item.modal, { show: true })));
                               } else if (item.to) {
                                 history.push(item.to);
                               } else if (item.onClick) {
@@ -209,7 +209,7 @@ function NavigationIdentity(props) {
                             ||
                             <ModalComponent
                               show={ modals.has(item.modal) ? modals.get(item.modal).show : false }
-                              onHide={ () => { setModals(modals.set(item.modal, { show: false })); } }/>
+                              onHide={ () => { dispatch(dataManager.setModals(modals.set(item.modal, { show: false }))); } }/>
                           }
                         </>
                       );

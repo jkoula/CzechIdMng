@@ -5,23 +5,24 @@ import classnames from 'classnames';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { makeStyles } from '@material-ui/core/styles';
 //
+import * as Utils from '../../../utils';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 import Icon from '../Icon/Icon';
 import Typography from '../Typography/Typography';
 //
 const useStyles = makeStyles((theme) => {
   return {
-    primary: {
-      '& .MuiLinearProgress-barColorPrimary': {
-        backgroundColor: theme.palette.success.main,
-        color: theme.palette.success.main
-      }
+    success: {
+      backgroundColor: theme.palette.success.main,
+      color: theme.palette.success.main
     },
-    secondary: {
-      '& .MuiLinearProgress-barColorPrimary': {
-        backgroundColor: theme.palette.error.main,
-        color: theme.palette.error.main
-      }
+    warning: {
+      backgroundColor: theme.palette.warning.main,
+      color: theme.palette.warning.main
+    },
+    error: {
+      backgroundColor: theme.palette.error.main,
+      color: theme.palette.error.main
     }
   };
 });
@@ -75,6 +76,12 @@ export default function BasicProgressBar(props) {
   _style.display = _style.display || 'flex';
   _style.alignItems = _style.alignItems || 'center';
   //
+  // tree levels are supported only
+  let _bsStyle = Utils.Ui.toLevel(bsStyle || 'success');
+  if (_bsStyle !== 'error' && _bsStyle !== 'warning') {
+    _bsStyle = 'success';
+  }
+  //
   return (
     <div
       style={ _style }
@@ -83,7 +90,7 @@ export default function BasicProgressBar(props) {
         <LinearProgress
           variant={ max === null && active ? 'indeterminate' : 'determinate'}
           value={ percent }
-          className={ classes[bsStyle === 'warning' || bsStyle === 'error' ? 'secondary' : 'primary'] }/>
+          classes={{ barColorPrimary: classes[_bsStyle] }}/>
       </div>
       {
         !label
@@ -124,7 +131,7 @@ BasicProgressBar.propTypes = {
    * Adds animation -  the stripes right to left. Not available in IE9 and below.
    */
   active: PropTypes.bool,
-  bsStyle: PropTypes.string
+  bsStyle: PropTypes.oneOf(['success', 'warning', 'error'])
 };
 
 BasicProgressBar.defaultProps = {

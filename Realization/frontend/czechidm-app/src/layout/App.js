@@ -88,14 +88,14 @@ export class App extends Basic.AbstractContent {
     return (
       <ThemeProvider theme={ theme }>
         <CssBaseline/>
+        <Basic.FlashMessages ref="messages" />
         <div id="content-wrapper">
-          <Basic.FlashMessages ref="messages" />
           {
             !appReady
             ?
             <Basic.Loading className="global" showLoading />
             :
-            <Basic.Div>
+            <div>
               <Helmet title={ this.i18n('navigation.menu.home') } titleTemplate={ titleTemplate } />
               <Advanced.Navigation location={ location }>
                 <div id="content-container" className={ classnames }>
@@ -103,6 +103,7 @@ export class App extends Basic.AbstractContent {
                     all components are loaded (componentDidMount) after identity is logged again */ }
                   { this.getRoutes() }
                   <Footer rendered={ !hideFooter } />
+                  { /* @deprecated - remove, when all bulk actions will be moved to BE */ }
                   <Advanced.ModalProgressBar
                     show={ bulk.showLoading }
                     text={ bulk.action.title }
@@ -111,7 +112,7 @@ export class App extends Basic.AbstractContent {
                   />
                 </div>
               </Advanced.Navigation>
-            </Basic.Div>
+            </div>
           }
         </div>
       </ThemeProvider>

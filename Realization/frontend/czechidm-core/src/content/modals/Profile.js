@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import Joi from 'joi';
 import _ from 'lodash';
-import Fab from '@material-ui/core/Fab';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
@@ -379,9 +378,9 @@ class Profile extends Basic.AbstractContent {
                 readOnly={ !profileManager.canSave(profile, _permissions) }
                 showLoading={ showLoading }>
 
-                <Basic.Div className={ showTwoFactorConfirm ? 'hidden' : '' }>
-                  <Basic.Div style={{ marginTop: 5, marginBottom: 20 }}>
-                    <Basic.Div className="profile-image-wrapper">
+                <div className={ showTwoFactorConfirm ? 'hidden' : '' }>
+                  <div style={{ marginTop: 5, marginBottom: 20 }}>
+                    <div className="profile-image-wrapper">
                       <Basic.Div style={{ marginBottom: 15, fontWeight: 700 }}>
                         { this.i18n('entity.Profile.image.label') }
                       </Basic.Div>
@@ -417,8 +416,8 @@ class Profile extends Basic.AbstractContent {
                           onClick={ this.deleteImage.bind(this) }
                           icon="fa:trash"/>
                       </Basic.Fab>
-                    </Basic.Div>
-                  </Basic.Div>
+                    </div>
+                  </div>
 
                   <Basic.EnumSelectBox
                     ref="preferredLanguage"
@@ -486,9 +485,9 @@ class Profile extends Basic.AbstractContent {
                     label={ this.i18n('entity.Profile.systemInformation.label') }
                     helpBlock={ this.i18n('entity.Profile.systemInformation.help') }
                     onChange={ (event) => this.onSave({ systemInformation: event.currentTarget.checked }) }/>
-                </Basic.Div>
+                </div>
 
-                <Basic.Div className={ showTwoFactorConfirm ? '' : 'hidden' }>
+                <div className={ showTwoFactorConfirm ? '' : 'hidden' }>
                   <Basic.Div className="text-center" rendered={ showTwoFactorConfirm === 'APPLICATION' }>
                     <Basic.Alert level="info">
                       { this.i18n('content.identity.profile.twoFactor.application.help', { escape: false }) }
@@ -554,7 +553,7 @@ class Profile extends Basic.AbstractContent {
                       :
                       Joi.any().allow(null)
                     }/>
-                </Basic.Div>
+                </div>
               </Basic.AbstractForm>
               {/* onEnter action - is needed because footer submit button is outside form */}
               <input type="submit" className="hidden"/>

@@ -3,97 +3,123 @@ import PropTypes from 'prop-types';
 import ReactDropzone from 'react-dropzone';
 import _ from 'lodash';
 //
+import { makeStyles } from '@material-ui/core/styles';
+//
+import { i18n } from '../../../services/LocalizationService';
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 import Well from '../Well/Well';
-import defaultStyle from './styles';
 
 /**
-* Dropzone component
+ * Theme decorator.
+ *
+ * @author Radek Tomiška
+ * @since 12.0.0
+ */
+const useStyles = makeStyles((theme) => {
+  return {
+    root: {
+      borderRadius: theme.shape.borderRadius
+    }
+  };
+});
+
+/**
+* Dropzone component.
 *
 * @author Vít Švanda
+* @author Radek Tomiška
 */
-class Dropzone extends AbstractContextComponent {
-
-  constructor(props, context) {
-    super(props, context);
-    this.state = {};
+export default function Dropzone(props) {
+  const {
+    id,
+    onDrop,
+    multiple,
+    accept,
+    style,
+    styleActive,
+    styleReject,
+    showLoading,
+    rendered,
+    children,
+    hidden,
+    readOnly
+  } = props;
+  const classes = useStyles();
+  // TODO: move to material classes and add theme (e.g. theme.palette.divider)
+  const defaultStyle = {
+    style: {
+      height: 'auto',
+      width: 'auto',
+      textAlign: 'center',
+      borderWidth: '2px',
+      borderStyle: 'dashed',
+      padding: '30px'
+    },
+    styleActive: {
+      borderColor: '#3d8b3d',
+      backgroundColor: 'rgba(92, 184, 92, 0.06)'
+    },
+    styleReject: {
+      borderColor: '#DE140E',
+      backgroundColor: 'rgba(217, 79, 79, 0.12)'
+    },
+    disabledStyle: {
+      opacity: '0.5',
+      filter: 'alpha(opacity=50)'
+    }
+  };
+  //
+  if (!rendered) {
+    return null;
   }
-
-  render() {
-    const {
-      id,
-      onDrop,
-      multiple,
-      accept,
-      style,
-      styleActive,
-      styleReject,
-      showLoading,
-      rendered,
-      children,
-      hidden,
-      readOnly
-    } = this.props;
-    //
-    if (!rendered) {
-      return null;
-    }
-    if (showLoading) {
-      return <Well showLoading/>;
-    }
-    let content = children;
-    if (!content) {
-      if (readOnly) {
-        content = this.i18n('component.basic.Dropzone.readOnly');
-      } else {
-        content = this.i18n('component.basic.Dropzone.infoText');
-      }
-    }
-    let _id = id;
-    if (!_id) {
-      _id = _.uniqueId('dropzone_');
-    }
-    //
-    return (
-      <div className={ hidden ? 'hidden' : '' }>
-        <ReactDropzone
-          id={ _id }
-          ref="dropzone"
-          style={{ ...defaultStyle.style, ...style }}
-          activeStyle={styleActive ? styleActive : defaultStyle.styleActive}
-          rejectStyle={styleReject ? styleReject : defaultStyle.styleReject}
-          multiple={multiple}
-          accept={accept}
-          disablePreview
-          disabled={ readOnly }
-          onDrop={onDrop}>
-          <div style={{ color: '#777' }}>
-            { content }
-          </div>
-        </ReactDropzone>
-      </div>
-
-    );
+  if (showLoading) {
+    return <Well showLoading/>;
   }
+  let content = children;
+  if (!content) {
+    if (readOnly) {
+      content = i18n('component.basic.Dropzone.readOnly');
+    } else {
+      content = i18n('component.basic.Dropzone.infoText');
+    }
+  }
+  let _id = id;
+  if (!_id) {
+    _id = _.uniqueId('dropzone_');
+  }
+  //
+  return (
+    <div className={ hidden ? 'hidden' : '' }>
+      <ReactDropzone
+        id={ _id }
+        style={{ ...defaultStyle.style, ...style }}
+        activeStyle={ styleActive || defaultStyle.styleActive }
+        rejectStyle={ styleReject || defaultStyle.styleReject }
+        multiple={ multiple }
+        accept={ accept }
+        disablePreview
+        disabled={ readOnly }
+        onDrop={ onDrop }
+        className={ classes.root }>
+        <div style={{ color: '#777' }}>
+          { content }
+        </div>
+      </ReactDropzone>
+    </div>
+
+  );
 }
 
 Dropzone.propTypes = {
+  ...AbstractContextComponent.propTypes,
   /**
    * Component identifier
    */
   id: PropTypes.string,
   /**
-  * Rendered component
-  */
-  rendered: PropTypes.bool,
-  /**
   * Hidden component
   */
   hidden: PropTypes.bool,
-  /**
-  * Show loading in component
-  */
-  showLoading: PropTypes.bool,
   /**
   * Function call after droped or selected any files
   */
@@ -125,12 +151,8 @@ Dropzone.propTypes = {
 };
 
 Dropzone.defaultProps = {
-  rendered: true,
-  showLoading: false,
+  ...AbstractContextComponent.defaultProps,
   multiple: true,
   hidden: false,
   readOnly: false
 };
-
-
-export default Dropzone;

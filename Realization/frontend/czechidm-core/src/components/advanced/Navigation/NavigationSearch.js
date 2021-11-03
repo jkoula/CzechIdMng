@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => {
       },
       selectBoxRoot: {
         '& .Select-control': {
-          width: 600,
+          width: 450,
           border: 0,
           color: theme.palette.common.white,
           fontSize: '1rem'
