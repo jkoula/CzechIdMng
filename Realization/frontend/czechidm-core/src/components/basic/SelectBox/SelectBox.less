@@ -38,15 +38,6 @@
     }
   }
 
-  .is-focused {
-    .Select-control {
-      .colorDefs(#3f51b5);
-      border-color: @select-primary-color;
-      background-color: transparent;
-      box-shadow: 0px 0px 5px 0px rgba(63, 81, 181, 0.7);
-    }
-  }
-
   .Select.is-focused:not(.is-open) > .Select-control {
     background-color: transparent;
   }
@@ -86,16 +77,6 @@
   z-index: 1301;
 }
 
-.has-error {
-	.is-focused {
-			.Select-control {
-				.colorDefs(#a94442);
-				border-color: @select-primary-color;
-				box-shadow: 0px 0px 5px 0px rgba(193, 66, 66, 0.7);
-      }
-   }
-}
-
 .small {
 
   input {
@@ -118,7 +99,7 @@
 
   .Select-control {
     height: 22px;
-    border-color: @idm-border-color;
+    border-color: #ddd;
   }
 
   .Select-value, .Select-placeholder {

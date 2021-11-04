@@ -79,7 +79,7 @@ export default function BasicModal(props) {
       onEnter={ onEnter }
       onClose={ _onExit }
       scroll={ affixFooter && hasHeader && hasBody ? 'paper' : 'body' }
-      className={ affixFooter && hasHeader && hasBody ? 'basic-modal-scroll-paper' : 'basic-modal-scroll-body' }
+      className={ affixFooter && hasHeader && hasBody ? 'basic-modal basic-modal-scroll-paper' : 'basic-modal basic-modal-scroll-body' }
       maxWidth={ _maxWidth }
       fullWidth={ fullWidth }
       aria-labelledby="scroll-dialog-header"

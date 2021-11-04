@@ -66,6 +66,12 @@ class BasicAlert extends AbstractComponent {
         </div>
       );
     }
+    let _icon = null;
+    if (icon === false) { // icon can be disabled
+      _icon = false;
+    } else if (icon) {
+      _icon = (<Icon icon={ icon }/>);
+    }
     //
     return (
       <Alert
@@ -73,7 +79,7 @@ class BasicAlert extends AbstractComponent {
         className={ classNames }
         style={ style }
         onClose={ onClose ? this._onClose.bind(this) : null }
-        icon={ icon ? <Icon icon={ icon }/> : null }>
+        icon={ _icon }>
         {
           !title
           ||

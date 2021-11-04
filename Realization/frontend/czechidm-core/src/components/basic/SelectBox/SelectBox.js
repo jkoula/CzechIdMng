@@ -32,6 +32,13 @@ const styles = theme => ({
         borderWidth: 2
       }
     },
+    '&.is-focused:not(.is-open)': {
+      '& .Select-control': {
+        boxShadow: 'none',
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2
+      }
+    },
     '& .Select-option': {
       backgroundColor: theme.palette.background.paper,
       '&.is-focused': {
@@ -742,7 +749,7 @@ export class SelectBox extends AbstractFormComponent {
     }
     // FIXME: works, when input is empty only ...
     const container = $(this.containerRef.current);
-    const isModal = container.closest('.basic-modal-scroll-paper').length > 0;
+    const isModal = container.closest('.basic-modal').length > 0;
     let selectBoxOuter = null;
     if (isModal) {
       selectBoxOuter = container.find('.Select-menu-outer');

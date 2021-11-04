@@ -323,7 +323,7 @@ class Login extends Basic.AbstractContent {
 
                       <Basic.Button
                         type="submit"
-                        level="success"
+                        level="primary"
                         fullWidth
                         variant="contained"
                         showLoading={ userContext.showLoading }>
