@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 //
+import { withStyles } from '@material-ui/core/styles';
+//
 import * as Basic from '../../basic';
+import { ScriptArea } from '../../basic/ScriptArea/ScriptArea';
 import ScriptOptionDecorator from './ScriptOptionDecorator';
 import ScriptValueDecorator from './ScriptValueDecorator';
 import RichTextArea from '../RichTextArea/RichTextArea';
@@ -14,7 +17,7 @@ import RichTextArea from '../RichTextArea/RichTextArea';
  * @author Ondřej Kopr
  * @author Radek Tomiška
  */
-class ScriptArea extends Basic.ScriptArea {
+export class AdvancedScriptArea extends ScriptArea {
 
   constructor(props, context) {
     super(props, context);
@@ -193,7 +196,7 @@ class ScriptArea extends Basic.ScriptArea {
   }
 }
 
-ScriptArea.propTypes = {
+AdvancedScriptArea.propTypes = {
   scriptCategory: PropTypes.array,
   scriptManager: PropTypes.object,
   headerText: PropTypes.string.isRequired,
@@ -202,12 +205,11 @@ ScriptArea.propTypes = {
   showScriptSelection: PropTypes.bool
 };
 
-ScriptArea.defaultProps = {
+AdvancedScriptArea.defaultProps = {
   scriptCategory: null,
   height: '10em',
   mode: 'groovy',
   showScriptSelection: true
 };
 
-
-export default ScriptArea;
+export default withStyles(ScriptArea.STYLES, { withTheme: true })(AdvancedScriptArea);

@@ -3,18 +3,39 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Joi from 'joi';
 //
+import { withStyles } from '@material-ui/core/styles';
+//
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import FormComponentLabel from '../AbstractFormComponent/FormComponentLabel';
 import Tooltip from '../Tooltip/Tooltip';
 import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
 
+const styles = theme => ({
+  root: {
+    '&.form-control': {
+      padding: 1,
+      borderRadius: theme.shape.borderRadius,
+      borderColor: theme.palette.type === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
+      '&.ace_focus': {
+        borderColor: theme.palette.primary.main
+        // TODO: borderWidth: 2, fix jump with some padding
+      },
+      '&.has-error': {
+        borderColor: `${ theme.palette.error.main } !important`
+      }
+    }
+  }
+});
+
 /**
  * Script Area.
  *
  * @author Vít Švanda
  */
-class ScriptArea extends AbstractFormComponent {
+export class ScriptArea extends AbstractFormComponent {
 
   componentDidMount() {
     super.componentDidMount();
@@ -174,16 +195,16 @@ class ScriptArea extends AbstractFormComponent {
   }
 
   _getComponent(feedback) {
-    const { labelSpan, label, placeholder, componentSpan, required, mode, height } = this.props;
+    const { labelSpan, label, placeholder, componentSpan, required, mode, height, classes } = this.props;
     const { showModalEditor, disabled, readOnly } = this.state;
     //
-    const className = classNames('form-control');
+    const className = classNames(
+      'form-control',
+      { 'has-error': !!feedback },
+      classes ? classes.root : null
+    );
     const labelClassName = classNames(labelSpan);
-    let showAsterix = false;
-    if (required && !this.state.value) {
-      showAsterix = true;
-    }
-
+    //
     // Workaround - Import for AceEditor must be here. When was on start, then not working tests (error is in AceEditor);
     const AceEditor = require('react-ace').default;
     require('brace/mode/groovy');
@@ -221,14 +242,8 @@ class ScriptArea extends AbstractFormComponent {
             <span>
               { this.getOptionsButton() }
               {/* Editor cannot be hidden here if modal is show, because Ace editor will be null after closing the modal dialog.*/}
-              {AceEditorInstance}
-              {
-                feedback
-                ||
-                !showAsterix
-                ||
-                <span className="form-control-feedback" style={{color: 'red', zIndex: 0}}>*</span>
-              }
+              { AceEditorInstance }
+              { feedback }
               <Modal
                 show={showModalEditor}
                 dialogClassName="modal-large"
@@ -268,4 +283,6 @@ ScriptArea.defaultProps = {
   showMaximalizationBtn: true
 };
 
-export default ScriptArea;
+ScriptArea.STYLES = styles;
+
+export default withStyles(styles, { withTheme: true })(ScriptArea);
