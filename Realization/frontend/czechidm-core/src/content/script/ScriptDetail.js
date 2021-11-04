@@ -172,7 +172,7 @@ export default class ScriptDetail extends Basic.AbstractContent {
 
                 <Advanced.RichTextArea
                   ref="description"
-                  label={ this.i18n('entity.Script.description') } />
+                  label={ this.i18n('entity.Script.description') }/>
 
                 <Basic.ScriptArea
                   ref="script"

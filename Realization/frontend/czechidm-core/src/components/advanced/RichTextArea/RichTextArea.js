@@ -5,9 +5,24 @@ import Joi from 'joi';
 import { Editor } from 'react-draft-wysiwyg';
 import { EditorState, ContentState, convertFromHTML, DefaultDraftBlockRenderMap, getSafeBodyFromHTML } from 'draft-js';
 import { stateToHTML } from 'draft-js-export-html';
-import FormComponentLabel from '../../basic/AbstractFormComponent/FormComponentLabel';
+//
+import { withStyles } from '@material-ui/core/styles';
 //
 import * as Basic from '../../basic';
+import FormComponentLabel from '../../basic/AbstractFormComponent/FormComponentLabel';
+
+const styles = theme => ({
+  root: {
+    '& .basic-richtextarea': {
+      borderRadius: theme.shape.borderRadius,
+      borderWidth: 1,
+      borderColor: theme.palette.type === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
+      // TODO: how to implement focus?
+    }
+  }
+});
 
 /**
  * Based on Draf.js and react draft wysiwyg editor
@@ -34,25 +49,25 @@ class RichTextArea extends Basic.AbstractFormComponent {
     };
   }
 
-  getValidationDefinition(required) {
+  getValidationDefinition(required, validation = null) {
     const { min, max } = this.props;
-    let validation = super.getValidationDefinition(min ? true : required);
+    let _validation = super.getValidationDefinition(min ? true : required, validation);
 
     if (min && max) {
-      validation = validation.concat(Joi.string().min(min).max(max).disallow(''));
+      _validation = _validation.concat(Joi.string().min(min).max(max).disallow(''));
     } else if (min) {
-      validation = validation.concat(Joi.string().min(min));
+      _validation = _validation.concat(Joi.string().min(min));
     } else if (max) {
       if (!required) {
         // if set only max is necessary to set allow null and empty string
-        validation = validation.concat(Joi.string().max(max).allow(null).allow(''));
+        _validation = _validation.concat(Joi.string().max(max).allow(null).allow(''));
       } else {
         // if set prop required it must not be set allow null or empty string
-        validation = validation.concat(Joi.string().max(max));
+        _validation = _validation.concat(Joi.string().max(max));
       }
     }
 
-    return validation;
+    return _validation;
   }
 
   getRequiredValidationSchema() {
@@ -92,7 +107,8 @@ class RichTextArea extends Basic.AbstractFormComponent {
     }
 
     this.setState({
-      editorState
+      editorState,
+      value: editorState.getCurrentContent().getPlainText()
     });
     //
     this.validate();
@@ -102,7 +118,8 @@ class RichTextArea extends Basic.AbstractFormComponent {
    * Focus input field
    */
   focus() {
-    this.refs.input.focus();
+    // TODO: focus doesn't work / see react-draft-wysiwyg doc
+    // this.refs.input.focus();
   }
 
   setValue(value) {
@@ -146,7 +163,7 @@ class RichTextArea extends Basic.AbstractFormComponent {
   }
 
   getBody(feedback) {
-    const { labelSpan, label, componentSpan, placeholder, style, required, showToolbar, mentions } = this.props;
+    const { labelSpan, label, componentSpan, placeholder, style, required, showToolbar, mentions, classes } = this.props;
     const { editorState, disabled, readOnly } = this.state;
     const labelClassName = classNames(
       labelSpan
@@ -155,10 +172,6 @@ class RichTextArea extends Basic.AbstractFormComponent {
       'basic-richtextarea',
       { readOnly: readOnly === true}
     );
-    let showAsterix = false;
-    if (required && !feedback) {
-      showAsterix = true;
-    }
     //
     const _label = [];
     if (label) {
@@ -174,8 +187,10 @@ class RichTextArea extends Basic.AbstractFormComponent {
       <div className={
         classNames(
           'basic-form-component',
-          { 'has-feedback': feedback },
-          { disabled: disabled || readOnly }
+          { 'has-feedback': !!feedback },
+          { 'has-error': !!feedback },
+          { disabled: disabled || readOnly },
+          classes ? classes.root : null
         )
       }>
         <FormComponentLabel
@@ -185,7 +200,7 @@ class RichTextArea extends Basic.AbstractFormComponent {
           helpIcon={ this.renderHelpIcon() }/>
         <div className={componentSpan}>
           <Basic.Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
-            <div className={containerClassName}>
+            <div className={ containerClassName }>
               <Editor
                 ref="input"
                 readOnly={readOnly}
@@ -198,13 +213,7 @@ class RichTextArea extends Basic.AbstractFormComponent {
                 style={style}
                 toolbar={this._getToolbar()}
                 spellCheck/>
-              {
-                feedback
-                ||
-                !showAsterix
-                ||
-                <span className="form-control-feedback" style={{ color: 'red', zIndex: 0 }}>*</span>
-              }
+              { feedback }
             </div>
           </Basic.Tooltip>
           { _label.length === 0 ? this.renderHelpIcon() : null }
@@ -246,4 +255,4 @@ RichTextArea.defaultProps = {
   },
 };
 
-export default RichTextArea;
+export default withStyles(styles, { withTheme: true })(RichTextArea);
