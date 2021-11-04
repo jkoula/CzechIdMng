@@ -7,7 +7,8 @@ import moment from 'moment';
 import Datetime from 'react-datetime';
 import $ from 'jquery';
 //
-
+import { withStyles } from '@material-ui/core/styles';
+//
 import LocalizationService from '../../../services/LocalizationService';
 import { ConfigurationManager } from '../../../redux';
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
@@ -17,13 +18,65 @@ import Tooltip from '../Tooltip/Tooltip';
 
 const INVALID_DATE = 'Invalid date';
 
+const styles = theme => ({
+  root: {
+    '& .rdtPicker': {
+      borderColor: theme.palette.divider,
+      '& td.rdtActive': {
+        backgroundColor: theme.palette.secondary.main,
+        color: theme.palette.secondary.contrastText
+      },
+      '& td.rdtActive:hover': {
+        backgroundColor: theme.palette.secondary.main,
+        color: theme.palette.secondary.contrastText
+      }
+    },
+    '& .form-control': {
+      borderRadius: theme.shape.borderRadius,
+      borderColor: theme.palette.type === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
+      '&:hover': {
+        borderColor: theme.palette.text.primary
+      },
+      '&:focus': {
+        boxShadow: 'none',
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2,
+        outline: 0,
+        paddingLeft: 11,
+        paddingRight: 11
+      }
+    },
+    '&.has-error': {
+      '& .form-control': {
+        borderColor: `${ theme.palette.error.main } !important`
+      }
+    }
+  },
+  input: {
+    '&.form-control': {
+      borderRadius: theme.shape.borderRadius,
+      borderColor: theme.palette.type === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
+      '&:focus': {
+        boxShadow: 'none'
+      },
+      '&.has-error': {
+        borderColor: `${ theme.palette.error.main } !important`
+      }
+    }
+  }
+});
+
 /**
  * Wrapped react-datetime component
  *
  * @author Vít Švanda
  * @author Radek Tomiška
  */
-class DateTimePicker extends AbstractFormComponent {
+export class DateTimePicker extends AbstractFormComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -314,9 +367,9 @@ class DateTimePicker extends AbstractFormComponent {
       dateFormat,
       timeFormat,
       isValidDate,
-      required
+      required,
+      classes
     } = this.props;
-
     const { readOnly, disabled, value, positionUp } = this.state;
     //
     // default prop values - we need initialized LocalizationService
@@ -325,6 +378,11 @@ class DateTimePicker extends AbstractFormComponent {
     const _timeFormat = this._getTimeFormat(timeFormat);
     //
     const labelClassName = classNames(labelSpan);
+    const inputClassName = classNames(
+      { rdtPickerOpenUpwards: positionUp },
+      { 'has-error': !!feedback },
+      classes ? classes.root : null
+    );
     const _label = [];
     if (label) {
       _label.push(label);
@@ -340,7 +398,7 @@ class DateTimePicker extends AbstractFormComponent {
       <div className={
         classNames(
           'basic-form-component',
-          { 'has-feedback': feedback },
+          { 'has-feedback': !!feedback },
           { disabled: disabled || readOnly }
         )
       }>
@@ -361,7 +419,13 @@ class DateTimePicker extends AbstractFormComponent {
                   type="text"
                   value={ value && value._isAMomentObject ? this._format(value) : value }
                   readOnly
-                  className="form-control"
+                  className={
+                    classNames(
+                      'form-control',
+                      { 'has-error': !!feedback },
+                      classes ? classes.input : null
+                    )
+                  }
                   style={ style }/>
                 :
                 <Datetime
@@ -370,7 +434,7 @@ class DateTimePicker extends AbstractFormComponent {
                   onChange={this.onChange}
                   disabled={disabled}
                   readOnly={readOnly}
-                  className={positionUp ? 'rdtPickerOpenUpwards' : '' }
+                  className={ inputClassName }
                   closeOnSelect
                   onFocus={this.resolvePosition.bind(this, null)}
                   locale={_locale === 'cs' ? 'cs' : 'en'}
@@ -445,5 +509,6 @@ DateTimePicker.defaultProps = {
   ...otherDefaultProps,
   mode: 'datetime'
 };
+DateTimePicker.STYLES = styles;
 
-export default DateTimePicker;
+export default withStyles(styles, { withTheme: true })(DateTimePicker);

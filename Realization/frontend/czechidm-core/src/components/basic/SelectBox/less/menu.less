@@ -40,7 +40,6 @@
 .Select-option {
 	box-sizing: border-box;
 	background-color: @select-option-bg;
-	color: @select-option-color;
 	cursor: pointer;
 	display: block;
 	padding: @select-padding-vertical @select-padding-horizontal;
@@ -52,17 +51,16 @@
 	&.is-selected {
 		background-color: @select-option-selected-bg-fb;  /* Fallback color for IE 8 */
 		background-color: @select-option-selected-bg;
-		color: @select-option-selected-color;
+		color: inherit;
 	}
 
 	&.is-focused {
 		background-color: @select-option-focused-bg-fb;  /* Fallback color for IE 8 */
 		background-color: @select-option-focused-bg;
-		color: @select-option-focused-color;
+		color: inherit;
 	}
 
 	&.is-disabled {
-		color: @select-option-disabled-color;
 		cursor: default;
 	}
 

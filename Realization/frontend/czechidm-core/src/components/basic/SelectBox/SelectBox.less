@@ -30,11 +30,18 @@
 
     > .Select-control {
         background-color: transparent;
-        border-color: rgba(0, 0, 0, 0.26);
 
         .Select-value .Select-value-label {
           color: inherit;
         }
+    }
+  }
+
+
+  .is-focused {
+    .Select-control {
+      .colorDefs(#3f51b5);
+      background-color: transparent;
     }
   }
 
@@ -99,7 +106,6 @@
 
   .Select-control {
     height: 22px;
-    border-color: #ddd;
   }
 
   .Select-value, .Select-placeholder {

@@ -6,6 +6,7 @@ import Joi from 'joi';
 import _ from 'lodash';
 import Waypoint from 'react-waypoint';
 import $ from 'jquery';
+//
 import { withStyles } from '@material-ui/core/styles';
 //
 import * as Utils from '../../../utils';
@@ -40,12 +41,16 @@ const styles = theme => ({
       }
     },
     '& .Select-option': {
+      color: theme.palette.text.primary,
       backgroundColor: theme.palette.background.paper,
       '&.is-focused': {
         backgroundColor: theme.palette.action.hover
       },
       '&:hover': {
         backgroundColor: theme.palette.action.hover
+      },
+      '&.is-disabled': {
+        color: `${theme.palette.text.disabled} !important`
       }
     },
     '& .Select-menu-outer': {
@@ -55,6 +60,9 @@ const styles = theme => ({
     '& .Select-control': {
       WebkitBoxShadow: 'none !important',
       borderRadius: theme.shape.borderRadius,
+      borderColor: theme.palette.type === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
       '&:hover': {
         borderColor: theme.palette.text.primary
       }

@@ -4,6 +4,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 //
 import * as Basic from '../../basic';
+import { DateTimePicker } from '../../basic/DateTimePicker/DateTimePicker';
 import FilterDateTimePicker from './FilterDateTimePicker';
 import FilterEnumSelectBox from './FilterEnumSelectBox';
 import DateFaceEnum from '../../../enums/DateFaceEnum';
@@ -264,7 +265,7 @@ FilterDate.propTypes = {
   /**
    * Defined mode of component see @DateTimePicker. Use 'datetime' for DateTime columns, timezone is ignored for LocalDate columns.
    */
-  mode: FilterDateTimePicker.propTypes.mode,
+  mode: DateTimePicker.propTypes.mode,
   /**
    * Property face - face - will be used for get/set value (configurable - more date filters can be used on the same content).
    */
@@ -297,7 +298,7 @@ FilterDate.propTypes = {
   hidden: PropTypes.bool
 };
 FilterDate.defaultProps = {
-  mode: FilterDateTimePicker.defaultProps.mode,
+  mode: DateTimePicker.defaultProps.mode,
   required: false,
   faceProperty: 'face',
   fromProperty: 'from',

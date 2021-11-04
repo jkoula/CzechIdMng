@@ -1,5 +1,9 @@
 import PropTypes from 'prop-types';
-import {EnumSelectBox} from '../EnumSelectBox/EnumSelectBox';
+//
+import { withStyles } from '@material-ui/core/styles';
+//
+import { SelectBox } from '../SelectBox/SelectBox';
+import { EnumSelectBox } from '../EnumSelectBox/EnumSelectBox';
 
 /**
  * Select boolean value
@@ -8,7 +12,7 @@ import {EnumSelectBox} from '../EnumSelectBox/EnumSelectBox';
  *
  * @author Radek Tomiška
  */
-export default class BooleanSelectBox extends EnumSelectBox {
+export class BooleanSelectBox extends EnumSelectBox {
 
   /**
    * Default options from localization
@@ -63,3 +67,5 @@ BooleanSelectBox.propTypes = {
 BooleanSelectBox.defaultProps = {
   ...EnumSelectBox.defaultProps
 };
+
+export default withStyles(SelectBox.STYLES, { withTheme: true })(BooleanSelectBox);

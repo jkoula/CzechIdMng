@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import {SelectBox} from '../../basic/SelectBox/SelectBox';
+//
+import { withStyles } from '@material-ui/core/styles';
+//
+import { SelectBox } from '../../basic/SelectBox/SelectBox';
 
 /**
  *  Select box used in filters

@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import Select from 'react-select';
-import {withStyles} from '@material-ui/core/styles';
 //
-import {SelectBox} from '../SelectBox/SelectBox';
+import { withStyles } from '@material-ui/core/styles';
+//
+import { SelectBox } from '../SelectBox/SelectBox';
 import AbstractFormComponent from '../AbstractFormComponent/AbstractFormComponent';
 import EnumValueDecorator from './EnumValueDecorator';
 import EnumOptionDecorator from './EnumOptionDecorator';
@@ -15,35 +16,6 @@ import EnumOptionDecorator from './EnumOptionDecorator';
  * @author Vít Švanda
  * @author Radek Tomiška
  */
-
-const styles = theme => ({
-  root: {
-    '&.is-focused': {
-      '& .Select-control': {
-        boxShadow: 'none',
-        borderColor: theme.palette.primary.main,
-        borderWidth: 2
-      }
-    },
-    '& .Select-option': {
-      backgroundColor: theme.palette.background.paper,
-      '&.is-focused': {
-        backgroundColor: theme.palette.action.hover
-      },
-      '&:hover': {
-        backgroundColor: theme.palette.action.hover
-      }
-    },
-    '& .Select-menu-outer': {
-      backgroundColor: theme.palette.background.paper,
-      marginTop: 1,
-      position: 'none'
-    },
-    '& .Select-control': {
-      WebkitBoxShadow: 'none !important'
-    }
-  }
-});
 export class EnumSelectBox extends SelectBox {
 
   constructor(props) {
