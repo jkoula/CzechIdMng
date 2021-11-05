@@ -15,7 +15,7 @@ const projectionManager = new FormProjectionManager();
 const securityManager = new SecurityManager();
 
 /**
- * Identity basic information (info card)
+ * Identity basic information (info card).
  *
  * @author Radek Tomiška
  */

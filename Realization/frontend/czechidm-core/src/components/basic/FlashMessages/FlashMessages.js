@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import NotificationSystem from 'react-notification-system';
 //
+import { ConfigurationManager } from '../../../redux';
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 
 /**
@@ -106,6 +107,8 @@ export class FlashMessages extends AbstractContextComponent {
   }
 
   _getNotificationSystemStyles() {
+    const { theme } = this.props;
+    //
     const styles = {
       Containers: {
         DefaultStyle: { // Applied to every notification, regardless of the notification level
@@ -126,6 +129,61 @@ export class FlashMessages extends AbstractContextComponent {
         }
       },
       NotificationItem: { // Override the notification item
+        DefaultStyle: {
+          borderRadius: `${ theme.shape.borderRadius }px`
+        },
+        success: { // Applied only to the success notification item
+          color: theme.palette.primary.contrastText,
+          borderTop: `3px solid ${ theme.palette.primary.main }`,
+          backgroundColor: theme.palette.primary.light,
+        },
+        warning: { // Applied only to the success notification item
+          color: theme.palette.warning.contrastText,
+          borderTop: `3px solid ${ theme.palette.warning.main }`,
+          backgroundColor: theme.palette.warning.light,
+        },
+        error: { // Applied only to the success notification item
+          color: theme.palette.error.contrastText,
+          borderTop: `3px solid ${ theme.palette.error.main }`,
+          backgroundColor: theme.palette.error.light,
+        },
+        info: { // Applied only to the success notification item
+          color: theme.palette.info.contrastText,
+          borderTop: `3px solid ${ theme.palette.info.main }`,
+          backgroundColor: theme.palette.info.light,
+        }
+      },
+      Title: {
+        success: {
+          color: theme.palette.success.contrastText
+        },
+        error: {
+          color: theme.palette.error.contrastText
+        },
+        warning: {
+          color: theme.palette.warning.contrastText
+        },
+        info: {
+          color: theme.palette.info.contrastText
+        }
+      },
+      Dismiss: {
+        success: {
+          color: theme.palette.success.contrastText,
+          backgroundColor: theme.palette.success.main,
+        },
+        error: {
+          color: theme.palette.error.contrastText,
+          backgroundColor: theme.palette.error.main,
+        },
+        warning: {
+          color: theme.palette.warning.contrastText,
+          backgroundColor: theme.palette.warning.main,
+        },
+        info: {
+          color: theme.palette.info.contrastText,
+          backgroundColor: theme.palette.info.main,
+        }
       },
       ActionWrapper: {
         DefaultStyle: {
@@ -159,7 +217,8 @@ FlashMessages.defaultProps = {
 // Note: use https://github.com/faassen/reselect for better performance.
 function select(state) {
   return {
-    messages: state.messages.messages.toArray()
+    messages: state.messages.messages.toArray(),
+    theme: ConfigurationManager.getApplicationTheme(state)
   };
 }
 
