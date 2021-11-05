@@ -1,9 +1,75 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import $ from 'jquery';
+//
+import { withStyles } from '@material-ui/core/styles';
 //
 import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
 import { SearchParameters } from '../../../domain';
+
+const styles = theme => ({
+  root: {
+    padding: '10px 15px',
+    borderTop: `1px solid ${ theme.palette.divider }`,
+    borderBottomRightRadius: theme.shape.borderRadius,
+    borderBottomLeftRadius: theme.shape.borderRadius,
+    '& .pagination > li > a:focus': {
+      color: theme.palette.secondary.main,
+    },
+    '& .pagination > li > a:hover': {
+      color: theme.palette.secondary.main,
+    },
+    '& .pagination > .active > a': {
+      color: theme.palette.secondary.contrastText,
+      borderColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.secondary.main,
+      '&:focus': {
+        color: theme.palette.secondary.contrastText,
+        backgroundColor: theme.palette.secondary.main,
+      },
+      '&:hover': {
+        color: theme.palette.secondary.contrastText,
+        backgroundColor: theme.palette.secondary.main,
+      }
+    }
+  },
+  input: {
+    '&.form-control': {
+      borderRadius: theme.shape.borderRadius,
+      borderColor: theme.palette.type === 'light'
+        ? 'rgba(0, 0, 0, 0.23)'
+        : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
+      padding: 1,
+      '&:focus': {
+        boxShadow: 'none',
+        borderColor: theme.palette.primary.main,
+        borderWidth: 2,
+        outline: 0,
+        padding: 0
+      }
+    }
+  },
+  select: {
+    width: 55,
+    margin: '0 0 0 5px',
+    padding: 1,
+    backgroundColor: theme.palette.background.paper,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: theme.palette.type === 'light'
+      ? 'rgba(0, 0, 0, 0.23)'
+      : 'rgba(255, 255, 255, 0.23)', // ~ hardcoded somewhere in material text field
+    borderRadius: theme.shape.borderRadius,
+    '&:focus': {
+      boxShadow: 'none',
+      borderColor: theme.palette.primary.main,
+      borderWidth: 2,
+      outline: 0,
+      padding: 0
+    }
+  }
+});
 
 /**
  * Pagination for table etc. Supports:
@@ -159,11 +225,11 @@ class Pagination extends AbstractContextComponent {
     for (let page = startPage; page <= (this.getMaxPage()) && page < (startPage + 5); page++) {
       const active = currentPage === page;
       pages.push(
-        <li key={`page-${page}`} className={active ? 'active' : ''}>
+        <li key={ `page-${ page }` } className={ active ? 'active' : '' }>
           <a
             href="#"
             onClick={this.setPage.bind(this, page)}
-            title={this.i18n(active ? '' : 'component.basic.Table.Pagination.page.select', { page: page + 1 })}>
+            title={ this.i18n(active ? '' : 'component.basic.Table.Pagination.page.select', { page: page + 1 }) }>
             { page + 1 }
           </a>
         </li>
@@ -174,7 +240,7 @@ class Pagination extends AbstractContextComponent {
     const activePrev = this.hasPrev();
     prev.push(
       <li key="page-first" className={ activePrev ? '' : 'disabled' }>
-        <a ref="page-first" href="#" aria-label="First" onClick={this.setPage.bind(this, 0)}>
+        <a ref="page-first" href="#" aria-label="First" onClick={ this.setPage.bind(this, 0) }>
           <span aria-hidden="true">&laquo;&laquo;</span>
         </a>
       </li>
@@ -207,7 +273,7 @@ class Pagination extends AbstractContextComponent {
     return (
       <div className="text-center">
         <nav>
-          <ul className="pagination pagination-sm" style={{margin: 0}}>
+          <ul className="pagination pagination-sm" style={{ margin: 0 }}>
             {prev}
             {pages}
             {next}
@@ -218,18 +284,24 @@ class Pagination extends AbstractContextComponent {
   }
 
   renderPages() {
-    const { total, paginationHandler } = this.props;
+    const { total, paginationHandler, classes } = this.props;
     const { changePage, currentSize } = this.state;
     const maxPage = this.getMaxPage();
     if (!paginationHandler || !maxPage || total <= currentSize) {
       return null;
     }
+    //
     return (
       <form onSubmit={ this._submitChangedPage.bind(this) }>
         { this.i18n('component.basic.Table.Pagination.page.title') }
         <input
           type="text"
-          className="form-control"
+          className={
+            classNames(
+              'form-control',
+              classes ? classes.input : null
+            )
+          }
           value={ changePage }
           onChange={ this._changePage.bind(this) }/>
         { `${ this.i18n('component.basic.Table.Pagination.from')} ${ maxPage + 1 }` }
@@ -238,7 +310,7 @@ class Pagination extends AbstractContextComponent {
   }
 
   renderRecords() {
-    const { total, paginationHandler, sizeOptions, showPageSize } = this.props;
+    const { total, paginationHandler, sizeOptions, showPageSize, classes } = this.props;
     const { currentPage, currentSize } = this.state;
     //
     let minRecord = 0;
@@ -272,8 +344,12 @@ class Pagination extends AbstractContextComponent {
             { this.i18n('component.basic.Table.Pagination.size') }
             <select
               value={ currentSize }
-              style={{ backgroundColor: 'inherit' }}
-              onChange={ this._changeSize.bind(this) }>
+              onChange={ this._changeSize.bind(this) }
+              className={
+                classNames(
+                  classes ? classes.select : null
+                )
+              }>
               { sizes }
             </select>
           </div>
@@ -285,12 +361,21 @@ class Pagination extends AbstractContextComponent {
   }
 
   render() {
-    const { paginationHandler } = this.props;
+    const { paginationHandler, classes } = this.props;
     const pages = this.renderPages();
     const pagination = this.renderPagination();
     const records = this.renderRecords();
+
+    //
     return (
-      <div className="panel-footer basic-pagination" style={{ display: 'block' }}>
+      <div
+        className={
+          classNames(
+            'basic-pagination',
+            classes ? classes.root : null
+          )
+        }
+        style={{ display: 'block' }}>
         {
           paginationHandler
           ?
@@ -351,4 +436,4 @@ Pagination.defaultProps = {
   showPageSize: true
 };
 
-export default Pagination;
+export default withStyles(styles, { withTheme: true })(Pagination);
