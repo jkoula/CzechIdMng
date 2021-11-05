@@ -2742,7 +2742,7 @@
            "placeholder": "Search by states"
          },
          "text":{
-           "placeholder": "Search by target object code, type and description"
+           "placeholder": "Target object code, type or description"
          }
        }
      },

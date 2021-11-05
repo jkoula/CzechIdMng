@@ -47,7 +47,6 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
     this.refs.table.useFilterForm(this.refs.filterForm);
   }
 
-
   showDetail(entity, add) {
     const {createNewRequestFunc } = this.props;
     if (add) {
@@ -151,26 +150,26 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
             <Advanced.Filter onSubmit={this.useFilter.bind(this)}>
               <Basic.AbstractForm ref="filterForm">
                 <Basic.Row>
-                  <Basic.Col lg={ 3 }>
+                  <Basic.Col lg={ 4 }>
                     <Advanced.Filter.IdentitySelect
                       ref="creator"
                       placeholder={this.i18n('filter.creator.placeholder')}/>
                   </Basic.Col>
-                  <Basic.Col lg={ 3 }>
+                  <Basic.Col lg={ 2 }>
                     <Advanced.Filter.EnumSelectBox
                       ref="states"
                       placeholder={ this.i18n('filter.states.placeholder') }
                       enum={ RoleRequestStateEnum }
                       multiSelect/>
                   </Basic.Col>
-                  <Basic.Col lg={ 3 }>
+                  <Basic.Col lg={ 2 }>
                     <Advanced.Filter.EnumSelectBox
                       ref="systemStates"
                       multiSelect
                       placeholder={ this.i18n('filter.systemStates.placeholder') }
                       enum={ OperationStateEnum }/>
                   </Basic.Col>
-                  <Basic.Col lg={ 3 } className="text-right">
+                  <Basic.Col lg={ 4 } className="text-right">
                     <Advanced.Filter.FilterButtons cancelFilter={this.cancelFilter.bind(this)}/>
                   </Basic.Col>
                 </Basic.Row>

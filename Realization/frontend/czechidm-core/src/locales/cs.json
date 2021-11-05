@@ -2662,7 +2662,7 @@
       },
       "filter": {
         "applicant":{
-          "placeholder": "Vyhledání dle celého uživatelského jména toho pro koho se žádá"
+          "placeholder": "Uživatelské jméno toho pro koho se žádá"
         },
         "states":{
           "placeholder": "Stav v IdM"
@@ -2792,7 +2792,7 @@
           "placeholder": "Vyhledání podle stavů"
         },
         "text":{
-          "placeholder": "Vyhledání podle kódu, typu cílového objektu a poznámky"
+          "placeholder": "Kód, typ cílového objektu či poznámka"
         }
       }
     },
