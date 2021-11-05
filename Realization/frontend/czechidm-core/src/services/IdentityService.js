@@ -7,7 +7,7 @@ import PasswordPolicyService from './PasswordPolicyService';
 const passwordPolicyService = new PasswordPolicyService();
 
 /**
- * Identities endpoint
+ * Identities endpoint.
  *
  * @author Radek Tomiška
  */

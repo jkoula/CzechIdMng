@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.persistence.Table;
@@ -31,8 +32,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.comparator.CodeableComparator;
@@ -79,6 +82,7 @@ public class IdmConfigurationController extends AbstractEventableDtoController<I
 	//
 	@Autowired private ApplicationContext context;
 	@Autowired private LoggerManager loggerManager;
+	@Autowired private ApplicationConfiguration applicationConfiguration;
 	
 	@Autowired
 	public IdmConfigurationController(
@@ -473,6 +477,58 @@ public class IdmConfigurationController extends AbstractEventableDtoController<I
 			.collect(Collectors.toList());
 		//
 		return new Resources<>(results);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/application/logo", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.CONFIGURATION_CREATE + "')"
+			+ " or hasAuthority('" + CoreGroupPermission.CONFIGURATION_UPDATE + "')")
+	@ApiOperation(
+			value = "Upload new application logo", 
+			nickname = "postApplicationLogo", 
+			tags = {
+			IdmConfigurationController.TAG }, 
+			notes = "Upload new application logo",
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_CREATE, description = ""),
+							@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_UPDATE, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_CREATE, description = ""),
+							@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_UPDATE, description = "")}) })
+	public ResponseEntity<?> uploadAplicationLogo(
+			@RequestParam(required = true, name = "fileName") @NotNull String fileName,
+			@RequestParam(required = true, name = "data") MultipartFile data) {
+		applicationConfiguration.uploadApplicationLogo(data, fileName, IdmBasePermission.CREATE, IdmBasePermission.UPDATE); // ~ create / update configuration property
+		//
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/application/logo", method = RequestMethod.DELETE)
+	@ResponseBody
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.CONFIGURATION_DELETE + "')")
+	@ApiOperation(
+			value = "Delete configured application logo", 
+			nickname = "deleteProfilePicure",
+			tags = { IdmConfigurationController.TAG },
+			notes = "Delete configured application logo.",
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+							@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_DELETE, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+							@AuthorizationScope(scope = CoreGroupPermission.CONFIGURATION_DELETE, description = "") })
+					})
+	public ResponseEntity<?> deleteApplicationLogo() {
+		UUID uuid = applicationConfiguration.getApplicationLogoId();
+		// 
+		// not configured
+		if (uuid == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		//
+		applicationConfiguration.deleteApplicationLogo(IdmBasePermission.DELETE); // ~ delete configuration property
+		//
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@Override

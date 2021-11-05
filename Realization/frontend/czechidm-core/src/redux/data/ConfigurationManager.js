@@ -269,6 +269,48 @@ export default class ConfigurationManager extends EntityManager {
   }
 
   /**
+   * Upload application logo to BE.
+   *
+   * @since 12.0.0
+   */
+  uploadApplicationLogo(formData, cb) {
+    const uiKey = this.getApplicationLogoKey();
+    return (dispatch) => {
+      dispatch(this.dataManager.requestData(uiKey));
+      this.getService().uploadApplicationLogo(formData)
+        .then(() => {
+          dispatch(this.downloadApplicationLogo(cb));
+        })
+        .catch(error => {
+          dispatch(this.receiveError(null, uiKey, error));
+        });
+    };
+  }
+
+  /**
+   * Delete application logo from BE.
+   *
+   * @since 12.0.0
+   */
+  deleteApplicationLogo() {
+    const uiKey = this.getApplicationLogoKey();
+    return (dispatch) => {
+      dispatch(this.dataManager.requestData(uiKey));
+      this.getService().deleteApplicationLogo()
+        .then(() => {
+          dispatch({
+            type: Actions.LOGO_RECEIVED,
+            data: false
+          });
+          dispatch(this.dataManager.stopRequest(uiKey));
+        })
+        .catch(error => {
+          dispatch(this.receiveError(null, uiKey, error));
+        });
+    };
+  }
+
+  /**
    * Get configured application theme.
    *
    * @return {action}

@@ -186,6 +186,56 @@ export default class ConfigurationService extends AbstractService {
   }
 
   /**
+   * Upload application logo to BE.
+   *
+   * @since 12.0.0
+   */
+  uploadApplicationLogo(formData) {
+    return RestApiService
+      .upload(`${ this.getApiPath() }/application/logo`, formData)
+      .then(response => {
+        if (response.status === 200) { // no content - ok
+          return null;
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        if (Utils.Response.hasInfo(json)) {
+          throw Utils.Response.getFirstInfo(json);
+        }
+        return json;
+      });
+  }
+
+  /**
+   * Delete application logo from BE.
+   *
+   * @since 12.0.0
+   */
+  deleteApplicationLogo() {
+    return RestApiService
+      .delete(`${ this.getApiPath() }/application/logo`)
+      .then(response => {
+        if (response.status === 204) { // no content - ok
+          return null;
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        if (Utils.Response.hasInfo(json)) {
+          throw Utils.Response.getFirstInfo(json);
+        }
+        return json;
+      });
+  }
+
+  /**
    * Get configured application theme.
    *
    * @return {promise}

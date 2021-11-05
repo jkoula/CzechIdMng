@@ -96,6 +96,7 @@ function ButtonMaterial(props) {
     onClick,
     onDoubleClick,
     icon,
+    startIcon,
     endIcon,
     tabIndex,
     fullWidth,
@@ -179,7 +180,7 @@ function ButtonMaterial(props) {
           ?
           <Icon type="fa" icon="refresh" showLoading/>
           :
-          <Icon value={ icon } disabled={ disabled }/>
+          startIcon || <Icon value={ icon } disabled={ disabled }/>
         }
       </IconButton>
     );
@@ -192,7 +193,7 @@ function ButtonMaterial(props) {
           ?
           <Icon type="fa" icon="refresh" showLoading/>
           :
-          <Icon value={ icon } disabled={ disabled }/>
+          startIcon || <Icon value={ icon } disabled={ disabled }/>
         }
         endIcon={ endIcon }
         color={ _color }

@@ -20,6 +20,7 @@ import { makeStyles } from '@material-ui/core/styles';
 //
 import { IdentityManager, SecurityManager, ConfigurationManager } from '../../../redux';
 import { collapseNavigation } from '../../../redux/config/actions';
+import { i18n } from '../../../services/LocalizationService';
 import NavigationSearch from './NavigationSearch';
 import NavigationMonitoring from './NavigationMonitoring';
 import NavigationLanguage from './NavigationLanguage';
@@ -313,18 +314,23 @@ function NavigationMaterial(props) {
             ||
             <NavigationMonitoring location={ location }/>
           }
-
           {
             toogleDarkButton
           }
-          <IconButton
-            color="inherit"
-            title="Edit application theme"
-            onClick={() => {
-              history.push('/configurations/theme');
-            }}>
-            <InvertColors />
-          </IconButton>
+          {
+            !SecurityManager.hasAuthority('CONFIGURATION_ADMIN')
+            ||
+            !isDevelopment
+            ||
+            <IconButton
+              color="inherit"
+              title={ i18n('content.configuration-theme.action.edit.link.title') }
+              onClick={() => {
+                history.push('/configurations/theme');
+              }}>
+              <InvertColors />
+            </IconButton>
+          }
           {
             userContext.isExpired
             ||

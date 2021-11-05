@@ -36,7 +36,7 @@ export default function BasicTabs(props) {
     return null;
   }
   //
-  const _mergedActiveKey = onSelect ? activeKey : _activeKey;
+  const _mergedActiveKey = onSelect ? `${ activeKey }` : _activeKey;
   //
   const handleChange = (event, newValue) => {
     if (onSelect) {
@@ -54,9 +54,14 @@ export default function BasicTabs(props) {
   }
   //
   // prepare rendered tabs
-  let value = onSelect ? activeKey : _mergedActiveKey;
+  let value = onSelect ? `${ activeKey }` : _mergedActiveKey;
   const _tabs = _children.map((child, index) => {
-    const eventKey = child.props.eventKey || index;
+    let eventKey = child.props.eventKey;
+    if (!eventKey && eventKey !== 0) {
+      eventKey = index;
+    } else {
+      eventKey = `${ eventKey }`;
+    }
     if (!value) {
       value = eventKey;
     }
@@ -94,7 +99,12 @@ export default function BasicTabs(props) {
       </AppBar>
       {
         _children.map((child, index) => {
-          const eventKey = child.props.eventKey || index;
+          let eventKey = child.props.eventKey;
+          if (!eventKey && eventKey !== 0) {
+            eventKey = index;
+          } else {
+            eventKey = `${ eventKey }`;
+          }
           //
           return (
             <div

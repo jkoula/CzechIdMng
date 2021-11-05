@@ -152,6 +152,4 @@ public class PublicIdmConfigurationController implements BaseController {
 		//
 		return new ResponseEntity<>(theme, HttpStatus.OK);
 	}
-	
-	
 }

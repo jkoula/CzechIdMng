@@ -10,8 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
-import { SecurityManager, ConfigurationManager, DataManager } from '../../redux';
-import { RestApiService } from '../../services';
+import { ConfigurationManager, DataManager } from '../../redux';
 
 const configurationManager = new ConfigurationManager();
 
@@ -89,6 +88,18 @@ class ThemeConfiguration extends Basic.AbstractContent {
     );
   }
 
+  getNavigationKey() {
+    return 'system-configuration';
+  }
+
+  getContentKey() {
+    return 'content.configuration-theme';
+  }
+
+  getManager() {
+    return configurationManager;
+  }
+
   _initDefaultValues(theme) {
     this.setState({
       primary: theme.palette.primary.main,
@@ -99,18 +110,6 @@ class ThemeConfiguration extends Basic.AbstractContent {
     });
   }
 
-  getNavigationKey() {
-    return 'system-configuration';
-  }
-
-  getContentKey() {
-    return 'content.theme-configuration';
-  }
-
-  getManager() {
-    return configurationManager;
-  }
-
   /**
    * Dropzone component function called after select file
    * @param file selected file (multiple is not allowed)
@@ -118,7 +117,7 @@ class ThemeConfiguration extends Basic.AbstractContent {
   _onDrop(files) {
     if (this.refs.dropzone.state.isDragReject) {
       this.addMessage({
-        message: this.i18n('content.identity.profile.fileRejected'),
+        message: this.i18n('message.fileRejected'),
         level: 'warning'
       });
       return;
@@ -127,7 +126,7 @@ class ThemeConfiguration extends Basic.AbstractContent {
       const fileName = file.name.toLowerCase();
       if (!fileName.endsWith('.jpg') && !fileName.endsWith('.jpeg') && !fileName.endsWith('.png') && !fileName.endsWith('.gif')) {
         this.addMessage({
-          message: this.i18n('content.identity.profile.fileRejected', {name: file.name}),
+          message: this.i18n('message.fileRejected', {name: file.name}),
           level: 'warning'
         });
         return;
@@ -153,25 +152,25 @@ class ThemeConfiguration extends Basic.AbstractContent {
       formData.fileName = this.state.fileName;
       formData.name = this.state.fileName;
       formData.append('fileName', this.state.fileName);
-      /*
-      this.context.store.dispatch(identityManager.uploadProfileImage(this._getIdentityIdentifier(), formData, (profile, error) => {
+      //
+      this.context.store.dispatch(this.getManager().uploadApplicationLogo(formData, (imageUrl, error) => {
         if (error) {
           this.addError(error);
           return;
         }
-        // new profile can be created => wee need to set id into form
-        this.refs.form.setData(profile);
-      })); */
+        this.addMessage({});
+      }));
     });
     this._closeCropper();
   }
 
   _deleteLogo() {
-    this.refs['confirm-delete'].show(
-      this.i18n(`action.deleteLogo.message`),
-      this.i18n(`action.deleteLogo.title`)
+    this.refs['confirm-delete-logo'].show(
+      this.i18n(`action.delete-logo.message`),
+      this.i18n(`action.delete-logo.title`)
     ).then(() => {
-      // this.context.store.dispatch(identityManager.deleteProfileImage(this._getIdentityIdentifier()));
+      this.context.store.dispatch(this.getManager().deleteApplicationLogo());
+      this.addMessage({});
     }, () => {
       // Rejected
     });
@@ -186,7 +185,6 @@ class ThemeConfiguration extends Basic.AbstractContent {
         this.getManager().deleteEntity({ id: 'idm.pub.app.show.theme' }, configurationManager.getApplicationThemeKey(), (entity, error) => {
           if (error) {
             if (error.statusCode === 404) { // default theme is already in use
-              // TODO: better message
               this.addMessage({});
             } else {
               this.addError(error);
@@ -266,7 +264,7 @@ class ThemeConfiguration extends Basic.AbstractContent {
   }
 
   render() {
-    const { _logoUrl, _logoLoading, _themeLoading, themeEntity, _themePermissions, _logoPermissions, logoEntity } = this.props;
+    const { _logoUrl, _logoLoading, _themeLoading, themeEntity, _themePermissions, _logoPermissions, logoEntity, theme } = this.props;
     const {
       primary,
       secondary,
@@ -279,14 +277,14 @@ class ThemeConfiguration extends Basic.AbstractContent {
     //
     return (
       <Basic.Container component="main" maxWidth="sm">
-        <Helmet title={ this.i18n('Theme configuration') } />
-        <Basic.Confirm ref="confirm-delete" level="danger"/>
+        <Helmet title={ this.i18n('title') } />
+        <Basic.Confirm ref="confirm-delete-logo" level="danger"/>
         <Basic.Confirm ref="confirm-reset-theme" level="secondary"/>
-        <Basic.PageHeader icon={<InvertColors/>} text="Theme configuration"/>
-        <Basic.ContentHeader text="Logo"/>
+        <Basic.PageHeader icon={<InvertColors/>} text={ this.i18n('header') }/>
+        <Basic.ContentHeader text={ this.i18n('logo.header') }/>
         <Basic.LabelWrapper
-          helpBlock="Recommended logo size is 165 x 40 px.">
-          <div className="profile-image-wrapper" style={{ width: 'auto' }}>
+          helpBlock={ this.i18n('logo.help', { escape: false }) }>
+          <div className="profile-image-wrapper" style={{ width: 300 }}>
             <Advanced.ImageDropzone
               ref="dropzone"
               accept="image/*"
@@ -305,7 +303,7 @@ class ThemeConfiguration extends Basic.AbstractContent {
                 level="danger"
                 buttonSize="xs"
                 style={{ color: 'white' }}
-                rendered={ !!_logoUrl && this.getManager().canSave(logoEntity, _logoPermissions) }
+                rendered={ !!_logoUrl && this.getManager().canDelete(logoEntity, _logoPermissions) }
                 titlePlacement="left"
                 icon="fa:trash"
                 onClick={ this._deleteLogo.bind(this) }/>
@@ -346,94 +344,103 @@ class ThemeConfiguration extends Basic.AbstractContent {
         {
           _themeLoading
           ||
-          <Basic.Panel className="last">
-            <Basic.PanelBody>
-              <Basic.ContentHeader text="Colors" style={{ paddingTop: 0 }}/>
-              <Basic.Row>
-                <Basic.Col sm={ 6 }>
-                  <Basic.LabelWrapper>
-                    <BasicColorPicker
-                      name="primary"
-                      label="Primary"
-                      placeholder="Primary color"
-                      value={ primary }
-                      onChange={ color => this.setState({ primary: color }) }/>
-                  </Basic.LabelWrapper>
-                </Basic.Col>
-                <Basic.Col sm={ 6 }>
-                  <Basic.LabelWrapper>
-                    <BasicColorPicker
-                      name="secondary"
-                      label="Secondary"
-                      placeholder="Secondary color"
-                      value={ secondary }
-                      onChange={ color => this.setState({ secondary: color }) }/>
-                  </Basic.LabelWrapper>
-                </Basic.Col>
-              </Basic.Row>
-              <Basic.Row>
-                <Basic.Col sm={ 6 }>
-                  <Basic.LabelWrapper>
-                    <BasicColorPicker
-                      name="primaryText"
-                      label="Primary text"
-                      placeholder="Primary contrast text color"
-                      value={ primaryText }
-                      parentValue={ primary }
-                      onChange={ color => this.setState({ primaryText: color }) }/>
-                  </Basic.LabelWrapper>
-                </Basic.Col>
-                <Basic.Col sm={ 6 }>
-                  <Basic.LabelWrapper>
-                    <BasicColorPicker
-                      name="secondaryText"
-                      label="Secondary text"
-                      placeholder="Secondary contrast text color"
-                      value={ secondaryText }
-                      parentValue={ secondary }
-                      onChange={ color => this.setState({ secondaryText: color }) }/>
-                  </Basic.LabelWrapper>
-                </Basic.Col>
-              </Basic.Row>
+          <>
+            <Basic.Alert
+              level="warning"
+              text={ this.i18n('colors.disabled') }
+              rendered={ theme && theme.palette.type !== 'light' }/>
+            <Basic.Panel className="last" rendered={ theme && theme.palette.type === 'light' }>
+              <Basic.PanelBody>
+                <Basic.ContentHeader text={ this.i18n('colors.header') } style={{ paddingTop: 0 }}/>
+                <Basic.Row>
+                  <Basic.Col sm={ 6 }>
+                    <Basic.LabelWrapper>
+                      <BasicColorPicker
+                        name="primary"
+                        label={ this.i18n('colors.primary.color.label') }
+                        placeholder={ this.i18n('colors.primary.color.placeholder') }
+                        value={ primary }
+                        onChange={ color => this.setState({ primary: color }) }/>
+                    </Basic.LabelWrapper>
+                  </Basic.Col>
+                  <Basic.Col sm={ 6 }>
+                    <Basic.LabelWrapper>
+                      <BasicColorPicker
+                        name="secondary"
+                        label={ this.i18n('colors.secondary.color.label') }
+                        placeholder={ this.i18n('colors.secondary.color.placeholder') }
+                        value={ secondary }
+                        onChange={ color => this.setState({ secondary: color }) }/>
+                    </Basic.LabelWrapper>
+                  </Basic.Col>
+                </Basic.Row>
+                <Basic.Row>
+                  <Basic.Col sm={ 6 }>
+                    <Basic.LabelWrapper>
+                      <BasicColorPicker
+                        name="primaryText"
+                        label={ this.i18n('colors.primary.text.label') }
+                        placeholder={ this.i18n('colors.primary.text.placeholder') }
+                        value={ primaryText }
+                        parentValue={ primary }
+                        onChange={ color => this.setState({ primaryText: color }) }/>
+                    </Basic.LabelWrapper>
+                  </Basic.Col>
+                  <Basic.Col sm={ 6 }>
+                    <Basic.LabelWrapper>
+                      <BasicColorPicker
+                        name="secondaryText"
+                        label={ this.i18n('colors.secondary.text.label') }
+                        placeholder={ this.i18n('colors.secondary.text.placeholder') }
+                        value={ secondaryText }
+                        parentValue={ secondary }
+                        onChange={ color => this.setState({ secondaryText: color }) }/>
+                    </Basic.LabelWrapper>
+                  </Basic.Col>
+                </Basic.Row>
 
-              <Basic.ContentHeader text="Border radius"/>
-              <Basic.LabelWrapper
-                helpBlock="Border radius [px].">
-                <Slider
-                  value={ borderRadius }
-                  aria-labelledby="discrete-slider"
-                  valueLabelDisplay="auto"
-                  step={ 1 }
-                  marks
-                  min={ 0 }
-                  max={ 20 }
-                  onChange={ (e, value) => this.setState({ borderRadius: value }) }
-                />
-              </Basic.LabelWrapper>
-            </Basic.PanelBody>
-            <Basic.PanelFooter>
-              <Basic.Button
-                type="submit"
-                level="secondary"
-                showLoading={ _themeLoading }
-                style={{ marginRight: 5 }}
-                onClick={ this._resetTheme.bind(this) }
-                disabled={ themeEntity === null }
-                rendered={ this.getManager().canSave(themeEntity, _themePermissions) }>
-                { this.i18n('Resetovat') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="primary"
-                showLoading={ _themeLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }
-                onClick={ this._saveTheme.bind(this) }
-                rendered={ this.getManager().canSave(themeEntity, _themePermissions) }>
-                { this.i18n('button.set') }
-              </Basic.Button>
-            </Basic.PanelFooter>
-          </Basic.Panel>
+                <Basic.ContentHeader text={ this.i18n('colors.borderRadius.header') }/>
+                <Basic.LabelWrapper
+                  helpBlock={ this.i18n('colors.borderRadius.help') }>
+                  <Slider
+                    value={ borderRadius }
+                    aria-labelledby="discrete-slider"
+                    valueLabelDisplay="auto"
+                    step={ 1 }
+                    marks
+                    min={ 0 }
+                    max={ 20 }
+                    onChange={ (e, value) => this.setState({ borderRadius: value }) }
+                  />
+                </Basic.LabelWrapper>
+              </Basic.PanelBody>
+              <Basic.PanelFooter
+                rendered={
+                  this.getManager().canDelete(themeEntity, _themePermissions) || this.getManager().canSave(themeEntity, _themePermissions)
+                }>
+                <Basic.Button
+                  type="submit"
+                  level="secondary"
+                  showLoading={ _themeLoading }
+                  style={{ marginRight: 5 }}
+                  onClick={ this._resetTheme.bind(this) }
+                  disabled={ themeEntity === null }
+                  rendered={ this.getManager().canDelete(themeEntity, _themePermissions) }>
+                  { this.i18n('button.reset') }
+                </Basic.Button>
+                <Basic.Button
+                  type="submit"
+                  level="primary"
+                  showLoading={ _themeLoading }
+                  showLoadingIcon
+                  showLoadingText={ this.i18n('button.saving') }
+                  onClick={ this._saveTheme.bind(this) }
+                  rendered={ this.getManager().canSave(themeEntity, _themePermissions) }>
+                  { this.i18n('button.set') }
+                </Basic.Button>
+              </Basic.PanelFooter>
+            </Basic.Panel>
+          </>
         }
       </Basic.Container>
     );

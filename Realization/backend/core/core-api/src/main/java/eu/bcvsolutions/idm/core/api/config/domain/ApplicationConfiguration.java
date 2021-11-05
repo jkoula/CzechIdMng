@@ -1,15 +1,22 @@
 package eu.bcvsolutions.idm.core.api.config.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import eu.bcvsolutions.idm.core.api.AppModule;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
+import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.Configurable;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
 /**
  * Common application configuration.
@@ -17,7 +24,7 @@ import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
  * @author Radek Tomiška
  * @since 11.1.0
  */
-public interface ApplicationConfiguration extends Configurable {
+public interface ApplicationConfiguration extends Configurable, Identifiable {
 	
 	String STAGE_PRODUCTION = "production";
 	String STAGE_DEVELOPMENT = "development";
@@ -80,6 +87,11 @@ public interface ApplicationConfiguration extends Configurable {
 	@Override
 	default String getName() {
 		return AppModule.MODULE_ID;
+	}
+	
+	@Override
+	default Serializable getId() {
+		return null; // UUID identifiable is not supported, but interface is required for upload attachments.
 	}
 	
 	@Override
@@ -159,6 +171,26 @@ public interface ApplicationConfiguration extends Configurable {
 	 * @since 12.0.0
 	 */
 	UUID getApplicationLogoId();
+	
+	/**
+	 * Upload new application logo version.
+	 * 
+	 * @param data - one of image/* content type is required.
+	 * @param fileName Original file name 
+	 * @param permission permissions to evaluate (AND)
+	 * @return
+	 * @throws ForbiddenEntityException if authorization policies doesn't met
+	 * @throws ResultCodeException if content type is different than image (one of  image/*)
+	 */
+	UUID uploadApplicationLogo(MultipartFile data, String fileName, BasePermission... permission);
+	
+	/**
+	 * Delete application logo (all versions).
+	 * 
+	 * @param permission permissions to evaluate (AND)
+	 * @throws ForbiddenEntityException if authorization policies doesn't met
+	 */
+	void deleteApplicationLogo(BasePermission... permission);
 	
 	/**
 	 * Configured application theme.

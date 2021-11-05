@@ -98,6 +98,7 @@
     "logout": "Odhlásit se",
     "no": "Ne",
     "refresh": "Obnovit",
+    "reset": "Resetovat",
     "select": "Vybrat",
     "send": "Odeslat",
     "sending": "Odesílám ...",
@@ -1571,6 +1572,61 @@
         "message": "Konfigurovatelná položka [<strong>{{name}}</strong>] již existuje s hodnotou [<strong>{{value}}</strong>]. Chcete ji přepsat?"
       }
     },
+    "configuration-theme": {
+      "header": "Téma aplikace",
+      "title": "Téma aplikace",
+      "message": {
+        "fileRejected": "Soubor loga aplikace ({{name}}) musí být formát grafického souboru - jpg, png, gif."
+      },
+      "logo": {
+        "header": "Logo",
+        "help": "Doporučená velikost loga je <strong>165 x 40 px</strong>."
+      },
+      "colors": {
+        "header": "Barvy",
+        "disabled": "Je možné konfigurovat pouze výchozí téma.",
+        "primary": {
+          "color": {
+            "label": "Primární",
+            "placeholder": "Primární barva"
+          },
+          "text": {
+            "label": "Primární text",
+            "placeholder": "Primární kontrastní barva"
+          }
+        },
+        "secondary": {
+          "color": {
+            "label": "Sekundární",
+            "placeholder": "Sekundární barva"
+          },
+          "text": {
+            "label": "Sekundární text",
+            "placeholder": "Sekundární kontrastní barva"
+          }
+        },
+        "borderRadius": {
+          "header": "Zaoblení rámečku",
+          "help": "Zaoblení rámečku (border radius) [px]."
+        }
+      },
+      "action": {
+        "edit": {
+          "link": {
+            "title": "Upravit téma aplikace",
+            "label": "Téma aplikace"
+          }
+        },
+        "delete-logo": {
+          "title": "Smazat logo",
+          "message": "Opravdu chcete smayat nastaven0 logo aplikace? Bude použito výchozí logo."
+        },
+        "reset-theme": {
+          "title": "Resetovat téma",
+          "message": "Opravdu chcete resetovat barvy do výchozího nastavení?"
+        }
+      }
+    },
     "monitorings": {
       "header": "Nastavení",
       "title": "Nastavení monitoringu",
@@ -2951,7 +3007,7 @@
         "label": "Oprávnění",
         "filter": {
           "text": {
-            "placeholder": "Agenda, typ entity, typ vyhodnocení či popis"
+            "placeholder": "Agenda, typ či popis"
           }
         },
         "edit": {

@@ -180,10 +180,10 @@ class RoleDetail extends Basic.AbstractContent {
           onSelect={ this._onChangeSelectTabs.bind(this)}>
           <Basic.Tab eventKey={ 1 } title={ this.i18n('entity.Role._type') } className="bordered">
             <form onSubmit={ this.save.bind(this, 'CONTINUE') }>
+              <Basic.ContentHeader
+                text={ Utils.Entity.isNew(entity) ? this.i18n('create.header') : this.i18n('tabs.basic') }
+                style={{ marginBottom: 0, paddingTop: 15, paddingRight: 15, paddingLeft: 15 }}/>
               <Basic.Panel className="no-border last">
-                <Basic.PanelHeader
-                  text={ Utils.Entity.isNew(entity) ? this.i18n('create.header') : this.i18n('tabs.basic') }
-                  style={{ paddingLeft: 15, paddingRight: 15 }}/>
                 <Basic.PanelBody style={{ paddingTop: 0, paddingBottom: 0 }}>
                   <Basic.AbstractForm
                     ref="form"
@@ -219,7 +219,6 @@ class RoleDetail extends Basic.AbstractContent {
                           useSymbol={ false }/>
                       </Basic.Col>
                     </Basic.Row>
-
 
                     <Basic.EnumSelectBox
                       ref="priorityEnum"

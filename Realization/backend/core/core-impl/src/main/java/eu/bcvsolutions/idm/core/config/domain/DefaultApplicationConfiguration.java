@@ -7,14 +7,28 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.core.api.config.domain.AbstractConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
+import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
+import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
+import eu.bcvsolutions.idm.core.ecm.api.entity.AttachableEntity;
+import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 
 /**
  * Common application configuration.
@@ -23,12 +37,15 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
  * @since 11.1.0
  */
 public class DefaultApplicationConfiguration extends AbstractConfiguration implements ApplicationConfiguration {	
-	
+
+	private static final long serialVersionUID = 1L;
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultApplicationConfiguration.class);
 	//
 	private String backendUrl = null;
 	//
 	@Autowired private ObjectMapper mapper;
+	@Autowired private AttachmentManager attachmentManager;
+	@Autowired private IdmConfigurationService configurationService;
 	
 	@Override
 	public String getStage() {
@@ -84,6 +101,82 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 	@Override
 	public UUID getApplicationLogoId() {
 		return DtoUtils.toUuid(getConfigurationService().getValue(PROPERTY_APPLICATION_LOGO));
+	}
+	
+	@Override
+	@Transactional
+	public UUID uploadApplicationLogo(MultipartFile data, String fileName, BasePermission... permission) {
+		// check required image content type
+		String contentType = data.getContentType();
+		if (StringUtils.isBlank(contentType) || !contentType.toLowerCase().startsWith("image/")) {
+			throw new ResultCodeException(
+					CoreResultCode.IDENTITY_PROFILE_IMAGE_WRONG_CONTENT_TYPE, 
+					ImmutableMap.of("contentType", String.valueOf(contentType))
+			);
+		}
+		//
+		// check access
+		IdmConfigurationDto configuration = configurationService.getByCode(PROPERTY_APPLICATION_LOGO);
+		if (configuration == null) { // new configuration property
+			configuration = new IdmConfigurationDto();
+			configuration.setName(PROPERTY_APPLICATION_LOGO);
+			//
+			if (!PermissionUtils.isEmpty(permission) 
+					&& Sets.newHashSet(PermissionUtils.trimNull(permission)).contains(IdmBasePermission.CREATE)) {
+				configurationService.checkAccess(configuration, IdmBasePermission.CREATE);
+			}
+		} else if (!PermissionUtils.isEmpty(permission) // update property
+				&& Sets.newHashSet(PermissionUtils.trimNull(permission)).contains(IdmBasePermission.UPDATE)) {
+			configurationService.checkAccess(configuration, IdmBasePermission.UPDATE);
+		}
+		//
+		IdmAttachmentDto attachment = new IdmAttachmentDto();
+		attachment.setName(fileName);
+		attachment.setOwnerType(ApplicationConfiguration.class.getCanonicalName());
+		attachment.setOwnerId(UUID.randomUUID()); // ~ application configuration cannot have uuid
+		attachment.setMimetype(StringUtils.isBlank(data.getContentType()) ? AttachableEntity.DEFAULT_MIMETYPE : data.getContentType());
+		//
+		UUID applicationLogoId = getApplicationLogoId();
+		IdmAttachmentDto previousAttachment = null;
+		if (applicationLogoId != null) {
+			previousAttachment = attachmentManager.get(applicationLogoId);
+		}
+		//
+		try {
+			attachment.setInputData(data.getInputStream());
+			if (previousAttachment == null) {
+				attachment = attachmentManager.saveAttachment(this, attachment);
+			} else {
+				attachment = attachmentManager.saveAttachmentVersion(this, attachment, previousAttachment);
+			}
+			UUID attachmentId = attachment.getId();
+			configuration.setValue(attachmentId.toString());
+			//
+			configurationService.save(configuration); // permissions are evaluated before attachment is saved
+			//
+			return attachmentId;
+		} catch (IOException ex) {
+			throw new ResultCodeException(CoreResultCode.ATTACHMENT_CREATE_FAILED, ImmutableMap.of(
+					"attachmentName", attachment.getName(),
+					"ownerType", attachment.getOwnerType(),
+					"ownerId", "null") // ~ application configuration cannot have uuid
+					, ex);
+		}
+	}
+	
+	@Override
+	@Transactional
+	public void deleteApplicationLogo(BasePermission... permission) {
+		UUID attachmentId = getApplicationLogoId();
+		if (attachmentId == null) {
+			// nothing to delete
+			return;
+		}
+		IdmConfigurationDto configuration = configurationService.getByCode(PROPERTY_APPLICATION_LOGO);
+		//
+		configurationService.delete(configuration, permission);
+		// delete attachment after configuration is deleted => permissions are evaluated
+		attachmentManager.deleteAttachment(attachmentId);
 	}
 	
 	@Override

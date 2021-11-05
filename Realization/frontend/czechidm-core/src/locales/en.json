@@ -98,6 +98,7 @@
     "logout": "Log Out",
     "no": "No",
     "refresh": "Refresh",
+    "reset": "Reset",
     "select": "Select",
     "send": "Send",
     "sending": "Sending",
@@ -1531,6 +1532,61 @@
         "message": "Configurable item [<strong>{{name}}</strong>] is already existing with value [<strong>{{value}}</strong>]. Do you want to overwrite it?"
       }
     },
+    "configuration-theme": {
+      "header": "Theme configuration",
+      "title": "Theme configuration",
+      "message": {
+        "fileRejected": "Application logo picture file ({{name}}) must be of image type - jpg, jpeg, png, gif."
+      },
+      "logo": {
+        "header": "Logo",
+        "help": "Recommended logo size is <strong>165 x 40 px</strong>."
+      },
+      "colors": {
+        "header": "Colors",
+        "disabled": "Default theme configured is supported only.",
+        "primary": {
+          "color": {
+            "label": "Primary",
+            "placeholder": "Primary color"
+          },
+          "text": {
+            "label": "Primary text",
+            "placeholder": "Primary contrast text color"
+          }
+        },
+        "secondary": {
+          "color": {
+            "label": "Secondary",
+            "placeholder": "Secondary color"
+          },
+          "text": {
+            "label": "Secondary text",
+            "placeholder": "Secondary contrast text color"
+          }
+        },
+        "borderRadius": {
+          "header": "Border radius",
+          "help": "Border radius [px]."
+        }
+      },
+      "action": {
+        "edit": {
+          "link": {
+            "title": "Edit application theme",
+            "label": "Application theme"
+          }
+        },
+        "delete-logo": {
+          "title": "Delete logo",
+          "message": "Do you really want to delete configured application logo? Default logo will be used."
+        },
+        "reset-theme": {
+          "title": "Reset theme",
+          "message": "Do you really want to reset application colors to default setting?"
+        }
+      }
+    },
     "monitorings": {
       "header": "Settings",
       "title": "Monitoring settings",
@@ -2898,7 +2954,7 @@
         "label": "Permissions",
         "filter": {
           "text": {
-            "placeholder": "Entity type, evaluator type or description"
+            "placeholder": "Entity, type or description"
           }
         },
         "edit": {

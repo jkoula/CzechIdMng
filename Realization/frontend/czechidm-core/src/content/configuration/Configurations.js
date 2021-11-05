@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 //
+import IconButton from '@material-ui/core/IconButton';
+import InvertColors from '@material-ui/icons/InvertColors';
+//
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import { ConfigurationManager, DataManager, SecurityManager, IdentityManager } from '../../redux';
@@ -348,7 +351,19 @@ class Configurations extends Advanced.AbstractTableContent {
 
         { this.renderPageHeader() }
 
-        <Basic.ContentHeader rendered={ showTables }>
+        <Basic.ContentHeader
+          rendered={ showTables }
+          buttons={[
+            <Basic.Button
+              level="secondary"
+              startIcon={ <InvertColors /> }
+              title={ this.i18n('content.configuration-theme.action.edit.link.title') }
+              onClick={() => {
+                this.context.history.push('/configurations/theme');
+              }}>
+              { this.i18n('content.configuration-theme.action.edit.link.label') }
+            </Basic.Button>
+          ]}>
           { this.i18n('configurable', { escape: false }) }
         </Basic.ContentHeader>
 
