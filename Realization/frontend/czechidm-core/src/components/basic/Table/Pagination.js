@@ -32,6 +32,14 @@ const styles = theme => ({
         color: theme.palette.secondary.contrastText,
         backgroundColor: theme.palette.secondary.main,
       }
+    },
+    '& .pagination-sm > li:last-child > a': {
+      borderBottomRightRadius: theme.shape.borderRadius,
+      borderTopRightRadius: theme.shape.borderRadius
+    },
+    '& .pagination-sm > li:first-child > a': {
+      borderBottomLeftRadius: theme.shape.borderRadius,
+      borderTopLeftRadius: theme.shape.borderRadius
     }
   },
   input: {
