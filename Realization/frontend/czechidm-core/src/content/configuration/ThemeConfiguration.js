@@ -351,7 +351,9 @@ class ThemeConfiguration extends Basic.AbstractContent {
               rendered={ theme && theme.palette.type !== 'light' }/>
             <Basic.Panel className="last" rendered={ theme && theme.palette.type === 'light' }>
               <Basic.PanelBody>
-                <Basic.ContentHeader text={ this.i18n('colors.header') } style={{ paddingTop: 0 }}/>
+                <Basic.ContentHeader
+                  text={ this.i18n('colors.header') }
+                  style={{ paddingTop: 0 }}/>
                 <Basic.Row>
                   <Basic.Col sm={ 6 }>
                     <Basic.LabelWrapper>
@@ -376,7 +378,12 @@ class ThemeConfiguration extends Basic.AbstractContent {
                 </Basic.Row>
                 <Basic.Row>
                   <Basic.Col sm={ 6 }>
-                    <Basic.LabelWrapper>
+                    <Basic.LabelWrapper
+                      helpBlock={
+                        !this.isDevelopment()
+                        ||
+                        <small><Basic.Link href="https://v4.mui.com/customization/color/#playground">Návod</Basic.Link> jak vybrat barvy.</small>
+                      }>
                       <BasicColorPicker
                         name="primaryText"
                         label={ this.i18n('colors.primary.text.label') }
