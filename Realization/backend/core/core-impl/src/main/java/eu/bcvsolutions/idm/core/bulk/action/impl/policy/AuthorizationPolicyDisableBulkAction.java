@@ -50,8 +50,8 @@ public class AuthorizationPolicyDisableBulkAction extends AbstractBulkAction<Idm
 	}
 	
 	@Override
-	public List<String> getAuthorities() {
-		List<String> authorities = super.getAuthorities();
+	protected List<String> getAuthoritiesForEntity() {
+		List<String> authorities =  super.getAuthoritiesForEntity();
 		authorities.add(CoreGroupPermission.AUTHORIZATIONPOLICY_UPDATE);
 		//
 		return authorities;

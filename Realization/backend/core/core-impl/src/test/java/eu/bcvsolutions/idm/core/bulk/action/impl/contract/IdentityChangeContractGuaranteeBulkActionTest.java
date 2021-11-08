@@ -52,7 +52,6 @@ public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkA
 		
 		getHelper().createIdentityRole(identity, createRole);
 		loginAsNoAdmin(identity.getUsername());
-		//loginAsAdmin();
 	}
 	
 	@After
@@ -83,7 +82,6 @@ public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkA
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_NEW_GUARANTEE, newGuarantees.get(0).getId().toString());
 		bulkAction.setProperties(properties);
 		bulkActionManager.processAction(bulkAction);
-		//checkResultLrt(processAction, 1l, null, null);  // has to be commented out because 
 
 		// test that there remains on both contracts only one guarantee 
 		// CONTRACT1
@@ -128,7 +126,6 @@ public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkA
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_NEW_GUARANTEE, newGuarantees.get(0).getId().toString());
 		bulkAction.setProperties(properties);
 		bulkActionManager.processAction(bulkAction);
-		//checkResultLrt(processAction, 1l, null, null);
 
 		// test that there remains on both contracts only one guarantee 
 		// CONTRACT1

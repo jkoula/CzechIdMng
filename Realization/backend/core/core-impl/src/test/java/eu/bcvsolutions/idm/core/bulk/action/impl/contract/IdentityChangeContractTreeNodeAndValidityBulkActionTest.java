@@ -47,11 +47,11 @@ public class IdentityChangeContractTreeNodeAndValidityBulkActionTest extends Abs
 		
 		IdmRoleDto createRole = getHelper().createRole();
 		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITYCONTRACT, IdmIdentityContract.class, IdmBasePermission.UPDATE);
+		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITY, IdmBasePermission.READ, IdmBasePermission.AUTOCOMPLETE);
 		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.TREENODE, IdmTreeNode.class, IdmBasePermission.AUTOCOMPLETE);
 		
 		getHelper().createIdentityRole(identity, createRole);
 		loginAsNoAdmin(identity.getUsername());
-		//loginAsAdmin();
 	}
 	
 	@After
@@ -160,7 +160,6 @@ public class IdentityChangeContractTreeNodeAndValidityBulkActionTest extends Abs
 		// log as a user without permissions
 		IdmIdentityDto identityForLogin = getHelper().createIdentity();
 		IdmRoleDto permissionRole = getHelper().createRole();
-		//getHelper().createBasePolicy(permissionRole.getId(), CoreGroupPermission.IDENTITYCONTRACT, IdmIdentityContract.class, IdmBasePermission.UPDATE);
 		getHelper().createBasePolicy(permissionRole.getId(), CoreGroupPermission.TREENODE, IdmTreeNode.class, IdmBasePermission.AUTOCOMPLETE);
 		getHelper().createIdentityRole(identityForLogin, permissionRole);
 		loginAsNoAdmin(identityForLogin.getUsername());
@@ -175,7 +174,7 @@ public class IdentityChangeContractTreeNodeAndValidityBulkActionTest extends Abs
 		properties.put(IdentityChangeContractTreeNodeAndValidityBulkAction.PARAMETER_VALID_TILL, newTillDate.toString());
 		bulkAction.setProperties(properties);
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
-		checkResultLrt(processAction, null, null, 2l);
+		checkResultLrt(processAction, null, null, 0l);
 				 
 		IdmIdentityContractDto changedContract = contractService.get(contract1);
 		Assert.assertNotNull(changedContract);

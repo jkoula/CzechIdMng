@@ -32,7 +32,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
 
 /**
- * Integration tests for {@link IdentityAddRoleBulkAction}
+ * Integration tests for {@link IdentityChangeUserTypeBulkAction}
  *
  * @author Ondrej Husnik
  *

@@ -46,12 +46,11 @@ public class IdentityRemoveContractGuaranteeBulkActionTest extends AbstractBulkA
 		IdmIdentityDto identity = getHelper().createIdentity();
 		
 		IdmRoleDto createRole = getHelper().createRole();
-		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITY, IdmIdentity.class, IdmBasePermission.READ, IdmBasePermission.COUNT, IdmBasePermission.AUTOCOMPLETE);
+		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.IDENTITY, IdmIdentity.class, IdmBasePermission.READ, IdmBasePermission.COUNT, IdmBasePermission.AUTOCOMPLETE, IdmBasePermission.UPDATE);
 		getHelper().createBasePolicy(createRole.getId(), CoreGroupPermission.CONTRACTGUARANTEE, IdmContractGuarantee.class, IdmBasePermission.DELETE);
 		
 		getHelper().createIdentityRole(identity, createRole);
 		loginAsNoAdmin(identity.getUsername());
-		//loginAsAdmin();
 	}
 	
 	@After
@@ -82,7 +81,6 @@ public class IdentityRemoveContractGuaranteeBulkActionTest extends AbstractBulkA
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_OLD_GUARANTEE, uuidStrings);
 		bulkAction.setProperties(properties);
 		bulkActionManager.processAction(bulkAction);
-		//checkResultLrt(processAction, 1l, null, null);
 
 		// test that there remains on both contracts only one guarantee  
 		List<IdmContractGuaranteeDto> assigned = getGuaranteesForContract(contract1.getId());
@@ -116,7 +114,6 @@ public class IdentityRemoveContractGuaranteeBulkActionTest extends AbstractBulkA
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_OLD_GUARANTEE, uuidStrings);
 		bulkAction.setProperties(properties);
 		bulkActionManager.processAction(bulkAction);
-		//checkResultLrt(processAction, 1l, null, null);
 
 		// test that there remains only one guarantee
 		// both instances of the twice added guarantee were removed
@@ -142,7 +139,6 @@ public class IdentityRemoveContractGuaranteeBulkActionTest extends AbstractBulkA
 		IdmIdentityDto identityForLogin = getHelper().createIdentity();
 		IdmRoleDto permissionRole = getHelper().createRole();
 		getHelper().createBasePolicy(permissionRole.getId(), CoreGroupPermission.IDENTITY, IdmIdentity.class, IdmBasePermission.READ, IdmBasePermission.COUNT);
-		//getHelper().createBasePolicy(permissionRole.getId(), CoreGroupPermission.CONTRACTGUARANTEE, IdmContractGuarantee.class, IdmBasePermission.DELETE);
 		getHelper().createIdentityRole(identityForLogin, permissionRole);
 		loginAsNoAdmin(identityForLogin.getUsername());
 		
