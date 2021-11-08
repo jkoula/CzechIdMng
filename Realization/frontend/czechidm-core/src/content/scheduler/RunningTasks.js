@@ -73,6 +73,7 @@ class RunningTasks extends Basic.AbstractContent {
               title={ this.i18n('refresh') }
               showLoading={ _showLoading }/>
           </div>
+          <div className="clearfix"/>
         </Basic.Toolbar>
         {
           _showLoading

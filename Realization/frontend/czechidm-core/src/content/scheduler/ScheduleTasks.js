@@ -611,12 +611,11 @@ class ScheduleTasks extends Advanced.AbstractTableContent {
           onHide={ this.closeDetail.bind(this) }
           backdrop="static"
           keyboard={ !showLoading }>
-
-          <form onSubmit={ this.save.bind(this) }>
-            <Basic.Modal.Header
-              closeButton={ !showLoadingDetail }
-              text={ !Utils.Entity.isNew(detail.entity) ? this.i18n('action.task-edit.header') : this.i18n('action.task-create.header')}/>
-            <Basic.Modal.Body>
+          <Basic.Modal.Header
+            closeButton={ !showLoadingDetail }
+            text={ !Utils.Entity.isNew(detail.entity) ? this.i18n('action.task-edit.header') : this.i18n('action.task-create.header')}/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this) }>
               <Basic.AbstractForm
                 ref="form"
                 showLoading={ showLoadingDetail }
@@ -649,37 +648,38 @@ class ScheduleTasks extends Advanced.AbstractTableContent {
                     useDefaultValue={ Utils.Entity.isNew(detail.entity) }/>
                 </Basic.Div>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
-
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeDetail.bind(this) }
-                showLoading={ showLoadingDetail }>
-                {this.i18n('button.close')}
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={ showLoadingDetail }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }
-                rendered={ this.getManager().canSave(detail.entity) }>
-                { this.i18n('button.save') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ showLoadingDetail }>
+              {this.i18n('button.close')}
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={ showLoadingDetail }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              rendered={ this.getManager().canSave(detail.entity) }
+              onClick={ this.save.bind(this) }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
 
         <Basic.Modal
-          show={triggerDetail.show}
-          onHide={this.closeTriggerDetail.bind(this)}
+          show={ triggerDetail.show }
+          onHide={ this.closeTriggerDetail.bind(this) }
           backdrop="static"
-          keyboard={!showLoading}>
-
-          <form onSubmit={ this.saveTrigger.bind(this) }>
-            <Basic.Modal.Header closeButton={ !showLoading } text={ this.i18n('action.trigger-create.header') }/>
-            <Basic.Modal.Body>
+          keyboard={ !showLoading }>
+          <Basic.Modal.Header closeButton={ !showLoading } text={ this.i18n('action.trigger-create.header') }/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.saveTrigger.bind(this) }>
               <Basic.AbstractForm ref="triggerForm" showLoading={ showLoading }>
                 <Basic.EnumSelectBox
                   ref="type"
@@ -729,25 +729,28 @@ class ScheduleTasks extends Advanced.AbstractTableContent {
                   clearable={ false }
                   searchInFields={ ['text', 'description'] }/>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeTriggerDetail.bind(this) }
-                showLoading={ showLoading }>
-                { this.i18n('button.close') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={ showLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }>
-                { this.i18n('button.save') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeTriggerDetail.bind(this) }
+              showLoading={ showLoading }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={ showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              onClick={ this.saveTrigger.bind(this) }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
       </Basic.Div>
     );

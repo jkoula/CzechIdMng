@@ -219,11 +219,6 @@ module.exports = {
           path: 'accounts',
           component: require('./src/content/contract/ContractAccounts'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['CONTRACTACCOUNT_READ'] } ]
-        },
-        {
-          path: 'provisioning',
-          component: require('./src/content/contract/ContractProvisioningOperations'),
-          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['PROVISIONINGOPERATION_READ', 'PROVISIONINGARCHIVE_READ'] } ]
         }
       ]
     },

@@ -39,9 +39,7 @@ class IdentityProvisioningOperations extends Advanced.AbstractTableContent {
     //
     return (
       <Basic.Div>
-        <Basic.ContentHeader>
-          { this.i18n('header', { escape: false }) }
-        </Basic.ContentHeader>
+        <Basic.ContentHeader text={ this.i18n('header', { escape: false }) }/>
 
         <ProvisioningOperations
           uiKey="identity-provisioning-operation-table"
