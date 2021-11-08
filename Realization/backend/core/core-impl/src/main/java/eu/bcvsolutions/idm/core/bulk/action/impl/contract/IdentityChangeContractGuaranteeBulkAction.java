@@ -48,9 +48,10 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 	
 	@Override
 	public List<String> getAuthorities() {
-		List<String> permissions = super.getAuthorities();
-		permissions.add(CoreGroupPermission.CONTRACTGUARANTEE_UPDATE);
-		return permissions;
+		List<String> authorities =  super.getAuthorities();
+		authorities.add(CoreGroupPermission.CONTRACTGUARANTEE_UPDATE);
+		//
+		return authorities;
 	}
 
 	@Override

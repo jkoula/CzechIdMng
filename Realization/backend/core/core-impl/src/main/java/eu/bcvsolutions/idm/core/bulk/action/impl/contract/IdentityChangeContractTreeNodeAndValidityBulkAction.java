@@ -67,11 +67,21 @@ public class IdentityChangeContractTreeNodeAndValidityBulkAction extends Abstrac
 	}
 	
 	@Override
+	protected List<String> getAuthoritiesForEntity() {
+		List<String> authorities =  super.getAuthoritiesForEntity();
+		authorities.add(CoreGroupPermission.IDENTITY_READ);
+		authorities.add(CoreGroupPermission.IDENTITY_AUTOCOMPLETE);
+		//
+		return authorities;
+	}
+	
+	@Override
 	public List<String> getAuthorities() {
-		List<String> permissions = super.getAuthorities();
-		permissions.add(CoreGroupPermission.IDENTITYCONTRACT_UPDATE);
-		permissions.add(CoreGroupPermission.TREENODE_AUTOCOMPLETE);
-		return permissions;
+		List<String> authorities =  super.getAuthorities();
+		authorities.add(CoreGroupPermission.IDENTITYCONTRACT_UPDATE);
+		authorities.add(CoreGroupPermission.TREENODE_AUTOCOMPLETE);
+		//
+		return authorities;
 	}
 
 	@Override
