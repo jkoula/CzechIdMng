@@ -41,7 +41,7 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
 
 /**
- * Default controller for script authority (allowed services and class)
+ * Default controller for script authority (allowed services and class).
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
@@ -251,5 +251,10 @@ public class IdmScriptAuthorityController extends AbstractReadWriteDtoController
 			@ApiParam(value = "Authority's uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId) {
 		return super.delete(backendId);
+	}
+	
+	@Override
+	protected IdmScriptAuthorityFilter toFilter(MultiValueMap<String, Object> parameters) {
+		return new IdmScriptAuthorityFilter(parameters, getParameterConverter());
 	}
 }

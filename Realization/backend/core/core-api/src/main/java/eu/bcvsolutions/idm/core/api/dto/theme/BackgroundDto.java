@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * Baskgroud colors.
+ * Background colors.
  * 
  * @author Radek Tomiška
  * @since 12.0.0

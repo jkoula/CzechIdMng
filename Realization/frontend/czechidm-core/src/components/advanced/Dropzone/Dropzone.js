@@ -1,6 +1,9 @@
 import React from 'react';
 //
+import { withStyles } from '@material-ui/core/styles';
+//
 import * as Basic from '../../basic';
+import { Dropzone } from '../../basic/Dropzone/Dropzone';
 
 /**
 * Advanced Dropzone component
@@ -13,7 +16,7 @@ import * as Basic from '../../basic';
 * @author Radek Tomiška
 * @since 7.7.0
 */
-class Dropzone extends Basic.AbstractContextComponent {
+class AdvancedDropzone extends Basic.AbstractContextComponent {
 
   constructor(props, context) {
     super(props, context);
@@ -98,11 +101,11 @@ class Dropzone extends Basic.AbstractContextComponent {
 }
 
 Dropzone.propTypes = {
-  ...Basic.Dropzone.propTypes
+  ...Dropzone.propTypes
 };
 
 Dropzone.defaultProps = {
-  ...Basic.Dropzone.defaultProps
+  ...Dropzone.defaultProps
 };
 
-export default Dropzone;
+export default withStyles(Dropzone.STYLES, { withTheme: true })(AdvancedDropzone);

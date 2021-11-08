@@ -25,6 +25,7 @@ import eu.bcvsolutions.idm.core.api.dto.AvailableServiceDto;
 import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.BackgroundDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.PaletteColorDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.PaletteDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.ShapeDto;
@@ -248,6 +249,7 @@ public class IdmConfigurationControllerRestTest extends AbstractReadWriteDtoCont
 			configureTheme.getPalette().setPrimary(new PaletteColorDto("#000"));
 			configureTheme.setShape(new ShapeDto());
 			configureTheme.getShape().setBorderRadius(5);
+			configureTheme.getPalette().setBackground(new BackgroundDto());
 			getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_APPLICATION_THEME, getMapper().writeValueAsString(configureTheme));
 			//
 			// get configured theme

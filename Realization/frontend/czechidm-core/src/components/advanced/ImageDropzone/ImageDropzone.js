@@ -2,6 +2,7 @@ import React from 'react';
 import Well from '../../basic/Well/Well';
 //
 import * as Basic from '../../basic';
+import { Dropzone } from '../../basic/Dropzone/Dropzone';
 
 /**
 * Advanced Dropzone component
@@ -41,11 +42,11 @@ class ImageDropzone extends Basic.AbstractContextComponent {
 }
 
 ImageDropzone.propTypes = {
-  ...Basic.Dropzone.propTypes
+  ...Dropzone.propTypes
 };
 
 ImageDropzone.defaultProps = {
-  ...Basic.Dropzone.defaultProps
+  ...Dropzone.defaultProps
 };
 
 export default ImageDropzone;
