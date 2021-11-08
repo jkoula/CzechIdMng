@@ -174,6 +174,7 @@ public interface ApplicationConfiguration extends Configurable {
 	 * @return
 	 * @throws ForbiddenEntityException if authorization policies doesn't met
 	 * @throws ResultCodeException if content type is different than image (one of  image/*)
+	 * @since 12.0.0
 	 */
 	UUID uploadApplicationLogo(MultipartFile data, String fileName, BasePermission... permission);
 	
@@ -182,6 +183,7 @@ public interface ApplicationConfiguration extends Configurable {
 	 * 
 	 * @param permission permissions to evaluate (AND)
 	 * @throws ForbiddenEntityException if authorization policies doesn't met
+	 * @since 12.0.0
 	 */
 	void deleteApplicationLogo(BasePermission... permission);
 	

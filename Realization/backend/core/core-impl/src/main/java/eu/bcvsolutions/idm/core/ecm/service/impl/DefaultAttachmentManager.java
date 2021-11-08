@@ -160,7 +160,6 @@ public class DefaultAttachmentManager
 	@Override
 	@Transactional
 	public IdmAttachmentDto saveAttachmentVersion(Identifiable owner, IdmAttachmentDto attachment, IdmAttachmentDto previousVersion, BasePermission... permission) {
-		Assert.notNull(owner, "Owner is required.");
 		Assert.notNull(attachment, "Insert attachment");
 		//
 		if (previousVersion == null) {

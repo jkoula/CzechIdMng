@@ -16,6 +16,10 @@ import eu.bcvsolutions.idm.core.model.entity.IdmScriptAuthority;
  */
 public interface IdmScriptAuthorityRepository extends AbstractEntityRepository<IdmScriptAuthority> {
 
+	/**
+	 * @deprecated use service layer instead.
+	 */
+	@Deprecated(since = "12.0.0")
 	@Query(value = "select e from #{#entityName} e" +
 	        " where"
 	        + " ("

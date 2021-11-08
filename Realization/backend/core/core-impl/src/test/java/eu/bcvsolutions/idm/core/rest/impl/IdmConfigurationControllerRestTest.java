@@ -25,6 +25,7 @@ import eu.bcvsolutions.idm.core.api.dto.AvailableServiceDto;
 import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.ActionDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.BackgroundDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.PaletteColorDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.PaletteDto;
@@ -247,9 +248,18 @@ public class IdmConfigurationControllerRestTest extends AbstractReadWriteDtoCont
 			ThemeDto configureTheme = new ThemeDto();
 			configureTheme.setPalette(new PaletteDto());
 			configureTheme.getPalette().setPrimary(new PaletteColorDto("#000"));
+			configureTheme.getPalette().setSecondary(new PaletteColorDto("#000"));
+			configureTheme.getPalette().setError(new PaletteColorDto("#000"));
+			configureTheme.getPalette().setInfo(new PaletteColorDto("#000"));
+			configureTheme.getPalette().setSuccess(new PaletteColorDto("#000"));
+			configureTheme.getPalette().setWarning(new PaletteColorDto("#000"));
 			configureTheme.setShape(new ShapeDto());
 			configureTheme.getShape().setBorderRadius(5);
 			configureTheme.getPalette().setBackground(new BackgroundDto());
+			configureTheme.getPalette().getBackground().setDefaultColor("#000");
+			configureTheme.getPalette().getBackground().setPaperColor("#000");
+			configureTheme.getPalette().setAction(new ActionDto());
+			configureTheme.getPalette().getAction().setLoading("#000");
 			getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_APPLICATION_THEME, getMapper().writeValueAsString(configureTheme));
 			//
 			// get configured theme
