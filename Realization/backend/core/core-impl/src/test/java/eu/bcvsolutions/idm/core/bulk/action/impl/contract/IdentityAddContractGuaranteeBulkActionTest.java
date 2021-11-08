@@ -52,7 +52,6 @@ public class IdentityAddContractGuaranteeBulkActionTest extends AbstractBulkActi
 		
 		getHelper().createIdentityRole(identity, createRole);
 		loginAsNoAdmin(identity.getUsername());
-		//loginAsAdmin();
 	}
 	
 	@After
@@ -78,7 +77,6 @@ public class IdentityAddContractGuaranteeBulkActionTest extends AbstractBulkActi
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_NEW_GUARANTEE, uuidStrings);
 		bulkAction.setProperties(properties);
 		bulkActionManager.processAction(bulkAction);
-		//checkResultLrt(processAction, 1l, null, null);
 
 		// test guarantes on all contracts
 		for (IdmIdentityContractDto contract : contracts) {
@@ -108,7 +106,6 @@ public class IdentityAddContractGuaranteeBulkActionTest extends AbstractBulkActi
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_NEW_GUARANTEE, uuidStrings);
 		bulkAction.setProperties(properties);
 		bulkActionManager.processAction(bulkAction);
-		//checkResultLrt(processAction, 1l, null, null);
 
 		// test guarantees on all contracts
 		List<IdmContractGuaranteeDto> assigned = getGuaranteesForContract(contract1.getId());
@@ -126,7 +123,6 @@ public class IdentityAddContractGuaranteeBulkActionTest extends AbstractBulkActi
 		IdmIdentityDto identityForLogin = getHelper().createIdentity();
 		IdmRoleDto permissionRole = getHelper().createRole();
 		getHelper().createBasePolicy(permissionRole.getId(), CoreGroupPermission.IDENTITY, IdmIdentity.class, IdmBasePermission.READ, IdmBasePermission.COUNT);
-		//getHelper().createBasePolicy(permissionRole.getId(), CoreGroupPermission.CONTRACTGUARANTEE, IdmContractGuarantee.class, IdmBasePermission.CREATE);
 		getHelper().createIdentityRole(identityForLogin, permissionRole);
 		loginAsNoAdmin(identityForLogin.getUsername());
 		
@@ -143,7 +139,7 @@ public class IdentityAddContractGuaranteeBulkActionTest extends AbstractBulkActi
 		properties.put(IdentityAddContractGuaranteeBulkAction.PROPERTY_NEW_GUARANTEE, uuidStrings);
 		bulkAction.setProperties(properties);
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
-		// one log record with warning level is expected
+		// no log record is expected
 		checkResultLrt(processAction, null, 0l, 1l);
 
 		// test guarantes on all contracts

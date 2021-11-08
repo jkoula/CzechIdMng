@@ -65,6 +65,15 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 		permissions.add(CoreGroupPermission.IDENTITY_AUTOCOMPLETE);
 		return permissions;
 	}
+	
+	@Override
+	protected List<String> getAuthoritiesForEntity() {
+		List<String> authorities =  super.getAuthoritiesForEntity();
+		authorities.add(CoreGroupPermission.IDENTITY_READ);
+		authorities.add(CoreGroupPermission.IDENTITY_AUTOCOMPLETE);
+		//
+		return authorities;
+	}
 
 	@Override
 	public ReadWriteDtoService<IdmIdentityDto, IdmIdentityFilter> getService() {

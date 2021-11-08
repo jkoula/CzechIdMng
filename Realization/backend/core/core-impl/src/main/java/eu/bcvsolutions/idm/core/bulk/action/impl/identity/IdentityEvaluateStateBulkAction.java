@@ -58,8 +58,8 @@ public class IdentityEvaluateStateBulkAction extends AbstractBulkAction<IdmIdent
 	}
 	
 	@Override
-	public List<String> getAuthorities() {
-		List<String> authorities = super.getAuthorities();
+	protected List<String> getAuthoritiesForEntity() {
+		List<String> authorities =  super.getAuthoritiesForEntity();
 		authorities.add(CoreGroupPermission.IDENTITY_UPDATE);
 		//
 		return authorities;

@@ -65,10 +65,11 @@ public class IdentityChangeUserTypeBulkAction extends AbstractBulkAction<IdmIden
 	}
 	
 	@Override
-	public List<String> getAuthorities() {
-		List<String> permissions = super.getAuthorities();
-		permissions.add(CoreGroupPermission.IDENTITY_CHANGEPROJECTION);
-		return permissions;
+	public List<String> getAuthoritiesForEntity() {
+		List<String> authorities =  super.getAuthoritiesForEntity();
+		authorities.add(CoreGroupPermission.IDENTITY_CHANGEPROJECTION);
+		//
+		return authorities;
 	}
 	
 	/**
