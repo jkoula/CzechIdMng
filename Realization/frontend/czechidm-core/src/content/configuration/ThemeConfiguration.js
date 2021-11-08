@@ -382,7 +382,10 @@ class ThemeConfiguration extends Basic.AbstractContent {
                       helpBlock={
                         !this.isDevelopment()
                         ||
-                        <small><Basic.Link href="https://v4.mui.com/customization/color/#playground">Návod</Basic.Link> jak vybrat barvy.</small>
+                        <small>
+                          <Basic.Link href="https://v4.mui.com/customization/color/#playground">{ this.i18n('colors.help.label') }</Basic.Link>
+                          { this.i18n('colors.help.title') }
+                        </small>
                       }>
                       <BasicColorPicker
                         name="primaryText"

@@ -133,9 +133,9 @@ export class FlashMessages extends AbstractContextComponent {
           borderRadius: `${ theme.shape.borderRadius }px`
         },
         success: { // Applied only to the success notification item
-          color: theme.palette.primary.contrastText,
-          borderTop: `3px solid ${ theme.palette.primary.main }`,
-          backgroundColor: theme.palette.primary.light,
+          color: theme.palette.success.contrastText,
+          borderTop: `3px solid ${ theme.palette.success.main }`,
+          backgroundColor: theme.palette.success.light,
         },
         warning: { // Applied only to the success notification item
           color: theme.palette.warning.contrastText,

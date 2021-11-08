@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.api.config.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import eu.bcvsolutions.idm.core.api.AppModule;
-import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -24,7 +22,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
  * @author Radek Tomiška
  * @since 11.1.0
  */
-public interface ApplicationConfiguration extends Configurable, Identifiable {
+public interface ApplicationConfiguration extends Configurable {
 	
 	String STAGE_PRODUCTION = "production";
 	String STAGE_DEVELOPMENT = "development";
@@ -87,11 +85,6 @@ public interface ApplicationConfiguration extends Configurable, Identifiable {
 	@Override
 	default String getName() {
 		return AppModule.MODULE_ID;
-	}
-	
-	@Override
-	default Serializable getId() {
-		return null; // UUID identifiable is not supported, but interface is required for upload attachments.
 	}
 	
 	@Override

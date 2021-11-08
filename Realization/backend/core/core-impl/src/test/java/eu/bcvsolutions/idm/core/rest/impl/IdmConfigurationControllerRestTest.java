@@ -1,27 +1,40 @@
 package eu.bcvsolutions.idm.core.rest.impl;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.dto.AvailableServiceDto;
 import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.PaletteColorDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.PaletteDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.ShapeDto;
+import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoControllerRestTest;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
+import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
+import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultIdmIdentityService;
 import eu.bcvsolutions.idm.core.model.service.impl.LogbackLoggerManagerIntegrationTest;
 import eu.bcvsolutions.idm.core.security.api.authentication.AuthenticationManager;
@@ -42,6 +55,8 @@ public class IdmConfigurationControllerRestTest extends AbstractReadWriteDtoCont
 	@Autowired private IdmConfigurationController controller;
 	@Autowired private AuthenticationManager authenticationManager;
 	@Autowired private TokenManager tokenManager;
+	@Autowired private AttachmentManager attachmentManager;
+	@Autowired private ApplicationConfiguration applicationConfiguration;
 	
 	@Override
 	protected AbstractReadWriteDtoController<IdmConfigurationDto, ?> getController() {
@@ -149,5 +164,108 @@ public class IdmConfigurationControllerRestTest extends AbstractReadWriteDtoCont
 		//
 		Assert.assertFalse(dtos.isEmpty());
 		Assert.assertTrue(dtos.stream().anyMatch(c -> c.getServiceName().equals(DefaultIdmIdentityService.class.getSimpleName())));
+	}
+	
+	@Test
+	public void testDownloadApplicationLogo() throws Exception {
+		// not configured
+		try {
+			getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/logo")
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNoContent());
+			
+			// wrongly configured
+			getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_APPLICATION_LOGO, UUID.randomUUID().toString());
+			getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/logo")
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNotFound());
+			
+			// upload
+			String fileName = "file.png";
+			String content = "some image";
+			getMockMvc().perform(MockMvcRequestBuilders.multipart(getBaseUrl() + "/application/logo")
+					.file(new MockMultipartFile("data", fileName, "image/png", IOUtils.toByteArray(IOUtils.toInputStream(content))))
+	        		.param("fileName", fileName)
+	        		.with(authentication(getAdminAuthentication())))
+					.andExpect(status().isOk());
+			
+			// get configured
+			String response = getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/logo")
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isOk())
+	                .andReturn()
+	                .getResponse()
+	                .getContentAsString();
+			Assert.assertEquals(content, response);
+			//
+			IdmAttachmentDto image = attachmentManager.get(applicationConfiguration.getApplicationLogoId());
+			Assert.assertEquals(content.length(), image.getFilesize().intValue());
+			Assert.assertEquals(fileName, image.getName());
+			InputStream is = attachmentManager.getAttachmentData(image.getId());
+			try {
+				Assert.assertEquals(content, IOUtils.toString(is));
+			} finally {
+				IOUtils.closeQuietly(is);
+			}
+			//
+			// delete
+			getMockMvc().perform(delete(getBaseUrl() + "/application/logo")
+					.with(authentication(getAdminAuthentication()))
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNoContent());
+			//
+			// not configured
+			getMockMvc().perform(delete(getBaseUrl() + "/application/logo")
+					.with(authentication(getAdminAuthentication()))
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNoContent());
+			getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/logo")
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNoContent());
+			
+		} finally {
+			// just for sure, it some test fails
+			applicationConfiguration.deleteApplicationLogo();
+		}
+	}
+	
+	@Test
+	public void testGetApplicationTheme() throws Exception {
+		try {
+			// not configured
+			getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/theme")
+					.contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNoContent());
+			// not configured - dark
+			getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/theme")
+					.param("type", "dark")
+					.contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isNoContent());
+			//
+			// configure 
+			ThemeDto configureTheme = new ThemeDto();
+			configureTheme.setPalette(new PaletteDto());
+			configureTheme.getPalette().setPrimary(new PaletteColorDto("#000"));
+			configureTheme.setShape(new ShapeDto());
+			configureTheme.getShape().setBorderRadius(5);
+			getHelper().setConfigurationValue(ApplicationConfiguration.PROPERTY_APPLICATION_THEME, getMapper().writeValueAsString(configureTheme));
+			//
+			// get configured theme
+			String response = getMockMvc().perform(get(BaseController.BASE_PATH + "/public/configurations/application/theme")
+	                .contentType(TestHelper.HAL_CONTENT_TYPE))
+					.andExpect(status().isOk())
+	                .andReturn()
+	                .getResponse()
+	                .getContentAsString();
+			//
+			ThemeDto theme = getMapper().readValue(response, ThemeDto.class);
+			Assert.assertNotNull(theme);
+			Assert.assertNotNull(theme.getPalette());
+			Assert.assertEquals(configureTheme.getPalette().getPrimary().getMain(), theme.getPalette().getPrimary().getMain());
+			Assert.assertNotNull(theme.getShape());
+			Assert.assertEquals(configureTheme.getShape().getBorderRadius(), theme.getShape().getBorderRadius());
+		} finally {
+			getHelper().deleteConfigurationValue(ApplicationConfiguration.PROPERTY_APPLICATION_THEME);
+		}
 	}
 }

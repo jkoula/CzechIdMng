@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.config.domain;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.core.api.config.domain.AbstractConfiguration;
 import eu.bcvsolutions.idm.core.api.config.domain.ApplicationConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.IdmConfigurationDto;
 import eu.bcvsolutions.idm.core.api.dto.theme.ThemeDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -36,7 +38,7 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
  * @author Radek Tomiška
  * @since 11.1.0
  */
-public class DefaultApplicationConfiguration extends AbstractConfiguration implements ApplicationConfiguration {	
+public class DefaultApplicationConfiguration extends AbstractConfiguration implements ApplicationConfiguration, Identifiable {	
 
 	private static final long serialVersionUID = 1L;
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultApplicationConfiguration.class);
@@ -46,6 +48,11 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 	@Autowired private ObjectMapper mapper;
 	@Autowired private AttachmentManager attachmentManager;
 	@Autowired private IdmConfigurationService configurationService;
+	
+	@Override
+	public Serializable getId() {
+		return null; // UUID identifiable is not supported, but interface is required for upload attachments.
+	}
 	
 	@Override
 	public String getStage() {
@@ -100,7 +107,12 @@ public class DefaultApplicationConfiguration extends AbstractConfiguration imple
 	
 	@Override
 	public UUID getApplicationLogoId() {
-		return DtoUtils.toUuid(getConfigurationService().getValue(PROPERTY_APPLICATION_LOGO));
+		String applicationLogoId = getConfigurationService().getValue(PROPERTY_APPLICATION_LOGO);
+		if (StringUtils.isBlank(applicationLogoId)) {
+			return null;
+		}
+		//
+		return DtoUtils.toUuid(applicationLogoId);
 	}
 	
 	@Override

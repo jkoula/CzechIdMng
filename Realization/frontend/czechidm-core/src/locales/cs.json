@@ -1585,6 +1585,10 @@
       "colors": {
         "header": "Barvy",
         "disabled": "Je možné konfigurovat pouze výchozí téma.",
+        "help": {
+          "label": "Návod",
+          "title": " jak vybrat barvy."
+        },
         "primary": {
           "color": {
             "label": "Primární",

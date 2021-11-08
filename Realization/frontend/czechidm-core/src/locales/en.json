@@ -1545,6 +1545,10 @@
       "colors": {
         "header": "Colors",
         "disabled": "Default theme configured is supported only.",
+        "help": {
+          "label": "How to",
+          "title": " pick colors."
+        },
         "primary": {
           "color": {
             "label": "Primary",

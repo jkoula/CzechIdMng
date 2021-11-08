@@ -244,25 +244,7 @@ module.exports = {
         titleKey: 'acc:content.provisioningOperations.title',
         order: 110,
         path: '/identity/:entityId/provisioning',
-        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['PROVISIONINGOPERATION_READ', 'PROVISIONINGARCHIVE_READ'] } ],
-        items: [
-          {
-            id: 'system-groups-detail',
-            type: 'TAB',
-            labelKey: 'acc:content.systemGroup.basic',
-            order: 10,
-            path: '/system-groups/:entityId/detail',
-            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
-          },
-          {
-            id: 'system-group-systems',
-            type: 'TAB',
-            labelKey: 'acc:content.systemGroupSystem.detail',
-            order: 20,
-            path: '/system-groups/:entityId/systems',
-            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
-          }
-        ]
+        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['PROVISIONINGOPERATION_READ', 'PROVISIONINGARCHIVE_READ'] } ]
       },
       {
         id: 'identity-contract-accounts',
