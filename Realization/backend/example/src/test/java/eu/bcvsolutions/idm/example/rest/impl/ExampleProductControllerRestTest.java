@@ -28,5 +28,10 @@ public class ExampleProductControllerRestTest extends AbstractReadWriteDtoContro
 		dto.setName(getHelper().createName());
 		return dto;
 	}
+	
+	@Override
+	protected boolean supportsBulkActions() {
+		return false;
+	}
 
 }
