@@ -71,6 +71,9 @@ export default function BasicProgressBar(props) {
   if ((_max - min) > 0) {
     percent = (now / (_max - min)) * 100;
   }
+  if (percent > 100) {
+    percent = 100;
+  }
   //
   const _style = style || {};
   _style.display = _style.display || 'flex';

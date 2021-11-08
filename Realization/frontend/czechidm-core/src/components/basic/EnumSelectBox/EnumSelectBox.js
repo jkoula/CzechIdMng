@@ -381,6 +381,40 @@ export class EnumSelectBox extends SelectBox {
     return this.i18n('label.select', { defaultValue: 'Select ...' });
   }
 
+  /**
+   * Load first page on input is opened.
+   */
+  onOpen(event) {
+    const {onOpen} = this.props;
+    if (onOpen) {
+      onOpen(event);
+    }
+    // FIXME: works, when input is empty only ...
+    const container = $(this.containerRef.current);
+    const isModal = container.closest('.basic-modal').length > 0;
+    let selectBoxOuter = null;
+    if (isModal) {
+      selectBoxOuter = container.find('.Select-menu-outer');
+    }
+    // it is neccessary set actualPage to zero and remove all options, after open
+    this.setState({
+      actualPage: 0,
+      options: [],
+      selectBoxOuter
+    }, () => {
+      selectBoxOuter = this.state.selectBoxOuter;
+      if (selectBoxOuter) {
+        const rect = this.containerRef.current.getBoundingClientRect();
+        selectBoxOuter.css({
+          top: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          position: 'fixed'
+        });
+      }
+    });
+  }
+
   getSelectComponent() {
     const {
       placeholder,
@@ -424,6 +458,16 @@ export class EnumSelectBox extends SelectBox {
           searchPromptText={ this.i18n('component.basic.SelectBox.searchPromptText') }
           onInputChange={ this.onInputChange.bind(this) }
           options={ this.getOptions() }
+          onOpen={ this.onOpen.bind(this) }
+          onClose={ () => {
+            const { selectBoxOuter } = this.state;
+            if (selectBoxOuter) {
+              selectBoxOuter.css({
+                top: 'auto',
+                position: 'relative'
+              });
+            }
+          }}
           searchable={ searchable }
           isLoading={ showLoading }
           className={ className }

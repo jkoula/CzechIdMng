@@ -334,19 +334,6 @@ class ScriptAuthorities extends Basic.AbstractContent {
                   label={this.i18n('entity.ScriptAuthority.className')}
                   max={2000}/>
               </Basic.AbstractForm>
-              {
-                !detail.isService
-                ||
-                <>
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                </>
-              }
               {/* onEnter action - is needed because footer submit button is outside form */}
               <input type="submit" className="hidden"/>
             </form>
