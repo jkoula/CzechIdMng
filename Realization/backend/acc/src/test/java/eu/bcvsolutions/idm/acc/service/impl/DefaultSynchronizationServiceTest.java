@@ -799,7 +799,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		SysSyncActionLogFilter actionLogFilter = new SysSyncActionLogFilter();
 		actionLogFilter.setSynchronizationLogId(log.getId());
 		List<SysSyncActionLogDto> actions = syncActionLogService.find(actionLogFilter, null).getContent();
-		Assert.assertEquals(1, actions.size());
+		Assert.assertEquals(2, actions.size());
 
 		SysSyncActionLogDto actionLog = actions.stream().filter(action -> {
 			return SynchronizationActionType.CREATE_ACCOUNT == action.getSyncAction();
