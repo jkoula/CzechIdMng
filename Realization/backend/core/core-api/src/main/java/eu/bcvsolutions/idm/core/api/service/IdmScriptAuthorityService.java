@@ -9,10 +9,10 @@ import eu.bcvsolutions.idm.core.api.dto.filter.AvailableServiceFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmScriptAuthorityFilter;
 
 /**
- * Interface of service for script authority
+ * Interface of service for script authority.
+ * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Ondrej Husnik
- *
  */
 public interface IdmScriptAuthorityService extends ReadWriteDtoService<IdmScriptAuthorityDto, IdmScriptAuthorityFilter> {
 	

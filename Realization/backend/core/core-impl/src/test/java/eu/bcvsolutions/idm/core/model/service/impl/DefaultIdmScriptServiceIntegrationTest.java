@@ -86,22 +86,29 @@ public class DefaultIdmScriptServiceIntegrationTest extends AbstractIntegrationT
 		IdmScriptDto script1 = scriptService.getByCode(TEST_SCRIPT_CODE_1);
 		IdmScriptDto script2 = scriptService.getByCode(TEST_SCRIPT_CODE_2);
 
-		assertNotNull(script1);
-		assertNotNull(script2);
+		Assert.assertNotNull(script1);
+		Assert.assertNotNull(script2);
 
-		assertEquals(TEST_SCRIPT_CODE_1, script1.getCode());
-		assertEquals(TEST_SCRIPT_CODE_2, script2.getCode());
+		Assert.assertEquals(TEST_SCRIPT_CODE_1, script1.getCode());
+		Assert.assertEquals(TEST_SCRIPT_CODE_2, script2.getCode());
 
 		IdmScriptAuthorityFilter filter = new IdmScriptAuthorityFilter();
 		filter.setScriptId(script1.getId());
 		List<IdmScriptAuthorityDto> authorities = scriptAuthorityService.find(filter, null).getContent();
-
-		assertEquals(4, authorities.size());
+		Assert.assertEquals(4, authorities.size());
 
 		filter.setScriptId(script2.getId());
 		authorities = scriptAuthorityService.find(filter, null).getContent();
+		Assert.assertEquals(0, authorities.size());
+		
+		filter = new IdmScriptAuthorityFilter();
+		filter.setText(script1.getCode());
+		authorities = scriptAuthorityService.find(filter, null).getContent();
+		Assert.assertEquals(4, authorities.size());
 
-		assertEquals(0, authorities.size());
+		filter.setText(script2.getCode());
+		authorities = scriptAuthorityService.find(filter, null).getContent();
+		Assert.assertEquals(0, authorities.size());
 	}
 	
 	@Test

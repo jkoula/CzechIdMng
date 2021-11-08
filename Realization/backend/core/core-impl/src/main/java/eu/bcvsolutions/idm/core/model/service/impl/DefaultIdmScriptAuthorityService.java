@@ -12,12 +12,16 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableMap;
@@ -37,11 +41,12 @@ import eu.bcvsolutions.idm.core.api.service.IdmScriptAuthorityService;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmScriptAuthority;
+import eu.bcvsolutions.idm.core.model.entity.IdmScriptAuthority_;
+import eu.bcvsolutions.idm.core.model.entity.IdmScript_;
 import eu.bcvsolutions.idm.core.model.repository.IdmScriptAuthorityRepository;
-import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
 /**
- * Default implementation for {@link IdmScriptAuthorityService}
+ * Default implementation for {@link IdmScriptAuthorityService}.
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Ondrej Husnik 
@@ -53,7 +58,6 @@ public class DefaultIdmScriptAuthorityService
 	
 	private final ApplicationContext applicationContext;
 	private List<AvailableServiceDto> services;
-	private IdmScriptAuthorityRepository repository;
 	
 	@Autowired
 	public DefaultIdmScriptAuthorityService(
@@ -63,20 +67,12 @@ public class DefaultIdmScriptAuthorityService
 		//
 		Assert.notNull(applicationContext, "Context is required.");
 		//
-		this.repository = repository;
 		this.applicationContext = applicationContext;
 	}
 	
 	@Override
-	protected Page<IdmScriptAuthority> findEntities(IdmScriptAuthorityFilter filter, Pageable pageable, BasePermission... permission) {
-		if (filter == null) {
-			return getRepository().findAll(pageable);
-		}
-		return repository.find(filter, pageable);
-	}
-	
-	@Override
-	public IdmScriptAuthorityDto save(IdmScriptAuthorityDto dto, BasePermission... permission) {
+	@Transactional
+	public IdmScriptAuthorityDto saveInternal(IdmScriptAuthorityDto dto) {
 		// check if class is accessible
 		if (dto.getType() == ScriptAuthorityType.CLASS_NAME) {
 			try {
@@ -94,7 +90,7 @@ public class DefaultIdmScriptAuthorityService
 						ImmutableMap.of("service", dto.getService()));
 			}
 		}
-		return super.save(dto, permission);
+		return super.saveInternal(dto);
 	}
 
 	@Override
@@ -159,6 +155,29 @@ public class DefaultIdmScriptAuthorityService
 		return result;
 	}
 	
+	@Override
+	protected List<Predicate> toPredicates(Root<IdmScriptAuthority> root, CriteriaQuery<?> query, CriteriaBuilder builder, IdmScriptAuthorityFilter filter) {
+		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
+		//
+		String text = filter.getText();
+		if (StringUtils.isNotEmpty(text)) {
+			text = text.toLowerCase();
+			List<Predicate> textPredicates = new ArrayList<>(2);
+			//
+			textPredicates.add(builder.like(builder.lower(root.get(IdmScriptAuthority_.script).get(IdmScript_.code)), "%" + text + "%"));
+			textPredicates.add(builder.like(builder.lower(root.get(IdmScriptAuthority_.script).get(IdmScript_.name)), "%" + text + "%"));
+			//
+			predicates.add(builder.or(textPredicates.toArray(new Predicate[textPredicates.size()])));
+		}
+		//
+		UUID scriptId = filter.getScriptId();
+		if (scriptId != null) {
+			predicates.add(builder.equal(root.get(IdmScriptAuthority_.script).get(IdmScript_.id), scriptId));
+		}
+		//
+		return predicates;
+	}
+	
 	private List<AvailableMethodDto> getServiceMethods(Class<?> service) {	
 		List<Method> omittedMethods = Lists.newArrayList(Object.class.getMethods());
 		List<Method> methods = Lists.newArrayList(service.getMethods());
@@ -189,12 +208,11 @@ public class DefaultIdmScriptAuthorityService
 	@Override
 	public boolean isServiceReachable(String serviceName, String className) {
 		//
-		return !this.findServices((String)null).stream()
-				.filter(
-						service -> (
-								service.getServiceName().equals(serviceName)
-								)
-						).collect(Collectors.toList()).isEmpty();
+		return !this
+				.findServices((String)null)
+				.stream()
+				.filter(service -> service.getServiceName().equals(serviceName))
+				.collect(Collectors.toList()).isEmpty();
 	}
 
 }
