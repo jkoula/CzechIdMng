@@ -110,12 +110,12 @@ export class IdentityInfo extends AbstractEntityInfo {
     //
     this.context.store.dispatch(securityManager.switchUser(username, (result) => {
       if (result) {
+        this.context.history.replace(`/`);
         this.addMessage({
           level: 'success',
           key: 'core-switch-user-success',
           message: this.i18n('content.identity.switch-user.message.success', { username })
         });
-        this.context.history.replace(`/`);
       }
     }));
   }

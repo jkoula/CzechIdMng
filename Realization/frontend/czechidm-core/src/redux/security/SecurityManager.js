@@ -118,7 +118,7 @@ export default class SecurityManager {
       //
       authenticateService.switchUser(username)
         .then(json => {
-          this._handleUserAuthSuccess(dispatch, getState, cb, json);
+          this._handleUserAuthSuccess(dispatch, getState, cb, json, true);
         })
         .catch(error => dispatch(this.receiveLoginError(error, cb)));
     };
@@ -143,7 +143,7 @@ export default class SecurityManager {
     };
   }
 
-  _handleUserAuthSuccess(dispatch, getState, redirect, json) {
+  _handleUserAuthSuccess(dispatch, getState, redirect, json, redirectFirts = false) {
     const decoded = AuthenticateService.decodeToken(json.token);
     const identityId = decoded.currentIdentityId;
     // load identity profile
@@ -179,7 +179,7 @@ export default class SecurityManager {
         }
         //
         // send userContext to state
-        dispatch(this.receiveLogin(userContext, redirect));
+        dispatch(this.receiveLogin(userContext, redirect, redirectFirts));
       });
   }
 
@@ -232,14 +232,26 @@ export default class SecurityManager {
     };
   }
 
-  receiveLogin(userContext, redirect) {
+  /**
+   * Set userContext into redux state.
+   *
+   * @param  {object}  userContext
+   * @param  {cb}  redirect
+   * @param  {Boolean} - redirect will be called before userContext is set into redux (e.g. required from switch user -> switched user doesn't have rights as previous user)
+   */
+  receiveLogin(userContext, redirect, redirectFirts = false) {
     return dispatch => {
+      // redirect after login, if needed
+      if (redirect && redirectFirts) {
+        redirect(userContext.isAuthenticated, null, userContext);
+      }
+      //
       dispatch({
         type: RECEIVE_LOGIN,
         userContext
       });
       // redirect after login, if needed
-      if (redirect) {
+      if (redirect && !redirectFirts) {
         redirect(userContext.isAuthenticated, null, userContext);
       }
     };

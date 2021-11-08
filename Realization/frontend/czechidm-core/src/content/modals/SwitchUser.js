@@ -36,12 +36,12 @@ class SwitchUser extends Basic.AbstractContent {
     this.context.store.dispatch(securityManager.switchUser(username, (result) => {
       const { onHide } = this.props;
       if (result) {
+        this.context.history.replace(`/`);
         this.addMessage({
           level: 'success',
           key: 'core-switch-user-success',
           message: this.i18n('content.identity.switch-user.message.success', { username })
         });
-        this.context.history.replace(`/`);
       }
       // modal is closed on error too => currently logged user is logout anyway
       onHide();
