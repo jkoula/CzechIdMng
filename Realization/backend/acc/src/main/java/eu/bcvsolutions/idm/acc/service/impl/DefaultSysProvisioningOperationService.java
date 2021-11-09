@@ -565,6 +565,9 @@ public class DefaultSysProvisioningOperationService
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public SysProvisioningOperationDto saveOperation(SysProvisioningOperationDto operation) {
+		if (operation.isDryRun()) {
+			return operation;
+		}
 		return save(operation);
 	}
 	
@@ -605,25 +608,26 @@ public class DefaultSysProvisioningOperationService
 				.setCause(ex)
 				.build());
 		//
-		operation = save(operation);
-		//
-		// create archive operation for the current attempt
-		provisioningArchiveService.archive(operation);	
-		//
-		// calculate next attempt
-		SysProvisioningOperationDto firstOperation = getFirstOperationByBatchId(operation.getBatch());
-		if (firstOperation.equals(operation)) {
-			SysProvisioningBatchDto batch = batchService.get(operation.getBatch());
-			batch.setNextAttempt(batchService.calculateNextAttempt(operation));
-			batch = batchService.save(batch);
-		}
-		//
-		if (securityService.getCurrentId() != null) { // TODO: check account owner
-			// TODO: notification is moved into console ... simple LOG instead?
-			notificationManager.send(
-					AccModuleDescriptor.TOPIC_PROVISIONING, new IdmMessageDto.Builder()
-					.setModel(resultModel)
-					.build());
+		if (!operation.isDryRun()) {
+			operation = save(operation);
+			// create archive operation for the current attempt
+			provisioningArchiveService.archive(operation);
+			//
+			// calculate next attempt
+			SysProvisioningOperationDto firstOperation = getFirstOperationByBatchId(operation.getBatch());
+			if (firstOperation.equals(operation)) {
+				SysProvisioningBatchDto batch = batchService.get(operation.getBatch());
+				batch.setNextAttempt(batchService.calculateNextAttempt(operation));
+				batch = batchService.save(batch);
+			}
+			//
+			if (securityService.getCurrentId() != null) { // TODO: check account owner
+				// TODO: notification is moved into console ... simple LOG instead?
+				notificationManager.send(
+						AccModuleDescriptor.TOPIC_PROVISIONING, new IdmMessageDto.Builder()
+						.setModel(resultModel)
+						.build());
+			}
 		}
 		return operation;
 	}
@@ -642,20 +646,23 @@ public class DefaultSysProvisioningOperationService
 						"operationType", operation.getOperationType(),
 						"objectClass", operation.getProvisioningContext().getConnectorObject().getObjectClass().getType()));
 		operation.setResult(new OperationResult.Builder(OperationState.EXECUTED).setModel(resultModel).build());
-		operation = save(operation);
-		//
-		// cleanup next attempt time - batch are not removed
-		SysProvisioningBatchDto batch = DtoUtils.getEmbedded(operation, SysProvisioningOperation_.batch, (SysProvisioningBatchDto) null);
-		if (batch == null) {
-			batch = batchService.get(operation.getBatch());
+		if (!operation.isDryRun()) {
+			operation = save(operation);
+		
+			//
+			// cleanup next attempt time - batch are not removed
+			SysProvisioningBatchDto batch = DtoUtils.getEmbedded(operation, SysProvisioningOperation_.batch, (SysProvisioningBatchDto) null);
+			if (batch == null) {
+				batch = batchService.get(operation.getBatch());
+			}
+			if (batch.getNextAttempt() != null) {
+				batch.setNextAttempt(null);
+				batch = batchService.save(batch);
+			}
+			//
+			LOG.info(resultModel.toString());
+			//
 		}
-		if (batch.getNextAttempt() != null) {
-			batch.setNextAttempt(null);
-			batch = batchService.save(batch);
-		}
-		//
-		LOG.info(resultModel.toString());
-		//
 		return operation;
 	}
 	

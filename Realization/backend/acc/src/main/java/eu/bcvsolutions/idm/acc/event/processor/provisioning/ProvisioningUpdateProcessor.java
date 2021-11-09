@@ -49,6 +49,11 @@ public class ProvisioningUpdateProcessor extends AbstractProvisioningProcessor {
 	public String getName() {
 		return PROCESSOR_NAME;
 	}
+	
+	@Override
+	public boolean conditional(EntityEvent<SysProvisioningOperationDto> event) {
+		return !event.getContent().isDryRun();
+	}
 
 	@Override
 	public IcUidAttribute processInternal(SysProvisioningOperationDto provisioningOperation, IcConnectorConfiguration connectorConfig) {

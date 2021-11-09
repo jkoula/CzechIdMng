@@ -12,7 +12,8 @@
       "EavForm": {
         "faceType": {
           "SYSTEM-SELECT": "System select (SelectBox)",
-          "SYNCHRONIZATION-CONFIG-SELECT": "Synchronization configuration select (SelectBox)"
+          "SYNCHRONIZATION-CONFIG-SELECT": "Synchronization configuration select (SelectBox)",
+          "SYSTEM-MAPPING-ATTRIBUTE-FILTERED-SELECT": "Mapping attribute selection based on pre-selected system and mapping (SelectBox)"
         }
       },
       "SystemUniversalSearchType": {

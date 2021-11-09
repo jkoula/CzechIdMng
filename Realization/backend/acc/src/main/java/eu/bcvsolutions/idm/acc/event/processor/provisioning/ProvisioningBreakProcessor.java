@@ -85,6 +85,11 @@ public class ProvisioningBreakProcessor extends AbstractEntityEventProcessor<Sys
 	public String getName() {
 		return PROCESSOR_NAME;
 	}
+	
+	@Override
+	public boolean conditional(EntityEvent<SysProvisioningOperationDto> event) {
+		return !event.getContent().isDryRun();
+	}
 
 	@Override
 	public EventResult<SysProvisioningOperationDto> process(EntityEvent<SysProvisioningOperationDto> event) {

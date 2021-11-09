@@ -64,6 +64,10 @@ public class ProvisioningUniformPasswordNotificationProcessor extends AbstractEn
 			return false;
 		}
 		SysProvisioningOperationDto provisioningOperation = event.getContent();
+		
+		if (provisioningOperation.isDryRun()) {
+			return false;
+		}
 
 		// Uniform password notification can be send, only when account is created => update can be switched to create, if target account does not exist.
 		// @see PrepareConnectorObjectProcessor

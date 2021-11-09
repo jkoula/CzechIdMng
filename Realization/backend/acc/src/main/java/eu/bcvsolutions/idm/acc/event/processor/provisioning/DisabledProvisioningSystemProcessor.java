@@ -11,6 +11,7 @@ import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.event.ProvisioningEvent.ProvisioningEventType;
+import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.ResultModel;
@@ -52,8 +53,9 @@ public class DisabledProvisioningSystemProcessor extends AbstractEntityEventProc
 		if (system == null) {
 			system = systemService.get(account.getSystem());
 		}
+		boolean isDryRun = getBooleanProperty(ProvisioningService.DRY_RUN_PROPERTY_NAME, event.getProperties());
 		boolean closed = false;
-		if (system.isDisabledProvisioning()) {
+		if (system.isDisabledProvisioning() && !isDryRun) {
 			ResultModel resultModel = new DefaultResultModel(AccResultCode.PROVISIONING_SYSTEM_DISABLED_PROVISIONING, 
 					ImmutableMap.of("name", account.getRealUid(), "system", system.getName()));
 			LOG.info(resultModel.toString());

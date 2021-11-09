@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.event.ProvisioningEvent.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.event.AbstractEntityEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -49,11 +51,12 @@ public class ProvisioningStartProcessor extends AbstractEntityEventProcessor<Acc
 	@Override
 	public EventResult<AccAccountDto> process(EntityEvent<AccAccountDto> event) {
 		AccAccountDto account = event.getContent();
+		boolean isDryRun = getBooleanProperty(ProvisioningService.DRY_RUN_PROPERTY_NAME, event.getProperties());
 		Assert.notNull(account, "Account is required.");
-		LOG.info("Provisioning event start, for account id: [{}], account uid: [{}], real uid [{}] , system id: [{}]",
-				account.getId(), account.getUid(), account.getRealUid(), account.getSystem());
+		LOG.info("Provisioning event start, for account id: [{}], account uid: [{}], real uid [{}], system id: [{}], dryRun: [{}]",
+				account.getId(), account.getUid(), account.getRealUid(), account.getSystem(), isDryRun);
 
-		if (account.isInProtection()) {
+		if (account.isInProtection() && !isDryRun) {
 			if(!isCanceledProvisioningProtectionBreak(event.getProperties())){
 				LOG.info("Account [{}] is in protection. Provisioning is skipped.", account.getUid());
 				return new DefaultEventResult<>(event, this);				
@@ -61,9 +64,13 @@ public class ProvisioningStartProcessor extends AbstractEntityEventProcessor<Acc
 			LOG.info("Account [{}] is in protection, but cancel attribute is TRUE. Provisioning is not skipped.", account.getUid());
 		}
 
-		provisioningService.doInternalProvisioning(
+		SysProvisioningOperationDto provisioningOperation = provisioningService.doInternalProvisioning(
 				account,
-				(AbstractDto) event.getProperties().get(ProvisioningService.DTO_PROPERTY_NAME));
+				(AbstractDto) event.getProperties().get(ProvisioningService.DTO_PROPERTY_NAME),
+				isDryRun);
+		if (isDryRun) {
+			event.getProperties().put(ProvisioningService.DRY_RUN_PROVISIONING_OPERATION_PROPERTY_NAME, provisioningOperation);
+		}
 		return new DefaultEventResult<>(event, this);
 	}
 

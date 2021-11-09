@@ -1,6 +1,8 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.plugin.core.Plugin;
@@ -9,12 +11,15 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 
@@ -41,7 +46,7 @@ public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plu
 	void doProvisioning(AccAccountDto account);
 
 	/**
-	 * Do provisioning for given account and dto Emits ProvisioningEventType.START
+	 * Do provisioning for given account and dto. Emits ProvisioningEventType.START
 	 * event.
 	 * 
 	 * @param account
@@ -50,6 +55,17 @@ public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plu
 	 * @return
 	 */
 	void doProvisioning(AccAccountDto account, DTO dto);
+	
+	/**
+	 * Do provisioning for given account, dto and additional parameters for the event. Emits ProvisioningEventType.START
+	 * event.
+	 * 
+	 * @param account
+	 * @param dto
+	 * @param properties
+	 * @return
+	 */
+	EventContext<AccAccountDto> doProvisioning(AccAccountDto account, DTO dto, Map<String,Serializable> properties);
 
 	/**
 	 * Do delete provisioning for given account on connected system
@@ -131,6 +147,8 @@ public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plu
 	 * @return
 	 */
 	void doInternalProvisioning(AccAccountDto account, DTO dto);
+	
+	SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, DTO dto, boolean isDryRun);
 
 	/**
 	 * Ensure the account management for given entity. First check if can be

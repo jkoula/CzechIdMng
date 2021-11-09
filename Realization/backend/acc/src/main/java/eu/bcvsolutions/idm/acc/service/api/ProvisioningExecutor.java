@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.service.api;
 import eu.bcvsolutions.idm.acc.config.domain.ProvisioningConfiguration;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 
 /**
@@ -21,6 +22,14 @@ public interface ProvisioningExecutor {
 	 * @param provisioningOperation executed operation
 	 */
 	void execute(SysProvisioningOperationDto provisioningOperation);
+	
+	/**
+	 * 
+	 * @param provisioningOperation
+	 * @param isDryRun
+	 * @return
+	 */
+	SysProvisioningOperationDto execute(SysProvisioningOperationDto provisioningOperation, boolean isDryRun);
 	
 	/**
 	 * Execute operation synchronously without queue and waiting to transaction ends.

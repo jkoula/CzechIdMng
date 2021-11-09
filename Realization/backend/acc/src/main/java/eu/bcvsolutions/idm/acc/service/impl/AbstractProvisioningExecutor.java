@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,9 +80,11 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
@@ -240,9 +243,28 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		entityEventManager.process(new ProvisioningEvent(ProvisioningEvent.ProvisioningEventType.START, account,
 				ImmutableMap.of(ProvisioningService.DTO_PROPERTY_NAME, dto)));
 	}
+	
+	@Override
+	public EventContext<AccAccountDto> doProvisioning(AccAccountDto account, DTO dto, Map<String,Serializable> properties) {
+		Assert.notNull(account, "Account cannot be null!");
+		Assert.notNull(dto, "Dto cannot be null");
+		//
+		LOG.debug("Start provisioning for account [{}]", account.getUid());
+		Map<String,Serializable> fullProperties = ImmutableMap.<String,Serializable>builder()
+				.putAll(properties)
+				.put(ProvisioningService.DTO_PROPERTY_NAME, dto)
+				.build();
+		return entityEventManager.process(new ProvisioningEvent(ProvisioningEvent.ProvisioningEventType.START, account,
+				fullProperties));
+	}
 
 	@Override
 	public void doInternalProvisioning(AccAccountDto account, DTO dto) {
+		doInternalProvisioning(account,dto,false);
+	}
+	
+	@Override
+	public SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, DTO dto, boolean isDryRun) {
 		Assert.notNull(account, "Account is required.");
 		Assert.notNull(dto, "DTO is required.");
 		//
@@ -280,10 +302,10 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				systemEntity.getEntityType());
 		if (CollectionUtils.isEmpty(finalAttributes)) {
 			// nothing to do - mapping is empty
-			return;
+			return null;
 		}
 
-		doProvisioning(systemEntity, dto, dto.getId(), operationType, finalAttributes);
+		return doProvisioning(systemEntity, dto, dto.getId(), operationType, finalAttributes, isDryRun);
 	}
 
 	@Override
@@ -745,8 +767,19 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		//
 		if (provisioningOperation != null) {
 			provisioningExecutor.execute(provisioningOperation);
+		}	
+	}
+	
+	private SysProvisioningOperationDto doProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
+			ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, boolean isDryRun) {
+		SysProvisioningOperationDto provisioningOperation = prepareProvisioning(systemEntity, dto, entityId,
+				operationType, attributes);
+		//
+		if (provisioningOperation != null) {
+			provisioningOperation.setDryRun(isDryRun);
+			return provisioningExecutor.execute(provisioningOperation, isDryRun);
 		}
-		
+		return null;
 	}
 
 	/**

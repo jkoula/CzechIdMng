@@ -1,19 +1,24 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 
@@ -31,6 +36,8 @@ public interface ProvisioningService {
 	 * Provisioned dto (identity, role ...)
 	 */
 	static final String DTO_PROPERTY_NAME = "dto";
+	static final String DRY_RUN_PROPERTY_NAME = "dry_run";
+	static final String DRY_RUN_PROVISIONING_OPERATION_PROPERTY_NAME = "dry_run_provisioning_operation";
 	
 	/**
 	 * Property in provisioning start event. If the value is TRUE, then provisioning break during account protection will be cancelled.
@@ -66,6 +73,16 @@ public interface ProvisioningService {
 	 * @return
 	 */
 	void doProvisioning(AccAccountDto account, AbstractDto dto);
+	
+	/**
+	 * Do provisioning for given account and content (dto)
+	 * Emits ProvisioningEventType.START event with additional properties.
+	 * 
+	 * @param account
+	 * @param dto
+	 * @return
+	 */
+	EventContext<AccAccountDto> doProvisioning(AccAccountDto account, AbstractDto dto,  Map<String,Serializable> properties);
 
 	/**
 	 * Do delete provisioning for given account on connected system
@@ -143,6 +160,8 @@ public interface ProvisioningService {
 	 * @return
 	 */
 	void doInternalProvisioning(AccAccountDto account, AbstractDto dto);
+	
+	SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, AbstractDto entity, boolean isDryRun);
 
 	
 	/**

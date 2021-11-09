@@ -57,7 +57,10 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 	@JsonIgnore
 	// Internal attribute, not persisted - for set manual event. A manual event prevents end sync to soon.
 	private UUID manualEventId;
-	
+	@JsonIgnore
+	// Internal attribute, not persisted - for dryRun flag - used for walking through the chain of provisioning operations without performing provisioning   
+	private boolean isDryRun = false;
+
 	public SysProvisioningOperationDto() {
 	}
 	
@@ -87,6 +90,14 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 
 	public void setEntityIdentifier(UUID entityIdentifier) {
 		this.entityIdentifier = entityIdentifier;
+	}
+	
+	public boolean isDryRun() {
+		return isDryRun;
+	}
+
+	public void setDryRun(boolean isDryRun) {
+		this.isDryRun = isDryRun;
 	}
 
 	/**

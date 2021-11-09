@@ -63,6 +63,11 @@ public class RemoveProcessedOperationProcessor extends AbstractEntityEventProces
 	}
 	
 	@Override
+	public boolean conditional(EntityEvent<SysProvisioningOperationDto> event) {
+		return !event.getContent().isDryRun();
+	}
+	
+	@Override
 	public EventResult<SysProvisioningOperationDto> process(EntityEvent<SysProvisioningOperationDto> event) {
 		SysProvisioningOperationDto provisioningOperation = event.getContent();
 		if (OperationState.EXECUTED == provisioningOperation.getResultState() 

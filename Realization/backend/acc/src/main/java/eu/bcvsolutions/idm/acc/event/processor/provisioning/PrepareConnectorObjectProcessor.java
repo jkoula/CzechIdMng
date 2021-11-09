@@ -181,22 +181,27 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				ProvisioningContext context = provisioningOperation.getProvisioningContext();
 				IcConnectorObject systemAttrs = intersectAccountAndSystemAttrs(context.getAccountObject(), existsConnectorObject);
 				context.setSystemConnectorObject(systemAttrs);
-				provisioningOperation = provisioningOperationService.saveOperation(provisioningOperation);
+				if(!provisioningOperation.isDryRun()) {
+					provisioningOperation = provisioningOperationService.saveOperation(provisioningOperation);
+				}
 			}
 			//
 			LOG.debug(
 					"Preparing attribubes for provisioning operation [{}] for object with uid [{}] and connector object [{}] is sucessfully completed",
 					provisioningOperation.getOperationType(), uid, objectClass.getType());
-			// set back to event content
-			provisioningOperation = provisioningOperationService.saveOperation(provisioningOperation);
-			// log attributes used in provisioning context into provisioning attributes
-			provisioningAttributeService.saveAttributes(provisioningOperation);
-			//
+			if (!provisioningOperation.isDryRun()) {
+				// set back to event content
+				provisioningOperation = provisioningOperationService.saveOperation(provisioningOperation);
+				// log attributes used in provisioning context into provisioning attributes
+				provisioningAttributeService.saveAttributes(provisioningOperation);
+			}
 			event.setContent(provisioningOperation);
 			return new DefaultEventResult<>(event, this);
 		} catch (Exception ex) {
-			provisioningOperation = provisioningOperationService.handleFailed(provisioningOperation, ex);
-			// set back to event content
+			if(!provisioningOperation.isDryRun()) {
+				provisioningOperation = provisioningOperationService.handleFailed(provisioningOperation, ex);
+			}
+			// TODO nastavit vyjimku stav do provisioning operation podobne jak se deje v handleFailed
 			event.setContent(provisioningOperation);
 			return new DefaultEventResult<>(event, this, true);
 		}
