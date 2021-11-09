@@ -115,7 +115,7 @@ export class ExportImportDetail extends Advanced.AbstractTableContent {
                 <Basic.TextField
                   ref="name"
                   readOnly
-                  label={ this.i18n('entity.ExportImport.name') }/>
+                  label={ this.i18n('entity.ExportImport.name.label') }/>
                 <Basic.Div rendered={longRunningTask}>
                   <Basic.Row>
                     <Basic.Col lg={ 6 }>

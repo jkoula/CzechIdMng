@@ -280,7 +280,7 @@ export default class CronGenerator extends AbstractFormComponent {
     return (
       <Basic.Div className="cron-generator">
         <Basic.LabelWrapper label={ this.i18n('repeatEvery') }>
-          <div className="main-group">
+          <div className="main-group" style={{ display: 'flex', alignItems: 'center',  marginBottom: 15 }}>
             <Basic.EnumSelectBox
               ref="cronMinute"
               className="num-select"
@@ -288,7 +288,8 @@ export default class CronGenerator extends AbstractFormComponent {
               value={ cronMinute }
               clearable={ false }
               hidden={ intervalType !== 'MINUTE' }
-              onChange={ this.onChangeCronMinute.bind(this) }/>
+              onChange={ this.onChangeCronMinute.bind(this) }
+              style={{ marginBottom: 0 }}/>
             <Basic.EnumSelectBox
               ref="cronHour"
               className="num-select"
@@ -296,7 +297,8 @@ export default class CronGenerator extends AbstractFormComponent {
               value={ cronHour }
               clearable={ false }
               hidden={ intervalType !== 'HOUR' }
-              onChange={ this.onChangeCronHour.bind(this) }/>
+              onChange={ this.onChangeCronHour.bind(this) }
+              style={{ marginBottom: 0 }}/>
 
             <Basic.EnumSelectBox
               ref="intervalType"
@@ -305,33 +307,33 @@ export default class CronGenerator extends AbstractFormComponent {
               value={ intervalType }
               clearable={ false }
               onChange={ this.onChangeIntervalType.bind(this) }
-              input={ false }/>
+              input={ false }
+              style={{ marginBottom: 0 }}/>
 
             {/* Week properties */}
             { intervalType === 'WEEK' && (
-              <div className="secondary-group">
-                <div className="text">
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center '}}>
+                <div style={{ marginLeft: 15, marginRight: 15 }}>
                   { this.i18n(weekDaySpelling) }
                 </div>
-                <div>
-                  <Basic.EnumSelectBox
-                    className="weekday-select"
-                    ref="weekDay"
-                    enum={ WeekDayEnum }
-                    value={ weekDay }
-                    clearable={ false }
-                    onChange={ this.onChangeWeekDay.bind(this) }/>
-                </div>
-                <div className="text">
+                <Basic.EnumSelectBox
+                  className="weekday-select"
+                  ref="weekDay"
+                  enum={ WeekDayEnum }
+                  value={ weekDay }
+                  clearable={ false }
+                  onChange={ this.onChangeWeekDay.bind(this) }
+                  style={{ marginBottom: 0 }}/>
+                <div style={{ marginLeft: 15, marginRight: 15 }}>
                   { this.i18n('at') }
                 </div>
-                <div className="time-select">
+                <div style={{ width: 125 }}>
                   <Basic.DateTimePicker
                     ref="weekTime"
                     mode="time"
                     value={ initTime }
                     onChange={ this.onChangeTime.bind(this) }
-                    style={{ marginBottom: 0 }}
+                    style={{ marginBottom: -6 }}
                   />
                 </div>
               </div>
@@ -339,8 +341,8 @@ export default class CronGenerator extends AbstractFormComponent {
 
             {/* Month properties */}
             { intervalType === 'MONTH' && (
-              <div className="secondary-group">
-                <div className="text">
+              <div style={{ display: 'flex', alignItems: 'center '}}>
+                <div style={{ marginLeft: 15, marginRight: 15 }}>
                   { this.i18n('monthly') }
                 </div>
                 <div>
@@ -350,21 +352,22 @@ export default class CronGenerator extends AbstractFormComponent {
                     options={ this._getDayInMonthOptions() }
                     value={ dayInMonth }
                     clearable={ false }
-                    onChange={ this.onChangeDayInMonth.bind(this) } />
+                    onChange={ this.onChangeDayInMonth.bind(this) }
+                    style={{ marginBottom: 0 }}/>
                 </div>
-                <div className="text">
+                <div style={{ marginLeft: 15, marginRight: 15, whiteSpace: 'nowrap' }}>
                   { this.i18n('day') }
                   {' '}
                   { this.i18n('at') }
                 </div>
-                <Basic.Div className="time-select">
+                <div style={{ width: 125 }}>
                   <Basic.DateTimePicker
                     ref="monthTime"
                     mode="time"
                     value={ initTime }
                     onChange={ this.onChangeTime.bind(this) }
-                    style={{ marginBottom: 0 }}/>
-                </Basic.Div>
+                    style={{ marginBottom: -6 }}/>
+                </div>
               </div>
             )}
           </div>

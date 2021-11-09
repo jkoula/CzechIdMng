@@ -77,7 +77,7 @@ class SchedulerTaskOptionDecorator extends Basic.SelectBox.OptionDecorator {
           ||
           <Basic.Div style={{ color: '#555', fontSize: '0.95em' }}>
             <strong>{ this.i18n('content.scheduler.schedule-tasks.action.task-edit.parameters') } :</strong>
-            <Basic.Div style={{ fontStyle: 'italic' }}>
+            <Basic.Div style={{ fontStyle: 'italic', marginTop: 5 }}>
               <Advanced.LongRunningTaskProperties entity={ entity } supportedTasks={ supportedTasks } condensed/>
             </Basic.Div>
           </Basic.Div>
