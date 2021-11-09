@@ -57,6 +57,9 @@ const styles = theme => ({
       backgroundColor: theme.palette.background.paper,
       marginTop: 1,
     },
+    '& .Select-placeholder': {
+      color: `${ theme.palette.text.secondary } !important`
+    },
     '& .Select-control': {
       WebkitBoxShadow: 'none !important',
       borderRadius: theme.shape.borderRadius,

@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import _ from 'lodash';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import {RequestItemManager } from '../../redux';
 import ConceptRoleRequestOperationEnum from '../../enums/ConceptRoleRequestOperationEnum';
-import _ from 'lodash';
 
 const uiKey = 'universal-request';
 const requestItemManager = new RequestItemManager();
@@ -16,10 +16,6 @@ const requestItemManager = new RequestItemManager();
  * @author Vít Švanda
  */
 class RequestItemChangesTable extends Advanced.AbstractTableContent {
-
-  constructor(props, context) {
-    super(props, context);
-  }
 
   getManager() {
     return requestItemManager;
@@ -36,7 +32,7 @@ class RequestItemChangesTable extends Advanced.AbstractTableContent {
   /**
    * Create value (highlights changes) cell for attributes table
    */
-  _getWishValueCell( old = false, showChanges = true, { rowIndex, data}) {
+  _getWishValueCell(old = false, showChanges = true, { rowIndex, data}) {
     const entity = data[rowIndex];
     if (!entity || (!entity.value && !entity.values)) {
       return '';
@@ -134,7 +130,7 @@ class RequestItemChangesTable extends Advanced.AbstractTableContent {
     return (
       <div>
         <Advanced.EntityInfo
-          entityType={entityType}
+          entityType={ entityType }
           entityIdentifier={ itemData.requestItem.ownerId }
           face="full"/>
         <Basic.Table

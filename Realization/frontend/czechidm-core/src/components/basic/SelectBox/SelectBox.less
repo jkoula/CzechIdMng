@@ -1,7 +1,4 @@
 @import "./less/default.less";
-@import "../../variables.less";
-
-@select-primary-color: @idm-base-color;
 
 .basic-select-box {
 
@@ -58,10 +55,6 @@
   }
 }
 
-.colorDefs(@c1: #222) {
-    @select-primary-color: @c1;
-}
-
 .has-error {
 	.Select-control{
 		border-color: #f44336 !important;
@@ -110,12 +103,10 @@
 
   .Select-value, .Select-placeholder {
     line-height: 24px;
-    color: @idm-text-color;
   }
 
   .Select--single > .Select-control .Select-value, .Select-placeholder {
     line-height: 22px;
-    color: @idm-text-color;
   }
 
 }

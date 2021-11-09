@@ -115,7 +115,7 @@ class LoggingEventTable extends Advanced.AbstractTableContent {
               <Advanced.Filter.FilterButtons cancelFilter={ this.cancelFilter.bind(this) }/>
             </Basic.Col>
           </Basic.Row>
-          <Basic.Row className="last">
+          <Basic.Row>
             <Basic.Col lg={ 4 }>
               <Advanced.Filter.EnumSelectBox
                 ref="levelString"

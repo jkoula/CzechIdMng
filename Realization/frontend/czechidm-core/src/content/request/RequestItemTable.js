@@ -124,12 +124,11 @@ class RequestItemTable extends Advanced.AbstractTableContent {
       <Basic.Button
         type="button"
         level="info"
-        title={ this.i18n('button.showItemChanges.tooltip')}
+        title={ this.i18n('button.showItemChanges.tooltip') }
         titlePlacement="bottom"
-        onClick={this.showItemChanges.bind(this, data[rowIndex])}
-        className="btn-xs">
-        <Basic.Icon type="fa" icon="eye"/>
-      </Basic.Button>
+        onClick={ this.showItemChanges.bind(this, data[rowIndex]) }
+        className="btn-xs"
+        icon="fa:eye"/>
     );
   }
 
@@ -259,6 +258,7 @@ class RequestItemTable extends Advanced.AbstractTableContent {
             sort
             face="datetime"/>
         </Advanced.Table>
+
         <Basic.Modal
           show={itemDetail && itemDetail.show}
           onHide={this.closeDetail.bind(this)}
@@ -266,8 +266,7 @@ class RequestItemTable extends Advanced.AbstractTableContent {
           keyboard={!showLoading}>
           <Basic.Modal.Header closeButton={ !showLoading } text={this.i18n(`itemDetail.title.${operation}`)}/>
           <Basic.Modal.Body>
-            <RequestItemChangesTable
-              itemData={itemDetail ? itemDetail.changes : null}/>
+            <RequestItemChangesTable itemData={ itemDetail ? itemDetail.changes : null }/>
           </Basic.Modal.Body>
           <Basic.Modal.Footer>
             <Basic.Button
