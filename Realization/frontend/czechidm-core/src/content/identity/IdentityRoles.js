@@ -515,16 +515,16 @@ function select(state, component) {
 
   return {
     identity: component.identity || identityManager.getEntity(state, entityId),
-    _showLoading: identityRoleManager.isShowLoading(state, `${uiKey}-${entityId}`),
-    _showLoadingContracts: identityContractManager.isShowLoading(state, `${uiKeyContracts}-${entityId}`),
-    _contracts: identityContractManager.getEntities(state, `${uiKeyContracts}-${entityId}`),
+    _showLoading: identityRoleManager.isShowLoading(state, `${ uiKey }-${ entityId }`),
+    _showLoadingContracts: identityContractManager.isShowLoading(state, `${ uiKeyContracts }-${ entityId }`),
+    _contracts: identityContractManager.getEntities(state, `${ uiKeyContracts }-${ entityId }`),
     _addRoleProcessIds: addRoleProcessIds,
     userContext: state.security.userContext,
     _permissions: identityManager.getPermissions(state, null, entityId),
-    _searchParameters: Utils.Ui.getSearchParameters(state, `${uiKey}-${entityId}`),
+    _searchParameters: Utils.Ui.getSearchParameters(state, `${ uiKey }-${ entityId }`),
     _requestUi: requestUi,
     _longPollingEnabled: longPollingEnabled,
-    _columns: component.columns || ConfigurationManager.getPublicValueAsArray(
+    _columns: ConfigurationManager.getPublicValueAsArray(
       state,
       'idm.pub.app.show.identityRole.table.columns',
       IdentityRoleTable.defaultProps.columns
