@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
@@ -411,7 +411,9 @@ public class DefaultIdmIdentityRoleService
 
 	@Override
 	public IdmIdentityRoleDto getDuplicated(IdmIdentityRoleDto one, IdmIdentityRoleDto two, Boolean skipSubdefinition) {
-
+		Assert.notNull(one, "The first assinged role to compare is required.");
+		Assert.notNull(two, "The second assinged role to compare is required.");
+		//
 		if (!one.getRole().equals(two.getRole())) {
 			// Role isn't same
 			return null;
@@ -450,8 +452,8 @@ public class DefaultIdmIdentityRoleService
 					// role was not created by business role definition
 					return null;
 				}
-				if (Objects.equal(one.getDirectRole(), two.getDirectRole())
-						&& Objects.equal(one.getRoleComposition(), two.getRoleComposition())) {
+				if (Objects.equals(one.getDirectRole(), two.getDirectRole())
+						&& Objects.equals(one.getRoleComposition(), two.getRoleComposition())) {
 					// #2034 compositon is duplicate
 					return getIdentityRoleForRemove(one, two);
 				}
@@ -533,7 +535,7 @@ public class DefaultIdmIdentityRoleService
 		IdmIdentityContractDto contractDto = lookupService.lookupEmbeddedDto(dto, IdmIdentityRole_.identityContract.getName());
 		IdmRoleDto subjectDto = lookupService.lookupEmbeddedDto(dto, IdmIdentityRole_.role.getName());
 		IdmIdentityDto targetDto = lookupService.lookupEmbeddedDto(contractDto, IdmIdentityContract_.identity.getName());		
-		String transactionUuid = java.util.Objects.toString(dto.getTransactionId(),"");
+		String transactionUuid = Objects.toString(dto.getTransactionId(),"");
 		siemLog(action, status, targetDto, subjectDto, transactionUuid, detail);
 	}
 

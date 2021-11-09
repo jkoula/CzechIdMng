@@ -25,6 +25,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
@@ -47,7 +48,7 @@ import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
  * Test for bulk action extends {@link IdentityRoleByIdentityDeduplicationBulkAction}.
  * 
  * @author Ondrej Kopr
- *
+ * @author Radek Tomiška
  */
 public class IdentityRoleByIdentityDeduplicationBulkActionTest extends AbstractBulkActionTest {
 
@@ -110,6 +111,65 @@ public class IdentityRoleByIdentityDeduplicationBulkActionTest extends AbstractB
 		IdmIdentityRoleDto actual = roles.get(0);
 		assertEquals(one.getId(), actual.getId());
 		assertNotEquals(two.getId(), actual.getId());
+	}
+	
+	@Test
+	public void testDuplicateManualAndBusinessRole() {
+		IdmIdentityDto identity = getHelper().createIdentity(new GuardedString());
+		IdmRoleDto role = getHelper().createRole();
+		IdmRoleDto subRole = getHelper().createRole();
+		getHelper().createRoleComposition(role, subRole);
+		getHelper().createIdentityRole(identity, subRole);
+		getHelper().createIdentityRole(identity, subRole);
+		IdmIdentityRoleDto three = getHelper().createIdentityRole(identity, role);
+
+		List<IdmIdentityRoleDto> roles = identityRoleService.findAllByIdentity(identity.getId());
+		Assert.assertEquals(4, roles.size());
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityRoleByIdentityDeduplicationBulkAction.NAME);
+		bulkAction.setIdentifiers(Sets.newHashSet(identity.getId()));
+		
+		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
+		checkResultLrt(processAction, 1l, null, null);
+
+		IdmIdentityRoleFilter filter = new IdmIdentityRoleFilter();
+		filter.setIdentityId(identity.getId());
+		filter.setDirectRole(Boolean.TRUE);
+		roles = identityRoleService.find(filter, null).getContent();
+		Assert.assertEquals(1, roles.size());
+
+		IdmIdentityRoleDto actual = roles.get(0);
+		Assert.assertEquals(three.getId(), actual.getId());
+	}
+	
+	@Test
+	public void testDuplicateBusinessRole() {
+		IdmIdentityDto identity = getHelper().createIdentity(new GuardedString());
+		IdmRoleDto role = getHelper().createRole();
+		IdmRoleDto subRole = getHelper().createRole();
+		getHelper().createRoleComposition(role, subRole);
+		getHelper().createIdentityRole(identity, subRole);
+		getHelper().createIdentityRole(identity, subRole);
+		IdmIdentityRoleDto three = getHelper().createIdentityRole(identity, role);
+		getHelper().createIdentityRole(identity, role);
+		
+		List<IdmIdentityRoleDto> roles = identityRoleService.findAllByIdentity(identity.getId());
+		Assert.assertEquals(6, roles.size());
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityRoleByIdentityDeduplicationBulkAction.NAME);
+		bulkAction.setIdentifiers(Sets.newHashSet(identity.getId()));
+		
+		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
+		checkResultLrt(processAction, 1l, null, null);
+
+		IdmIdentityRoleFilter filter = new IdmIdentityRoleFilter();
+		filter.setIdentityId(identity.getId());
+		filter.setDirectRole(Boolean.TRUE);
+		roles = identityRoleService.find(filter, null).getContent();
+		Assert.assertEquals(1, roles.size());
+
+		IdmIdentityRoleDto actual = roles.get(0);
+		Assert.assertEquals(three.getId(), actual.getId()); // ~ by created
 	}
 
 	@Test

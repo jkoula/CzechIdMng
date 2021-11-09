@@ -4,17 +4,17 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
@@ -62,10 +62,9 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
  * As log items is created each {@link IdmIdentityRoleDto} that will be removed.
  *
  * @author Ondrej Kopr
+ * @author Radek Tomiška
  * @since 9.5.0
- *
  */
-
 @Enabled(CoreModuleDescriptor.MODULE_ID)
 @Component("identityRoleByIdentityDeduplicationBulkAction")
 @Description("Deduplicate identity role by identity.")
@@ -98,6 +97,7 @@ public class IdentityRoleByIdentityDeduplicationBulkAction
 		List<IdmFormAttributeDto> formAttributes = super.getFormAttributes();
 		formAttributes.add(getApproveAttribute());
 		formAttributes.add(getCheckSubdefinition());
+		//
 		return formAttributes;
 	}
 
@@ -107,24 +107,24 @@ public class IdentityRoleByIdentityDeduplicationBulkAction
 	}
 
 	@Override
-	protected OperationResult processDto(IdmIdentityDto dto) {
-		// Result will be list of concepts
+	protected OperationResult processDto(IdmIdentityDto identity) {
+		UUID identityId = identity.getId();
+		
+		// Result will be list of concepts.
 		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>();
 
-		List<IdmIdentityContractDto> contracts = identityContractService.findAllValidForDate(dto.getId(), LocalDate.now(), null);
+		List<IdmIdentityContractDto> contracts = identityContractService.findAllValidForDate(identityId, LocalDate.now(), null);
 		for (IdmIdentityContractDto contract : contracts) {
 
-			// Check access for contract
+			// Check access for contract.
 			try {
 				identityContractService.checkAccess(contract, PermissionUtils.toPermissions(getAuthoritiesForIdentityContract()).toArray(new BasePermission[] {}));
 			} catch (ForbiddenEntityException e) {
 				continue;
 			}
-			// Process deduplication per identity contract
+			// Process deduplication per identity contract.
 			concepts.addAll(processDuplicitiesForContract(contract));
 		}
-
-		// Log item
 
 		// If result is empty for identity will be removed any roles.
 		if (concepts.isEmpty()) {
@@ -132,7 +132,7 @@ public class IdentityRoleByIdentityDeduplicationBulkAction
 		}
 
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(dto.getId());
+		roleRequest.setApplicant(identityId);
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setLog("Request was created by bulk action (deduplication).");
 		roleRequest.setExecuteImmediately(!isApprove()); // if set approve, dont execute immediately
@@ -207,112 +207,99 @@ public class IdentityRoleByIdentityDeduplicationBulkAction
 	 * @return
 	 */
 	public List<IdmIdentityRoleDto> getDuplicatesIdentityRoleForContract(IdmIdentityContractDto contract) {
-		Boolean skipSubdefinition = !isCheckSubdefinition();
-
-		// Identity roles must be sorted by create, for duplicities with manually will be removed always the newer.
-		Pageable page = PageRequest.of(0, Integer.MAX_VALUE, new Sort(Direction.DESC, IdmIdentityRole_.created.getName()));
-		
-		List<IdmIdentityRoleDto> duplicities = new ArrayList<>();
+		boolean checkSubdefinition = isCheckSubdefinition();
 
 		// Get all identity roles
 		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
 		identityRoleFilter.setIdentityId(contract.getIdentity());
 		identityRoleFilter.setIdentityContractId(contract.getId());
-		List<IdmIdentityRoleDto> identityRoles = identityRoleService.find(identityRoleFilter, page,
-				PermissionUtils.toPermissions(getAuthoritiesForIdentityRole()).toArray(new BasePermission[] {})).getContent();
-		
-		// Get map of duplicity roles 
-		Map<UUID, List<IdmIdentityRoleDto>> duplictRoles = identityRoles
+		// Identity roles must be sorted by create, for duplicities with manually will be removed always the newer.
+		List<IdmIdentityRoleDto> identityRoles = identityRoleService
+				.find(
+						identityRoleFilter, 
+						PageRequest.of(0, Integer.MAX_VALUE, new Sort(Direction.DESC, IdmIdentityRole_.created.getName())),
+						PermissionUtils.toPermissions(getAuthoritiesForIdentityRole()).toArray(new BasePermission[] {})).getContent();
+		//
+		// load eav instance, if eav values has to be checked
+		if (checkSubdefinition) {
+			identityRoles.forEach(identityRole -> {
+				identityRole.setEavs(Lists.newArrayList(identityRoleService.getRoleAttributeValues(identityRole)));
+			});
+		}
+		// Get map of duplicity roles (roleId, assignedRoles).
+		Map<UUID, List<IdmIdentityRoleDto>> duplicateRoles = identityRoles
 				.stream() //
 				.collect( //
-						Collectors.groupingBy( // Group identity roles by role
+						Collectors.groupingBy( // Group identity roles by role.
 								IdmIdentityRoleDto::getRole) //
 						).entrySet() //
 				.stream() //
 				.filter( //
-						entry -> entry.getValue().size() > 1 // Filter only by values where is more than one record (possible duplicites)
+						entry -> entry.getValue().size() > 1 // Filter only by values where is more than one record (possible duplicates).
 						) //
 				.collect( //
 						Collectors.toMap( //
-								k -> k.getKey(), // Collect as map where key is UUID of role
-								v -> v.getValue() // And value is list of identity roles for this role
+								k -> k.getKey(), // Collect as map where key is UUID of role.
+								v -> v.getValue() // And value is list of identity roles for this role.
 								) //
 						); //
+		//
+		List<IdmIdentityRoleDto> resolvedDuplicities = new ArrayList<>();
+		// Iterate over duplicated roles. In Key is ID of role that has more finding for the contract.
+		for (Entry<UUID, List<IdmIdentityRoleDto>> entry : duplicateRoles.entrySet()) {
+			List<IdmIdentityRoleDto> assignedRoles = entry.getValue();
 
-		// Iterate over duplicated roles. In Key is ID of role that has more finding
-		// for the contract
-		for (Entry<UUID, List<IdmIdentityRoleDto>> entry : duplictRoles.entrySet()) {
-			List<IdmIdentityRoleDto> duplicitIdentityRoles = entry.getValue();
-
-			List<IdmIdentityRoleDto> rolesToCheck = duplicitIdentityRoles //
-					.stream() //
-					.filter(idenityRole -> { //
-						return idenityRole.getAutomaticRole() == null;
-					}) //
+			List<IdmIdentityRoleDto> rolesToCheck = assignedRoles // ~ manually assigned direct roles can be removed only
+					.stream()
+					.filter(idenityRole -> {
+						return idenityRole.getAutomaticRole() == null; // not automatic
+					})
+					.filter(idenityRole -> {
+						return idenityRole.getDirectRole() == null; // not sub role
+					})
 					.collect(Collectors.toList());
-			// Copy of manually added roles is for prevent comparing with already removed role
-			List<IdmIdentityRoleDto> rolesToCheckCopy = new ArrayList<>(rolesToCheck);
 
 			if (rolesToCheck.isEmpty()) {
 				continue;
 			}
-
-			// Remove form duplicated manually added
-			duplicitIdentityRoles.removeAll(rolesToCheck);
-			
-			for (IdmIdentityRoleDto checkedRole : rolesToCheck) {
-				IdmIdentityRoleDto duplicit = null;
-				// Add identity form attributes with value into eavs
-				if (BooleanUtils.isFalse(skipSubdefinition)) {
-					checkedRole.setEavs(Lists.newArrayList(identityRoleService.getRoleAttributeValues(checkedRole)));
+			//
+			for (IdmIdentityRoleDto checkRoleOne : rolesToCheck) {
+				// skip already processed assigned role
+				if (resolvedDuplicities.contains(checkRoleOne)) {
+					continue;
 				}
-				
-				for (IdmIdentityRoleDto duplicitIdentityRole : duplicitIdentityRoles) {
-					// Add identity form attributes with value into eavs
-					if (BooleanUtils.isFalse(skipSubdefinition)) {
-						duplicitIdentityRole.setEavs(Lists.newArrayList(identityRoleService.getRoleAttributeValues(duplicitIdentityRole)));
-					}
-					duplicit = identityRoleService.getDuplicated(checkedRole, duplicitIdentityRole, skipSubdefinition);
-
-					if (duplicit != null) {
-						break;
-					}
-				}
-
-				// If this role isn't duplicated check also manually added
-				if (duplicit == null) {
-					for (IdmIdentityRoleDto checkedRoleSecond : rolesToCheckCopy) {
-
-						// Skip itself
-						if (checkedRole.getId().equals(checkedRoleSecond.getId())) {
+				//
+				while (true) {
+					IdmIdentityRoleDto duplicate = null;
+					for (Iterator<IdmIdentityRoleDto> i = assignedRoles.iterator(); i.hasNext(); ) {
+						IdmIdentityRoleDto checkRoleTwo = i.next();
+						if (Objects.equals(checkRoleOne.getId(), checkRoleTwo.getId())) {
+							// the same assigned role is not duplicate
 							continue;
 						}
-
-						// Add identity form attributes with value into eavs
-						if (BooleanUtils.isFalse(skipSubdefinition)) {
-							checkedRoleSecond.setEavs(Lists.newArrayList(identityRoleService.getRoleAttributeValues(checkedRoleSecond)));
-						}
-
-						duplicit = identityRoleService.getDuplicated(checkedRole, checkedRoleSecond, skipSubdefinition);
-
-						if (duplicit != null) {
-							break;
+						//
+						duplicate = identityRoleService.getDuplicated(checkRoleOne, checkRoleTwo, !checkSubdefinition);
+						//
+						if (duplicate != null) {
+							// add duplicate
+							if (!resolvedDuplicities.contains(duplicate)) {
+								resolvedDuplicities.add(duplicate);
+							}
+							assignedRoles.remove(duplicate);
+							break; // ~ run again, until no duplicate is found
+						} else {
+							continue;
 						}
 					}
-				}
-
-				// Finally role is duplicated
-				if (duplicit != null) {
-					rolesToCheckCopy.remove(checkedRole);
-					// prevent to remove roles with the same created date
-					if (!duplicities.contains(duplicit)) {
-						duplicities.add(duplicit);
+					// end => no duplicates was found finally, or duplicate is controlled role itself
+					if (duplicate == null || duplicate.getId().equals(checkRoleOne.getId())) { 
+						break;
 					}
 				}
 			}
 		}
-		
-		return duplicities;
+		//
+		return resolvedDuplicities;
 	}
 	
 	/**
