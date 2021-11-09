@@ -6,6 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import AppBar from '@material-ui/core/AppBar';
 //
+import * as Utils from '../../../utils';
 import AbstractComponent from '../AbstractComponent/AbstractComponent';
 
 const useStyles = makeStyles((theme) => ({
@@ -62,7 +63,7 @@ export default function BasicTabs(props) {
     } else {
       eventKey = `${ eventKey }`;
     }
-    if (!value) {
+    if (Utils.Ui.isEmpty(value)) {
       value = eventKey;
     }
     //

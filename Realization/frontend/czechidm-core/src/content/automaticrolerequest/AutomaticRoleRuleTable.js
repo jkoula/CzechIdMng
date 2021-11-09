@@ -400,29 +400,27 @@ export class AutomaticRoleRuleTable extends Basic.AbstractContent {
 
     actions.push(
       <Basic.Button
-        level={'danger'}
+        level="danger"
         onClick={this._deleteConcept.bind(this, data[rowIndex])}
         className="btn-xs"
         disabled={readOnly || isAutomaticRole}
         showLoading={showLoadingButtonRemove}
         role="group"
         title={this.i18n('button.delete')}
-        titlePlacement="bottom">
-        <Basic.Icon icon={notModificated ? 'trash' : 'remove'}/>
-      </Basic.Button>
+        titlePlacement="bottom"
+        icon={notModificated ? 'trash' : 'remove'}/>
     );
     if (!value._removed) {
       actions.push(
         <Basic.Button
-          level={'warning'}
+          level="warning"
           onClick={this._showDetail.bind(this, data[rowIndex], true, false)}
           className="btn-xs"
           disabled={readOnly || isAutomaticRole || !notModificated}
           role="group"
           title={this.i18n('button.edit')}
-          titlePlacement="bottom">
-          <Basic.Icon icon={'edit'}/>
-        </Basic.Button>
+          titlePlacement="bottom"
+          icon="edit"/>
       );
     }
     return (

@@ -703,10 +703,10 @@ class AutomaticRoleRequestDetail extends Advanced.AbstractTableContent {
               rendered={_adminMode}
               level="success"
               type="submit"
-              showLoading={showLoading}>
+              showLoading={showLoading}
+              style={{ marginRight: 5 }}>
               {this.i18n('button.save')}
             </Basic.Button>
-            {' '}
             <Basic.Button
               level="success"
               disabled={!isEditable}
@@ -714,9 +714,8 @@ class AutomaticRoleRequestDetail extends Advanced.AbstractTableContent {
               onClick={this.save.bind(this, this, true, true)}
               rendered={ request && automaticRoleRequestManager.canSave(request, _permissions)}
               titlePlacement="bottom"
-              title={this.i18n('button.createRequest.tooltip')}>
-              <Basic.Icon type="fa" icon="object-group"/>
-              {' '}
+              title={this.i18n('button.createRequest.tooltip')}
+              icon="fa:object-group">
               { this.i18n('button.createRequest.label') }
             </Basic.Button>
           </Basic.PanelFooter>

@@ -85,6 +85,7 @@ export class ExportImportDetail extends Advanced.AbstractTableContent {
       detail,
       longRunningTask,
     } = this.props;
+    const { activeKey } = this.state;
 
     let isImport = false;
     if (detail.entity && detail.entity.type) {
@@ -96,9 +97,9 @@ export class ExportImportDetail extends Advanced.AbstractTableContent {
 
     return (
       <Basic.Div showLoading={showLoading}>
-        <Basic.Tabs onSelect={this._onChangeSelectTabs.bind(this)}>
+        <Basic.Tabs activeKey={ activeKey } onSelect={ this._onChangeSelectTabs.bind(this) }>
           <Basic.Tab
-            eventKey={1}
+            eventKey={ 1 }
             title={this.i18n('content.export-imports.detail.tab')}
             className="bordered">
             <Basic.Panel className="no-border">
@@ -189,25 +190,27 @@ export class ExportImportDetail extends Advanced.AbstractTableContent {
                 <Advanced.Filter onSubmit={this.useLogFilter.bind(this)}>
                   <Basic.AbstractForm ref="logFilterForm">
                     <Basic.Row>
-                      <Basic.Col lg={ 3 }>
+                      <Basic.Col lg={ 8 }>
+                        <Advanced.Filter.TextField
+                          ref="text"
+                          placeholder={this.i18n('filter.textLog.placeholder')}/>
+                      </Basic.Col>
+                      <Basic.Col lg={ 4 } className="text-right">
+                        <Advanced.Filter.FilterButtons cancelFilter={this.cancelLogFilter.bind(this)}/>
+                      </Basic.Col>
+                    </Basic.Row>
+                    <Basic.Row className="last">
+                      <Basic.Col lg={ 6 }>
                         <Advanced.Filter.EnumSelectBox
                           ref="operation"
                           placeholder={this.i18n('filter.operation.placeholder')}
                           enum={ ConceptRoleRequestOperationEnum }/>
                       </Basic.Col>
-                      <Basic.Col lg={ 3 }>
-                        <Advanced.Filter.TextField
-                          ref="text"
-                          placeholder={this.i18n('filter.textLog.placeholder')}/>
-                      </Basic.Col>
-                      <Basic.Col lg={ 3 }>
+                      <Basic.Col lg={ 6 }>
                         <Advanced.Filter.EnumSelectBox
                           ref="operationState"
                           placeholder={this.i18n('filter.operationState.placeholder')}
                           enum={OperationStateEnum}/>
-                      </Basic.Col>
-                      <Basic.Col lg={ 3 } className="text-right">
-                        <Advanced.Filter.FilterButtons cancelFilter={this.cancelLogFilter.bind(this)}/>
                       </Basic.Col>
                     </Basic.Row>
                   </Basic.AbstractForm>

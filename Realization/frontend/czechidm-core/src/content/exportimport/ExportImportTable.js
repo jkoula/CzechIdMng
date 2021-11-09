@@ -349,8 +349,7 @@ export class ExportImportTable extends Advanced.AbstractTableContent {
                       placeholder={this.i18n('filter.text.placeholder')}
                       help={ Advanced.Filter.getTextHelp() }/>
                   </Basic.Col>
-                  <Basic.Col lg={ 6 }>
-                  </Basic.Col>
+                  <Basic.Col lg={ 6 }/>
                 </Basic.Row>
               </Basic.AbstractForm>
             </Advanced.Filter>
@@ -470,28 +469,25 @@ export class ExportImportTable extends Advanced.AbstractTableContent {
           backdrop="static"
           bsSize="large"
           keyboard={ !showLoadingDetail }>
+          <Basic.Modal.Header
+            closeButton={ !showLoadingDetail }
+            text={ this.i18n('detail.header') }/>
+          <Basic.Modal.Body>
+            <ExportImportDetail
+              showLoading={showLoadingDetail}
+              detail={detail}
+              longRunningTask={longRunningTask}
+            />
+          </Basic.Modal.Body>
 
-          <form>
-            <Basic.Modal.Header
-              closeButton={ !showLoadingDetail }
-              text={ this.i18n('detail.header') }/>
-            <Basic.Modal.Body>
-              <ExportImportDetail
-                showLoading={showLoadingDetail}
-                detail={detail}
-                longRunningTask={longRunningTask}
-              />
-            </Basic.Modal.Body>
-
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={this.closeDetail.bind(this)}
-                showLoading={ showLoadingDetail }>
-                {this.i18n('button.close')}
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={this.closeDetail.bind(this)}
+              showLoading={ showLoadingDetail }>
+              {this.i18n('button.close')}
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
       </div>
     );

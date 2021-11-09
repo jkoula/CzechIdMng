@@ -108,10 +108,10 @@ class NotificationConfigurations extends Advanced.AbstractTableContent {
         <Basic.Panel className="last">
           <Advanced.Table
             ref="table"
-            uiKey={uiKey}
-            filterOpened={filterOpened}
-            manager={this.getManager()}
-            showRowSelection={SecurityManager.hasAnyAuthority(['NOTIFICATIONCONFIGURATION_UPDATE'])}
+            uiKey={ uiKey }
+            filterOpened={ filterOpened }
+            manager={ this.getManager() }
+            showRowSelection={ SecurityManager.hasAnyAuthority(['NOTIFICATIONCONFIGURATION_UPDATE']) }
             actions={
               SecurityManager.hasAnyAuthority(['NOTIFICATIONCONFIGURATION_DELETE'])
               ?
@@ -125,11 +125,10 @@ class NotificationConfigurations extends Advanced.AbstractTableContent {
                   level="success"
                   key="add_button"
                   className="btn-xs"
-                  onClick={this.showDetail.bind(this, { level: NotificationLevelEnum.findKeyBySymbol(NotificationLevelEnum.SUCCESS) })}
-                  rendered={SecurityManager.hasAnyAuthority(['NOTIFICATIONCONFIGURATION_CREATE'])}>
-                  <Basic.Icon type="fa" icon="plus"/>
-                  {' '}
-                  {this.i18n('button.add')}
+                  onClick={ this.showDetail.bind(this, { level: NotificationLevelEnum.findKeyBySymbol(NotificationLevelEnum.SUCCESS) }) }
+                  rendered={ SecurityManager.hasAnyAuthority(['NOTIFICATIONCONFIGURATION_CREATE']) }
+                  icon="fa:plus">
+                  { this.i18n('button.add') }
                 </Basic.Button>
               ]
             }
@@ -138,7 +137,7 @@ class NotificationConfigurations extends Advanced.AbstractTableContent {
                 ref="filterForm"
                 onSubmit={ this.useFilter.bind(this) }
                 onCancel={ this.cancelFilter.bind(this) }
-                supportedNotificationTypes={_supportedNotificationTypes}/>
+                supportedNotificationTypes={ _supportedNotificationTypes }/>
             }
             _searchParameters={ this.getSearchParameters() }>
             <Advanced.Column
@@ -202,18 +201,17 @@ class NotificationConfigurations extends Advanced.AbstractTableContent {
           backdrop="static"
           keyboard={!_showLoading}
           showLoading={_supportedNotificationTypesLoading}>
-
-          <form onSubmit={this.save.bind(this, {})}>
-            <Basic.Modal.Header
-              closeButton={ !_showLoading }
-              text={ this.i18n('create.header') }
-              rendered={ Utils.Entity.isNew(detail.entity) }/>
-            <Basic.Modal.Header
-              closeButton={!_showLoading}
-              text={this.i18n('edit.header', { name: detail.entity.topic })}
-              rendered={!Utils.Entity.isNew(detail.entity)}/>
-            <Basic.Modal.Body>
-              <Basic.AbstractForm ref="form" data={detail.entity} showLoading={_showLoading}>
+          <Basic.Modal.Header
+            closeButton={ !_showLoading }
+            text={ this.i18n('create.header') }
+            rendered={ Utils.Entity.isNew(detail.entity) }/>
+          <Basic.Modal.Header
+            closeButton={!_showLoading}
+            text={this.i18n('edit.header', { name: detail.entity.topic })}
+            rendered={!Utils.Entity.isNew(detail.entity)}/>
+          <Basic.Modal.Body>
+            <form onSubmit={ this.save.bind(this, {}) }>
+              <Basic.AbstractForm ref="form" data={ detail.entity } showLoading={ _showLoading }>
                 <Basic.TextField
                   ref="topic"
                   label={this.i18n('entity.NotificationConfiguration.topic')}
@@ -250,25 +248,28 @@ class NotificationConfigurations extends Advanced.AbstractTableContent {
                   label={ this.i18n('entity.NotificationConfiguration.disabled.label') }
                   helpBlock={ this.i18n('entity.NotificationConfiguration.disabled.help') }/>
               </Basic.AbstractForm>
-            </Basic.Modal.Body>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden"/>
+            </form>
+          </Basic.Modal.Body>
 
-            <Basic.Modal.Footer>
-              <Basic.Button
-                level="link"
-                onClick={ this.closeDetail.bind(this) }
-                showLoading={ _showLoading }>
-                { this.i18n('button.close') }
-              </Basic.Button>
-              <Basic.Button
-                type="submit"
-                level="success"
-                showLoading={ _showLoading }
-                showLoadingIcon
-                showLoadingText={ this.i18n('button.saving') }>
-                { this.i18n('button.save') }
-              </Basic.Button>
-            </Basic.Modal.Footer>
-          </form>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={ this.closeDetail.bind(this) }
+              showLoading={ _showLoading }>
+              { this.i18n('button.close') }
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              showLoading={ _showLoading }
+              showLoadingIcon
+              showLoadingText={ this.i18n('button.saving') }
+              onClick={ this.save.bind(this, {}) }>
+              { this.i18n('button.save') }
+            </Basic.Button>
+          </Basic.Modal.Footer>
         </Basic.Modal>
       </Basic.Div>
     );
@@ -294,7 +295,6 @@ function select(state) {
 }
 
 export default connect(select)(NotificationConfigurations);
-
 
 /**
  * Table filter component
