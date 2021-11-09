@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 //
-import { Basic, Advanced, Managers} from 'czechidm-core';
-import { SystemTable} from 'czechidm-acc';
+import { Basic, Advanced, Managers, Utils } from 'czechidm-core';
+import { SystemTable } from 'czechidm-acc';
 import VsSystemService from '../../services/VsSystemService';
 
 const { SystemManager } = require('czechidm-acc').Managers;
@@ -10,11 +11,11 @@ const systemManager = new SystemManager();
 const vsSystemService = new VsSystemService();
 
 /**
- * Virtual system table
+ * Virtual system table.
  *
  * @author Vít Švanda
  */
-export default class VsSystemTable extends SystemTable {
+class VsSystemTable extends SystemTable {
 
   constructor(props, context) {
     super(props, context);
@@ -109,12 +110,12 @@ export default class VsSystemTable extends SystemTable {
   }
 
   render() {
-    const {show, showLoading, detail} = this.state;
+    const { show, showLoading, detail } = this.state;
     const parentRender = super.render();
     const title = this.i18n(`vs:content.vs-system.action.create.header`);
     return (
       <div>
-        {parentRender}
+        { parentRender }
         <Basic.Modal show={show} onHide={this._closeModal.bind(this)}>
           <Basic.Loading showLoading={showLoading} showAnimation>
             <form onSubmit={this._createNewSystem.bind(this)}>
@@ -159,12 +160,24 @@ export default class VsSystemTable extends SystemTable {
               </Basic.Modal.Body>
               <Basic.Modal.Footer>
                 <Basic.Button level="link" onClick={this._closeModal.bind(this)}>{this.i18n('vs:content.vs-system.button.cancel')}</Basic.Button>
-                <Basic.Button ref="yesButton" level="success" onClick={this._createNewSystem.bind(this)}>{this.i18n('vs:content.vs-system.button.create')}</Basic.Button>
+                <Basic.Button ref="yesButton" level="success" onClick={this._createNewSystem.bind(this)}>
+                  { this.i18n('vs:content.vs-system.button.create') }
+                </Basic.Button>
               </Basic.Modal.Footer>
             </form>
           </Basic.Loading>
-      </Basic.Modal>
+        </Basic.Modal>
       </div>
     );
   }
 }
+
+function select(state, component) {
+  return {
+    i18nReady: state.config.get('i18nReady'),
+    _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey),
+    _showLoading: (component.manager || systemManager).isShowLoading(state, `${ component.uiKey }-detail`)
+  };
+}
+
+export default connect(select, null, null, { forwardRef: true })(VsSystemTable);

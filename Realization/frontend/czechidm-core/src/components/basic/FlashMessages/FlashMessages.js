@@ -128,7 +128,16 @@ export class FlashMessages extends AbstractContextComponent {
           bottom: '0px'
         }
       },
-      NotificationItem: { // Override the notification item
+      ActionWrapper: {
+        DefaultStyle: {
+          textAlign: 'right'
+        }
+      }
+    };
+    //
+    // apply them, if it is loaded
+    if (theme) {
+      styles.NotificationItem = { // Override the notification item
         DefaultStyle: {
           borderRadius: `${ theme.shape.borderRadius }px`
         },
@@ -152,8 +161,8 @@ export class FlashMessages extends AbstractContextComponent {
           borderTop: `3px solid ${ theme.palette.info.main }`,
           backgroundColor: theme.palette.info.light,
         }
-      },
-      Title: {
+      };
+      styles.Title = {
         success: {
           color: theme.palette.success.contrastText
         },
@@ -166,8 +175,8 @@ export class FlashMessages extends AbstractContextComponent {
         info: {
           color: theme.palette.info.contrastText
         }
-      },
-      Dismiss: {
+      };
+      styles.Dismiss = {
         success: {
           color: theme.palette.success.contrastText,
           backgroundColor: theme.palette.success.main,
@@ -184,13 +193,8 @@ export class FlashMessages extends AbstractContextComponent {
           color: theme.palette.info.contrastText,
           backgroundColor: theme.palette.info.main,
         }
-      },
-      ActionWrapper: {
-        DefaultStyle: {
-          textAlign: 'right'
-        }
-      }
-    };
+      };
+    }
     return styles;
   }
 

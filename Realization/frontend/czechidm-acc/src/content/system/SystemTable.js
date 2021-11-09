@@ -351,8 +351,7 @@ export class SystemTable extends Advanced.AbstractTableContent {
                     className="btn-xs"
                     style={{marginLeft: 5}}
                     onClick={ this.showInWizard.bind(this, data[rowIndex])}
-                    icon="fa:magic">
-                  </Basic.Button>
+                    icon="fa:magic"/>
                 ]
                 );
               }
