@@ -541,7 +541,7 @@ class ScheduleTasks extends Advanced.AbstractTableContent {
                           return null;
                         }
                         return (
-                          <Basic.Div>
+                          <div style={{ whiteSpace: 'nowrap' }}>
                             {
                               trigger.initiatorTaskId
                               ?
@@ -551,15 +551,14 @@ class ScheduleTasks extends Advanced.AbstractTableContent {
                               :
                               <Advanced.DateValue value={trigger.nextFireTime} title={trigger.cron ? `Cron: ${trigger.cron}` : null} showTime />
                             }
-                            {' '}
                             <Basic.Button
-                              level="link"
-                              className="btn-xs"
+                              level="error"
+                              buttonSize="xs"
                               onClick={ this.onTriggerDelete.bind(this, trigger) }
-                              rendered={ SecurityManager.hasAnyAuthority(['SCHEDULER_DELETE']) }>
-                              <Basic.Icon value="remove" color="red"/>
-                            </Basic.Button>
-                          </Basic.Div>
+                              rendered={ SecurityManager.hasAnyAuthority(['SCHEDULER_DELETE']) }
+                              icon="remove"
+                              style={{ marginLeft: 3 }}/>
+                          </div>
                         );
                       })
                     }
