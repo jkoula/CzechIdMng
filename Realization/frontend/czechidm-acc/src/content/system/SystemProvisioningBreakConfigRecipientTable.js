@@ -87,11 +87,11 @@ export class SystemProvisioningBreakConfigRecipientTable extends Advanced.Abstra
       return;
     }
     //
+    const formEntity = this.refs.form.getData();
     detail.showLoading = true;
     this.setState({
       detail
     }, () => {
-      const formEntity = this.refs.form.getData();
       //
       const savedEntity = {
         ...formEntity,

@@ -3,15 +3,20 @@ package eu.bcvsolutions.idm.rpt.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 
+/**
+ * DTO for report for comparison values in IdM and system.
+ *
+ * @author Ondrej Husnik
+ * @since 12.0.0
+ */
 public class RptChangesOnSystemDataDto implements Serializable {
-	private static final long serialVersionUID = 1L;
-
 	
+	private static final long serialVersionUID = 1L;
+	//
 	private SysSystemDto system;
 	private SysSystemMappingDto systemMapping;
 	private List<SysSystemAttributeMappingDto> attributes;

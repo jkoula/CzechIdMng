@@ -13,7 +13,6 @@ import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.event.ProvisioningEvent.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.event.AbstractEntityEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -69,7 +68,7 @@ public class ProvisioningStartProcessor extends AbstractEntityEventProcessor<Acc
 				(AbstractDto) event.getProperties().get(ProvisioningService.DTO_PROPERTY_NAME),
 				isDryRun);
 		if (isDryRun) {
-			event.getProperties().put(ProvisioningService.DRY_RUN_PROVISIONING_OPERATION_PROPERTY_NAME, provisioningOperation);
+			event.getProperties().put(EventResult.EVENT_PROPERTY_RESULT, provisioningOperation);
 		}
 		return new DefaultEventResult<>(event, this);
 	}

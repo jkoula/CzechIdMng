@@ -98,8 +98,11 @@ export class AttributeTable extends Basic.AbstractContent {
       connectorObject,
       rendered
     } = this.props;
+    if (!rendered) {
+      return null;
+    }
+    //
     const _connectorObject = this._applyAttributeFilter(connectorObject);
-
     return (
       <>
         <form onSubmit={ this._useAttributesFilter.bind(this) }>
@@ -127,8 +130,7 @@ export class AttributeTable extends Basic.AbstractContent {
           showLoading={!connectorObject && !this.state.hasOwnProperty('connectorObject')}
           data={_connectorObject ? _connectorObject.attributes : null}
           noData={this.i18n('component.basic.Table.noData')}
-          className="table-bordered"
-          rendered={rendered}>
+          className="table-bordered">
           <Basic.Column property="name" header={this.i18n('label.property')}/>
           <Basic.Column
             property="values"

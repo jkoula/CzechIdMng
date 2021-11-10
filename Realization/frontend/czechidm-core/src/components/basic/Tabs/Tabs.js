@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
  */
 export default function BasicTabs(props) {
   const { rendered, activeKey, onSelect, className, style, unmountOnExit, children } = props;
-  const [ _activeKey, setActiveKey ] = React.useState(0);
+  const [ _activeKey, setActiveKey ] = React.useState(activeKey);
   const classes = useStyles();
   //
   if (!rendered) {

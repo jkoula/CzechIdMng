@@ -14,16 +14,16 @@ import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
+import eu.bcvsolutions.idm.core.scheduler.api.service.SchedulableTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 
 /**
- * Basic interface for do provisioning
+ * Basic interface for do provisioning.
  * 
  * @author svandav
  *
@@ -36,8 +36,9 @@ public interface ProvisioningService {
 	 * Provisioned dto (identity, role ...)
 	 */
 	static final String DTO_PROPERTY_NAME = "dto";
-	static final String DRY_RUN_PROPERTY_NAME = "dry_run";
-	static final String DRY_RUN_PROVISIONING_OPERATION_PROPERTY_NAME = "dry_run_provisioning_operation";
+	static final String EVENT_PROPERTY_DRY_RUN = "idm:skip-notify";
+	
+	static final String DRY_RUN_PROPERTY_NAME = SchedulableTaskExecutor.PARAMETER_DRY_RUN;
 	
 	/**
 	 * Property in provisioning start event. If the value is TRUE, then provisioning break during account protection will be cancelled.
@@ -81,6 +82,7 @@ public interface ProvisioningService {
 	 * @param account
 	 * @param dto
 	 * @return
+	 * @since 12.0.0
 	 */
 	EventContext<AccAccountDto> doProvisioning(AccAccountDto account, AbstractDto dto,  Map<String,Serializable> properties);
 
@@ -161,9 +163,17 @@ public interface ProvisioningService {
 	 */
 	void doInternalProvisioning(AccAccountDto account, AbstractDto dto);
 	
+	/**
+	 * Do provisioning for given account and dto. For internal purpose without emit event.
+	 * 
+	 * @param account
+	 * @param entity
+	 * @param isDryRun
+	 * @return
+	 * @since 12.0.0
+	 */
 	SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, AbstractDto entity, boolean isDryRun);
 
-	
 	/**
 	 * Ensure the account management for given entity. First check if
 	 * AccAccount and relation for this entity can be created. If yes then 

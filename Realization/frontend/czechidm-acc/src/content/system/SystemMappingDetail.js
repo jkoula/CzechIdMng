@@ -462,7 +462,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
         <Basic.ContentHeader rendered={!showOnlyAttributes}>
           <span dangerouslySetInnerHTML={{__html: this.i18n('header')}}/>
         </Basic.ContentHeader>
-        <Basic.Tabs rendered={!showOnlyAttributes} activeKey={activeKey}>
+        <Basic.Tabs rendered={!showOnlyAttributes} activeKey={ activeKey }>
           <Basic.Tab eventKey={1} title={this.i18n('title')} className="bordered">
             <form onSubmit={this.save.bind(this)}>
               <Basic.Panel className="no-border">

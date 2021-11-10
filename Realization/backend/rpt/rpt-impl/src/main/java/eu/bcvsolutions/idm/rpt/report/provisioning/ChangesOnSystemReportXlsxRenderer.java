@@ -1,10 +1,8 @@
-package eu.bcvsolutions.idm.rpt.report.identity;
+package eu.bcvsolutions.idm.rpt.report.provisioning;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,45 +27,36 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceValueDto;
-import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
-import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
-import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.rpt.api.dto.RptReportDto;
 import eu.bcvsolutions.idm.rpt.api.exception.ReportRenderException;
 import eu.bcvsolutions.idm.rpt.api.renderer.AbstractXlsxRenderer;
 import eu.bcvsolutions.idm.rpt.api.renderer.RendererRegistrar;
-import eu.bcvsolutions.idm.rpt.dto.RptChangesOnSystemDataDto;
 import eu.bcvsolutions.idm.rpt.dto.RptChangesOnSystemRecordDto;
 import eu.bcvsolutions.idm.rpt.dto.RptChangesOnSystemState;
-import eu.bcvsolutions.idm.rpt.dto.RptIdentityIncompatibleRoleDto;
 
 /**
  * The report renderer of changes on the system.
  * 
  * @author Ondrej Husnik
- * @since 11.3.0
- *
+ * @since 12.0.0
  */
 @Component("changes-on-system-report-xlsx-renderer")
 @Description(AbstractXlsxRenderer.RENDERER_EXTENSION) // will be show as format for download
 public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer implements RendererRegistrar {
 	
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory
-			.getLogger(ChangesOnSystemReportXlsxRenderer.class);
-	
-	final private String reportSheetName = "Report";
-	final private String statusColumnName = "Status";
-	final private String keyColumnName = "Username (uid)";
-	
-	final private String NEW_LINE = System.lineSeparator();
-	final private String IDM_VALUE = "IdM:";
-	final private String SYSTEM_VALUE = "Sys:";
-	
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ChangesOnSystemReportXlsxRenderer.class);
+	//
+    private static final String REPORT_SHEET_NAME = "Report";
+    private static final String STATUS_COLUMN_NAME = "Status";
+    private static final String KEY_COLUMN_NAME = "Username (uid)";
+	//
+    private static final String NEW_LINE = System.lineSeparator();
+    private static final String IDM_VALUE = "IdM:";
+    private static final String SYSTEM_VALUE = "Sys:";
 	
 	@Override
 	public InputStream render(RptReportDto report) {
@@ -77,7 +66,7 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 			JsonToken token = null;
 
 			XSSFWorkbook workbook = new XSSFWorkbook();
-			XSSFSheet sheet = workbook.createSheet(reportSheetName);
+			XSSFSheet sheet = workbook.createSheet(REPORT_SHEET_NAME);
 			sheet.setDefaultColumnWidth(15);
 			
 			// parse and render attributes' name
@@ -138,15 +127,15 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 		Row row = sheet.createRow(0);
 		Cell cell = row.createCell(0);
 		XSSFRichTextString headerColumn = new XSSFRichTextString();
-		headerColumn.append(statusColumnName, headerFont);
+		headerColumn.append(STATUS_COLUMN_NAME, headerFont);
 		cell.setCellValue(headerColumn);
-		attributeOrder.put(statusColumnName, 0);
+		attributeOrder.put(STATUS_COLUMN_NAME, 0);
 		
 		cell = row.createCell(1);
 		XSSFRichTextString keyColumn = new XSSFRichTextString();
-		keyColumn.append(keyColumnName, headerFont);
+		keyColumn.append(KEY_COLUMN_NAME, headerFont);
 		cell.setCellValue(keyColumn);
-		attributeOrder.put(keyColumnName, 1);
+		attributeOrder.put(KEY_COLUMN_NAME, 1);
 		
 		if (CollectionUtils.isEmpty(headerNames)) {
 			return attributeOrder; 
@@ -179,7 +168,7 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 		// render status
 		XSSFRichTextString content = new XSSFRichTextString();
 		RptChangesOnSystemState state = record.getState();
-		cellIdx = attributeOrder.get(statusColumnName);
+		cellIdx = attributeOrder.get(STATUS_COLUMN_NAME);
 		Cell cell = row.createCell(cellIdx);
 		content.append(state.toString());
 		cell.setCellValue(content);
@@ -190,7 +179,7 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 		boldFont.setBold(true);
 		String key = record.getIdentifier();
 		content = new XSSFRichTextString(); 
-		cellIdx = attributeOrder.get(keyColumnName);
+		cellIdx = attributeOrder.get(KEY_COLUMN_NAME);
 		cell = row.createCell(cellIdx);
 		content.append(Objects.toString(key, ""), boldFont);
 		cell.setCellValue(content);

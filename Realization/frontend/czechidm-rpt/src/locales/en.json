@@ -99,6 +99,30 @@
         "label": "Monitoring report",
         "help": "Report with last monitoring results.",
         "icon": "component:monitoring-results"
+      },
+      "changes-on-system-report": {
+        "label": "Compare values in IdM with values in system",
+        "help": "Report for comparison values in IdM and system (provisioning demo process).",
+        "icon": "component:system",
+        "attributes": {
+          "mappingattributes": {
+            "label": "Mapping attributes",
+            "help": "Selected mapping attributes. Selection is limited by previous system and mapping select.",
+            "placeholder": "All attributes or select ..."
+          },
+          "skipunchangedvalues": {
+            "label": "Skip unchanged values",
+            "help": "If checked all unchanged values of a multivalued attribute are omitted from the report."
+          },
+          "identities": {
+            "label": "Users",
+            "help": "Only the accounts of selected users will be included into the report."
+          },
+          "treenode": {
+            "label": "$t(entity.TreeNode._type)",
+            "help": "Only the accounts of users which belong to the selected organization unit will be included into the report."
+          }
+        }
       }
     }
   },

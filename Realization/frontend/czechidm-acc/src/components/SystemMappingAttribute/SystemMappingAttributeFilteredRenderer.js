@@ -8,8 +8,10 @@ const systemManager = new SystemManager();
 const systemMappingManager = new SystemMappingManager();
 
 /**
- * [SystemAttributeMappingSelect description]
- * @extends Advanced
+ * Select mapped atribute.
+ *
+ * @author Ondrej Husnik
+ * @since 12.0.0
  */
 export default class SystemMappingAttributeFilteredRenderer extends Advanced.AbstractFormAttributeRenderer {
 
@@ -23,7 +25,7 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
   }
 
   supportsMultiple() {
-    return true;
+    return false; // ~ multiple mapping attributes can be selected in this face
   }
 
   supportsConfidential() {
@@ -83,23 +85,19 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
    * Creates form value with and its ouptut value.
    * @return {[type]} [description]
    */
-  toFormValues() {
+  toFormValue() {
     const { values } = this.props;
     const systemComponent = this.refs.system;
     const mappingComponent = this.refs.systemMapping;
     const attributeComponent = this.refs.mappingAttributes;
-    const filledFormValues = [];
     //
     if (!systemComponent || !mappingComponent || !attributeComponent) {
       // not supported compoenents
-      return filledFormValues;
+      return undefined;
     }
     const systemValue = systemComponent.getValue();
     const mappingValue = mappingComponent.getValue();
     const attributeValues = attributeComponent.getValue();
-    if (!systemValue || !mappingValue) {
-      // co dal? asi koncime neni co...
-    }
 
     const resultObj = {system: systemValue, systemMapping: mappingValue, mappingAttributes: attributeValues};
     const result = JSON.stringify(resultObj);
@@ -108,8 +106,7 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
     if (values && values.length > 0) {
       formValue = values[0];
     }
-    filledFormValues.push(this.fillFormValue(this.prepareFormValue(formValue, 0), result));
-    return filledFormValues;
+    return this.fillFormValue(this.prepareFormValue(formValue, 0), result);
   }
 
   /**
@@ -128,7 +125,17 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
   }
 
   getInputValue(formValue) {
-    return formValue.stringValue ? formValue.stringValue : formValue.value;
+    if (formValue === null) {
+      return null;
+    }
+    const inputValue = formValue.stringValue ? formValue.stringValue : formValue.value;
+    //
+    try {
+      const result = JSON.parse(inputValue);
+      return result;
+    } catch (error) {
+      return null;
+    }
   }
 
   /**
@@ -139,17 +146,12 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
       return null;
     }
     const singleValue = _.isArray(formValues) && formValues.length > 0 ? formValues[0] : formValues;
-    const inputValue = this.getInputValue(singleValue);
-    try {
-      const result = JSON.parse(inputValue);
-      return result;
-    } catch (error) {
-      return null;
-    }
+    //
+    return this.getInputValue(singleValue);
   }
 
   renderSingleInput(originalValues) {
-    const { attribute, manager, values } = this.props;
+    const { manager, values } = this.props;
     const { systemId, systemMappingId } = this.state;
     const showOriginalValue = !!originalValues;
 
@@ -174,7 +176,7 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
           ref="system"
           value={ systemIdValue }
           manager={ systemManager }
-          label="System"
+          label={ this.i18n('acc:entity.System._type') }
           onChange={ this.onSystemChange.bind(this) }
           readOnly={ showOriginalValue ? true : this.isReadOnly() }
           required />
@@ -183,7 +185,7 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
           value={ mappingIdValue }
           manager={ systemMappingManager }
           forceSearchParameters={ forceSearchMappings }
-          label="System mapping"
+          label={ this.i18n('acc:entity.SystemMapping._type') }
           onChange={ this.onSystemMappingChange.bind(this) }
           readOnly={ showOriginalValue ? true : this.isReadOnly() }
           required />
@@ -192,8 +194,10 @@ export default class SystemMappingAttributeFilteredRenderer extends Advanced.Abs
           value={ attributeIdValues }
           manager={ manager }
           forceSearchParameters={ forceSearchMappingAttributes }
-          label="Mapping attributes"
-          multiSelect={ attribute.multiple }
+          label={ this.getLabel() }
+          placeholder={ this.getPlaceholder() }
+          helpBlock={ this.getHelpBlock() }
+          multiSelect
           required={ this.isRequired() }
           readOnly={ showOriginalValue ? true : this.isReadOnly() }/>
       </div>

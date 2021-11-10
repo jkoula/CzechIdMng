@@ -99,6 +99,30 @@
         "label": "Report monitoringu",
         "help": "Report s posledními výsledky monitoringu.",
         "icon": "component:monitoring-results"
+      },
+      "changes-on-system-report": {
+        "label": "Porovnání hodnot v IdM a na koncovém systému",
+        "help": "Report pro porovnání hodnot v IdM a na koncovém systému (provisioning v demo režimu)",
+        "icon": "component:system",
+        "attributes": {
+          "mappingattributes": {
+            "label": "Mapované atributy",
+            "help": "Mapované atributy, které budou zahrnuty v reportu.",
+            "placeholder": "Všechny atributy v daném mapování nebo vyberte ..."
+          },
+          "skipunchangedvalues": {
+            "label": "Přeskočit nezměněné hodnoty",
+            "help": "Nezměněné hodnoty vícehodnotových atributů nebudou zahrnuty v reportu."
+          },
+          "identities": {
+            "label": "Uživatelé",
+            "help": "V reportu budou zahrnuty pouze účty vybraných uživatelů."
+          },
+          "treenode": {
+            "label": "$t(entity.TreeNode._type)",
+            "help": "V reportu budou zahrnuty pouze účty vybraných uživatelů na zadané pozici."
+          }
+        }
       }
     }
   },

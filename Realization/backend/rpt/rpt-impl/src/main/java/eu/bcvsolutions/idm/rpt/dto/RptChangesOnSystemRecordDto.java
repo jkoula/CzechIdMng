@@ -5,9 +5,16 @@ import java.util.List;
 
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 
+/**
+ * DTO for report for comparison values in IdM and system.
+ *
+ * @author Ondrej Husnik
+ * @since 12.0.0
+ */
 public class RptChangesOnSystemRecordDto implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
-
+	//
 	private String identifier;
 	private RptChangesOnSystemState state;
 	private List<SysAttributeDifferenceDto> attributeDifferences;

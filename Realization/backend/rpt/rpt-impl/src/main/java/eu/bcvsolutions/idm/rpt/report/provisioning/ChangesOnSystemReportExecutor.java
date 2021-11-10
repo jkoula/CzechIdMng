@@ -1,4 +1,27 @@
-package eu.bcvsolutions.idm.rpt.report.identity;
+package eu.bcvsolutions.idm.rpt.report.provisioning;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -6,7 +29,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.collections.CollectionUtils;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
@@ -14,7 +36,14 @@ import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperation;
 import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
-import eu.bcvsolutions.idm.acc.dto.*;
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
+import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceValueDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
@@ -22,20 +51,24 @@ import eu.bcvsolutions.idm.acc.eav.domain.AccFaceType;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
-import eu.bcvsolutions.idm.acc.service.api.*;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
+import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
+import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
-import eu.bcvsolutions.idm.core.api.service.IdmScriptService;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
-import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
@@ -47,27 +80,12 @@ import eu.bcvsolutions.idm.rpt.api.executor.AbstractReportExecutor;
 import eu.bcvsolutions.idm.rpt.dto.RptChangesOnSystemRecordDto;
 import eu.bcvsolutions.idm.rpt.dto.RptChangesOnSystemState;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
- * Report for comparison values in IdM and system
+ * Report for comparison values in IdM and system.
  *
  * @author Ondrej Husnik
- * @since 11.3.0
- *
+ * @since 12.0.0
  */
-
 @Component(ChangesOnSystemReportExecutor.REPORT_NAME)
 @Description("Compare values in IdM with values in system")
 public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
@@ -84,37 +102,15 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	// output JSON file keys
 	public static final String ATTRIBUTE_NAME_JSON_KEY = "selectedAttributeNames";
 	public static final String RECORDS_JSON_KEY = "records";
-
-
-	private final SysSystemService systemService;
-	private final IdmIdentityService identityService;
-	private final AccAccountService accountService;
-	private final SysSystemAttributeMappingService systemAttributeMappingService;
-	private final IdmScriptService scriptService;
-	private final ProvisioningService provisioningService;
-	private final SysSystemMappingService systemMappingService;
-
-	@Autowired
-	private AccIdentityAccountService identityAccountService;
-	@Autowired
-	private SysProvisioningArchiveService provisioningArchiveService;
-
-	@Autowired
-	public ChangesOnSystemReportExecutor(SysSystemService systemService, IdmIdentityService identityService,
-			AccAccountService accountService, SysSchemaObjectClassService schemaObjectClassService,
-			SysSystemAttributeMappingService systemAttributeMappingService, IdmScriptService scriptService,
-			ProvisioningService provisioningService, SysSystemMappingService systemMappingService,
-			SysSchemaAttributeService schemaAttributeService, FormService formService,
-			ConfidentialStorage confidentialStorage,
-			SysAttributeControlledValueService attributeControlledValueService) {
-		this.systemService = systemService;
-		this.identityService = identityService;
-		this.accountService = accountService;
-		this.systemAttributeMappingService = systemAttributeMappingService;
-		this.scriptService = scriptService;
-		this.provisioningService = provisioningService;
-		this.systemMappingService = systemMappingService;
-	}
+	//
+	@Autowired private SysSystemService systemService;
+	@Autowired private IdmIdentityService identityService;
+	@Autowired private AccAccountService accountService;
+	@Autowired private SysSystemAttributeMappingService systemAttributeMappingService;
+	@Autowired private ProvisioningService provisioningService;
+	@Autowired private SysSystemMappingService systemMappingService;
+	@Autowired private AccIdentityAccountService identityAccountService;
+	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
 
 	/**
 	 * Report ~ executor name
@@ -128,27 +124,19 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	public List<IdmFormAttributeDto> getFormAttributes() {
 		IdmFormAttributeDto mappingSelect = new IdmFormAttributeDto(PARAMETER_MAPPING_ATTRIBUTES, "MappingAttributes",
 				PersistentType.TEXT);
-		mappingSelect.setMultiple(true);
 		mappingSelect.setFaceType(AccFaceType.SYSTEM_MAPPING_ATTRIBUTE_FILTERED_SELECT);
-		mappingSelect.setDescription(
-				"Selected mapping attributes. Selection is limited by previous system and mapping select.");
 		//
 		IdmFormAttributeDto skipUnchanged = new IdmFormAttributeDto(PARAMETER_SKIP_UNCHANGED_VALUES, "Skip unchanged values",
 				PersistentType.BOOLEAN);
-		skipUnchanged.setDescription("If checked all unchanged values of a multivalued attribute are omitted from the report.");
 		//		
 		IdmFormAttributeDto identities = new IdmFormAttributeDto(PARAMETER_ONLY_IDENTITY, "Identities",
 				PersistentType.UUID);
 		identities.setFaceType(BaseFaceType.IDENTITY_SELECT);
 		identities.setMultiple(true);
-		identities.setDescription(
-				"Only the accounts of selected identities will be included into the report.");
 		//
 		IdmFormAttributeDto treeNode = new IdmFormAttributeDto(PARAMETER_TREE_NODE, "Treenode", PersistentType.UUID);
 		treeNode.setFaceType(BaseFaceType.TREE_NODE_SELECT);
-		treeNode.setDescription(
-				"Only the accounts of identities which belong to the selected organization unit will be included into the report.");
-
+		//
 		return Lists.newArrayList(mappingSelect, skipUnchanged, identities, treeNode);
 	}
 
@@ -198,7 +186,6 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		}
 	}
 
-
 	/**
 	 * Create key for given account and identity
 	 *
@@ -211,9 +198,11 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		if (identity != null) {
 			result.append(identity.getUsername());
 		}
-		result.append(" (");
-		result.append(account != null ? account.getUid() : "");
-		result.append(')');
+		if (account != null) {
+			result.append(" (");
+			result.append(account != null ? account.getUid() : "");
+			result.append(')');
+		}
 		return result.toString();
 	}
 
@@ -259,12 +248,12 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 			filter.setDisabledAttribute(false);
 			attributes = systemAttributeMappingService.find(filter, null).getContent();
 			return attributes;
-			}
+		}
 		
 		for (UUID id : attributeIds) {
 			SysSystemAttributeMappingDto dto = systemAttributeMappingService.get(id);
 			if (dto == null) {	
-				LOG.warn(String.format("Selected mapping attribute cannot be found by its Id [%s]. Will be skipped.", id));
+				LOG.warn("Selected mapping attribute cannot be found by its Id [{}]. Will be skipped.", id);
 				continue;
 			}
 			attributes.add(dto);
@@ -282,7 +271,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		Set<UUID> result = new HashSet<UUID>();
 		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(report, getFormDefinition(), report.getFilter());
 		List<Serializable> identitiesAsSerializable = formInstance.toPersistentValues(PARAMETER_ONLY_IDENTITY);
-		if (identitiesAsSerializable == null) {
+		if (CollectionUtils.isEmpty(identitiesAsSerializable)) {
 			return result;
 		}
 
@@ -290,9 +279,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 			if (identityIdAsSerializable == null) {
 				continue;
 			}
-			String identityId = identityIdAsSerializable.toString();
-			identityId = identityId.trim();
-			result.add(UUID.fromString(identityId));
+			result.add(DtoUtils.toUuid(identityIdAsSerializable));
 		}
 		return result;
 	}
@@ -305,10 +292,8 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	private UUID getTreeNode(RptReportDto report) {
 		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(report, getFormDefinition(), report.getFilter());
 		Serializable treeNodeIdAsSerializable = formInstance.toSinglePersistentValue(PARAMETER_TREE_NODE);
-		if (treeNodeIdAsSerializable == null) {
-			return null;
-		}
-		return UUID.fromString(treeNodeIdAsSerializable.toString());
+		//
+		return DtoUtils.toUuid(treeNodeIdAsSerializable);
 	}
 	
 
@@ -356,7 +341,10 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 
 	/**
 	 * Parser of the System, mapping and mappingAttribute configuration.
-	 * Configuration is sent from FE in a String using JSON form
+	 * Configuration is sent from FE in a String using JSON form.
+	 * 
+	 * TODO: create json java POJO representation and use it as result type
+	 * 
 	 * @param report
 	 * @return
 	 */
@@ -364,11 +352,12 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(report, getFormDefinition(), report.getFilter());
 		Serializable value = formInstance.toSinglePersistentValue(PARAMETER_MAPPING_ATTRIBUTES);
 		MultiValueMap<String, UUID> output = new LinkedMultiValueMap<String, UUID>();
-		
+		//
 		if (!(value instanceof String)) {
 			throw new ResultCodeException(RptResultCode.REPORT_WRONG_CONFIGURATION, ImmutableMap.of("attribute","all")); 
 		}
-		
+		//
+		// TODO: create json java POJO representation
 		String stringValue = (String) value;
 		try {
 			String nodeValue;
@@ -380,7 +369,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 				throw new ResultCodeException(RptResultCode.REPORT_WRONG_CONFIGURATION, ImmutableMap.of("attribute", PARAMETER_SYSTEM));
 			}
 			nodeValue = node.asText();
-			output.add(PARAMETER_SYSTEM, UUID.fromString(nodeValue));
+			output.add(PARAMETER_SYSTEM, DtoUtils.toUuid(nodeValue));
 
 			// get system mapping id form config
 			node = treeNode.get(PARAMETER_SYSTEM_MAPPING);
@@ -451,7 +440,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 					"system", account.getSystem(), "operationType", "DRY_RUN", "objectClass", ""));
 		}
 		ProvisioningOperation provisioningOperation = (ProvisioningOperation) result.getEvent().getProperties()
-				.get(ProvisioningService.DRY_RUN_PROVISIONING_OPERATION_PROPERTY_NAME);
+				.get(EventResult.EVENT_PROPERTY_RESULT);
 
 		if (provisioningOperation == null) {
 			throw new ProvisioningException(AccResultCode.PROVISIONING_FAILED, ImmutableMap.of("name", account.getId(),
