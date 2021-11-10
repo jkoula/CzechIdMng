@@ -121,20 +121,18 @@ export class DefinitionTable extends Advanced.AbstractTableContent {
               const rowData = data[rowIndex];
               //
               return (
-                <span>
-                  <a
-                    key={ `rep-${rowData.id}` }
-                    href={ this.getManager().getService().getProcessDefinitionUrl(rowData.id) }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                    className="btn btn-primary btn-xs"
-                    style={{ color: 'white' }}
-                    title={ this.i18n('label.download') }>
-                    <Basic.Icon value="fa:download"/>
-                    {' XML '}
-                  </a>
-                </span>
+                <Basic.Button
+                  level="secondary"
+                  buttonSize="xs"
+                  key={ `rep-${rowData.id}` }
+                  href={ this.getManager().getService().getProcessDefinitionUrl(rowData.id) }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  title={ this.i18n('label.download') }
+                  icon="fa:download">
+                  XML
+                </Basic.Button>
               );
             }
           }

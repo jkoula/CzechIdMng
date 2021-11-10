@@ -56,16 +56,12 @@ export default class OperationResult extends Basic.AbstractContextComponent {
           value={ this._getPopoverContent() }
           className="abstract-entity-info-popover"
           rendered={ value.code !== null && value.code !== undefined }>
-          {
-            <span>
-              <Basic.Button
-                level="info"
-                buttonSize="xs"
-                style={{ padding: 0, marginLeft: 3 }}
-                title={ this.i18n('link.popover.title') }
-                icon="fa:info-circle"/>
-            </span>
-          }
+          <Basic.Button
+            level="info"
+            buttonSize="xs"
+            style={{ padding: 0, marginLeft: 3 }}
+            title={ this.i18n('link.popover.title') }
+            icon="fa:info-circle"/>
         </Basic.Popover>
       </Basic.Div>
     );

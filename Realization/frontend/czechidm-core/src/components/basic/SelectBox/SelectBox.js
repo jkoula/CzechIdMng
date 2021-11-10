@@ -86,11 +86,6 @@ const styles = theme => ({
         borderColor: theme.palette.action.hover
       }
     }
-  },
-  positionRelative: {
-    '& .Select-menu-outer': {
-      position: 'relative'
-    },
   }
 });
 
@@ -801,7 +796,6 @@ export class SelectBox extends AbstractFormComponent {
       menuContainerStyle,
       onSelectResetsInput,
       onFocus,
-      positionRelative,
       classes
     } = this.props;
     const {
@@ -811,12 +805,7 @@ export class SelectBox extends AbstractFormComponent {
       disabled,
       value
     } = this.state;
-
-    let className = classes ? classes.root : '';
-
-    if (positionRelative && classes) {
-      className = `${className} ${classes.positionRelative}`;
-    }
+    const className = classes ? classes.root : '';
     //
     // from new version react-select is necessary turn off onBlurResetsInput and closeOnSelect
     // onBlurResetsInput made problems with submit form and focus
@@ -955,12 +944,7 @@ SelectBox.propTypes = {
   /**
    * Additional select box options - extend options wit custom behavior.
    */
-  additionalOptions: PropTypes.arrayOf(PropTypes.object),
-
-  /**
-   * Defines if the menu with options should be opened with relative position (inside of a panel).
-   */
-  positionRelative: PropTypes.bool
+  additionalOptions: PropTypes.arrayOf(PropTypes.object)
 };
 
 SelectBox.defaultProps = {
@@ -980,8 +964,7 @@ SelectBox.defaultProps = {
   additionalOptions: [],
   onSelectResetsInput: false,
   size: 'small',
-  fullWidth: true,
-  positionRelative: false
+  fullWidth: true
 };
 
 SelectBox.NICE_LABEL = NICE_LABEL;

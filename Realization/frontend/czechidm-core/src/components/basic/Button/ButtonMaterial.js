@@ -65,6 +65,20 @@ const useStyles = makeStyles((theme) => {
       '&:hover': {
         backgroundColor: theme.palette.error.dark,
       }
+    },
+    download: {
+      '&:hover': {
+        color: theme.palette.error.contrastText,
+        textDecoration: 'none'
+      },
+      '&:focus': {
+        color: theme.palette.error.contrastText,
+        textDecoration: 'none'
+      },
+      '&:visited': {
+        color: theme.palette.error.contrastText,
+        textDecoration: 'none'
+      }
     }
   };
 });
@@ -100,7 +114,11 @@ function ButtonMaterial(props) {
     endIcon,
     tabIndex,
     fullWidth,
-    color
+    color,
+    href,
+    rel,
+    download,
+    target
   } = props;
   //
   const classes = useStyles();
@@ -131,6 +149,10 @@ function ButtonMaterial(props) {
         _color = 'primary';
       } else if (_level === 'secondary') {
         _color = 'secondary';
+        if (download) {
+          // TODO: use new class for download buttons => secondary should be enforced ~ link
+          _statusClasses = classes.download;
+        }
       } else if (_level === 'success') {
         _statusClasses = classes.success;
       } else if (_level === 'info') {
@@ -161,6 +183,8 @@ function ButtonMaterial(props) {
         _statusClasses = classes.warningIcon;
       } else if (_level === 'error') {
         _statusClasses = classes.errorIcon;
+      } else if (_level === 'secondary') {
+        _statusClasses = null; // TODO: use new class for download buttons => secondary should be enforced ~ link
       }
     }
     //
@@ -174,7 +198,11 @@ function ButtonMaterial(props) {
         disabled={ disabled || showLoading }
         onClick={ onClick }
         onDoubleClick={ onDoubleClick }
-        tabIndex={ tabIndex }>
+        tabIndex={ tabIndex }
+        href={ href }
+        rel={ rel }
+        download={ download }
+        target={ target }>
         {
           showLoading && showLoadingIcon
           ?
@@ -207,7 +235,11 @@ function ButtonMaterial(props) {
         tabIndex={ tabIndex }
         disableElevation={ false }
         title={ title }
-        fullWidth={ fullWidth }>
+        fullWidth={ fullWidth }
+        href={ href }
+        rel={ rel }
+        download={ download }
+        target={ target }>
         {
           showLoading && _showLoadingText
           ?
@@ -280,7 +312,31 @@ ButtonMaterial.propTypes = {
    *
    * @since 12.0.0
    */
-  color: PropTypes.string
+  color: PropTypes.string,
+  /**
+   * Link href.
+   *
+   * @since 12.0.0
+   */
+  href: PropTypes.string,
+  /**
+   * Link rel.
+   *
+   * @since 12.0.0
+   */
+  rel: PropTypes.string,
+  /**
+   * Link download.
+   *
+   * @since 12.0.0
+   */
+  download: PropTypes.bool,
+  /**
+   * Link target.
+   *
+   * @since 12.0.0
+   */
+  target: PropTypes.string
 };
 ButtonMaterial.defaultProps = {
   ...AbstractComponent.defaultProps,

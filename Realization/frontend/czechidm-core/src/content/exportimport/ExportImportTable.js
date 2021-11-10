@@ -247,24 +247,23 @@ export class ExportImportTable extends Advanced.AbstractTableContent {
     return Utils.Ui.getSimpleJavaType(name);
   }
 
-  renderButtons(entity, className = '') {
+  renderButtons(entity, buttonSize = 'default') {
     if (!entity.data) {
       return null;
     }
     return (
       <div>
-        <a
+        <Basic.Button
+          level="secondary"
+          buttonSize={ buttonSize }
           key="export-download-zip"
           href={ this.getManager().getService().getDownloadUrl(entity.id) }
           target="_blank"
           rel="noopener noreferrer"
           download
           title={ this.i18n('action.download.title')}
-          className={ `btn btn-primary ${className}` }
-          style={{ color: 'white', marginLeft: 3 }}>
-          <Basic.Icon value="fa:download" />
-          {' '}
-        </a>
+          style={{ marginLeft: 3 }}
+          icon="fa:download"/>
         <Basic.Button
           ref="import-dry-run"
           type="button"
@@ -458,7 +457,7 @@ export class ExportImportTable extends Advanced.AbstractTableContent {
             width="20%"
             cell={
               ({ data, rowIndex }) => {
-                return this.renderButtons(data[rowIndex], 'btn-xs');
+                return this.renderButtons(data[rowIndex], 'xs');
               }
             }/>
         </Advanced.Table>

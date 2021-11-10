@@ -84,17 +84,14 @@ export default function BasicTabs(props) {
     );
   });
   //
-  // indicatorColor="primary"
-  // textColor="primary"
   return (
-    <div>
+    <div className="tab-horizontal" style={ style }>
       <AppBar position="static">
         <Tabs
           value={ value }
           onChange={ handleChange }
           aria-label="basic tabs"
-          className={ className }
-          style={ style }>
+          className={ className }>
           { _tabs }
         </Tabs>
       </AppBar>

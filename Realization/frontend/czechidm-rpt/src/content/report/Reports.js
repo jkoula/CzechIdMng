@@ -4,7 +4,7 @@ import { Basic } from 'czechidm-core';
 import ReportTableComponent from './ReportTable';
 
 /**
- * List of reports
+ * List of reports.
  *
  * @author Radek Tomiška
  */
@@ -26,7 +26,7 @@ export default class Reports extends Basic.AbstractContent {
 
   render() {
     return (
-      <Basic.Div>
+      <div>
         { this.renderPageHeader() }
 
         <Basic.Panel>
@@ -36,7 +36,7 @@ export default class Reports extends Basic.AbstractContent {
             location={ this.props.location }/>
         </Basic.Panel>
 
-      </Basic.Div>
+      </div>
     );
   }
 }

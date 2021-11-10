@@ -242,7 +242,8 @@ class NotificationDetail extends Basic.AbstractContent {
 
             <Basic.Tabs
               activeKey={ activeTab }
-              onSelect={ this._onChangeSelectTabs.bind(this) }>
+              onSelect={ this._onChangeSelectTabs.bind(this) }
+              style={{ marginBottom: 15 }}>
               <Basic.Tab
                 eventKey={ 1 }
                 title={ this.i18n('entity.Notification.message.htmlMessage') }
@@ -267,6 +268,7 @@ class NotificationDetail extends Basic.AbstractContent {
                 </Basic.Div>
               </Basic.Tab>
             </Basic.Tabs>
+
             <Basic.LabelWrapper
               hidden={isNew || !notification.message.model}
               label={this.i18n('entity.Notification.message.model')}>

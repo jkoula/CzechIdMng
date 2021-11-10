@@ -426,15 +426,11 @@ export class EnumSelectBox extends SelectBox {
       title,
       optionComponent,
       valueComponent,
-      classes,
-      positionRelative
+      classes
     } = this.props;
     const { value, readOnly, disabled } = this.state;
 
-    let className = classes ? classes.root : '';
-    if (positionRelative && classes) {
-      className = `${className} ${classes.positionRelative}`;
-    }
+    const className = classes ? classes.root : '';
     //
     return (
       <span>

@@ -15,7 +15,7 @@ const attachmentService = new AttachmentService();
 export default class OperationResultDownloadButton extends Basic.AbstractContextComponent {
 
   render() {
-    const {operationResult, downloadLinkPrefix, downloadLinkSuffix, btnSize, style} = this.props;
+    const {operationResult, downloadLinkPrefix, downloadLinkSuffix, btnSize, style } = this.props;
 
     if (!operationResult) {
       return null;
@@ -46,19 +46,19 @@ export default class OperationResultDownloadButton extends Basic.AbstractContext
     }
 
     return (
-      <a
-        key={ `attachment-download-${attachmentId}` }
+      <Basic.Button
+        level="secondary"
+        buttonSize={ btnSize }
+        key={ `attachment-download-${ attachmentId }` }
         href={ completeDownloadUrl }
         target="_blank"
         rel="noopener noreferrer"
         download
-        style={{ color: 'white', ...style }}
         title={ this.i18n('button.download')}
-        className={`btn ${btnSize} btn-primary`}>
-        <Basic.Icon value="fa:download" />
-        {' '}
+        icon="fa:download"
+        style={ style }>
         { this.i18n('button.download') }
-      </a>
+      </Basic.Button>
     );
   }
 }

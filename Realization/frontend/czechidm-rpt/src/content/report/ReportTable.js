@@ -221,7 +221,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
     return this.i18n('action.report-detail.header');
   }
 
-  renderDownloadButtons(entity, className = '') {
+  renderDownloadButtons(entity, buttonSize = 'md') {
     const { supportedReports } = this.props;
     //
     if (!supportedReports || !supportedReports.has(entity.executorName)) {
@@ -256,19 +256,19 @@ export class ReportTable extends Advanced.AbstractTableContent {
         {
           [...enabledRenderers.map(renderer => {
             return (
-              <a
+              <Basic.Button
+                level="secondary"
+                buttonSize={ buttonSize }
                 key={ `rep-${ renderer.id }-${ entity.id }` }
                 href={ this.getManager().getService().getDownloadUrl(entity.id, renderer.name) }
                 target="_blank"
                 rel="noopener noreferrer"
                 download
                 title={ this.i18n('action.download.title', { report: entity.name, renderer: renderer.description }) }
-                className={ `btn btn-primary ${ className }` }
-                style={{ color: 'white', marginLeft: 3 }}>
-                <Basic.Icon value="fa:download" />
-                {' '}
+                style={{ marginLeft: 3 }}
+                icon="fa:download">
                 { renderer.description }
-              </a>
+              </Basic.Button>
             );
           }).values()]
         }
@@ -505,7 +505,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
             header={ this.i18n('label.download') }
             cell={
               ({ data, rowIndex }) => {
-                return this.renderDownloadButtons(data[rowIndex], 'btn-xs');
+                return this.renderDownloadButtons(data[rowIndex], 'xs');
               }
             }/>
           <Basic.Column
@@ -573,7 +573,6 @@ export class ReportTable extends Advanced.AbstractTableContent {
                   onChange={ this.onChangeReport.bind(this) }
                   readOnly={ recover ? true : !Utils.Entity.isNew(detail.entity) }
                   required
-                  positionRelative
                   searchable/>
                 {
                   !report || !report.formDefinition
