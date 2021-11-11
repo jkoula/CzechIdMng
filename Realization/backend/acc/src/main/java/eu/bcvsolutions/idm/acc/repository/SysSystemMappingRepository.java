@@ -9,13 +9,17 @@ import eu.bcvsolutions.idm.acc.entity.SysSystemMapping;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
 
 /**
- * System entity handling
+ * System entity handling.
  * 
  * @author Svanda
  *
  */
 public interface SysSystemMappingRepository extends AbstractEntityRepository<SysSystemMapping> {
 
+	/**
+	 * @deprecated use service layer instead.
+	 */
+	@Deprecated(since = "12.0.0")
 	@Query(value = "select e from SysSystemMapping e"+ 
 			" where" +
 			" (?#{[0].text} is null or lower(e.name) like ?#{[0].text == null ? '%' : '%'.concat([0].text.toLowerCase()).concat('%')} or lower(e.objectClass.system.name) like ?#{[0].text == null ? '%' : '%'.concat([0].text.toLowerCase()).concat('%')})"+

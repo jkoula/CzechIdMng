@@ -44,13 +44,13 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Searching entities, using filters
+ * Searching entities, using filters.
  *
  * @author Petr Hanák
  * @author Vít Švanda
  */
 @Transactional
-public class DefaultSysSystemMappingServiceTest extends AbstractIntegrationTest {
+public class DefaultSysSystemMappingServiceIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired
 	private SysSystemMappingService mappingService;

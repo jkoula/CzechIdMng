@@ -1,7 +1,34 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.plugin.core.OrderAwarePluginRegistry;
+import org.springframework.plugin.core.PluginRegistry;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -18,9 +45,11 @@ import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
+import eu.bcvsolutions.idm.acc.entity.SysSchemaObjectClass_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
+import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.repository.SysSystemMappingRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
@@ -47,38 +76,16 @@ import eu.bcvsolutions.idm.core.api.service.IdmTreeTypeService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
+import eu.bcvsolutions.idm.core.model.entity.IdmTreeType_;
 import eu.bcvsolutions.idm.core.script.evaluator.AbstractScriptEvaluator;
-import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.plugin.core.OrderAwarePluginRegistry;
-import org.springframework.plugin.core.PluginRegistry;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
- * Default system entity handling
+ * Default system entity handling.
  *
  * @author svandav
  * @author Ondrej Husnik
- *
+ * @author Radek Tomiška
  */
 @Service
 public class DefaultSysSystemMappingService
@@ -91,7 +98,6 @@ public class DefaultSysSystemMappingService
 	private static final String IDENTITY_STATE_IDM_NAME = "state";
 	private static final String IDENTITY_DISABLED_IDM_NAME = "disabled";
 	//
-	private final SysSystemMappingRepository repository;
 	private final GroovyScriptService groovyScriptService;
 	private final PluginRegistry<AbstractScriptEvaluator, IdmScriptCategory> pluginExecutors;
 	private final ApplicationContext applicationContext;
@@ -116,17 +122,18 @@ public class DefaultSysSystemMappingService
 	private SysSystemEntityService systemEntityService;
 
 	@Autowired
-	public DefaultSysSystemMappingService(SysSystemMappingRepository repository, EntityEventManager entityEventManager,
-			GroovyScriptService groovyScriptService, List<AbstractScriptEvaluator> evaluators,
+	public DefaultSysSystemMappingService(
+			SysSystemMappingRepository repository, 
+			EntityEventManager entityEventManager,
+			GroovyScriptService groovyScriptService, 
+			List<AbstractScriptEvaluator> evaluators,
 			ApplicationContext applicationContext) {
 		super(repository, entityEventManager);
 		//
-		Assert.notNull(entityEventManager, "Manager is required.");
 		Assert.notNull(groovyScriptService, "Groovy script service is required.");
 		Assert.notNull(evaluators, "Script evaluators is required.");
 		Assert.notNull(applicationContext, "Context is required.");
 		//
-		this.repository = repository;
 		this.applicationContext = applicationContext;
 		this.groovyScriptService = groovyScriptService;
 		this.pluginExecutors = OrderAwarePluginRegistry.create(evaluators);
@@ -149,31 +156,6 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
-	protected Page<SysSystemMapping> findEntities(SysSystemMappingFilter filter, Pageable pageable,
-			BasePermission... permission) {
-		if (filter == null) {
-			return repository.findAll(pageable);
-		}
-		return repository.find(filter, pageable);
-	}
-
-	/**
-	 * FIXME: refactor repository usage.
-	 */
-	@Override
-	public Page<UUID> findIds(SysSystemMappingFilter filter, Pageable pageable, BasePermission... permission) {
-		Page<SysSystemMapping> findEntities = findEntities(filter, pageable, permission);
-		//
-		List<UUID> ids = findEntities
-				.getContent()
-				.stream()
-				.map(SysSystemMapping::getId)
-				.collect(Collectors.toList());
-		//
-		return new PageImpl<UUID>(ids, findEntities.getPageable(), findEntities.getTotalElements());
-	}
-
-	@Override
 	public List<SysSystemMappingDto> findBySystem(SysSystemDto system, SystemOperationType operation,
 			SystemEntityType entityType) {
 		Assert.notNull(system, "System is required.");
@@ -182,7 +164,9 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
-	public List<SysSystemMappingDto> findBySystemId(UUID systemId, SystemOperationType operation,
+	public List<SysSystemMappingDto> findBySystemId(
+			UUID systemId, 
+			SystemOperationType operation,
 			SystemEntityType entityType) {
 		Assert.notNull(systemId, "System identifier is required.");
 		//
@@ -190,21 +174,23 @@ public class DefaultSysSystemMappingService
 		filter.setSystemId(systemId);
 		filter.setOperationType(operation);
 		filter.setEntityType(entityType);
-		Page<SysSystemMappingDto> page = toDtoPage(repository.find(filter, null));
-		return page.getContent();
+		//
+		return find(filter, null).getContent();
 	}
 
 	@Override
-	public List<SysSystemMappingDto> findByObjectClass(SysSchemaObjectClassDto objectClass,
-			SystemOperationType operation, SystemEntityType entityType) {
+	public List<SysSystemMappingDto> findByObjectClass(
+			SysSchemaObjectClassDto objectClass,
+			SystemOperationType operation, 
+			SystemEntityType entityType) {
 		Assert.notNull(objectClass, "Object class is required.");
-
+		//
 		SysSystemMappingFilter filter = new SysSystemMappingFilter();
 		filter.setObjectClassId(objectClass.getId());
 		filter.setOperationType(operation);
 		filter.setEntityType(entityType);
-		Page<SysSystemMappingDto> page = toDtoPage(repository.find(filter, null));
-		return page.getContent();
+		//
+		return find(filter, null).getContent();
 	}
 
 	@Override
@@ -586,5 +572,64 @@ public class DefaultSysSystemMappingService
 				i++;
 			}
 		} while (true);
+	}
+	
+	@Override
+	protected List<Predicate> toPredicates(Root<SysSystemMapping> root, CriteriaQuery<?> query, CriteriaBuilder builder, SysSystemMappingFilter filter) {
+		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
+		//
+		String text = filter.getText();
+		if (StringUtils.isNotEmpty(text)) {
+			text = text.toLowerCase();
+			List<Predicate> textPredicates = new ArrayList<>(2);
+			//
+			textPredicates.add(builder.like(builder.lower(root.get(SysSystemMapping_.name)), "%" + text + "%"));
+			textPredicates.add(builder.like(builder.lower(
+					root.get(SysSystemMapping_.objectClass).get(SysSchemaObjectClass_.system).get(SysSystem_.name)), "%" + text + "%")
+			);
+			//
+			predicates.add(builder.or(textPredicates.toArray(new Predicate[textPredicates.size()])));
+		}
+		//
+		UUID systemId = filter.getSystemId();
+		if (systemId != null) {
+			predicates.add(
+					builder.equal(
+							root.get(SysSystemMapping_.objectClass).get(SysSchemaObjectClass_.system).get(SysSystem_.id),
+							systemId
+					)
+			);
+		}
+		UUID objectClassId = filter.getObjectClassId();
+		if (objectClassId != null) {
+			predicates.add(
+					builder.equal(
+							root.get(SysSystemMapping_.objectClass).get(SysSchemaObjectClass_.id),
+							objectClassId
+					)
+			);
+		}
+		SystemOperationType operationType = filter.getOperationType();
+		if (operationType != null) {
+			predicates.add(
+					builder.equal(root.get(SysSystemMapping_.operationType), operationType)
+			);
+		}
+		UUID treeTypeId = filter.getTreeTypeId();
+		if (treeTypeId != null) {
+			predicates.add(
+					builder.equal(
+							root.get(SysSystemMapping_.treeType).get(IdmTreeType_.id),
+							treeTypeId
+					)
+			);
+		}
+		//
+		SystemEntityType entityType = filter.getEntityType();
+		if (entityType != null) {
+			predicates.add(builder.equal(root.get(SysSystemMapping_.entityType), entityType));
+		}
+		//
+		return predicates;
 	}
 }

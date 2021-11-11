@@ -288,4 +288,9 @@ public class SysSystemMappingController extends AbstractReadWriteDtoController<S
 	public ResponseEntity<ResultModels> prevalidateBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
 		return super.prevalidateBulkAction(bulkAction);
 	}
+	
+	@Override
+	protected SysSystemMappingFilter toFilter(MultiValueMap<String, Object> parameters) {
+		return new SysSystemMappingFilter(parameters, getParameterConverter());
+	}
 }

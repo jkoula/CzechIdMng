@@ -156,7 +156,6 @@ public class DefaultSysSystemEntityService
 	protected List<Predicate> toPredicates(Root<SysSystemEntity> root, CriteriaQuery<?> query, CriteriaBuilder builder, SysSystemEntityFilter filter) {
 		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
 		//
-		//
 		String text = filter.getText();
 		if (StringUtils.isNotEmpty(text)) {
 			text = text.toLowerCase();

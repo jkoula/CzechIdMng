@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -27,6 +28,7 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Patrik Stloukal
  *
  */
+@Transactional
 public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegrationTest {
 
 	@Autowired private SysSystemEntityService entityService;
