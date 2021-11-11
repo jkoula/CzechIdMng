@@ -3,8 +3,10 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
 import java.util.UUID;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,6 +67,23 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 		Page<SysSystemEntityDto> pages = entityService.find(testFilter, null);
 		assertEquals(1, pages.getTotalElements());
 		assertEquals(entity1.getId(), pages.getContent().get(0).getId());
+	}
+	
+	@Test
+	public void testFindByText() {
+		SysSystemDto system = helper.createTestResourceSystem(false);
+		SysSystemEntityDto entityOne = createEntitySystem(getHelper().createName(), SystemEntityType.CONTRACT,
+				system.getId(), UUID.randomUUID());
+		createEntitySystem(getHelper().createName(), SystemEntityType.CONTRACT, system.getId(),
+				UUID.randomUUID());
+		createEntitySystem(getHelper().createName(), SystemEntityType.CONTRACT, system.getId(),
+				UUID.randomUUID());
+		//
+		SysSystemEntityFilter testFilter = new SysSystemEntityFilter();
+		testFilter.setText(entityOne.getUid());
+		List<SysSystemEntityDto> results = entityService.find(testFilter, null).getContent();
+		Assert.assertEquals(1, results.size());
+		Assert.assertEquals(entityOne.getId(), results.get(0).getId());
 	}
 
 	/**

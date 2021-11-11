@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
@@ -43,7 +42,7 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;;
 
 /**
- * Entities on target system
+ * Entities on target system.
  * 
  * @author Radek Tomiška
  *
@@ -208,12 +207,12 @@ public class SysSystemEntityController extends AbstractReadWriteDtoController<Sy
 			@ApiParam(value = "System entity's uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId) {
 		SysSystemEntityDto systemEntity = this.getDto(backendId);
-		if(systemEntity == null) {
+		if (systemEntity == null) {
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
 		}
 		IcConnectorObject connectorObject = ((SysSystemEntityService)getService())
 				.getConnectorObject(systemEntity, IdmBasePermission.READ);
-		if(connectorObject == null) {
+		if (connectorObject == null) {
 			return new ResponseEntity<IcConnectorObject>(HttpStatus.NO_CONTENT);
 		}
 		return new ResponseEntity<IcConnectorObject>(connectorObject, HttpStatus.OK);
@@ -221,12 +220,6 @@ public class SysSystemEntityController extends AbstractReadWriteDtoController<Sy
 
 	@Override
 	protected SysSystemEntityFilter toFilter(MultiValueMap<String, Object> parameters) {
-		SysSystemEntityFilter filter = new SysSystemEntityFilter(parameters, getParameterConverter());
-		//
-		filter.setSystemId(getParameterConverter().toUuid(parameters, "systemId"));
-		filter.setEntityType(getParameterConverter().toEnum(parameters, "entityType", SystemEntityType.class));
-		filter.setUid(getParameterConverter().toString(parameters, "uid"));
-		//
-		return filter;
+		return new SysSystemEntityFilter(parameters, getParameterConverter());
 	}
 }

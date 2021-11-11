@@ -1,6 +1,23 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
+
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperation;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -14,6 +31,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSystemEntity;
 import eu.bcvsolutions.idm.acc.entity.SysSystemEntity_;
+import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.repository.SysSystemEntityRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
@@ -30,13 +48,6 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * Entities on target system.
@@ -68,17 +79,8 @@ public class DefaultSysSystemEntityService
 	}
 
 	@Override
-	protected Page<SysSystemEntity> findEntities(SysSystemEntityFilter filter, Pageable pageable,
-			BasePermission... permission) {
-		if (filter == null) {
-			return repository.findAll(pageable);
-		}
-		return repository.find(filter, pageable);
-	}
-
-	@Override
 	@Transactional
-	public void delete(SysSystemEntityDto systemEntity, BasePermission... permission) {
+	public void deleteInternal(SysSystemEntityDto systemEntity) {
 		Assert.notNull(systemEntity, "System entity is required.");
 		//
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
@@ -108,12 +110,14 @@ public class DefaultSysSystemEntityService
 			batchService.delete(batch);
 		}
 		//
-		super.delete(systemEntity, permission);
+		super.deleteInternal(systemEntity);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public SysSystemEntityDto getBySystemAndEntityTypeAndUid(SysSystemDto system, SystemEntityType entityType,
+	public SysSystemEntityDto getBySystemAndEntityTypeAndUid(
+			SysSystemDto system, 
+			SystemEntityType entityType,
 			String uid) {
 		return toDto(repository.findOneBySystem_IdAndEntityTypeAndUid(system.getId(), entityType, uid));
 	}
@@ -146,5 +150,36 @@ public class DefaultSysSystemEntityService
 						systemEntity.getUid(),
 						icObjectClass,
 						connectorType);
+	}
+	
+	@Override
+	protected List<Predicate> toPredicates(Root<SysSystemEntity> root, CriteriaQuery<?> query, CriteriaBuilder builder, SysSystemEntityFilter filter) {
+		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
+		//
+		//
+		String text = filter.getText();
+		if (StringUtils.isNotEmpty(text)) {
+			text = text.toLowerCase();
+			List<Predicate> textPredicates = new ArrayList<>(2);
+			//
+			textPredicates.add(builder.like(builder.lower(root.get(SysSystemEntity_.uid)), "%" + text + "%"));
+			//
+			predicates.add(builder.or(textPredicates.toArray(new Predicate[textPredicates.size()])));
+		}
+		//
+		UUID systemId = filter.getSystemId();
+		if (systemId != null) {
+			predicates.add(builder.equal(root.get(SysSystemEntity_.system).get(SysSystem_.id), systemId));
+		}
+		String uid = filter.getUid();
+		if (StringUtils.isNotEmpty(uid)) {
+			predicates.add(builder.equal(root.get(SysSystemEntity_.uid), uid));
+		}
+		SystemEntityType entityType = filter.getEntityType();
+		if (entityType != null) {
+			predicates.add(builder.equal(root.get(SysSystemEntity_.entityType), entityType));
+		}
+		//
+		return predicates;
 	}
 }

@@ -13,13 +13,17 @@ import eu.bcvsolutions.idm.acc.entity.SysSystemEntity;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
 
 /**
- * Entity on target system
+ * Entity on target system.
  * 
  * @author Radek Tomiška
  *
  */
 public interface SysSystemEntityRepository extends AbstractEntityRepository<SysSystemEntity> {
 	
+	/**
+	 * @deprecated use service layer instead.
+	 */
+	@Deprecated(since = "12.0.0")
 	@Query(value = "select e from SysSystemEntity e" +
 	        " where" +
 	        " (lower(e.uid) like ?#{[0].text == null ? '%' : '%'.concat([0].text.toLowerCase()).concat('%')})" +

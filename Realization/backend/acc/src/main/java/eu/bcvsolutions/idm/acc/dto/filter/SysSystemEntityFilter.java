@@ -11,16 +11,16 @@ import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 
 /**
- * Filter for entity on target system
+ * Filter for entity on target system.
  * 
  * @author Radek Tomiška
  *
  */
 public class SysSystemEntityFilter extends DataFilter {
 	
-	private UUID systemId;	
-	private String uid;	
-	private SystemEntityType entityType;
+	public static final String PARAMETER_SYSTEM_ID = "systemId";
+	public static final String PARAMETER_UID = "uid";
+	public static final String PARAMETER_ENTITY_TYPE = "entityType";
 	
 	public SysSystemEntityFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -35,26 +35,26 @@ public class SysSystemEntityFilter extends DataFilter {
 	}
 
 	public UUID getSystemId() {
-		return systemId;
+		return getParameterConverter().toUuid(getData(), PARAMETER_SYSTEM_ID);
 	}
 
 	public void setSystemId(UUID systemId) {
-		this.systemId = systemId;
+		set(PARAMETER_SYSTEM_ID, systemId);
 	}
 
 	public SystemEntityType getEntityType() {
-		return entityType;
+		return getParameterConverter().toEnum(getData(), PARAMETER_ENTITY_TYPE, SystemEntityType.class);
 	}
 
 	public void setEntityType(SystemEntityType entityType) {
-		this.entityType = entityType;
+		set(PARAMETER_ENTITY_TYPE, entityType);
 	}
 
 	public String getUid() {
-		return uid;
+		return getParameterConverter().toString(getData(), PARAMETER_UID);
 	}
 
 	public void setUid(String uid) {
-		this.uid = uid;
+		set(PARAMETER_UID, uid);
 	}
 }
