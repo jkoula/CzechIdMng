@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => {
       borderRadius: theme.shape.borderRadius
     },
     default: {
-      // nothing
+      backgroundColor: theme.palette.action.disabled
     },
     info: {
       backgroundColor: theme.palette.info.main
