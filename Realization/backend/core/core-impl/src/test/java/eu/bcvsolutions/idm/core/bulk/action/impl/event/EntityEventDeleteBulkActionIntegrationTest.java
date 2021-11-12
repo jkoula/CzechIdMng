@@ -22,7 +22,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmEntityEventService;
 import eu.bcvsolutions.idm.core.model.entity.IdmEntityEvent;
 
 /**
- * Delete entity events from queue integration test
+ * Delete entity events from queue integration test.
  * 
  * @author Radek Tomiška
  *

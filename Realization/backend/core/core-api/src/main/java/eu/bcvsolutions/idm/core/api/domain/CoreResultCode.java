@@ -322,6 +322,7 @@ public enum CoreResultCode implements ResultCode {
 	EVENT_EXECUTE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Event [%s] type [%s] for owner [%s] on instance [%s] failed."),
 	EVENT_EXECUTE_PROCESSOR_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Event [%s] failed in processor [%s]."),
 	EVENT_CONTENT_DELETED(HttpStatus.CONFLICT, "Content for event [%s] type [%s] for owner [%s] on instance [%s] was deleted. Event cannot be executed and will be canceled."),
+	EVENT_NOT_RUNNING(HttpStatus.BAD_REQUEST, "Entity event [%s] is not running - can not be cancelled.", NotificationLevel.INFO),
 	//
 	// Identity bulk actions
 	BULK_ACTION_BAD_FILTER(HttpStatus.BAD_REQUEST, "Filter must be instance of [%s], given instance [%s]."),

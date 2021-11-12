@@ -50,6 +50,7 @@ import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.event.EventType;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
 import eu.bcvsolutions.idm.core.api.service.IdmEntityEventService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
@@ -853,5 +854,66 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 		} finally {
 			getHelper().disableAsynchronousProcessing();
 		}
+	}
+	
+	@Test
+	public void testCancelRunningEvent() {
+		IdmEntityEventDto event = new IdmEntityEventDto();
+		AcceptedContent content = new AcceptedContent();
+		content.setId(UUID.randomUUID());
+		event.setContent(content);
+		event.setOwnerId(content.getId());
+		event.setOwnerType(manager.getOwnerType(content));
+		event.setResult(new OperationResultDto.Builder(OperationState.RUNNING).build());
+		event = manager.saveEvent(event);
+		//
+		manager.cancelEvent(event);
+		//
+		event = manager.getEvent(event.getId());
+		Assert.assertEquals(OperationState.CANCELED, event.getResult().getState());
+	}
+	
+	@Test
+	public void testCancelCreatedEvent() {
+		IdmEntityEventDto event = new IdmEntityEventDto();
+		AcceptedContent content = new AcceptedContent();
+		content.setId(UUID.randomUUID());
+		event.setContent(content);
+		event.setOwnerId(content.getId());
+		event.setOwnerType(manager.getOwnerType(content));
+		event.setResult(new OperationResultDto.Builder(OperationState.CREATED).build());
+		event = manager.saveEvent(event);
+		//
+		manager.cancelEvent(event);
+		//
+		event = manager.getEvent(event.getId());
+		Assert.assertEquals(OperationState.CANCELED, event.getResult().getState());
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testCancelNotRunningEvent() {
+		IdmEntityEventDto event = new IdmEntityEventDto();
+		AcceptedContent content = new AcceptedContent();
+		content.setId(UUID.randomUUID());
+		event.setContent(content);
+		event.setOwnerId(content.getId());
+		event.setOwnerType(manager.getOwnerType(content));
+		event = manager.saveEvent(event);
+		//
+		manager.cancelEvent(event);
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testCancelNotRunningEventWitnResult() {
+		IdmEntityEventDto event = new IdmEntityEventDto();
+		AcceptedContent content = new AcceptedContent();
+		content.setId(UUID.randomUUID());
+		event.setContent(content);
+		event.setOwnerId(content.getId());
+		event.setOwnerType(manager.getOwnerType(content));
+		event.setResult(new OperationResultDto.Builder(OperationState.BLOCKED).build());
+		event = manager.saveEvent(event);
+		//
+		manager.cancelEvent(event);
 	}
 }

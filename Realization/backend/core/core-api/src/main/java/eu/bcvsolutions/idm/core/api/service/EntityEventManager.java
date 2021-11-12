@@ -26,6 +26,7 @@ import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.exception.EventContentDeletedException;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -307,11 +308,19 @@ public interface EntityEventManager extends ScriptEnabled {
 	 * - immediate - synchronously
 	 * - high / normal - asynchronously in new thread
 	 * 
-	 * @param event
-	 * @return
+	 * @param entityEvent
 	 * @since 8.0.0
 	 */
-	void executeEvent(IdmEntityEventDto event);
+	void executeEvent(IdmEntityEventDto entityEvent);
+	
+	/**
+	 * Cancel given running event.
+	 * 
+	 * @param entityEvent
+	 * @since 12.0.0
+	 * @throws ResultCodeException if event is not runnable (~ created, running).
+	 */
+	void cancelEvent(IdmEntityEventDto entityEvent);
 	
 	/**
 	 * Persists event "as it is". Event id is set (if it was empty).

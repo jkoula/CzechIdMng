@@ -710,6 +710,32 @@ public class DefaultEntityEventManager implements EntityEventManager {
 	}
 	
 	@Override
+	public void cancelEvent(IdmEntityEventDto entityEvent) {
+		Assert.notNull(entityEvent, "Entity event is required.");
+		OperationResultDto eventResult = entityEvent.getResult();
+		//
+		if (eventResult == null || !eventResult.getState().isRunnable()) {
+			throw new ResultCodeException(CoreResultCode.EVENT_NOT_RUNNING,
+					ImmutableMap.of(
+							"eventId", entityEvent.getId(),
+							ConfigurationService.PROPERTY_INSTANCE_ID, entityEvent.getInstanceId())
+					);
+		}
+		//
+		// clear running event
+		if (eventResult.getState() == OperationState.RUNNING) {
+			removeRunningEvent(entityEvent);
+		}
+		// remove event from queue => end related LRT in waiting state
+		completeEvent(entityEvent.getId(), entityEvent.getTransactionId());
+		//
+		// set canceled state
+		entityEvent.setResult(new OperationResultDto.Builder(OperationState.CANCELED).build());
+		//
+		entityEventService.save(entityEvent);
+	}
+	
+	@Override
 	public void processOnBackground(EntityEvent<? extends Identifiable> event) {
 		Assert.notNull(event, "Event is required to be executed.");
 		//
@@ -749,7 +775,6 @@ public class DefaultEntityEventManager implements EntityEventManager {
 			// remove event from queue
 			completeEvent(entityEvent.getId(), entityEvent.getTransactionId());
 		}
-		
 	}
 	
 	@Override

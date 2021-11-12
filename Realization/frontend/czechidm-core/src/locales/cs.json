@@ -6652,6 +6652,11 @@
         "help": "Vybrané události nebudou hlášeny v monitoringu.",
         "icon": "component:monitoring-ignored"
       },
+      "core-entity-event-cancel-bulk-action": {
+        "label": "Zrušit události",
+        "help": "Zrušit vybrané události.",
+        "icon": "remove"
+      },
       "core-entity-state-delete-bulk-action": {
         "label": "$t(action.delete.action) stavy",
         "help": "Smaže vybrané stavy.",
@@ -8033,6 +8038,10 @@
     "EVENT_NOT_FOUND": {
       "title": "Nenalezeno",
       "message": "Událost již neexistuje, zpracované události jsou automaticky mazány."
+    },
+    "EVENT_NOT_RUNNING": {
+      "title": "Událost již nebeží",
+      "message": "Událost na instanci serveru [{{instanceId}}] nemůže být zrušena, událost již nebeží."
     },
     "CONTENT_DELETED": {
       "title": "Obsah byl smazán",

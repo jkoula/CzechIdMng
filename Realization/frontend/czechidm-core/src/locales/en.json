@@ -6599,6 +6599,11 @@
         "help": "Ignore selected entity events in monitoring warnings.",
         "icon": "component:monitoring-ignored"
       },
+      "core-entity-event-cancel-bulk-action": {
+        "label": "Cancel events",
+        "help": "Cancel selected events.",
+        "icon": "remove"
+      },
       "core-entity-state-delete-bulk-action": {
         "label": "$t(action.delete.action) states",
         "help": "$t(action.delete.action) selected states.",
@@ -7980,6 +7985,10 @@
     "EVENT_NOT_FOUND": {
       "title": "Not found",
       "message": "Event does not exist, processed events are deleted automatically."
+    },
+    "EVENT_NOT_RUNNING": {
+      "title": "Event not running",
+      "message": "Event on instance [{{instanceId}}] cannot be cancelled, event not running."
     },
     "CONTENT_DELETED": {
       "title": "Content was deleted",
