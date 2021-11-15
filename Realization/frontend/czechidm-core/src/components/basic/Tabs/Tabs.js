@@ -110,7 +110,8 @@ export default function BasicTabs(props) {
               hidden={ value !== eventKey }
               id={ `basic-tabpanel-${ eventKey }` }
               aria-labelledby={ `basic-tab-${ eventKey }` }
-              className={ classes.tabContent }>
+              className={ classes.tabContent }
+              style={ child.props.style }>
               {
                 value === eventKey || !unmountOnExit
                 ?
