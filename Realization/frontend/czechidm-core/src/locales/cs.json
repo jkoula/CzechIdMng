@@ -6552,6 +6552,17 @@
           }
         }
       },
+      "core-role-catalogue-delete-bulk-action": {
+        "label": "$t(action.delete.action) položku katalogu",
+        "help": "Smaže vybrané položky katalogu rolí.",
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Smazat i navázané záznamy (force delete)",
+            "help": "Smazat položku katalogu rolí včetně odebrání všech podřazených položek."
+          }
+        }
+      },
       "configuration-export-bulk-action": {
         "icon": "export",
         "label": "Exportovat konfiguraci",
@@ -7742,6 +7753,10 @@
     "ROLE_CATALOGUE_DELETE_FAILED_HAS_CHILDREN": {
       "title": "Katalog rolí nelze odebrat",
       "message": "Katalog rolí [{{roleCatalogue}}] obsahuje podřízené katalogy. Před odebráním tohoto katalogu odeberte všechny podřízené katalogy."
+    },
+    "ROLE_CATALOGUE_FORCE_DELETE_HAS_CHILDREN": {
+      "title": "Katalog rolí obsahuje položky",
+      "message": "Katalog rolí [{{roleCatalogue}}] obsahuje podřízené položky katalogu [<strong class=\"highlight\">{{count}}</strong>]. Před odebráním tohoto katalogu odeberte všechny podřízené položky nebo zaškrtněte smazání včetně navázaných záznamů níže."
     },
     "ROLE_CATALOGUE_BAD_NICE_NAME" : {
       "title": "Duplicitní jméno pro uživatele",

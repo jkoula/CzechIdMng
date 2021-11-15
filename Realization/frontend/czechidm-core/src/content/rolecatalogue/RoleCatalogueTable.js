@@ -85,15 +85,15 @@ class RoleCatalogueTable extends Advanced.AbstractTableContent {
       return null;
     }
     return (
-      <Basic.Div className="basic-toolbar" style={{ borderLeft: '1px solid #ddd' }}>
+      <div className="basic-toolbar" style={{ borderLeft: '1px solid #ddd' }}>
         <Basic.Alert
           title={ this.i18n('label.selected') }
           level="info"
           style={{ margin: 0, maxWidth: 450 }}>
-          <Basic.Div style={{ display: 'flex'}}>
-            <Basic.Div style={{ flex: 1}}>
+          <div style={{ display: 'flex'}}>
+            <div style={{ flex: 1}}>
               <Basic.ShortText text={ this.getManager().getNiceLabel(selectedNode) } maxLength={ 40 }/>
-            </Basic.Div>
+            </div>
             <Basic.Button
               type="button"
               level="primary"
@@ -102,9 +102,9 @@ class RoleCatalogueTable extends Advanced.AbstractTableContent {
               onClick={ this.showDetail.bind(this, selectedNode) }>
               { this.i18n('component.advanced.EntityInfo.link.detail.label') }
             </Basic.Button>
-          </Basic.Div>
+          </div>
         </Basic.Alert>
-      </Basic.Div>
+      </div>
     );
   }
 
@@ -144,8 +144,8 @@ class RoleCatalogueTable extends Advanced.AbstractTableContent {
             manager={ this.getManager() }
             className={ showTree ? 'show-tree' : '' }
             rowClass={ ({rowIndex, data}) => { return Utils.Ui.getRowClass(data[rowIndex]); } }
-            filterOpened={filterOpened}
-            showRowSelection={ SecurityManager.hasAuthority('ROLECATALOGUE_DELETE') }
+            filterOpened={ filterOpened }
+            showRowSelection
             filter={
               <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
                 <Basic.AbstractForm ref="filterForm">
@@ -169,11 +169,6 @@ class RoleCatalogueTable extends Advanced.AbstractTableContent {
                 </Basic.AbstractForm>
               </Advanced.Filter>
             }
-            actions={
-              [
-                { value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false }
-              ]
-            }
             buttons={
               [
                 <Basic.Button
@@ -183,7 +178,7 @@ class RoleCatalogueTable extends Advanced.AbstractTableContent {
                   onClick={ this.showDetail.bind(this, { }) }
                   rendered={ SecurityManager.hasAuthority('ROLECATALOGUE_CREATE') }
                   icon="fa:plus">
-                  {this.i18n('button.add')}
+                  { this.i18n('button.add') }
                 </Basic.Button>
               ]
             }

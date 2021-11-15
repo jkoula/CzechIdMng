@@ -27,7 +27,7 @@ public interface IdmRoleCatalogueRepository extends
 	IdmRoleCatalogue findOneByCode(@Param("code") String code);
 	
 	/**
-	 * Find direct children
+	 * Find direct children.
 	 * 
 	 * @param parentId
 	 * @param pageable

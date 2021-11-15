@@ -16,13 +16,11 @@ import javax.persistence.criteria.Subquery;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -31,7 +29,6 @@ import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleCatalogueFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
-import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmConfigurationService;
@@ -54,11 +51,10 @@ import eu.bcvsolutions.idm.core.scheduler.task.impl.RebuildRoleCatalogueIndexTas
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
- * Implementation of @IdmRoleCatalogueService
+ * Implementation of @IdmRoleCatalogueService.
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
- *
  */
 @Service("roleCatalogueService")
 public class DefaultIdmRoleCatalogueService 
@@ -129,19 +125,11 @@ public class DefaultIdmRoleCatalogueService
 	@Override
 	@Transactional
 	public void deleteInternal(IdmRoleCatalogueDto roleCatalogue) {
-		Page<IdmRoleCatalogue> nodes = repository.findChildren(roleCatalogue.getId(), PageRequest.of(0, 1));
-		if (nodes.getTotalElements() != 0) {
-			throw new ResultCodeException(CoreResultCode.ROLE_CATALOGUE_DELETE_FAILED_HAS_CHILDREN, ImmutableMap.of("roleCatalogue", roleCatalogue.getCode()));
-		}
+		Assert.notNull(roleCatalogue, "DTO is required for delete.");
+		UUID id = roleCatalogue.getId();
+		Assert.notNull(id, "DTO identifier is required for delete.");
 		//
-		// remove row from intersection table
-		roleCatalogueRoleService
-			.findAllByRoleCatalogue(roleCatalogue.getId())
-			.forEach(roleCatalogueRole -> {
-				roleCatalogueRoleService.delete(roleCatalogueRole);
-			});
-		//
-		forestContentService.deleteIndex(roleCatalogue.getId());
+		forestContentService.deleteIndex(id);
 		//
 		super.deleteInternal(roleCatalogue);
 	}

@@ -514,6 +514,7 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String ROLE_CANBEREQUESTED = "ROLE" + BasePermission.SEPARATOR + "CANBEREQUESTED";
 	public static final String ROLE_CHANGEPERMISSION = "ROLE" + BasePermission.SEPARATOR + "CHANGEPERMISSION";
 	//
+	public static final String ROLECATALOGUE_ADMIN = "ROLECATALOGUE" + BasePermission.SEPARATOR + "ADMIN";
 	public static final String ROLECATALOGUE_COUNT = "ROLECATALOGUE" + BasePermission.SEPARATOR + "COUNT";
 	public static final String ROLECATALOGUE_AUTOCOMPLETE = "ROLECATALOGUE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String ROLECATALOGUE_READ = "ROLECATALOGUE" + BasePermission.SEPARATOR + "READ";

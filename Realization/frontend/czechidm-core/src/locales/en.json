@@ -6499,6 +6499,17 @@
           }
         }
       },
+      "core-role-catalogue-delete-bulk-action": {
+        "label": "$t(action.delete.action) catalogue items",
+        "help": "$t(action.delete.action) selected role catalogue items.",
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Force delete",
+            "help": "Delete role catalogue item and all sub items."
+          }
+        }
+      },
       "configuration-export-bulk-action": {
         "icon": "export",
         "label": "Export configuration",
@@ -7689,6 +7700,10 @@
     "ROLE_CATALOGUE_DELETE_FAILED_HAS_CHILDREN": {
       "title": "Role catalog cannot be removed",
       "message": "Role catalog [{{roleCatalogue}}] contains child catalog. Remove all child catalogs first."
+    },
+    "ROLE_CATALOGUE_FORCE_DELETE_HAS_CHILDREN": {
+      "title": "Role catalog contains items",
+      "message": "Role catalog [{{roleCatalogue}}] contains sub catalog items [<strong class=\"highlight\">{{count}}</strong>]. Remove all sub items first or use force delete bellow."
     },
     "ROLE_CATALOGUE_BAD_NICE_NAME" : {
       "title": "Duplicate name for user",

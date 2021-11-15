@@ -17,16 +17,16 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleCatalogueFilter;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Basic role catalogue service operations
+ * Basic role catalogue service operations.
  * 
  * @author Ondřej Kopr
  * @author Radek Tomiška
- *
  */
 @Transactional
 public class DefaultIdmRoleCatalogueServiceIntegrationTest extends AbstractIntegrationTest {
@@ -65,6 +65,14 @@ public class DefaultIdmRoleCatalogueServiceIntegrationTest extends AbstractInteg
 		Assert.assertEquals(0, roleCatalogueRoleService.findAllByRoleCatalogue(roleCatalogue.getId()).size());
 		List<IdmRoleCatalogueDto> roleCatalogues = roleCatalogueService.findAllByRole(role.getId());
 		assertEquals(0, roleCatalogues.size());
+	}
+	
+	@Test(expected = ResultCodeException.class)
+	public void testReferentialIntegrityHasChildren() {
+		IdmRoleCatalogueDto roleCatalogue = getHelper().createRoleCatalogue();
+		getHelper().createRoleCatalogue(null, roleCatalogue.getId());
+		//
+		roleCatalogueService.delete(roleCatalogue);
 	}
 
 // VS: I turned off this validation ... because in implementation is same name (different code) normal situation 
