@@ -227,7 +227,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
   }
 
   onChangeWorkPosition(option) {
-    if (!option) {
+    if (!option || option.value !== 'core:without-work-position') {
       const { uiKey, _searchParameters } = this.props;
       // cleanup redux state search parameters for additional options
       this.context.store.dispatch(manager.setSearchParameters(_searchParameters.clearFilter('withoutWorkPosition'), uiKey));
@@ -235,7 +235,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
   }
 
   onChangeFormProjection(option) {
-    if (!option) {
+    if (!option || option.value !== 'core:without-form-projection') {
       const { uiKey, _searchParameters } = this.props;
       // cleanup redux state search parameters for additional options
       this.context.store.dispatch(manager.setSearchParameters(_searchParameters.clearFilter('withoutFormProjection'), uiKey));

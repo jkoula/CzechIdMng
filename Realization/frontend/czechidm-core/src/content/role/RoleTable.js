@@ -239,7 +239,7 @@ class RoleTable extends Advanced.AbstractTableContent {
   }
 
   onChangeRoleCatalogue(option) {
-    if (!option) {
+    if (!option || option.value !== 'core:no-catalogue') {
       const { roleManager, uiKey, _searchParameters } = this.props;
       // cleanup redux state search parameters for additional options
       this.context.store.dispatch(roleManager.setSearchParameters(_searchParameters.clearFilter('withoutCatalogue'), uiKey));
