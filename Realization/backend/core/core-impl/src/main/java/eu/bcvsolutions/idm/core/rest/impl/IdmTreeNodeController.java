@@ -36,11 +36,13 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditDto;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
+import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.domain.TreeConfiguration;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
+import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmTreeNodeFilter;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -66,7 +68,7 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
 
 /**
- * Tree nodes endpoint 
+ * Tree nodes endpoint.
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
@@ -307,6 +309,62 @@ public class IdmTreeNodeController extends AbstractEventableDtoController<IdmTre
 			@ApiParam(value = "Node's uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId) {
 		return super.getPermissions(backendId);
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/bulk/actions", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.TREENODE_READ + "')")
+	@ApiOperation(
+			value = "Get available bulk actions", 
+			nickname = "availableBulkAction", 
+			tags = { IdmTreeNodeController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.TREENODE_READ, description = "") }),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.TREENODE_READ, description = "") })
+				})
+	public List<IdmBulkActionDto> getAvailableBulkActions() {
+		return super.getAvailableBulkActions();
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/action", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.TREENODE_READ + "')")
+	@ApiOperation(
+			value = "Process bulk action for tree nodes", 
+			nickname = "bulkAction", 
+			response = IdmBulkActionDto.class, 
+			tags = { IdmTreeNodeController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.TREENODE_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.TREENODE_READ, description = "")})
+				})
+	public ResponseEntity<IdmBulkActionDto> bulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.bulkAction(bulkAction);
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/prevalidate", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.TREENODE_READ + "')")
+	@ApiOperation(
+			value = "Prevalidate bulk action for tree nodes", 
+			nickname = "prevalidateBulkAction", 
+			response = IdmBulkActionDto.class, 
+			tags = { IdmTreeNodeController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.TREENODE_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.TREENODE_READ, description = "")})
+				})
+	public ResponseEntity<ResultModels> prevalidateBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.prevalidateBulkAction(bulkAction);
 	}
 	
 	@ResponseBody
@@ -665,7 +723,7 @@ public class IdmTreeNodeController extends AbstractEventableDtoController<IdmTre
 	
 	@Override
 	protected IdmTreeNodeFilter toFilter(MultiValueMap<String, Object> parameters) {
-		IdmTreeNodeFilter filter = new IdmTreeNodeFilter(parameters);
+		IdmTreeNodeFilter filter = new IdmTreeNodeFilter(parameters, getParameterConverter());
 		//
 		// @deprecated @since 9.4.0 => will be removed finally in 10.x
 		UUID legacyParentId = getParameterConverter().toUuid(parameters, "treeNodeId");

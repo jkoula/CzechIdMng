@@ -60,6 +60,7 @@ public interface IdmIdentityContractService extends
 	 * @see #findByWorkPosition(UUID, RecursionType, Pageable)
 	 * @deprecated @since 10.4.0 use {@link IdmIdentityContractFilter#PARAMETER_RECURSION_TYPE}
 	 */
+	@Deprecated(since = "10.4.0")
 	List<IdmIdentityContractDto> findAllByWorkPosition(UUID workPositionId, RecursionType recursion);
 	
 	/**

@@ -23,7 +23,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
 
 /**
- * Integration tests for {@link RoleDeleteBulkAction}.
+ * Integration tests for {@link TreeNodeDeleteBulkAction}.
  *
  * @author Ondrej Husnik
  */

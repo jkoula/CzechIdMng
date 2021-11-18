@@ -31,12 +31,11 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
 
 /**
- * Integration tests for {@link SystemMappingDeleteBulkAction}
+ * Integration tests for {@link SystemMappingDeleteBulkAction}.
  *
  * @author Ondrej Husnik
  *
  */
-
 public class SystemMappingDeleteBulkActionTest extends AbstractBulkActionTest {
 
 	@Autowired

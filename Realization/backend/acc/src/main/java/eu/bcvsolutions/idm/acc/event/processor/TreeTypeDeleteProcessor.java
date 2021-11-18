@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.http.util.Asserts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import eu.bcvsolutions.idm.acc.dto.SysSyncContractConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
+import eu.bcvsolutions.idm.acc.event.SystemMappingEvent;
+import eu.bcvsolutions.idm.acc.event.SystemMappingEvent.SystemMappingEventType;
 import eu.bcvsolutions.idm.acc.repository.SysSyncConfigRepository;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
@@ -29,10 +32,10 @@ import eu.bcvsolutions.idm.core.exception.TreeTypeException;
 import eu.bcvsolutions.idm.core.model.event.TreeTypeEvent.TreeTypeEventType;
 
 /**
- * Before tree type delete - check connection on systems mapping
+ * Before tree type delete - check connection on systems mapping.
  * 
  * @author Svanda
- *
+ * @author Radek Tomiška
  */
 @Component(TreeTypeDeleteProcessor.PROCESSOR_NAME)
 @Description("Ensures referential integrity. Cannot be disabled.")
@@ -62,29 +65,37 @@ public class TreeTypeDeleteProcessor extends AbstractEntityEventProcessor<IdmTre
 	@Override
 	public EventResult<IdmTreeTypeDto> process(EntityEvent<IdmTreeTypeDto> event) {
 		IdmTreeTypeDto treeType = event.getContent();
-		Asserts.notNull(treeType, "TreeType must be set!");
+		UUID treeTypeId = treeType.getId();
+		Asserts.notNull(treeTypeId, "Tree type identifier is required.");
+		boolean forceDelete = getBooleanProperty(PROPERTY_FORCE_DELETE, event.getProperties());
+		//
 		SysSystemMappingFilter filter = new SysSystemMappingFilter();
-		filter.setTreeTypeId(treeType.getId());
-
+		filter.setTreeTypeId(treeTypeId);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(filter, null).getContent();
-		long count = mappings.size();
-		if (count > 0) {
-			SysSystemDto systemDto = systemService
-					.get(schemaObjectClassService.get(mappings.get(0).getObjectClass()).getSystem());
-			throw new TreeTypeException(AccResultCode.SYSTEM_MAPPING_TREE_TYPE_DELETE_FAILED,
-					ImmutableMap.of("treeType", treeType.getName(), "system", systemDto.getCode()));
+		if (!forceDelete) {
+			long count = mappings.size();
+			if (count > 0) {
+				SysSystemDto systemDto = systemService
+						.get(schemaObjectClassService.get(mappings.get(0).getObjectClass()).getSystem());
+				throw new TreeTypeException(AccResultCode.SYSTEM_MAPPING_TREE_TYPE_DELETE_FAILED,
+						ImmutableMap.of("treeType", treeType.getCode(), "system", systemDto.getCode()));
+			}
+		} else {
+			mappings.forEach(mapping -> {
+				SystemMappingEvent mappingEvent = new SystemMappingEvent(SystemMappingEventType.DELETE, mapping);
+				//
+				systemMappingService.publish(mappingEvent, event);
+			});
 		}
 
-		// Delete link to sync contract configuration
-		if (treeType != null && treeType.getId() != null) {
-			syncConfigRepository
-			.findByDefaultTreeType(treeType.getId())
+		// Delete link to sync contract configuration.
+		syncConfigRepository
+			.findByDefaultTreeType(treeTypeId)
 			.forEach(config -> {
 				SysSyncContractConfigDto configDto = (SysSyncContractConfigDto) syncConfigService.get(config.getId());
 				configDto.setDefaultTreeType(null);
 				syncConfigService.save(configDto);
 			});
-		}
 
 		return new DefaultEventResult<>(event, this);
 	}

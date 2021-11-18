@@ -145,7 +145,7 @@ public class DefaultIdmTreeNodeService
 		//
 		Page<IdmTreeNode> nodes = repository.findChildren(null, treeNode.getId(), PageRequest.of(0, 1));
 		if (nodes.getTotalElements() > 0) {
-			throw new TreeNodeException(CoreResultCode.TREE_NODE_DELETE_FAILED_HAS_CHILDREN,  ImmutableMap.of("treeNode", treeNode.getName()));
+			throw new TreeNodeException(CoreResultCode.TREE_NODE_DELETE_FAILED_HAS_CHILDREN,  ImmutableMap.of("treeNode", treeNode.getCode()));
 		}
 		//
 		forestContentService.deleteIndex(treeNode.getId());

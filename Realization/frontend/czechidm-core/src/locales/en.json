@@ -6510,6 +6510,28 @@
           }
         }
       },
+      "core-tree-type-delete-bulk-action": {
+        "label": "$t(action.delete.action) structure types",
+        "help": "$t(action.delete.action) selected structure types.",
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Force delete",
+            "help": "Delete structure type and all related elements, contracts, automatic roles and other related records."
+          }
+        }
+      },
+      "core-tree-node-delete-bulk-action": {
+        "label": "$t(action.delete.action) structure elements",
+        "help": "$t(action.delete.action) selected structure elements.",
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Force delete",
+            "help": "Delete structure element and all related contracts, automatic roles and other related records."
+          }
+        }
+      },
       "configuration-export-bulk-action": {
         "icon": "export",
         "label": "Export configuration",

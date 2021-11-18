@@ -29,7 +29,7 @@ import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleCatalogueFilter;
-import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
+import eu.bcvsolutions.idm.core.api.rest.AbstractEventableDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueService;
@@ -45,10 +45,10 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
 
 /**
- * Role catalogue controller
+ * Role catalogue controller.
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
- *
+ * @author Radek Tomiška
  */
 @RestController
 @RequestMapping(value = BaseDtoController.BASE_PATH + "/role-catalogues")
@@ -58,7 +58,7 @@ import io.swagger.annotations.AuthorizationScope;
 		description = "Operations with role catalogues", 
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE,
 		consumes = MediaType.APPLICATION_JSON_VALUE)
-public class IdmRoleCatalogueController extends AbstractReadWriteDtoController<IdmRoleCatalogueDto, IdmRoleCatalogueFilter> {
+public class IdmRoleCatalogueController extends AbstractEventableDtoController<IdmRoleCatalogueDto, IdmRoleCatalogueFilter> {
 	
 	protected static final String TAG = "Role catalogues";
 	

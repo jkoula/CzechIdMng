@@ -2,11 +2,9 @@ package eu.bcvsolutions.idm.core.bulk.action.impl.role;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,13 +66,11 @@ public class RoleCatalogueDeleteBulkAction extends AbstractRemoveBulkAction<IdmR
 	
 	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
-		Set<String> distinctAttributes = new HashSet<>();
 		List<IdmFormAttributeDto> formAttributes = super.getFormAttributes();
 		//
 		// add force delete, if currently logged user is ROLECATALOGUE_ADMIN
 		if (securityService.hasAnyAuthority(CoreGroupPermission.ROLECATALOGUE_ADMIN)) {
 			formAttributes.add(new IdmFormAttributeDto(EntityEventProcessor.PROPERTY_FORCE_DELETE, "Force delete", PersistentType.BOOLEAN));
-			distinctAttributes.add(EntityEventProcessor.PROPERTY_FORCE_DELETE);
 		}
 		//
 		return formAttributes;

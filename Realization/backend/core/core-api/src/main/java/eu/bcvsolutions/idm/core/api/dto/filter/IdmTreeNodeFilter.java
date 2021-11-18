@@ -99,7 +99,7 @@ public class IdmTreeNodeFilter
 	}
 
     public Boolean getDefaultTreeType() {
-    	return getParameterConverter().toBoolean(data, PARAMETER_DEFAULT_TREE_TYPE);
+    	return getParameterConverter().toBoolean(getData(), PARAMETER_DEFAULT_TREE_TYPE);
     }
 
     public void setDefaultTreeType(Boolean defaultTreeType) {
@@ -107,7 +107,7 @@ public class IdmTreeNodeFilter
     }
 
     public boolean isRecursively() {
-    	return getParameterConverter().toBoolean(data, PARAMETER_RECURSIVELY, DEFAULT_RECURSIVELY);
+    	return getParameterConverter().toBoolean(getData(), PARAMETER_RECURSIVELY, DEFAULT_RECURSIVELY);
     }
 
     public void setRecursively(boolean recursively) {
@@ -115,7 +115,7 @@ public class IdmTreeNodeFilter
     }
     
     public String getCode() {
-		return (String) data.getFirst(PARAMETER_CODE);
+		return getParameterConverter().toString(getData(), PARAMETER_CODE);
 	}
 
 	public void setCode(String code) {
@@ -127,7 +127,7 @@ public class IdmTreeNodeFilter
 	 * @return
 	 */
 	public Boolean getRoots() {
-    	return getParameterConverter().toBoolean(data, PARAMETER_ROOTS);
+    	return getParameterConverter().toBoolean(getData(), PARAMETER_ROOTS);
 	}
 	
 	/**

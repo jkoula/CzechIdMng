@@ -44,6 +44,13 @@ class TreeNodeService extends FormableEntityService {
   }
 
   /**
+   * @since 12.0.0
+   */
+  supportsBulkAction() {
+    return true;
+  }
+
+  /**
    * Returns default searchParameters for current entity type
    *
    * @return {object} searchParameters

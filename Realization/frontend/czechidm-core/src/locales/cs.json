@@ -6563,6 +6563,28 @@
           }
         }
       },
+      "core-tree-type-delete-bulk-action": {
+        "label": "$t(action.delete.action) typy struktur",
+        "help": "Smaže vybrané typy struktur.",
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Smazat i navázané záznamy (force delete)",
+            "help": "Smazat typ struktury včetně odebrání všech prvků, kontraků, automatických rolí a všech dalších navázaných záznamů."
+          }
+        }
+      },
+      "core-tree-node-delete-bulk-action": {
+        "label": "$t(action.delete.action) prvky organizace",
+        "help": "Smaže vybrané prvky organizace.",
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Smazat i navázané záznamy (force delete)",
+            "help": "Smazat prvek včetně odebrání všech kontraků, automatických rolí a všech dalších navázaných záznamů."
+          }
+        }
+      },
       "configuration-export-bulk-action": {
         "icon": "export",
         "label": "Exportovat konfiguraci",

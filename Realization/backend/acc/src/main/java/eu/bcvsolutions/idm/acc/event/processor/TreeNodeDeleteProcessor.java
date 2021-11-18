@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -49,23 +51,24 @@ public class TreeNodeDeleteProcessor extends AbstractEntityEventProcessor<IdmTre
 	@Override
 	public EventResult<IdmTreeNodeDto> process(EntityEvent<IdmTreeNodeDto> event) {
 		IdmTreeNodeDto node = event.getContent();
-		Assert.notNull(node, "Tree node is required.");
+		UUID treeNodeId = node.getId();
+		Assert.notNull(treeNodeId, "Tree node identifier is required.");
+		//
 		AccTreeAccountFilter filter = new AccTreeAccountFilter();
-		filter.setTreeNodeId(node.getId());
+		filter.setTreeNodeId(treeNodeId);
 		treeAccountService.find(filter, null).forEach(treeAccount -> {
 			treeAccountService.delete(treeAccount);
 		});
 		
-		// Delete link to sync contract configuration
-		if(node != null && node.getId() != null) {
-			syncConfigRepository
-				.findByDefaultTreeNode(node.getId())
-				.forEach(config -> {
-					SysSyncContractConfigDto configDto = (SysSyncContractConfigDto) syncConfigService.get(config.getId());
-					configDto.setDefaultTreeNode(null);
-					syncConfigService.save(configDto);
-				});
-		}
+		// Delete link to sync contract configuration.
+		syncConfigRepository
+			.findByDefaultTreeNode(treeNodeId)
+			.forEach(config -> {
+				SysSyncContractConfigDto configDto = (SysSyncContractConfigDto) syncConfigService.get(config.getId());
+				configDto.setDefaultTreeNode(null);
+				syncConfigService.save(configDto);
+			});
+
 		return new DefaultEventResult<>(event, this);
 	}
 	

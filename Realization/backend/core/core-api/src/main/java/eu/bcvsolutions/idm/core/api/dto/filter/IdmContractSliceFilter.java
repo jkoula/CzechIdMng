@@ -10,6 +10,8 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 
 /**
  * Filter for {@link IdmContractSliceDto} dtos.
+ * 
+ * FIXME: rewrite to pure DataFilter, lookout - IdmIdentityContractFilter properties are not fully implemented now!
  *
  * @author svandav
  */

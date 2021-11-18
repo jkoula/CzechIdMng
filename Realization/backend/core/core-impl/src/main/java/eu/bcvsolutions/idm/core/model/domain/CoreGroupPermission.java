@@ -490,6 +490,7 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String CONFIGURATION_UPDATE = "CONFIGURATION" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String CONFIGURATION_DELETE = "CONFIGURATION" + BasePermission.SEPARATOR + "DELETE";
 	//
+	public static final String TREENODE_ADMIN = "TREENODE" + BasePermission.SEPARATOR + "ADMIN";
 	public static final String TREENODE_COUNT = "TREENODE" + BasePermission.SEPARATOR + "COUNT";
 	public static final String TREENODE_AUTOCOMPLETE = "TREENODE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String TREENODE_READ = "TREENODE" + BasePermission.SEPARATOR + "READ";
@@ -497,6 +498,7 @@ public enum CoreGroupPermission implements GroupPermission {
 	public static final String TREENODE_UPDATE = "TREENODE" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String TREENODE_DELETE = "TREENODE" + BasePermission.SEPARATOR + "DELETE";
 	//
+	public static final String TREETYPE_ADMIN = "TREETYPE" + BasePermission.SEPARATOR + "ADMIN";
 	public static final String TREETYPE_COUNT = "TREETYPE" + BasePermission.SEPARATOR + "COUNT";
 	public static final String TREETYPE_AUTOCOMPLETE = "TREETYPE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
 	public static final String TREETYPE_READ = "TREETYPE" + BasePermission.SEPARATOR + "READ";

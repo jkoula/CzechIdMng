@@ -1,13 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
+import uuid from 'uuid';
+//
 import * as Basic from '../../../components/basic';
 import * as Advanced from '../../../components/advanced';
-import uuid from 'uuid';
 import { SecurityManager, DataManager, TreeTypeManager } from '../../../redux';
 
 /**
- * Table of type
+ * Table of structure types.
+ *
+ * @author Ondřej Kopr
+ * @author Radek Tomiška
  */
 export class TypeTable extends Basic.AbstractContent {
 
@@ -38,7 +42,7 @@ export class TypeTable extends Basic.AbstractContent {
       event.preventDefault();
     }
     const data = {
-      ... this.refs.filterForm.getData(),
+      ...this.refs.filterForm.getData(),
     };
     this.refs.table.useFilterData(data);
   }
@@ -50,27 +54,6 @@ export class TypeTable extends Basic.AbstractContent {
     this.refs.table.cancelFilter(this.refs.filterForm);
   }
 
-  onDelete(bulkActionValue, selectedRows) {
-    const { uiKey, treeTypeManager } = this.props;
-    const selectedEntities = treeTypeManager.getEntitiesByIds(this.context.store.getState(), selectedRows);
-    //
-    this.refs['confirm-' + bulkActionValue].show(
-      this.i18n(`action.${bulkActionValue}.message`, { count: selectedEntities.length, record: treeTypeManager.getNiceLabel(selectedEntities[0]), records: treeTypeManager.getNiceLabels(selectedEntities).join(', ') }),
-      this.i18n(`action.${bulkActionValue}.header`, { count: selectedEntities.length, records: treeTypeManager.getNiceLabels(selectedEntities).join(', ') })
-    ).then(() => {
-      this.context.store.dispatch(treeTypeManager.deleteEntities(selectedEntities, uiKey, (entity, error, successEntities) => {
-        if (entity && error) {
-          this.addErrorMessage({ title: this.i18n(`action.delete.error`, { record: treeTypeManager.getNiceLabel(entity) }) }, error);
-        }
-        if (!error && successEntities) {
-          this.refs.table.reload();
-        }
-      }));
-    }, () => {
-      //
-    });
-  }
-
   /**
    * Recive new form for create new type else show detail for existing org.
    */
@@ -80,9 +63,9 @@ export class TypeTable extends Basic.AbstractContent {
     }
     if (entity.id === undefined) {
       const uuidId = uuid.v1();
-      this.context.history.push(`/tree/types/${uuidId}?new=1`);
+      this.context.history.push(`/tree/types/${ uuidId }?new=1`);
     } else {
-      this.context.history.push('/tree/types/' + entity.id);
+      this.context.history.push(`/tree/types/${ entity.id }`);
     }
   }
 
@@ -96,38 +79,37 @@ export class TypeTable extends Basic.AbstractContent {
           <Basic.Confirm ref="confirm-delete" level="danger"/>
           <Advanced.Table
             ref="table"
-            uiKey={uiKey}
-            manager={treeTypeManager}
-            showRowSelection={SecurityManager.hasAuthority('TREETYPE_DELETE')}
-            rowClass={({rowIndex, data}) => { return data[rowIndex].disabled ? 'disabled' : ''; }}
+            uiKey={ uiKey }
+            manager={ treeTypeManager }
+            showRowSelection
+            rowClass={ ({ rowIndex, data }) => { return data[rowIndex].disabled ? 'disabled' : ''; } }
             filter={
               <Advanced.Filter onSubmit={this.useFilter.bind(this)}>
                 <Basic.AbstractForm ref="filterForm">
                   <Basic.Row className="last">
-                    <div className="col-lg-6">
+                    <Basic.Col lg={ 6 }>
                       <Advanced.Filter.TextField
                         ref="text"
-                        placeholder={this.i18n('entity.TreeType.code') + ' / ' + this.i18n('entity.TreeType.name')}/>
-                    </div>
-                    <div className="col-lg-6 text-right">
+                        placeholder={`${ this.i18n('entity.TreeType.code') } / ${ this.i18n('entity.TreeType.name') }`}/>
+                    </Basic.Col>
+                    <Basic.Col lg={ 6 } className="text-right">
                       <Advanced.Filter.FilterButtons cancelFilter={this.cancelFilter.bind(this)}/>
-                    </div>
+                    </Basic.Col>
                   </Basic.Row>
                 </Basic.AbstractForm>
               </Advanced.Filter>
             }
             filterOpened={!filterOpened}
-            actions={
-              [
-                { value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false }
-              ]
-            }
             buttons={
               [
-                <Basic.Button level="success" key="add_button" className="btn-xs" onClick={this.showDetail.bind(this, {})} rendered={SecurityManager.hasAuthority('TREETYPE_CREATE')}>
-                  <Basic.Icon type="fa" icon="plus"/>
-                  {' '}
-                  {this.i18n('button.add')}
+                <Basic.Button
+                  level="success"
+                  key="add_button"
+                  buttonSize="xs"
+                  onClick={ this.showDetail.bind(this, {}) }
+                  rendered={ SecurityManager.hasAuthority('TREETYPE_CREATE') }
+                  icon="fa:plus">
+                  { this.i18n('button.add') }
                 </Basic.Button>
               ]
             }>
@@ -138,8 +120,8 @@ export class TypeTable extends Basic.AbstractContent {
                 ({ rowIndex, data }) => {
                   return (
                     <Advanced.DetailButton
-                      title={this.i18n('button.detail')}
-                      onClick={this.showDetail.bind(this, data[rowIndex])}/>
+                      title={ this.i18n('button.detail') }
+                      onClick={ this.showDetail.bind(this, data[rowIndex]) }/>
                   );
                 }
               }
@@ -153,7 +135,7 @@ export class TypeTable extends Basic.AbstractContent {
                 ({ rowIndex, data }) => {
                   //
                   return (
-                    <input type="checkbox" checked={ (defaultTreeType && defaultTreeType.id === data[rowIndex].id) ? true : false } disabled />
+                    <input type="checkbox" checked={ !!(defaultTreeType && defaultTreeType.id === data[rowIndex].id) } disabled />
                   );
                 }
               }/>
