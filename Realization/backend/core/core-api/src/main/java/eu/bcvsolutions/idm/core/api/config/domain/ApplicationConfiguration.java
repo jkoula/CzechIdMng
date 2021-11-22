@@ -77,6 +77,22 @@ public interface ApplicationConfiguration extends Configurable {
 	 */
 	String PROPERTY_APPLICATION_THEME = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.theme";
 	
+	/**
+	 * Footer help link url.
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_SHOW_FOOTER_HELP_LINK = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.footer.help.link";
+	String DEFAULT_SHOW_FOOTER_HELP_LINK = "https://wiki.czechidm.com/start";
+	
+	/**
+	 * Footer service desk link url.
+	 * 
+	 * @since 12.0.0
+	 */
+	String PROPERTY_SHOW_FOOTER_SERVICEDESK_LINK = ConfigurationService.IDM_PUBLIC_PROPERTY_PREFIX + "app.show.footer.serviceDesk.link";
+	String DEFAULT_SHOW_FOOTER_SERVICEDESK_LINK = "https://redmine.czechidm.com/projects/czechidmng";
+	
 	@Override
 	default String getConfigurableType() {
 		return AppModule.MODULE_ID;
@@ -111,6 +127,10 @@ public interface ApplicationConfiguration extends Configurable {
 		properties.add(getPropertyName(PROPERTY_FRONTEND_URL));
 		properties.add(getPropertyName(PROPERTY_BACKEND_URL));
 		properties.add(getPropertyName(PROPERTY_APPLICATION_LOGO));
+		properties.add(getPropertyName(PROPERTY_APPLICATION_THEME));
+		properties.add(getPropertyName(PROPERTY_SHOW_FOOTER_HELP_LINK));
+		properties.add(getPropertyName(PROPERTY_SHOW_FOOTER_SERVICEDESK_LINK));
+		//
 		return properties;
 	}
 	

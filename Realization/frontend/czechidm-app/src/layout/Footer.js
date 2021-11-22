@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 //
-import { Basic } from 'czechidm-core';
+import { Basic, Managers } from 'czechidm-core';
 import packageInfo from '../../package.json';
 
 /**
@@ -29,7 +29,8 @@ class Footer extends Basic.AbstractContent {
   }
 
   render() {
-    const { backendVersion, rendered } = this.props;
+    const { backendVersion, rendered, helpLink, serviceDeskLink } = this.props;
+    //
     if (!rendered) {
       return null;
     }
@@ -62,20 +63,32 @@ class Footer extends Basic.AbstractContent {
             { this.i18n('app.author.name') }
           </a>
           <span style={{ margin: '0 10px' }}>|</span>
-          <a
-            href={ `${ this.i18n('app.documentation.url') }/start`}
-            target="_blank"
-            rel="noopener noreferrer">
-            { this.i18n('app.helpDesk') }
-          </a>
-          <span style={{ margin: '0 10px' }}>|</span>
-          <a
-            href="http://redmine.czechidm.com/projects/czechidmng"
-            target="_blank"
-            rel="noopener noreferrer">
-            { this.i18n('app.serviceDesk') }
-          </a>
-          <span style={{ margin: '0 10px' }}>|</span>
+          {
+            !helpLink
+            ||
+            <>
+              <a
+                href={ helpLink }
+                target="_blank"
+                rel="noopener noreferrer">
+                { this.i18n('app.helpDesk') }
+              </a>
+              <span style={{ margin: '0 10px' }}>|</span>
+            </>
+          }
+          {
+            !serviceDeskLink
+            ||
+            <>
+              <a
+                href={ serviceDeskLink }
+                target="_blank"
+                rel="noopener noreferrer">
+                { this.i18n('app.serviceDesk') }
+              </a>
+              <span style={{ margin: '0 10px' }}>|</span>
+            </>
+          }
           <a href="#" onClick={ this.showAbout.bind(this) } title={ this.i18n('content.about.link') }>
             { this.i18n('content.about.link') }
           </a>
@@ -100,7 +113,17 @@ Footer.defaultProps = {
 function select(state) {
   return {
     i18nReady: state.config.get('i18nReady'),
-    backendVersion: 'x.x.x'// settingManager.getValue(state, 'environment.version')
+    backendVersion: 'x.x.x', // settingManager.getValue(state, 'environment.version')
+    helpLink: Managers.ConfigurationManager.getValue(
+      state,
+      'idm.pub.app.show.footer.help.link',
+      'https://wiki.czechidm.com/start'
+    ),
+    serviceDeskLink: Managers.ConfigurationManager.getValue(
+      state,
+      'idm.pub.app.show.footer.serviceDesk.link',
+      'https://redmine.czechidm.com/projects/czechidmng'
+    ),
   };
 }
 
