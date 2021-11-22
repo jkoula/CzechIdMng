@@ -42,7 +42,7 @@ public class AsynchronousAccountManagementIntegrationTest extends AbstractIntegr
 	@Autowired private IdmIdentityService identityService;
 	@Autowired private AccAccountService accountService;
 	@Autowired private SysSystemService systemService;
-	@Autowired private SysSystemAttributeMappingService schemaAttributeHandlingService;
+	@Autowired private SysSystemAttributeMappingService attributeMappingService;
 	@Autowired private IdmEntityEventService entityEventService;
 	
 	@Before
@@ -89,11 +89,11 @@ public class AsynchronousAccountManagementIntegrationTest extends AbstractIntegr
 		// add error to some script
 		SysSystemDto system = getHelper().createTestResourceSystem(true);
 		SysSystemMappingDto mapping = getHelper().getDefaultMapping(system);
-		SysSystemAttributeMappingDto attributeHandlingUserName = schemaAttributeHandlingService
+		SysSystemAttributeMappingDto attributeHandlingUserName = attributeMappingService
 				.findBySystemMappingAndName(mapping.getId(), TestHelper.ATTRIBUTE_MAPPING_NAME);
 		// username is transformed with error
 		attributeHandlingUserName.setTransformToResourceScript("returan \"" + "error" + "\";");
-		attributeHandlingUserName = schemaAttributeHandlingService.save(attributeHandlingUserName);
+		attributeHandlingUserName = attributeMappingService.save(attributeHandlingUserName);
 		
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmRoleDto role = getHelper().createRole();

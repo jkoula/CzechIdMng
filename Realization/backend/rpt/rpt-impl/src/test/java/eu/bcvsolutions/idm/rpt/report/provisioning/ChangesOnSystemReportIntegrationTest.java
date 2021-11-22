@@ -12,9 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
@@ -39,6 +42,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 	@Autowired private AttachmentManager attachmentManager;
 	@Autowired private ChangesOnSystemReportXlsxRenderer xlsxRenderer;
 	@Autowired private AccAccountService accountService;
+	@Autowired private SysSystemAttributeMappingService attributeMappingService;
 	
 	public TestHelper getHelper() {
 		return (TestHelper) super.getHelper();
@@ -101,6 +105,9 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		IdmTreeNodeDto position = getHelper().createTreeNode();
 		getHelper().createContract(identityTwo, position);
 		SysSystemDto system = createSystemWithOperation();
+		SysSystemMappingDto defaultMapping = getHelper().getDefaultMapping(system);
+		SysSystemAttributeMappingDto attributeName = attributeMappingService
+				.findBySystemMappingAndName(defaultMapping.getId(), TestHelper.ATTRIBUTE_MAPPING_NAME);
 		IdmRoleDto role = getHelper().createRole();
 		getHelper().createRoleSystem(role, system);
 		getHelper().createIdentityRole(identityTwo, role);
@@ -119,7 +126,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		IdmFormDefinitionDto definition = reportExecutor.getFormDefinition();
 		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ChangesOnSystemReportExecutor.PARAMETER_MAPPING_ATTRIBUTES));
 		// TODO: create json java POJO representation
-		filterValue.setStringValue("{ \"system\": \"" + system.getId() + "\", \"systemMapping\": \"" + getHelper().getDefaultMapping(system).getId() + "\", \"mappingAttributes\": [] }");
+		filterValue.setStringValue("{ \"system\": \"" + system.getId() + "\", \"systemMapping\": \"" + defaultMapping.getId() + "\", \"mappingAttributes\": [ \"" + attributeName.getId() + "\" ] }");
 		filter.getValues().add(filterValue);
 		IdmFormValueDto filterIdentitites = new IdmFormValueDto(definition.getMappedAttributeByCode(ChangesOnSystemReportExecutor.PARAMETER_ONLY_IDENTITY));
 		filterIdentitites.setUuidValue(identityOne.getId());

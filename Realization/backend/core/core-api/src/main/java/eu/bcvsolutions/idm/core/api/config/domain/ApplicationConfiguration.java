@@ -123,11 +123,11 @@ public interface ApplicationConfiguration extends Configurable {
 	default List<String> getPropertyNames() {
 		List<String> properties = new ArrayList<>(); // we are not using superclass properties - enable and order does not make a sense here
 		properties.add(getPropertyName(PROPERTY_STAGE));
-		properties.add(getPropertyName(PROPERTY_SHOW_LOGOUT_CONTENT));
 		properties.add(getPropertyName(PROPERTY_FRONTEND_URL));
 		properties.add(getPropertyName(PROPERTY_BACKEND_URL));
 		properties.add(getPropertyName(PROPERTY_APPLICATION_LOGO));
 		properties.add(getPropertyName(PROPERTY_APPLICATION_THEME));
+		properties.add(getPropertyName(PROPERTY_SHOW_LOGOUT_CONTENT));
 		properties.add(getPropertyName(PROPERTY_SHOW_FOOTER_HELP_LINK));
 		properties.add(getPropertyName(PROPERTY_SHOW_FOOTER_SERVICEDESK_LINK));
 		//

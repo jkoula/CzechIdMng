@@ -241,7 +241,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	 * @return
 	 */
 	private List<SysSystemAttributeMappingDto> getAttributesById(List<UUID> attributeIds, SysSystemMappingDto mapping) {
-		if (attributeIds == null || attributeIds.isEmpty()) {
+		if (CollectionUtils.isEmpty(attributeIds)) {
 			SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 			filter.setSystemMappingId(mapping.getId());
 			filter.setDisabledAttribute(Boolean.FALSE);
