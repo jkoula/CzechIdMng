@@ -1,4 +1,4 @@
-# CzechIdM 11
+# CzechIdM 12
 
 CzechIdM is an opensource identity management tool for user accounts that automates the operations associated with establishing and managing identities.
 
@@ -47,12 +47,12 @@ The seventh version of [CzechIdM](http://www.czechidm.com/) will be based on tec
 
 ## Screenshots
 ### Login page
-![Login page](https://wiki.czechidm.com/_media/login_page.png)
+![Login page](https://wiki.czechidm.com/_media/login.png)
 ### User's dashboard
-![User's dashboard](https://wiki.czechidm.com/_media/basic_info.png)
+![User's dashboard](https://wiki.czechidm.com/_media/dashboard.png)
 ### Role detail
-![Role detail](https://wiki.czechidm.com/_media/role.png)
+![Role detail](https://wiki.czechidm.com/_media/role-detail.png)
 ### List of users
-![List of users](https://wiki.czechidm.com/_media/users.png)
+![List of users](https://wiki.czechidm.com/_media/identity-table.png)
 ### Workflow history
-![Workflow history](https://wiki.czechidm.com/_media/wf_history.png)
+![Workflow history](https://wiki.czechidm.com/_media/workflow-audit.png)

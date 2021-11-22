@@ -640,7 +640,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		for (SysAttributeDifferenceDto difference : differences) {
 			SysAttributeDifferenceValueDto value = difference.getValue();
 			if (!difference.isMultivalue() && value != null) {
-				if (value.getChange()==SysValueChangeType.ADDED) {
+				if (value.getChange() == SysValueChangeType.ADDED) {
 					isAdded = true;
 					continue;
 				}

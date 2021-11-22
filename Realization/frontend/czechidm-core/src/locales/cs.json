@@ -6581,7 +6581,7 @@
         "attributes": {
           "force-delete": {
             "label": "Smazat i navázané záznamy (force delete)",
-            "help": "Smazat prvek včetně odebrání všech kontraků, automatických rolí a všech dalších navázaných záznamů. Je odebrána i vazba na odebíraný prvek u kontraktu a další pozice kontraktu - kontraty a další pozice jsou upraveny do stavu '-- bez pracovní pozice v organizační struktuře --'."
+            "help": "Smazat prvek včetně odebrání všech automatických rolí a všech dalších navázaných záznamů. Je odebrána i vazba na odebíraný prvek u kontraktu a další pozice kontraktu - kontraty a další pozice jsou upraveny do stavu '-- bez pracovní pozice v organizační struktuře --'."
           }
         }
       },
