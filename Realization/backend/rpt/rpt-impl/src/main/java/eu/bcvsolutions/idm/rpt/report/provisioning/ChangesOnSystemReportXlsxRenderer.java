@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.rpt.report.provisioning;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,17 +79,13 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 			// parse and render attribute record
 			token = getJsonNodeByName(jParser, ChangesOnSystemReportExecutor.RECORDS_JSON_KEY);
 			int recordIdx = 1;
-			do {
-				if (token != null) {
-					RptChangesOnSystemRecordDto record = getMapper().readValue(jParser, RptChangesOnSystemRecordDto.class);
-					renderRecord(recordIdx, sheet, record, attributeOrder);
-					token = jParser.nextValue();
-					recordIdx++;
-				} else {
-					break;
-				}
-			} while(token != JsonToken.END_ARRAY && !jParser.isClosed());
-			
+			while (token != null && token != JsonToken.END_ARRAY && !jParser.isClosed()) {
+				RptChangesOnSystemRecordDto record = getMapper().readValue(jParser, RptChangesOnSystemRecordDto.class);
+				renderRecord(recordIdx, sheet, record, attributeOrder);
+				token = jParser.nextValue();
+				recordIdx++;
+			}
+			//
 			// cell autofitting
 			for (int index = 0; index < attributeOrder.size()+1; index++) {
 				sheet.autoSizeColumn(index);
@@ -120,7 +117,7 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 	 * @return
 	 */
 	private Map<String, Integer> renderHeader(Sheet sheet, List<String> headerNames) {
-		Map<String, Integer> attributeOrder = new HashMap<String, Integer>();
+		Map<String, Integer> attributeOrder = new HashMap<String, Integer>(CollectionUtils.isEmpty(headerNames) ? 2 : headerNames.size() + 2);
 		XSSFFont headerFont = ((XSSFWorkbook)sheet.getWorkbook()).createFont();
 		headerFont.setBold(true);
 		headerFont.setFontHeightInPoints((short)15);
@@ -240,20 +237,21 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 	}
 	
 	/**
-	 * Multi value cell renderer 
+	 * Multi value cell renderer.
 	 */
 	private Cell renderMultiValueCell(Cell cell, SysAttributeDifferenceDto attribute) {
 		XSSFRichTextString content = new XSSFRichTextString();
 		SysValueChangeType[] changeTypes = {SysValueChangeType.ADDED, SysValueChangeType.REMOVED, null}; // also defines the order of change types 
-		List<List<SysAttributeDifferenceValueDto>> valueList = new ArrayList<List<SysAttributeDifferenceValueDto>>();
-		for (SysValueChangeType type : changeTypes) {
-			List<SysAttributeDifferenceValueDto> values = attribute
-					.getValues()
-					.stream()
-					.filter(val -> type==val.getChange())
-					.collect(Collectors.toList());
-			valueList.add(values);
-		}
+		List<List<SysAttributeDifferenceValueDto>> valueList = Arrays
+				.stream(changeTypes)
+				.map(type -> {
+					return attribute
+							.getValues()
+							.stream()
+							.filter(val -> type == val.getChange())
+							.collect(Collectors.toList());
+				})
+				.collect(Collectors.toList());
 		
 		for (int i = 0; i < changeTypes.length; i++) {
 			SysValueChangeType changeType = changeTypes[i];

@@ -241,24 +241,19 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	 * @return
 	 */
 	private List<SysSystemAttributeMappingDto> getAttributesById(List<UUID> attributeIds, SysSystemMappingDto mapping) {
-		List<SysSystemAttributeMappingDto> attributes = new ArrayList<SysSystemAttributeMappingDto>();
 		if (attributeIds == null || attributeIds.isEmpty()) {
 			SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 			filter.setSystemMappingId(mapping.getId());
-			filter.setDisabledAttribute(false);
-			attributes = systemAttributeMappingService.find(filter, null).getContent();
-			return attributes;
+			filter.setDisabledAttribute(Boolean.FALSE);
+			//
+			return systemAttributeMappingService.find(filter, null).getContent();
 		}
-		
-		for (UUID id : attributeIds) {
-			SysSystemAttributeMappingDto dto = systemAttributeMappingService.get(id);
-			if (dto == null) {	
-				LOG.warn("Selected mapping attribute cannot be found by its Id [{}]. Will be skipped.", id);
-				continue;
-			}
-			attributes.add(dto);
-		}
-		return attributes;
+		//
+		return attributeIds
+				.stream()
+				.map(systemAttributeMappingService::get)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -268,20 +263,17 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	 * @return
 	 */
 	private Set<UUID> getSelectedIdentities(RptReportDto report) {
-		Set<UUID> result = new HashSet<UUID>();
 		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(report, getFormDefinition(), report.getFilter());
 		List<Serializable> identitiesAsSerializable = formInstance.toPersistentValues(PARAMETER_ONLY_IDENTITY);
 		if (CollectionUtils.isEmpty(identitiesAsSerializable)) {
-			return result;
+			return new HashSet<UUID>();
 		}
-
-		for (Serializable identityIdAsSerializable : identitiesAsSerializable) {
-			if (identityIdAsSerializable == null) {
-				continue;
-			}
-			result.add(DtoUtils.toUuid(identityIdAsSerializable));
-		}
-		return result;
+		//
+		return identitiesAsSerializable
+			.stream()
+			.filter(Objects::nonNull)
+			.map(DtoUtils::toUuid)
+			.collect(Collectors.toSet());
 	}
 	
 	/**
@@ -475,9 +467,13 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	 * @throws JsonMappingException
 	 * @throws JsonGenerationException
 	 */
-	private void createReportData(JsonGenerator jGenerator, AccAccountFilter accountFilter, Set<UUID> identityIds,
-			UUID systemId, List<String> selectedAttributeNames, boolean skipUnchangedMultivalue)
-			throws JsonGenerationException, JsonMappingException, IOException {
+	private void createReportData(
+			JsonGenerator jGenerator,
+			AccAccountFilter accountFilter,
+			Set<UUID> identityIds,
+			UUID systemId,
+			List<String> selectedAttributeNames,
+			boolean skipUnchangedMultivalue) throws IOException {
 
 		if (identityIds == null) { // null indicates that no identity explicitly specified from report config
 			List<UUID> accountIds = accountService.findIds(accountFilter, null).getContent();
