@@ -132,10 +132,10 @@ public class TreeNodeDeleteBulkActionIntegrationTest extends AbstractBulkActionT
 		Assert.assertNull(treeNodeService.get(subTreeNode));
 		Assert.assertNull(treeNodeService.get(subSubTreeNode));
 		Assert.assertNull(treeNodeService.get(subSubTreeNode));
-		Assert.assertNull(identityRoleService.get(assignedRoleOne));
-		Assert.assertNull(identityRoleService.get(assignedRoleTwo));
-		Assert.assertNull(identityContractService.get(contract));
-		Assert.assertNull(contractPositionService.get(contractPosition));
+		Assert.assertNotNull(identityRoleService.get(assignedRoleOne));
+		Assert.assertNotNull(identityRoleService.get(assignedRoleTwo));
+		Assert.assertNull(identityContractService.get(contract).getWorkPosition());
+		Assert.assertNull(contractPositionService.get(contractPosition).getWorkPosition());
 		Assert.assertNull(roleTreeNodeService.get(automaticRole));
 		//
 		Assert.assertNotNull(treeNodeService.get(otherTreeNode));

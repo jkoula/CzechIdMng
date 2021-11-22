@@ -11,27 +11,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.AbstractRemoveBulkAction;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
-import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
-import eu.bcvsolutions.idm.core.api.domain.RecursionType;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmTreeNodeFilter;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmTreeNodeService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
@@ -60,8 +52,6 @@ public class TreeNodeDeleteBulkAction extends AbstractRemoveBulkAction<IdmTreeNo
 	@Autowired private SecurityService securityService;
 	@Autowired private EntityStateManager entityStateManager;
 	@Autowired private EntityManager entityManager;
-	@Autowired private IdmIdentityRoleService identityRoleService;
-	@Autowired private IdmIdentityContractService contractService;
 	//
 	private final List<UUID> processedIds = new ArrayList<UUID>();
 
@@ -166,32 +156,6 @@ public class TreeNodeDeleteBulkAction extends AbstractRemoveBulkAction<IdmTreeNo
 			if (errorResult != null) {
 				return errorResult;
 			}
-		}
-		//
-		// delete identity contracts => contract related records are removed asynchronously, but contract itself will be removed here
-		IdmIdentityContractFilter contractFilter = new IdmIdentityContractFilter();
-		contractFilter.setWorkPosition(treeNodeId);
-		contractFilter.setRecursionType(RecursionType.NO);
-		for (IdmIdentityContractDto contract : contractService.find(contractFilter, null)) {
-			// check assigned roles again - can be assigned in the meantime ...
-			IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
-			UUID contractId = contract.getId();
-			identityRoleFilter.setIdentityContractId(contractId);
-			if (identityRoleService.count(identityRoleFilter) > 0) {		
-				return super.end(
-						result, 
-						new ResultCodeException(
-								CoreResultCode.CONTRACT_DELETE_FAILED_ROLE_ASSIGNED,
-								ImmutableMap.of("contract", contractId)
-						)
-				);
-			}
-			contractService.deleteInternal(contract);
-			//
-			LOG.debug("Contract [{}] deleted.", contractId);
-			// clean up all states
-			entityStateManager.deleteStates(contract, null, null);
-			clearSession();
 		}
 		//
 		treeNodeService.delete(treeNode);

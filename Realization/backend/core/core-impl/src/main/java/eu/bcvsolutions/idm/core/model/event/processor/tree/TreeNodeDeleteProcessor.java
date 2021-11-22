@@ -118,23 +118,25 @@ public class TreeNodeDeleteProcessor extends CoreEventProcessor<IdmTreeNodeDto> 
 				clearSession();
 			});
 			//
-			// delete contract slices
+			// update contract slices
 			IdmContractSliceFilter sliceFilter = new IdmContractSliceFilter();
 			sliceFilter.setTreeNode(treeNodeId);
 			sliceFilter.setRecursionType(RecursionType.NO);
 			contractSliceService.find(sliceFilter, null).forEach(slice -> {
-				contractSliceService.delete(slice);
+				slice.setWorkPosition(null);
+				contractSliceService.save(slice);
 				clearSession();
 			});
 			//
-			// delete related contracts
+			// update related contracts
 			IdmIdentityContractFilter contractFilter = new IdmIdentityContractFilter();
 			contractFilter.setWorkPosition(treeNodeId);
 			contractFilter.setRecursionType(RecursionType.NO);
 			identityContractService.find(contractFilter, null).forEach(identityContract -> {
 				// prepare event
+				identityContract.setWorkPosition(null);
 				IdentityContractEvent contractEvent = new IdentityContractEvent(
-						IdentityContractEventType.DELETE, 
+						IdentityContractEventType.UPDATE, 
 						identityContract
 				);
 				//
@@ -142,13 +144,14 @@ public class TreeNodeDeleteProcessor extends CoreEventProcessor<IdmTreeNodeDto> 
 				clearSession();
 			});
 			//
-			// delete related contract positions
+			// update related contract positions
 			IdmContractPositionFilter positionFilter = new IdmContractPositionFilter();
 			positionFilter.setWorkPosition(treeNodeId);
 			contractPositionService.find(positionFilter, null).forEach(contractPosition -> {
 				// prepare event
+				contractPosition.setWorkPosition(null);
 				ContractPositionEvent contractPositionEvent = new ContractPositionEvent(
-						ContractPositionEventType.DELETE, 
+						ContractPositionEventType.UPDATE, 
 						contractPosition
 				);
 				//

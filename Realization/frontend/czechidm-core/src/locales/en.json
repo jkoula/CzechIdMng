@@ -6517,7 +6517,7 @@
         "attributes": {
           "force-delete": {
             "label": "Force delete",
-            "help": "Delete structure type and all related elements, contracts, automatic roles and other related records."
+            "help": "Delete structure type and all related elements, automatic roles and other related records. Related structure element is removed from related contract and other position, but contrat and other position is preserved (updated only)."
           }
         }
       },
@@ -6528,7 +6528,7 @@
         "attributes": {
           "force-delete": {
             "label": "Force delete",
-            "help": "Delete structure element and all related contracts, automatic roles and other related records."
+            "help": "Delete structure element with all related automatic roles and other related records. Structure element is removed from related contract and other position, but contrat and other position is preserved (updated only)."
           }
         }
       },
