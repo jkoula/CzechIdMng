@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,11 @@ public abstract class AbstractFormProjectionLookup<DTO extends BaseDto> implemen
 		return getBasicFieldsDefinition(dto);
 	}
 	
+	@Override
+	public IdmFormDefinitionDto lookupFormDefinition(DTO dto, IdmFormDefinitionDto formDefinition) {
+		return getFormDefinition(dto, formDefinition);
+	}
+	
 	/**
 	 * Construct basic fields form definition.
 	 * 
@@ -66,6 +72,18 @@ public abstract class AbstractFormProjectionLookup<DTO extends BaseDto> implemen
 	 * @return basic fields form definition
 	 */
 	protected IdmFormDefinitionDto getBasicFieldsDefinition(DTO dto) {
+		return getFormDefinition(dto, null); // null ~ basicFileds ~ without form definition
+	}
+	
+	/**
+	 * Get overriden / configured form definition by projection.
+	 * @param dto projection owner
+	 * @param formDefinition form definition to load
+	 * @return overriden form definition
+	 * 
+	 * @since 12.0.0
+	 */
+	protected IdmFormDefinitionDto getFormDefinition(DTO dto, IdmFormDefinitionDto formDefinition) {
 		IdmFormProjectionDto formProjection = lookupProjection(dto);
 		if (formProjection == null) {
 			return null;
@@ -75,20 +93,28 @@ public abstract class AbstractFormProjectionLookup<DTO extends BaseDto> implemen
 			return null;
 		}
 		//
-		IdmFormDefinitionDto basicFieldsDefinition = new IdmFormDefinitionDto();
-		basicFieldsDefinition.setCode(FormService.FORM_DEFINITION_CODE_BASIC_FIELDS);
+		if (formDefinition == null) { // ~ basic fields
+			formDefinition = new IdmFormDefinitionDto();
+			formDefinition.setCode(FormService.FORM_DEFINITION_CODE_BASIC_FIELDS);
+		}
+		IdmFormDefinitionDto overridenDefinition = new IdmFormDefinitionDto(); // clone ~ prevent to change input (e.g. cache can be modified)
+		overridenDefinition.setId(formDefinition.getId());
+		overridenDefinition.setCode(formDefinition.getCode());
 		// transform form attributes from json
 		try {
 			List<IdmFormAttributeDto> attributes = mapper.readValue(formValidations, new TypeReference<List<IdmFormAttributeDto>>() {});
-			attributes.forEach(attribute -> {
-				if (attribute.getId() == null) {
-					// wee need artificial id to find attributes in definition / instance
-					attribute.setId(UUID.randomUUID());
-				}
-				basicFieldsDefinition.addFormAttribute(attribute);
-			});
+			attributes
+				.stream()
+				.filter(attribute -> Objects.equals(attribute.getFormDefinition(), overridenDefinition.getId()))
+				.forEach(attribute -> {
+					if (attribute.getId() == null) {
+						// we need artificial id to find attributes in definition / instance
+						attribute.setId(UUID.randomUUID());
+					}
+					overridenDefinition.addFormAttribute(attribute);
+				});
 			//
-			return basicFieldsDefinition;
+			return overridenDefinition;
 		} catch (IOException ex) {
 			throw new ResultCodeException(
 					CoreResultCode.FORM_PROJECTION_WRONG_VALIDATION_CONFIGURATION,

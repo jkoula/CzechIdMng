@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import _ from 'lodash';
 //
 import * as Basic from '../../basic';
 import * as Utils from '../../../utils';
@@ -172,6 +173,7 @@ export default class EavForm extends Basic.AbstractContextComponent {
       validationErrors,
       formableManager,
       showAttributes,
+      formValidations,
       condensed,
       className
     } = this.props;
@@ -235,15 +237,49 @@ export default class EavForm extends Basic.AbstractContextComponent {
               );
             }
             //
+            // apply overriden form Validations and setting
+            const _finalAttribute = _.merge({}, attribute);
+            if (formValidations) {
+              try {
+                const _overridenAttribute = JSON
+                  .parse(formValidations)
+                  .find(a => a.id === attribute.id);
+                if (_overridenAttribute) {
+                  _finalAttribute.readonly = _overridenAttribute.readonly;
+                  _finalAttribute.required = _overridenAttribute.required;
+                  if (_overridenAttribute.placeholder) {
+                    _finalAttribute.placeholder = _overridenAttribute.placeholder;
+                  }
+                  if (_overridenAttribute.label) {
+                    _finalAttribute.name = _overridenAttribute.label;
+                  }
+                  if (_overridenAttribute.min) {
+                    _finalAttribute.min = _overridenAttribute.min;
+                  }
+                  if (_overridenAttribute.max) {
+                    _finalAttribute.max = _overridenAttribute.max;
+                  }
+                  if (_overridenAttribute.regex) {
+                    _finalAttribute.regex = _overridenAttribute.regex;
+                  }
+                  if (_overridenAttribute.validationMessage) {
+                    _finalAttribute.validationMessage = _overridenAttribute.validationMessage;
+                  }
+                }
+              } catch (syntaxError) {
+                // nothing - attribute  will not be overriden
+              }
+            }
+            //
             const FormValueComponent = component.component;
             const ManagerType = component.manager;
             //
             return (
               <FormValueComponent
                 ref={ attribute.code }
-                uiKey={ `form-attribute-${attribute.code}` }
+                uiKey={ `form-attribute-${ attribute.code }` }
                 formDefinition={ this.getFormDefinition() }
-                attribute={ attribute }
+                attribute={ _finalAttribute }
                 values={ values }
                 readOnly={ readOnly }
                 useDefaultValue={ useDefaultValue }
@@ -290,6 +326,12 @@ EavForm.propTypes = {
    * Render given attributes only. Render all atributes otherwise.
    */
   showAttributes: PropTypes.arrayOf(PropTypes.string),
+  /**
+   * Overriden attributes validations and settings
+   *
+   * @since 12.0.0
+   */
+  formValidations: PropTypes.arrayOf(PropTypes.object),
   /**
    * Condensed (shorten) form properties - usable in tables. Just filled values without help will be shown.
    */

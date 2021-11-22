@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent.CoreEventType;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -20,12 +21,14 @@ import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.exception.InvalidFormException;
 import eu.bcvsolutions.idm.core.api.service.ContractSliceManager;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.event.processor.FormInstanceProcessor;
+import eu.bcvsolutions.idm.core.eav.api.service.FormProjectionManager;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 
 /**
@@ -43,6 +46,8 @@ public class FormInstanceValidateProcessor
 	public static final String PROCESSOR_NAME = "core-form-instance-validate-processor";
 	//
 	@Autowired private FormService formService;
+	@Autowired private LookupService lookupService;
+	@Autowired private FormProjectionManager formProjectionManager;
 	
 	public FormInstanceValidateProcessor() {
 		super(CoreEventType.UPDATE); // eavs are updated for CUD
@@ -70,8 +75,22 @@ public class FormInstanceValidateProcessor
 		IdmFormInstanceDto formInstance = event.getContent();
 		Assert.notNull(formInstance.getFormDefinition(), "Form definition is required for form instance validation.");
 		//
-		IdmFormDefinitionDto formDefinition = formService.getDefinition(formInstance.getFormDefinition().getId());
+		// resolve given / configured / overridden / default form definition
+		// configured definition is loaded only once and applied twice (optimization)
+		IdmFormDefinitionDto configuredFormDefinition = formProjectionManager.getConfiguredFormDefinition(
+				getOwner(formInstance), 
+				formInstance.getFormDefinition()
+		);
+		IdmFormDefinitionDto formDefinition = formProjectionManager.overrideFormDefinition(
+				formService.getDefinition(formInstance.getFormDefinition().getId()), 
+				configuredFormDefinition
+		);
 		Assert.notNull(formDefinition, "Form definition is required for form instance validation.");
+		IdmFormDefinitionDto formInstanceDefinition = formProjectionManager.overrideFormDefinition(
+				formInstance.getFormDefinition(),
+				configuredFormDefinition
+		);
+		Assert.notNull(formInstanceDefinition, "Form definition is required for form instance validation.");
 		//
 		Map<String, Serializable> properties = event.getProperties();
 		//
@@ -82,7 +101,7 @@ public class FormInstanceValidateProcessor
 				.stream()
 				.map(IdmFormValueDto::getFormAttribute)
 				.map(attributeId -> {
-					IdmFormAttributeDto mappedAttribute = formInstance.getFormDefinition().getMappedAttribute(attributeId);
+					IdmFormAttributeDto mappedAttribute = formInstanceDefinition.getMappedAttribute(attributeId);
 					if (mappedAttribute != null) {
 						return mappedAttribute;
 					}
@@ -108,10 +127,19 @@ public class FormInstanceValidateProcessor
 	}
 
 	/**
-	 * Before validation
+	 * Validation before save.
 	 */
 	@Override
 	public int getOrder() {
 		return -50;
+	}
+	
+	private Identifiable getOwner(IdmFormInstanceDto formInstance) {
+		Identifiable owner = formInstance.getOwner();
+		if (owner != null) { // ~ cached in form instance
+			return owner;
+		}
+		//
+		return lookupService.lookupDto(formInstance.getOwnerType(), formInstance.getOwnerId());
 	}
 }

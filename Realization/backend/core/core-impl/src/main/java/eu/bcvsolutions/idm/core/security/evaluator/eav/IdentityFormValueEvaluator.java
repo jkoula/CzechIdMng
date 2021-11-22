@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import eu.bcvsolutions.idm.core.model.entity.eav.IdmIdentityFormValue;
 
 /**
- * Permissions to form attribute values
+ * Permissions to form attribute values.
  * 
  * @author Radek Tomiška
  *

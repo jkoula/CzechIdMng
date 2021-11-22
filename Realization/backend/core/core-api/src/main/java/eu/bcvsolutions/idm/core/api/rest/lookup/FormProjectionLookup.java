@@ -12,10 +12,10 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormProjectionDto;
  * Find {@link IdmFormProjectionDto} by uuid identifier or by {@link Codeable} identifier.
  * 
  * @author Radek Tomiška
- * @param <T> dto
+ * @param <DTO> dto
  * @since 11.0.0
  */
-public interface FormProjectionLookup<T extends BaseDto> extends Plugin<Class<?>> {
+public interface FormProjectionLookup<DTO extends BaseDto> extends Plugin<Class<?>> {
 
 	/**
 	 * Returns {@link IdmFormProjectionDto} for given DTO.
@@ -23,7 +23,7 @@ public interface FormProjectionLookup<T extends BaseDto> extends Plugin<Class<?>
 	 * @param dto basic fields owner
 	 * @return related {@link IdmFormProjectionDto}
 	 */
-	IdmFormProjectionDto lookupProjection(T dto);
+	IdmFormProjectionDto lookupProjection(DTO dto);
 	
 	/**
 	 * Returns {@link IdmFormDefinitionDto} of basic fields for given DTO.
@@ -31,7 +31,17 @@ public interface FormProjectionLookup<T extends BaseDto> extends Plugin<Class<?>
 	 * @param dto basic fields owner
 	 * @return filled {@link IdmFormDefinitionDto}
 	 */
-	IdmFormDefinitionDto lookupBasicFieldsDefinition(T dto);
+	IdmFormDefinitionDto lookupBasicFieldsDefinition(DTO dto);
+	
+	/**
+	 * Returns {@link IdmFormDefinitionDto} of overriden / configured form definition for given DTO.
+	 * 
+	 * @param dto fields owner
+	 * @param formDefinition form definition to load
+	 * @return filled {@link IdmFormDefinitionDto}
+	 * @since 12.0.0
+	 */
+	IdmFormDefinitionDto lookupFormDefinition(DTO dto, IdmFormDefinitionDto formDefinition);
 	
 	/**
 	 * Returns {@link IdmFormInstanceDto} of basic fields for given DTO with filled values.
@@ -39,5 +49,5 @@ public interface FormProjectionLookup<T extends BaseDto> extends Plugin<Class<?>
 	 * @param dto basic fields owner
 	 * @return filled {@link IdmFormInstanceDto}
 	 */
-	IdmFormInstanceDto lookupBasicFieldsInstance(T dto);
+	IdmFormInstanceDto lookupBasicFieldsInstance(DTO dto);
 }

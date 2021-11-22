@@ -1169,7 +1169,7 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
    * Render identity eav attributes.
    */
   renderIdentityAttributes() {
-    const { attributes, identityProjection, isNew, validationErrors } = this.state;
+    const { attributes, formProjection, identityProjection, isNew, validationErrors } = this.state;
     const { entityId } = this.props.match.params;
     //
     return (
@@ -1180,6 +1180,7 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
         showSaveButton
         showAttributesOnly
         showDefinitions={ attributes }
+        formValidations={ formProjection.formValidations }
         entityId={ isNew ? null : entityId }
         formInstances={ isNew ? null : identityProjection._eav }
         validationErrors={ validationErrors }
@@ -1302,7 +1303,7 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
    * Render contract eav attributes by index.
    */
   renderContractAttributes(index, readOnly = false) {
-    const { attributes, identityProjection, isNew, validationErrors } = this.state;
+    const { attributes, formProjection, identityProjection, isNew, validationErrors } = this.state;
     const contract = identityProjection.allContracts[index];
     if (!contract) {
       return null;
@@ -1316,6 +1317,7 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
         showSaveButton={ !readOnly }
         showAttributesOnly
         showDefinitions={ attributes }
+        formValidations={ formProjection.formValidations }
         entityId={ isNew ? null : contract.id }
         formInstances={ isNew ? null : contract._eav }
         validationErrors={ validationErrors }

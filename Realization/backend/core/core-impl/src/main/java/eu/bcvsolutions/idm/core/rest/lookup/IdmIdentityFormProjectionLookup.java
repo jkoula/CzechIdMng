@@ -58,7 +58,7 @@ public class IdmIdentityFormProjectionLookup extends AbstractFormProjectionLooku
 					.filter(attribute -> {
 						String attributeName = attribute.getName();
 						//
-						return StringUtils.isEmpty(attributeName) 
+						return StringUtils.isEmpty(attributeName)
 								|| attributeName.startsWith(String.format("%s.", IdmIdentity.class.getSimpleName()));
 					})
 					.collect(Collectors.toList())

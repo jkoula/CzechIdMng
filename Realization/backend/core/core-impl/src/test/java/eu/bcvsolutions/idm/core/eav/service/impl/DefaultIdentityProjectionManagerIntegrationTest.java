@@ -1533,4 +1533,332 @@ public class DefaultIdentityProjectionManagerIntegrationTest extends AbstractRes
 		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
 		manager.publish(identityProjectionEvent);
 	}
+	
+	@Transactional
+	@Test(expected = InvalidFormException.class)
+	public void testValidateExtendedAttributeRegexFailed() throws Exception {
+		// prepare projection
+		IdmFormProjectionDto formProjection = new IdmFormProjectionDto();
+		formProjection.setCode(getHelper().createName());
+		formProjection.setOwnerType(lookupService.getOwnerType(IdmIdentityDto.class));
+		formProjection.getProperties().put(IdentityFormProjectionRoute.PARAMETER_ALL_CONTRACTS, true);
+		//
+		IdmFormAttributeDto attributeDefinitionOne = new IdmFormAttributeDto();
+		attributeDefinitionOne.setCode(getHelper().createName());
+		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
+		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
+		//
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setId(attributeDefinitionOne.getId());
+		attribute.setPersistentType(attributeDefinitionOne.getPersistentType());
+		attribute.setFormDefinition(attributeDefinitionOne.getFormDefinition());
+		attribute.setCode(attributeDefinitionOne.getCode());
+		attribute.setRequired(true);
+		attribute.setLabel("overriden");
+		attribute.setPlaceholder("overriden");
+		attribute.setMin(BigDecimal.ONE);
+		attribute.setMax(BigDecimal.TEN);
+		attribute.setRegex("[abc]");
+		attribute.setValidationMessage("Test validation failed.");
+		formProjection.setFormValidations(mapper.writeValueAsString(Lists.newArrayList(attribute)));
+		formProjection = projectionService.save(formProjection);
+		//
+		// create identity with projection is defined
+		IdmIdentityDto identity = new IdmIdentityDto(getHelper().createName());
+		identity.setExternalCode(getHelper().createName());
+		identity.setLastName(getHelper().createName());
+		identity.setFormProjection(formProjection.getId());
+		//
+		// set eav 
+		IdmFormInstanceDto instanceOne = new IdmFormInstanceDto();
+		instanceOne.setFormDefinition(formDefinitionOne);
+		IdmFormValueDto valueOne = new IdmFormValueDto(attribute);
+		valueOne.setValue("abcd");
+		instanceOne.setValues(Lists.newArrayList(valueOne));
+		identity.setEavs(Lists.newArrayList(instanceOne));
+		//
+		IdmIdentityProjectionDto projection = new IdmIdentityProjectionDto(identity);
+		//
+		IdentityProjectionEvent identityProjectionEvent = new IdentityProjectionEvent(IdentityProjectionEventType.CREATE, projection);
+		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
+		manager.publish(identityProjectionEvent);
+	}
+	
+	@Transactional
+	@Test(expected = InvalidFormException.class)
+	public void testValidateExtendedAttributeRequiredFailed() throws Exception {
+		// prepare projection
+		IdmFormProjectionDto formProjection = new IdmFormProjectionDto();
+		formProjection.setCode(getHelper().createName());
+		formProjection.setOwnerType(lookupService.getOwnerType(IdmIdentityDto.class));
+		formProjection.getProperties().put(IdentityFormProjectionRoute.PARAMETER_ALL_CONTRACTS, true);
+		//
+		IdmFormAttributeDto attributeDefinitionOne = new IdmFormAttributeDto();
+		attributeDefinitionOne.setCode(getHelper().createName());
+		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
+		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
+		//
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setId(attributeDefinitionOne.getId());
+		attribute.setPersistentType(attributeDefinitionOne.getPersistentType());
+		attribute.setFormDefinition(attributeDefinitionOne.getFormDefinition());
+		attribute.setCode(attributeDefinitionOne.getCode());
+		attribute.setRequired(true);
+		attribute.setLabel("overriden");
+		attribute.setPlaceholder("overriden");
+		attribute.setMin(BigDecimal.ONE);
+		attribute.setMax(BigDecimal.TEN);
+		attribute.setRegex("[abc]");
+		attribute.setValidationMessage("Test validation failed.");
+		formProjection.setFormValidations(mapper.writeValueAsString(Lists.newArrayList(attribute)));
+		formProjection = projectionService.save(formProjection);
+		//
+		// create identity with projection is defined
+		IdmIdentityDto identity = new IdmIdentityDto(getHelper().createName());
+		identity.setExternalCode(getHelper().createName());
+		identity.setLastName(getHelper().createName());
+		identity.setFormProjection(formProjection.getId());
+		//
+		// set eav 
+		IdmFormInstanceDto instanceOne = new IdmFormInstanceDto();
+		instanceOne.setFormDefinition(formDefinitionOne);
+		IdmFormValueDto valueOne = new IdmFormValueDto(attribute);
+		instanceOne.setValues(Lists.newArrayList(valueOne));
+		identity.setEavs(Lists.newArrayList(instanceOne));
+		//
+		IdmIdentityProjectionDto projection = new IdmIdentityProjectionDto(identity);
+		//
+		IdentityProjectionEvent identityProjectionEvent = new IdentityProjectionEvent(IdentityProjectionEventType.CREATE, projection);
+		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
+		manager.publish(identityProjectionEvent);
+	}
+	
+	@Transactional
+	public void testValidateExtendedAttribute() throws Exception {
+		// prepare projection
+		IdmFormProjectionDto formProjection = new IdmFormProjectionDto();
+		formProjection.setCode(getHelper().createName());
+		formProjection.setOwnerType(lookupService.getOwnerType(IdmIdentityDto.class));
+		formProjection.getProperties().put(IdentityFormProjectionRoute.PARAMETER_ALL_CONTRACTS, true);
+		//
+		IdmFormAttributeDto attributeDefinitionOne = new IdmFormAttributeDto();
+		attributeDefinitionOne.setCode(getHelper().createName());
+		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
+		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
+		//
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setId(attributeDefinitionOne.getId());
+		attribute.setPersistentType(attributeDefinitionOne.getPersistentType());
+		attribute.setFormDefinition(attributeDefinitionOne.getFormDefinition());
+		attribute.setCode(attributeDefinitionOne.getCode());
+		attribute.setRequired(true);
+		attribute.setLabel("overriden");
+		attribute.setPlaceholder("overriden");
+		attribute.setMin(BigDecimal.ONE);
+		attribute.setMax(BigDecimal.TEN);
+		attribute.setRegex("[abc]");
+		attribute.setValidationMessage("Test validation failed.");
+		formProjection.setFormValidations(mapper.writeValueAsString(Lists.newArrayList(attribute)));
+		formProjection = projectionService.save(formProjection);
+		//
+		// create identity with projection is defined
+		IdmIdentityDto identity = new IdmIdentityDto(getHelper().createName());
+		identity.setExternalCode(getHelper().createName());
+		identity.setLastName(getHelper().createName());
+		identity.setFormProjection(formProjection.getId());
+		//
+		// set eav 
+		IdmFormInstanceDto instanceOne = new IdmFormInstanceDto();
+		instanceOne.setFormDefinition(formDefinitionOne);
+		IdmFormValueDto valueOne = new IdmFormValueDto(attribute);
+		valueOne.setValue("abc");
+		instanceOne.setValues(Lists.newArrayList(valueOne));
+		identity.setEavs(Lists.newArrayList(instanceOne));
+		//
+		IdmIdentityProjectionDto projection = new IdmIdentityProjectionDto(identity);
+		//
+		IdentityProjectionEvent identityProjectionEvent = new IdentityProjectionEvent(IdentityProjectionEventType.CREATE, projection);
+		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
+		manager.publish(identityProjectionEvent);
+	}
+	
+	@Transactional
+	@Test(expected = InvalidFormException.class)
+	public void testValidateExtendedAttributeMinFailed() throws Exception {
+		// prepare projection
+		IdmFormProjectionDto formProjection = new IdmFormProjectionDto();
+		formProjection.setCode(getHelper().createName());
+		formProjection.setOwnerType(lookupService.getOwnerType(IdmIdentityDto.class));
+		formProjection.getProperties().put(IdentityFormProjectionRoute.PARAMETER_ALL_CONTRACTS, true);
+		//
+		IdmFormAttributeDto attributeDefinitionOne = new IdmFormAttributeDto();
+		attributeDefinitionOne.setCode(getHelper().createName());
+		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
+		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
+		//
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setId(attributeDefinitionOne.getId());
+		attribute.setPersistentType(attributeDefinitionOne.getPersistentType());
+		attribute.setFormDefinition(attributeDefinitionOne.getFormDefinition());
+		attribute.setCode(attributeDefinitionOne.getCode());
+		attribute.setRequired(true);
+		attribute.setLabel("overriden");
+		attribute.setPlaceholder("overriden");
+		attribute.setMin(BigDecimal.TEN);
+		attribute.setMax(BigDecimal.TEN);
+		attribute.setRegex("[abc]");
+		attribute.setValidationMessage("Test validation failed.");
+		formProjection.setFormValidations(mapper.writeValueAsString(Lists.newArrayList(attribute)));
+		formProjection = projectionService.save(formProjection);
+		//
+		// create identity with projection is defined
+		IdmIdentityDto identity = new IdmIdentityDto(getHelper().createName());
+		identity.setExternalCode(getHelper().createName());
+		identity.setLastName(getHelper().createName());
+		identity.setFormProjection(formProjection.getId());
+		//
+		// set eav 
+		IdmFormInstanceDto instanceOne = new IdmFormInstanceDto();
+		instanceOne.setFormDefinition(formDefinitionOne);
+		IdmFormValueDto valueOne = new IdmFormValueDto(attribute);
+		valueOne.setValue("abc");
+		instanceOne.setValues(Lists.newArrayList(valueOne));
+		identity.setEavs(Lists.newArrayList(instanceOne));
+		//
+		IdmIdentityProjectionDto projection = new IdmIdentityProjectionDto(identity);
+		//
+		IdentityProjectionEvent identityProjectionEvent = new IdentityProjectionEvent(IdentityProjectionEventType.CREATE, projection);
+		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
+		manager.publish(identityProjectionEvent);
+	}
+	
+	@Transactional
+	@Test(expected = InvalidFormException.class)
+	public void testValidateExtendedAttributeMaxFailed() throws Exception {
+		// prepare projection
+		IdmFormProjectionDto formProjection = new IdmFormProjectionDto();
+		formProjection.setCode(getHelper().createName());
+		formProjection.setOwnerType(lookupService.getOwnerType(IdmIdentityDto.class));
+		formProjection.getProperties().put(IdentityFormProjectionRoute.PARAMETER_ALL_CONTRACTS, true);
+		//
+		IdmFormAttributeDto attributeDefinitionOne = new IdmFormAttributeDto();
+		attributeDefinitionOne.setCode(getHelper().createName());
+		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attributeDefinitionOne));
+		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
+		//
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setId(attributeDefinitionOne.getId());
+		attribute.setPersistentType(attributeDefinitionOne.getPersistentType());
+		attribute.setFormDefinition(attributeDefinitionOne.getFormDefinition());
+		attribute.setCode(attributeDefinitionOne.getCode());
+		attribute.setRequired(true);
+		attribute.setLabel("overriden");
+		attribute.setPlaceholder("overriden");
+		attribute.setMin(BigDecimal.TEN);
+		attribute.setMax(BigDecimal.TEN);
+		attribute.setRegex("[abc]");
+		attribute.setValidationMessage("Test validation failed.");
+		formProjection.setFormValidations(mapper.writeValueAsString(Lists.newArrayList(attribute)));
+		formProjection = projectionService.save(formProjection);
+		//
+		// create identity with projection is defined
+		IdmIdentityDto identity = new IdmIdentityDto(getHelper().createName());
+		identity.setExternalCode(getHelper().createName());
+		identity.setLastName(getHelper().createName());
+		identity.setFormProjection(formProjection.getId());
+		//
+		// set eav 
+		IdmFormInstanceDto instanceOne = new IdmFormInstanceDto();
+		instanceOne.setFormDefinition(formDefinitionOne);
+		IdmFormValueDto valueOne = new IdmFormValueDto(attribute);
+		valueOne.setValue("aabbaabbaabbcc");
+		instanceOne.setValues(Lists.newArrayList(valueOne));
+		identity.setEavs(Lists.newArrayList(instanceOne));
+		//
+		IdmIdentityProjectionDto projection = new IdmIdentityProjectionDto(identity);
+		//
+		IdentityProjectionEvent identityProjectionEvent = new IdentityProjectionEvent(IdentityProjectionEventType.CREATE, projection);
+		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
+		manager.publish(identityProjectionEvent);
+	}
+	
+	@Test
+	@Transactional
+	public void testValidateExtendedAttributeIsDeleted() throws Exception {
+		// prepare projection
+		IdmFormProjectionDto formProjection = new IdmFormProjectionDto();
+		formProjection.setCode(getHelper().createName());
+		formProjection.setOwnerType(lookupService.getOwnerType(IdmIdentityDto.class));
+		formProjection.getProperties().put(IdentityFormProjectionRoute.PARAMETER_ALL_CONTRACTS, true);
+		//
+		IdmFormAttributeDto attributeDefinitionOne = new IdmFormAttributeDto();
+		attributeDefinitionOne.setCode(getHelper().createName());
+		attributeDefinitionOne.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionOne.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormAttributeDto attributeDefinitionTwo = new IdmFormAttributeDto();
+		attributeDefinitionTwo.setCode(getHelper().createName());
+		attributeDefinitionTwo.setName(attributeDefinitionOne.getCode());
+		attributeDefinitionTwo.setPersistentType(PersistentType.SHORTTEXT);
+		IdmFormDefinitionDto formDefinitionOne = formService.createDefinition(
+				IdmIdentity.class, getHelper().createName(), Lists.newArrayList(attributeDefinitionOne, attributeDefinitionTwo)
+		);
+		attributeDefinitionOne = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionOne.getCode());
+		attributeDefinitionTwo = formDefinitionOne.getMappedAttributeByCode(attributeDefinitionTwo.getCode());
+		//
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setId(attributeDefinitionOne.getId());
+		attribute.setPersistentType(attributeDefinitionOne.getPersistentType());
+		attribute.setFormDefinition(attributeDefinitionOne.getFormDefinition());
+		attribute.setCode(attributeDefinitionOne.getCode());
+		attribute.setRequired(true);
+		attribute.setLabel("overriden");
+		attribute.setPlaceholder("overriden");
+		attribute.setMin(BigDecimal.TEN);
+		attribute.setMax(BigDecimal.TEN);
+		attribute.setRegex("[abc]");
+		attribute.setValidationMessage("Test validation failed.");
+		formProjection.setFormValidations(mapper.writeValueAsString(Lists.newArrayList(attribute)));
+		formProjection = projectionService.save(formProjection);
+		//
+		formService.deleteAttribute(attributeDefinitionOne);
+		//
+		// create identity with projection is defined
+		IdmIdentityDto identity = new IdmIdentityDto(getHelper().createName());
+		identity.setExternalCode(getHelper().createName());
+		identity.setLastName(getHelper().createName());
+		identity.setFormProjection(formProjection.getId());
+		//
+		// set eav 
+		IdmFormInstanceDto instanceOne = new IdmFormInstanceDto();
+		instanceOne.setFormDefinition(formDefinitionOne);
+		IdmFormValueDto valueTwo = new IdmFormValueDto(attributeDefinitionTwo);
+		valueTwo.setValue("aabbaabbcc");
+		instanceOne.setValues(Lists.newArrayList(valueTwo));
+		identity.setEavs(Lists.newArrayList(instanceOne));
+		//
+		IdmIdentityProjectionDto projection = new IdmIdentityProjectionDto(identity);
+		//
+		IdentityProjectionEvent identityProjectionEvent = new IdentityProjectionEvent(IdentityProjectionEventType.CREATE, projection);
+		identityProjectionEvent.setPriority(PriorityType.IMMEDIATE);
+		IdmIdentityProjectionDto createdProjection = manager.publish(identityProjectionEvent).getContent();
+		//
+		Assert.assertEquals(valueTwo.getValue(), createdProjection
+				.getIdentity()
+				.getEavs()
+				.stream()
+				.filter(i -> i.getFormDefinition().getId().equals(formDefinitionOne.getId()))
+				.findFirst()
+				.get()
+				.toSinglePersistentValue(attributeDefinitionTwo.getCode()));
+	}
 }

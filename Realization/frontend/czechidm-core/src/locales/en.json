@@ -4560,18 +4560,18 @@
         "placeholder": "All supported basic attributes or select ..."
       },
       "formValidations": {
-        "label": "Basic attributes validation / setting",
-        "help": "Validations / setting for shown basic attributes.",
-        "empty": "Validations  / setting for shown basic attributes are not defined.",
-        "placeholder": "Select basic attribute ...",
+        "label": "Attributes validation / setting",
+        "help": "Validations / setting for shown attributes.",
+        "empty": "Validations  / setting for shown attributes are not defined.",
+        "placeholder": "Select attribute ...",
         "attribute": {
           "label": "Attribute",
-          "help": "Define attribute validation / setting for supported user or contract basic fields."
+          "help": "Define attribute validation / setting for supported user or contract basic fields or selected extended attributes."
         },
         "button": {
           "add": {
             "label": "Add attribute validation / setting",
-            "title": "Add basic field validation / setting for this form projection."
+            "title": "Add attribute validation / setting for this form projection."
           },
           "remove": {
             "title": "Remove attribute validation / setting"
@@ -4580,7 +4580,7 @@
         "create": {
           "header": "Add attribute validation / setting",
           "message": {
-            "contains": "Validation / setting for given basic filed is already set."
+            "contains": "Validation / setting for given attribute is already set."
           }
         },
         "edit": {

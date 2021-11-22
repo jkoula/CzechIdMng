@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.eav.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -42,6 +43,8 @@ public class IdmFormInstanceDto implements BaseDto {
 	private UUID id;
 	@NotNull
 	private IdmFormDefinitionDto formDefinition;
+	@JsonIgnore
+	private transient Identifiable owner;
 	@JsonDeserialize(as = String.class)
 	private Serializable ownerId;
 	@NotNull
@@ -70,6 +73,7 @@ public class IdmFormInstanceDto implements BaseDto {
 		Assert.notNull(formDefinition, "Form definition is required for form instance.");
 		//
 		if (owner != null) {
+			this.owner = owner;
 			this.ownerId = owner.getId();
 			this.ownerType = owner.getClass();
 		}
@@ -88,6 +92,16 @@ public class IdmFormInstanceDto implements BaseDto {
 
 	public Serializable getOwnerId() {
 		return ownerId;
+	}
+	
+	/**
+	 * Transient owner instance. Is set, when instance is processed only.
+	 * 
+	 * @return related owner instance
+	 * @since 12.0.0
+	 */
+	public Identifiable getOwner() {
+		return owner;
 	}
 
 	public void setOwnerId(Serializable ownerId) {

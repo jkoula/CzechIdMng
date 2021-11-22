@@ -36,7 +36,7 @@ export default class FormableEntityManager extends EntityManager {
   }
 
   /**
-   * Load form instances (definitions + values) by given entity
+   * Load form instances (definitions + values) by given entity.
    *
    * @param  {string} id entity identifier
    * @param {string} uiKey
@@ -84,7 +84,7 @@ export default class FormableEntityManager extends EntityManager {
   }
 
   /**
-   * Saves form values
+   * Saves form values.
    *
    * @param  {string} id entity identifier
    * @param  {string} form definition code
@@ -109,7 +109,7 @@ export default class FormableEntityManager extends EntityManager {
   }
 
   /**
-   * Saves single form value
+   * Saves single form value.
    *
    * @param  {string} id entity identifier
    * @param  {string} form definition code
@@ -137,7 +137,8 @@ export default class FormableEntityManager extends EntityManager {
   }
 
   /**
-   * Form attribute - owner id, attribute id and value (uuid value) as attachment id is required
+   * Form attribute - owner id, attribute id and value (uuid value) as attachment id is required.
+   *
    * @param  {IdmFormValueDto} formValue
    * @return {string}
    */

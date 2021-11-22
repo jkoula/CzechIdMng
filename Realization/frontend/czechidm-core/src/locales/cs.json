@@ -4613,18 +4613,18 @@
         "placeholder": "Všechny podporované základní atributy nebo vyberte ..."
       },
       "formValidations": {
-        "label": "Validace / nastavení základních atributů formuláře",
-        "help": "Validace  / nastavení základních atributů pro projekci.",
-        "empty": "Validace / nastavení základních atributů nejsou pro projekci definovány.",
-        "placeholder": "Vyberte základní atribut formuláře ...",
+        "label": "Validace / nastavení atributů formuláře",
+        "help": "Validace  / nastavení atributů pro projekci.",
+        "empty": "Validace / nastavení atributů nejsou pro projekci definovány.",
+        "placeholder": "Vyberte atribut formuláře ...",
         "attribute": {
           "label": "Atribut",
-          "help": "Definovat validaci a nastavení pro podporované základní atributy uživatele a kontraktu."
+          "help": "Definovat validaci a nastavení pro podporované základní atributy uživatele a kontraktu nobo pro vybrané rozšířené atributy."
         },
         "button": {
           "add": {
             "label": "Přidat validaci / nastavení atributu",
-            "title": "Přidat validaci a nastavení základního atributu formuláře pro projekci formuláře"
+            "title": "Přidat validaci a nastavení atributu formuláře pro projekci formuláře"
           },
           "remove": {
             "title": "Odebrat validaci / nastavení atributu"

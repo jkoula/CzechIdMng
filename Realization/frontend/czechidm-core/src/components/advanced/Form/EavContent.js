@@ -226,6 +226,7 @@ class EavContent extends Basic.AbstractContent {
       showAttributesOnly,
       _formInstances,
       showDefinitions,
+      formValidations,
       userContext,
       useDefaultValue
     } = this.props;
@@ -302,6 +303,7 @@ class EavContent extends Basic.AbstractContent {
               validationErrors={ validationErrors }
               formableManager={ formableManager }
               showAttributes={ _renderAttributes }
+              formValidations={ formValidations }
               showLoading={ showLoadingKeys.has(definitionCode) }
               useDefaultValue={ useDefaultValue }/>
           );
@@ -363,6 +365,7 @@ class EavContent extends Basic.AbstractContent {
                   validationErrors={ validationErrors }
                   formableManager={ formableManager }
                   showAttributes={ _renderAttributes }
+                  formValidations={ formValidations }
                   useDefaultValue={ useDefaultValue }/>
               </Basic.PanelBody>
 
@@ -424,6 +427,12 @@ EavContent.propTypes = {
    * Render given definitions and attributes only. Render all definitions and atributes otherwise.
    */
   showDefinitions: PropTypes.arrayOf(PropTypes.object),
+  /**
+   * Overriden attributes validations and settings
+   *
+   * @since 12.0.0
+   */
+  formValidations: PropTypes.arrayOf(PropTypes.object),
   /**
    * List of InvalidFormAttributeDto
    */

@@ -13,7 +13,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.entity.eav.IdmIdentityContractFormValue;
 
 /**
- * Permissions to form attribute values
+ * Permissions to form attribute values.
  * 
  * @author Radek Tomiška
  * @since 10.2.0
@@ -47,6 +47,6 @@ public class IdentityContractFormValueEvaluator extends AbstractFormValueEvaluat
 				new IdmFormAttributeDto(PARAMETER_FORM_ATTRIBUTES, PARAMETER_FORM_ATTRIBUTES, PersistentType.SHORTTEXT),
 				new IdmFormAttributeDto(PARAMETER_OWNER_UPDATE, PARAMETER_OWNER_UPDATE, PersistentType.BOOLEAN),
 				new IdmFormAttributeDto(PARAMETER_OWNER_READ, PARAMETER_OWNER_READ, PersistentType.BOOLEAN)
-				);
+		);
 	}
 }

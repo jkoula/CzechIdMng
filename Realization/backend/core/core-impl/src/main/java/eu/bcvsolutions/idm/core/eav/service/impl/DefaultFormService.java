@@ -79,6 +79,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormDefinitionFilter;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.eav.api.service.FormAttributeRenderer;
+import eu.bcvsolutions.idm.core.eav.api.service.FormProjectionManager;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormValueService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
@@ -115,6 +116,7 @@ public class DefaultFormService implements FormService {
 	@Autowired private LookupService lookupService;
 	@Autowired private AttachmentManager attachmentManager;
 	@Autowired private IdmCacheManager cacheManager;
+	@Autowired private FormProjectionManager formProjectionManager;
 	@Autowired @Lazy private EnabledEvaluator enabledEvaluator;
 
 	@Autowired
@@ -960,7 +962,7 @@ public class DefaultFormService implements FormService {
 		// evaluate permissions for form definition attributes by values - change attribute properties or remove attribute at all
 		if (!ObjectUtils.isEmpty(permissions)) {
 			Set<UUID> checkedAttributes = new HashSet<>(values.size());
-			for(IdmFormValueDto value : values) {
+			for (IdmFormValueDto value : values) {
 				checkedAttributes.add(value.getFormAttribute());
 				Set<String> valuePermissions = formValueService.getPermissions(value);
 				if (!PermissionUtils.hasPermission(valuePermissions, IdmBasePermission.READ)) {
@@ -972,7 +974,7 @@ public class DefaultFormService implements FormService {
 			}
 			// evaluate permissions for new values - iterate through unprocessed attributes and check update permission
 			List<IdmFormAttributeDto> formAttributes = Lists.newArrayList(formInstance.getFormDefinition().getFormAttributes());
-			for(IdmFormAttributeDto formAttribute : formAttributes) {
+			for (IdmFormAttributeDto formAttribute : formAttributes) {
 				if (checkedAttributes.contains(formAttribute.getId())) {
 					continue;
 				}
@@ -987,6 +989,9 @@ public class DefaultFormService implements FormService {
 				}
 			}
 		}
+		//
+		// apply overridden attributes by form projection
+		formInstance.setFormDefinition(formProjectionManager.overrideFormDefinition(owner, formInstance.getFormDefinition()));
 		//
 		return formInstance;
 	}
@@ -1443,14 +1448,18 @@ public class DefaultFormService implements FormService {
 		formDefinition
 			.getFormAttributes()
 			.stream()
-			.forEach(formAttribute -> { //
-				List<IdmFormValueDto> formValueForAttributes = formInstance //
-						.getValues() //
-						.stream() //
-						.filter(formValue -> formAttribute.getId().equals(formValue.getFormAttribute())) //
+			.forEach(formAttribute -> {
+				List<IdmFormValueDto> formValueForAttributes = formInstance
+						.getValues()
+						.stream()
+						.filter(formValue -> formAttribute.getId().equals(formValue.getFormAttribute()))
 						.peek(formValue -> {
-							// we don't trust value persistent type - set current from attribute 
+							// we don't trust value persistent type - set current from attribute
 							formValue.setPersistentType(formAttribute.getPersistentType());
+							// we need owner type to perform validations
+							if (formValue.getOwnerType() == null && formInstance.getOwnerType() != null) {
+								formValue.setOwnerType(formDefinitionService.getFormableOwnerType(formInstance.getOwnerType()));
+							}
 						})
 						.collect(Collectors.toList()); //
 				InvalidFormAttributeDto result = this.validateAttribute(formDefinition, formAttribute, formValueForAttributes, validateOnlySameOwnerType);
@@ -1460,7 +1469,7 @@ public class DefaultFormService implements FormService {
 					Class<? extends Identifiable> ownerType = formInstance.getOwnerType();
 					if (ownerType != null) {
 						result.setOwnerType(lookupService.getOwnerType(ownerType));
-					}					
+					}			
 					results.add(result);
 				}
 			});
