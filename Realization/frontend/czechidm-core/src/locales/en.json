@@ -4010,7 +4010,7 @@
       "label": "$t(content.audit.title)",
       "title-entities": "Entities",
       "title-identities": "Users",
-      "title-identity-roles": "Audit for added roles",
+      "title-identity-roles": "Audit of assigned roles",
       "title-identity-login": "Login audit",
       "title-identity-password-change": "Password change audit",
       "modifier": "Action executor",
@@ -4026,7 +4026,7 @@
         "userDetail": "{{revision}}. revision, {{name}}, {{date}}"
       },
       "identityRoles": {
-        "label": "Audit of roles",
+        "label": "Audit of assigned roles",
         "role": "Role",
         "modification": {
           "ADD": "Add",

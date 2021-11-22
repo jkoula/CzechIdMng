@@ -4079,7 +4079,7 @@
         "userDetail": "{{revision}}. revize, {{name}}, {{date}}"
       },
       "identityRoles": {
-        "label": "Audit rolí",
+        "label": "Audit přidělení rolí",
         "role": "Role",
         "modification": {
           "ADD": "Přidání",
