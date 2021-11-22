@@ -309,7 +309,7 @@ export class ReportTable extends Advanced.AbstractTableContent {
       });
     }
     _supportedReports.sort((one, two) => {
-      return one.niceLabel > two.niceLabel;
+      return one.niceLabel.localeCompare(two.niceLabel);
     });
 
     return (
