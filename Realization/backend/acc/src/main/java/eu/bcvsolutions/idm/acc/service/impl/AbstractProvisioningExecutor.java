@@ -1367,12 +1367,20 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				return schemaAttributeDto;
 			}
 			if (attributeMapping instanceof SysRoleSystemAttributeDto) {
-				SysSystemAttributeMappingDto systemAttributeMappingDto = DtoUtils.getEmbedded((SysRoleSystemAttributeDto) attributeMapping,
-						SysRoleSystemAttribute_.systemAttributeMapping.getName(), SysSystemAttributeMappingDto.class, null);
-				if(systemAttributeMappingDto != null) {
-					schemaAttributeDto = DtoUtils.getEmbedded(systemAttributeMappingDto,
-							SysSystemAttributeMapping_.schemaAttribute.getName(), SysSchemaAttributeDto.class, null);
-					if(schemaAttributeDto != null) {
+				SysSystemAttributeMappingDto systemAttributeMappingDto = DtoUtils.getEmbedded(
+						(SysRoleSystemAttributeDto) attributeMapping,
+						SysRoleSystemAttribute_.systemAttributeMapping, 
+						SysSystemAttributeMappingDto.class, 
+						null
+				);
+				if (systemAttributeMappingDto != null) {
+					schemaAttributeDto = DtoUtils.getEmbedded(
+							systemAttributeMappingDto,
+							SysSystemAttributeMapping_.schemaAttribute,
+							SysSchemaAttributeDto.class,
+							null
+					);
+					if (schemaAttributeDto != null) {
 						return schemaAttributeDto;
 					}
 				}

@@ -629,7 +629,7 @@ public class DefaultSysSystemService
 	@Override
 	protected SysSystemDto internalExport(UUID id) {
 		SysSystemDto system = super.internalExport(id);
-		// Set as inactive system
+		// Set as inactive system.
 		system.setDisabled(true);
 
 		// Set remote connector server password to the null. We don't want update

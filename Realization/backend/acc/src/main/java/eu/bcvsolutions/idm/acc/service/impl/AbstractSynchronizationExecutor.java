@@ -9,7 +9,6 @@ import eu.bcvsolutions.idm.acc.config.domain.ProvisioningConfiguration;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
-import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
@@ -137,7 +136,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Abstract executor for do synchronization and reconciliation
+ * Abstract executor for do synchronization and reconciliation.
  *
  * @author svandav
  * @param <DTO>
@@ -1806,22 +1805,21 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	 */
 	protected boolean canSetValue(String uid, SysSystemAttributeMappingDto attribute, DTO dto, boolean create) {
 		Assert.notNull(attribute, "Attribute is required.");
-		AttributeMappingStrategyType strategyType = attribute.getStrategyType();
-		switch (strategyType) {
-		case CREATE: {
-			return create;
-		}
-		case SET: {
-			return true;
-		}
-
-		case WRITE_IF_NULL: {
-			Object value = systemAttributeMappingService.getAttributeValue(uid, dto, attribute);
-			return value == null;
-		}
-		default: {
-			return false;
-		}
+		//
+		switch (attribute.getStrategyType()) {
+			case CREATE: {
+				return create;
+			}
+			case SET: {
+				return true;
+			}	
+			case WRITE_IF_NULL: {
+				Object value = systemAttributeMappingService.getAttributeValue(uid, dto, attribute);
+				return value == null;
+			}
+			default: {
+				return false;
+			}
 		}
 	}
 
@@ -2216,6 +2214,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public DTO getDtoByAccount(UUID entityId, AccAccountDto account) {
 		if (entityId == null && account != null) {
 			Assert.notNull(account.getId(), "Account ID cannot be null!");
@@ -2242,9 +2241,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 							.findFirst()//
 							.orElse(null);
 					if (targetDto != null) {
-						@SuppressWarnings("unchecked")
-						DTO result = (DTO) targetDto;
-						return result;
+						return (DTO) targetDto;
 					} else {
 						entityId = entityIdLocal;
 					}
