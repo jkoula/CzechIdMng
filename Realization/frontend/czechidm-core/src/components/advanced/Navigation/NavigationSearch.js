@@ -232,7 +232,7 @@ function NavigationSearch(props, context) {
   };
   //
   return (
-    <>
+    <div>
       <div className={classes.search}>
         <SelectBox
           ref={universalSearch}
@@ -255,7 +255,7 @@ function NavigationSearch(props, context) {
             </Div>
           }/>
       </div>
-    </>
+    </div>
   );
 }
 

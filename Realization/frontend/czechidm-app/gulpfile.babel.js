@@ -410,7 +410,7 @@ function useHtmlReplace() {
           src: `images/favicon.gif`,
           tpl: '<link rel="icon" href="%s" type="image/gif" />'
         },
-        css: ['css/main.css', 'css/google.fonts.css'],
+        css: ['css/main.css'],
         js: ['js/jquery.min.js', 'config.js', 'js/app.js']
       }
     ))

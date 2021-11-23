@@ -4,7 +4,7 @@ import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 
 /**
- * Default content (routes) for tasks
+ * Default content (routes) for tasks.
  *
  * @author Ondřej Kopr
  */
@@ -20,14 +20,13 @@ export default class TaskRoutes extends Basic.AbstractContent {
   render() {
     return (
       <div>
-        <Basic.PageHeader>
-          <Basic.Icon value="fa:tasks"/>
-          {' '}
-          {this.i18n('navigation.menu.tasks.label')}
+        <Basic.PageHeader
+          icon="fa:tasks">
+          { this.i18n('navigation.menu.tasks.label') }
         </Basic.PageHeader>
 
         <Advanced.TabPanel position="top" parentId="tasks" match={ this.props.match }>
-          {this.getRoutes()}
+          { this.getRoutes() }
         </Advanced.TabPanel>
       </div>
     );

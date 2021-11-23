@@ -115,7 +115,7 @@ public abstract class AbstractSwaggerConfig implements SwaggerConfig {
 	 * @return
 	 */
 	protected ApiInfo metaData() {
-        ApiInfo apiInfo = new ApiInfo(
+        return new ApiInfo(
                 getModuleDescriptor().getName() + " - RESTful API",
                 getModuleDescriptor().getDescription(),
                 getModuleDescriptor().getVersion(),
@@ -124,6 +124,5 @@ public abstract class AbstractSwaggerConfig implements SwaggerConfig {
                "MIT",
                 "https://github.com/bcvsolutions/CzechIdMng/blob/develop/LICENSE",
                 Lists.newArrayList());
-        return apiInfo;
     }
 }

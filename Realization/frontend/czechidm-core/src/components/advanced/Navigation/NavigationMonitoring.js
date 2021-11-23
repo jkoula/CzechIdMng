@@ -134,7 +134,7 @@ class NavigationMonitoring extends Basic.AbstractContent {
     }
     //
     return (
-      <>
+      <div>
         <IconButton
           role="button"
           color="inherit"
@@ -229,7 +229,7 @@ class NavigationMonitoring extends Basic.AbstractContent {
             null
           }
         </Menu>
-      </>
+      </div>
     );
   }
 }

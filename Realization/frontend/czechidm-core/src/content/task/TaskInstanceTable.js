@@ -135,8 +135,7 @@ export class TaskInstanceTable extends Advanced.AbstractTableContent {
                     tillProperty="createdBefore"
                     tillPlaceholder={ this.i18n('entity.WorkflowTaskInstance.filter.createdBefore') }/>
                 </Basic.Col>
-                <Basic.Col lg={ 4 }>
-                </Basic.Col>
+                <Basic.Col lg={ 4 } />
               </Basic.Row>
             </Basic.AbstractForm>
           </Advanced.Filter>

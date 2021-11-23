@@ -90,7 +90,7 @@ export default function TabPanel(props) {
       item.to = `/${ Utils.Ui.trimSlash(item.to) }`;
     }
     const active = _.includes(selectedNavigationItems, item.id);
-    if (active) {
+    if (active || !activeItemId) {
       activeItemId = item.id;
     }
     //

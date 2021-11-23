@@ -81,7 +81,7 @@ function NavigationIdentity(props) {
   };
   //
   return (
-    <>
+    <div>
       <Button
         color={ !isSwitchedUser ? 'inherit' : 'secondary' }
         variant={ isSwitchedUser ? 'contained' : '' }
@@ -135,7 +135,7 @@ function NavigationIdentity(props) {
             ?
             <Basic.Loading isStatic show/>
             :
-            <>
+            <div>
               <div className="identity-image">
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <Basic.Avatar src={ _imageUrl } alt="profile">
@@ -186,7 +186,7 @@ function NavigationIdentity(props) {
                     }
                     if (item.type === 'DYNAMIC') {
                       return (
-                        <>
+                        <div>
                           <Basic.MenuItem
                             eventKey={ index }
                             icon={ item.icon }
@@ -211,7 +211,7 @@ function NavigationIdentity(props) {
                               show={ modals.has(item.modal) ? modals.get(item.modal).show : false }
                               onHide={ () => { dispatch(dataManager.setModals(modals.set(item.modal, { show: false }))); } }/>
                           }
-                        </>
+                        </div>
                       );
                     }
                     //
@@ -219,11 +219,11 @@ function NavigationIdentity(props) {
                   })
                 }
               </MenuList>
-            </>
+            </div>
           }
         </div>
       </Menu>
-    </>
+    </div>
   );
 }
 
