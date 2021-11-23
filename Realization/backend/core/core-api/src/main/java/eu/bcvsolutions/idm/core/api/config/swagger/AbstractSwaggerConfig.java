@@ -101,7 +101,7 @@ public abstract class AbstractSwaggerConfig implements SwaggerConfig {
 	}
 
 	/**
-	 * CIDMST token authentication
+	 * CIDMST token authentication.
 	 *
 	 * @return
 	 */
@@ -110,12 +110,12 @@ public abstract class AbstractSwaggerConfig implements SwaggerConfig {
 	}
 
 	/**
-	 * TODO: license to properties (maven license plugin or simple pom props?)
+	 * TODO: license to properties (maven license plugin or simple pom props?).
 	 *
 	 * @return
 	 */
 	protected ApiInfo metaData() {
-        return new ApiInfo(
+		ApiInfo apiInfo = new ApiInfo(
                 getModuleDescriptor().getName() + " - RESTful API",
                 getModuleDescriptor().getDescription(),
                 getModuleDescriptor().getVersion(),
@@ -124,5 +124,7 @@ public abstract class AbstractSwaggerConfig implements SwaggerConfig {
                "MIT",
                 "https://github.com/bcvsolutions/CzechIdMng/blob/develop/LICENSE",
                 Lists.newArrayList());
+		//
+		return apiInfo;
     }
 }
