@@ -12,9 +12,9 @@ All notable changes to this project will be documented in this file.
 ### Developer
 
 - 🟠 [#2885](https://redmine.czechidm.com/issues/2885) - Application theme was redesigned from scratch. Configurable less variables and cascade styles are not available anymore:
-  - 🟠 Css removed - componentSpan, labelSpan, ``btn-*``, ``label-*``, ``badge-*``, ``modal-*``, ``popover-*``.
-  - 🟢 Markdow font removed - roboto font is used in whole application.
-  - 🟢 Modal className property removed - modal windows are unified in whole application.
+  - 🟠 CSS removed - ``btn-*``, ``label-*``, ``badge-*``, ``modal-*``, ``popover-*``
+  - 🟢 Markdown font removed - roboto font is used in whole application.
+  - 🟢 Modal ``className`` property removed - modal windows are unified in whole application.
   - 🟡 Modal ``closeButton`` property is supported with ``ModalHeader`` and ``ModalBody`` as direct ``Modal`` child only. The same with scroll paper feature (~ affix footer buttons feature).
   _How to fix it: If ``closeButton`` will be missiong on you modal window - move ``form`` into ``ModalBody``._
   - 🟢 Popover properties ``focus`` trigger and  ``delayShow`` removed. Property ``focus`` trigger didn't work even before and property ``delayShow`` was unused.

@@ -329,6 +329,8 @@ export default class ConfigurationManager extends EntityManager {
             secondaryMain = theme.palette.secondary.main;
             if (theme.palette.secondary.dark) {
               secondaryDark = theme.palette.secondary.dark;
+            } else {
+              secondaryDark = secondaryMain; // @TODO: configure dark color in theme content
             }
           }
           let _theme = {
