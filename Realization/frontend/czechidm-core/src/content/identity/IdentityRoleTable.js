@@ -507,15 +507,15 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             closeButton={ !_showLoading }
             text={ this.i18n('edit.header', { role: detail.entity._embedded ? roleManager.getNiceLabel(detail.entity._embedded.role) : null }) }
             rendered={ !Utils.Entity.isNew(detail.entity) }/>
-          <Basic.Modal.Body>
+          <Basic.Modal.Body style={{ padding: 0 }}>
             <form onSubmit={ this.save.bind(this) }>
               <Basic.Tabs
                 activeKey={ activeKey }
-                onSelect={ this._onChangeSelectTabs.bind(this)}>
+                onSelect={ this._onChangeSelectTabs.bind(this) }>
                 <Basic.Tab
                   eventKey={ 1 }
                   title={ this.i18n('detail.tabs.basic') }
-                  style={{ padding: 15 }}>
+                  style={{ padding: 15, border: 'none' }}>
                   <Basic.AbstractForm ref="form" showLoading={ _showLoading } readOnly={ !TEST_ADD_ROLE_DIRECTLY }>
                     <Basic.SelectBox
                       ref="role"
@@ -579,7 +579,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 <Basic.Tab
                   eventKey={ 2 }
                   rendered={!!(detail && detail.entity && detail.entity._embedded && detail.entity._embedded.role.identityRoleAttributeDefinition)}
-                  style={{ padding: 15}}
+                  style={{ padding: 15, border: 'none' }}
                   title={this.i18n('detail.tabs.attributes')}>
                   <IdentityRoleEav
                     entityId={detail.entity.id}

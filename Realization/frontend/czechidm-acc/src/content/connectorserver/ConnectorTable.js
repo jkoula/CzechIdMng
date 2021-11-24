@@ -123,12 +123,12 @@ export default class ConnectorTable extends Advanced.AbstractTableContent {
             closeButton
             icon="component:default-connector"
             text={ this.i18n('detail.header', { record: detail.entity.connectorDisplayName, version: detail.entity.version, escape: false }) }/>
-          <Basic.Modal.Body>
+          <Basic.Modal.Body style={{ padding: 0 }}>
             <Basic.Tabs>
               <Basic.Tab
                 eventKey={ 1 }
                 title={ this.i18n('detail.tabs.basic.title') }
-                style={{ padding: 15 }}>
+                style={{ padding: 15, border: 'none' }}>
                 <form>
                   <Basic.AbstractForm
                     ref="form"
@@ -159,7 +159,8 @@ export default class ConnectorTable extends Advanced.AbstractTableContent {
               <Basic.Tab
                 eventKey={ 2 }
                 title={ this.i18n('detail.tabs.systems.title') }
-                rendered={ Managers.SecurityManager.hasAnyAuthority(['SYSTEM_READ']) }>
+                rendered={ Managers.SecurityManager.hasAnyAuthority(['SYSTEM_READ']) }
+                style={{ border: 'none' }}>
 
                 <SystemTable
                   columns={ ['name', 'description', 'state', 'blockedOperation'] }
@@ -171,12 +172,9 @@ export default class ConnectorTable extends Advanced.AbstractTableContent {
                   forceSearchParameters={ forceSearchParameters }
                   defaultSearchParameters={ defaultSearchParameters }
                   match={ this.props.match }
-                  className="no-margin"
                   rendered={ Utils.Ui.isNotEmpty(detail.entity.id) }/>
               </Basic.Tab>
             </Basic.Tabs>
-
-
           </Basic.Modal.Body>
 
           <Basic.Modal.Footer>
