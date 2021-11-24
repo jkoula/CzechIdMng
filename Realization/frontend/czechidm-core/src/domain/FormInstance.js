@@ -66,6 +66,18 @@ export default class FormInstance {
     return this.attributes;
   }
 
+  /**
+   * Set form definition attribute - attribute setting can be changed.
+   *
+   * @param  {IdmFormAttributeDto} formAttribute configured attribute
+   * @since 12.0.0
+   */
+  setAttribute(formAttribute) {
+    if (formAttribute && formAttribute.code) {
+      this.attributes = this.attributes.set(formAttribute.code, formAttribute);
+    }
+  }
+
   getValidationErrors() {
     return this.validationErrors;
   }

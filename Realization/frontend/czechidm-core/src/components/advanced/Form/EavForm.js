@@ -237,7 +237,7 @@ export default class EavForm extends Basic.AbstractContextComponent {
               );
             }
             //
-            // apply overriden form Validations and setting
+            // apply overridden form Validations and setting
             const _finalAttribute = _.merge({}, attribute);
             if (formValidations) {
               try {
@@ -265,6 +265,9 @@ export default class EavForm extends Basic.AbstractContextComponent {
                   if (_overridenAttribute.validationMessage) {
                     _finalAttribute.validationMessage = _overridenAttribute.validationMessage;
                   }
+                  //
+                  // set overridden attribute back into form instance definition => used in validations
+                  formInstance.setAttribute(_finalAttribute);
                 }
               } catch (syntaxError) {
                 // nothing - attribute  will not be overriden

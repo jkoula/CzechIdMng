@@ -1464,7 +1464,6 @@ export default class AbstractIdentityProjection extends Basic.AbstractContent {
                 }
                 this.context.history.push(`/identity/${ encodeURIComponent(identityProjection.username) }/password/change`);
               }}
-              className="embedded"
               title={ this.i18n('content.password.change.message.passwordChange.link') }>
               { this.i18n('content.password.change.button.passwordChange') }
             </Basic.Button>

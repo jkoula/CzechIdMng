@@ -389,7 +389,7 @@ export default class AbstractFormAttributeRenderer extends Basic.AbstractContext
   }
 
   getOriginalValues() {
-    const {values} = this.props;
+    const { values } = this.props;
     const originalValues = [];
     if (_.isArray(values)) {
       values.forEach(value => {
