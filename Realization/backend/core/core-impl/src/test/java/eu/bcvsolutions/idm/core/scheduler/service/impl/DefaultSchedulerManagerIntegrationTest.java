@@ -1,10 +1,5 @@
 package eu.bcvsolutions.idm.core.scheduler.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -53,10 +48,9 @@ import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
- * Scheduler tests
+ * Scheduler tests.
  * 
  * @author Radek Tomiška
- *
  */
 public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationTest {
 
@@ -117,7 +111,7 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 	public void testTaskRegistration() {
 		List<Task> tasks = manager.getSupportedTasks();
 		//
-		assertTrue(tasks.size() > 0);
+		Assert.assertTrue(tasks.size() > 0);
 		boolean testTaskIsRegisterd = false;
 		for (Task task : tasks) {
 			if (TestRegistrableSchedulableTask.class.equals(task.getTaskType())) {
@@ -125,7 +119,7 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 				break;
 			}
 		}
-		assertTrue(testTaskIsRegisterd);
+		Assert.assertTrue(testTaskIsRegisterd);
 	}
 	
 	@Test
@@ -133,12 +127,12 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		String result = "TEST_SCHEDULER_ONE";
 		Task task = createTask(result);
 		//
-		assertNotNull(task.getId());
-		assertEquals(task.getId(), manager.getTask(task.getId()).getId());
+		Assert.assertNotNull(task.getId());
+		Assert.assertEquals(task.getId(), manager.getTask(task.getId()).getId());
 		//
 		manager.deleteTask(task.getId());
 		//
-		assertNull(manager.getTask(task.getId()));
+		Assert.assertNull(manager.getTask(task.getId()));
 	}
 	
 	@Test
@@ -178,12 +172,12 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		//
 		ObserveLongRunningTaskEndProcessor.waitForEnd(task.getId());
 		//
-		assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(task.getId()).getState());
-		assertEquals(result, ObserveLongRunningTaskEndProcessor.getResultValue(task.getId()));
+		Assert.assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(task.getId()).getState());
+		Assert.assertEquals(result, ObserveLongRunningTaskEndProcessor.getResultValue(task.getId()));
 		//
 		IdmScheduledTaskDto scheduledTask = scheduledTaskService.findByQuartzTaskName(task.getId());
-		assertNotNull(scheduledTask);
-		assertEquals(task.getId(), scheduledTask.getQuartzTaskName());
+		Assert.assertNotNull(scheduledTask);
+		Assert.assertEquals(task.getId(), scheduledTask.getQuartzTaskName());
 	}
 
 	@Test
@@ -196,11 +190,13 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		//
 		ObserveLongRunningTaskEndProcessor.waitForEnd(task.getId());
 		//
-		assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(task.getId()).getState());
+		Assert.assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(task.getId()).getState());
 		//
 		IdmScheduledTaskDto scheduledTask = scheduledTaskService.findByQuartzTaskName(task.getId());
-		assertNotNull(scheduledTask);
-		assertEquals(task.getId(), scheduledTask.getQuartzTaskName());
+		Assert.assertNotNull(scheduledTask);
+		Assert.assertEquals(task.getId(), scheduledTask.getQuartzTaskName());
+		//
+		manager.deleteTask(task.getId());
 	}
 
 	@Test
@@ -215,14 +211,14 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		//
 		task = manager.getTask(task.getId());
 		//
-		assertEquals(1, task.getTriggers().size());
-		assertEquals(CronTaskTrigger.class, task.getTriggers().get(0).getClass());
-		assertEquals(task.getId(), task.getTriggers().get(0).getTaskId());
+		Assert.assertEquals(1, task.getTriggers().size());
+		Assert.assertEquals(CronTaskTrigger.class, task.getTriggers().get(0).getClass());
+		Assert.assertEquals(task.getId(), task.getTriggers().get(0).getTaskId());
 		//
 		manager.deleteTrigger(task.getId(), task.getTriggers().get(0).getId());
 		//
 		task = manager.getTask(task.getId());
-		assertEquals(0, task.getTriggers().size());
+		Assert.assertEquals(0, task.getTriggers().size());
 	}
 	
 	@Test(expected = InvalidCronExpressionException.class)
@@ -254,10 +250,10 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		ObserveLongRunningTaskEndProcessor.waitForEnd(initiatorTask.getId());
 		ObserveLongRunningTaskEndProcessor.waitForEnd(dependentTask.getId());
 		//
-		assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(initiatorTask.getId()).getState());
-		assertEquals(resultValue, ObserveLongRunningTaskEndProcessor.getResultValue(initiatorTask.getId()));
-		assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(dependentTask.getId()).getState());
-		assertEquals(resultValueDependent, ObserveLongRunningTaskEndProcessor.getResultValue(dependentTask.getId()));
+		Assert.assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(initiatorTask.getId()).getState());
+		Assert.assertEquals(resultValue, ObserveLongRunningTaskEndProcessor.getResultValue(initiatorTask.getId()));
+		Assert.assertEquals(OperationState.EXECUTED, ObserveLongRunningTaskEndProcessor.getResult(dependentTask.getId()).getState());
+		Assert.assertEquals(resultValueDependent, ObserveLongRunningTaskEndProcessor.getResultValue(dependentTask.getId()));
 	}
 	
 	/**
@@ -332,10 +328,10 @@ public class DefaultSchedulerManagerIntegrationTest extends AbstractIntegrationT
 		ObserveLongRunningTaskEndProcessor.waitForEnd(initiatorTask.getId());
 		ObserveLongRunningTaskEndProcessor.waitForEnd(dependentTask.getId());
 		//
-		assertEquals(resultValue, ObserveLongRunningTaskEndProcessor.getResultValue(initiatorTask.getId()));
-		assertTrue(ObserveLongRunningTaskEndProcessor.getLongRunningTask(initiatorTask.getId()).isDryRun());
-		assertEquals(resultValueDependent, ObserveLongRunningTaskEndProcessor.getResultValue(dependentTask.getId()));
-		assertTrue(ObserveLongRunningTaskEndProcessor.getLongRunningTask(dependentTask.getId()).isDryRun());
+		Assert.assertEquals(resultValue, ObserveLongRunningTaskEndProcessor.getResultValue(initiatorTask.getId()));
+		Assert.assertTrue(ObserveLongRunningTaskEndProcessor.getLongRunningTask(initiatorTask.getId()).isDryRun());
+		Assert.assertEquals(resultValueDependent, ObserveLongRunningTaskEndProcessor.getResultValue(dependentTask.getId()));
+		Assert.assertTrue(ObserveLongRunningTaskEndProcessor.getLongRunningTask(dependentTask.getId()).isDryRun());
 	}
 	
 	@Test
