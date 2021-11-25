@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
   - 🟢 Markdown font removed - roboto font is used in whole application.
   - 🟢 Modal ``className`` property removed - modal windows are unified in whole application.
   - 🟡 Modal ``closeButton`` property is supported with ``ModalHeader`` and ``ModalBody`` as direct ``Modal`` child only. The same with scroll paper feature (~ affix footer buttons feature).
-  _How to fix it: If ``closeButton`` will be missiong on you modal window - move ``form`` into ``ModalBody``._
+  _How to fix it: If ``closeButton`` will be missing on your modal window - move ``<form>`` element into ``<Basic.ModalBody>``._
   - 🟢 Popover properties ``focus`` trigger and  ``delayShow`` removed. Property ``focus`` trigger didn't work even before and property ``delayShow`` was unused.
   - 🟠 ``Index.js``, ``layout`` in frontend ``czechidm-app`` module was updated - don't forget to **update this module**, if project specific app module is used.
 
