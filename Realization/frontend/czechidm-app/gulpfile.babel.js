@@ -8,7 +8,7 @@ import source from 'vinyl-source-stream';
 import buffer from 'vinyl-buffer';
 import shell from 'gulp-shell';
 import babelify from 'babelify';
-import uglify from 'gulp-uglify';
+import uglify from 'gulp-uglify-es';
 import notify from 'gulp-notify';
 import browserSync, { reload } from 'browser-sync';
 import sourcemaps from 'gulp-sourcemaps';

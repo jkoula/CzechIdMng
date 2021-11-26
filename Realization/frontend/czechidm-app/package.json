@@ -151,7 +151,7 @@
     "gulp-replace": "1.0.0",
     "gulp-shell": "0.8.0",
     "gulp-sourcemaps": "3.0.0",
-    "gulp-uglify": "3.0.2",
+    "gulp-uglify-es": "3.0.0",
     "gulp-version-number": "0.2.4",
     "pathmodify": "0.5.0",
     "vinyl-buffer": "1.0.1",
