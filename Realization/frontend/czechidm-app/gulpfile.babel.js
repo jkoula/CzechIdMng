@@ -14,12 +14,13 @@ import browserSync, { reload } from 'browser-sync';
 import sourcemaps from 'gulp-sourcemaps';
 import htmlReplace from 'gulp-html-replace';
 import less from 'gulp-less';
-import minifyCSS from 'gulp-minify-css';
+import cleanCSS from 'gulp-clean-css';
 import autoprefixer from 'gulp-autoprefixer';
 import mocha from 'gulp-mocha';
 import stringify from 'stringify';
 import yargs from 'yargs';
-import util from 'gulp-util';
+import log from 'fancy-log';
+import colors from 'ansi-colors';
 import pathmodify from 'pathmodify';
 import flatmap from 'gulp-flatmap';
 import replace from 'gulp-replace';
@@ -91,16 +92,16 @@ function selectStageAndProfile(done) {
   let profile = argv.profile;
   if (!profile) {
     profile = 'default';
-    util.log(`No profile argument present. Profile "${ profile }" will be used for build!`);
+    log(`No profile argument present. Profile "${ profile }" will be used for build!`);
   } else {
-    util.log(`Profile "${ profile }" will be used for build.`);
+    log(`Profile "${ profile }" will be used for build.`);
   }
   let stage = argv.stage;
   if (!stage) {
     stage = 'development';
-    util.log(`No stage argument present. Stage "${ stage }" will be used for build!`);
+    log(`No stage argument present. Stage "${ stage }" will be used for build!`);
   } else {
-    util.log(`Stage "${ stage }" will be used for build.`);
+    log(`Stage "${ stage }" will be used for build.`);
   }
   process.env.NODE_ENV = stage;
   process.env.NODE_PROFILE = profile;
@@ -121,7 +122,7 @@ function removeSymlinks() {
     .src([ '../czechidm-*' ])
     .pipe(flatmap((stream, file) => {
       const pathToSymlink = `./node_modules/${ file.basename }`;
-      util.log('Symlink to delete:', pathToSymlink);
+      log('Symlink to delete:', pathToSymlink);
       del.sync(pathToSymlink);
       return stream;
     }));
@@ -158,11 +159,11 @@ function makeProductModules() {
   return vfs.src([ '../czechidm-*' ]) // Exclusion '!../czechidm-app' not works on linux
     .pipe(flatmap((stream, file) => {
       if (!file.path.endsWith('czechidm-app')) {
-        util.log('Product module found:', file.path);
+        log('Product module found:', file.path);
         vfs.src('./node_modules')
           .pipe(vfs.symlink(`${ file.path }/`, { useJunctions: true }))
           .pipe(flatmap((streamLog, fileLog) => {
-            util.log('Created symlink on main "node_modules"', util.colors.magenta(fileLog.path));
+            log('Created symlink on main "node_modules"', colors.magenta(fileLog.path));
             return streamLog;
           }))
           .pipe(shell([ 'npm install' ], { verbose: true, quiet: false }));
@@ -192,7 +193,7 @@ function loadModules() {
     .pipe(flatmap((stream, file) => {
       const descriptor = require(file.path);
       if (descriptor.npmName) {
-        util.log('Loaded module-descriptor with ID:', descriptor.id);
+        log('Loaded module-descriptor with ID:', descriptor.id);
         const pathRelative = `${descriptor.npmName }/module-descriptor.js`;
         // Add row to module assembler
         modulesAssemblerContent = `${ modulesAssemblerContent } moduleDescriptors = moduleDescriptors.set("${
@@ -222,10 +223,10 @@ function loadModuleStyles() {
     .src(paths.srcModuleDescriptor)
     .pipe(flatmap((stream, file) => {
       const descriptor = require(file.path);
-      util.log('Loading style for module with ID:', descriptor.id);
+      log('Loading style for module with ID:', descriptor.id);
       if (descriptor.mainStyleFile) {
         const fullStylePath = file.path.substring(0, file.path.lastIndexOf('module-descriptor.js')) + descriptor.mainStyleFile;
-        util.log('Main module style file path:', fullStylePath);
+        log('Main module style file path:', fullStylePath);
         paths.srcIncludedLess.push(fullStylePath);
       }
       return stream;
@@ -241,9 +242,9 @@ function loadModuleRoutes() {
     .pipe(flatmap((stream, file) => {
       const descriptor = require(file.path);
       if (descriptor.mainRouteFile && descriptor.npmName) {
-        util.log('Loading routes for module with ID:', descriptor.id);
+        log('Loading routes for module with ID:', descriptor.id);
         const fullRoutePath = file.path.substring(0, file.path.lastIndexOf('module-descriptor.js')) + descriptor.mainRouteFile;
-        util.log('Main module route file path:', fullRoutePath);
+        log('Main module route file path:', fullRoutePath);
         const relativeRoutePath = `${ descriptor.npmName }/${ descriptor.mainRouteFile }`;
         // Add row to route assembler
         routesAssemblerContent = `${ routesAssemblerContent }require("${ relativeRoutePath }"),\n`;
@@ -273,9 +274,9 @@ function loadModuleComponents() {
     .pipe(flatmap((stream, file) => {
       const descriptor = require(file.path);
       if (descriptor.mainComponentDescriptorFile && descriptor.npmName) {
-        util.log('Loading components for module with ID:', descriptor.id);
+        log('Loading components for module with ID:', descriptor.id);
         const fullComponentPath = file.path.substring(0, file.path.lastIndexOf('module-descriptor.js')) + descriptor.mainComponentDescriptorFile;
-        util.log('Main module route file path:', fullComponentPath);
+        log('Main module route file path:', fullComponentPath);
         const relativeComponentPath = `${ descriptor.npmName }/${ descriptor.mainComponentDescriptorFile }`;
         // Add row to component assembler
         componentsAssemblerContent = `${componentsAssemblerContent } componentDescriptors = componentDescriptors.set("${
@@ -313,7 +314,7 @@ function themes(done) {
   const configuration = getConfigByEnvironment(process.env.NODE_ENV, process.env.NODE_PROFILE);
   if (configuration.theme) {
     const themeFullPath = path.join(__dirname, '/node_modules/', configuration.theme);
-    util.log('Theme will load form path:', themeFullPath);
+    log('Theme will load form path:', themeFullPath);
     gulp
       .src(path.join(themeFullPath, '/images/**'))
       .pipe(gulp.dest(paths.distImg)); // Stream can not continue ...it was sometime problem during build (image directory was add as less)
@@ -321,7 +322,7 @@ function themes(done) {
     return gulp
       .src(path.join(themeFullPath, '/css/*.less'))
       .pipe(flatmap((stream, file) => {
-        util.log('Add theme style from:', file.path);
+        log('Add theme style from:', file.path);
         paths.srcIncludedLess.push(file.path);
         return stream;
       }));
@@ -358,8 +359,8 @@ function copyConfig(done) {
  * Compile less styles.
  */
 function styles() {
-  util.log('Main application less:', paths.srcLess);
-  util.log('Less for include to main:', paths.srcIncludedLess);
+  log('Main application less:', paths.srcLess);
+  log('Less for include to main:', paths.srcIncludedLess);
   const configuration = getConfigByEnvironment(process.env.NODE_ENV, process.env.NODE_PROFILE);
   //
   return gulp
@@ -384,13 +385,13 @@ function styles() {
         version: 10,
         theme: `"${ configuration.theme }"` // wrap to quotes - less engine needs it to skip formating slash characters
       }
-    }).on('error', util.log))
+    }).on('error', log))
     .pipe(autoprefixer('last 10 versions', 'ie 9'))
-    .pipe(minifyCSS({keepBreaks: false}))
+    .pipe(cleanCSS())
     .pipe(concat('main.css'))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.distCss))
-    .pipe(reload({stream: true}))
+    .pipe(reload({ stream: true }))
     .pipe(gulp.dest(paths.distCss));
 }
 
@@ -469,13 +470,13 @@ function loadModuleLocales() {
     .pipe(flatmap((stream, file) => {
       const descriptor = require(file.path);
       if (descriptor.mainLocalePath) {
-        util.log('Loading locale for module with ID:', descriptor.id);
+        log('Loading locale for module with ID:', descriptor.id);
         const fullLocalesPath = path.join(
           file.path.substring(0, file.path.lastIndexOf('module-descriptor.js')),
           descriptor.mainLocalePath,
           '*.json'
         );
-        util.log('Main module locale file path:', fullLocalesPath);
+        log('Main module locale file path:', fullLocalesPath);
         //
         // For watch purpose only- pattern doesn.t work under symlinks
         paths.srcLocale.push(
