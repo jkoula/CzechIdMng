@@ -740,6 +740,73 @@ public class SendNotificationToApplicantAndImplementerTest extends AbstractCoreW
 		notifications = notificationLogService.find(filter, null).getContent();
 		assertEquals(0, notifications.size());
 	}
+	
+	@Test
+	public void requestApprovedApplicantNotSameChangeUsernameTest() {
+		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+
+		configurationService.setValue(SENT_TO_APPLICANT, "true");
+		configurationService.setValue(SENT_TO_IMPLEMENTER, "false");
+		//
+		IdmIdentityDto testUser3 = createTestUser();
+		loginAsAdmin(testUser3.getUsername());
+		IdmIdentityDto test1 = createTestUser();
+		IdmRoleDto test_role = createRole();
+		//
+		IdmIdentityContractDto contract = identityContractService.getPrimeContract(test1.getId());
+
+		IdmRoleRequestDto request = createRoleRequest(test1);
+		request = roleRequestService.save(request);
+
+		IdmConceptRoleRequestDto concept = createRoleConcept(test_role, contract, request);
+		concept = conceptRoleRequestService.save(concept);
+
+		roleRequestService.startRequestInternal(request.getId(), true);
+		request = roleRequestService.get(request.getId());
+		assertEquals(RoleRequestState.IN_PROGRESS, request.getState());
+
+		// change username
+		test1.setUsername(test1.getUsername() + test1.getUsername());
+		identityService.save(test1);
+		
+		WorkflowFilterDto taskFilter = new WorkflowFilterDto();
+		taskFilter.setCandidateOrAssigned(securityService.getCurrentId().toString());
+		taskFilter.setCreatedAfter(now);
+		List<WorkflowTaskInstanceDto> tasks = (List<WorkflowTaskInstanceDto>) workflowTaskInstanceService
+				.find(taskFilter, null, IdmBasePermission.READ).getContent();
+		assertEquals(0, tasks.size());
+
+		loginAsAdmin();
+		taskFilter.setCandidateOrAssigned(securityService.getCurrentId().toString());
+		// HELPDESK
+		checkAndCompleteOneTask(taskFilter, test1.getUsername(), "approve");
+		// MANAGER
+		loginAsAdmin(testUser2.getUsername());
+		taskFilter.setCandidateOrAssigned(securityService.getCurrentId().toString());
+		checkAndCompleteOneTask(taskFilter, test1.getUsername(), "approve");
+		// USER MANAGER
+		loginAsAdmin();
+		taskFilter.setCandidateOrAssigned(securityService.getCurrentId().toString());
+		checkAndCompleteOneTask(taskFilter, test1.getUsername(), "approve");
+		// SECURITY
+		checkAndCompleteOneTask(taskFilter, test1.getUsername(), "approve");
+
+		// test notification to applicant
+		IdmNotificationFilter filter = new IdmNotificationFilter();
+		filter.setRecipient(test1.getUsername());
+		filter.setNotificationType(IdmNotificationLog.class);
+		List<IdmNotificationLogDto> notifications = notificationLogService.find(filter, null).getContent();
+		assertEquals(1, notifications.size());
+
+		assertEquals(CoreModuleDescriptor.TOPIC_CHANGE_IDENTITY_ROLES, notifications.get(0).getTopic());
+
+		// test notification to implementer
+		filter = new IdmNotificationFilter();
+		filter.setRecipient(testUser3.getUsername());
+		filter.setNotificationType(IdmNotificationLog.class);
+		notifications = notificationLogService.find(filter, null).getContent();
+		assertEquals(0, notifications.size());
+	}
 
 	@Test
 	public void requestApprovedImplementerSameTest() {
