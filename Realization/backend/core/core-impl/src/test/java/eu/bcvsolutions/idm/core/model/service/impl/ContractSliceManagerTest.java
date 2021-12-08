@@ -7,13 +7,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import java.time.LocalDate;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -334,7 +334,48 @@ public class ContractSliceManagerTest extends AbstractIntegrationTest {
 		Assert.assertEquals(0, contractFormInstanceDto.getValues().size());
 	}
 
+	@Test
+	public void createSliceValidFromSameDateAsSomeExisting() {
+		IdmIdentityDto identity = helper.createIdentity();
+		String contractCode = "contract-three";
 
+		LocalDate now = LocalDate.now();
+
+		IdmContractSliceDto sliceCurrent = helper.createContractSlice(identity, contractCode, null, now, now,
+				now.plusDays(200));
+
+		IdmContractSliceDto sliceCurrentNew = helper.createContractSlice(identity, contractCode, null, now, now,
+				now.plusDays(50));
+
+		IdmContractSliceFilter filter = new IdmContractSliceFilter();
+		filter.setIdentity(identity.getId());
+		List<IdmContractSliceDto> results = contractSliceService.find(filter, null).getContent();
+		assertEquals(2, results.size());
+		UUID parentContract = results.get(0).getParentContract();
+		List<IdmContractSliceDto> slices = contractSliceManager.findAllSlices(parentContract);
+		assertEquals(2, slices.size());
+		IdmContractSliceDto validSlice = contractSliceManager.findValidSlice(parentContract);
+		// Valid slice should be currentSliceNew
+		assertEquals(sliceCurrentNew, validSlice);
+
+		IdmContractSliceDto previousSlice = contractSliceManager.findPreviousSlice(validSlice, slices);
+		// Previous slice should be sliceCurrent with longer validity
+		assertEquals(sliceCurrent, previousSlice);
+		assertNotNull(previousSlice.getValidTill());
+
+		// Check created contract by that slice
+		IdmIdentityContractFilter contractFilter = new IdmIdentityContractFilter();
+		contractFilter.setIdentity(identity.getId());
+		List<IdmIdentityContractDto> resultsContract = contractService.find(filter, null).getContent().stream() //
+				.filter(c -> contractService.get(c.getId()).getControlledBySlices()) //
+				.collect(Collectors.toList());
+
+		assertEquals(1, resultsContract.size());
+		// Current slice should be contract
+		IdmIdentityContractDto contract = resultsContract.get(0);
+		assertTrue(contract.isValid());
+		assertEquals(sliceCurrentNew.getContractValidFrom(), contract.getValidFrom());
+	}
 
 	@Test
 	public void createSliceValidInFutureTest() {

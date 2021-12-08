@@ -267,7 +267,7 @@ public class DefaultContractSliceManager implements ContractSliceManager {
 		Comparator<IdmContractSliceDto> comparatorValidFrom = Comparator.comparing(IdmContractSliceDto::getValidFrom);
 		return slices.stream() //
 				.filter(s -> !s.equals(slice) && s.getValidFrom() != null
-						&& s.getValidFrom().isBefore(slice.getValidFrom())) //
+						&& (s.getValidFrom().isEqual(slice.getValidFrom()) || s.getValidFrom().isBefore(slice.getValidFrom()))) //
 				.max(comparatorValidFrom) //
 				.orElse(null); //
 	}
