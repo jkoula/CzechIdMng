@@ -2803,7 +2803,13 @@
          },
          "text":{
            "placeholder": "Target object code, type or description"
-         }
+         },
+         "dateCreatedFrom":{
+          "placeholder": "Created from"
+         },
+         "dateCreatedTill":{
+          "placeholder": "Created to"
+        }
        }
      },
      "requestInfo": {

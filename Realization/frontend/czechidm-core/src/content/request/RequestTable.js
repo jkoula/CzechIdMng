@@ -143,7 +143,12 @@ export class RequestTable extends Advanced.AbstractTableContent {
               <Basic.AbstractForm ref="filterForm">
                 <Basic.Row>
                   <Basic.Col lg={ 8 }>
-                    <Advanced.Filter.FilterDate ref="fromTill"/>
+                    <Advanced.Filter.FilterDate
+                      ref="fromTill"
+                      fromProperty="createdFrom"
+                      fromPlaceholder={this.i18n('filter.dateCreatedFrom.placeholder')}
+                      tillProperty="createdTill"
+                      tillPlaceholder={this.i18n('filter.dateCreatedTill.placeholder')}/>
                   </Basic.Col>
                 </Basic.Row>
                 <Basic.Row className="last">

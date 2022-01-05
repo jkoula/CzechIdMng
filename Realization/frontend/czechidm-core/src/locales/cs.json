@@ -2853,6 +2853,12 @@
         },
         "text":{
           "placeholder": "Kód, typ cílového objektu či poznámka"
+        },
+        "dateCreatedFrom":{
+          "placeholder": "Vytvořeno od"
+        },
+        "dateCreatedTill":{
+          "placeholder": "Vytvořeno do"
         }
       }
     },
