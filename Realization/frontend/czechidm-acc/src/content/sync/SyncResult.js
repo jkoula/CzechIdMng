@@ -32,7 +32,7 @@ class SyncResult extends Basic.AbstractContent {
         level = 'warning';
       }
       if (action.operationResult === 'IGNORE') {
-        level = 'primary';
+        level = 'info';
       }
       actions.push(
         <div>

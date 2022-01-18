@@ -38,7 +38,7 @@ export default class OperationResultTypeEnum extends Enums.AbstractEnum {
         return 'warning';
       }
       case this.IGNORE: {
-        return 'primary';
+        return 'info';
       }
       default: {
         return 'default';
