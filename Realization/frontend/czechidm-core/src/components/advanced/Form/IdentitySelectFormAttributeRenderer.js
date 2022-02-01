@@ -59,6 +59,11 @@ export default class IdentitySelectFormAttributeRenderer extends SelectBoxFormAt
         forceSearchParameters = forceSearchParameters.setFilter('_permission', component.permission);
       }
     }
+    if (!forceSearchParameters) {
+      forceSearchParameters = new SearchParameters();
+    }
+    forceSearchParameters = forceSearchParameters.setFilter('id', attribute.forceSearchParameters.ids);
+
     //
     return (
       <IdentitySelect

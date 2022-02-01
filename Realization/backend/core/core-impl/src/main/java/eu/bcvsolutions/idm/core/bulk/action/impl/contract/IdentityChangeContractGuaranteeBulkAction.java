@@ -121,7 +121,6 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction) {
 		List<UUID> selectedUsers = getUsersFromBulkAction(bulkAction);
 		IdmContractGuaranteeFilter filter = new IdmContractGuaranteeFilter();
-//		filter.setIdentity(selectedUsers.stream().findFirst().orElse(null));
 		filter.setIdentities(selectedUsers);
 		List<IdmContractGuaranteeDto> guarantees = contractGuaranteeService.find(filter, null).getContent();
 		List<UUID> guaranteeIdentityIds = guarantees
@@ -158,7 +157,7 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 					multivaluedMap.add(entry.getKey(), entry.getValue());
 				}
 			}
-			IdmIdentityFilter filter = this.getParameterConverter().toFilter(multivaluedMap, IdmIdentityFilter.class);
+			IdmIdentityFilter filter = this.getFilterConverter().toFilter(multivaluedMap, IdmIdentityFilter.class);
 			List<UUID> identityIds = identityService.findIds(filter, null).getContent();
 			if (!identityIds.isEmpty()) {
 				selectedUsers.addAll(identityIds);
@@ -170,11 +169,11 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 	}
 	
 	/**
-	 * Return parameter converter helper
+	 * Return the filter converter helper.
 	 * 
 	 * @return
 	 */
-	protected FilterConverter getParameterConverter() {
+	protected FilterConverter getFilterConverter() {
 		if (filterConverter == null) {
 			filterConverter = new FilterConverter(lookupService, mapper);
 		}
@@ -182,7 +181,7 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 	}
 
 	@Override
-	public boolean isSupportsPreprocessing() {
+	public boolean supportsPreprocessing() {
 		return true;
 	}
 }

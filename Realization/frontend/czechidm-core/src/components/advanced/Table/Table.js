@@ -719,19 +719,18 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       });
       //
       this.preprocessBulkAction(backendBulkAction, (bulkActionNew) => {
-        console.log("bulk", bulkActionNew)
         this.setState({
         showBulkActionDetail: !showBulkActionDetail,
         backendBulkAction: bulkActionNew,
         now: moment(new Date()).format(this.i18n('format.datetime')),
         formInstance: new Domain.FormInstance({}, values)
-      }, () => {
+      }, (bulkActionNew) => {
         // @todo-upgrade-10 This is brutal hack!
         // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
         // This problem occured after update on React 16
         // @todo-upgrade-12 still occurs with material-ui modals
         setTimeout(() => {
-          this.prevalidateBulkAction(backendBulkAction);
+          this.prevalidateBulkAction(bulkActionNew);
         }, 10);
       });});
       //
