@@ -147,6 +147,7 @@ export default class SelectBoxFormAttributeRenderer extends UuidFormAttributeRen
         validationErrors={ validationErrors }
         validationMessage={ attribute.validationMessage }
         className={ className }
+        forceSearchParameters={ attribute.forceSearchParameters }
         style={ style}/>
     );
   }

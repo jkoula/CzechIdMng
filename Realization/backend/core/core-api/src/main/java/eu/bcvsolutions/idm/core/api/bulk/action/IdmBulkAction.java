@@ -106,6 +106,12 @@ public interface IdmBulkAction<DTO extends BaseDto, F extends BaseFilter> extend
 	 */
 	ResultModels prevalidate();
 	
+	IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction);
+	
+	default boolean isSupportsPreprocessing() {
+		return false;
+	}
+	
 	/**
 	 * Generic action.
 	 *

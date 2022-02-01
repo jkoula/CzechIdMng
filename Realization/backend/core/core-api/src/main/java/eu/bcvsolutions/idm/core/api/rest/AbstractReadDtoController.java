@@ -72,7 +72,7 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	@Autowired private PagedResourcesAssembler<Object> pagedResourcesAssembler;
 	@Autowired private ObjectMapper objectMapper;
 	@Autowired private LookupService lookupService;
-	@Autowired	private BulkActionManager bulkActionManager;
+	@Autowired private BulkActionManager bulkActionManager;
 	//
 	private FilterConverter filterConverter;
 	private final ReadDtoService<DTO, F> service;
@@ -524,6 +524,15 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	public ResponseEntity<ResultModels> prevalidateBulkAction(IdmBulkActionDto bulkAction) {
 		initBulkAction(bulkAction);
 		ResultModels result = bulkActionManager.prevalidate(bulkAction);
+		if(result == null) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+	
+	public ResponseEntity<IdmBulkActionDto> preprocessBulkAction(IdmBulkActionDto bulkAction) {
+		initBulkAction(bulkAction);
+		IdmBulkActionDto result = bulkActionManager.preprocessBulkAction(bulkAction);
 		if(result == null) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}

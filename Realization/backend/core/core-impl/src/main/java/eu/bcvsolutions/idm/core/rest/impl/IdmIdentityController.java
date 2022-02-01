@@ -495,6 +495,25 @@ public class IdmIdentityController extends AbstractFormableDtoController<IdmIden
 		return super.prevalidateBulkAction(bulkAction);
 	}
 
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/preprocess", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.IDENTITY_READ + "')")
+	@ApiOperation(
+			value = "Preprocess bulk action for identities", 
+			nickname = "preprocessBulkAction", 
+			response = IdmBulkActionDto.class, 
+			tags = { IdmIdentityController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.IDENTITY_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.IDENTITY_READ, description = "")})
+				})
+	public ResponseEntity<IdmBulkActionDto> preprocessBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.preprocessBulkAction(bulkAction);
+	}
+
 	/**
 	 * Returns given identity's granted authorities
 	 * 

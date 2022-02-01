@@ -69,6 +69,7 @@ public class IdmBulkActionDto extends AbstractComponentDto implements Ordered {
 	private boolean quickButton = false;
 	@ApiModelProperty(notes = "Action can be included in quick buttons on FE. Action can be shown as quick button, when icon is defined (in locale or by icon property).")
 	private boolean quickButtonable = true;
+	private boolean supportsPreprocessing = false;
 
 	public UUID getLongRunningTaskId() {
 		return longRunningTaskId;
@@ -300,5 +301,13 @@ public class IdmBulkActionDto extends AbstractComponentDto implements Ordered {
 	 */
 	public void setQuickButtonable(boolean quickButtonable) {
 		this.quickButtonable = quickButtonable;
+	}
+
+	public boolean isSupportsPreprocessing() {
+		return supportsPreprocessing;
+	}
+
+	public void setSupportsPreprocessing(boolean supportsPreprocessing) {
+		this.supportsPreprocessing = supportsPreprocessing;
 	}
 }

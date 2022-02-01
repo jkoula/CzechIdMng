@@ -1493,6 +1493,26 @@ export default class EntityManager {
   }
 
   /**
+   * Executes preprocessing of action before it starts
+   *
+   * @param  {object}   action
+   * @param  {Function} cb
+   * @return {action}
+   */
+   preprocessBulkAction(action, cb) {
+    return (dispatch) => {
+      this.getService()
+        .preprocessBulkAction(action, cb)
+        .then(json => {
+          return json;
+        })
+        .catch(error => {
+          dispatch(this.receiveError(null, null, error, cb));
+        });
+    };
+  }
+
+  /**
    * Execute bulk action
    *
    * @param  {object}   action

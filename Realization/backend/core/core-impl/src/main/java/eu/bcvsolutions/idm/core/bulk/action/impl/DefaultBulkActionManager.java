@@ -110,6 +110,18 @@ public class DefaultBulkActionManager implements BulkActionManager {
 	}
 	
 	@Override
+	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto action) {
+		AbstractBulkAction<? extends BaseDto, ? extends BaseFilter> executor = getOperationForDto(action);
+		//
+		executor = createNewActionInstance(executor, action);
+		//
+		executor.setAction(action);
+		//
+		// Prevalidate before execute.
+		return executor.preprocessBulkAction(action);
+	}
+	
+	@Override
 	public List<IdmBulkActionDto> getAvailableActions(Class<? extends BaseEntity> entity) {
 
 		List<AbstractBulkAction<? extends BaseDto, ? extends BaseFilter>> enabledActions = getEnabledActions(entity);

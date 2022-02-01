@@ -249,6 +249,80 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     return _.includes(selectedRows, identifier);
   }
 
+  preprocessBulkAction(bulkAction, event) {
+    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
+
+    const { selectedRows, removedRows } = this.state;
+
+    const bulkActionToProcess = {
+      ...bulkAction
+    };
+    const { manager } = this.props;
+    //
+    if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
+      bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
+      bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+    } else {
+      bulkActionToProcess.identifiers = selectedRows;
+    }
+
+    // const bulkActionReturned = this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess));
+    // return bulkActionReturned;
+
+    this.setState({
+      bulkActionShowLoading: true
+    }, () => {
+      this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionNew) => {
+        if (bulkActionNew) {
+          const { bulkActionNew } = this.state;
+          this.setState({
+            bulkActionShowLoading: false,
+            bulkActionNew
+          });
+        } else {
+          this.setState({
+            bulkActionShowLoading: false
+          });
+        }
+      }));
+    });
+
+    // if (bulkAction) {
+    //   const bulkActionToProcess = {
+    //     ...bulkAction
+    //   };
+    //   const { manager } = this.props;
+    //   //
+    //   if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
+    //     bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
+    //     bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+    //   } else {
+    //     bulkActionToProcess.identifiers = selectedRows;
+    //   }
+
+    //   // const bulkActionReturned = this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess));
+    //   // return bulkActionReturned;
+
+    //   this.setState({
+    //     bulkActionShowLoading: true
+    //   }, () => {
+    //     this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionNew) => {
+    //       if (bulkActionNew) {
+    //         const { bulkActionNew } = this.state;
+    //         this.setState({
+    //           bulkActionShowLoading: false,
+    //           bulkActionNew
+    //         });
+    //       } else {
+    //         this.setState({
+    //           bulkActionShowLoading: false
+    //         });
+    //       }
+    //     }));
+    //   });
+    // }
+  }
+
   prevalidateBulkAction(bulkAction, event) {
     if (event) {
       event.preventDefault();
@@ -674,6 +748,9 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           }
         }
       });
+      //
+      this.preprocessBulkAction(backendBulkAction);
+      const { bulkActionNew } = this.state;
       //
       this.setState({
         showBulkActionDetail: !showBulkActionDetail,

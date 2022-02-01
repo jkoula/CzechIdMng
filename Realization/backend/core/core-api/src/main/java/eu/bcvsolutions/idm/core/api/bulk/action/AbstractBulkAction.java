@@ -137,6 +137,11 @@ public abstract class AbstractBulkAction<DTO extends AbstractDto, F extends Base
 	public ResultModels prevalidate() {
 		return new ResultModels();
 	}
+	
+	@Override
+	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction) {
+		return bulkAction;
+	}
 
 	@Override
 	public Map<String, Object> getProperties() {

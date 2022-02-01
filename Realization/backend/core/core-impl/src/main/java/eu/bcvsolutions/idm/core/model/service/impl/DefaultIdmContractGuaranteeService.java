@@ -65,6 +65,11 @@ public class DefaultIdmContractGuaranteeService
 					identity));
 		}
 		
+		List<UUID> identities = filter.getIdentities();
+		if (identities != null && !identities.isEmpty()) {
+			predicates.add(root.get(IdmContractGuarantee_.identityContract).get(IdmIdentityContract_.identity).in(identities));
+		}
+		
 		return predicates;
 	}
 }

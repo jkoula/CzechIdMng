@@ -61,6 +61,8 @@ public interface BulkActionManager {
 	 */
 	ResultModels prevalidate(IdmBulkActionDto bulkAction);
 	
+	IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction);
+	
 	/**
 	 * To DTO conversion.
 	 * 
