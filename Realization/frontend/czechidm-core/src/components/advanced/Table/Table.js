@@ -249,78 +249,47 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     return _.includes(selectedRows, identifier);
   }
 
-  preprocessBulkAction(bulkAction, event) {
+  preprocessBulkAction(bulkAction, cb = null) {
     const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
 
     const { selectedRows, removedRows } = this.state;
 
-    const bulkActionToProcess = {
-      ...bulkAction
-    };
-    const { manager } = this.props;
-    //
-    if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-      bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
-      bulkActionToProcess.removeIdentifiers = removedRows.toArray();
-    } else {
-      bulkActionToProcess.identifiers = selectedRows;
+    if (bulkAction) {
+      const bulkActionToProcess = {
+        ...bulkAction
+      };
+      const { manager } = this.props;
+      //
+      if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
+        bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
+        bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+      } else {
+        bulkActionToProcess.identifiers = selectedRows;
+      }
+
+      // const bulkActionReturned = this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess));
+      // return bulkActionReturned;
+
+      this.setState({
+        bulkActionShowLoading: true
+      }, () => {
+        this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionNew) => {
+          if (bulkActionNew) {
+            this.setState({
+              bulkActionShowLoading: false,
+              backendBulkAction: bulkActionNew
+            });
+            if (cb) {
+              cb(bulkActionNew)
+            }
+          } else {
+            this.setState({
+              bulkActionShowLoading: false
+            });
+          }
+        }));
+      });
     }
-
-    // const bulkActionReturned = this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess));
-    // return bulkActionReturned;
-
-    this.setState({
-      bulkActionShowLoading: true
-    }, () => {
-      this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionNew) => {
-        if (bulkActionNew) {
-          const { bulkActionNew } = this.state;
-          this.setState({
-            bulkActionShowLoading: false,
-            bulkActionNew
-          });
-        } else {
-          this.setState({
-            bulkActionShowLoading: false
-          });
-        }
-      }));
-    });
-
-    // if (bulkAction) {
-    //   const bulkActionToProcess = {
-    //     ...bulkAction
-    //   };
-    //   const { manager } = this.props;
-    //   //
-    //   if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-    //     bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
-    //     bulkActionToProcess.removeIdentifiers = removedRows.toArray();
-    //   } else {
-    //     bulkActionToProcess.identifiers = selectedRows;
-    //   }
-
-    //   // const bulkActionReturned = this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess));
-    //   // return bulkActionReturned;
-
-    //   this.setState({
-    //     bulkActionShowLoading: true
-    //   }, () => {
-    //     this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionNew) => {
-    //       if (bulkActionNew) {
-    //         const { bulkActionNew } = this.state;
-    //         this.setState({
-    //           bulkActionShowLoading: false,
-    //           bulkActionNew
-    //         });
-    //       } else {
-    //         this.setState({
-    //           bulkActionShowLoading: false
-    //         });
-    //       }
-    //     }));
-    //   });
-    // }
   }
 
   prevalidateBulkAction(bulkAction, event) {
@@ -710,7 +679,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
   }
 
-  showBulkActionDetail(backendBulkAction) {
+  showBulkActionDetail(backendBulkAction, cb=null) {
     const { showBulkActionDetail } = this.state;
     //
     if (showBulkActionDetail) { // FIXME: ~close bulk action ...
@@ -749,12 +718,11 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         }
       });
       //
-      this.preprocessBulkAction(backendBulkAction);
-      const { bulkActionNew } = this.state;
-      //
-      this.setState({
+      this.preprocessBulkAction(backendBulkAction, (bulkActionNew) => {
+        console.log("bulk", bulkActionNew)
+        this.setState({
         showBulkActionDetail: !showBulkActionDetail,
-        backendBulkAction,
+        backendBulkAction: bulkActionNew,
         now: moment(new Date()).format(this.i18n('format.datetime')),
         formInstance: new Domain.FormInstance({}, values)
       }, () => {
@@ -765,7 +733,9 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         setTimeout(() => {
           this.prevalidateBulkAction(backendBulkAction);
         }, 10);
-      });
+      });});
+      //
+      
     }
   }
 

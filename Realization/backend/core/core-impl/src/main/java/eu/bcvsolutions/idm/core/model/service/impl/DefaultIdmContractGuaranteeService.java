@@ -67,7 +67,7 @@ public class DefaultIdmContractGuaranteeService
 		
 		List<UUID> identities = filter.getIdentities();
 		if (identities != null && !identities.isEmpty()) {
-			predicates.add(root.get(IdmContractGuarantee_.identityContract).get(IdmIdentityContract_.identity).in(identities));
+			predicates.add(root.get(IdmContractGuarantee_.identityContract).get(IdmIdentityContract_.identity).get(AbstractEntity_.id).in(identities));
 		}
 		
 		return predicates;
