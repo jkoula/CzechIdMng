@@ -25,6 +25,7 @@ public class IdmProcessedTaskItemFilter extends DataFilter {
 	private OperationState operationState;
 	private ZonedDateTime from;
 	private ZonedDateTime till;
+	private Boolean taskMonitoringIgnored;
 
 	public IdmProcessedTaskItemFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -89,4 +90,12 @@ public class IdmProcessedTaskItemFilter extends DataFilter {
 	public void setTill(ZonedDateTime till) {
 		this.till = till;
 	}
+
+    public void setTaskMonitoringIgnored(boolean taskMonitoringIgnored) {
+        this.taskMonitoringIgnored = taskMonitoringIgnored;
+    }
+
+    public Boolean getTaskMonitoringIgnored() {
+        return taskMonitoringIgnored;
+    }
 }

@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import javax.sql.DataSource;
 
+import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskExecutor;
 import org.flywaydb.core.internal.exception.FlywaySqlException;
 import org.flywaydb.core.internal.jdbc.JdbcUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1013,6 +1014,13 @@ public class DefaultTestHelper implements TestHelper {
 		d.setQuartzTaskName(UUID.randomUUID().toString());
 		d = scheduledTaskService.saveInternal(d);
 		return d;
+	}
+
+	@Override
+	public IdmLongRunningTaskDto createLongRunningTask(LongRunningTaskExecutor<?> executor) {
+		final IdmScheduledTaskDto schedulableTask = createSchedulableTask();
+		IdmLongRunningTaskDto lrt = new IdmLongRunningTaskDto();
+		return taskManager.resolveLongRunningTask(executor, schedulableTask.getId(), OperationState.CREATED);
 	}
 
 	@Override

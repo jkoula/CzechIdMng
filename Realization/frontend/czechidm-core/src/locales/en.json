@@ -7438,6 +7438,16 @@
           }
         }
       },
+      "core-long-running-task-result-monitoring-evaluator": {
+        "label": "Check, if there are any long running tasks with failed items",
+        "help": "Warning about failed items in long running tasks",
+        "attributes": {
+          "numberofdays": {
+            "label": "Number of days",
+            "help": "Errors not older than given number of days."
+          }
+        }
+      },
       "core-entity-event-lock-thread-queue-monitoring-evaluator": {
         "label": "Check numnber of threads waiting for entity event lock.",
         "help": "Warning about number of threads waiting for lock on entity event queue",

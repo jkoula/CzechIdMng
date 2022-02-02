@@ -3,11 +3,12 @@ package eu.bcvsolutions.idm.core.scheduler.service.impl;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 
+import eu.bcvsolutions.idm.core.model.repository.filter.MonitoringIgnorableFilterBuilder;
+import eu.bcvsolutions.idm.core.monitoring.api.dto.filter.MonitoringIgnorableFilter;
+import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
+import eu.bcvsolutions.idm.core.scheduler.entity.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,10 +28,6 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmProcessedTaskItemDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmScheduledTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmProcessedTaskItemFilter;
 import eu.bcvsolutions.idm.core.scheduler.api.service.IdmProcessedTaskItemService;
-import eu.bcvsolutions.idm.core.scheduler.entity.IdmLongRunningTask_;
-import eu.bcvsolutions.idm.core.scheduler.entity.IdmProcessedTaskItem;
-import eu.bcvsolutions.idm.core.scheduler.entity.IdmProcessedTaskItem_;
-import eu.bcvsolutions.idm.core.scheduler.entity.IdmScheduledTask_;
 import eu.bcvsolutions.idm.core.scheduler.repository.IdmProcessedTaskItemRepository;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
@@ -45,12 +42,14 @@ public class DefaultIdmProcessedTaskItemService
 	implements IdmProcessedTaskItemService {
 	
 	private final IdmProcessedTaskItemRepository repository;
+	private final MonitoringIgnorableFilterBuilder monitoringIgnorableFilterBuilder;
 
 	@Autowired
-	public DefaultIdmProcessedTaskItemService(IdmProcessedTaskItemRepository repository) {
+	public DefaultIdmProcessedTaskItemService(IdmProcessedTaskItemRepository repository, MonitoringIgnorableFilterBuilder monitoringIgnorableFilterBuilder) {
 		super(repository);
 		//
 		this.repository = repository;
+		this.monitoringIgnorableFilterBuilder = monitoringIgnorableFilterBuilder;
 	}
 	
 	@Override
@@ -104,6 +103,24 @@ public class DefaultIdmProcessedTaskItemService
 					.get(IdmLongRunningTask_.id),
 					filter.getLongRunningTaskId()));
 		}
+
+		if (filter.getTaskMonitoringIgnored() != null) {
+			IdmLongRunningTaskFilter taskFilter = new IdmLongRunningTaskFilter();
+			taskFilter.setMonitoringIgnored(true);
+
+			final Subquery<IdmLongRunningTask> subquery = query.subquery(IdmLongRunningTask.class);
+			final Root<IdmLongRunningTask> subroot = subquery.from(IdmLongRunningTask.class);
+			subquery.select(subroot)
+					.where(builder.and(
+							monitoringIgnorableFilterBuilder.getPredicate(subroot, subquery, builder, taskFilter),
+							builder.equal(root.get(IdmProcessedTaskItem_.LONG_RUNNING_TASK),subroot.get(IdmLongRunningTask_.id))
+					));
+
+			predicates.add(
+					filter.getTaskMonitoringIgnored() ? builder.exists(subquery) : builder.not(builder.exists(subquery))
+			);
+		}
+
 		if (filter.getOperationState() != null) {
 			predicates.add(builder.equal(root.get(IdmProcessedTaskItem_.operationResult).get(OperationResult_.state), filter.getOperationState()));
 		}

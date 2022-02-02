@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.model.repository.filter.MonitoringIgnorableFilterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -237,6 +238,7 @@ public class IdmServiceConfiguration {
 	@Autowired private IdmTokenRepository tokenRepository;
 	@Autowired private IdmProfileRepository profileRepository;
 	@Autowired private IdmGenerateValueRepository generatedValueRepository;
+	@Autowired private MonitoringIgnorableFilterBuilder monitoringIgnorableFilterBuilder;
 	//
 	// Auto registered beans (plugins)
 	@Autowired private PluginRegistry<ModuleDescriptor, String> moduleDescriptorRegistry;
@@ -784,7 +786,7 @@ public class IdmServiceConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(IdmProcessedTaskItemService.class)
 	public IdmProcessedTaskItemService processedTaskItemService() {
-		return new DefaultIdmProcessedTaskItemService(processedTaskRepository);
+		return new DefaultIdmProcessedTaskItemService(processedTaskRepository, monitoringIgnorableFilterBuilder);
 	}
 	
 	/**

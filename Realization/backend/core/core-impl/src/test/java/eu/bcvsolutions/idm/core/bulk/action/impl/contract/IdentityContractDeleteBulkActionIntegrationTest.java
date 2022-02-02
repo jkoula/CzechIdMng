@@ -1,10 +1,12 @@
 package eu.bcvsolutions.idm.core.bulk.action.impl.contract;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import eu.bcvsolutions.idm.core.api.domain.OperationState;
+import eu.bcvsolutions.idm.core.api.dto.filter.BulkActionFilter;
+import eu.bcvsolutions.idm.core.scheduler.api.config.SchedulerConfiguration;
+import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
+import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

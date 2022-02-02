@@ -7491,6 +7491,16 @@
           }
         }
       },
+      "core-long-running-task-result-monitoring-evaluator": {
+        "label": "Kontrola chyb ve zpracovaných položkách dlouhotrvajících úloh",
+        "help": "Varování o chybných položkách ve výsledcích zpracovaných dlouhotrvajících úloh",
+        "attributes": {
+          "numberofdays": {
+            "label": "Počet dní",
+            "help": "Chyby, které nejsou starší, než-li zadaný počet dní."
+          }
+        }
+      },
       "core-entity-event-lock-thread-queue-monitoring-evaluator": {
         "label": "Kontrola počtu vláken čekajících na zámek na frontě událostí",
         "help": "Zobrazí varování, pokud počet čekajících vláken na frontě událostí překročí daný limit.",
