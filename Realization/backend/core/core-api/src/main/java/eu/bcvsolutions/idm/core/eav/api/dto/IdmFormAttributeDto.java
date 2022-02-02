@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import javax.validation.constraints.NotEmpty;
 import org.springframework.hateoas.core.Relation;
 import org.springframework.util.Assert;
 
@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.Niceable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.UnmodifiableEntity;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 
@@ -25,6 +26,7 @@ import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
  * Form attribute dto
  * 
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  *
  */
 @Relation(collectionRelation = "formAttributes")
@@ -66,6 +68,7 @@ public class IdmFormAttributeDto extends AbstractDto implements UnmodifiableEnti
 	@Size(max = DefaultFieldLengths.NAME)
 	private String module;
 	private String label;
+	private DataFilter forceSearchParameters;
 	
 	public IdmFormAttributeDto() {
 	}
@@ -377,5 +380,29 @@ public class IdmFormAttributeDto extends AbstractDto implements UnmodifiableEnti
 	 */
 	public String getLabel() {
 		return label;
+	}
+
+	/**
+	 * Filter which is used when proprocessing a bulk action. This
+	 * allows you to limit what the user can see in the form based
+	 * on items selected for the bulk action. Persisted in json only.
+	 * 
+	 * @return filter used to limit the content of user facing forms
+	 * @since 12.1.0
+	 */
+	public DataFilter getForceSearchParameters() {
+		return forceSearchParameters;
+	}
+
+	/**
+	 * Filter which is used when proprocessing a bulk action. This
+	 * allows you to limit what the user can see in the form based
+	 * on items selected for the bulk action. Persisted in json only.
+	 * 
+	 * @param forceSearchParameters
+	 * @since 12.1.0
+	 */
+	public void setForceSearchParameters(DataFilter forceSearchParameters) {
+		this.forceSearchParameters = forceSearchParameters;
 	}
 }

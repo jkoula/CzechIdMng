@@ -45,6 +45,7 @@ import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 @Service("bulkActionManager")
 public class DefaultBulkActionManager implements BulkActionManager {
@@ -107,6 +108,18 @@ public class DefaultBulkActionManager implements BulkActionManager {
 		//
 		// Prevalidate before execute.
 		return executor.prevalidate();
+	}
+	
+	@Override
+	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto action) {
+		AbstractBulkAction<? extends BaseDto, ? extends BaseFilter> executor = getOperationForDto(action);
+		//
+		executor = createNewActionInstance(executor, action);
+		//
+		executor.setAction(action);
+		//
+		// Preprocess before execute.
+		return executor.preprocessBulkAction(action);
 	}
 	
 	@Override
@@ -307,6 +320,7 @@ public class DefaultBulkActionManager implements BulkActionManager {
 		actionDto.setDeleteAction(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_DELETE_ACTION, action.isDeleteAction()));
 		actionDto.setQuickButton(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_QUICK_BUTTON, action.isQuickButton()));
 		actionDto.setQuickButtonable(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_QUICK_BUTTONABLE, action.isQuickButtonable()));
+		actionDto.setSupportsPreprocessing(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_SUPPORTS_PREPROCESSING, action.isSupportsPreprocessing()));
 		actionDto.setLevel(action.getLevel());
 		try {
 			NotificationLevel level = parameterConverter.toEnum(configurationMap, ConfigurationService.PROPERTY_LEVEL, NotificationLevel.class);

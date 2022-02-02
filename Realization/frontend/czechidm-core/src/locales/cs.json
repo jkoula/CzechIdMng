@@ -8130,6 +8130,10 @@
       "title": "Nedostatečná oprávnění pro změnu garanta kontraktu",
       "message": "Uživatel nemá oprávnění k provedení operace [{{permission}}] garanta kontraktu pro kontrakt [{{contractId}}] a identity garanta [{{guaranteeId}}]."
     },
+    "BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS": {
+      "title": "Vybraní uživatelé nemají žádné garanty kontraktů",
+      "message": "Vybraní uživatelé nemají aktuálně žádné garanty kontraktů, které by bylo možné nahradit či odstranit."
+    },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Nedostatečná oprávnění pro změnu atributů kontraktu",
       "message": "Uživatel nemá oprávnění k provedení změn kontraktu [{{contractId}}]."

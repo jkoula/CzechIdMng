@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.api.dto.filter;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.util.LinkedMultiValueMap;
@@ -13,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
  * 
  * @author Radek Tomiška
  * @author Ondrej Husnik
+ * @author Tomáš Doischer
  *
  */
 public class IdmContractGuaranteeFilter extends DataFilter implements ExternalIdentifiableFilter {
@@ -21,6 +23,8 @@ public class IdmContractGuaranteeFilter extends DataFilter implements ExternalId
 	 * Related identity - contract (~ position) owner.
 	 */
 	public static final String PARAMETER_IDENTITY = IdmIdentityContractFilter.PARAMETER_IDENTITY;
+	
+	public static final String PARAMETER_IDENTITIES = "identities";
 	/**
 	 * Related contract - position owner.
 	 */
@@ -77,5 +81,25 @@ public class IdmContractGuaranteeFilter extends DataFilter implements ExternalId
 	 */
 	public void setIdentity(UUID identity) {
 		set(PARAMETER_IDENTITY, identity);
+	}
+	
+	/**
+	 * Identities of contract of which is guaranteed. Will return union of guarantees.
+	 * 
+	 * @return identity
+	 * @since 12.1.0
+	 */
+	public List<UUID> getIdentities() {
+		return getParameterConverter().toUuids(getData(), PARAMETER_IDENTITIES);
+	}
+
+	/**
+	 * Identities of contract of which is guaranteed. Will return union of guarantees.
+	 * 
+	 * @param identityId identity
+	 * @since 12.1.0
+	 */
+	public void setIdentities(List<UUID> identities) {
+		put(PARAMETER_IDENTITIES, identities);
 	}
 }
