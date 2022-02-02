@@ -29,7 +29,7 @@ import io.swagger.annotations.ApiModelProperty;
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
- *
+ * @author Tomáš Doischer
  */
 @JsonInclude(Include.NON_NULL)
 @Relation(collectionRelation = "bulkOperations")
@@ -303,10 +303,22 @@ public class IdmBulkActionDto extends AbstractComponentDto implements Ordered {
 		this.quickButtonable = quickButtonable;
 	}
 
+	/**
+	 * Action supports preprocessing.
+	 * 
+	 * @return true - action supports preprocessing
+	 * @since 12.1.0
+	 */
 	public boolean isSupportsPreprocessing() {
 		return supportsPreprocessing;
 	}
 
+	/**
+	 * Action supports preprocessing.
+	 * 
+	 * @param supportsPreprocessing
+	 * @since 12.1.0
+	 */
 	public void setSupportsPreprocessing(boolean supportsPreprocessing) {
 		this.supportsPreprocessing = supportsPreprocessing;
 	}

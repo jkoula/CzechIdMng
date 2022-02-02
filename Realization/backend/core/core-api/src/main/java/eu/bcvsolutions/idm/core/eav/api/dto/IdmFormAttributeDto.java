@@ -26,6 +26,7 @@ import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
  * Form attribute dto
  * 
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  *
  */
 @Relation(collectionRelation = "formAttributes")
@@ -381,10 +382,26 @@ public class IdmFormAttributeDto extends AbstractDto implements UnmodifiableEnti
 		return label;
 	}
 
+	/**
+	 * Filter which is used when proprocessing a bulk action. This
+	 * allows you to limit what the user can see in the form based
+	 * on items selected for the bulk action. Persisted in json only.
+	 * 
+	 * @return filter used to limit the content of user facing forms
+	 * @since 12.1.0
+	 */
 	public DataFilter getForceSearchParameters() {
 		return forceSearchParameters;
 	}
 
+	/**
+	 * Filter which is used when proprocessing a bulk action. This
+	 * allows you to limit what the user can see in the form based
+	 * on items selected for the bulk action. Persisted in json only.
+	 * 
+	 * @param forceSearchParameters
+	 * @since 12.1.0
+	 */
 	public void setForceSearchParameters(DataFilter forceSearchParameters) {
 		this.forceSearchParameters = forceSearchParameters;
 	}

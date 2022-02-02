@@ -58,6 +58,7 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
  * Abstract parent for all bulk actions.
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
+ * @author Tomáš Doischer
  *
  * @param <DTO>
  * @param <F>

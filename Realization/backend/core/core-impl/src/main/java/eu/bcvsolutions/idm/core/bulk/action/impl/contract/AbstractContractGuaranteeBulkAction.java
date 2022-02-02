@@ -49,7 +49,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
  *
  * @author Ondrej Husnik
  * @author Radek Tomiška
- *
+ * @author Tomáš Doischer
  */
 public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAction<IdmIdentityDto, IdmIdentityFilter> {
 	
@@ -230,6 +230,13 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 		return super.logItemProcessed(item, opResult);
 	}
 	
+	/**
+	 * Get the ids of identities who are the guarantees for users selected
+	 * for the bulk action.
+	 * 
+	 * @param bulkAction
+	 * @return
+	 */
 	protected List<UUID> getContractGuaranteeIdentities(IdmBulkActionDto bulkAction) {
 		List<UUID> selectedUsers = getUsersFromBulkAction(bulkAction);
 		IdmContractGuaranteeFilter filter = new IdmContractGuaranteeFilter();
@@ -243,6 +250,12 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 		return guaranteeIdentityIds;
 	}
 	
+	/**
+	 * The the users selected in the bulk action.
+	 * 
+	 * @param bulkAction
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	protected List<UUID> getUsersFromBulkAction(IdmBulkActionDto bulkAction) {
 		List<UUID> selectedUsers = new ArrayList<>();

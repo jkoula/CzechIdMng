@@ -45,6 +45,7 @@ import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 @Service("bulkActionManager")
 public class DefaultBulkActionManager implements BulkActionManager {

@@ -29,6 +29,7 @@ export const EMPTY = 'VOID_ACTION'; // dispatch cannot return null
  * Encapsulate redux action for entity type
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 export default class EntityManager {
 

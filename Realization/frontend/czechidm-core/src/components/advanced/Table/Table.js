@@ -39,6 +39,7 @@ const dataManager = new DataManager();
  * Table component with header and columns.
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 class AdvancedTable extends Basic.AbstractContextComponent {
 

@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 public interface BulkActionManager {
 
@@ -61,6 +62,14 @@ public interface BulkActionManager {
 	 */
 	ResultModels prevalidate(IdmBulkActionDto bulkAction);
 	
+	/**
+	 * Prepare bulk action before showing the form to the user.
+	 * Used to prefilter the forms.
+	 * 
+	 * @param bulkAction
+	 * @return bulkAction changed by preprocessing
+	 * @since 12.1.0
+	 */
 	IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction);
 	
 	/**

@@ -8,6 +8,7 @@ import * as Utils from '../utils';
  * Contains basic CRUD + search operation
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 export default class AbstractService {
 

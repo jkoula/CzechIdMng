@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
  * 
  * @author Radek Tomiška
  * @author Ondrej Husnik
+ * @author Tomáš Doischer
  *
  */
 public class IdmContractGuaranteeFilter extends DataFilter implements ExternalIdentifiableFilter {
@@ -83,7 +84,7 @@ public class IdmContractGuaranteeFilter extends DataFilter implements ExternalId
 	}
 	
 	/**
-	 * Identities of contract of which is guaranteed.
+	 * Identities of contract of which is guaranteed. Will return union of guarantees.
 	 * 
 	 * @return identity
 	 * @since 12.1.0
@@ -93,7 +94,7 @@ public class IdmContractGuaranteeFilter extends DataFilter implements ExternalId
 	}
 
 	/**
-	 * Identities of contract of which is guaranteed.
+	 * Identities of contract of which is guaranteed. Will return union of guarantees.
 	 * 
 	 * @param identityId identity
 	 * @since 12.1.0

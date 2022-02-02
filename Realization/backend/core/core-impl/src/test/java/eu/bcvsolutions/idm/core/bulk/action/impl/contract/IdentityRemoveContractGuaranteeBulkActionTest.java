@@ -41,7 +41,7 @@ import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
  * Integration tests for {@link IdentityRemoveContractGuaranteeBulkAction}
  *
  * @author Ondrej Husnik
- *
+ * @author Tomáš Doischer
  */
 
 public class IdentityRemoveContractGuaranteeBulkActionTest extends AbstractBulkActionTest {

@@ -65,6 +65,7 @@ import io.swagger.annotations.Authorization;
  * @param <F> filter type - {@link DataFilter} is preferred.
  * @author Svanda
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends BaseFilter>
 		implements BaseDtoController<DTO> {
@@ -530,6 +531,13 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 	
+	/**
+	 * Start preprocessing for a given bulk action.
+	 * 
+	 * @param bulkAction
+	 * @return
+	 * @since 12.1.0
+	 */
 	public ResponseEntity<IdmBulkActionDto> preprocessBulkAction(IdmBulkActionDto bulkAction) {
 		initBulkAction(bulkAction);
 		IdmBulkActionDto result = bulkActionManager.preprocessBulkAction(bulkAction);

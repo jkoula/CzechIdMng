@@ -32,6 +32,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
  * Bulk operation for removing contract guarantees
  *
  * @author Ondrej Husnik
+ * @author Tomáš Doischer
  *
  */
 @Enabled(CoreModuleDescriptor.MODULE_ID)
@@ -94,6 +95,10 @@ public class IdentityRemoveContractGuaranteeBulkAction extends AbstractContractG
 		return new OperationResult.Builder(OperationState.EXECUTED).build();
 	}
 	
+	/**
+	 * If no guarantee for selected identities exists, 
+	 * return the info in the result model.
+	 */
 	@Override
 	public ResultModels prevalidate() {
 		ResultModels result = new ResultModels();
@@ -106,6 +111,10 @@ public class IdentityRemoveContractGuaranteeBulkAction extends AbstractContractG
 		return result;
 	}
 
+	/**
+	 * Add the form attributes containing forceSearchParameters (filter) with
+	 * users who are the guarantees of the selected users.
+	 */
 	@Override
 	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction) {
 		List<UUID> guaranteeIdentityIds = getContractGuaranteeIdentities(bulkAction);
