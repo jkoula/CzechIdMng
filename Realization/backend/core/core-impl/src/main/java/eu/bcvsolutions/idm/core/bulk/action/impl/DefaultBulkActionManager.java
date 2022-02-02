@@ -117,7 +117,7 @@ public class DefaultBulkActionManager implements BulkActionManager {
 		//
 		executor.setAction(action);
 		//
-		// Prevalidate before execute.
+		// Preprocess before execute.
 		return executor.preprocessBulkAction(action);
 	}
 	
@@ -319,6 +319,7 @@ public class DefaultBulkActionManager implements BulkActionManager {
 		actionDto.setDeleteAction(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_DELETE_ACTION, action.isDeleteAction()));
 		actionDto.setQuickButton(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_QUICK_BUTTON, action.isQuickButton()));
 		actionDto.setQuickButtonable(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_QUICK_BUTTONABLE, action.isQuickButtonable()));
+		actionDto.setSupportsPreprocessing(parameterConverter.toBoolean(configurationMap, IdmBulkAction.PROPERTY_SUPPORTS_PREPROCESSING, action.isSupportsPreprocessing()));
 		actionDto.setLevel(action.getLevel());
 		try {
 			NotificationLevel level = parameterConverter.toEnum(configurationMap, ConfigurationService.PROPERTY_LEVEL, NotificationLevel.class);

@@ -267,20 +267,17 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         bulkActionToProcess.identifiers = selectedRows;
       }
 
-      // const bulkActionReturned = this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess));
-      // return bulkActionReturned;
-
       this.setState({
         bulkActionShowLoading: true
       }, () => {
-        this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionNew) => {
-          if (bulkActionNew) {
+        this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionPreprocessed) => {
+          if (bulkActionPreprocessed) {
             this.setState({
               bulkActionShowLoading: false,
-              backendBulkAction: bulkActionNew
+              backendBulkAction: bulkActionPreprocessed
             });
             if (cb) {
-              cb(bulkActionNew)
+              cb(bulkActionPreprocessed)
             }
           } else {
             this.setState({
@@ -718,23 +715,38 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         }
       });
       //
-      this.preprocessBulkAction(backendBulkAction, (bulkActionNew) => {
+      if (backendBulkAction.supportsPreprocessing) {
+        this.preprocessBulkAction(backendBulkAction, (bulkActionPreprocessed) => {
+          this.setState({
+          showBulkActionDetail: !showBulkActionDetail,
+          backendBulkAction: bulkActionPreprocessed,
+          now: moment(new Date()).format(this.i18n('format.datetime')),
+          formInstance: new Domain.FormInstance({}, values)
+        }, () => {
+          // @todo-upgrade-10 This is brutal hack!
+          // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
+          // This problem occured after update on React 16
+          // @todo-upgrade-12 still occurs with material-ui modals
+          setTimeout(() => {
+            this.prevalidateBulkAction(backendBulkAction);
+          }, 10);
+        });});
+      } else {
         this.setState({
-        showBulkActionDetail: !showBulkActionDetail,
-        backendBulkAction: bulkActionNew,
-        now: moment(new Date()).format(this.i18n('format.datetime')),
-        formInstance: new Domain.FormInstance({}, values)
-      }, (bulkActionNew) => {
-        // @todo-upgrade-10 This is brutal hack!
-        // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
-        // This problem occured after update on React 16
-        // @todo-upgrade-12 still occurs with material-ui modals
-        setTimeout(() => {
-          this.prevalidateBulkAction(bulkActionNew);
-        }, 10);
-      });});
-      //
-      
+          showBulkActionDetail: !showBulkActionDetail,
+          backendBulkAction,
+          now: moment(new Date()).format(this.i18n('format.datetime')),
+          formInstance: new Domain.FormInstance({}, values)
+        }, () => {
+          // @todo-upgrade-10 This is brutal hack!
+          // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
+          // This problem occured after update on React 16
+          // @todo-upgrade-12 still occurs with material-ui modals
+          setTimeout(() => {
+            this.prevalidateBulkAction(backendBulkAction);
+          }, 10);
+        });
+      }
     }
   }
 

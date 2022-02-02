@@ -62,8 +62,10 @@ export default class IdentitySelectFormAttributeRenderer extends SelectBoxFormAt
     if (!forceSearchParameters) {
       forceSearchParameters = new SearchParameters();
     }
-    forceSearchParameters = forceSearchParameters.setFilter('id', attribute.forceSearchParameters.ids);
-
+    if (attribute.forceSearchParameters && attribute.forceSearchParameters.ids) {
+      forceSearchParameters = forceSearchParameters.setFilter('id', attribute.forceSearchParameters.ids);
+    }
+    
     //
     return (
       <IdentitySelect

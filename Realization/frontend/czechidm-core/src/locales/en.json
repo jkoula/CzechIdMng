@@ -8057,6 +8057,10 @@
       "title": "Insufficient permissions for contract guarantee change",
       "message": "User is not authorized to perform [{{permission}}] operation with contract guarantee for contract [{{contractId}}] and identity of guarantee [{{guaranteeId}}]."
     },
+    "BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS": {
+      "title": "No contract guarantee for selected users",
+      "message": "Selected users have currently no guarantees to replace or remove."
+    },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Insufficient permissions for contract change",
       "message": "User is not authorized to perform changes of contract [{{contractId}}]."

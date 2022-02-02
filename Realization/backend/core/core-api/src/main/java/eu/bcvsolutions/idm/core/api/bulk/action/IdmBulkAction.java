@@ -55,6 +55,12 @@ public interface IdmBulkAction<DTO extends BaseDto, F extends BaseFilter> extend
 	 */
 	String PROPERTY_QUICK_BUTTONABLE = "quickButtonable";
 	/**
+	 * Configurable property for posibility to include action in quick access buttons.
+	 * 
+	 * @since 11.1.0
+	 */
+	String PROPERTY_SUPPORTS_PREPROCESSING = "supportsPreprocessing";
+	/**
 	 * Bulk action configurable type.
 	 * 
 	 * @since 10.6.0
@@ -108,7 +114,7 @@ public interface IdmBulkAction<DTO extends BaseDto, F extends BaseFilter> extend
 	
 	IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction);
 	
-	default boolean supportsPreprocessing() {
+	default boolean isSupportsPreprocessing() {
 		return false;
 	}
 	
