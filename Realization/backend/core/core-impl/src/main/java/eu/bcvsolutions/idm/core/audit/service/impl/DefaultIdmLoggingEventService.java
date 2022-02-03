@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
  */
 @Service
 public class DefaultIdmLoggingEventService
-		extends AbstractReadDtoService<IdmLoggingEventDto, IdmLoggingEvent, IdmLoggingEventFilter>
+		extends AbstractReadWriteDtoService<IdmLoggingEventDto, IdmLoggingEvent, IdmLoggingEventFilter>
 		implements IdmLoggingEventService {
 
 	private final IdmLoggingEventRepository repository;
