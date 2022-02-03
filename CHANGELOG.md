@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 
 
+## [12.1.0]
+
+### Administrator
+
+- 🟢 [#3008](https://redmine.czechidm.com/issues/3008) - Bulk actions for changing and removing contract guarantees only show the current guarantees for selected identities.
+
+
+### Developer
+
+- 🟢 [#3008](https://redmine.czechidm.com/issues/3008) - Added support for preprocessing to bulk actions. Preprocessing allows you to filter the values in forms based on the entities selected for the bulk action.
+
 ## [12.0.0]
 
 ### Administrator
