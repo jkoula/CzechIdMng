@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,6 @@ import org.springframework.util.Assert;
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmLoggingEventPropertyDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmLoggingEventPropertyFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventPropertyService;
-import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEventProperty;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEventProperty_;
 import eu.bcvsolutions.idm.core.audit.entity.key.IdmLoggingEventPropertyPrimaryKey;
@@ -27,7 +27,7 @@ import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 @Service
 public class DefaultIdmLoggingEventPropertyService extends
-		AbstractReadDtoService<IdmLoggingEventPropertyDto, IdmLoggingEventProperty, IdmLoggingEventPropertyFilter>
+		AbstractReadWriteDtoService<IdmLoggingEventPropertyDto, IdmLoggingEventProperty, IdmLoggingEventPropertyFilter>
 		implements IdmLoggingEventPropertyService {
 
 	private final IdmLoggingEventPropertyRepository repository;
@@ -41,7 +41,7 @@ public class DefaultIdmLoggingEventPropertyService extends
 
 	@Override
 	protected List<Predicate> toPredicates(Root<IdmLoggingEventProperty> root, CriteriaQuery<?> query,
-			CriteriaBuilder builder, IdmLoggingEventPropertyFilter filter) {
+										   CriteriaBuilder builder, IdmLoggingEventPropertyFilter filter) {
 		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
 
 		if (filter.getEventId() != null) {
@@ -58,7 +58,7 @@ public class DefaultIdmLoggingEventPropertyService extends
 
 		return predicates;
 	}
-	
+
 	@Override
 	protected IdmLoggingEventPropertyDto toDto(IdmLoggingEventProperty entity) {
 		IdmLoggingEventPropertyDto dto = new IdmLoggingEventPropertyDto();
@@ -67,7 +67,7 @@ public class DefaultIdmLoggingEventPropertyService extends
 		dto.setMappedValue(entity.getMappedValue());
 		return dto;
 	}
-	
+
 	@Override
 	protected IdmLoggingEventProperty toEntity(IdmLoggingEventPropertyDto dto) {
 		IdmLoggingEventProperty entity = new IdmLoggingEventProperty();
