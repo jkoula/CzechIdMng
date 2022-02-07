@@ -8061,6 +8061,10 @@
       "title": "No contract guarantee for selected users",
       "message": "Selected users have currently no guarantees to replace or remove."
     },
+    "BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST": {
+      "title": "Too many contract guarantees for users",
+      "message": "Selected users have too many contract guarantees (>45). All active users will be shown instead."
+    },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Insufficient permissions for contract change",
       "message": "User is not authorized to perform changes of contract [{{contractId}}]."

@@ -8114,6 +8114,10 @@
       "title": "Vybraní uživatelé nemají žádné garanty kontraktů",
       "message": "Vybraní uživatelé nemají aktuálně žádné garanty kontraktů, které by bylo možné nahradit či odstranit."
     },
+    "BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST": {
+      "title": "Uživatelé mají příliš mnoho garantů",
+      "message": "Uživatelé mají příliš mnoho garantu (>45). Zobrazeni jsou tak všichni aktivní uživatelé."
+    },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Nedostatečná oprávnění pro změnu atributů kontraktu",
       "message": "Uživatel nemá oprávnění k provedení změn kontraktu [{{contractId}}]."
