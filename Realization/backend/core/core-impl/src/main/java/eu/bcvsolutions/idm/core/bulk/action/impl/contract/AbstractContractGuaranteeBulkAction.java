@@ -247,7 +247,8 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 				.map(IdmContractGuaranteeDto::getGuarantee)
 				.collect(Collectors.toList());
 		
-		return guaranteeIdentityIds;
+		// remove duplicated identities
+		return new ArrayList<>(new HashSet<>(guaranteeIdentityIds));
 	}
 	
 	/**
@@ -284,8 +285,7 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 			}
 		}
 		
-		// remove duplicated identities
-		return new ArrayList<>(new HashSet<>(selectedUsers));
+		return selectedUsers;
 	}
 	
 	/**

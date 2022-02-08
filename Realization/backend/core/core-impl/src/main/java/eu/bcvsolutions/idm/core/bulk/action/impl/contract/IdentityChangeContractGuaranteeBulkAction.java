@@ -118,6 +118,12 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 		if (guarantees.isEmpty()) {
 			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS));
 		}
+		if (guarantees.size() > 45) {
+			// this is because during autocomplete all IDs are put into the URL
+			// which has a max length of 2048
+			// the user will be shown all identities without the added filtering
+			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST));
+		}
 		
 		return result;
 	}
@@ -134,7 +140,12 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 			guaranteeIdentityIds.add(UUID.randomUUID());
 		}
 		IdmIdentityFilter identityFilter = new IdmIdentityFilter();
-		identityFilter.setIds(guaranteeIdentityIds);
+		if (guaranteeIdentityIds.size() <= 45) {
+			// this is because during autocomplete all IDs are put into the URL
+			// which has a max length of 2048
+			// the user will be shown all identities without the added filtering
+			identityFilter.setIds(guaranteeIdentityIds);
+		}
 		
 		IdmFormAttributeDto oldGuarantee = getGuaranteeAttribute(PROPERTY_OLD_GUARANTEE, true, false);
 		oldGuarantee.setForceSearchParameters(identityFilter);

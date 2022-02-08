@@ -257,6 +257,21 @@ public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkA
 	}
 	
 	@Test
+	public void prevalidateBulkActionWithTooManyGuarantees() {
+		List<IdmIdentityDto> guarantees = this.createIdentities(50);
+		IdmIdentityDto employee = getHelper().createIdentity();
+		IdmIdentityContractDto contract1 = getHelper().getPrimeContract(employee);
+		createContractGuarantees(contract1, guarantees);
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityChangeContractGuaranteeBulkAction.NAME);
+		bulkAction.getIdentifiers().add(employee.getId());
+		
+		// 1 result model, info, warning that too many contract guarantees are found
+		ResultModels resultModels = bulkActionManager.prevalidate(bulkAction);
+		assertEquals(1, resultModels.getInfos().size());
+	}
+	
+	@Test
 	public void preprocessBulkActionWithGuarantees() {
 		List<IdmIdentityDto> guarantees = this.createIdentities(2);
 		IdmIdentityDto employee = getHelper().createIdentity();

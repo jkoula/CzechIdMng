@@ -338,6 +338,7 @@ public enum CoreResultCode implements ResultCode {
 	BULK_ACTION_IDENTITY_REMOVE_ROLE_FAILED(HttpStatus.NOT_FOUND, "Roles for identity [%s] not removed. Roles not found or cannot be removed (its automatic role, business role or for insufficient permissions)."),
 	BULK_ACTION_NOT_AUTHORIZED_CONTRACT_GUARANTEE (HttpStatus.FORBIDDEN, "Insufficient permissions [%s] for the guarantee [%s] for contract [%s]."),
 	BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS (HttpStatus.NOT_FOUND, "No contract guarantees found."),
+	BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST (HttpStatus.FORBIDDEN, "Too many contract guarantees found."),
 	BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT (HttpStatus.FORBIDDEN, "Insufficient permissions for [%s] contract modification."),
 	BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT (HttpStatus.FORBIDDEN, "Insufficient permissions to assign role for contract [%s]."),
 	// Role bulk actions
