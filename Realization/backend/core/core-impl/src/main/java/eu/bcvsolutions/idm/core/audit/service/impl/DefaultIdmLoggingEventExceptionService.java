@@ -104,6 +104,12 @@ public class DefaultIdmLoggingEventExceptionService extends
 		return  idmLoggingEventException;
 	}
 
+	/**
+	 * Needst to be overriden here, because original implementation from parent cannot handle composite identifier.
+	 *
+	 * @param dto {@link IdmLoggingEventExceptionDto} to save
+	 * @return saved {@link IdmLoggingEventExceptionDto}
+	 */
 	@Override
 	@Transactional
 	public IdmLoggingEventExceptionDto saveInternal(IdmLoggingEventExceptionDto dto) {
