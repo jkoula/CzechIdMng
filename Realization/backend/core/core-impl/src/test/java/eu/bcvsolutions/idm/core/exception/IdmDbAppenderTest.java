@@ -23,7 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Component
-class IdmDbAppenderTest extends AbstractIntegrationTest {
+public class IdmDbAppenderTest extends AbstractIntegrationTest {
 
 
 
