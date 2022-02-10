@@ -1,10 +1,15 @@
 package eu.bcvsolutions.idm.core.exception;
 
+import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventExceptionService;
+import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventPropertyService;
+import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventService;
 import org.junit.Assert;
 import org.junit.Test;
 
 import ch.qos.logback.classic.spi.LoggingEvent;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Test for implementation of log DBAppender. Only purpose is fix bugs in DBAppender (max message length, forbidden characters in Postgresql).
@@ -14,9 +19,13 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  */
 public class IdmDbAppenderIntegrationTest extends AbstractIntegrationTest {
 
+
+
 	@Test
 	public void testLogTooLongMessage() {
-		IdmDbAppender appender = new IdmDbAppender();
+		IdmDbAppender appender = new IdmDbAppender(mock(IdmLoggingEventService.class),
+				mock(IdmLoggingEventExceptionService.class),
+				mock(IdmLoggingEventPropertyService.class));
 		appender.stop();
 		String veryLongText = "verylongtext!!!!!!!!!!!!!!!verylongtext!!!!!!!!!!!!!!!verylongtext!!!!!!!!!!!!!!!" +
 				"verylongtext!!!!!!!!!!!!!!!verylongtext!!!!!!!!!!!!!!!verylongtext!!!!!!!!!!!!!!!verylongtext!!" +
@@ -39,7 +48,9 @@ public class IdmDbAppenderIntegrationTest extends AbstractIntegrationTest {
 	
 	@Test
 	public void testLogForbiddenChars() {
-		IdmDbAppender appender = new IdmDbAppender();
+		IdmDbAppender appender = new IdmDbAppender(mock(IdmLoggingEventService.class),
+				mock(IdmLoggingEventExceptionService.class),
+				mock(IdmLoggingEventPropertyService.class));
 		appender.stop();
 		String wrongMessage = "Log message with forbidden (\u0000) characters \\x00!";
 		

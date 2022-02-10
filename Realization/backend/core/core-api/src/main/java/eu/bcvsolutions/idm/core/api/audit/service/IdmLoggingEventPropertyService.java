@@ -2,7 +2,7 @@ package eu.bcvsolutions.idm.core.api.audit.service;
 
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmLoggingEventPropertyDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmLoggingEventPropertyFilter;
-import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
+import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 
 /**
@@ -12,7 +12,7 @@ import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
  */
 
 public interface IdmLoggingEventPropertyService
-		extends ReadDtoService<IdmLoggingEventPropertyDto, IdmLoggingEventPropertyFilter>,
+		extends ReadWriteDtoService<IdmLoggingEventPropertyDto, IdmLoggingEventPropertyFilter>,
 		AuthorizableService<IdmLoggingEventPropertyDto> {
 
 	/**
