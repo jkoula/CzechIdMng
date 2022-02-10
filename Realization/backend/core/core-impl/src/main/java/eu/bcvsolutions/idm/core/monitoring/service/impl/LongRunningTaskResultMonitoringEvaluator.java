@@ -8,9 +8,7 @@ import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModel;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringDto;
 import eu.bcvsolutions.idm.core.monitoring.api.dto.IdmMonitoringResultDto;
-import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmLongRunningTaskFilter;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.IdmProcessedTaskItemFilter;
-import eu.bcvsolutions.idm.core.scheduler.api.service.IdmLongRunningTaskService;
 import eu.bcvsolutions.idm.core.scheduler.api.service.IdmProcessedTaskItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -32,9 +30,6 @@ public class LongRunningTaskResultMonitoringEvaluator extends AbstractDailyMonit
 
     public static final String NAME = "core-long-running-task-result-monitoring-evaluator";
     //
-    @Autowired
-    private IdmLongRunningTaskService longRunningTaskService;
-
     @Autowired
     private IdmProcessedTaskItemService processedTaskItemService;
 

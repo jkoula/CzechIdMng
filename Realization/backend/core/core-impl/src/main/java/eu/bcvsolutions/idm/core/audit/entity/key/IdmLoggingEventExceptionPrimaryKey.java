@@ -1,12 +1,9 @@
 package eu.bcvsolutions.idm.core.audit.entity.key;
 
-import com.google.common.hash.HashCode;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEvent;
-import org.ehcache.impl.store.HashUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.Objects;
 

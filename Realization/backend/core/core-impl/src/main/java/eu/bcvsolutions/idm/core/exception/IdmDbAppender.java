@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.core.exception;
 
 import ch.qos.logback.classic.spi.*;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.stream.Stream;

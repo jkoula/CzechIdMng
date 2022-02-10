@@ -22,7 +22,6 @@ import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmLoggingEventFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventService;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEvent;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEvent_;
 import eu.bcvsolutions.idm.core.audit.repository.IdmLoggingEventRepository;

@@ -11,7 +11,6 @@ import javax.persistence.criteria.Root;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEvent;
 import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEvent_;
-import eu.bcvsolutions.idm.core.audit.entity.key.IdmLoggingEventExceptionPrimaryKey;
 import eu.bcvsolutions.idm.core.audit.entity.key.IdmLoggingEventExceptionPrimaryKey_;
 import eu.bcvsolutions.idm.core.audit.repository.IdmLoggingEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
