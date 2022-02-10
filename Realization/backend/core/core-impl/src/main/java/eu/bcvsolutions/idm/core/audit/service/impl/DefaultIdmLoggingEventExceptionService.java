@@ -101,6 +101,8 @@ public class DefaultIdmLoggingEventExceptionService extends
 			idmLoggingEventException.setEvent(event);
 		}
 
+		idmLoggingEventException.setId(dto.getId());
+
 		return  idmLoggingEventException;
 	}
 

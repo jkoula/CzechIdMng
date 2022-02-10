@@ -164,7 +164,9 @@ public class IdmLoggingEventDto implements BaseDto {
 	}
 
 	public String getCallerLine() {
-		return callerLine;
+		// This needs to be trimmed, because it is saved in DB as char(4), which will always be padded with spaces to
+		// the exact length of 4
+		return callerLine == null ? callerLine : callerLine.trim();
 	}
 
 	public void setCallerLine(String callerLine) {
