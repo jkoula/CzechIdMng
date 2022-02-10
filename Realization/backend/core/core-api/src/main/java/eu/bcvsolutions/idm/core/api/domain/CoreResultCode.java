@@ -337,6 +337,8 @@ public enum CoreResultCode implements ResultCode {
 	BULK_ACTION_ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Roles for remove not found for identity: [%s]."),
 	BULK_ACTION_IDENTITY_REMOVE_ROLE_FAILED(HttpStatus.NOT_FOUND, "Roles for identity [%s] not removed. Roles not found or cannot be removed (its automatic role, business role or for insufficient permissions)."),
 	BULK_ACTION_NOT_AUTHORIZED_CONTRACT_GUARANTEE (HttpStatus.FORBIDDEN, "Insufficient permissions [%s] for the guarantee [%s] for contract [%s]."),
+	BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS (HttpStatus.NOT_FOUND, "No contract guarantees found."),
+	BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST (HttpStatus.FORBIDDEN, "Too many contract guarantees found."),
 	BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT (HttpStatus.FORBIDDEN, "Insufficient permissions for [%s] contract modification."),
 	BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT (HttpStatus.FORBIDDEN, "Insufficient permissions to assign role for contract [%s]."),
 	// Role bulk actions
@@ -422,7 +424,8 @@ public enum CoreResultCode implements ResultCode {
 	MONITORING_DEMO_ADMIN_NOT_FOUND(HttpStatus.OK, "Demo admin user not found.", NotificationLevel.SUCCESS),
 	MONITORING_ENTITY_EVENT_ERROR(HttpStatus.CONFLICT, "Entity event queue contains [%s] errors.", NotificationLevel.ERROR),
 	MONITORING_LONG_RUNNING_TASK_ERROR(HttpStatus.CONFLICT, "Long running task queue contains [%s] errors.", NotificationLevel.ERROR),
-	MONITORING_LOGGING_EVENT_ERROR(HttpStatus.CONFLICT, "Logging events contains [%s] errors.", NotificationLevel.ERROR);
+	MONITORING_LOGGING_EVENT_ERROR(HttpStatus.CONFLICT, "Logging events contains [%s] errors.", NotificationLevel.ERROR),
+	MONITORING_EVENT_LOCK_QUEUE(HttpStatus.FOUND, "[%s] threads wait for entity event lock", NotificationLevel.SUCCESS);
 	
 	private final HttpStatus status;
 	private final String message;

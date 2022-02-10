@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.bulk.action.impl.contract;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,11 +10,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.AbstractBulkAction;
+import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -29,7 +34,9 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmContractGuaranteeService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
+import eu.bcvsolutions.idm.core.api.utils.FilterConverter;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -42,7 +49,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
  *
  * @author Ondrej Husnik
  * @author Radek Tomiška
- *
+ * @author Tomáš Doischer
  */
 public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAction<IdmIdentityDto, IdmIdentityFilter> {
 	
@@ -51,6 +58,11 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 	public static final String PROPERTY_NEW_GUARANTEE = "new-guarantee";
 	public static final String PROPERTY_OLD_GUARANTEE = "old-guarantee";
 	
+	private FilterConverter filterConverter;
+	@Autowired(required = false)
+	private ObjectMapper mapper;
+	@Autowired
+	private LookupService lookupService;
 	@Autowired
 	protected IdmIdentityService identityService;
 	@Autowired
@@ -216,5 +228,75 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 			return null;
 		}
 		return super.logItemProcessed(item, opResult);
+	}
+	
+	/**
+	 * Get the ids of identities who are the guarantees for users selected
+	 * for the bulk action.
+	 * 
+	 * @param bulkAction
+	 * @return
+	 */
+	protected List<UUID> getContractGuaranteeIdentities(IdmBulkActionDto bulkAction) {
+		List<UUID> selectedUsers = getUsersFromBulkAction(bulkAction);
+		IdmContractGuaranteeFilter filter = new IdmContractGuaranteeFilter();
+		filter.setIdentities(selectedUsers);
+		List<IdmContractGuaranteeDto> guarantees = contractGuaranteeService.find(filter, null).getContent();
+		List<UUID> guaranteeIdentityIds = guarantees
+				.stream()
+				.map(IdmContractGuaranteeDto::getGuarantee)
+				.collect(Collectors.toList());
+		
+		// remove duplicated identities
+		return new ArrayList<>(new HashSet<>(guaranteeIdentityIds));
+	}
+	
+	/**
+	 * The the users selected in the bulk action.
+	 * 
+	 * @param bulkAction
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected List<UUID> getUsersFromBulkAction(IdmBulkActionDto bulkAction) {
+		List<UUID> selectedUsers = new ArrayList<>();
+		if (bulkAction.getIdentifiers() != null && !bulkAction.getIdentifiers().isEmpty()) {
+			selectedUsers = new ArrayList<>(bulkAction.getIdentifiers());
+		}
+		
+		if (bulkAction.getFilter() != null) {
+			MultiValueMap<String, Object> multivaluedMap = new LinkedMultiValueMap<>();
+			Map<String, Object> properties = bulkAction.getFilter();
+			
+			for (Map.Entry<String, Object> entry : properties.entrySet()) {
+				Object value = entry.getValue();
+				if (value == null) {
+					multivaluedMap.remove(entry.getKey());
+				} else if(value instanceof List<?>) {
+					multivaluedMap.put(entry.getKey(), (List<Object>) value);
+				} else {
+					multivaluedMap.add(entry.getKey(), entry.getValue());
+				}
+			}
+			IdmIdentityFilter forceSearchParameters = this.getFilterConverter().toFilter(multivaluedMap, IdmIdentityFilter.class);
+			List<UUID> identityIds = identityService.findIds(forceSearchParameters, null).getContent();
+			if (!identityIds.isEmpty()) {
+				selectedUsers.addAll(identityIds);
+			}
+		}
+		
+		return selectedUsers;
+	}
+	
+	/**
+	 * Return the filter converter helper.
+	 * 
+	 * @return
+	 */
+	protected FilterConverter getFilterConverter() {
+		if (filterConverter == null) {
+			filterConverter = new FilterConverter(lookupService, mapper);
+		}
+		return filterConverter;
 	}
 }

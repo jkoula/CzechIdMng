@@ -2,12 +2,7 @@ package eu.bcvsolutions.idm.core.audit.entity;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.Type;
 
@@ -29,6 +24,7 @@ public class IdmLoggingEvent implements BaseEntity {
 	private static final long serialVersionUID = 5803765065103354200L;
 
 	@Id
+	@GeneratedValue
 	@Column(name = "event_id", nullable = true)
 	private Long id;
 

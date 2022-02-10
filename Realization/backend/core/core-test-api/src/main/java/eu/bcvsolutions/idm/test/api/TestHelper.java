@@ -53,6 +53,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmProcessedTaskItemDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmScheduledTaskDto;
+import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.GroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
@@ -1108,4 +1109,6 @@ public interface TestHelper {
 	 * @return
 	 */
 	IdmScriptDto createScript(String code, IdmScriptCategory category, String ...lines);
+
+	IdmLongRunningTaskDto createLongRunningTask(LongRunningTaskExecutor<?> executor);
 }

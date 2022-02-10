@@ -2853,6 +2853,12 @@
         },
         "text":{
           "placeholder": "Kód, typ cílového objektu či poznámka"
+        },
+        "dateCreatedFrom":{
+          "placeholder": "Vytvořeno od"
+        },
+        "dateCreatedTill":{
+          "placeholder": "Vytvořeno do"
         }
       }
     },
@@ -7485,6 +7491,26 @@
           }
         }
       },
+      "core-long-running-task-result-monitoring-evaluator": {
+        "label": "Kontrola chyb ve zpracovaných položkách dlouhotrvajících úloh",
+        "help": "Varování o chybných položkách ve výsledcích zpracovaných dlouhotrvajících úloh",
+        "attributes": {
+          "numberofdays": {
+            "label": "Počet dní",
+            "help": "Chyby, které nejsou starší, než-li zadaný počet dní."
+          }
+        }
+      },
+      "core-entity-event-lock-thread-queue-monitoring-evaluator": {
+        "label": "Kontrola počtu vláken čekajících na zámek na frontě událostí",
+        "help": "Zobrazí varování, pokud počet čekajících vláken na frontě událostí překročí daný limit.",
+        "attributes": {
+          "threshold": {
+            "label": "Limit počtu čekajících vláken",
+            "help": "Varování bude zobrazeno, pokud počet vláken čekajících na zámek překročí zadaný počet."
+          }
+        }
+      },
       "core-entity-event-monitoring-evaluator": {
         "label": "Kontrola chyb ve frontě událostí",
         "help": "Zobrazí varování, pokud se ve frontě událostí vyskytuje chyba.",
@@ -7496,8 +7522,8 @@
         }
       },
       "core-long-running-task-monitoring-evaluator": {
-        "label": "Kontrola chyb v agendě dlouhotrvajích úloh",
-        "help": "Zobrazí varování, pokud se v provedených dlouhotrvajích úlohách vyskytuje chyba.",
+        "label": "Kontrola chyb v agendě dlouhotrvajících úloh",
+        "help": "Zobrazí varování, pokud se v provedených dlouhotrvajících úlohách vyskytuje chyba.",
         "attributes": {
           "numberofdays": {
             "label": "Počet dní",
@@ -8103,6 +8129,14 @@
     "BULK_ACTION_NOT_AUTHORIZED_CONTRACT_GUARANTEE": {
       "title": "Nedostatečná oprávnění pro změnu garanta kontraktu",
       "message": "Uživatel nemá oprávnění k provedení operace [{{permission}}] garanta kontraktu pro kontrakt [{{contractId}}] a identity garanta [{{guaranteeId}}]."
+    },
+    "BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS": {
+      "title": "Vybraní uživatelé nemají žádné garanty kontraktů",
+      "message": "Vybraní uživatelé nemají aktuálně žádné garanty kontraktů, které by bylo možné nahradit či odstranit."
+    },
+    "BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST": {
+      "title": "Uživatelé mají příliš mnoho garantů",
+      "message": "Uživatelé mají příliš mnoho garantu (>45). Zobrazeni jsou tak všichni aktivní uživatelé."
     },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Nedostatečná oprávnění pro změnu atributů kontraktu",
@@ -8823,6 +8857,10 @@
     "MONITORING_ENTITY_EVENT_ERROR": {
       "title": "Chyba ve frontě událostí",
       "message": "Ve frontě událostí se vyskytují chyby [{{count}}]."
+    },
+    "MONITORING_EVENT_LOCK_QUEUE": {
+      "title": "Počet vláken čekajících na zámek nad frontou událostí",
+      "message": "[{{count}}] vláken čeká na zámek nad frontou událostí."
     },
     "MONITORING_LONG_RUNNING_TASK_ERROR": {
       "title": "Chyba ve frontě dlouhotrvajících úloh",

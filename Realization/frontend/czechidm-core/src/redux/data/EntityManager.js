@@ -29,6 +29,7 @@ export const EMPTY = 'VOID_ACTION'; // dispatch cannot return null
  * Encapsulate redux action for entity type
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 export default class EntityManager {
 
@@ -1483,6 +1484,26 @@ export default class EntityManager {
     return (dispatch) => {
       this.getService()
         .prevalidateBulkAction(action, cb)
+        .then(json => {
+          return json;
+        })
+        .catch(error => {
+          dispatch(this.receiveError(null, null, error, cb));
+        });
+    };
+  }
+
+  /**
+   * Executes preprocessing of action before it starts
+   *
+   * @param  {object}   action
+   * @param  {Function} cb
+   * @return {action}
+   */
+   preprocessBulkAction(action, cb) {
+    return (dispatch) => {
+      this.getService()
+        .preprocessBulkAction(action, cb)
         .then(json => {
           return json;
         })

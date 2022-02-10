@@ -30,7 +30,7 @@ public interface IdmLoggingEventRepository extends AbstractEntityRepository<IdmL
 	 * @return
 	 */
 	@Modifying
-	@Query("DELETE FROM #{#entityName} e WHERE id = :id")
+	@Query("DELETE FROM #{#entityName} e WHERE e.id = :id")
 	int deleteById(@Param("id") Long id);
 	
 	/**

@@ -21,6 +21,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskExecutor;
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 public interface IdmBulkAction<DTO extends BaseDto, F extends BaseFilter> extends 
 		LongRunningTaskExecutor<OperationResult>,
@@ -54,6 +55,12 @@ public interface IdmBulkAction<DTO extends BaseDto, F extends BaseFilter> extend
 	 * @since 11.1.0
 	 */
 	String PROPERTY_QUICK_BUTTONABLE = "quickButtonable";
+	/**
+	 * Configurable property for the possibility to preprocess the bulk action.
+	 * 
+	 * @since 11.1.0
+	 */
+	String PROPERTY_SUPPORTS_PREPROCESSING = "supportsPreprocessing";
 	/**
 	 * Bulk action configurable type.
 	 * 
@@ -105,6 +112,26 @@ public interface IdmBulkAction<DTO extends BaseDto, F extends BaseFilter> extend
 	 * @return
 	 */
 	ResultModels prevalidate();
+	
+	/**
+	 * Preprocess method is called before the start of the bulk action. It is used to prefilter data in forms facing the user.
+	 * 
+	 * @param bulkAction
+	 * @return
+	 * @since 12.1.0
+	 */
+	IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction);
+	
+	/**
+	 * Returns {@code true}, when action can preprocessed.
+	 * Returns {@code false} by default.
+	 * 
+	 * @return
+	 * @since 12.1.0
+	 */
+	default boolean isSupportsPreprocessing() {
+		return false;
+	}
 	
 	/**
 	 * Generic action.

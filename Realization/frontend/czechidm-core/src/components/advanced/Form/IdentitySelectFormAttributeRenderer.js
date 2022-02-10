@@ -10,6 +10,7 @@ import IdentitySelect from '../IdentitySelect/IdentitySelect';
  * - TODO: validation
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  * @since 10.1.0
  */
 export default class IdentitySelectFormAttributeRenderer extends SelectBoxFormAttributeRenderer {
@@ -59,6 +60,15 @@ export default class IdentitySelectFormAttributeRenderer extends SelectBoxFormAt
         forceSearchParameters = forceSearchParameters.setFilter('_permission', component.permission);
       }
     }
+    if (!forceSearchParameters) {
+      forceSearchParameters = new SearchParameters();
+    }
+
+    // set preprocessed data into force search parameters
+    if (attribute.forceSearchParameters && attribute.forceSearchParameters.ids) {
+      forceSearchParameters = forceSearchParameters.setFilter('id', attribute.forceSearchParameters.ids);
+    }
+    
     //
     return (
       <IdentitySelect

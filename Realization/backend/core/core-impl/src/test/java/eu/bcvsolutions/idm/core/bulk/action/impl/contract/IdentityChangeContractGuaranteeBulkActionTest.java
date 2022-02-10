@@ -1,6 +1,11 @@
 package eu.bcvsolutions.idm.core.bulk.action.impl.contract;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,8 +27,11 @@ import eu.bcvsolutions.idm.core.api.dto.IdmContractGuaranteeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmContractGuaranteeFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmContractGuaranteeService;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.entity.IdmContractGuarantee;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
@@ -34,13 +42,15 @@ import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
  * Integration tests for {@link IdentityChangeContractGuaranteeBulkAction}
  *
  * @author Ondrej Husnik
- *
+ * @author Tomáš Doischer
  */
 
 public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkActionTest {
 
 	@Autowired
 	private IdmContractGuaranteeService contractGuaranteeService;
+	@Autowired
+	private IdmIdentityService identityService;
 
 	@Before
 	public void login() {
@@ -219,6 +229,91 @@ public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkA
 		Assert.assertTrue(isContractGuarantee(contract1, guarantees.subList(0, 1)).isEmpty());
 	}
 	
+	@Test
+	public void prevalidateBulkActionWithGuarantees() {
+		List<IdmIdentityDto> guarantees = this.createIdentities(2);
+		IdmIdentityDto employee = getHelper().createIdentity();
+		IdmIdentityContractDto contract1 = getHelper().getPrimeContract(employee);
+		createContractGuarantees(contract1, guarantees);
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityChangeContractGuaranteeBulkAction.NAME);
+		bulkAction.getIdentifiers().add(employee.getId());
+		
+		// no result model
+		ResultModels resultModels = bulkActionManager.prevalidate(bulkAction);
+		assertEquals(0, resultModels.getInfos().size());
+	}
+	
+	@Test
+	public void prevalidateBulkActionWithoutGuarantees() {
+		IdmIdentityDto employee = getHelper().createIdentity();
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityChangeContractGuaranteeBulkAction.NAME);
+		bulkAction.getIdentifiers().add(employee.getId());
+		
+		// 1 result model, info, warning that no contract guarantee exists
+		ResultModels resultModels = bulkActionManager.prevalidate(bulkAction);
+		assertEquals(1, resultModels.getInfos().size());
+	}
+	
+	@Test
+	public void prevalidateBulkActionWithTooManyGuarantees() {
+		List<IdmIdentityDto> guarantees = this.createIdentities(50);
+		IdmIdentityDto employee = getHelper().createIdentity();
+		IdmIdentityContractDto contract1 = getHelper().getPrimeContract(employee);
+		createContractGuarantees(contract1, guarantees);
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityChangeContractGuaranteeBulkAction.NAME);
+		bulkAction.getIdentifiers().add(employee.getId());
+		
+		// 1 result model, info, warning that too many contract guarantees are found
+		ResultModels resultModels = bulkActionManager.prevalidate(bulkAction);
+		assertEquals(1, resultModels.getInfos().size());
+	}
+	
+	@Test
+	public void preprocessBulkActionWithGuarantees() {
+		List<IdmIdentityDto> guarantees = this.createIdentities(2);
+		IdmIdentityDto employee = getHelper().createIdentity();
+		IdmIdentityContractDto contract1 = getHelper().getPrimeContract(employee);
+		createContractGuarantees(contract1, guarantees);
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityChangeContractGuaranteeBulkAction.NAME);
+		bulkAction.getIdentifiers().add(employee.getId());
+		
+		IdmBulkActionDto bulkActionPreprocessed = bulkActionManager.preprocessBulkAction(bulkAction);
+		IdmFormAttributeDto oldGuaranteeFormAttribute = bulkActionPreprocessed.getFormAttributes()
+				.stream()
+				.filter(attr -> attr.getCode().equals(AbstractContractGuaranteeBulkAction.PROPERTY_OLD_GUARANTEE))
+				.findFirst()
+				.orElse(null);
+		assertNotNull(oldGuaranteeFormAttribute);
+		List<UUID> oldGuaranteeIds = oldGuaranteeFormAttribute.getForceSearchParameters().getIds();
+		assertEquals(2, oldGuaranteeIds.size());
+		assertTrue(oldGuaranteeIds.contains(guarantees.get(0).getId()));
+		assertTrue(oldGuaranteeIds.contains(guarantees.get(1).getId()));
+	}
+	
+	@Test
+	public void preprocessBulkActionWithoutGuarantees() {
+		IdmIdentityDto employee = getHelper().createIdentity();
+		
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmIdentity.class, IdentityChangeContractGuaranteeBulkAction.NAME);
+		bulkAction.getIdentifiers().add(employee.getId());
+		
+		IdmBulkActionDto bulkActionPreprocessed = bulkActionManager.preprocessBulkAction(bulkAction);
+		IdmFormAttributeDto oldGuaranteeFormAttribute = bulkActionPreprocessed.getFormAttributes()
+				.stream()
+				.filter(attr -> attr.getCode().equals(AbstractContractGuaranteeBulkAction.PROPERTY_OLD_GUARANTEE))
+				.findFirst()
+				.orElse(null);
+		assertNotNull(oldGuaranteeFormAttribute);
+		List<UUID> oldGuaranteeIds = oldGuaranteeFormAttribute.getForceSearchParameters().getIds();
+		// it will always be 1 which is a random id not corresponding to an actual identity
+		assertEquals(1, oldGuaranteeIds.size());
+		assertNull(identityService.get(oldGuaranteeIds.get(0)));
+	}
+	
 	/**
 	 * Assigns all identities as guarantees for specified contract
 	 * 
@@ -262,5 +357,4 @@ public class IdentityChangeContractGuaranteeBulkActionTest extends AbstractBulkA
 				.filter(ident -> !cgUUIDs.contains(ident.getId()))
 				.collect(Collectors.toList());
 	}
-	
 }

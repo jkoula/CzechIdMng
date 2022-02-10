@@ -39,6 +39,7 @@ const dataManager = new DataManager();
  * Table component with header and columns.
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 class AdvancedTable extends Basic.AbstractContextComponent {
 
@@ -247,6 +248,46 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       return !removedRows.has(identifier);
     }
     return _.includes(selectedRows, identifier);
+  }
+
+  preprocessBulkAction(bulkAction, cb = null) {
+    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
+
+    const { selectedRows, removedRows } = this.state;
+
+    if (bulkAction) {
+      const bulkActionToProcess = {
+        ...bulkAction
+      };
+      const { manager } = this.props;
+      //
+      if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
+        bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
+        bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+      } else {
+        bulkActionToProcess.identifiers = selectedRows;
+      }
+
+      this.setState({
+        bulkActionShowLoading: true
+      }, () => {
+        this.context.store.dispatch(manager.preprocessBulkAction(bulkActionToProcess, (bulkActionPreprocessed) => {
+          if (bulkActionPreprocessed) {
+            this.setState({
+              bulkActionShowLoading: false,
+              backendBulkAction: bulkActionPreprocessed
+            });
+            if (cb) {
+              cb(bulkActionPreprocessed)
+            }
+          } else {
+            this.setState({
+              bulkActionShowLoading: false
+            });
+          }
+        }));
+      });
+    }
   }
 
   prevalidateBulkAction(bulkAction, event) {
@@ -636,7 +677,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
   }
 
-  showBulkActionDetail(backendBulkAction) {
+  showBulkActionDetail(backendBulkAction, cb=null) {
     const { showBulkActionDetail } = this.state;
     //
     if (showBulkActionDetail) { // FIXME: ~close bulk action ...
@@ -675,20 +716,38 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         }
       });
       //
-      this.setState({
-        showBulkActionDetail: !showBulkActionDetail,
-        backendBulkAction,
-        now: moment(new Date()).format(this.i18n('format.datetime')),
-        formInstance: new Domain.FormInstance({}, values)
-      }, () => {
-        // @todo-upgrade-10 This is brutal hack!
-        // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
-        // This problem occured after update on React 16
-        // @todo-upgrade-12 still occurs with material-ui modals
-        setTimeout(() => {
-          this.prevalidateBulkAction(backendBulkAction);
-        }, 10);
-      });
+      if (backendBulkAction.supportsPreprocessing) {
+        this.preprocessBulkAction(backendBulkAction, (bulkActionPreprocessed) => {
+          this.setState({
+          showBulkActionDetail: !showBulkActionDetail,
+          backendBulkAction: bulkActionPreprocessed,
+          now: moment(new Date()).format(this.i18n('format.datetime')),
+          formInstance: new Domain.FormInstance({}, values)
+        }, () => {
+          // @todo-upgrade-10 This is brutal hack!
+          // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
+          // This problem occured after update on React 16
+          // @todo-upgrade-12 still occurs with material-ui modals
+          setTimeout(() => {
+            this.prevalidateBulkAction(backendBulkAction);
+          }, 10);
+        });});
+      } else {
+        this.setState({
+          showBulkActionDetail: !showBulkActionDetail,
+          backendBulkAction,
+          now: moment(new Date()).format(this.i18n('format.datetime')),
+          formInstance: new Domain.FormInstance({}, values)
+        }, () => {
+          // @todo-upgrade-10 This is brutal hack!
+          // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
+          // This problem occured after update on React 16
+          // @todo-upgrade-12 still occurs with material-ui modals
+          setTimeout(() => {
+            this.prevalidateBulkAction(backendBulkAction);
+          }, 10);
+        });
+      }
     }
   }
 

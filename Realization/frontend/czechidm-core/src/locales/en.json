@@ -2803,7 +2803,13 @@
          },
          "text":{
            "placeholder": "Target object code, type or description"
-         }
+         },
+         "dateCreatedFrom":{
+          "placeholder": "Created from"
+         },
+         "dateCreatedTill":{
+          "placeholder": "Created to"
+        }
        }
      },
      "requestInfo": {
@@ -7432,6 +7438,26 @@
           }
         }
       },
+      "core-long-running-task-result-monitoring-evaluator": {
+        "label": "Check, if there are any long running tasks with failed items",
+        "help": "Warning about failed items in long running tasks",
+        "attributes": {
+          "numberofdays": {
+            "label": "Number of days",
+            "help": "Errors not older than given number of days."
+          }
+        }
+      },
+      "core-entity-event-lock-thread-queue-monitoring-evaluator": {
+        "label": "Check numnber of threads waiting for entity event lock.",
+        "help": "Warning about number of threads waiting for lock on entity event queue",
+        "attributes": {
+          "threshold": {
+            "label": "Waiting thread threshold",
+            "help": "Warning will be shown, if number of waiting threads surpasses given threshold."
+          }
+        }
+      },
       "core-entity-event-monitoring-evaluator": {
         "label": "Check errors in event queue",
         "help": "Warning about errors in event queue.",
@@ -8050,6 +8076,14 @@
     "BULK_ACTION_NOT_AUTHORIZED_CONTRACT_GUARANTEE": {
       "title": "Insufficient permissions for contract guarantee change",
       "message": "User is not authorized to perform [{{permission}}] operation with contract guarantee for contract [{{contractId}}] and identity of guarantee [{{guaranteeId}}]."
+    },
+    "BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS": {
+      "title": "No contract guarantee for selected users",
+      "message": "Selected users have currently no guarantees to replace or remove."
+    },
+    "BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST": {
+      "title": "Too many contract guarantees for users",
+      "message": "Selected users have too many contract guarantees (>45). All active users will be shown instead."
     },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Insufficient permissions for contract change",
@@ -8770,6 +8804,10 @@
     "MONITORING_ENTITY_EVENT_ERROR": {
       "title": "Error in event queue",
       "message": "Event queue contains errors [{{count}}]."
+    },
+    "MONITORING_EVENT_LOCK_QUEUE": {
+      "title": "Number of threads waiting for entity event lock",
+      "message": "[{{count}}] threads is waiting for entity event lock"
     },
     "MONITORING_LONG_RUNNING_TASK_ERROR": {
       "title": "Error in long running tasks",

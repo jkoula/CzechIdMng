@@ -114,6 +114,7 @@ import io.swagger.annotations.AuthorizationScope;
  * 
  * @author Radek Tomiška
  * @author Petr Hanák
+ * @author Tomáš Doischer
  */
 @RestController
 @RequestMapping(value = BaseDtoController.BASE_PATH + "/identities") //produces= BaseController.APPLICATION_HAL_JSON_VALUE - I have to remove this (username cannot have "@.com" in user name)
@@ -493,6 +494,25 @@ public class IdmIdentityController extends AbstractFormableDtoController<IdmIden
 				})
 	public ResponseEntity<ResultModels> prevalidateBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
 		return super.prevalidateBulkAction(bulkAction);
+	}
+
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/bulk/preprocess", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.IDENTITY_READ + "')")
+	@ApiOperation(
+			value = "Preprocess bulk action for identities", 
+			nickname = "preprocessBulkAction", 
+			response = IdmBulkActionDto.class, 
+			tags = { IdmIdentityController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.IDENTITY_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.IDENTITY_READ, description = "")})
+				})
+	public ResponseEntity<IdmBulkActionDto> preprocessBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
+		return super.preprocessBulkAction(bulkAction);
 	}
 
 	/**

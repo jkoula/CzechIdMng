@@ -8,6 +8,7 @@ import * as Utils from '../utils';
  * Contains basic CRUD + search operation
  *
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
 export default class AbstractService {
 
@@ -490,6 +491,32 @@ export default class AbstractService {
   prevalidateBulkAction(action, cb) {
     return RestApiService
       .post(`${ this.getApiPath() }/bulk/prevalidate`, action)
+      .then(response => {
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        if (cb) {
+          cb(json);
+        }
+        return json;
+      }).catch(ex => {
+        throw this._resolveException(ex);
+      });
+  }
+
+  /**
+   * Preprocess action before execution
+   *
+   * @param  {object}   action
+   * @param  {Function} cb
+   * @return {Promise}
+   */
+   preprocessBulkAction(action, cb) {
+    return RestApiService
+      .post(`${ this.getApiPath() }/bulk/preprocess`, action)
       .then(response => {
         return response.json();
       })

@@ -507,8 +507,8 @@ def removedRoles = conceptRoleRequestService.find(conceptFilter, null).getConten
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
 def sendNotificationToImplementer = configurationService.getBooleanValue("idm.sec.core.wf.notification.implementer.enabled", false);
 
-def applicantUsername = execution.getVariable("applicantUsername");
-def applicantIdentity = identityService.getByUsername(applicantUsername);
+def applicantIdentifier = execution.getVariable("applicantIdentifier");
+def applicantIdentity = identityService.get(applicantIdentifier);
 
 def implementerIdentity = identityService.get(implementerIdentifier);
 

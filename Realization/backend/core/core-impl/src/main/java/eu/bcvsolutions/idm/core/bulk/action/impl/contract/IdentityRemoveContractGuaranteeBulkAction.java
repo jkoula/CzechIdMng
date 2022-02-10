@@ -9,10 +9,17 @@ import java.util.stream.Collectors;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
+import com.beust.jcommander.internal.Lists;
+
 import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
+import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
+import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractGuaranteeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.ResultModels;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -25,6 +32,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
  * Bulk operation for removing contract guarantees
  *
  * @author Ondrej Husnik
+ * @author Tomáš Doischer
  *
  */
 @Enabled(CoreModuleDescriptor.MODULE_ID)
@@ -85,5 +93,57 @@ public class IdentityRemoveContractGuaranteeBulkAction extends AbstractContractG
 			}
 		});
 		return new OperationResult.Builder(OperationState.EXECUTED).build();
+	}
+	
+	/**
+	 * If no guarantee for selected identities exists, 
+	 * return the info in the result model.
+	 */
+	@Override
+	public ResultModels prevalidate() {
+		ResultModels result = new ResultModels();
+		IdmBulkActionDto action = getAction();
+		List<UUID> guarantees = getContractGuaranteeIdentities(action);
+		if (guarantees.isEmpty()) {
+			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS));
+		}
+		if (guarantees.size() > 45) {
+			// this is because during autocomplete all IDs are put into the URL
+			// which has a max length of 2048
+			// the user will be shown all identities without the added filtering
+			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST));
+		}
+		
+		return result;
+	}
+
+	/**
+	 * Add the form attributes containing forceSearchParameters (filter) with
+	 * users who are the guarantees of the selected users.
+	 */
+	@Override
+	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction) {
+		List<UUID> guaranteeIdentityIds = getContractGuaranteeIdentities(bulkAction);
+		if (guaranteeIdentityIds.isEmpty()) {
+			// add random id to show empty select box
+			guaranteeIdentityIds.add(UUID.randomUUID());
+		}
+		IdmIdentityFilter identityFilter = new IdmIdentityFilter();
+		if (guaranteeIdentityIds.size() <= 45) {
+			// this is because during autocomplete all IDs are put into the URL
+			// which has a max length of 2048
+			// the user will be shown all identities without the added filtering
+			identityFilter.setIds(guaranteeIdentityIds);
+		}
+		
+		IdmFormAttributeDto oldGuarantee = getGuaranteeAttribute(PROPERTY_OLD_GUARANTEE, true, true);
+		oldGuarantee.setForceSearchParameters(identityFilter);
+		bulkAction.setFormAttributes(Lists.newArrayList(oldGuarantee));
+		return bulkAction;
+	}
+
+	@Override
+	public boolean isSupportsPreprocessing() {
+		return true;
 	}
 }

@@ -11,6 +11,11 @@ import static org.junit.Assert.fail;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
+import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
+import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
+import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
+import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +48,7 @@ public class DefaultIdmProcessedTaskItemServiceTest extends AbstractIntegrationT
 	@Autowired private IdmProcessedTaskItemService service;
 	@Autowired private IdmScheduledTaskService scheduledTaskService;
 	@Autowired private IdmLongRunningTaskService longrunningService;
+	@Autowired private EntityStateManager entityStateManager;
 
 	@Test
 	public void testCreateItem() {
@@ -246,6 +252,32 @@ public class DefaultIdmProcessedTaskItemServiceTest extends AbstractIntegrationT
 		//
 		IdmProcessedTaskItemFilter filter = new IdmProcessedTaskItemFilter();
 		filter.setOperationState(item.getOperationResult().getState());
+		Page<IdmProcessedTaskItemDto> result = service.find(filter,null);
+		assertTrue(result.getContent().contains(item));
+		assertTrue(result.getContent().contains(item2));
+		assertFalse(result.getContent().contains(item3));
+	}
+
+	@Test
+	public void filterByIgnoredMonitoringOfRelatedTask(){
+		IdmLongRunningTaskDto ignoredTask = getHelper().createLongRunningTask(new TestSchedulableTask());
+
+		IdmEntityStateDto state = new IdmEntityStateDto();
+		state.setResult(
+				new OperationResultDto.Builder(OperationState.BLOCKED)
+						.setModel(new DefaultResultModel(CoreResultCode.MONITORING_IGNORED))
+						.build()
+		);
+		entityStateManager.saveState(ignoredTask, state);
+
+		IdmLongRunningTaskDto unignoredTask = getHelper().createLongRunningTask(new TestSchedulableTask());
+		//
+		IdmProcessedTaskItemDto item = service.saveInternal(getHelper().prepareProcessedItem(ignoredTask));
+		IdmProcessedTaskItemDto item2 = service.saveInternal(getHelper().prepareProcessedItem(ignoredTask));
+		IdmProcessedTaskItemDto item3 = service.saveInternal(getHelper().prepareProcessedItem(unignoredTask));
+		//
+		IdmProcessedTaskItemFilter filter = new IdmProcessedTaskItemFilter();
+		filter.setTaskMonitoringIgnored(true);
 		Page<IdmProcessedTaskItemDto> result = service.find(filter,null);
 		assertTrue(result.getContent().contains(item));
 		assertTrue(result.getContent().contains(item2));

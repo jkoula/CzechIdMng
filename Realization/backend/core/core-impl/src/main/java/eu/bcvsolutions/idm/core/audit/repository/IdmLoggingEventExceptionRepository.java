@@ -22,6 +22,6 @@ public interface IdmLoggingEventExceptionRepository extends AbstractEntityReposi
 	 * @return
 	 */
 	@Modifying
-	@Query("DELETE FROM #{#entityName} e WHERE event.id = :eventId")
+	@Query("DELETE FROM #{#entityName} e WHERE e.id = :eventId")
 	int deleteByEventId(@Param("eventId") Long eventId);
 }

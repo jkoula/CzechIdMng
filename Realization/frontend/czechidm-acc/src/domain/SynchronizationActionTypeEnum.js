@@ -59,19 +59,19 @@ export default class SynchronizationActionTypeEnum extends Enums.AbstractEnum {
         return 'danger';
       }
       case this.LINKED: {
-        return 'primary';
+        return 'info';
       }
       case this.MISSING_ENTITY: {
-        return 'primary';
+        return 'info';
       }
       case this.UNLINKED: {
-        return 'primary';
+        return 'info';
       }
       case this.MISSING_ACCOUNT: {
-        return 'primary';
+        return 'info';
       }
       case this.IGNORE: {
-        return 'primary';
+        return 'info';
       }
       default: {
         return 'default';
