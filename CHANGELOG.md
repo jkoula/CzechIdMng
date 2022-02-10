@@ -7,7 +7,21 @@ All notable changes to this project will be documented in this file.
 ### Administrator
 
 - 🟠 [#3008](https://redmine.czechidm.com/issues/3008) - Bulk actions for changing and removing contract guarantees only show the current guarantees for selected identities. If the bulk action is to be used for more than 500 identities, increase the value ``idm.sec.core.filter.check.size.maximum``. See the wiki [doc](https://wiki.czechidm.com/devel/documentation/contracts/adm/contract_guarantee) page for details.
+- 🟠 [#3008](https://redmine.czechidm.com/issues/3036) - Configuration od IdmDbAppender must be changed. If you are using database logging appender, replace the following section in your logback-spring.xml files
 
+      <appender name="DB" class="eu.bcvsolutions.idm.core.exception.IdmDbAppender">
+            <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+                <driverClass>${spring.datasource.driver-class-name}</driverClass>
+                <url>${spring.datasource.url}</url>
+                <user>${spring.datasource.username}</user>
+                <password>${spring.datasource.password}</password>
+            </connectionSource>
+      </appender>
+
+  with
+
+        <appender name="DB" class="eu.bcvsolutions.idm.core.exception.IdmDbAppender">
+        </appender>
 
 ### Developer
 
