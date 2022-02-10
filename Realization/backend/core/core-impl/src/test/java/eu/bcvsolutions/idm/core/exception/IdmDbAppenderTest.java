@@ -14,7 +14,7 @@ import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventPropertyService
 import eu.bcvsolutions.idm.core.api.audit.service.IdmLoggingEventService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ class IdmDbAppenderTest extends AbstractIntegrationTest {
 
 
     @Test
-    void append() {
+    public void append() {
 
         final IdmDbAppender appender = new IdmDbAppender(loggingEventService, eventExceptionService, propertyService);
 
