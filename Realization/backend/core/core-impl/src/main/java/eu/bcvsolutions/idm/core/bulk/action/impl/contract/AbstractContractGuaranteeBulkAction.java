@@ -30,6 +30,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmContractGuaranteeFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.exception.FilterSizeExceededException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmContractGuaranteeService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
@@ -43,6 +44,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmProcessedTaskItemDto;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 
 /**
  * Bulk operation changing contract guarantee selected identity.
@@ -237,11 +239,11 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 	 * @param bulkAction
 	 * @return
 	 */
-	protected List<UUID> getContractGuaranteeIdentities(IdmBulkActionDto bulkAction) {
+	protected List<UUID> getContractGuaranteeIdentities(IdmBulkActionDto bulkAction) throws FilterSizeExceededException {
 		List<UUID> selectedUsers = getUsersFromBulkAction(bulkAction);
 		IdmContractGuaranteeFilter filter = new IdmContractGuaranteeFilter();
 		filter.setIdentities(selectedUsers);
-		List<IdmContractGuaranteeDto> guarantees = contractGuaranteeService.find(filter, null).getContent();
+		List<IdmContractGuaranteeDto> guarantees = contractGuaranteeService.find(filter, null, IdmBasePermission.READ).getContent();
 		List<UUID> guaranteeIdentityIds = guarantees
 				.stream()
 				.map(IdmContractGuaranteeDto::getGuarantee)
@@ -264,7 +266,15 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 			selectedUsers = new ArrayList<>(bulkAction.getIdentifiers());
 		}
 		
-		if (bulkAction.getFilter() != null) {
+		if (bulkAction.getTransformedFilter() != null) {
+			List<UUID> identityIds = identityService.findIds((IdmIdentityFilter) bulkAction.getTransformedFilter(), 
+					null, IdmBasePermission.READ).getContent();
+			if (!identityIds.isEmpty()) {
+				selectedUsers.addAll(identityIds);
+			}
+		}
+		
+		if (bulkAction.getTransformedFilter() == null && bulkAction.getFilter() != null) {
 			MultiValueMap<String, Object> multivaluedMap = new LinkedMultiValueMap<>();
 			Map<String, Object> properties = bulkAction.getFilter();
 			
@@ -279,7 +289,7 @@ public abstract class AbstractContractGuaranteeBulkAction extends AbstractBulkAc
 				}
 			}
 			IdmIdentityFilter forceSearchParameters = this.getFilterConverter().toFilter(multivaluedMap, IdmIdentityFilter.class);
-			List<UUID> identityIds = identityService.findIds(forceSearchParameters, null).getContent();
+			List<UUID> identityIds = identityService.findIds(forceSearchParameters, null, IdmBasePermission.READ).getContent();
 			if (!identityIds.isEmpty()) {
 				selectedUsers.addAll(identityIds);
 			}

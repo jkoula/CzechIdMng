@@ -8085,6 +8085,10 @@
       "title": "Too many contract guarantees for users",
       "message": "Selected users have too many contract guarantees (>45). All active users will be shown instead."
     },
+    "BULK_ACTION_TOO_MANY_USERS_SELECTED": {
+      "title": "Too many users selected",
+      "message": "Too many users were selected to filter, maximum is [{{maximum}}]. All active users will be shown instead."
+    },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Insufficient permissions for contract change",
       "message": "User is not authorized to perform changes of contract [{{contractId}}]."
