@@ -21,6 +21,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.exception.FilterSizeExceededException;
 import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -114,15 +115,21 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 	public ResultModels prevalidate() {
 		ResultModels result = new ResultModels();
 		IdmBulkActionDto action = getAction();
-		List<UUID> guarantees = getContractGuaranteeIdentities(action);
-		if (guarantees.isEmpty()) {
-			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS));
-		}
-		if (guarantees.size() > 45) {
-			// this is because during autocomplete all IDs are put into the URL
-			// which has a max length of 2048
-			// the user will be shown all identities without the added filtering
-			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST));
+		try {
+			List<UUID> guarantees = getContractGuaranteeIdentities(action);
+			if (guarantees.isEmpty()) {
+				result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS));
+			}
+			if (guarantees.size() > 45) {
+				// this is because during autocomplete all IDs are put into the URL
+				// which has a max length of 2048
+				// the user will be shown all identities without the added filtering
+				result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST));
+			}
+		} catch (FilterSizeExceededException e) {
+			result.addInfo(new DefaultResultModel(CoreResultCode.BULK_ACTION_TOO_MANY_USERS_SELECTED,
+					Map.of(
+							"maximum", e.getMaximum())));
 		}
 		
 		return result;
@@ -134,22 +141,28 @@ public class IdentityChangeContractGuaranteeBulkAction extends AbstractContractG
 	 */
 	@Override
 	public IdmBulkActionDto preprocessBulkAction(IdmBulkActionDto bulkAction) {
-		List<UUID> guaranteeIdentityIds = getContractGuaranteeIdentities(bulkAction);
-		if (guaranteeIdentityIds.isEmpty()) {
-			// add random id to show empty select box
-			guaranteeIdentityIds.add(UUID.randomUUID());
-		}
-		IdmIdentityFilter identityFilter = new IdmIdentityFilter();
-		if (guaranteeIdentityIds.size() <= 45) {
-			// this is because during autocomplete all IDs are put into the URL
-			// which has a max length of 2048
-			// the user will be shown all identities without the added filtering
-			identityFilter.setIds(guaranteeIdentityIds);
+		IdmFormAttributeDto oldGuarantee = getGuaranteeAttribute(PROPERTY_OLD_GUARANTEE, true, false);
+		IdmFormAttributeDto newGuarantee = getGuaranteeAttribute(PROPERTY_NEW_GUARANTEE, false, false);
+		try {
+			// try to filter the users
+			List<UUID> guaranteeIdentityIds = getContractGuaranteeIdentities(bulkAction);
+			if (guaranteeIdentityIds.isEmpty()) {
+				// add random id to show empty select box
+				guaranteeIdentityIds.add(UUID.randomUUID());
+			}
+			IdmIdentityFilter identityFilter = new IdmIdentityFilter();
+			if (guaranteeIdentityIds.size() <= 45) {
+				// this is because during autocomplete all IDs are put into the URL
+				// which has a max length of 2048
+				// the user will be shown all identities without the added filtering
+				identityFilter.setIds(guaranteeIdentityIds);
+			}
+			
+			oldGuarantee.setForceSearchParameters(identityFilter);
+		} catch (FilterSizeExceededException e) {
+			LOG.error(e.getLocalizedMessage(), e);
 		}
 		
-		IdmFormAttributeDto oldGuarantee = getGuaranteeAttribute(PROPERTY_OLD_GUARANTEE, true, false);
-		oldGuarantee.setForceSearchParameters(identityFilter);
-		IdmFormAttributeDto newGuarantee = getGuaranteeAttribute(PROPERTY_NEW_GUARANTEE, false, false);
 		bulkAction.setFormAttributes(Lists.newArrayList(oldGuarantee, newGuarantee));
 		return bulkAction;
 	}

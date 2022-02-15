@@ -8136,7 +8136,11 @@
     },
     "BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST": {
       "title": "Uživatelé mají příliš mnoho garantů",
-      "message": "Uživatelé mají příliš mnoho garantu (>45). Zobrazeni jsou tak všichni aktivní uživatelé."
+      "message": "Uživatelé mají příliš mnoho garantu (>45). Zobrazeni jsou tak všichni uživatelé."
+    },
+    "BULK_ACTION_TOO_MANY_USERS_SELECTED": {
+      "title": "Vybráno bylo příliš mnoho uživatelů",
+      "message": "Vybráno bylo příliš mnoho uživatelů k filtrování, maximum je [{{maximum}}]. Zobrazeni jsou tak všichni uživatelé."
     },
     "BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT": {
       "title": "Nedostatečná oprávnění pro změnu atributů kontraktu",
