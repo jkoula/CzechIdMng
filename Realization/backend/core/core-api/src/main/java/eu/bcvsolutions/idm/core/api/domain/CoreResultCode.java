@@ -339,6 +339,7 @@ public enum CoreResultCode implements ResultCode {
 	BULK_ACTION_NOT_AUTHORIZED_CONTRACT_GUARANTEE (HttpStatus.FORBIDDEN, "Insufficient permissions [%s] for the guarantee [%s] for contract [%s]."),
 	BULK_ACTION_NO_CONTRACT_GUARANTEE_EXISTS (HttpStatus.NOT_FOUND, "No contract guarantees found."),
 	BULK_ACTION_TOO_MANY_CONTRACT_GUARANTEE_EXIST (HttpStatus.FORBIDDEN, "Too many contract guarantees found."),
+	BULK_ACTION_TOO_MANY_USERS_SELECTED (HttpStatus.FORBIDDEN, "Too many users selected for this bulk action."),
 	BULK_ACTION_NOT_AUTHORIZED_MODIFY_CONTRACT (HttpStatus.FORBIDDEN, "Insufficient permissions for [%s] contract modification."),
 	BULK_ACTION_NOT_AUTHORIZED_ASSING_ROLE_FOR_CONTRACT (HttpStatus.FORBIDDEN, "Insufficient permissions to assign role for contract [%s]."),
 	// Role bulk actions
