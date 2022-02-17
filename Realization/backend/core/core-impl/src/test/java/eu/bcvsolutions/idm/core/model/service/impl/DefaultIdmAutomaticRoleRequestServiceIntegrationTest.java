@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Collection;
 import java.util.List;
@@ -662,6 +663,205 @@ public class DefaultIdmAutomaticRoleRequestServiceIntegrationTest extends Abstra
 		fail("Automatic role request have to be approving by gurantee!");
 	}
 
+	@Test
+	public void testRemoveLastRule() {
+		getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+		//
+		IdmRoleDto role = prepareRole();
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+
+		IdmAutomaticRoleAttributeDto automaticRole = new IdmAutomaticRoleAttributeDto();
+		automaticRole.setRole(role.getId());
+		automaticRole.setName(role.getCode());
+
+		IdmAutomaticRoleRequestDto request = new IdmAutomaticRoleRequestDto();
+		request.setState(RequestState.EXECUTED);
+		request.setOperation(RequestOperationType.ADD);
+		request.setRequestType(AutomaticRoleRequestType.ATTRIBUTE);
+		request.setExecuteImmediately(true);
+		request.setName(role.getCode());
+		request.setRole(role.getId());
+		request = roleRequestService.save(request);
+		
+		IdmAutomaticRoleAttributeRuleRequestDto rule = new IdmAutomaticRoleAttributeRuleRequestDto();
+		rule.setRequest(request.getId());
+		rule.setOperation(RequestOperationType.ADD);
+		rule.setAttributeName(IdmIdentity_.username.getName());
+		rule.setComparison(AutomaticRoleAttributeRuleComparison.EQUALS);
+		rule.setType(AutomaticRoleAttributeRuleType.IDENTITY);
+		rule.setValue(identity.getUsername());
+		rule = ruleRequestService.save(rule);
+		UUID ruleId = rule.getId();
+
+		request = roleRequestService.startRequest(request.getId(), true);
+		// reload the automatic role
+		automaticRole = automaticRoleAttributeService.get(request.getAutomaticRole());
+		//
+		IdmAutomaticRoleAttributeRuleFilter ruleFilter = new IdmAutomaticRoleAttributeRuleFilter();
+		ruleFilter.setAutomaticRoleAttributeId(automaticRole.getId());
+		List<IdmAutomaticRoleAttributeRuleDto> rules = ruleService.find(ruleFilter, null).getContent();
+		Assert.assertEquals(1, rules.size());
+		
+		assertThrows(RoleRequestException.class, () -> {
+			// remove the last rule
+			IdmAutomaticRoleRequestDto removeRequest = new IdmAutomaticRoleRequestDto();
+			removeRequest.setState(RequestState.EXECUTED);
+			removeRequest.setOperation(RequestOperationType.ADD);
+			removeRequest.setRequestType(AutomaticRoleRequestType.ATTRIBUTE);
+			removeRequest.setExecuteImmediately(true);
+			removeRequest.setName(role.getCode());
+			removeRequest.setRole(role.getId());
+			removeRequest = roleRequestService.save(removeRequest);
+			
+			IdmAutomaticRoleAttributeRuleRequestDto changedRule = ruleRequestService.get(ruleId);
+			changedRule.setRequest(removeRequest.getId());
+			changedRule.setOperation(RequestOperationType.REMOVE);
+			ruleRequestService.save(changedRule);
+			
+			roleRequestService.startRequest(removeRequest.getId(), true);
+		});
+	}
+	
+	@Test
+	public void testRemoveSecondToLastRule() {
+		getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+		//
+		IdmRoleDto role = prepareRole();
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto identityTwo = getHelper().createIdentity((GuardedString) null);
+
+		IdmAutomaticRoleAttributeDto automaticRole = new IdmAutomaticRoleAttributeDto();
+		automaticRole.setRole(role.getId());
+		automaticRole.setName(role.getCode());
+
+		IdmAutomaticRoleRequestDto request = new IdmAutomaticRoleRequestDto();
+		request.setState(RequestState.EXECUTED);
+		request.setOperation(RequestOperationType.ADD);
+		request.setRequestType(AutomaticRoleRequestType.ATTRIBUTE);
+		request.setExecuteImmediately(true);
+		request.setName(role.getCode());
+		request.setRole(role.getId());
+		request = roleRequestService.save(request);
+		
+		IdmAutomaticRoleAttributeRuleRequestDto rule = new IdmAutomaticRoleAttributeRuleRequestDto();
+		rule.setRequest(request.getId());
+		rule.setOperation(RequestOperationType.ADD);
+		rule.setAttributeName(IdmIdentity_.username.getName());
+		rule.setComparison(AutomaticRoleAttributeRuleComparison.EQUALS);
+		rule.setType(AutomaticRoleAttributeRuleType.IDENTITY);
+		rule.setValue(identity.getUsername());
+		rule = ruleRequestService.save(rule);
+		UUID ruleId = rule.getId();
+		
+		IdmAutomaticRoleAttributeRuleRequestDto ruleTwo = new IdmAutomaticRoleAttributeRuleRequestDto();
+		ruleTwo.setRequest(request.getId());
+		ruleTwo.setOperation(RequestOperationType.ADD);
+		ruleTwo.setAttributeName(IdmIdentity_.username.getName());
+		ruleTwo.setComparison(AutomaticRoleAttributeRuleComparison.EQUALS);
+		ruleTwo.setType(AutomaticRoleAttributeRuleType.IDENTITY);
+		ruleTwo.setValue(identityTwo.getUsername());
+		ruleTwo = ruleRequestService.save(ruleTwo);
+
+		request = roleRequestService.startRequest(request.getId(), true);
+		// reload the automatic role
+		automaticRole = automaticRoleAttributeService.get(request.getAutomaticRole());
+		//
+		IdmAutomaticRoleAttributeRuleFilter ruleFilter = new IdmAutomaticRoleAttributeRuleFilter();
+		ruleFilter.setAutomaticRoleAttributeId(automaticRole.getId());
+		List<IdmAutomaticRoleAttributeRuleDto> rules = ruleService.find(ruleFilter, null).getContent();
+		Assert.assertEquals(2, rules.size());
+		
+		// remove the second to last rule
+		IdmAutomaticRoleRequestDto removeRequest = new IdmAutomaticRoleRequestDto();
+		removeRequest.setState(RequestState.EXECUTED);
+		removeRequest.setOperation(RequestOperationType.UPDATE);
+		removeRequest.setRequestType(AutomaticRoleRequestType.ATTRIBUTE);
+		removeRequest.setExecuteImmediately(true);
+		removeRequest.setName(role.getCode());
+		removeRequest.setRole(role.getId());
+		removeRequest.setAutomaticRole(request.getAutomaticRole());
+		removeRequest = roleRequestService.save(removeRequest);
+		
+		IdmAutomaticRoleAttributeRuleRequestDto changedRule = ruleRequestService.get(ruleId);
+		changedRule.setRequest(removeRequest.getId());
+		changedRule.setOperation(RequestOperationType.REMOVE);
+		ruleRequestService.save(changedRule);
+		
+		roleRequestService.startRequest(removeRequest.getId(), true);
+		rules = ruleService.find(ruleFilter, null).getContent();
+		Assert.assertEquals(1, rules.size());
+	}
+	
+	@Test
+	public void testRemoveLastRuleAndAddAnotherOne() {
+		getHelper().setConfigurationValue(SchedulerConfiguration.PROPERTY_TASK_ASYNCHRONOUS_ENABLED, false);
+		//
+		IdmRoleDto role = prepareRole();
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto identityTwo = getHelper().createIdentity((GuardedString) null);
+
+		IdmAutomaticRoleAttributeDto automaticRole = new IdmAutomaticRoleAttributeDto();
+		automaticRole.setRole(role.getId());
+		automaticRole.setName(role.getCode());
+
+		IdmAutomaticRoleRequestDto request = new IdmAutomaticRoleRequestDto();
+		request.setState(RequestState.EXECUTED);
+		request.setOperation(RequestOperationType.ADD);
+		request.setRequestType(AutomaticRoleRequestType.ATTRIBUTE);
+		request.setExecuteImmediately(true);
+		request.setName(role.getCode());
+		request.setRole(role.getId());
+		request = roleRequestService.save(request);
+		
+		IdmAutomaticRoleAttributeRuleRequestDto rule = new IdmAutomaticRoleAttributeRuleRequestDto();
+		rule.setRequest(request.getId());
+		rule.setOperation(RequestOperationType.ADD);
+		rule.setAttributeName(IdmIdentity_.username.getName());
+		rule.setComparison(AutomaticRoleAttributeRuleComparison.EQUALS);
+		rule.setType(AutomaticRoleAttributeRuleType.IDENTITY);
+		rule.setValue(identity.getUsername());
+		rule = ruleRequestService.save(rule);
+		UUID ruleId = rule.getId();
+		
+		request = roleRequestService.startRequest(request.getId(), true);
+		// reload the automatic role
+		automaticRole = automaticRoleAttributeService.get(request.getAutomaticRole());
+		//
+		IdmAutomaticRoleAttributeRuleFilter ruleFilter = new IdmAutomaticRoleAttributeRuleFilter();
+		ruleFilter.setAutomaticRoleAttributeId(automaticRole.getId());
+		List<IdmAutomaticRoleAttributeRuleDto> rules = ruleService.find(ruleFilter, null).getContent();
+		Assert.assertEquals(1, rules.size());
+		
+		// remove the second to last rule
+		IdmAutomaticRoleRequestDto removeRequest = new IdmAutomaticRoleRequestDto();
+		removeRequest.setState(RequestState.EXECUTED);
+		removeRequest.setOperation(RequestOperationType.UPDATE);
+		removeRequest.setRequestType(AutomaticRoleRequestType.ATTRIBUTE);
+		removeRequest.setExecuteImmediately(true);
+		removeRequest.setName(role.getCode());
+		removeRequest.setRole(role.getId());
+		removeRequest.setAutomaticRole(request.getAutomaticRole());
+		removeRequest = roleRequestService.save(removeRequest);
+		
+		IdmAutomaticRoleAttributeRuleRequestDto ruleTwo = new IdmAutomaticRoleAttributeRuleRequestDto();
+		ruleTwo.setRequest(removeRequest.getId());
+		ruleTwo.setOperation(RequestOperationType.ADD);
+		ruleTwo.setAttributeName(IdmIdentity_.username.getName());
+		ruleTwo.setComparison(AutomaticRoleAttributeRuleComparison.EQUALS);
+		ruleTwo.setType(AutomaticRoleAttributeRuleType.IDENTITY);
+		ruleTwo.setValue(identityTwo.getUsername());
+		ruleTwo = ruleRequestService.save(ruleTwo);
+		
+		IdmAutomaticRoleAttributeRuleRequestDto changedRule = ruleRequestService.get(ruleId);
+		changedRule.setRequest(removeRequest.getId());
+		changedRule.setOperation(RequestOperationType.REMOVE);
+		ruleRequestService.save(changedRule);
+		
+		roleRequestService.startRequest(removeRequest.getId(), true);
+		rules = ruleService.find(ruleFilter, null).getContent();
+		Assert.assertEquals(1, rules.size());
+	}
+	
 	@Test
 	public void testCreateTreeAutomaticRoleWithApproval() {
 		IdmRoleDto role = prepareRole();
