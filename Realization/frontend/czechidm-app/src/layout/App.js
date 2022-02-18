@@ -36,7 +36,7 @@ export class App extends Basic.AbstractContent {
   */
   componentDidUpdate() {
     const { location, userContext, appReady } = this.props;
-    if (userContext.isExpired && location.pathname !== '/login') {
+    if (userContext.isExpired || (userContext.id == null && !userContext.isAuthenticated) && location.pathname !== '/login') {
       // preserve path before logout
       this.context.store.dispatch(securityManager.receiveLogin(
         _.merge({}, userContext, {
