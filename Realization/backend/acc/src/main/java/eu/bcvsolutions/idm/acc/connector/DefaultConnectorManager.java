@@ -27,8 +27,10 @@ import eu.bcvsolutions.idm.acc.service.api.ConnectorManager;
 import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.SysRemoteServerService;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
+import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
 import eu.bcvsolutions.idm.ic.api.IcConnectorInfo;
 import eu.bcvsolutions.idm.ic.api.IcConnectorKey;
@@ -62,6 +64,8 @@ public class DefaultConnectorManager implements ConnectorManager {
 	private DefaultConnectorType defaultConnectorType;
 	@Autowired
 	private SysRemoteServerService remoteServerService;
+	@Autowired
+	private IdmCacheManager cacheManager;
 
 	@Override
 	public List<ConnectorType> getSupportedTypes() {
@@ -121,6 +125,10 @@ public class DefaultConnectorManager implements ConnectorManager {
 
 		ConnectorType connectorTypeDef = this.getConnectorType(connectorType.getId());
 		Assert.notNull(connectorTypeDef, "Connector type definition was not found!");
+
+		if (!connectorType.isReopened()) {
+			cacheManager.evictCache(FormService.FORM_DEFINITION_CACHE_NAME);
+		}
 
 		return connectorTypeDef.execute(connectorType);
 	}
