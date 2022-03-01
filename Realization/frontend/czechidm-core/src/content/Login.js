@@ -71,6 +71,14 @@ class Login extends Basic.AbstractContent {
       this.refs.form.setData(data);
     }
     //
+    if (!SecurityManager.isAuthenticated(userContext) && !userContext.isTryRemoteLogin) {
+      this.context.store.dispatch(securityManager.receiveLogin(
+        _.merge({}, userContext, {
+          isTryRemoteLogin: true
+        })
+      ));
+      window.location.reload(); // so the change of remote login will make effect
+    }
     if (!SecurityManager.isAuthenticated(userContext) && userContext.isTryRemoteLogin) {
       this.context.store.dispatch(securityManager.remoteLogin((result, error) => {
         if (result) {
