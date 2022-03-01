@@ -124,6 +124,17 @@
           }
         }
       }
+    },
+    "authorization-evaluator": {
+      "rpt-report-by-report-type-evaluator": {
+        "help": "Gives access to only one report specified by code",
+        "attributes": {
+          "report-type": {
+            "label": "Report code",
+            "help": "Executor code, e. g., 'users-start-end'. To allow downloading every generated report of this type, a Create or Administration permission is needed alongside Read!"
+          }
+        }
+      }
     }
   },
   "error": {

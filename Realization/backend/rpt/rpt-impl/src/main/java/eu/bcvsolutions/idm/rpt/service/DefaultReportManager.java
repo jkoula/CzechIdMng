@@ -22,9 +22,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
+import eu.bcvsolutions.idm.core.api.dto.IdmAuthorizationPolicyDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmAuthorizationPolicyFilter;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.api.service.IdmAuthorizationPolicyService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -35,8 +38,11 @@ import eu.bcvsolutions.idm.core.scheduler.api.dto.IdmLongRunningTaskDto;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.LongRunningFutureTask;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.service.EnabledEvaluator;
+import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import eu.bcvsolutions.idm.rpt.RptModuleDescriptor;
+import eu.bcvsolutions.idm.rpt.api.domain.RptGroupPermission;
 import eu.bcvsolutions.idm.rpt.api.dto.RptRenderedReportDto;
 import eu.bcvsolutions.idm.rpt.api.dto.RptReportDto;
 import eu.bcvsolutions.idm.rpt.api.dto.RptReportExecutorDto;
@@ -48,12 +54,13 @@ import eu.bcvsolutions.idm.rpt.api.renderer.RendererRegistrar;
 import eu.bcvsolutions.idm.rpt.api.renderer.ReportRenderer;
 import eu.bcvsolutions.idm.rpt.api.service.ReportManager;
 import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
+import eu.bcvsolutions.idm.rpt.security.evaluator.ReportByReportTypeEvaluator;
 
 /**
  * Default report manager
  * 
  * @author Radek Tomiška
- *
+ * @author Tomáš Doischer
  */
 @Service("reportManager")
 @Enabled(RptModuleDescriptor.MODULE_ID)
@@ -70,6 +77,8 @@ public class DefaultReportManager implements ReportManager {
     private final LongRunningTaskManager taskManager;
     //
     @Autowired private LookupService lookupService;
+    @Autowired private IdmAuthorizationPolicyService authorizationPolicyService;
+    @Autowired private SecurityService securityService;
 	
 	@Autowired
 	public DefaultReportManager(
@@ -171,6 +180,23 @@ public class DefaultReportManager implements ReportManager {
 
 	@Override
 	public List<RptReportExecutorDto> getExecutors() {
+		/* Perform permission check to limit available executors.
+		 * This is used by ReportByReportTypeEvaluator.
+		 */
+		IdmAuthorizationPolicyFilter filter = new IdmAuthorizationPolicyFilter();
+		filter.setIdentityId(securityService.getCurrentId());
+		filter.setGroupPermission(RptGroupPermission.REPORT.getName());
+		List<IdmAuthorizationPolicyDto> reportPolicies = authorizationPolicyService.find(filter, null).getContent()
+				.stream()
+				.filter(policy -> ReportByReportTypeEvaluator.class.getCanonicalName().equals(policy.getEvaluatorType()))
+				.collect(Collectors.toList());
+		List<String> allowedReportExecutors = reportPolicies
+				.stream()
+				.filter(policy -> policy.getBasePermissions() != null && (policy.getBasePermissions().contains(IdmBasePermission.CREATE.getName()) || 
+						policy.getBasePermissions().contains(IdmBasePermission.ADMIN.getName())))
+				.map(policy -> policy.getEvaluatorProperties().getString(ReportByReportTypeEvaluator.PARAMETER_REPORT_TYPE))
+				.collect(Collectors.toList());
+
 		return reportExecutorRegistry
 				.getPlugins()
 				.stream()
@@ -186,6 +212,7 @@ public class DefaultReportManager implements ReportManager {
 					}
 				})
 				.filter(Objects::nonNull)
+				.filter(rptReport -> allowedReportExecutors.isEmpty() || allowedReportExecutors.contains(rptReport.getName()))
 				.sorted(Comparator.comparing(RptReportExecutorDto::getName))
 				.collect(Collectors.toList());
 	}
