@@ -130,6 +130,10 @@ If you’d like an enhancement to be made to CzechIdM, pull requests are most we
 4. Make sure your code lints.
 
 5. Do not commit anything to the `dist` or `target` folder.
+ 
+6. Create pull request to develop. Select a reviewer and assign them as the assignee of the PR. As a comment, add a link to the related Redmine page. In the Redmine page, add a link to the PR.
+ 
+7. After review is finished, the PR can be merged to develop.
 
 ## License
 
