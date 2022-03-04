@@ -6,6 +6,7 @@ import _ from 'lodash';
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
+import SearchParameters from '../../domain/SearchParameters';
 import { SecurityManager, WorkflowTaskInstanceManager, RoleRequestManager } from '../../redux';
 import RoleRequestStateEnum from '../../enums/RoleRequestStateEnum';
 import OperationStateEnum from '../../enums/OperationStateEnum';
@@ -71,12 +72,19 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
 
   _getCandidatesCell({ rowIndex, data, property}) {
     const entity = data[rowIndex];
-    if (!entity || !entity._embedded || !entity._embedded.wfProcessId) {
+    if (!entity || !entity.approvers) {
       return '';
     }
+    const approvers = entity.approvers;
+    const identities = approvers.map(getIdentityIdFromIdenties)
+
+    function getIdentityIdFromIdenties(value, index, array) {
+      return value.id;
+    }
+
     return (
       <IdentitiesInfo
-        identities={ entity._embedded.wfProcessId[property] }
+        identities={ identities }
         maxEntry={ 5 }
         header={ this.i18n('entity.WorkflowHistoricTaskInstance.candicateUsers') }/>
     );
@@ -116,13 +124,17 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
       startRequestFunc,
       createNewRequestFunc,
       columns,
-      forceSearchParameters,
       showFilter,
       className,
       rendered,
       header } = this.props;
     const { filterOpened } = this.state;
     const innerShowLoading = _showLoading;
+    let forceSearchParameters = this.props.forceSearchParameters;
+    if (!forceSearchParameters) {
+      forceSearchParameters = new SearchParameters();
+    }
+    forceSearchParameters = forceSearchParameters.setFilter('includeApprovers', true);
     //
     if (!rendered) {
       return null;
