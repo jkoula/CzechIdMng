@@ -31,7 +31,7 @@ jobs:
       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
     - name: Build with Maven without tests
       if: ${{ github.event.inputs.tests == 'false' }}
-      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true -Dmaven.test.skip=true
+      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
