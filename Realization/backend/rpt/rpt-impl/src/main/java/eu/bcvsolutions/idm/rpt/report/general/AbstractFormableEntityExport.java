@@ -73,7 +73,7 @@ public abstract class AbstractFormableEntityExport<D extends AbstractDto, F exte
 			}
 			if (!eavsWithValues.containsKey(eavName)) {
 				eavsWithValues.put(eavName, new ArrayList<>());
-			}
+			} 
 			eavsWithValues.get(eavName).add(val.getValue());
 		});
 		//fill other attributes with empty values
@@ -85,13 +85,35 @@ public abstract class AbstractFormableEntityExport<D extends AbstractDto, F exte
 		eavsWithValues.keySet().forEach(attr -> {
 			List<Serializable> values = eavsWithValues.get(attr);
 			if (values.isEmpty()) {
-				resultMap.put(attr, "");
+				if (!resultMap.containsKey(attr)) {
+					resultMap.put(attr, "");
+				} else {
+					resultMap.put(sanitizeEavName(attr, resultMap), "");
+				}
 			} else {
-				resultMap.put(attr, String.valueOf(values.size() > 1 ? values : values.get(0)));
+				if (!resultMap.containsKey(attr)) {
+					resultMap.put(attr, String.valueOf(values.size() > 1 ? values : values.get(0)));
+				} else {
+					resultMap.put(sanitizeEavName(attr, resultMap), String.valueOf(values.size() > 1 ? values : values.get(0)));
+				}
 			}
 		});
 	}
 
+	private String sanitizeEavName(String attr, Map<String, String> resultMap) {
+		StringBuilder sanitizedNameBuilder = new StringBuilder();
+		sanitizedNameBuilder.append(attr);
+		sanitizedNameBuilder.append("_eav");
+		int i = 1;
+		sanitizedNameBuilder.append(i);
+		while (resultMap.containsKey(sanitizedNameBuilder.toString())) {
+			i++;
+			sanitizedNameBuilder.replace(sanitizedNameBuilder.length() - 1, sanitizedNameBuilder.length(), String.valueOf(i));
+		}
+		
+		return sanitizedNameBuilder.toString();
+	}
+	
 	protected String getEavName(IdmFormAttributeDto mappedAttribute,IdmFormInstanceDto formInstance, boolean prefixEavsWithDefinitionCode) {
 		if (mappedAttribute == null || (prefixEavsWithDefinitionCode && formInstance == null)) {
 			return null;
