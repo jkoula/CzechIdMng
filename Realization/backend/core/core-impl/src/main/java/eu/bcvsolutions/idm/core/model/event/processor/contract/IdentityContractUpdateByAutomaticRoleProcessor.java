@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.model.event.processor.contract;
 
 import java.io.Serializable;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,6 +74,8 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 	@Autowired private IdmContractPositionService contractPositionService;
 	@Autowired private IdmRoleRequestService roleRequestService;
 	@Autowired private EntityStateManager entityStateManager;
+
+	@Autowired private Clock clock;
 	
 	public IdentityContractUpdateByAutomaticRoleProcessor() {
 		super(IdentityContractEventType.NOTIFY);
@@ -95,7 +98,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 		IdmIdentityContractDto previous = event.getOriginalSource();
 		UUID previousPosition = previous == null ? null : previous.getWorkPosition();
 		UUID newPosition = contract.getWorkPosition();
-		boolean validityChangedToValid = previous == null ? false : contract.isValidNowOrInFuture() && previous.isValidNowOrInFuture() != contract.isValidNowOrInFuture();
+		boolean validityChangedToValid = previous == null ? false : contract.isValidNowOrInFuture(clock) && previous.isValidNowOrInFuture() != contract.isValidNowOrInFuture(clock);
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		//
 		// when automatic role recalculation is skipped, then flag for contract position is created only
@@ -110,7 +113,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			entityStateManager.createState(
 					contract, 
 					OperationState.BLOCKED, 
-					contract.isValidNowOrInFuture()
+					contract.isValidNowOrInFuture(clock)
 					?
 					CoreResultCode.AUTOMATIC_ROLE_SKIPPED 
 					: 
@@ -120,7 +123,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			//
 			return new DefaultEventResult<>(event, this);
 		}
-		if (!contract.isValidNowOrInFuture()) {
+		if (!contract.isValidNowOrInFuture(clock)) {
 			// invalid contracts cannot have roles (roles for disabled contracts are removed by different processor or LRT)
 			// but we need to add skipped flag above, even when invalid contract is updated
 			return new DefaultEventResult<>(event, this);
@@ -159,7 +162,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 					})
 					.collect(Collectors.toSet());
 			Set<IdmRoleTreeNodeDto> addedAutomaticRoles = new HashSet<>();
-			if (newPosition != null && contract.isValidNowOrInFuture()) {
+			if (newPosition != null && contract.isValidNowOrInFuture(clock)) {
 				addedAutomaticRoles = roleTreeNodeService.getAutomaticRolesByTreeNode(newPosition);
 			}
 			// prevent to remove newly added or still exists roles
@@ -317,4 +320,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 		return super.getOrder() + 500;
 	}
 
+	public void setClock(Clock clock) {
+		this.clock = clock;
+	}
 }

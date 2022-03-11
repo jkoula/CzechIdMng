@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.api.dto;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectInputStream.GetField;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -160,6 +161,21 @@ public class IdmIdentityContractDto extends FormableDto implements ValidableEnti
 	@Override
 	public boolean isValidNowOrInFuture() {
 		return ValidableEntity.super.isValidNowOrInFuture() && !isDisabled();
+	}
+	
+	/**
+	 * Contract validity and state is evaluated too. Added Clock
+	 * to simulate time change in tests.
+	 * 
+	 * @param clock
+	 * @return
+	 */
+	@Override
+	public boolean isValidNowOrInFuture(Clock clock) {
+		if (clock == null) {
+			return this.isValidNowOrInFuture();
+		}
+		return ValidableEntity.super.isValidNowOrInFuture(clock) && !isDisabled();
 	}
 
 	@Override
