@@ -522,13 +522,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 			accountsUseInTreeList.add(root);
 			IcConnectorObject account = accountsMap.get(root);
 
-			SynchronizationContext itemContext = cloneItemContext(context);
-			itemContext //
-					.addUid(root) //
-					.addIcObject(account) //
-					.addAccount(null) //
-					.addTokenAttribute(tokenAttribute) //
-					.addGeneratedUid(null); //
+			SynchronizationContext itemContext = getItemContext(context, root, account, tokenAttribute);
 
 			boolean result = handleIcObject(itemContext);
 			if (!result) {
@@ -542,48 +536,32 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 			}
 		}
 
+		Set<String> allNodesFromSystem = new HashSet<>(accountsMap.keySet());
+		allNodesFromSystem.removeAll(accountsUseInTreeList);
+
+		allNodesFromSystem.forEach(uid -> {
+			accountsUseInTreeList.add(uid);
+			IcConnectorObject account = accountsMap.get(uid);
+			SynchronizationContext itemContext = getItemContext(context, uid, account, tokenAttribute);
+			handleIcObject(itemContext);
+		});
+
 		if (config.isReconciliation()) {
 			// We do reconciliation (find missing account)
 			startReconciliation(entityType, accountsUseInTreeList, config, system, log, actionsLog);
 		}
 
-		logMissingParent(accountsMap, entityType, log, accountsUseInTreeList);
 	}
 
-	private void logMissingParent(Map<String, IcConnectorObject> accountsMap, SystemEntityType entityType, SysSyncLogDto log, Set<String> accountsUseInTreeList) {
-		Set<String> allNodesFromSystem = new HashSet<>(accountsMap.keySet());
-		allNodesFromSystem.removeAll(accountsUseInTreeList);
-
-		if(!allNodesFromSystem.isEmpty()) {
-			log.addToLog(MessageFormat.format("We found [{0}] nodes with parent which is not existing, we will log it as unknown state", allNodesFromSystem.size()));
-			SysSyncActionLogDto syncActionLogDto = new SysSyncActionLogDto();
-			syncActionLogDto.setSyncAction(SynchronizationActionType.UNKNOWN);
-			syncActionLogDto.setSyncLog(log.getId());
-			syncActionLogDto.setOperationCount(0);
-			syncActionLogDto.setOperationResult(OperationResultType.WARNING);
-			syncActionLogDto = syncActionLogService.save(syncActionLogDto);
-
-			AtomicReference<SysSyncActionLogDto> actionLogDtoAtomicReference = new AtomicReference<>(syncActionLogDto);
-			allNodesFromSystem.forEach(uid -> {
-				SysSyncItemLogDto itemLog = new SysSyncItemLogDto();
-				// Default setting for log item
-				itemLog.setIdentification(uid);
-				itemLog.setDisplayName(uid);
-				itemLog.setType(entityType.getEntityType().getSimpleName());
-
-				IcConnectorObject icConnectorObject = accountsMap.get(uid);
-				IcAttribute parentAttr = icConnectorObject.getAttributeByName(PARENT_FIELD);
-				addToItemLog(itemLog, MessageFormat.format("Parent [{0}] not found for tree node [{1}]!", parentAttr.getValue(), uid));
-
-				longRunningTaskExecutor.increaseCounter();
-
-				SysSyncActionLogDto actionLogUnknown = actionLogDtoAtomicReference.get();
-				actionLogUnknown.setOperationCount(actionLogUnknown.getOperationCount() + 1);
-				syncActionLogService.save(actionLogUnknown);
-				itemLog.setSyncActionLog(actionLogUnknown.getId());
-				syncItemLogService.save(itemLog);
-			});
-		}
+	private SynchronizationContext getItemContext(SynchronizationContext context, String uid, IcConnectorObject account, AttributeMapping tokenAttribute) {
+		SynchronizationContext itemContext = cloneItemContext(context);
+		itemContext //
+				.addUid(uid) //
+				.addIcObject(account) //
+				.addAccount(null) //
+				.addTokenAttribute(tokenAttribute) //
+				.addGeneratedUid(null); //
+		return itemContext;
 	}
 
 	private void deleteChildrenRecursively(IdmTreeNodeDto treeNode, SysSyncItemLogDto logItem) {
