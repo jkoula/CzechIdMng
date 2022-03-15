@@ -30,8 +30,8 @@ class RoleRequestDashboard extends Basic.AbstractContent {
     }
     //
     const columns = _.difference(RoleRequestTable.defaultProps.columns, ['modified', 'executeImmediately', 'startRequest', 'createNew']);
-    const creatorForceSearch = new Domain.SearchParameters().setFilter('creator', identity.id).setFilter('states', ['IN_PROGRESS', 'APPROVED']);
-    const applicantForceSearch = new Domain.SearchParameters().setFilter('applicant', identity.id).setFilter('states', ['IN_PROGRESS', 'APPROVED']);
+    const creatorForceSearch = new Domain.SearchParameters().setFilter('creator', identity.id).setFilter('states', ['IN_PROGRESS', 'APPROVED']).setFilter('includeApprovers', true);
+    const applicantForceSearch = new Domain.SearchParameters().setFilter('applicant', identity.id).setFilter('states', ['IN_PROGRESS', 'APPROVED']).setFilter('includeApprovers', true);
     const isLoggedIdentity = userContext.id === identity.id;
     //
     return (
