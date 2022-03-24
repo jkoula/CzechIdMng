@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm;
 
+import java.time.Clock;
+
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -8,6 +10,7 @@ import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.plugin.core.config.EnablePluginRegistries;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -39,4 +42,9 @@ public class IdmApplication extends SpringBootServletInitializer {
 		application.bannerMode(Banner.Mode.OFF);
         return application.sources(IdmApplication.class, IdmFlywayAutoConfiguration.class);
     }
+	
+	@Bean
+	Clock clock() {
+		return Clock.systemUTC();
+	}
 }

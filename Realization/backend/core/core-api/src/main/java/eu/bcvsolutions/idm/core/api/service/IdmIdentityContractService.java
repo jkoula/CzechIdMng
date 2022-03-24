@@ -139,5 +139,6 @@ public interface IdmIdentityContractService extends
 	 * @since 10.2.0
 	 */
 	void sortByPrimeContract(List<IdmIdentityContractDto> contracts);
-
+	
+	boolean isValidNowOrInFuture(IdmIdentityContractDto contract);
 }

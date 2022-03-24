@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.api.entity;
 
-import java.time.Clock;
 import java.time.LocalDate;
 
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
@@ -56,16 +55,4 @@ public interface ValidableEntity {
 	default boolean isValidNowOrInFuture() {
 		return EntityUtils.isValidNowOrInFuture(this);
 	}
-	
-	/**
-	 * Returns true, if entity is valid now or in future.
-	 * Added Clock to simulate time change in tests.
-	 * 
-	 * @param clock
-	 * @return
-	 */
-	default boolean isValidNowOrInFuture(Clock clock) {
-		return EntityUtils.isValidNowOrInFuture(this, clock);
-	}
-	
 }

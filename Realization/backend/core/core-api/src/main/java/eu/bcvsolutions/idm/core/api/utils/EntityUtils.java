@@ -10,7 +10,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -112,26 +111,11 @@ public class EntityUtils {
 	public static boolean isValidNowOrInFuture(ValidableEntity entity) {
 		if (entity == null) {
 			return false;
-		}	
+		}
 		LocalDate now = LocalDate.now();
+		 
 		return entity.getValidTill() == null || entity.getValidTill().compareTo(now) >= 0;
 	}	
-	
-	/**
-	 * Returns true, if entity is valid now or in future. Added Clock
-	 * to simulate time change in tests.
-	 * 
-	 * @param entity
-	 * @param clock
-	 * @return
-	 */
-	public static boolean isValidNowOrInFuture(ValidableEntity entity, Clock clock) {
-		if (entity == null) {
-			return false;
-		}	
-		LocalDate now = LocalDate.now(clock);
-		return entity.getValidTill() == null || entity.getValidTill().compareTo(now) >= 0;
-	}
 	
 	/**
 	 * Returns false, when validable information are the same

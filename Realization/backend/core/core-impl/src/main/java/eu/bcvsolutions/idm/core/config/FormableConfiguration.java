@@ -1,7 +1,5 @@
 package eu.bcvsolutions.idm.core.config;
 
-import java.time.Clock;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -174,10 +172,5 @@ public class FormableConfiguration {
 	public AbstractFormValueService<IdmConceptRoleRequest, IdmConceptRoleRequestFormValue> conceptRoleRequestFormValueService(
 			AbstractFormValueRepository<IdmConceptRoleRequest, IdmConceptRoleRequestFormValue> repository) {
 		return new AbstractFormValueService<IdmConceptRoleRequest, IdmConceptRoleRequestFormValue>(repository) {};
-	}
-	
-	@Bean
-	Clock clock() {
-		return Clock.systemUTC();
 	}
 }

@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
@@ -73,6 +74,8 @@ public class DefaultIdmIdentityContractService
 	@Autowired private TreeConfiguration treeConfiguration;
 	@Autowired private IdmContractSliceService contractSliceService;
 	@Autowired private PrivateIdentityConfiguration identityConfiguration;
+	
+	@Autowired private Clock clock;
 	
 	@Autowired
 	public DefaultIdmIdentityContractService(
@@ -454,6 +457,21 @@ public class DefaultIdmIdentityContractService
 			//
 			return builder.toComparison();
 		}
+	}
+
+	@Override
+	public boolean isValidNowOrInFuture(IdmIdentityContractDto contract) {
+		if (contract == null) {
+			return false;
+		}
+		LocalDate now;
+		if (clock != null) {
+			now = LocalDate.now(clock);
+		} else {
+			now = LocalDate.now();
+		}
+		 
+		return contract.getValidTill() == null || contract.getValidTill().compareTo(now) >= 0;
 	}
 }
 
