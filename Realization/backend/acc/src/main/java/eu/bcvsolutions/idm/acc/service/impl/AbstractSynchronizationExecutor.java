@@ -72,6 +72,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaObjectClass_;
 import eu.bcvsolutions.idm.acc.entity.SysSyncConfig;
+import eu.bcvsolutions.idm.acc.entity.SysSyncConfig_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.event.SynchronizationEventType;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
@@ -330,44 +331,69 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 		log.addToLog(MessageFormat.format("Synchronization was started in [{0}].", log.getStarted()));
 		AbstractSysSyncConfigDto config = context.getConfig();
 		if (config != null) {
-			StringBuilder settings = new StringBuilder();
-			settings.append(MessageFormat.format("Is running as reconciliation: [{0}]", config.isReconciliation()));
-			// initial token
-			if (!StringUtils.isEmpty(config.getToken())) {
-				settings.append(MessageFormat.format("\nInitial token: [{0}]", config.getToken()));
-			}
-			// linked account action
-			if (config.getLinkedAction() != null) {
-				settings.append(MessageFormat.format("\nLinked account action: [{0}]", config.getLinkedAction()));
-			}
-			if (!StringUtils.isEmpty(config.getLinkedActionWfKey())) {
-				settings.append(MessageFormat.format("\nLinked account action WF key: [{0}]", config.getLinkedActionWfKey()));
-			}
-			// unlinked account action
-			if (config.getUnlinkedAction() != null) {
-				settings.append(MessageFormat.format("\nUnlinked account action: [{0}]", config.getUnlinkedAction()));
-			}
-			if (!StringUtils.isEmpty(config.getUnlinkedActionWfKey())) {
-				settings.append(MessageFormat.format("\nUnlinked account action WF key: [{0}]", config.getUnlinkedActionWfKey()));
-			}
-			// missing entity action
-			if (config.getMissingEntityAction() != null) {
-				settings.append(MessageFormat.format("\nMissing entity action: [{0}]", config.getMissingEntityAction()));
-			}
-			if (!StringUtils.isEmpty(config.getMissingEntityActionWfKey())) {
-				settings.append(MessageFormat.format("\nMissing entity action WF key: [{0}]", config.getMissingEntityActionWfKey()));
-			}
-			// missing account action
-			if (config.getMissingAccountAction() != null) {
-				settings.append(MessageFormat.format("\nMissing account action: [{0}]", config.getMissingAccountAction()));
-			}
-			if (!StringUtils.isEmpty(config.getMissingAccountActionWfKey())) {
-				settings.append(MessageFormat.format("\nMissing account action WF key: [{0}]", config.getMissingAccountActionWfKey()));
-			}
-			log.addToLog(settings.toString());
+			log.addToLog(getSynchronizationConfigurationDetail(config));
 		}
 		
 		return log;
+	}
+	
+	/**
+	 * Return the configuration used to run the synchronization. This will be saved in the synchronization
+	 * log.
+	 * 
+	 * @param config
+	 * @return
+	 */
+	private String getSynchronizationConfigurationDetail(AbstractSysSyncConfigDto config) {
+		StringBuilder settings = new StringBuilder();
+		settings.append("Synchronization used the following settings:");
+		// mapping
+		SysSystemMappingDto mapping = DtoUtils.getEmbedded(config,
+				SysSyncConfig_.systemMapping, SysSystemMappingDto.class);
+		if (mapping != null) {
+			settings.append(MessageFormat.format("\nSynchronization mapping: [{0}]", mapping.getName()));
+		}
+		// correlation attribute
+		SysSystemAttributeMappingDto correlationAttribute = DtoUtils.getEmbedded(config,
+				SysSyncConfig_.correlationAttribute, SysSystemAttributeMappingDto.class);
+		if (correlationAttribute != null) {
+			settings.append(MessageFormat.format("\nCorrelation attribute: [{0}]", correlationAttribute.getName()));
+		}
+		settings.append(MessageFormat.format("\nIs running as reconciliation: [{0}]", config.isReconciliation()));
+		// initial token
+		if (!StringUtils.isEmpty(config.getToken())) {
+			settings.append(MessageFormat.format("\nInitial token: [{0}]", config.getToken()));
+		}
+		// linked account action
+		if (config.getLinkedAction() != null) {
+			settings.append(MessageFormat.format("\nLinked account action: [{0}]", config.getLinkedAction()));
+		}
+		if (!StringUtils.isEmpty(config.getLinkedActionWfKey())) {
+			settings.append(MessageFormat.format("\nLinked account action WF key: [{0}]", config.getLinkedActionWfKey()));
+		}
+		// unlinked account action
+		if (config.getUnlinkedAction() != null) {
+			settings.append(MessageFormat.format("\nUnlinked account action: [{0}]", config.getUnlinkedAction()));
+		}
+		if (!StringUtils.isEmpty(config.getUnlinkedActionWfKey())) {
+			settings.append(MessageFormat.format("\nUnlinked account action WF key: [{0}]", config.getUnlinkedActionWfKey()));
+		}
+		// missing entity action
+		if (config.getMissingEntityAction() != null) {
+			settings.append(MessageFormat.format("\nMissing entity action: [{0}]", config.getMissingEntityAction()));
+		}
+		if (!StringUtils.isEmpty(config.getMissingEntityActionWfKey())) {
+			settings.append(MessageFormat.format("\nMissing entity action WF key: [{0}]", config.getMissingEntityActionWfKey()));
+		}
+		// missing account action
+		if (config.getMissingAccountAction() != null) {
+			settings.append(MessageFormat.format("\nMissing account action: [{0}]", config.getMissingAccountAction()));
+		}
+		if (!StringUtils.isEmpty(config.getMissingAccountActionWfKey())) {
+			settings.append(MessageFormat.format("\nMissing account action WF key: [{0}]", config.getMissingAccountActionWfKey()));
+		}
+		
+		return settings.toString();
 	}
 
 	/**
