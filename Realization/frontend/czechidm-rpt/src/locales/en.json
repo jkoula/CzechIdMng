@@ -131,7 +131,7 @@
         "attributes": {
           "report-type": {
             "label": "Report code",
-            "help": "Executor code, e. g., 'identity-report'. To allow downloading every generated report of this type, a Create or Administration permission is needed alongside Read!"
+            "help": "Executor code, e. g., 'identity-report'. To allow downloading every generated report of this type, a Create or Administration permission is needed alongside Read! The field is single-valued, i. e., only one report can be here."
           }
         }
       }
