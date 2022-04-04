@@ -99,7 +99,6 @@ public class RemoveRoleCompositionTaskExecutor extends AbstractSchedulableStatef
 		//
 		IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
 		filter.setOperationState(OperationState.RUNNING);
-		filter.setRunning(Boolean.TRUE); // ignore waiting tasks
 		filter.setTaskType(AddNewRoleCompositionTaskExecutor.class.getCanonicalName());
 		for (UUID longRunningTaskId : getLongRunningTaskService().findIds(filter, PageRequest.of(0, 1))) {
 			throw new AcceptedException(CoreResultCode.ROLE_COMPOSITION_RUN_CONCURRENTLY,
