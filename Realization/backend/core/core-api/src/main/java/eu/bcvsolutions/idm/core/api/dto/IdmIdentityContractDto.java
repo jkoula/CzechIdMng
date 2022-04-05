@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import javax.validation.constraints.Size;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
@@ -15,7 +14,6 @@ import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -51,9 +49,6 @@ public class IdmIdentityContractDto extends FormableDto implements ValidableEnti
 	private String description;
 	private Boolean controlledBySlices; // Is true only if contract has some slice. Contract created by slice, cannot be
 										// updated directly! Is sets only if DTO is not trimmed!
-	
-	@Autowired
-	private IdmIdentityContractService identityContractService;
 	
 	public IdmIdentityContractDto() {
 	}
@@ -164,8 +159,7 @@ public class IdmIdentityContractDto extends FormableDto implements ValidableEnti
 	 */
 	@Override
 	public boolean isValidNowOrInFuture() {
-		return identityContractService.isValidNowOrInFuture(this) && !isDisabled();
-//		return ValidableEntity.super.isValidNowOrInFuture() && !isDisabled();
+		return ValidableEntity.super.isValidNowOrInFuture() && !isDisabled();
 	}
 
 	@Override

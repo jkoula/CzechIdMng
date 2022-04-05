@@ -1,32 +1,24 @@
 package eu.bcvsolutions.idm.core.model.event.processor.contract;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 import java.io.Serializable;
-import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
-import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
-import eu.bcvsolutions.idm.core.api.event.CoreEvent;
-import eu.bcvsolutions.idm.core.api.event.CoreEvent.CoreEventType;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
@@ -53,14 +45,6 @@ public class IdentityContractUpdateByAutomaticRoleProcessorTest extends Abstract
 	private IdmIdentityContractService identityContractService;
 	@Autowired
 	private EntityStateManager entityStateManager;
-	
-	@MockBean
-	private Clock clock;
-	
-	@Before
-    public void setupClock() {
-        when(clock.getZone()).thenReturn(ZoneId.of("Europe/Prague"));
-    }
 	
 	@Test
 	public void testRoleValidityChange() {
@@ -96,36 +80,35 @@ public class IdentityContractUpdateByAutomaticRoleProcessorTest extends Abstract
 	
 	@Test
 	public void testRoleValidityChangeLastDay() {
-		LocalDate today = LocalDate.now();
 		ProcessAllAutomaticRoleByAttributeTaskExecutor autoRolecalculation = new ProcessAllAutomaticRoleByAttributeTaskExecutor();
 		longRunningTaskManager.executeSync(autoRolecalculation);
 		//
 		IdmIdentityDto identity = this.getHelper().createIdentity(new GuardedString());
 		IdmIdentityContractDto contract = this.getHelper().getPrimeContract(identity);
-		contract.setValidFrom(LocalDate.now().minusDays(5));
-		contract.setValidTill(LocalDate.now().plusDays(5));
+		contract.setValidFrom(LocalDate.now());
+		contract.setValidTill(LocalDate.now().plusDays(5L));
 		contract = identityContractService.save(contract);
 		//
 		IdmAutomaticRoleAttributeDto automaticRole = this.getHelper().createAutomaticRole(this.getHelper().createRole().getId());
 		this.getHelper().createAutomaticRoleRule(automaticRole.getId(), AutomaticRoleAttributeRuleComparison.EQUALS, AutomaticRoleAttributeRuleType.IDENTITY, IdmIdentity_.username.getName(), null, identity.getUsername());
 		//
-		autoRolecalculation = new ProcessAllAutomaticRoleByAttributeTaskExecutor();
-		longRunningTaskManager.executeSync(autoRolecalculation);
+		executeAutomaticRoleRecalculation();
 		//
 		List<IdmIdentityRoleDto> findAllByIdentity = identityRoleService.findAllByIdentity(identity.getId());
 		assertEquals(1, findAllByIdentity.size());
 		assertEquals(contract.getValidTill(), findAllByIdentity.get(0).getValidTill());
 		//
-		when(clock.instant()).thenReturn(
-		        today.minusDays(1).atStartOfDay(ZoneId.of("Europe/Prague")).toInstant());
-		contract.setValidTill(LocalDate.now(clock));
-		contract = saveContractAsInFrontend(contract);
-		LocalDate t1 = LocalDate.now();
+		contract.setValidTill(LocalDate.now());
+		contract = saveContractAsInSynchronization(contract);
+		executeAutomaticRoleRecalculation();
+		findAllByIdentity = identityRoleService.findAllByIdentity(identity.getId());
+		assertEquals(1, findAllByIdentity.size());
+		assertEquals(contract.getValidTill(), findAllByIdentity.get(0).getValidTill());
 		//
-		when(clock.instant()).thenReturn(
-				today.atStartOfDay(ZoneId.of("Europe/Prague")).toInstant());
+		contract.setValidTill(LocalDate.now().minusDays(1L));
+		contract = identityContractService.saveInternal(contract); // skip all processors
+		//
 		contract.setValidTill(LocalDate.now().plusDays(5));
-//		contract = identityContractService.save(contract);
 		contract = saveContractAsInSynchronization(contract);
 		executeAutomaticRoleRecalculation();
 		//
@@ -166,13 +149,6 @@ public class IdentityContractUpdateByAutomaticRoleProcessorTest extends Abstract
 		}
 		//
 		return contract;
-	}
-	
-	private IdmIdentityContractDto saveContractAsInFrontend(IdmIdentityContractDto entity) {
-		CoreEvent<IdmIdentityContractDto> event = new CoreEvent<IdmIdentityContractDto>(CoreEventType.CREATE, entity);
-		event.setPriority(PriorityType.HIGH);
-		//
-		return identityContractService.publish(event).getContent();
 	}
 	
 	private void executeAutomaticRoleRecalculation() {
