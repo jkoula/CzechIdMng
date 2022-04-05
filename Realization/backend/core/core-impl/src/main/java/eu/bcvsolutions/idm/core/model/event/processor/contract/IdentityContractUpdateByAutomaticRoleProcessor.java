@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -128,7 +128,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			return new DefaultEventResult<>(event, this);
 		}
 		//
-		List<UUID> changedIdentityRoles = Lists.newArrayList();
+		List<UUID> changedIdentityRoles = Lists.newArrayList(); // we will list changed identity role to only process them once
 		if (previous == null || !Objects.equals(newPosition, previousPosition) || validityChangedToValid) {
 			// work positions has some difference or validity changes
 			List<IdmIdentityRoleDto> assignedRoles = getAssignedAutomaticRoles(contract.getId());
