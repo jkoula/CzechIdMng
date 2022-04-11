@@ -202,16 +202,21 @@ class AbstractForm extends AbstractContextComponent {
   }
 
   isFormValid() {
+    // this is checking if form is rendered. Return true if form is not rendered
+    if (!this.props.rendered) {
+      return true;
+    }
     for (const componentRef in this.state.componentsKeys) {
       if (!this.state.componentsKeys.hasOwnProperty(componentRef)) {
         continue;
       }
-      if (!this.props.rendered) {
-        return true;
-      }
       const component = this.getComponent(this.state.componentsKeys[componentRef]);
       if (!component) {
         // component could not be rendered
+        continue;
+      }
+      // check if component is not rendered
+      if (!component.refs.rendered) {
         continue;
       }
       if (!component.isValid()) {
