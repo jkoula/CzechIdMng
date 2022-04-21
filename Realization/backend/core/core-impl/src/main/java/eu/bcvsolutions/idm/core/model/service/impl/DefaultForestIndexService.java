@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +35,8 @@ public class DefaultForestIndexService extends AbstractForestIndexService<IdmFor
 	
 	@Autowired
 	public DefaultForestIndexService(
-			IdmForestIndexEntityRepository repository, 
-			EntityManager entityManager,
+			IdmForestIndexEntityRepository repository,
+			@CoreEntityManager EntityManager entityManager,
 			ConfigurationService configurationService) {
 		super(repository, entityManager);
 		//

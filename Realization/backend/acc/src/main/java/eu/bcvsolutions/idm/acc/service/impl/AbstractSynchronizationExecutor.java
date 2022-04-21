@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -184,6 +185,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	@Autowired
 	protected EntityEventManager entityEventManager;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	@Autowired
 	protected SysSystemMappingService systemMappingService;

@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,9 @@ public abstract class AbstractSchedulableStatefulExecutor<DTO extends AbstractDt
 	//
 	@Autowired private IdmProcessedTaskItemService itemService;
 	@Autowired private PlatformTransactionManager platformTransactionManager;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 
 	@Override
 	public Boolean process() {

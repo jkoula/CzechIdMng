@@ -21,6 +21,7 @@ import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.query.criteria.internal.PathImplementor;
 import org.hibernate.query.criteria.internal.predicate.ExistsPredicate;
 import org.hibernate.query.criteria.internal.predicate.InPredicate;
@@ -91,6 +92,7 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 	@Autowired
 	private ApplicationContext context;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	@Autowired
 	@Lazy
