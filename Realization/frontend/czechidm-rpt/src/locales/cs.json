@@ -131,7 +131,7 @@
         "attributes": {
           "report-type": {
             "label": "Kód reportu",
-            "help": "Kód executoru, např. 'identity-report'. Ke stažení kteréhokoli vygenerovaného reportu tohoto typu je třeba mít i oprávnění Vytvoření či Administrace! Toho pole je jednohodnotové, tj. může obsahovat pouze jeden report."
+            "help": "Kód executoru, např. 'identity-report'. Ke stažení kteréhokoli vygenerovaného reportu tohoto typu je třeba mít i oprávnění Vytvoření či Administrace! Toto pole je jednohodnotové, tj. může obsahovat pouze jeden report."
           }
         }
       }
