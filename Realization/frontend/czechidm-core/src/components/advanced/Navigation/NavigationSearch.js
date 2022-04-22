@@ -29,9 +29,9 @@ const useStyles = makeStyles((theme) => {
       search: {
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.05),
+        backgroundColor: alpha(theme.palette.common.white, 0.20),
         '&:hover': {
-          backgroundColor: alpha(theme.palette.common.white, 0.15),
+          backgroundColor: alpha(theme.palette.common.white, 0.30),
         },
         marginLeft: 0,
         width: '100%',
@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme) => {
           color: theme.palette.common.white
         },
         '& .Select-placeholder': {
-          color: alpha(theme.palette.common.white, 0.42)
+          color: theme.palette.primary.contrastText
         },
         '& .Select-option': {
           backgroundColor: theme.palette.background.paper,
@@ -89,7 +89,13 @@ const useStyles = makeStyles((theme) => {
           backgroundColor: theme.palette.background.paper
         },
         '& .MuiSvgIcon-root': {
-          color: theme.palette.common.white
+          color: theme.palette.primary.contrastText
+        },
+        '& .Search-placeholder': {
+          color: theme.palette.primary.contrastText
+        },
+        '& .Select-arrow': {
+          borderTopColor: theme.palette.primary.contrastText
         }
       }
     });
@@ -251,7 +257,7 @@ function NavigationSearch(props, context) {
           placeholder={
             <Div rendered={!selectedItem}>
               <SearchIcon style={{marginTop: 8}} titleAccess={i18n('component.advanced.NavigationSearch.search.placeholder')}/>
-              <span style={{marginLeft: 5, verticalAlign: 'top'}}>{i18n('component.advanced.NavigationSearch.search.placeholder')} ...</span>
+              <span className="Search-placeholder" style={{marginLeft: 5, verticalAlign: 'top'}}>{i18n('component.advanced.NavigationSearch.search.placeholder')} ...</span>
             </Div>
           }/>
       </div>
