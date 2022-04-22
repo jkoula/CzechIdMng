@@ -93,6 +93,9 @@ const useStyles = makeStyles((theme) => {
         },
         '& .Search-placeholder': {
           color: theme.palette.primary.contrastText
+        },
+        '& .Select-arrow': {
+          borderTopColor: theme.palette.primary.contrastText
         }
       }
     });
