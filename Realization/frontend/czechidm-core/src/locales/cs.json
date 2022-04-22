@@ -754,7 +754,7 @@
       },
       "NavigationSearch": {
         "search": {
-          "placeholder": "Najít uživatele nebo roli"
+          "placeholder": "Najít uživatele, roli nebo systém"
         },
         "button": {
           "title": "Hledat"
