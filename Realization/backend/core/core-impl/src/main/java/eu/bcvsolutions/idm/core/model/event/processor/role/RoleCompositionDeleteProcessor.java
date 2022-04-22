@@ -79,7 +79,9 @@ public class RoleCompositionDeleteProcessor
 		}
 		//
 		roleCompositionTask.setRequireNewTransaction(true);
-		longRunningTaskManager.execute(roleCompositionTask);
+		// always execute as sync, so prevent warning status if multiple compositions should be deleted. It occurs if you remove
+		// more or same number of compositions as number in property scheduler.task.executor.corePoolSize
+		longRunningTaskManager.executeSync(roleCompositionTask);
 		// TODO: new flag asynchronous?
 		return new DefaultEventResult.Builder<>(event, this).setSuspended(true).build();
 	}
