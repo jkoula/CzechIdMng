@@ -60,6 +60,8 @@ public class DatasourceConfig {
         if (StringUtils.isEmpty(hikariConfig.getJdbcUrl())) {
             hikariConfig.setDriverClassName("org.h2.Driver");
             hikariConfig.setJdbcUrl("jdbc:h2:mem:testdb");
+            hikariConfig.setUsername("");
+            hikariConfig.setPassword("");
         }
         return new HikariDataSource(hikariConfig);
     }

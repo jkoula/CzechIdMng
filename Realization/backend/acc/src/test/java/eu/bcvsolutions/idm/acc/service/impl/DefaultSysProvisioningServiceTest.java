@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -135,7 +136,9 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 	@Autowired private SysSystemMappingService systemEntityHandlingService;
 	@Autowired private SysSystemAttributeMappingService systemAttributeMappingService;
 	@Autowired private SysSchemaAttributeService schemaAttributeService;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	@Autowired private IdmPasswordPolicyService passwordPolicyService;
 	@Autowired private IdmTreeNodeService treeNodeService;
 	@Autowired private IdmTreeTypeService treeTypeService;

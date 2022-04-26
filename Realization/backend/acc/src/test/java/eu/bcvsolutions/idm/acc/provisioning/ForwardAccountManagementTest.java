@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -66,6 +67,7 @@ public class ForwardAccountManagementTest extends AbstractIntegrationTest {
 	@Autowired
 	private SysSchemaAttributeService schemaAttributeService;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	@Autowired
 	private IdmIdentityService identityService;

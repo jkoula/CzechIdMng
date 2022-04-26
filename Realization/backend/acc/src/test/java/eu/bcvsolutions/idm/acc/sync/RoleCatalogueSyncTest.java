@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -75,6 +76,7 @@ public class RoleCatalogueSyncTest extends AbstractIntegrationTest {
 	@Autowired
 	private SysSyncLogService syncLogService;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	@Autowired
 	private ApplicationContext applicationContext;
