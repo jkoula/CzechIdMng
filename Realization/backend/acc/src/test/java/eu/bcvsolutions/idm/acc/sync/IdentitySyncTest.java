@@ -2748,6 +2748,40 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		syncLogService.delete(log);
 		syncConfigService.delete(config);
 	}
+	
+	// linked, system entity has "wish", action Ignore => no change
+	@Test
+	public void testLinkedIdentityIgnoredDontRemoveWishSyncNoLog() {
+		SysSystemDto system = initData();
+		Assert.assertNotNull(system);
+
+		SysSyncIdentityConfigDto config = doCreateSyncConfig(system);
+		config.setLinkedAction(SynchronizationLinkedActionType.IGNORE_AND_DO_NOT_LOG);
+		config = (SysSyncIdentityConfigDto) syncConfigService.save(config);
+
+		// Create system entity with "wish"
+		createSystemEntityWish(system);
+
+		// Create identity with account
+		IdmIdentityDto identity = helper.createIdentity(IDENTITY_ONE);
+		helper.createIdentityAccount(system, identity);
+
+		helper.startSynchronization(config);
+
+		// has to be ignored
+		SysSyncLogDto log = checkSyncLog(config, SynchronizationActionType.LINKED, 0, OperationResultType.IGNORE);
+
+		Assert.assertFalse(log.isRunning());
+		Assert.assertFalse(log.isContainsError());
+
+		// System entity has "wish"
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, IDENTITY_ONE);
+		Assert.assertTrue(systemEntity.isWish());
+
+		// Delete log
+		syncLogService.delete(log);
+		syncConfigService.delete(config);
+	}
 
 	// linked, system entity has "wish", action Update entity, automapping is allowed => removed "wish" 
 	@Test
@@ -3002,6 +3036,11 @@ public class IdentitySyncTest extends AbstractIntegrationTest {
 		actionLogFilter.setSynchronizationLogId(log.getId());
 		List<SysSyncActionLogDto> actions = syncActionLogService.find(actionLogFilter, null).getContent();
 
+		if (actions.isEmpty()) {
+			Assert.assertEquals(count, 0);
+			return log;
+		}
+		
 		SysSyncActionLogDto actionLog = actions.stream().filter(action -> {
 			return actionType == action.getSyncAction();
 		}).findFirst().get();

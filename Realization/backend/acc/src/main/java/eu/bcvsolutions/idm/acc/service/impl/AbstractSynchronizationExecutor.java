@@ -276,7 +276,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 				// Resolve filter for custom search
 				IcFilter filter = resolveSynchronizationFilter(config);
 				log.addToLog(MessageFormat.format("Start search with filter [{0}].", filter != null ? filter : "NONE"));
-
+				
 				connectorFacade.search(systemService.getConnectorInstance(system), connectorConfig, objectClass, filter,
 						new DefaultResultHandler(context, systemAccountsList));
 			} else {
@@ -636,6 +636,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 		SystemEntityType entityType = itemContext.getEntityType();
 		SysSyncLogDto log = itemContext.getLog();
 		SysSyncItemLogDto itemLog = itemContext.getLogItem();
+		boolean ignored = false;
 
 		List<SysSyncActionLogDto> actionsLog = new ArrayList<>();
 		try {
@@ -661,6 +662,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 					&& lastResult.getEvent().getProperties().containsKey(SynchronizationService.RESULT_SYNC_ITEM)) {
 				result = (boolean) lastResult.getEvent().getProperties().get(SynchronizationService.RESULT_SYNC_ITEM);
 			}
+			ignored = shouldBeIgnored(lastResult);
 
 			return result;
 		} catch (Exception ex) {
@@ -679,14 +681,16 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			return true;
 		} finally {
 			synchronizationConfigService.save(config);
-			boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
-			actionsLog = saveActionLogs(actionsLog, log.getId());
-			//
-			if (!existingItemLog) {
-				addToItemLog(itemLog, MessageFormat.format("Missing action log for UID [{0}]!", uid));
-				initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
-						actionsLog);
-				syncItemLogService.save(itemLog);
+			if (!ignored) {
+				boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
+				actionsLog = saveActionLogs(actionsLog, log.getId());
+				//
+				if (!existingItemLog) {
+					addToItemLog(itemLog, MessageFormat.format("Missing action log for UID [{0}]!", uid));
+					initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
+							actionsLog);
+					syncItemLogService.save(itemLog);
+				}
 			}
 		}
 	}
@@ -720,6 +724,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			String uid = account.getRealUid();
 			if (!allAccountsSet.contains(uid)) {
 				SysSyncItemLogDto itemLog = new SysSyncItemLogDto();
+				boolean ignored = false;
 				try {
 
 					// Default setting for log item
@@ -744,10 +749,11 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 						result = (boolean) lastResult.getEvent().getProperties()
 								.get(SynchronizationService.RESULT_SYNC_ITEM);
 					}
+					// The strategy was set as ignored
+					ignored = shouldBeIgnored(lastResult);
 					// Update (increased counter) and check state of sync (maybe was cancelled from
 					// sync or LRT)
 					updateAndCheckState(result, log);
-
 				} catch (Exception ex) {
 					String message = MessageFormat.format("Reconciliation - error for uid [{0}]", uid);
 					log.addToLog(message);
@@ -755,15 +761,16 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 					LOG.error(message, ex);
 				} finally {
 					config = synchronizationConfigService.save(config);
-
-					boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
-					actionsLog = saveActionLogs(actionsLog, log.getId());
-					//
-					if (!existingItemLog) {
-						addToItemLog(itemLog, MessageFormat.format("Missing action log for UID [{0}]!", uid));
-						initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
-								actionsLog);
-						syncItemLogService.save(itemLog);
+					if (!ignored) {
+						boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
+						actionsLog = saveActionLogs(actionsLog, log.getId());
+						//
+						if (!existingItemLog) {
+							addToItemLog(itemLog, MessageFormat.format("Missing action log for UID [{0}]!", uid));
+							initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
+									actionsLog);
+							syncItemLogService.save(itemLog);
+						}
 					}
 				}
 			}
@@ -785,6 +792,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 		List<SysSyncActionLogDto> actionsLog = context.getActionLogs();
 		SysSystemDto system = context.getSystem();
 		SysSyncItemLogDto itemLog = new SysSyncItemLogDto();
+		boolean ignored = false;
 		try {
 			// Default setting for log item
 			itemLog.setIdentification(entity.getId().toString());
@@ -825,6 +833,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 					&& lastResult.getEvent().getProperties().containsKey(SynchronizationService.RESULT_SYNC_ITEM)) {
 				result = (boolean) lastResult.getEvent().getProperties().get(SynchronizationService.RESULT_SYNC_ITEM);
 			}
+			ignored = shouldBeIgnored(lastResult);
 
 			// Update (increased counter) and check state of sync (maybe was cancelled from
 			// sync or LRT)
@@ -837,14 +846,16 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			LOG.error(message, ex);
 		} finally {
 			synchronizationConfigService.save(config);
-			boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
-			actionsLog = (List<SysSyncActionLogDto>) syncActionLogService.saveAll(actionsLog);
-			//
-			if (!existingItemLog) {
-				addToItemLog(itemLog, MessageFormat.format("Missing action log for entity [{0}]!", entity.getId()));
-				initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
-						actionsLog);
-				syncItemLogService.save(itemLog);
+			if (!ignored) {
+				boolean existingItemLog = existItemLogInActions(actionsLog, itemLog);
+				actionsLog = (List<SysSyncActionLogDto>) syncActionLogService.saveAll(actionsLog);
+				//
+				if (!existingItemLog) {
+					addToItemLog(itemLog, MessageFormat.format("Missing action log for entity [{0}]!", entity.getId()));
+					initSyncActionLog(SynchronizationActionType.UNKNOWN, OperationResultType.ERROR, itemLog, log,
+							actionsLog);
+					syncItemLogService.save(itemLog);
+				}
 			}
 		}
 	}
@@ -1032,6 +1043,9 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			// Linked action is IGNORE. We will do nothing
 			initSyncActionLog(SynchronizationActionType.LINKED, OperationResultType.IGNORE, logItem, log, actionLogs);
 			return;
+		case IGNORE_AND_DO_NOT_LOG:
+			// Linked action is IGNORE_AND_DO_NOT_LOG. We will do nothing and LOG NOTHING.
+			return;
 		case UNLINK:
 			// Linked action is UNLINK
 			updateAccountUid(context);
@@ -1093,13 +1107,17 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 		List<IcAttribute> icAttributes = context.getIcObject().getAttributes();
 
 		addToItemLog(logItem, "Account and entity don't exist (missing entity).");
-
+		addToItemLog(logItem, MessageFormat.format("Missing entity action is [{0}]", actionType));
+		
 		switch (actionType) {
 		case IGNORE:
 			// Ignore we will do nothing
 			addToItemLog(logItem, "Missing entity action is IGNORE, we will do nothing.");
 			initSyncActionLog(SynchronizationActionType.MISSING_ENTITY, OperationResultType.IGNORE, logItem, log,
 					actionLogs);
+			return;
+		case IGNORE_AND_DO_NOT_LOG:
+			// Missing account action is IGNORE_AND_DO_NOT_LOG. We will do nothing and LOG NOTHING.
 			return;
 		case CREATE_ENTITY:
 
@@ -1156,6 +1174,9 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			// Ignore we will do nothing
 			initSyncActionLog(SynchronizationActionType.UNLINKED, OperationResultType.IGNORE, logItem, log, actionLogs);
 			return;
+		case IGNORE_AND_DO_NOT_LOG:
+			// Linked action is IGNORE_AND_DO_NOT_LOG. We will do nothing and LOG NOTHING.
+			return;
 		case LINK:
 			// Create IdM account
 			doCreateLink(entity, false, context);
@@ -1210,6 +1231,9 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			// Ignore we will do nothing
 			initSyncActionLog(SynchronizationActionType.MISSING_ACCOUNT, OperationResultType.IGNORE, logItem, log,
 					actionLogs);
+			return;
+		case IGNORE_AND_DO_NOT_LOG:
+			// Missing account action is IGNORE_AND_DO_NOT_LOG. We will do nothing and LOG NOTHING.
 			return;
 		case CREATE_ACCOUNT:
 			doUpdateAccount(account, entityType, log, logItem, actionLogs);
@@ -2702,5 +2726,16 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	 */
 	protected boolean skipEntityUpdate(DTO entity, SynchronizationContext context) {
 		return false;
+	}
+	
+	/**
+	 * Check that the strategy was set to IGNORE_AND_DO_NOT_LOG.
+	 * 
+	 * @param lastResult
+	 * @return
+	 */
+	private boolean shouldBeIgnored(EventResult<SysSyncItemLogDto> lastResult) {
+		return lastResult != null && lastResult.getEvent().getContent() != null &&
+				lastResult.getEvent().getContent().getLog().contains(SynchronizationActionType.IGNORE_AND_DO_NOT_LOG.name());
 	}
 }

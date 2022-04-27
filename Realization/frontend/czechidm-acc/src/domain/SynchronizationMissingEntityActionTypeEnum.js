@@ -31,6 +31,9 @@ export default class SynchronizationMissingEntityActionTypeEnum extends Enums.Ab
       case this.IGNORE: {
         return 'primary';
       }
+      case this.IGNORE_AND_DO_NOT_LOG: {
+        return 'primary';
+      }
       default: {
         return 'default';
       }
@@ -40,3 +43,4 @@ export default class SynchronizationMissingEntityActionTypeEnum extends Enums.Ab
 
 SynchronizationMissingEntityActionTypeEnum.CREATE_ENTITY = Symbol('CREATE_ENTITY');
 SynchronizationMissingEntityActionTypeEnum.IGNORE = Symbol('IGNORE');
+SynchronizationMissingEntityActionTypeEnum.IGNORE_AND_DO_NOT_LOG = Symbol('IGNORE_AND_DO_NOT_LOG');

@@ -1644,24 +1644,28 @@
       "UNLINK": "Remove link",
       "UNLINK_AND_REMOVE_ROLE": "Remove link and appropriate roles",
       "DELETE_ENTITY": "Delete entity",
-      "IGNORE": "Ignore"
+      "IGNORE": "Ignore",
+      "IGNORE_AND_DO_NOT_LOG": "Ignore and do not log"
     },
     "SynchronizationLinkedActionTypeEnum": {
       "UPDATE_ENTITY": "Update entity",
       "UNLINK": "Remove link",
       "UNLINK_AND_REMOVE_ROLE": "Remove link and appropriate roles",
       "UPDATE_ACCOUNT": "Update account",
-      "IGNORE": "Ignore"
+      "IGNORE": "Ignore",
+      "IGNORE_AND_DO_NOT_LOG": "Ignore and do not log"
     },
     "SynchronizationMissingEntityActionTypeEnum": {
       "CREATE_ENTITY": "Create entity",
-      "IGNORE": "Ignore"
+      "IGNORE": "Ignore",
+      "IGNORE_AND_DO_NOT_LOG": "Ignore and do not log"
     },
     "SynchronizationUnlinkedActionTypeEnum": {
       "LINK": "Create link",
       "LINK_AND_UPDATE_ENTITY": "Create link and update entity",
       "LINK_AND_UPDATE_ACCOUNT": "Create link and update account",
-      "IGNORE": "Ignore"
+      "IGNORE": "Ignore",
+      "IGNORE_AND_DO_NOT_LOG": "Ignore and do not log"
     },
     "SynchronizationInactiveOwnerBehaviorTypeEnum": {
       "DO_NOT_LINK": "DO_NOT_LINK - Don't link the account and end its processing, if there is no valid contract for the default role",

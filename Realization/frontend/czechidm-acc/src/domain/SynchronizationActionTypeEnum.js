@@ -73,6 +73,9 @@ export default class SynchronizationActionTypeEnum extends Enums.AbstractEnum {
       case this.IGNORE: {
         return 'info';
       }
+      case this.IGNORE_AND_DO_NOT_LOG: {
+        return 'info';
+      }
       default: {
         return 'default';
       }
@@ -95,3 +98,4 @@ SynchronizationActionTypeEnum.MISSING_ENTITY = Symbol('MISSING_ENTITY');
 SynchronizationActionTypeEnum.UNLINKED = Symbol('UNLINKED');
 SynchronizationActionTypeEnum.MISSING_ACCOUNT = Symbol('MISSING_ACCOUNT');
 SynchronizationActionTypeEnum.IGNORE = Symbol('IGNORE');
+SynchronizationActionTypeEnum.IGNORE_AND_DO_NOT_LOG = Symbol('IGNORE_AND_DO_NOT_LOG');
