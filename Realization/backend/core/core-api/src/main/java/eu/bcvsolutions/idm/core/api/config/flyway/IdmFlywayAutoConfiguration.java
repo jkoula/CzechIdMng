@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.api.config.flyway;
 
 import javax.sql.DataSource;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.DatasourceConfig;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.callback.FlywayCallback;
@@ -10,15 +11,10 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
-import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
-import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
-import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.flyway.*;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
@@ -29,11 +25,10 @@ import org.springframework.core.io.ResourceLoader;
  * @author Radek Tomiška
  */
 @SuppressWarnings("deprecation") // third party warning
-@Configuration
 @ConditionalOnClass(Flyway.class)
 @ConditionalOnBean(DataSource.class)
 @ConditionalOnProperty(prefix = "flyway", name = "enabled", matchIfMissing = true)
-@AutoConfigureAfter({ DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
+@AutoConfigureAfter({ DatasourceConfig.class, HibernateJpaAutoConfiguration.class })
 public class IdmFlywayAutoConfiguration extends FlywayAutoConfiguration {
 	
 	/**
@@ -42,7 +37,8 @@ public class IdmFlywayAutoConfiguration extends FlywayAutoConfiguration {
 	 * @author Radek Tomiška
 	 */
 	@Configuration
-	@Import(FlywayJpaDependencyConfiguration.class)
+	@Import({FlywayJpaDependencyConfiguration.class, DatasourceConfig.class})
+	@EnableConfigurationProperties({ DataSourceProperties.class, FlywayProperties.class })
 	public static class IdmFlywayConfiguration extends FlywayAutoConfiguration.FlywayConfiguration {
 
 		public IdmFlywayConfiguration(

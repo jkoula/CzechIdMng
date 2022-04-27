@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -40,7 +41,9 @@ public class RoleCatalogueDeleteProcessor extends CoreEventProcessor<IdmRoleCata
 	//
 	@Autowired private IdmRoleCatalogueService service;
 	@Autowired private IdmRoleCatalogueRoleService roleCatalogueRoleService;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 
 	public RoleCatalogueDeleteProcessor() {
 		super(RoleCatalogueEventType.DELETE);

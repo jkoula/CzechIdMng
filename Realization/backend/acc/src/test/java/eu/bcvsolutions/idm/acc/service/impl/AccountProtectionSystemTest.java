@@ -7,9 +7,8 @@ import javax.persistence.EntityManager;
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
 
-import eu.bcvsolutions.idm.acc.dto.*;
-import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
-import eu.bcvsolutions.idm.core.api.dto.*;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +48,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 	@Autowired
 	private SysSystemMappingService systemMappingService;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	@Autowired
 	private IdmRoleService roleService;

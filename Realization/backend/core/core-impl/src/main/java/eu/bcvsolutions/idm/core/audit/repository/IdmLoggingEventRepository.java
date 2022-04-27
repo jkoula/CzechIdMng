@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.audit.repository;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreDatasourceExcluded;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +14,7 @@ import eu.bcvsolutions.idm.core.audit.entity.IdmLoggingEvent;
  * @author Ondrej Kopr <kopr@xyxy.cz>
  *
  */
+@CoreDatasourceExcluded
 public interface IdmLoggingEventRepository extends AbstractEntityRepository<IdmLoggingEvent> {
 
 	/**

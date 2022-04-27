@@ -63,7 +63,7 @@ public class SchedulerConfig implements SchedulerConfiguration {
 	 * @throws IOException
 	 */
 	@Bean
-    public SchedulerFactoryBean schedulerFactoryBean(ApplicationContext context) {
+    public SchedulerFactoryBean schedulerFactoryBean(ApplicationContext context, DataSource dataSource) {
 		try {
 			Properties quartzProperties = quartzProperties();
 			SchedulerFactoryBean factory = new SchedulerFactoryBean();
@@ -71,7 +71,7 @@ public class SchedulerConfig implements SchedulerConfiguration {
 	        // if store is set to DB set data source, else store in RAM
 	        Object store = quartzProperties.get("org.quartz.jobStore.class");
 	        if (store != null && !StringUtils.equals(store.toString(), RAMJobStore.class.getCanonicalName())) {
-	        	DataSource dataSource = (DataSource) context.getBean("dataSource");
+	        	//DataSource dataSource = (DataSource) context.getBean("dataSource");
 	        	factory.setDataSource(dataSource);
 	        }
 	        factory.setJobFactory(jobFactory(context));
@@ -92,11 +92,11 @@ public class SchedulerConfig implements SchedulerConfiguration {
 
     @DependsOn(CoreFlywayConfig.NAME)
 	@Bean(name = "schedulerManager")
-	public SchedulerManager schedulerManager(ApplicationContext context, IdmDependentTaskTriggerRepository dependentTaskTriggerRepository) {
-    	Scheduler scheduler = schedulerFactoryBean(context).getScheduler();
+	public SchedulerManager schedulerManager(ApplicationContext context, IdmDependentTaskTriggerRepository dependentTaskTriggerRepository, SchedulerFactoryBean schedulerFactoryBean) {
+    	Scheduler scheduler = schedulerFactoryBean.getScheduler();
     	SchedulerManager manager = new DefaultSchedulerManager(
 				context, 
-				schedulerFactoryBean(context).getScheduler(), 
+				schedulerFactoryBean.getScheduler(),
 				dependentTaskTriggerRepository);
 		// read all task - checks obsolete task types and remove them before scheduler starts automatically
 		try {

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.Session;
 import org.quartz.DisallowConcurrentExecution;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,7 @@ public class ClearDirtyStateForContractSliceTaskExecutor extends AbstractSchedul
 	@Autowired
 	private ContractSliceManager contractSliceManager;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	
 	@Override

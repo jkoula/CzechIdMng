@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
+
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.GenericTypeResolver;
@@ -80,6 +82,7 @@ public abstract class AbstractBulkAction<DTO extends AbstractDto, F extends Base
 	@Autowired
 	private PlatformTransactionManager platformTransactionManager;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 
 	@Override
