@@ -69,6 +69,7 @@ function NavigationIdentity(props) {
         }));
         history.replace(`/`);
       }
+      localStorage.removeItem("switchUser");
     }));
   };
   //

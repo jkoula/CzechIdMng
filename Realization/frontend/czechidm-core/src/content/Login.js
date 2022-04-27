@@ -21,17 +21,20 @@ const dataManager = new DataManager();
  * Login box.
  *
  * @author Radek Tomiška
+ * @author Roman Kučera
  */
 class Login extends Basic.AbstractContent {
 
   constructor(props, context) {
     super(props, context);
     const { query } = this.props.location;
+    const switchUser = localStorage.getItem("switchUser");
     //
     this.state = {
       showTwoFactor: false,
       token: null,
-      nocas: query && !!query.nocas
+      nocas: query && !!query.nocas,
+      switchUser: switchUser
     };
   }
 
@@ -60,7 +63,7 @@ class Login extends Basic.AbstractContent {
   componentDidMount() {
     super.componentDidMount();
     const { userContext, casEnabled, location } = this.props;
-    const { nocas } = this.state;
+    const { nocas, switchUser } = this.state;
     const _casEnabled = casEnabled && !nocas;
     //
     if (!_casEnabled) {
@@ -71,7 +74,7 @@ class Login extends Basic.AbstractContent {
       this.refs.form.setData(data);
     }
     //
-    if (!SecurityManager.isAuthenticated(userContext) && !userContext.isTryRemoteLogin) {
+    if (!SecurityManager.isAuthenticated(userContext) && !userContext.isTryRemoteLogin && !userContext.isExpired && !switchUser) {
       this.context.store.dispatch(securityManager.receiveLogin(
         _.merge({}, userContext, {
           isTryRemoteLogin: true

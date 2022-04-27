@@ -23,6 +23,7 @@ public enum SynchronizationActionType {
 	UNLINKED, // situation (for IGNORE and WF sort)
 	MISSING_ACCOUNT, // situation (for IGNORE and WF sort)
 	IGNORE,
+	IGNORE_AND_DO_NOT_LOG,
 	UNKNOWN;
 
 }

@@ -5,7 +5,9 @@ import java.util.concurrent.Executor;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.model.repository.filter.MonitoringIgnorableFilterBuilder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -125,6 +127,7 @@ import eu.bcvsolutions.idm.core.model.repository.IdmTokenRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmTreeNodeRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmTreeTypeRepository;
 import eu.bcvsolutions.idm.core.model.repository.filter.DefaultFilterManager;
+import eu.bcvsolutions.idm.core.model.repository.filter.MonitoringIgnorableFilterBuilder;
 import eu.bcvsolutions.idm.core.model.repository.thin.IdmIdentityRoleThinRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultConfigurationService;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultEntityEventManager;
@@ -198,7 +201,9 @@ public class IdmServiceConfiguration {
 	@Autowired private ApplicationContext context;
 	@Qualifier(SchedulerConfiguration.TASK_EXECUTOR_NAME)
 	@Autowired private Executor executor;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	//
 	// Spring Data repositories through interfaces - they are constructed automatically
 	@Autowired private IdmConfigurationRepository configurationRepository;

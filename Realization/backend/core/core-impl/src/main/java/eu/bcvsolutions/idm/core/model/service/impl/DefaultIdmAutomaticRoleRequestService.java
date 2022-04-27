@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -39,6 +40,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmAutomaticRoleAttributeRuleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmAutomaticRoleAttributeRuleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmAutomaticRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
@@ -130,12 +132,35 @@ public class DefaultIdmAutomaticRoleRequestService extends
 		// Validation on exist some rule
 		if (AutomaticRoleRequestType.ATTRIBUTE == request.getRequestType()
 				&& RequestOperationType.REMOVE != request.getOperation()) {
-			IdmAutomaticRoleAttributeRuleRequestFilter ruleFilter = new IdmAutomaticRoleAttributeRuleRequestFilter();
-			ruleFilter.setRoleRequestId(requestId);
-
+			IdmAutomaticRoleAttributeRuleRequestFilter ruleRequestFilter = new IdmAutomaticRoleAttributeRuleRequestFilter();
+			ruleRequestFilter.setRoleRequestId(requestId);
 			List<IdmAutomaticRoleAttributeRuleRequestDto> ruleConcepts = automaticRoleRuleRequestService
-					.find(ruleFilter, null).getContent();
-			if (ruleConcepts.isEmpty()) {
+					.find(ruleRequestFilter, null).getContent();
+			boolean addingOrUpdatingRules = ruleConcepts
+					.stream()
+					.anyMatch(ruleConcept -> RequestOperationType.UPDATE == ruleConcept.getOperation() ||
+							RequestOperationType.ADD == ruleConcept.getOperation());
+			boolean hasOtherRules = false;
+			if (!addingOrUpdatingRules && RequestOperationType.UPDATE == request.getOperation()) {
+				/* We are not adding or updating rules so we need to check current rules
+				to see that some will remain.*/
+				List<UUID> removedRulesIds = ruleConcepts
+						.stream()
+						.filter(rule -> RequestOperationType.REMOVE == rule.getOperation())
+						.map(IdmAutomaticRoleAttributeRuleRequestDto::getRule)
+						.collect(Collectors.toList());
+				if (request.getAutomaticRole() != null) {
+					IdmAutomaticRoleAttributeRuleFilter ruleFilter = new IdmAutomaticRoleAttributeRuleFilter();
+					ruleFilter.setAutomaticRoleAttributeId(request.getAutomaticRole());
+					List<IdmAutomaticRoleAttributeRuleDto> currentRules = automaticRoleRuleService.find(ruleFilter, null).getContent();
+					hasOtherRules = currentRules
+							.stream()
+							.anyMatch(rule -> !removedRulesIds.contains(rule.getId())
+							);
+				} 
+			}
+			
+			if (ruleConcepts.isEmpty() || (!addingOrUpdatingRules && !hasOtherRules)) {
 				throw new RoleRequestException(CoreResultCode.AUTOMATIC_ROLE_REQUEST_START_WITHOUT_RULE,
 						ImmutableMap.of("request", request.getName()));
 			}

@@ -1,6 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [12.2.0]
+- 🟡 [#2613](https://redmine.czechidm.com/issues/2613) - When some tree node has non existing parent in source, IdM will log it as create error item. **If the tree node was created with correct parent and later the parent has changed in the source, IdM will process it as update error instead of missing account!**
 
 ## [12.1.0]
 

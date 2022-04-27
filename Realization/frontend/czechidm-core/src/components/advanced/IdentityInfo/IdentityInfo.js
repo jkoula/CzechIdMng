@@ -117,6 +117,7 @@ export class IdentityInfo extends AbstractEntityInfo {
           message: this.i18n('content.identity.switch-user.message.success', { username })
         });
       }
+      localStorage.removeItem("switchUser");
     }));
   }
 

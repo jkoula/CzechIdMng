@@ -40,7 +40,7 @@ class DynamicTaskDetail extends Basic.AbstractContent {
    */
   validateDecisionReason(decision, confirmResult, caller) {
     let result = true;
-    if (confirmResult === 'confirm') {
+    if (confirmResult === 'confirm' && this.refs.decisionForm !== undefined) {
       result = this.refs.decisionForm.isFormValid();
     }
     return result;

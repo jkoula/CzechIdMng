@@ -1,9 +1,12 @@
 package eu.bcvsolutions.idm;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.DatasourceConfig;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -23,17 +26,17 @@ import eu.bcvsolutions.idm.core.api.repository.ExtendedJpaRepositoryFactoryBean;
  * @author Radek Tomiška
  *
  */
-@EnableAutoConfiguration(exclude = { FlywayAutoConfiguration.class, SecurityAutoConfiguration.class })
+@EnableAutoConfiguration(exclude = { FlywayAutoConfiguration.class, SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class,
+        HibernateJpaAutoConfiguration.class })
 @EnablePluginRegistries({ ModuleDescriptor.class })
 @EnableCaching
 @EnableScheduling
-@EnableJpaRepositories(repositoryFactoryBeanClass = ExtendedJpaRepositoryFactoryBean.class)
 public class IdmApplication extends SpringBootServletInitializer {
 	
 	@Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		application.bannerMode(Banner.Mode.OFF);
-        return application.sources(IdmApplication.class, IdmFlywayAutoConfiguration.class);
+        return application.sources(IdmApplication.class, DatasourceConfig.class);
     }
 	
 }

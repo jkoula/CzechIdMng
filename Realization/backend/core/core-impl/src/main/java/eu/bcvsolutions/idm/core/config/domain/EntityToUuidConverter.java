@@ -2,11 +2,16 @@ package eu.bcvsolutions.idm.core.config.domain;
 
 import static eu.bcvsolutions.idm.core.api.utils.EntityUtils.getFirstFieldInClassHierarchy;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.persistence.EntityNotFoundException;
+
+import org.hibernate.proxy.HibernateProxy;
+import org.hibernate.proxy.LazyInitializer;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
@@ -48,7 +53,9 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 		if (context.getSource() == null || !(context.getSource().getId() instanceof UUID)) {
 			return null;
 		}
-		
+
+		BaseEntity entity = null;
+
 		MappingContext<?, ?> parentContext = context.getParent();
 		if (parentContext != null && parentContext.getDestination() != null
 				&& AbstractDto.class.isAssignableFrom(parentContext.getDestinationType())
@@ -57,8 +64,10 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 
 			try {
 				AbstractDto parentDto = (AbstractDto) parentContext.getDestination();
-				BaseEntity entity = (BaseEntity) context.getSource();
+				entity = context.getSource();
 				Map<String, BaseDto> embedded = parentDto.getEmbedded();
+
+				entity = lookUpEntityIfEntityIsHibernateProxy(entity);
 
 				PropertyMapping propertyMapping = (PropertyMapping) context.getMapping();
 				// Find name of field by property mapping
@@ -97,9 +106,34 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 				throw new CoreException(ex);
 			}
 		}
-		return (UUID) context.getSource().getId();
+		if (entity == null) {
+			return (UUID) context.getSource().getId();
+		}
+		return (UUID) entity.getId();
 	}
-	
+
+	/**
+	 * If entity is HibernateProxy we will try to look up the entity again from DB.
+	 * We will do the look-up only if implementation in this hibernate proxy throws EntityNotFoundException
+	 * This is used for use case when audit tables where truncated. This solution will return live data instead of nothing which
+	 * is better for us.
+	 * @param entity
+	 * @return entity
+	 */
+	private BaseEntity lookUpEntityIfEntityIsHibernateProxy(BaseEntity entity) {
+		if (entity instanceof HibernateProxy) {
+			LazyInitializer hibernateLazyInitializer = ((HibernateProxy) entity).getHibernateLazyInitializer();
+			try {
+				hibernateLazyInitializer.getImplementation();
+			} catch (EntityNotFoundException ex){
+				String entityName = hibernateLazyInitializer.getEntityName();
+				Serializable identifier = hibernateLazyInitializer.getIdentifier();
+				entity = getLookupService().lookupEntity(entityName, identifier);
+			}
+		}
+		return entity;
+	}
+
 	private LookupService getLookupService() {
 		if (this.lookupService == null) {
 			Assert.notNull(applicationContext, "Application context is required!");

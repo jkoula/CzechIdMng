@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.modelmapper.Condition;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -48,6 +49,7 @@ public class ModelMapperConfig {
 	public static final String NAME = "modelMapperConfig";
 
 	@PersistenceContext
+	@CoreEntityManager
 	private EntityManager entityManager;
 	@Autowired
 	private ApplicationContext applicationContext;

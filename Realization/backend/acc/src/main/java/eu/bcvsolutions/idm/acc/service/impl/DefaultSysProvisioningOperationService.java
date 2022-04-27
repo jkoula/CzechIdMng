@@ -20,6 +20,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.sql.DataSource;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +118,9 @@ public class DefaultSysProvisioningOperationService
 	@Autowired private SysSystemEntityService systemEntityService;
 	@Autowired private ProvisioningConfiguration provisioningConfiguration;
 	@Autowired private SysProvisioningAttributeService provisioningAttributeService;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	@Autowired private IdmFlywayMigrationStrategy flywayMigrationStrategy;
 	@Autowired private DataSource dataSource;
 

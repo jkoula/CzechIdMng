@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
@@ -64,7 +65,7 @@ import joptsimple.internal.Strings;
 @Component("accTestHelper")
 public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTestHelper implements TestHelper {
 	
-	@Autowired private EntityManager entityManager;	
+	@Autowired @CoreEntityManager private EntityManager entityManager;
 	@Autowired private SysSystemService systemService;
 	@Autowired private SysSystemMappingService systemMappingService;
 	@Autowired private SysSystemAttributeMappingService systemAttributeMappingService;

@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -44,7 +45,9 @@ public class FormAttributeDeleteProcessor
 	private final PluginRegistry<FormValueService<?>, Class<?>> formValueServices;
 	//
 	@Autowired private IdmFormAttributeService service;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	
 	@Autowired
 	public FormAttributeDeleteProcessor(List<? extends FormValueService<?>> formValueServices) {

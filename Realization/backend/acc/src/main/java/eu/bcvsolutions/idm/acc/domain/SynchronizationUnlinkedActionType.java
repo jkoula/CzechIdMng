@@ -11,6 +11,7 @@ public enum SynchronizationUnlinkedActionType {
 	LINK(SynchronizationActionType.LINK),
 	LINK_AND_UPDATE_ACCOUNT(SynchronizationActionType.LINK_AND_UPDATE_ACCOUNT), // create link and produce entity save event (call provisioning)
 	IGNORE(SynchronizationActionType.IGNORE),
+	IGNORE_AND_DO_NOT_LOG(SynchronizationActionType.IGNORE_AND_DO_NOT_LOG),
 	LINK_AND_UPDATE_ENTITY(SynchronizationActionType.LINK_AND_UPDATE_ENTITY); // create link, update entity
 	
 	private SynchronizationActionType action;

@@ -12,7 +12,8 @@ public enum SynchronizationLinkedActionType {
 	UPDATE_ACCOUNT(SynchronizationActionType.UPDATE_ACCOUNT), // produce only entity save event (call provisioning)
 	UNLINK(SynchronizationActionType.UNLINK),
 	UNLINK_AND_REMOVE_ROLE(SynchronizationActionType.UNLINK_AND_REMOVE_ROLE),
-	IGNORE(SynchronizationActionType.IGNORE);
+	IGNORE(SynchronizationActionType.IGNORE),
+	IGNORE_AND_DO_NOT_LOG(SynchronizationActionType.IGNORE_AND_DO_NOT_LOG);
 	
 	private SynchronizationActionType action;
 	

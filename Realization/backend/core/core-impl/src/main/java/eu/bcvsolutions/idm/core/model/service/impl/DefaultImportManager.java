@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +113,7 @@ public class DefaultImportManager implements ImportManager {
 	@Autowired
 	private FormService formService;
 	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultImportManager.class);

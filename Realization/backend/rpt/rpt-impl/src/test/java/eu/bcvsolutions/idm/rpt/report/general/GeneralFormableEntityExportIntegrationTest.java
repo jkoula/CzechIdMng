@@ -125,6 +125,61 @@ public class GeneralFormableEntityExportIntegrationTest extends AbstractIntegrat
 		Assert.assertNotNull(parsed.get(identityDisabled.getId().toString()));
 		Assert.assertEquals("TESTVAL", parsed.get(identityOne.getId().toString()).get("testAttrRpt"));
 		Assert.assertEquals("[B, A]", parsed.get(identityOne.getId().toString()).get("testAttrRptMulti"));
+		reportService.delete(reportDto);
+	}
+	
+	@Test
+	public void testReportWithoutValueSpecifiedDuplicateColumnName() throws IOException {
+		// prepare test identities
+		IdmIdentityDto identityOne = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto identityDisabled = getHelper().createIdentity((GuardedString) null);
+		identityService.disable(identityDisabled.getId());
+
+		String eavCode = "firstName";
+		IdmFormAttributeDto testAttrRpt = getHelper().createEavAttribute(eavCode, IdmIdentity.class, PersistentType.SHORTTEXT);
+		getHelper().setEavValue(identityOne, testAttrRpt, IdmIdentity.class, "TESTVAL", PersistentType.SHORTTEXT);
+		//
+		IdmBulkActionDto bulkAction = new IdmBulkActionDto();
+		bulkAction.setEntityClass(IdmIdentity.class.getCanonicalName());
+		bulkAction.setFilterClass(IdmIdentityFilter.class.getCanonicalName());
+		bulkAction.setModule(RptModuleDescriptor.MODULE_ID);
+		bulkAction.setIdentifiers(new HashSet<UUID>(Arrays.asList(identityOne.getId(), identityDisabled.getId())));
+		bulkAction.setId(AbstractFormableEntityExport.REPORT_NAME);
+		bulkAction.setName(AbstractFormableEntityExport.REPORT_NAME);
+
+		bulkActionManager.processAction(bulkAction);
+
+		RptReportFilter reportFilter = new RptReportFilter();
+		reportFilter.setText(AbstractFormableEntityExport.REPORT_NAME);
+
+		List<RptReportDto> content = reportService.find(reportFilter, null).getContent();
+
+		Assert.assertFalse(content.isEmpty());
+		Assert.assertEquals(1, content.size());
+
+		RptReportDto reportDto = content.get(0);
+		
+		Assert.assertEquals(
+				CoreResultCode.LONG_RUNNING_TASK_PARTITIAL_DOWNLOAD.getCode(), 
+				longRunningTaskManager.getLongRunningTask(reportDto.getLongRunningTask()).getResult().getCode()
+		);
+
+		RptRenderedReportDto render = reportManager.render(reportDto, FormableEntityXlsxRenderer.NAME);
+
+		Assert.assertNotNull(render);
+
+		XSSFSheet sheetAt = null;
+		try (XSSFWorkbook workbook = new XSSFWorkbook(render.getRenderedReport())) {
+			sheetAt = workbook.getSheetAt(0);
+		}
+
+		Map<String, Map<String, String>> parsed = sheetToMap(sheetAt);
+
+		Assert.assertEquals(2, parsed.size());
+		Assert.assertNotNull(parsed.get(identityOne.getId().toString()));
+		Assert.assertNotNull(parsed.get(identityDisabled.getId().toString()));
+		Assert.assertEquals("TESTVAL", parsed.get(identityOne.getId().toString()).get(eavCode + "_eav1"));
+		reportService.delete(reportDto);
 	}
 
 	private Map<String, Map<String, String>> sheetToMap(XSSFSheet sheet) {

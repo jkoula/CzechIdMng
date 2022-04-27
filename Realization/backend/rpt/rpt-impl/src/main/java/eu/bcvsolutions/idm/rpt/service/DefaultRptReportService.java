@@ -33,7 +33,7 @@ import eu.bcvsolutions.idm.rpt.repository.RptReportRepository;
  * CRUD for generated reports
  * 
  * @author Radek Tomiška
- *
+ * @author Tomáš Doischer
  */
 @Service("rptReportService")
 public class DefaultRptReportService 
@@ -119,6 +119,10 @@ public class DefaultRptReportService
 		UUID longRunningTaskId = filter.getLongRunningTaskId();
 		if (longRunningTaskId != null) {
 			predicates.add(builder.equal(root.get(RptReport_.longRunningTask).get(IdmLongRunningTask_.id), longRunningTaskId));
+		}
+		String reportExecutorName = filter.getExecutorName();
+		if (!StringUtils.isBlank(reportExecutorName)) {
+			predicates.add(builder.equal(root.get(RptReport_.executorName), reportExecutorName));
 		}
 		//
 		return predicates;

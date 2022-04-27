@@ -111,8 +111,9 @@ public class EntityUtils {
 	public static boolean isValidNowOrInFuture(ValidableEntity entity) {
 		if (entity == null) {
 			return false;
-		}	
+		}
 		LocalDate now = LocalDate.now();
+		 
 		return entity.getValidTill() == null || entity.getValidTill().compareTo(now) >= 0;
 	}	
 	

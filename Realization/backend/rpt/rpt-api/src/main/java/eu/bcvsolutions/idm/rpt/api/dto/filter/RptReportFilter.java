@@ -13,11 +13,13 @@ import eu.bcvsolutions.idm.rpt.api.dto.RptReportDto;
  * Generated report filter.
  * 
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  *
  */
 public class RptReportFilter extends DataFilter {
 	
 	public final static String PARAMETER_LONG_RUNNING_TASK_ID = "longRunningTaskId"; 
+	public final static String PARAMETER_REPORT_EXECUTOR_NAME = "executorName"; 
 	//
 	private ZonedDateTime from;
 	private ZonedDateTime till;
@@ -52,5 +54,13 @@ public class RptReportFilter extends DataFilter {
 	
 	public void setLongRunningTaskId(UUID longRunningTaskId) {
 		data.set(PARAMETER_LONG_RUNNING_TASK_ID, longRunningTaskId);
+	}
+
+	public String getExecutorName() {
+		return (String) data.getFirst(PARAMETER_REPORT_EXECUTOR_NAME);
+	}
+
+	public void setExecutorName(String reportExecutorName) {
+		data.set(PARAMETER_REPORT_EXECUTOR_NAME, reportExecutorName);
 	}
 }

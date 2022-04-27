@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -70,7 +71,9 @@ public class TreeNodeDeleteProcessor extends CoreEventProcessor<IdmTreeNodeDto> 
 	@Autowired private IdmContractPositionService contractPositionService;
 	@Autowired private IdmAutomaticRoleRequestService roleRequestService;
 	@Autowired private EntityStateManager entityStateManager;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	@Autowired private LongRunningTaskManager longRunningTaskManager;
 	
 	public TreeNodeDeleteProcessor() {

@@ -79,6 +79,7 @@ import eu.bcvsolutions.idm.ic.impl.IcObjectClassImpl;
  * Default implementation of tree sync.
  * 
  * @author svandav
+ * @author Roman Kucera
  *
  */
 @Component
@@ -520,13 +521,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 			accountsUseInTreeList.add(root);
 			IcConnectorObject account = accountsMap.get(root);
 
-			SynchronizationContext itemContext = cloneItemContext(context);
-			itemContext //
-					.addUid(root) //
-					.addIcObject(account) //
-					.addAccount(null) //
-					.addTokenAttribute(tokenAttribute) //
-					.addGeneratedUid(null); //
+			SynchronizationContext itemContext = getItemContext(context, root, account, tokenAttribute);
 
 			boolean result = handleIcObject(itemContext);
 			if (!result) {
@@ -540,10 +535,32 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 			}
 		}
 
+		Set<String> allNodesFromSystem = new HashSet<>(accountsMap.keySet());
+		allNodesFromSystem.removeAll(accountsUseInTreeList);
+
+		allNodesFromSystem.forEach(uid -> {
+			accountsUseInTreeList.add(uid);
+			IcConnectorObject account = accountsMap.get(uid);
+			SynchronizationContext itemContext = getItemContext(context, uid, account, tokenAttribute);
+			handleIcObject(itemContext);
+		});
+
 		if (config.isReconciliation()) {
 			// We do reconciliation (find missing account)
 			startReconciliation(entityType, accountsUseInTreeList, config, system, log, actionsLog);
 		}
+
+	}
+
+	private SynchronizationContext getItemContext(SynchronizationContext context, String uid, IcConnectorObject account, AttributeMapping tokenAttribute) {
+		SynchronizationContext itemContext = cloneItemContext(context);
+		itemContext //
+				.addUid(uid) //
+				.addIcObject(account) //
+				.addAccount(null) //
+				.addTokenAttribute(tokenAttribute) //
+				.addGeneratedUid(null); //
+		return itemContext;
 	}
 
 	private void deleteChildrenRecursively(IdmTreeNodeDto treeNode, SysSyncItemLogDto logItem) {
