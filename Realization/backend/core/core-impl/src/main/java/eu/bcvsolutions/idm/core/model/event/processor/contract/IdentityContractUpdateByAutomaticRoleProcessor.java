@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
@@ -73,7 +75,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 	@Autowired private IdmContractPositionService contractPositionService;
 	@Autowired private IdmRoleRequestService roleRequestService;
 	@Autowired private EntityStateManager entityStateManager;
-	
+
 	public IdentityContractUpdateByAutomaticRoleProcessor() {
 		super(IdentityContractEventType.NOTIFY);
 	}
@@ -126,6 +128,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			return new DefaultEventResult<>(event, this);
 		}
 		//
+		List<UUID> changedIdentityRoles = Lists.newArrayList(); // we will list changed identity role to only process them once
 		if (previous == null || !Objects.equals(newPosition, previousPosition) || validityChangedToValid) {
 			// work positions has some difference or validity changes
 			List<IdmIdentityRoleDto> assignedRoles = getAssignedAutomaticRoles(contract.getId());
@@ -188,7 +191,9 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 							conceptRoleRequest.setOperation(ConceptRoleRequestOperation.REMOVE);
 							//
 							roleRequest.getConceptRoles().add(conceptRoleRequest);
-							
+							//
+							changedIdentityRoles.add(identityRole.getId());
+							//
 							iter.remove();
 						} else {
 							// change relation only
@@ -203,6 +208,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 							//
 							roleRequest.getConceptRoles().add(conceptRoleRequest);
 							//
+							changedIdentityRoles.add(identityRole.getId());
 							// new automatic role is not needed
 							addedAutomaticRoles.remove(addedAutomaticRole);
 						}
@@ -212,7 +218,12 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			//
 			// change date - for unchanged assigned roles only
 			if (previous != null && EntityUtils.validableChanged(previous, contract)) {
-				roleRequest.getConceptRoles().addAll(changeValidable(contract, assignedRoles));
+				// these roles were not changed yet
+				List<IdmIdentityRoleDto> identityRolesToUpdate = getAssignedAutomaticRoles(contract.getId())
+						.stream()
+						.filter(ir -> !changedIdentityRoles.contains(ir.getId()))
+						.collect(Collectors.toList());
+				roleRequest.getConceptRoles().addAll(changeValidable(contract, identityRolesToUpdate));
 			}
 			//
 			// add identity roles
@@ -316,5 +327,4 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 	public int getOrder() {
 		return super.getOrder() + 500;
 	}
-
 }

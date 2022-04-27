@@ -39,6 +39,4 @@ public class IdmApplication extends SpringBootServletInitializer {
 		application.bannerMode(Banner.Mode.OFF);
         return application.sources(IdmApplication.class, IdmFlywayAutoConfiguration.class);
     }
-	
-	
 }
