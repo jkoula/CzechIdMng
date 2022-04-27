@@ -25,6 +25,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -98,7 +99,9 @@ public class DefaultAuditService extends AbstractReadWriteDtoService<IdmAuditDto
 	
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultAuditService.class);
 	
-	@PersistenceContext
+	//@PersistenceContext
+	@Autowired
+	@CoreEntityManager
 	private EntityManager entityManager;
 	private final IdmAuditRepository auditRepository;
 	@LazyCollection(LazyCollectionOption.TRUE)

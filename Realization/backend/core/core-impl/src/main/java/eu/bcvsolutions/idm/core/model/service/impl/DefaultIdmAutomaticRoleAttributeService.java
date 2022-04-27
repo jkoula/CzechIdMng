@@ -22,6 +22,7 @@ import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +141,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 			IdmFormAttributeService formAttributeService,
 			IdmAutomaticRoleAttributeRuleService automaticRoleAttributeRuleService,
 			IdmIdentityRoleService identityRoleService,
-			EntityManager entityManager,
+			@CoreEntityManager EntityManager entityManager,
 			LongRunningTaskManager longRunningTaskManager,
 			IdmIdentityContractRepository identityContractRepository) {
 		super(repository);

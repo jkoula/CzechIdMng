@@ -12,6 +12,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.metamodel.SingularAttribute;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.proxy.HibernateProxy;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class DefaultLookupService implements LookupService {
 	@Autowired
 	public DefaultLookupService(
 			ApplicationContext context,
-			EntityManager entityManager,
+			@CoreEntityManager EntityManager entityManager,
 			List<? extends EntityLookup<?>> entityLookups,
 			List<? extends DtoLookup<?>> dtoLookups,
 			List<? extends DtoLookupByExample<?>> dtoLookupByExamples) {

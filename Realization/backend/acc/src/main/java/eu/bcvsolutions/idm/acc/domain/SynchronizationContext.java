@@ -292,7 +292,7 @@ public class SynchronizationContext implements Serializable {
 		this.properties.put(key, object);
 		return this;
 	}
-
+	
 	public Map<String, Object> getProperties() {
 		return this.properties;
 	}

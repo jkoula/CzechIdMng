@@ -721,7 +721,7 @@
       },
       "NavigationSearch": {
         "search": {
-          "placeholder": "Seach user or role"
+          "placeholder": "Search user, role or system"
         },
         "button": {
           "title": "Search"

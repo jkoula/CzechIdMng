@@ -5,6 +5,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccUniformPasswordService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupService;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleTreeNodeFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
@@ -88,7 +89,9 @@ import joptsimple.internal.Strings;
 @Component("accTestHelper")
 public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTestHelper implements TestHelper {
 	
-	@Autowired private EntityManager entityManager;	
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	@Autowired private SysSystemService systemService;
 	@Autowired private SysSystemMappingService systemMappingService;
 	@Autowired private SysSystemAttributeMappingService systemAttributeMappingService;

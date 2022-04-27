@@ -55,5 +55,4 @@ public interface ValidableEntity {
 	default boolean isValidNowOrInFuture() {
 		return EntityUtils.isValidNowOrInFuture(this);
 	}
-	
 }

@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
@@ -232,7 +233,9 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ComplexHrProcessIntegrationTest.class);
 
 	@Autowired private ApplicationContext applicationContext;
-	@Autowired private EntityManager entityManager;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 	@Autowired private SysSystemService systemService;
 	@Autowired private IdmTreeNodeService treeNodeService;
 	@Autowired private IdmTreeTypeService treeTypeService;

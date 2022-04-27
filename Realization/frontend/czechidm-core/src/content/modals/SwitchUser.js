@@ -43,6 +43,7 @@ class SwitchUser extends Basic.AbstractContent {
           message: this.i18n('content.identity.switch-user.message.success', { username })
         });
       }
+      localStorage.removeItem("switchUser");
       // modal is closed on error too => currently logged user is logout anyway
       onHide();
     }));

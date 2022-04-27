@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.hibernate.envers.EntityTrackingRevisionListener;
 import org.hibernate.envers.RevisionType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ public class IdmAuditListener implements EntityTrackingRevisionListener {
 	@Autowired
 	private SecurityService securityService;
 	@PersistenceContext
+	@CoreEntityManager
 	private EntityManager entityManger;
 
 	@Override

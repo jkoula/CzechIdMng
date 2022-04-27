@@ -1645,24 +1645,28 @@
       "UNLINK": "Odstranit vazbu",
       "UNLINK_AND_REMOVE_ROLE": "Odstranit vazbu a navázané role",
       "DELETE_ENTITY": "Smazat entitu",
-      "IGNORE": "Ignorovat"
+      "IGNORE": "Ignorovat",
+      "IGNORE_AND_DO_NOT_LOG": "Ignorovat a nelogovat"
     },
     "SynchronizationLinkedActionTypeEnum": {
       "UPDATE_ENTITY": "Aktualizovat entitu",
       "UNLINK": "Odstranit vazbu",
       "UNLINK_AND_REMOVE_ROLE": "Odstranit vazbu a navázané role",
       "UPDATE_ACCOUNT": "Aktualizovat účet",
-      "IGNORE": "Ignorovat"
+      "IGNORE": "Ignorovat",
+      "IGNORE_AND_DO_NOT_LOG": "Ignorovat a nelogovat"
     },
     "SynchronizationMissingEntityActionTypeEnum": {
       "CREATE_ENTITY": "Vytvořit entitu",
-      "IGNORE": "Ignorovat"
+      "IGNORE": "Ignorovat",
+      "IGNORE_AND_DO_NOT_LOG": "Ignorovat a nelogovat"
     },
     "SynchronizationUnlinkedActionTypeEnum": {
       "LINK": "Vytvořit vazbu",
       "LINK_AND_UPDATE_ENTITY": "Vytvořit vazbu a aktualizovat entitu",
       "LINK_AND_UPDATE_ACCOUNT": "Vytvořit vazbu a aktualizovat účet",
-      "IGNORE": "Ignorovat"
+      "IGNORE": "Ignorovat",
+      "IGNORE_AND_DO_NOT_LOG": "Ignorovat a nelogovat"
     },
     "SynchronizationInactiveOwnerBehaviorTypeEnum": {
       "DO_NOT_LINK": "DO_NOT_LINK - Nepřilinkovat účet a ukončit jeho zpracování, pokud neexistuje validní úvazek pro přidělení výchozí role",

@@ -9,7 +9,8 @@ package eu.bcvsolutions.idm.acc.domain;
 public enum SynchronizationMissingEntityActionType {
 
 	CREATE_ENTITY(SynchronizationActionType.CREATE_ENTITY),
-	IGNORE(SynchronizationActionType.IGNORE);
+	IGNORE(SynchronizationActionType.IGNORE),
+	IGNORE_AND_DO_NOT_LOG(SynchronizationActionType.IGNORE_AND_DO_NOT_LOG);
 
 	private SynchronizationActionType action;
 
