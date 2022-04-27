@@ -1,13 +1,10 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-
-import java.time.ZonedDateTime;
-import java.time.LocalDate;
-
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -15,6 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import eu.bcvsolutions.idm.acc.dto.*;
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.dto.*;
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
@@ -23,6 +23,7 @@ import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
