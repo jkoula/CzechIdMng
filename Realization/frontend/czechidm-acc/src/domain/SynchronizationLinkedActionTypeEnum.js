@@ -40,6 +40,9 @@ export default class SynchronizationLinkedActionTypeEnum extends Enums.AbstractE
       case this.IGNORE: {
         return 'primary';
       }
+      case this.IGNORE_AND_DO_NOT_LOG: {
+        return 'primary';
+      }
       default: {
         return 'default';
       }
@@ -52,3 +55,4 @@ SynchronizationLinkedActionTypeEnum.UPDATE_ACCOUNT = Symbol('UPDATE_ACCOUNT');
 SynchronizationLinkedActionTypeEnum.UNLINK = Symbol('UNLINK');
 SynchronizationLinkedActionTypeEnum.UNLINK_AND_REMOVE_ROLE = Symbol('UNLINK_AND_REMOVE_ROLE');
 SynchronizationLinkedActionTypeEnum.IGNORE = Symbol('IGNORE');
+SynchronizationLinkedActionTypeEnum.IGNORE_AND_DO_NOT_LOG = Symbol('IGNORE_AND_DO_NOT_LOG');

@@ -49,7 +49,7 @@ public class IdmIdentityContractDto extends FormableDto implements ValidableEnti
 	private String description;
 	private Boolean controlledBySlices; // Is true only if contract has some slice. Contract created by slice, cannot be
 										// updated directly! Is sets only if DTO is not trimmed!
-
+	
 	public IdmIdentityContractDto() {
 	}
 

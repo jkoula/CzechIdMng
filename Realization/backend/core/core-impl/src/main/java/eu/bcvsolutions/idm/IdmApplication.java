@@ -42,6 +42,4 @@ public class IdmApplication extends SpringBootServletInitializer {
 		// flyway error
         return application.sources(IdmApplication.class, DatasourceConfig.class);
     }
-	
-	
 }

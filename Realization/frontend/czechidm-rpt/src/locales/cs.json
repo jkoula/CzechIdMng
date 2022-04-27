@@ -124,6 +124,17 @@
           }
         }
       }
+    },
+    "authorization-evaluator": {
+      "rpt-report-by-report-type-evaluator": {
+        "help": "Uděluje přístup pouze k jednomu kódem specifikovanému reportu",
+        "attributes": {
+          "report-type": {
+            "label": "Kód reportu",
+            "help": "Kód executoru, např. 'identity-report'. Ke stažení kteréhokoli vygenerovaného reportu tohoto typu je třeba mít i oprávnění Vytvoření či Administrace! Toto pole je jednohodnotové, tj. může obsahovat pouze jeden report."
+          }
+        }
+      }
     }
   },
   "error": {

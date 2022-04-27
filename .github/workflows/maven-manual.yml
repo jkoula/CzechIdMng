@@ -13,9 +13,11 @@ on:
         description: 'Run tests'
         required: true
         default: 'true'
+  pull_request:
+    branches: [ develop ]
 jobs:
   build:
-
+    name: Build manual
     runs-on: ubuntu-latest
 
     steps:

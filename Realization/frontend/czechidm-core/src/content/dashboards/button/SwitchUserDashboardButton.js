@@ -44,6 +44,7 @@ class SwitchUserDashboardButton extends Advanced.AbstractIdentityDashboardButton
         });
         this.context.history.replace(`/`);
       }
+      localStorage.removeItem("switchUser");
     }));
   }
 

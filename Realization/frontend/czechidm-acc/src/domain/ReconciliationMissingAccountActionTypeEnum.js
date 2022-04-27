@@ -40,6 +40,9 @@ export default class ReconciliationMissingAccountActionTypeEnum extends Enums.Ab
       case this.IGNORE: {
         return 'primary';
       }
+      case this.IGNORE_AND_DO_NOT_LOG: {
+        return 'primary';
+      }
       default: {
         return 'default';
       }
@@ -52,3 +55,4 @@ ReconciliationMissingAccountActionTypeEnum.DELETE_ENTITY = Symbol('DELETE_ENTITY
 ReconciliationMissingAccountActionTypeEnum.UNLINK = Symbol('UNLINK');
 ReconciliationMissingAccountActionTypeEnum.UNLINK_AND_REMOVE_ROLE = Symbol('UNLINK_AND_REMOVE_ROLE');
 ReconciliationMissingAccountActionTypeEnum.IGNORE = Symbol('IGNORE');
+ReconciliationMissingAccountActionTypeEnum.IGNORE_AND_DO_NOT_LOG = Symbol('IGNORE_AND_DO_NOT_LOG');

@@ -112,6 +112,7 @@ export default class SecurityManager {
    * @since 10.5.0
    */
   switchUser(username, cb = null) {
+    localStorage.setItem("switchUser", true);
     return (dispatch, getState) => {
       dispatch(this.requestLogin());
       dispatch(flashMessagesManager.hideAllMessages());
@@ -131,6 +132,7 @@ export default class SecurityManager {
    * @since 10.5.0
    */
   switchUserLogout(cb = null) {
+    localStorage.setItem("switchUser", true);
     return (dispatch, getState) => {
       dispatch(this.requestLogin());
       dispatch(flashMessagesManager.hideAllMessages());

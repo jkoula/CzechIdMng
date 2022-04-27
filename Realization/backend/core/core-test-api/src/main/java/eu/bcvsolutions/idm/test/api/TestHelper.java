@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.test.api;
 
-import eu.bcvsolutions.idm.core.api.dto.IdmDelegationDefinitionDto;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -23,6 +22,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmContractGuaranteeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractSliceDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractSliceGuaranteeDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmDelegationDefinitionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
