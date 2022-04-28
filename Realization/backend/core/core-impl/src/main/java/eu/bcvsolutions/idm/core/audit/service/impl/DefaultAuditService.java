@@ -94,6 +94,7 @@ import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
  *
  */
 @Service
+@Transactional(readOnly = true)
 public class DefaultAuditService extends AbstractReadWriteDtoService<IdmAuditDto, IdmAudit, IdmAuditFilter>
 		implements IdmAuditService {
 	
