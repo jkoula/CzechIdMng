@@ -36,11 +36,11 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven with tests
-      if: ${{ github.event.inputs.tests == 'true' }}
+#       if: ${{ github.event.inputs.tests == 'true' }}
       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
-    - name: Build with Maven without tests
-      if: ${{ github.event.inputs.tests == 'false' }}
-      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
+#     - name: Build with Maven without tests
+#       if: ${{ github.event.inputs.tests == 'false' }}
+#       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
