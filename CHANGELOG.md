@@ -2,10 +2,29 @@
 All notable changes to this project will be documented in this file.
 
 ## [12.2.0]
+
+### Administrator
 - 🟡 [#2613](https://redmine.czechidm.com/issues/2613) - When some tree node has non existing parent in source, IdM will log it as create error item. **If the tree node was created with correct parent and later the parent has changed in the source, IdM will process it as update error instead of missing account!**
 - 🟢 [#3055](https://redmine.czechidm.com/issues/3055) - You can now allow users to run only one report without giving them access to all reports.
 - 🟢 [#3089](https://redmine.czechidm.com/issues/3089) - Synchronization logs now contain more information about the configuration options used for the synchronization.
 - 🟢 [#2949](https://redmine.czechidm.com/issues/2949) - New action for synchronizations is available: ignore and do not log. When used, the synchronization items which are ignored are not logged which can improve performance. **This is an alternative to to the ignore action.** It is particularly useful for delete reconciliations where most synchronization items are ignored. See the wiki [doc](https://wiki.czechidm.com/tutorial/adm/synchronization#synchronization_states_and_actions) page for details.
+- 🟠 [#3052](https://redmine.czechidm.com/issues/3052) - Support for multiple persistence contexts
+  - There are by default two datasources configured
+    - datasource - default datasource, which is being used for almost all database communication (Flyway, JPA repositories)
+    - loggingDatasource - This datasource is used by our database logging appender to write logging messages, when databes appender is enabled. The reason why this is done by separate datasource is to prevent database logging to hog database connections and hinder the application performance
+  - Configuration properties, that have changed with introduction of additional datasources:
+    - *`spring.datasource.url` →* *`spring.datasource.jdbcUrl`*
+    - `spring.datasource.hikari.*` → `spring.datasource.*`
+
+See the wiki [doc](https://wiki.czechidm.com/devel/documentation/application_configuration/dev/backend?s[]=%2Adatasource%2A#additional_datasources) page for details.
+
+### Developer
+
+- 🟠 [#3052](https://redmine.czechidm.com/issues/3052) - Support for multiple persistence contexts
+  - If you are using `EntityManager` in your code, you will run into the issue with autowiring. In order to fix it, you need to explicitly specify, which `EntityManager` bean you want spring to autowire. You can use
+    - `@CoreEntityManager` annotation, if you want to autowire main application datasource (in most cases you want to use this)
+    - `@Qualifier("coreEntityManager")` annotation, if you want to autowire main application datasource and do not want to explicitly define dependency on core-api module
+
 
 ## [12.1.0]
 
