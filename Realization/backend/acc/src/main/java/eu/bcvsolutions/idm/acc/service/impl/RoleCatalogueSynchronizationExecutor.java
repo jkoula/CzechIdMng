@@ -120,8 +120,8 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 		log.setStarted(ZonedDateTime.now());
 		log.setRunning(true);
 		log.setToken(lastToken != null ? lastToken.toString() : null);
-		log.addToLog(MessageFormat.format("Synchronization was started in {0}.", log.getStarted()));
-
+		log = syncStarted(log, context);
+		
 		// List of all accounts with full IC object (used in catalogue sync)
 		Map<String, IcConnectorObject> accountsMap = new HashMap<>();
 
