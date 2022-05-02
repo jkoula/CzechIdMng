@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
     - *`spring.datasource.url` →* *`spring.datasource.jdbcUrl`*
     - `spring.datasource.hikari.*` → `spring.datasource.*`
 
+See the wiki [doc](https://wiki.czechidm.com/devel/documentation/application_configuration/dev/backend?s[]=%2Adatasource%2A#additional_datasources) page for details.
+
 ### Developer
 
 - 🟠 [#3052](https://redmine.czechidm.com/issues/3052) - Support for multiple persistence contexts
