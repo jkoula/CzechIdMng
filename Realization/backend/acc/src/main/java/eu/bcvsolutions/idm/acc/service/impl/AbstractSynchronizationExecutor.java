@@ -1834,12 +1834,18 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			}
 
 			if (context.isEntityDifferent()) {
-				List<IdmFormValueDto> formValues = values.stream().map(value -> {
+				if (values.isEmpty()) {
+					// empty list synchronized, remove all values
 					IdmFormValueDto formValue = new IdmFormValueDto(defAttribute);
-					formValue.setValue(value);
-					return formValue;
-				}).collect(Collectors.toList());
-				formInstanceDto.getValues().addAll(formValues);
+					formInstanceDto.getValues().addAll(Lists.newArrayList(formValue));
+				} else {
+					List<IdmFormValueDto> formValues = values.stream().map(value -> {
+						IdmFormValueDto formValue = new IdmFormValueDto(defAttribute);
+						formValue.setValue(value);
+						return formValue;
+					}).collect(Collectors.toList());
+					formInstanceDto.getValues().addAll(formValues);
+				}
 			}
 		});
 		return formInstanceDto;
