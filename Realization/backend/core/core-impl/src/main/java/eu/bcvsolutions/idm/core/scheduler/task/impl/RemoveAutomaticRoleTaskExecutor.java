@@ -52,6 +52,7 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
@@ -425,10 +426,10 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 		UUID automaticRoleAttributeId = getParameterConverter().toUuid(properties, PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE);
 		if (automaticRoleTreeId != null) {
 			automaticRoleId = automaticRoleTreeId;
-			value = new IdmFormValueDto(formInstance.getMappedAttributeByCode(PARAMETER_AUTOMATIC_ROLE_TREE));
+			value = new IdmFormValueDto(getFormAttributeFromDefinition(formInstance.getFormDefinition(), PARAMETER_AUTOMATIC_ROLE_TREE));
 		} else if (automaticRoleAttributeId != null) {
 			automaticRoleId = automaticRoleAttributeId;
-			value = new IdmFormValueDto(formInstance.getMappedAttributeByCode(PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE));
+			value = new IdmFormValueDto(getFormAttributeFromDefinition(formInstance.getFormDefinition(), PARAMETER_AUTOMATIC_ROLE_ATTRIBUTE));
 		}
 		if (value == null) {
 			return null;
@@ -442,6 +443,18 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 		formInstance.getValues().add(value);
 		//
 		return formInstance;
+	}
+	
+	private IdmFormAttributeDto getFormAttributeFromDefinition(IdmFormDefinitionDto formDefinition, String attributeCode) {
+		if (formDefinition == null) {
+			return null;
+		}
+		
+		return formDefinition.getFormAttributes()
+				.stream()
+				.filter(attr -> attr.getCode().equals(attributeCode))
+				.findFirst()
+				.orElse(null);
 	}
 	
 	@Override
