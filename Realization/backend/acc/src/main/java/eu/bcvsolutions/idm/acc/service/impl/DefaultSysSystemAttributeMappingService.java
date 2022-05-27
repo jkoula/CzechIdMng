@@ -840,7 +840,12 @@ public class DefaultSysSystemAttributeMappingService
 		if (attributeHandling.isExtendedAttribute() && entity != null && formService.isFormable(entity.getClass())) {
 			List<IdmFormValueDto> formValues = formService.getValues(entity, attributeHandling.getIdmPropertyName());
 			if (formValues.isEmpty()) {
-				idmValue = null;
+				if (schemaAttributeDto.getClassType().equals(Boolean.class.getCanonicalName())) {
+					// convert empty value to false for booleans
+					idmValue = Boolean.FALSE;
+				} else {
+					idmValue = null;
+				}
 			} else if (schemaAttributeDto.isMultivalued()) {
 				// Multiple value extended attribute
 				List<Object> values = new ArrayList<>();
