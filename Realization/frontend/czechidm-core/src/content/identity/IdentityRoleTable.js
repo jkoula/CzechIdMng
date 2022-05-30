@@ -333,7 +333,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             rendered={ _.includes(columns, 'role') }/>
           <Advanced.Column
             header={ this.i18n('entity.Identity._type') }
-            property="identity"
+            property="identityContract"
             width={ 175 }
             cell={
               /* eslint-disable react/no-multi-comp */
