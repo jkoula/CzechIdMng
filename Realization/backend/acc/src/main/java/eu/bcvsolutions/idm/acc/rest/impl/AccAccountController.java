@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -84,7 +85,8 @@ public class AccAccountController extends AbstractReadWriteDtoController<AccAcco
 	public AccAccountController(AccAccountService accountService) {
 		super(accountService);
 	}
-	
+
+	@Transactional(readOnly = true)
 	@Override
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET)
@@ -104,7 +106,8 @@ public class AccAccountController extends AbstractReadWriteDtoController<AccAcco
 			@PageableDefault Pageable pageable) {
 		return super.find(parameters, pageable);
 	}
-	
+
+	@Transactional(readOnly = true)
 	@ResponseBody
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
 	@RequestMapping(value= "/search/quick", method = RequestMethod.GET)
@@ -123,7 +126,8 @@ public class AccAccountController extends AbstractReadWriteDtoController<AccAcco
 			@PageableDefault Pageable pageable) {
 		return super.find(parameters, pageable);
 	}
-	
+
+	@Transactional(readOnly = true)
 	@Override
 	public Page<AccAccountDto> find(AccAccountFilter filter, Pageable pageable, BasePermission permission) {
 		Page<AccAccountDto> dtos = super.find(filter, pageable, permission);
@@ -153,7 +157,7 @@ public class AccAccountController extends AbstractReadWriteDtoController<AccAcco
 			@PageableDefault Pageable pageable) {
 		return super.autocomplete(parameters, pageable);
 	}
-	
+
 	@Override
 	@ResponseBody
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")

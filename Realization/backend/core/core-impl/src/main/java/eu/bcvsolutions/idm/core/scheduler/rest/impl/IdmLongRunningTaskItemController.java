@@ -15,6 +15,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -120,6 +121,7 @@ public class IdmLongRunningTaskItemController extends AbstractReadWriteDtoContro
 	 * @param pageable
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	@ResponseBody
 	@RequestMapping(value= "/search/quick", method = RequestMethod.GET)
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.SCHEDULER_READ + "')")
@@ -135,6 +137,7 @@ public class IdmLongRunningTaskItemController extends AbstractReadWriteDtoContro
 		return super.find(parameters, pageable);
 	}
 	
+	@Transactional(readOnly = true)
 	@Override
 	public Page<IdmProcessedTaskItemDto> find(IdmProcessedTaskItemFilter filter, Pageable pageable, BasePermission permission) {
 		Page<IdmProcessedTaskItemDto> dtos = super.find(filter, pageable, permission);
