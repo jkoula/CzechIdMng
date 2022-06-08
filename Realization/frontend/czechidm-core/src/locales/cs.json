@@ -2471,7 +2471,7 @@
         },
         "filter": {
           "text": {
-            "placeholder": "Kód či honota"
+            "placeholder": "Kód či hodnota"
           }
         },
         "save": {
