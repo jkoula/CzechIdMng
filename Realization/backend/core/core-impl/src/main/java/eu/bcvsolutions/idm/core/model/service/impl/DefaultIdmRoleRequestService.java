@@ -1578,6 +1578,19 @@ public class DefaultIdmRoleRequestService
 						"Request change in concept [{0}], was not executed, because requested automatic role was already assigned (not from this role request)!",
 						concept.getId());
 			}
+		} else if (concept.getRoleComposition() != null){
+			// role is in composition, check if this same role is not already added by automatic parent role
+			List<UUID> autoRolesIds = request.getConceptRoles().stream()
+					.filter(idmConceptRoleRequestDto -> idmConceptRoleRequestDto.getState().equals(RoleRequestState.CANCELED))
+					.map(IdmConceptRoleRequestDto::getRole)
+					.collect(Collectors.toList());
+
+			IdmRoleCompositionDto roleCompositionDto = roleCompositionService.get(concept.getRoleComposition());
+			if (roleCompositionDto != null && autoRolesIds.contains(roleCompositionDto.getSuperior())) {
+				message = MessageFormat.format(
+						"Request change in concept [{0}], was not executed, because requested role was already assigned as a sub role of another role (not from this role request)!",
+						concept.getId());
+			}
 		}
 
 		if (message != null) {
