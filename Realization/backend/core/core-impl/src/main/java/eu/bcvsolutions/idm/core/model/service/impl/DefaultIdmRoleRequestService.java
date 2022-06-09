@@ -10,6 +10,7 @@ import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1577,6 +1578,23 @@ public class DefaultIdmRoleRequestService
 				message = MessageFormat.format(
 						"Request change in concept [{0}], was not executed, because requested automatic role was already assigned (not from this role request)!",
 						concept.getId());
+			}
+		} else if (concept.getRoleComposition() != null) {
+			// role is in composition, check if this same role is not already added by automatic parent role
+			List<UUID> autoRolesIds = request.getConceptRoles().stream()
+					.filter(idmConceptRoleRequestDto -> idmConceptRoleRequestDto.getState().equals(RoleRequestState.CANCELED))
+					.map(IdmConceptRoleRequestDto::getRole)
+					.collect(Collectors.toList());
+
+			if (!autoRolesIds.isEmpty()) {
+				List<UUID> allSuperiorRoles = roleCompositionService.findAllSuperiorRoles(concept.getRole()).stream()
+						.map(IdmRoleCompositionDto::getSuperior)
+						.collect(Collectors.toList());
+				if (!Collections.disjoint(autoRolesIds, allSuperiorRoles)) {
+					message = MessageFormat.format(
+							"Request change in concept [{0}], was not executed, because requested role was already assigned as a sub role of another role (not from this role request)!",
+							concept.getId());
+				}
 			}
 		}
 
