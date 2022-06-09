@@ -607,39 +607,33 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Validate attributes on incompatible strategies
-	 * 
+	 *
 	 * @param finalAttributes
+	 * @param overloadingAttributes
 	 */
-	protected void validateAttributesStrategy(List<AttributeMapping> finalAttributes) {
+	protected void validateAttributesStrategy(List<AttributeMapping> finalAttributes, List<SysRoleSystemAttributeDto> overloadingAttributes) {
 		if (finalAttributes == null) {
 			return;
 		}
-		finalAttributes.forEach(parentAttribute -> {
-			if (AttributeMappingStrategyType.MERGE == parentAttribute.getStrategyType()
-					|| AttributeMappingStrategyType.AUTHORITATIVE_MERGE == parentAttribute.getStrategyType()) {
-				Optional<AttributeMapping> conflictAttributeOptional = finalAttributes.stream().filter(att -> {
-					UUID attributeSchemaId = getSchemaAttributeId(att);
-					UUID parentSchemaId = getSchemaAttributeId(parentAttribute);
-					return attributeSchemaId.equals(parentSchemaId)
-							&& !(att.getStrategyType() == parentAttribute.getStrategyType()
-									|| att.getStrategyType() == AttributeMappingStrategyType.CREATE
-									|| att.getStrategyType() == AttributeMappingStrategyType.WRITE_IF_NULL);
-				}).findFirst();
-				if (conflictAttributeOptional.isPresent()) {
-					AttributeMapping conflictAttribute = conflictAttributeOptional.get();
+		finalAttributes.forEach(parentAttribute -> overloadingAttributes.forEach(sysRoleSystemAttributeDto -> {
+			AttributeMapping overloadedMapping = DtoUtils.getEmbedded(sysRoleSystemAttributeDto, SysRoleSystemAttribute_.systemAttributeMapping, AttributeMapping.class);
+			UUID attributeSchemaId = getSchemaAttributeId(overloadedMapping);
+			UUID parentSchemaId = getSchemaAttributeId(parentAttribute);
 
-					IdmRoleDto roleParent = this.getRole(parentAttribute);
-					IdmRoleDto roleConflict = this.getRole(conflictAttribute);
-
-					throw new ProvisioningException(AccResultCode.PROVISIONING_ATTRIBUTE_STRATEGY_CONFLICT,
-							ImmutableMap.of("strategyParent", parentAttribute.getStrategyType(), //
-									"strategyConflict",	conflictAttribute.getStrategyType(), //
-									"attribute", conflictAttribute.getName(), //
-					"roleParent",	roleParent != null ? roleParent.getCode() : "-", //
-					"roleConflict",	roleConflict != null ? roleConflict.getCode() : "-")); //
-				}
+			if (attributeSchemaId.equals(parentSchemaId)
+					&& !(overloadedMapping.getStrategyType() == parentAttribute.getStrategyType()
+					|| overloadedMapping.getStrategyType() == AttributeMappingStrategyType.CREATE
+					|| overloadedMapping.getStrategyType() == AttributeMappingStrategyType.WRITE_IF_NULL)) {
+				IdmRoleDto roleParent = this.getRole(parentAttribute);
+				IdmRoleDto roleConflict = this.getRole(overloadedMapping);
+				throw new ProvisioningException(AccResultCode.PROVISIONING_ATTRIBUTE_STRATEGY_CONFLICT,
+						ImmutableMap.of("strategyParent", parentAttribute.getStrategyType(), //
+								"strategyConflict", overloadedMapping.getStrategyType(), //
+								"attribute", parentAttribute.getName(), //
+								"roleParent", roleParent != null ? roleParent.getCode() : "-", //
+								"roleConflict", roleConflict != null ? roleConflict.getCode() : "-")); //
 			}
-		});
+		}));
 	}
 
 	/**
@@ -1029,7 +1023,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		});
 
 		// Validate attributes on incompatible strategies
-		validateAttributesStrategy(finalAttributes);
+		validateAttributesStrategy(finalAttributes, overloadingAttributes);
 
 		return finalAttributes;
 	}
