@@ -143,13 +143,13 @@ public class DefaultIdmLoggingEventService
 	}
 
 	@Override
-	@Transactional
+	@Transactional(transactionManager = "loggingTransactionManager")
 	public void deleteAllById(Long eventId) {
 		this.repository.deleteById(eventId);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(transactionManager = "loggingTransactionManager")
 	public int deleteLowerOrEqualTimestamp(Long timestamp) {
 		return this.repository.deleteLowerOrEqual(timestamp);
 	}
