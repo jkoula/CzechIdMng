@@ -51,7 +51,7 @@ jobs:
         java-version: 11
     - name: Build with Maven with tests
 #       if: ${{ github.event.inputs.tests == 'true' }}
-      run: mvn -B --file Realization/backend/aggregator/pom.xml -Ptest-postgresql flyway:clean clean verify package
+      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Ptest-postgresql -DdocumentationOnly=true
 #     - name: Build with Maven without tests
 #       if: ${{ github.event.inputs.tests == 'false' }}
 #       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
