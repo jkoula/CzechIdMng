@@ -101,7 +101,7 @@ public class DefaultIdmLoggingEventPropertyService extends
 	}
 
 	@Override
-	@Transactional
+	@Transactional(transactionManager = "loggingTransactionManager")
 	public void deleteAllByEventId(Long eventId) {
 		this.repository.deleteByEventId(eventId);
 	}

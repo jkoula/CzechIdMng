@@ -112,7 +112,7 @@ public class DefaultIdmLoggingEventExceptionService extends
 	 * @return saved {@link IdmLoggingEventExceptionDto}
 	 */
 	@Override
-	@Transactional
+	@Transactional(transactionManager = "loggingTransactionManager")
 	public IdmLoggingEventExceptionDto saveInternal(IdmLoggingEventExceptionDto dto) {
 		Assert.notNull(dto, "DTO is required for save.");
 		dto = validateDto(dto);
@@ -149,7 +149,7 @@ public class DefaultIdmLoggingEventExceptionService extends
 	}
 
 	@Override
-	@Transactional
+	@Transactional(transactionManager = "loggingTransactionManager")
 	public void deleteByEventId(Long eventId) {
 		this.repository.deleteByEventId(eventId);
 	}

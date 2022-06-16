@@ -457,7 +457,8 @@ public class DefaultIdmAutomaticRoleRequestService extends
 		request.setRequestType(type);
 		request.setOperation(RequestOperationType.REMOVE);
 		request.setResult(new OperationResultDto.Builder(OperationState.CREATED).build());
-		request = this.save(request);
+		// call it this way in order to execute it in transaction
+		request = getIdmAutomaticRoleRequestService().save(request);
 
 		this.getIdmAutomaticRoleRequestService().startRequest(request.getId(), true);
 	}
@@ -474,7 +475,8 @@ public class DefaultIdmAutomaticRoleRequestService extends
 		request.setRequestType(AutomaticRoleRequestType.TREE);
 		request.setOperation(RequestOperationType.ADD);
 		request.setResult(new OperationResultDto.Builder(OperationState.CREATED).build());
-		request = this.save(request);
+		// call it this way in order to execute it in transaction
+		request = this.getIdmAutomaticRoleRequestService().save(request);
 
 		IdmAutomaticRoleRequestDto result = this.getIdmAutomaticRoleRequestService().startRequest(request.getId(), true);
 		if (RequestState.EXECUTED == result.getState()) {
