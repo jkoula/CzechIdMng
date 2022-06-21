@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [12.3.0]
+
+### Administrator
+- 🟠 [#3016](https://redmine.czechidm.com/issues/3016) - In the provisioning archive, the boolean value 'false' was displayed as an empty String. It now behaves as expected.
+  - If you use a virtual system to which you added a custom attribute of the type `java.lang.Boolean`, make sure to change the type of the attribute in the form definition of the system's accounts (VsAccount type) to Boolean. Otherwise, you will see failures in the provisioning.
+
 ## [12.2.0]
 
 ### Administrator

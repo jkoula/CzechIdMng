@@ -160,11 +160,11 @@ class ProvisioningOperations extends Basic.AbstractContent {
             result[index].valueState.push(value && value.change ? this._toPropertyValue(value.change) : '');
           }
         } else {
-          const accountVal = item && item.value && item.value.value
+          const accountVal = item != undefined && item.value != undefined && item.value.value != undefined
             ? item.value.value : '';
-          const systemVal = item && item.value && item.value.oldValue
+          const systemVal = item != undefined && item.value != undefined && item.value.oldValue != undefined
             ? item.value.oldValue : '';
-          const valueState = item && item.value && item.value.change
+          const valueState = item != undefined && item.value != undefined && item.value.change != undefined
             ? item.value.change : '';
           result[index].accountVal = this._toPropertyValue(accountVal);
           result[index].systemVal = this._toPropertyValue(systemVal);
