@@ -1183,6 +1183,7 @@
     "group": {
       "AUTHORIZATIONPOLICY": "Permissions",
       "APP": "App configuration",
+      "APPSKIPCAS": "Login without CAS",
       "AUDIT": "Audit",
       "CONFIGURATION": "Configuration (app)",
       "IDENTITY": "Users",

@@ -1216,6 +1216,7 @@
     "group": {
       "AUTHORIZATIONPOLICY": "Oprávnění",
       "APP": "Správa aplikace",
+      "APPSKIPCAS": "Přihlášení bez CAS",
       "AUDIT": "Audit",
       "CONFIGURATION": "Konfigurace aplikace",
       "IDENTITY": "Uživatelé",
