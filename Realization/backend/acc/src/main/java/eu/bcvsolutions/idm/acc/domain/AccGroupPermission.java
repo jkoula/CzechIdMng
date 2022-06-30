@@ -84,6 +84,22 @@ public enum AccGroupPermission implements GroupPermission {
 			IdmBasePermission.READ,
 			IdmBasePermission.CREATE,
 			IdmBasePermission.UPDATE,
+			IdmBasePermission.DELETE),
+	SYSTEMOWNER(
+			IdmBasePermission.ADMIN,
+			IdmBasePermission.COUNT,
+			IdmBasePermission.AUTOCOMPLETE,
+			IdmBasePermission.READ,
+			IdmBasePermission.CREATE,
+			IdmBasePermission.UPDATE,
+			IdmBasePermission.DELETE),
+	SYSTEMOWNERROLE(
+			IdmBasePermission.ADMIN,
+			IdmBasePermission.COUNT,
+			IdmBasePermission.AUTOCOMPLETE,
+			IdmBasePermission.READ,
+			IdmBasePermission.CREATE,
+			IdmBasePermission.UPDATE,
 			IdmBasePermission.DELETE);
 	
 	// String constants could be used in pre / post authotize SpEl expressions
@@ -196,7 +212,21 @@ public enum AccGroupPermission implements GroupPermission {
 	public static final String SYSTEM_GROUP_SYSTEM_CREATE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "CREATE";
 	public static final String SYSTEM_GROUP_SYSTEM_UPDATE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String SYSTEM_GROUP_SYSTEM_DELETE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "DELETE";
-	
+	//
+	public static final String SYSTEMOWNER_COUNT = "SYSTEMOWNER" + BasePermission.SEPARATOR + "COUNT";
+	public static final String SYSTEMOWNER_AUTOCOMPLETE = "SYSTEMOWNER" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
+	public static final String SYSTEMOWNER_READ = "SYSTEMOWNER" + BasePermission.SEPARATOR + "READ";
+	public static final String SYSTEMOWNER_CREATE = "SYSTEMOWNER" + BasePermission.SEPARATOR + "CREATE";
+	public static final String SYSTEMOWNER_UPDATE = "SYSTEMOWNER" + BasePermission.SEPARATOR + "UPDATE";
+	public static final String SYSTEMOWNER_DELETE = "SYSTEMOWNER" + BasePermission.SEPARATOR + "DELETE";
+	//
+	public static final String SYSTEMOWNERROLE_COUNT = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "COUNT";
+	public static final String SYSTEMOWNERROLE_AUTOCOMPLETE = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
+	public static final String SYSTEMOWNERROLE_READ = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "READ";
+	public static final String SYSTEMOWNERROLE_CREATE = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "CREATE";
+	public static final String SYSTEMOWNERROLE_UPDATE = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "UPDATE";
+	public static final String SYSTEMOWNERROLE_DELETE = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "DELETE";
+
 	private final List<BasePermission> permissions;
 
 	private AccGroupPermission(BasePermission... permissions) {
