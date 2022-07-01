@@ -216,7 +216,7 @@ class AbstractForm extends AbstractContextComponent {
         continue;
       }
       // check if component is not rendered
-      if (!component.refs.rendered) {
+      if (!component.refs.rendered && !component.props.rendered) {
         continue;
       }
       if (!component.isValid()) {
