@@ -422,8 +422,7 @@ export default class AutomaticRoleAttributeRuleDetail extends Basic.AbstractCont
         formAttribute,
         entity,
         attributeName,
-        hideValueField,
-        comparison: entity.comparison
+        hideValueField
       });
       this.refs.type.focus();
     }
