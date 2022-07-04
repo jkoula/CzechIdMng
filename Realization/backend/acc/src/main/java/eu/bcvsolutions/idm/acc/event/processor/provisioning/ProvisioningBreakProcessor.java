@@ -107,7 +107,7 @@ public class ProvisioningBreakProcessor extends AbstractEntityEventProcessor<Sys
 				return new DefaultEventResult<>(event, this, blocked);
 			}
 			// if provisioning is empty, just continue
-			if (isEmptyProvisioning(provisioningOperation)) {
+			if (operationType == ProvisioningEventType.UPDATE && isEmptyProvisioning(provisioningOperation)) {
 				LOG.info("Provisioning is empty, don't need to check for provisioning break");
 				return new DefaultEventResult<>(event, this, blocked);
 			}
