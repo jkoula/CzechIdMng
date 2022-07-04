@@ -106,6 +106,11 @@ public class ProvisioningBreakProcessor extends AbstractEntityEventProcessor<Sys
 				event.setContent(provisioningOperation);
 				return new DefaultEventResult<>(event, this, blocked);
 			}
+			// if provisioning is empty, just continue
+			if (isEmptyProvisioning(provisioningOperation)) {
+				LOG.info("Provisioning is empty, don't need to check for provisioning break");
+				return new DefaultEventResult<>(event, this, blocked);
+			}
 			//
 			// try found provisioning break configuration
 			SysProvisioningBreakConfigDto breakConfig = breakConfigService.getConfig(operationType, system.getId());
@@ -144,6 +149,11 @@ public class ProvisioningBreakProcessor extends AbstractEntityEventProcessor<Sys
 						"objectClass", provisioningOperation.getProvisioningContext().getConnectorObject().getObjectClass().getType()),
 					ex);
 		}
+	}
+
+	private boolean isEmptyProvisioning(SysProvisioningOperationDto provisioningOperation) {
+		return provisioningOperation.getProvisioningContext() != null && provisioningOperation.getProvisioningContext().getConnectorObject() != null
+				&& provisioningOperation.getProvisioningContext().getConnectorObject().getAttributes().isEmpty();
 	}
 
 	@Override
