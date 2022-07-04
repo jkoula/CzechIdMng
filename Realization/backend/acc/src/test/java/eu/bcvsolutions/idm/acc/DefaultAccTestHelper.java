@@ -1,14 +1,5 @@
 package eu.bcvsolutions.idm.acc;
 
-import eu.bcvsolutions.idm.acc.dto.filter.AccUniformPasswordFilter;
-import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupFilter;
-import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
-import eu.bcvsolutions.idm.acc.service.api.AccUniformPasswordService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupService;
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleTreeNodeFilter;
-import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -50,14 +41,20 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccUniformPasswordFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncActionLogFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncItemLogFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.scheduler.task.impl.SynchronizationSchedulableTaskExecutor;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
+import eu.bcvsolutions.idm.acc.service.api.AccUniformPasswordService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
@@ -66,13 +63,20 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncItemLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemOwnerRoleService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemOwnerService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.impl.DefaultSysSystemMappingService;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleTreeNodeFilter;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
+import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
@@ -111,7 +115,9 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Autowired private IdmAutomaticRoleAttributeService automaticRoleAttributeService;
 	@Autowired private AccUniformPasswordService uniformPasswordService;
 	@Autowired private SysSystemGroupService systemGroupService;
-	
+	@Autowired private SysSystemOwnerService systemOwnerService;
+	@Autowired private SysSystemOwnerRoleService systemOwnerRoleService;
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public TestResource findResource(String uid) {
@@ -479,6 +485,35 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		systemMappingService.deleteAll(systemMappingService.find(new SysSystemMappingFilter(), null).getContent());
 		// Delete all uniform password definitions.
 		uniformPasswordService.deleteAll(uniformPasswordService.find(new AccUniformPasswordFilter(), null).getContent());
-
 	}
+
+	/**
+	 * create system owner by identity
+	 * @param system
+	 * @param owner
+	 * @return
+	 */
+	@Override
+	public SysSystemOwnerDto createSystemOwner(SysSystemDto system, IdmIdentityDto owner) {
+		SysSystemOwnerDto dto = new SysSystemOwnerDto();
+		dto.setSystem(system.getId());
+		dto.setOwner(owner.getId());
+		return systemOwnerService.save(dto);
+	}
+
+	/**
+	 * create system owner by role
+	 * @param system
+	 * @param owner
+	 * @return
+	 */
+	@Override
+	public SysSystemOwnerRoleDto createSystemOwnerRole(SysSystemDto system, IdmRoleDto owner) {
+		SysSystemOwnerRoleDto dto = new SysSystemOwnerRoleDto();
+		dto.setSystem(system.getId());
+		dto.setOwnerRole(owner.getId());
+		//
+		return systemOwnerRoleService.save(dto);
+	}
+
 }
