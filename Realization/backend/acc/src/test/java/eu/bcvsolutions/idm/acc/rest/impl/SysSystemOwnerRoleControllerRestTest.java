@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.acc.DefaultAccTestHelper;
 import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto;
@@ -39,6 +40,7 @@ public class SysSystemOwnerRoleControllerRestTest extends AbstractReadWriteDtoCo
 	}
 
 	@Test
+	@Transactional
 	public void testFindBySystem() {
 		SysSystemOwnerRoleDto dto = createDto(prepareDto());
 
@@ -53,6 +55,7 @@ public class SysSystemOwnerRoleControllerRestTest extends AbstractReadWriteDtoCo
 	}
 
 	@Test
+	@Transactional
 	public void testFindByRole() {
 		SysSystemOwnerRoleDto dto = createDto(prepareDto());
 
