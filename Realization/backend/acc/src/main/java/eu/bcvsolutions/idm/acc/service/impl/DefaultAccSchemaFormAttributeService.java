@@ -129,25 +129,34 @@ implements AccSchemaFormAttributeService {
 
 	private IdmFormDefinitionDto getSchemaFormDefinition(SysSystemDto system, SysSchemaObjectClassDto objectClass) {
 		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
-		formDefinitionFilter.setCode(createFormDefinitionName(system, objectClass));
+		formDefinitionFilter.setCode(createFormDefinitionCode(system, objectClass));
 		return formDefinitionService.find(formDefinitionFilter, null).stream().findFirst().orElse(null);
 	}
 	
 	private IdmFormDefinitionDto createSchemaFormDefinition(SysSystemDto system, SysSchemaObjectClassDto objectClass) {
 		IdmFormDefinitionDto formDefinition = new IdmFormDefinitionDto();
-		String name = createFormDefinitionName(system, objectClass);
-		formDefinition.setCode(name);
-		formDefinition.setName(name);
+		formDefinition.setCode(createFormDefinitionCode(system, objectClass));
+		formDefinition.setName(createFormDefinitionName(system, objectClass));
 		formDefinition.setType(SysSchemaObjectClass.class.getCanonicalName());
 		
 		return formDefinitionService.save(formDefinition);
 	}
 	
-	private String createFormDefinitionName(SysSystemDto system, SysSchemaObjectClassDto objectClass) {
+	private String createFormDefinitionCode(SysSystemDto system, SysSchemaObjectClassDto objectClass) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("account-eav-definition:systemId=");
 		sb.append(system.getId());
-		sb.append(":object-class-name=");
+		sb.append(":object-classId=");
+		sb.append(objectClass.getId());
+		
+		return sb.toString();
+	}
+	
+	private String createFormDefinitionName(SysSystemDto system, SysSchemaObjectClassDto objectClass) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Definition for EAV attributes for accounts on system ");
+		sb.append(system.getName());
+		sb.append(" and object class name ");
 		sb.append(objectClass.getObjectClassName());
 		
 		return sb.toString();
