@@ -6,7 +6,7 @@ import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.acc.entity.SysSchemaObjectClass;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
-import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.FormableDto;
 
 /**
  * DTO for {@link SysSchemaObjectClass}
@@ -16,7 +16,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
  */
 
 @Relation(collectionRelation = "schemaObjectClasses")
-public class SysSchemaObjectClassDto extends AbstractDto {
+public class SysSchemaObjectClassDto extends FormableDto {
 
 	private static final long serialVersionUID = 2416496027763299303L;
 	

@@ -15,6 +15,7 @@ import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute;
 import eu.bcvsolutions.idm.acc.event.SchemaAttributeEvent;
 import eu.bcvsolutions.idm.acc.event.SchemaAttributeEvent.SchemaAttributeEventType;
 import eu.bcvsolutions.idm.acc.repository.SysSchemaAttributeRepository;
+import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -33,6 +34,9 @@ public class DefaultSysSchemaAttributeService extends AbstractReadWriteDtoServic
 
 	private final SysSchemaAttributeRepository repository;
 	private final EntityEventManager entityEventManager;
+	
+	@Autowired
+	private AccSchemaFormAttributeService schemaFormAttributeService;
 	
 	@Autowired
 	public DefaultSysSchemaAttributeService(
@@ -73,4 +77,13 @@ public class DefaultSysSchemaAttributeService extends AbstractReadWriteDtoServic
 		EntityUtils.clearAuditFields(original);
 		return original;
 	}
+	
+	@Override
+	@Transactional
+	public SysSchemaAttributeDto save(SysSchemaAttributeDto dto, BasePermission... permission) {
+		schemaFormAttributeService.createFormAttribute(dto);
+		
+		return super.save(dto, permission);
+	}
+	
 }

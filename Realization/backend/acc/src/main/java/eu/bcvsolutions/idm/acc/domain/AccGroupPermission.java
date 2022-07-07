@@ -100,7 +100,14 @@ public enum AccGroupPermission implements GroupPermission {
 			IdmBasePermission.READ,
 			IdmBasePermission.CREATE,
 			IdmBasePermission.UPDATE,
+			IdmBasePermission.DELETE),
+	ACCOUNTFORMVALUE(
+			IdmBasePermission.ADMIN,
+			IdmBasePermission.READ, 
+			IdmBasePermission.CREATE, 
+			IdmBasePermission.UPDATE, 
 			IdmBasePermission.DELETE);
+			
 	
 	// String constants could be used in pre / post authotize SpEl expressions
 	
@@ -212,6 +219,7 @@ public enum AccGroupPermission implements GroupPermission {
 	public static final String SYSTEM_GROUP_SYSTEM_CREATE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "CREATE";
 	public static final String SYSTEM_GROUP_SYSTEM_UPDATE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String SYSTEM_GROUP_SYSTEM_DELETE = "SYSTEMGROUPSYSTEM" + BasePermission.SEPARATOR + "DELETE";
+<<<<<<< HEAD
 	//
 	public static final String SYSTEMOWNER_COUNT = "SYSTEMOWNER" + BasePermission.SEPARATOR + "COUNT";
 	public static final String SYSTEMOWNER_AUTOCOMPLETE = "SYSTEMOWNER" + BasePermission.SEPARATOR + "AUTOCOMPLETE";
@@ -227,6 +235,15 @@ public enum AccGroupPermission implements GroupPermission {
 	public static final String SYSTEMOWNERROLE_UPDATE = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "UPDATE";
 	public static final String SYSTEMOWNERROLE_DELETE = "SYSTEMOWNERROLE" + BasePermission.SEPARATOR + "DELETE";
 
+=======
+	
+	public static final String ACCOUNT_FORM_VALUE_ADMIN = "ACCOUNTFORMVALUE" + BasePermission.SEPARATOR + "ADMIN";
+	public static final String ACCOUNT_FORM_VALUE_READ = "ACCOUNTFORMVALUE" + BasePermission.SEPARATOR + "READ";
+	public static final String ACCOUNT_FORM_VALUE_CREATE = "ACCOUNTFORMVALUE" + BasePermission.SEPARATOR + "CREATE";
+	public static final String ACCOUNT_FORM_VALUE_UPDATE = "ACCOUNTFORMVALUE" + BasePermission.SEPARATOR + "UPDATE";
+	public static final String ACCOUNT_FORM_VALUE_DELETE = "ACCOUNTFORMVALUE" + BasePermission.SEPARATOR + "DELETE";
+	
+>>>>>>> e21c13f62... 3162, initial implementation of EAV attributes for accounts and the form attribute generation for schema
 	private final List<BasePermission> permissions;
 
 	private AccGroupPermission(BasePermission... permissions) {

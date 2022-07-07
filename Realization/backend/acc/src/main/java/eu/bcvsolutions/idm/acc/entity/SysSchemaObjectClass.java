@@ -17,6 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
+import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 
 /**
  * This entity keeps relation on object class in resource
@@ -27,7 +28,7 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 @Entity
 @Table(name = "sys_schema_obj_class", indexes = {
 		@Index(name = "ux_schema_class_name_sys", columnList = "object_class_name,system_id", unique = true)})
-public class SysSchemaObjectClass extends AbstractEntity {
+public class SysSchemaObjectClass extends AbstractEntity implements FormableEntity {
 
 	private static final long serialVersionUID = -3578470144453764063L;
 

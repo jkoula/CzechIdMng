@@ -28,6 +28,7 @@ import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
+import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 
 /**
  * Account on target system
@@ -44,7 +45,7 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 		@Index(name = "idx_acc_account_sys_entity", columnList = "system_entity_id"),
 		@Index(name = "idx_acc_account_sys_mapping", columnList = "system_mapping_id")
 		})
-public class AccAccount extends AbstractEntity {
+public class AccAccount extends AbstractEntity implements FormableEntity {
 	
 	private static final long serialVersionUID = -565558977675057360L;
 
