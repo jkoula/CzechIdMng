@@ -1181,11 +1181,6 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					system.getName(), entityType));
 			return null;
 		}
-		if (systemMappings.size() != 1) {
-			throw new IllegalStateException(MessageFormat.format(
-					"System [{0}] is not configured properly! Remove duplicit provisioning mapping for entity type [{1}]", system.getName(),
-					entityType));
-		}
 		return systemMappings.get(0);
 	}
 

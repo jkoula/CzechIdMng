@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
  * Account on target system DTO
  * 
  * @author Svanda
+ * @author Roman Kucera
  *
  */
 
@@ -44,6 +45,8 @@ public class AccAccountDto extends AbstractDto {
 	private UUID targetEntityId;
 	@Beta
 	private String targetEntityType;
+	@Embedded(dtoClass = SysSystemMappingDto.class)
+	private UUID systemMapping;
 
 	public String getUid() {
 		return uid;
@@ -146,5 +149,13 @@ public class AccAccountDto extends AbstractDto {
 	@Beta
 	public void setTargetEntityType(String targetEntityType) {
 		this.targetEntityType = targetEntityType;
+	}
+
+	public UUID getSystemMapping() {
+		return systemMapping;
+	}
+
+	public void setSystemMapping(UUID systemMapping) {
+		this.systemMapping = systemMapping;
 	}
 }

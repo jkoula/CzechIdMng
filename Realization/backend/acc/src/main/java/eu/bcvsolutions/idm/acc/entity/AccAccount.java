@@ -33,6 +33,7 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
  * Account on target system
  * 
  * @author Radek Tomiška
+ * @author Roman Kucera
  *
  */
 @Entity
@@ -40,7 +41,8 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 		@Index(name = "ux_acc_account_sys_entity", columnList = "system_entity_id", unique = true),
 		@Index(name = "ux_account_uid", columnList = "uid,system_id", unique = true),
 		@Index(name = "idx_acc_account_sys_id", columnList = "system_id"),
-		@Index(name = "idx_acc_account_sys_entity", columnList = "system_entity_id")
+		@Index(name = "idx_acc_account_sys_entity", columnList = "system_entity_id"),
+		@Index(name = "idx_acc_account_sys_mapping", columnList = "system_mapping_id")
 		})
 public class AccAccount extends AbstractEntity {
 	
@@ -85,6 +87,11 @@ public class AccAccount extends AbstractEntity {
 	@Audited
 	@Column(name = "end_of_protection", nullable = true)
 	private ZonedDateTime endOfProtection;
+
+	@Audited
+	@ManyToOne
+	@JoinColumn(name = "system_mapping_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	private SysSystemMapping systemMapping;
 
 	public void setAccountType(AccountType accountType) {
 		this.accountType = accountType;
@@ -153,5 +160,13 @@ public class AccAccount extends AbstractEntity {
 	
 	public void setEntityType(SystemEntityType entityType) {
 		this.entityType = entityType;
+	}
+
+	public SysSystemMapping getSystemMapping() {
+		return systemMapping;
+	}
+
+	public void setSystemMapping(SysSystemMapping systemMapping) {
+		this.systemMapping = systemMapping;
 	}
 }

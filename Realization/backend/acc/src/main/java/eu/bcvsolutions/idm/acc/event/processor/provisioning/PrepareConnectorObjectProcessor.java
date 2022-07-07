@@ -674,11 +674,6 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 					"System [{0}] does not have mapping, provisioning will not be executed. Add some mapping for entity type [{1}]",
 					system.getName(), entityType));
 		}
-		if (systemMappings.size() != 1) {
-			throw new IllegalStateException(MessageFormat.format(
-					"System [{0}] is wrong configured! Remove duplicit mapping for entity type [{1}]", system.getName(),
-					entityType));
-		}
 		return systemMappings.get(0);
 	}
 
