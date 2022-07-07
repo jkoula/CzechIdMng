@@ -88,6 +88,7 @@ import org.springframework.util.Assert;
  *
  * @author Radek Tomiška
  * @author svandav
+ * @author Roman Kucera
  *
  */
 @Service("accAccountService")
@@ -323,6 +324,10 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 		if (filter.getSystemEntityId() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.systemEntity).get(SysSystemEntity_.id),
 					filter.getSystemEntityId()));
+		}
+		if (filter.getSystemMapping() != null) {
+			predicates.add(builder.equal(root.get(AccAccount_.systemMapping).get(SysSystemMapping_.id),
+					filter.getSystemMapping()));
 		}
 		if (filter.getUid() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.uid), filter.getUid()));
