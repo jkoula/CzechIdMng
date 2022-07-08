@@ -338,6 +338,7 @@ public class AccAccountController extends AbstractReadWriteDtoController<AccAcco
 		//
 		filter.setSystemId(getParameterConverter().toUuid(parameters, "systemId"));
 		filter.setSystemEntityId(getParameterConverter().toUuid(parameters, "systemEntityId"));
+		filter.setSystemMapping(getParameterConverter().toUuid(parameters, "systemMappingId"));
 		//
 		// for first check identityId, this attribute has bigger priority than identity parameter
 		UUID identityId = getParameterConverter().toUuid(parameters, "identityId");
