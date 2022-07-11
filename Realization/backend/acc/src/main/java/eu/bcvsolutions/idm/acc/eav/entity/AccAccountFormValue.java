@@ -22,7 +22,7 @@ import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute;
  *
  */
 @Entity
-@Table(name = "prp_property_form_value", indexes = {
+@Table(name = "acc_account_form_value", indexes = {
 		@Index(name = "idx_acc_account_form_a", columnList = "owner_id"),
 		@Index(name = "idx_acc_account_form_a_def", columnList = "attribute_id"),
 		@Index(name = "idx_acc_account_form_stxt", columnList = "short_text_value"),

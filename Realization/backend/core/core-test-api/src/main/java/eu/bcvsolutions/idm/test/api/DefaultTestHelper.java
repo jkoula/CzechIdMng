@@ -1042,8 +1042,15 @@ public class DefaultTestHelper implements TestHelper {
 	@Override
 	public void setEavValue(Identifiable owner, IdmFormAttributeDto attribute, Class<? extends Identifiable> clazz,
 			Serializable value, PersistentType type) {
-		UUID ownerId = UUID.fromString(owner.getId().toString());
 		IdmFormDefinitionDto main = formDefinitionService.findOneByMain(clazz.getName());
+		
+		setEavValue(owner, attribute, clazz, value, type, main);
+	}
+	
+	@Override
+	public void setEavValue(Identifiable owner, IdmFormAttributeDto attribute, Class<? extends Identifiable> clazz,
+			Serializable value, PersistentType type, IdmFormDefinitionDto formDefinition) {
+		UUID ownerId = UUID.fromString(owner.getId().toString());
 		List<IdmFormValueDto> values = Lists.newArrayList(formService.getValues(ownerId, clazz, attribute));
 		
 		if (values.isEmpty()) {
@@ -1057,7 +1064,7 @@ public class DefaultTestHelper implements TestHelper {
 			values.get(0).setValue(value);
 		}
 		
-		formService.saveFormInstance(owner, main, values);
+		formService.saveFormInstance(owner, formDefinition, values);
 		
 	}
 

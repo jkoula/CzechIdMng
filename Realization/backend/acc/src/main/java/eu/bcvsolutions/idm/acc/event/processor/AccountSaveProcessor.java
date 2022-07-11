@@ -9,10 +9,13 @@ import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.event.AccountEvent.AccountEventType;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
+import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
@@ -20,6 +23,7 @@ import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 
 /**
  * Save account processor
@@ -39,6 +43,10 @@ public class AccountSaveProcessor extends CoreEventProcessor<AccAccountDto> impl
 	private SysSystemMappingService systemMappingService;
 	@Autowired
 	private SysSystemService systemService;
+	@Autowired
+	private SysSchemaObjectClassService schemaObjectClassService;
+	@Autowired
+	private AccSchemaFormAttributeService schemaFormAttributeService;
 
 	@Autowired
 	public AccountSaveProcessor(AccAccountService service) {
@@ -57,10 +65,12 @@ public class AccountSaveProcessor extends CoreEventProcessor<AccAccountDto> impl
 	@Override
 	public EventResult<AccAccountDto> process(EntityEvent<AccAccountDto> event) {
 		AccAccountDto entity = event.getContent();
+		SysSystemMappingDto mapping = null;
+		SysSystemDto systemDto = null;
 
 		// no mapping relation, add default backward compatible mapping
 		if (entity.getSystemMapping() == null) {
-			SysSystemDto systemDto = systemService.get(entity.getSystem());
+			systemDto = systemService.get(entity.getSystem());
 			List<SysSystemMappingDto> systemMappings = systemMappingService.findBySystem(systemDto,
 					SystemOperationType.PROVISIONING, entity.getEntityType());
 
@@ -68,9 +78,19 @@ public class AccountSaveProcessor extends CoreEventProcessor<AccAccountDto> impl
 				LOG.debug("Setting default provisioning mapping for account with system entity {} of type {} on system {}.",
 						entity.getSystemEntity() ,entity.getEntityType(), entity.getSystem());
 				entity.setSystemMapping(systemMappings.get(0).getId());
+				mapping = systemMappings.get(0);
 			} else {
 				LOG.debug("No provisioning mapping found for account with system entity {} of type {} on system {}.",
-						entity.getSystemEntity() ,entity.getEntityType(), entity.getSystem());
+						entity.getSystemEntity(), entity.getEntityType(), entity.getSystem());
+			}
+		}
+		
+		
+		if (entity.getFormDefinition() == null) {
+			SysSchemaObjectClassDto schema = schemaObjectClassService.get(mapping.getObjectClass());
+			IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(systemDto, schema);
+			if (formDefinition != null) {
+				entity.setFormDefinition(formDefinition.getId());
 			}
 		}
 

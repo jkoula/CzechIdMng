@@ -9,6 +9,8 @@ import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.ExternalIdentifiableFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.FormableFilter;
 
 /**
  * Filter for accounts
@@ -17,7 +19,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
  * @author Roman Kucera
  *
  */
-public class AccAccountFilter extends DataFilter {
+public class AccAccountFilter extends DataFilter implements ExternalIdentifiableFilter, FormableFilter {
 	
 	public static final String PARAMETER_IDENTITY_ID = "identity";
 	//
@@ -34,6 +36,8 @@ public class AccAccountFilter extends DataFilter {
 	private Boolean supportPasswordFilter;
 	private Boolean includeEcho; // Returned account will contains echo record in embedded
 	private UUID systemMapping;
+	private UUID formDefinitionId;
+	private String externalId;
 	
 	public AccAccountFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -145,5 +149,21 @@ public class AccAccountFilter extends DataFilter {
 
 	public void setSystemMapping(UUID systemMapping) {
 		this.systemMapping = systemMapping;
+	}
+
+	public UUID getFormDefinitionId() {
+		return formDefinitionId;
+	}
+
+	public void setFormDefinitionId(UUID formDefinitionId) {
+		this.formDefinitionId = formDefinitionId;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
 	}
 }
