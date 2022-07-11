@@ -37,12 +37,13 @@ jobs:
         java-version: 11
     - name: Build with Maven with tests
 #       if: ${{ github.event.inputs.tests == 'true' }}
-      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
+      #run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
+      run: mvn test --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
 #     - name: Build with Maven without tests
 #       if: ${{ github.event.inputs.tests == 'false' }}
 #       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: idm.war
-        path: Realization/backend/app/target
+    #- name: Upload artifact
+      #uses: actions/upload-artifact@v1.0.0
+      #with:
+      #  name: idm.war
+      #  path: Realization/backend/app/target
