@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import java.io.Serializable;
@@ -76,6 +77,7 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
  * 
  * @author Vít Švanda
  * @author Peter Štrunc <github.com/peter-strunc>
+ * @author Roman Kucera
  *
  */
 @Service
@@ -145,15 +147,12 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		identityAccountStatesFilter.setOwnerType(entityStateManager.getOwnerType(AccIdentityAccountDto.class));
 		identityAccountStatesFilter.setResultCode(CoreResultCode.DELETED.getCode());
 		List<IdmEntityStateDto> identityAccountStates = entityStateManager.findStates(identityAccountStatesFilter, null).getContent();
-		List<AccIdentityAccountDto> identityAccountList = allIdentityAccountList //
-				.stream() //
-				.filter(ia -> {
-					return !identityAccountStates //
-							.stream() //
-							.anyMatch(state -> { 
-								return ia.getId().equals(state.getOwnerId());
-							});
-				}).collect(Collectors.toList());
+		List<AccIdentityAccountDto> identityAccountList = allIdentityAccountList
+				.stream()
+				.filter(ia -> identityAccountStates
+						.stream()
+						.noneMatch(state -> ia.getId().equals(state.getOwnerId())))
+				.collect(Collectors.toList());
 		
 		// create / remove accounts 
 		if (!CollectionUtils.isEmpty(identityRoles) || !CollectionUtils.isEmpty(identityAccountList)) {
@@ -168,14 +167,13 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			resolveIdentityAccountForDelete(identityAccountList, identityRoles, identityAccountsToDelete);
 			
 			// Create new identity accounts
-			identityAccountsToCreate.forEach(identityAccount -> identityAccountService.save(identityAccount));
+			identityAccountsToCreate.forEach(identityAccountService::save);
 	
 			// Delete invalid identity accounts
 			identityAccountsToDelete.forEach(identityAccount -> identityAccountService.deleteById(identityAccount.getId()));
 		}		
 		// clear identity accounts marked to be deleted
 		identityAccountStates //
-			.stream() //
 			.forEach(state -> {	// 
 				AccIdentityAccountDto deleteIdentityAccount = identityAccountService.get(state.getOwnerId());
 				if (deleteIdentityAccount != null) {
@@ -210,11 +208,10 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 				Lists.newArrayList(), true, accounts);
 
 		// Create new identity accounts
-		identityAccountsToCreate.forEach(identityAccount -> {
+		identityAccountsToCreate.forEach(identityAccount ->
 			// Check if this identity-account already exists, if yes then is his account ID
 			// add to accounts (for provisioning).
-			createIdentityAccountIfNotExists(accounts, identityAccount);
-		});
+			createIdentityAccountIfNotExists(accounts, identityAccount));
 		return accounts;
 	}
 	
@@ -255,16 +252,13 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 				.collect(Collectors.toList());
 
 		// Create new identity accounts
-		identityAccountsToCreate.forEach(identityAccount -> {
+		identityAccountsToCreate.forEach(identityAccount ->
 			// Check if this identity-account already exists, if yes then is his account ID
 			// add to accounts (for provisioning).
-			createIdentityAccountIfNotExists(accounts, identityAccount);
-		});
+			createIdentityAccountIfNotExists(accounts, identityAccount));
 
 		// Delete invalid identity accounts
-		identityAccountsToDelete.forEach(identityAccount -> {
-			identityAccountService.deleteById(identityAccount.getId());
-		});
+		identityAccountsToDelete.forEach(identityAccount -> identityAccountService.deleteById(identityAccount.getId()));
 		
 		return accounts;
 	}
@@ -438,10 +432,9 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 					identityAccountFilter.setSystemId(roleSystem.getSystem());
 					identityAccountFilter.setIdentityId(contractDto.getIdentity());
 					identityAccountService.find(identityAccountFilter, null).getContent()
-							.forEach(identityAccount -> {
+							.forEach(identityAccount ->
 								// Noting identity-accounts for delayed additional provisioning.
-								notingIdentityAccountForDelayedAcm(event, identityAccount, IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING);
-							});
+								notingIdentityAccountForDelayedAcm(event, identityAccount, IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING));
 				});
 	}
 	
@@ -456,26 +449,21 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			List<IdmIdentityRoleDto> identityRoles, List<AccIdentityAccountDto> identityAccountsToDelete) {
 
 		// Search IdentityAccounts to delete
-		identityRoles.stream().filter(identityRole -> {
-			return !identityRole.isValid();
-		}).forEach(identityRole -> {
-			identityAccountList.stream() //
-					.filter(identityAccount -> identityRole.getId().equals(identityAccount.getIdentityRole())) //
-					// Identity-account is not removed (even if that identity-role is invalid) if
-					// the role-system has enabled forward account management and identity-role will
-					// be valid in the future.
-					.filter(identityAccount -> identityAccount.getRoleSystem() == null
-							|| !( ((SysRoleSystemDto) DtoUtils
-									.getEmbedded(identityAccount, AccIdentityAccount_.roleSystem))
-									.isForwardAccountManagemen() && identityRole.isValidNowOrInFuture())) //
-					.forEach(identityAccountsToDelete::add);
-		});
+		identityRoles.stream().filter(identityRole -> !identityRole.isValid())
+				.forEach(identityRole -> identityAccountList.stream() //
+						.filter(identityAccount -> identityRole.getId().equals(identityAccount.getIdentityRole())) //
+						// Identity-account is not removed (even if that identity-role is invalid) if
+						// the role-system has enabled forward account management and identity-role will
+						// be valid in the future.
+						.filter(identityAccount -> identityAccount.getRoleSystem() == null
+								|| !(((SysRoleSystemDto) DtoUtils
+								.getEmbedded(identityAccount, AccIdentityAccount_.roleSystem))
+								.isForwardAccountManagemen() && identityRole.isValidNowOrInFuture())) //
+						.forEach(identityAccountsToDelete::add));
 
 		// Search IdentityAccounts to delete - we want to delete identity-account if
 		// identity-role is valid, but mapped system on the role does not longer exist.
-		identityRoles.stream().filter(identityRole -> {
-			return identityRole.isValid();
-		}).forEach(identityRole -> {
+		identityRoles.stream().filter(ValidableEntity::isValid).forEach(identityRole ->
 			identityAccountList.stream() //
 					.filter(identityAccount -> identityRole.getId().equals(identityAccount.getIdentityRole()))
 					.filter(identityAccount -> {
@@ -499,8 +487,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 						}
 						return false;
 					})
-					.forEach(identityAccountsToDelete::add);
-		});
+					.forEach(identityAccountsToDelete::add));
 	}
 
 	/**
@@ -575,11 +562,9 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		}
 
 		// Prevent to create the same identity account
-		if (identityAccountList.stream().filter(identityAccount -> {
-			return identityAccount.getAccount().equals(account.getId())
-					&& identityRole.getId().equals(identityAccount.getIdentityRole())
-					&& roleSystem.getId().equals(identityAccount.getRoleSystem());
-		}).count() == 0) {
+		if (identityAccountList.stream().filter(identityAccount -> identityAccount.getAccount().equals(account.getId())
+				&& identityRole.getId().equals(identityAccount.getIdentityRole())
+				&& roleSystem.getId().equals(identityAccount.getRoleSystem())).count() == 0) {
 			AccIdentityAccountDto identityAccount = new AccIdentityAccountDto();
 			identityAccount.setAccount(account.getId());
 			identityAccount.setIdentity(identity.getId());
@@ -681,11 +666,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		// Account management - can be the account created? - execute the script on the
 		// system mapping
 		SysSystemDto system = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.system);
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				SystemEntityType.IDENTITY);
-		if (mapping == null) {
-			return null;
-		}
+		SysSystemMappingDto mapping = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.systemMapping);
 		if (!this.canBeAccountCreated(uid, identity, mapping, system)) {
 			LOG.info(MessageFormat.format(
 					"For entity [{0}] and entity type [{1}] cannot be created the account (on system [{2}]),"
@@ -700,7 +681,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		List<AccAccountDto> sameAccounts = accountService.find(accountFilter, null).getContent();
 		if (CollectionUtils.isEmpty(sameAccounts)) {
 			// Create and persist new account
-			return createAccount(uid, roleSystem);
+			return createAccount(uid, roleSystem, mapping.getId());
 		} else {
 			// We use existed account
 			return sameAccounts.get(0);
@@ -708,12 +689,13 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 
 	}
 
-	private AccAccountDto createAccount(String uid, SysRoleSystemDto roleSystem) {
+	private AccAccountDto createAccount(String uid, SysRoleSystemDto roleSystem, UUID mappingId) {
 		AccAccountDto account = new AccAccountDto();
 		account.setUid(uid);
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setAccountType(AccountType.PERSONAL);
 		account.setSystem(roleSystem.getSystem());
+		account.setSystemMapping(mappingId);
 		
 		return accountService.save(account);
 	}
