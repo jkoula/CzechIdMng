@@ -38,6 +38,7 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 	private UUID systemMapping;
 	private UUID formDefinitionId;
 	private String externalId;
+	private Boolean hasFormDefinition;
 	
 	public AccAccountFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -165,5 +166,13 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 
 	public void setExternalId(String externalId) {
 		this.externalId = externalId;
+	}
+
+	public Boolean getHasFormDefinition() {
+		return hasFormDefinition;
+	}
+
+	public void setHasFormDefinition(Boolean hasFormDefinition) {
+		this.hasFormDefinition = hasFormDefinition;
 	}
 }

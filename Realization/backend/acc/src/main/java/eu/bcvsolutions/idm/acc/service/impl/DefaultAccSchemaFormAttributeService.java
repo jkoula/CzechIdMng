@@ -14,11 +14,13 @@ import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.AccSchemaFormAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaObjectClass_;
+import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.repository.AccSchemaFormAttributeRepository;
 import eu.bcvsolutions.idm.acc.repository.filter.AccSchemaFormAttributeFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
@@ -200,6 +202,12 @@ implements AccSchemaFormAttributeService {
 		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
 		formDefinitionFilter.setCode(createFormDefinitionCode(system, objectClass));
 		return formDefinitionService.find(formDefinitionFilter, null).stream().findFirst().orElse(null);
+	}
+	
+	@Override
+	public IdmFormDefinitionDto getSchemaFormDefinition(SysSystemMappingDto mapping) {
+		SysSchemaObjectClassDto objectClass = DtoUtils.getEmbedded(mapping, SysSystemMapping_.objectClass, SysSchemaObjectClassDto.class);
+		return getSchemaFormDefinition(objectClass);
 	}
 	
 	private IdmFormDefinitionDto createSchemaFormDefinition(SysSystemDto system, SysSchemaObjectClassDto objectClass) {

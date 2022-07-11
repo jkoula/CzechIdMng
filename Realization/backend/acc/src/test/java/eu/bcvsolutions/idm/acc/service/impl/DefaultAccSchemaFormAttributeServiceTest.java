@@ -9,23 +9,17 @@ import java.util.List;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
-import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
-import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
-import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
-import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -49,17 +43,11 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 	@Autowired
 	private IdmFormAttributeService formAttributeService;
 	@Autowired
-	private SysSystemService systemService;
-	@Autowired
 	private SysSchemaAttributeService schemaAttributeService;
 	@Autowired
 	private AccAccountService accountService;
 	@Autowired
 	private FormService formService;
-	@Autowired
-	private AccSchemaFormAttributeService schemaFormAttributeService;
-	@Autowired
-	private SysProvisioningOperationService provisioningService;
 	
 	@Test
 	public void testFormDefinitionCreationOnSchemaCreation() {
@@ -75,7 +63,6 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 		assertFalse(formDefinitions.isEmpty());
 		assertEquals(1, formDefinitions.size());
 		formDefinitionService.delete(formDefinitions.get(0));
-		systemService.delete(system);
 	}
 	
 	@Test
@@ -106,7 +93,6 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 		assertEquals(PersistentType.SHORTTEXT, enable.getPersistentType()); // this is shorttext in the schema
 		//
 		formDefinitionService.delete(formDefinition);
-		systemService.delete(system);
 	}
 	
 	@Test
@@ -141,7 +127,6 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 		assertEquals(PersistentType.BOOLEAN, enableFormAttribute.getPersistentType()); // this should now be boolean
 		//
 		formDefinitionService.delete(formDefinition);
-		systemService.delete(system);
 	}
 	
 	@Test
@@ -178,6 +163,5 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 		//
 		formService.deleteValue(formValue);
 		formDefinitionService.delete(formDefinition);
-//		systemService.delete(system);
 	}
 }

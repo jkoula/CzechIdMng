@@ -335,6 +335,13 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 			predicates.add(builder.equal(root.get(AccAccount_.formDefinition).get(IdmFormDefinition_.id),
 					filter.getFormDefinitionId()));
 		}
+		if (filter.getHasFormDefinition() != null) {
+			if (BooleanUtils.isTrue(filter.getHasFormDefinition())) {
+				predicates.add(builder.isNotNull(root.get(AccAccount_.formDefinition)));
+			} else {
+				predicates.add(builder.isNull(root.get(AccAccount_.formDefinition)));
+			}
+		}
 		if (filter.getSystemMapping() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.systemMapping).get(SysSystemMapping_.id),
 					filter.getSystemMapping()));

@@ -7,6 +7,7 @@ import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.repository.filter.AccSchemaFormAttributeFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 import eu.bcvsolutions.idm.core.api.service.EventableDtoService;
@@ -32,4 +33,6 @@ public interface AccSchemaFormAttributeService extends EventableDtoService<AccSc
 	IdmFormDefinitionDto getSchemaFormDefinition(SysSystemDto system, SysSchemaObjectClassDto objectClass);
 	
 	IdmFormDefinitionDto getSchemaFormDefinition(SysSchemaObjectClassDto objectClass);
+	
+	IdmFormDefinitionDto getSchemaFormDefinition(SysSystemMappingDto mapping);
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaObjectClassFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.core.api.dto.ModuleDescriptorDto;
@@ -46,7 +47,7 @@ public class AccInitSchemaFormDefinitionProcessor extends AbstractInitApplicatio
 
 	@Override
 	public EventResult<ModuleDescriptorDto> process(EntityEvent<ModuleDescriptorDto> event) {
-		List<SysSchemaObjectClassDto> schemas = sysSchemaObjectClassService.find(null).getContent();
+		List<SysSchemaObjectClassDto> schemas = sysSchemaObjectClassService.find(new SysSchemaObjectClassFilter(), null).getContent();
 		for (SysSchemaObjectClassDto schema : schemas) {
 			IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(schema);
 			if (formDefinition == null) {
