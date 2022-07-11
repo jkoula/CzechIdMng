@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.domain.AssignedRoleDto;
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
+import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -28,7 +28,6 @@ import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
-import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
@@ -76,6 +75,7 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
  * 
  * @author Vít Švanda
  * @author Radek Tomiška
+ * @author Roman Kucera
  */
 @Service
 @Qualifier(value = IdentityProvisioningExecutor.NAME)
@@ -130,25 +130,23 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		//
 		AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
 		filter.setAccountId(account.getId());
-		identityAccountService.find(filter, null).getContent().stream().filter(identityAccount -> {
-			return identityAccount.isOwnership();
-		}).forEach((identityAccount) -> {
-			doProvisioning(account,
-					DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.identity, IdmIdentityDto.class));
-		});
+		identityAccountService.find(filter, null).getContent().stream()
+				.filter(AccIdentityAccountDto::isOwnership)
+				.forEach(identityAccount -> doProvisioning(account,
+					DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.identity, IdmIdentityDto.class)));
 	}
 
-	@Override
 	/**
 	 * Identities have own implementation of ACM
 	 */
+	@Override
 	public boolean accountManagement(IdmIdentityDto dto) {
 		return accountManagementService.resolveIdentityAccounts(dto);
 	}
 
 	/**
 	 * Return list of all overloading attributes for given identity, system and uid
-	 * 
+	 *
 	 * @param entity
 	 * @param system
 	 * @param entityType
@@ -158,17 +156,14 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 	@Override
 	protected List<SysRoleSystemAttributeDto> findOverloadingAttributes(IdmIdentityDto entity, SysSystemDto system,
 			AccAccountDto account, SystemEntityType entityType) {
-		
-		SysSystemMappingDto mapping = getMapping(system, entityType);
-		
 		List<SysRoleSystemAttributeDto> roleSystemAttributesAll = new ArrayList<>();
-
-		if(mapping == null) {
+		UUID mapping = account.getSystemMapping();
+		if (mapping == null) {
 			return roleSystemAttributesAll;
 		}
 		// Search overridden attributes for this account.
 		SysRoleSystemAttributeFilter roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
-		roleSystemAttributeFilter.setSystemMappingId(mapping.getId());
+		roleSystemAttributeFilter.setSystemMappingId(mapping);
 		// Filtering by identity-account relation.
 		roleSystemAttributeFilter.setAccountId(account.getId());
 		roleSystemAttributeFilter.setIdentityId(entity.getId());
@@ -187,7 +182,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 			// Beware - these attributes are added for every account (overridden attributes are not supported)
 			roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
 			roleSystemAttributeFilter.setRoleSystemRelationForIdentityId(entity.getId());
-			roleSystemAttributeFilter.setSystemMappingId(mapping.getId());
+			roleSystemAttributeFilter.setSystemMappingId(mapping);
 			roleSystemAttributeFilter.setInCrossDomainGroupOrIsNoLogin(Boolean.TRUE);
 
 			List<SysRoleSystemAttributeDto> roleAttributesInCrossGroup = roleSystemAttributeService
@@ -197,7 +192,6 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 				roleSystemAttributesAll.addAll(roleAttributesInCrossGroup);
 			}
 		}
-		
 		return roleSystemAttributesAll;
 	}
 
@@ -271,12 +265,10 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 						.getContent();
 
 				// Filtering only identity-roles for that system
-				identityAccounts.forEach(identityAccount -> {
-					identityRolesForSystem.addAll(identityRoles.stream() //
-							.filter(identityRole -> identityRole.getId().equals(identityAccount.getIdentityRole())) //
-							.collect(Collectors.toList()) //
-					);
-				});
+				identityAccounts.forEach(identityAccount -> identityRolesForSystem.addAll(identityRoles.stream()
+						.filter(identityRole -> identityRole.getId().equals(identityAccount.getIdentityRole()))
+						.collect(Collectors.toList())
+				));
 
 				identityRolesToProcess = identityRolesForSystem;
 			} else {
