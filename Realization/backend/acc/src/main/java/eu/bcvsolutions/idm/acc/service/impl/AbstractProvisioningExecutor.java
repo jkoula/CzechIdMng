@@ -314,7 +314,10 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	public void doDeleteProvisioning(AccAccountDto account, UUID entityId) {
 		Assert.notNull(account, "Account is required.");
 		SysSystemEntityDto systemEntity = getSystemEntity(account);
-		SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		SysSystemMappingDto systemMappingDto = null;
+		if (account.getSystemMapping() != null) {
+			systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		}
 		//
 		if (systemEntity != null) {
 			doProvisioning(systemEntity, null, entityId, ProvisioningOperationType.DELETE, null, systemMappingDto);
@@ -685,7 +688,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		//
 		// If are input attributes null, then we load default mapped attributes
 		if (attributes == null) {
-			attributes = findAttributeMappings(systemMappingDto.getId());
+			attributes = findAttributeMappings(systemMappingDto);
 		}
 		if (attributes == null || attributes.isEmpty()) {
 			return null;
@@ -970,7 +973,11 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				account, entityType);
 
 		// All default mapped attributes from system
-		List<? extends AttributeMapping> defaultAttributes = findAttributeMappings(account.getSystemMapping());
+		SysSystemMappingDto systemMappingDto = null;
+		if (account.getSystemMapping() != null) {
+			systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		}
+		List<? extends AttributeMapping> defaultAttributes = findAttributeMappings(systemMappingDto);
 
 		// Final list of attributes use for provisioning
 		return compileAttributes(defaultAttributes, roleSystemAttributesAll, entityType);
@@ -1175,15 +1182,15 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 * Find list of {@link SysSystemAttributeMapping} by provisioning type and
 	 * entity type on given system
 	 *
-	 * @param systemMappingID
+	 * @param systemMappingDto
 	 * @return
 	 */
-	protected List<? extends AttributeMapping> findAttributeMappings(UUID systemMappingID) {
-		if (systemMappingID == null) {
+	protected List<? extends AttributeMapping> findAttributeMappings(SysSystemMappingDto systemMappingDto) {
+		if (systemMappingDto == null) {
 			return null;
 		}
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
-		filter.setSystemMappingId(systemMappingID);
+		filter.setSystemMappingId(systemMappingDto.getId());
 		// We don't want attributes for password change only.
 		filter.setSendOnlyOnPasswordChange(Boolean.FALSE);
 		
