@@ -17,8 +17,8 @@ jobs:
 
     steps:
     - name: Get number of CPU cores
-        uses: SimenB/github-actions-cpu-cores@v1
-        id: cpu-cores
+      uses: SimenB/github-actions-cpu-cores@v1
+      id: cpu-cores
     - name: Checkout branch manual
       if: ${{ github.event.inputs.branch != '' }}
       uses: actions/checkout@v3
