@@ -30,34 +30,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Parent test
-      run: mvn test --file Realization/backend/parent/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: Core test
-      run: mvn test --file Realization/backend/core/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: Tool test
-      run: mvn test --file Realization/backend/tool/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: App test
-      run: mvn test --file Realization/backend/app/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: Rpt API test
-      run: mvn test --file Realization/backend/rpt/rpt-api/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: Rpt Impl test
-      run: mvn test --file Realization/backend/rpt/rpt-impl/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: IC test
-      run: mvn test --file Realization/backend/ic/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: Acc test
-      run: mvn test --file Realization/backend/acc/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: Example test
-      run: mvn test --file Realization/backend/example/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
-    - name: VS test
-      run: mvn test --file Realization/backend/vs/pom.xml -Dspring.profiles.active=test
-      continue-on-error: true
+    - name: Maven tests
+      run: mvn test -fn --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
     
