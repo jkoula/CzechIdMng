@@ -8,11 +8,6 @@ on:
       branch:
         description: 'Define branch name'     
         required: true
-      tests:
-        type: boolean
-        description: 'Run tests'
-        required: true
-        default: 'true'
   pull_request:
     branches: [ develop ]
 jobs:
@@ -35,15 +30,28 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Build with Maven with tests
-#       if: ${{ github.event.inputs.tests == 'true' }}
-      #run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
-      run: mvn test --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
-#     - name: Build with Maven without tests
-#       if: ${{ github.event.inputs.tests == 'false' }}
-#       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
-    #- name: Upload artifact
-      #uses: actions/upload-artifact@v1.0.0
-      #with:
-      #  name: idm.war
-      #  path: Realization/backend/app/target
+    - name: Parent test
+      run: mvn test --file Realization/backend/parent/pom.xml -Dspring.profiles.active=test
+    - name: Core API test
+      run: mvn test --file Realization/backend/core/core-api/pom.xml -Dspring.profiles.active=test
+    - name: Core Impl test
+      run: mvn test --file Realization/backend/core/core-impl/pom.xml -Dspring.profiles.active=test
+    - name: Core Test API test
+      run: mvn test --file Realization/backend/core/core-test-api/pom.xml -Dspring.profiles.active=test
+    - name: Tool test
+      run: mvn test --file Realization/backend/tool/pom.xml -Dspring.profiles.active=test
+    - name: App test
+      run: mvn test --file Realization/backend/app/pom.xml -Dspring.profiles.active=test
+    - name: Rpt API test
+      run: mvn test --file Realization/backend/rpt/rpt-api/pom.xml -Dspring.profiles.active=test
+    - name: Rpt Impl test
+      run: mvn test --file Realization/backend/rpt/rpt-impl/pom.xml -Dspring.profiles.active=test
+    - name: IC test
+      run: mvn test --file Realization/backend/ic/pom.xml -Dspring.profiles.active=test
+    - name: Acc test
+      run: mvn test --file Realization/backend/acc/pom.xml -Dspring.profiles.active=test
+    - name: Example test
+      run: mvn test --file Realization/backend/example/pom.xml -Dspring.profiles.active=test
+    - name: VS test
+      run: mvn test --file Realization/backend/vs/pom.xml -Dspring.profiles.active=test
+    
