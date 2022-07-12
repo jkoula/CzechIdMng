@@ -27,6 +27,7 @@ import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
+import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
@@ -52,6 +53,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
 import eu.bcvsolutions.idm.core.api.domain.IdmPasswordPolicyType;
@@ -107,6 +109,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	@Autowired private ConnectorManager connectorManager;
 	@Autowired
 	private AccAccountService accountService;
+	@Autowired
+	private SysSystemMappingService systemMappingService;
 	
 	@Autowired
 	public PrepareConnectorObjectProcessor(
@@ -644,8 +648,15 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 
 		AccAccountDto accountDto = accountService.getAccount(systemEntityUid, system);
 		if (accountDto == null) {
-			throw new IllegalStateException(MessageFormat.format("Account on system [{0}] not found for entity uid [{1}]",
-					system, systemEntityUid));
+			// This is fallback, if account is not found, but system has some provisioning mapping, get first one
+			List<SysSystemMappingDto> systemMappings = systemMappingService.findBySystemId(system,
+					SystemOperationType.PROVISIONING, provisioningOperationDto.getEntityType());
+			if (systemMappings == null || systemMappings.isEmpty()) {
+				throw new IllegalStateException(MessageFormat.format(
+						"System [{0}] does not have mapping, provisioning will not be executed. Add some mapping for entity type [{1}]",
+						system, provisioningOperationDto.getEntityType()));
+			}
+			return systemMappings.get(0);
 		}
 		return DtoUtils.getEmbedded(accountDto, AccAccount_.systemMapping, SysSystemMappingDto.class);
 	}
