@@ -4,20 +4,23 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 //
 import { Basic, Advanced, Managers, Utils, Domain } from 'czechidm-core';
-import { AccountManager, SystemEntityManager, SystemManager } from '../../redux';
+import { AccountManager, SystemEntityManager, SystemManager, SystemMappingManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
 import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
+import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 import AttributeTable from './AttributeTable';
 
 const manager = new AccountManager();
 const systemEntityManager = new SystemEntityManager();
 const systemManager = new SystemManager();
+const systemMappingManager = new SystemMappingManager();
 
 /**
  * Accounts on target system
  *
  * @author Vít Švanda
  * @author Radek Tomiška
+ * @author Roman Kucera
  */
 export class AccountTable extends Advanced.AbstractTableContent {
 
@@ -130,7 +133,14 @@ export class AccountTable extends Advanced.AbstractTableContent {
     let systemId = null;
     if (forceSearchParameters.getFilters().has('systemId')) {
       systemId = forceSearchParameters.getFilters().get('systemId');
+    } 
+    if (systemId == null && detail && detail.entity) {
+      systemId = detail.entity.system
     }
+
+    const forceSearchMappings = new Domain.SearchParameters()
+      .setFilter('operationType', SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
+      .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
 
     return (
       <Basic.Div>
@@ -310,6 +320,12 @@ export class AccountTable extends Advanced.AbstractTableContent {
                   enum={ SystemEntityTypeEnum }
                   label={ this.i18n('acc:entity.SystemEntity.entityType') }
                   hidden={ systemEntity }/>
+                <Basic.SelectBox
+                  ref="systemMapping"
+                  manager={systemMappingManager}
+                  forceSearchParameters={forceSearchMappings}
+                  label={this.i18n('acc:entity.RoleSystem.systemMapping')}
+                  placeholder={systemId ? null : this.i18n('systemMapping.systemPlaceholder')} />
                 <Basic.Checkbox
                   ref="inProtection"
                   label={ this.i18n('acc:entity.Account.inProtection') }
