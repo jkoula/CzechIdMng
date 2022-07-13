@@ -16,9 +16,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Get number of CPU cores
-      uses: SimenB/github-actions-cpu-cores@v1
-      id: cpu-cores
     - name: Checkout branch manual
       if: ${{ github.event.inputs.branch != '' }}
       uses: actions/checkout@v3
@@ -34,5 +31,5 @@ jobs:
       with:
         java-version: 11
     - name: Maven tests
-      run: mvn test -fn -q -T ${{ steps.cpu-cores.outputs.count }} --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
+      run: mvn test -fn --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
     
