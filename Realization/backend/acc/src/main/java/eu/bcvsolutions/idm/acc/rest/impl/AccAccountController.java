@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,6 +42,7 @@ import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
@@ -50,9 +52,15 @@ import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.eav.rest.impl.AbstractFormableDtoController;
+import eu.bcvsolutions.idm.core.eav.rest.impl.IdmFormDefinitionController;
+import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
@@ -78,16 +86,21 @@ import io.swagger.annotations.AuthorizationScope;;
 		description = "Account on target system",
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE,
 		consumes = MediaType.APPLICATION_JSON_VALUE)
-public class AccAccountController extends AbstractReadWriteDtoController<AccAccountDto, AccAccountFilter> {
+public class AccAccountController extends AbstractFormableDtoController<AccAccountDto, AccAccountFilter> {
 	
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AccAccountController.class);
 	protected static final String TAG = "Accounts";
 	//
 	@Autowired private SysSystemEntityService systemEntityService;
+	private final IdmFormDefinitionController formDefinitionController;
 	
 	@Autowired
-	public AccAccountController(AccAccountService accountService) {
+	public AccAccountController(AccAccountService accountService,
+			IdmFormDefinitionController formDefinitionController) {
+
 		super(accountService);
+		
+		this.formDefinitionController = formDefinitionController;
 	}
 
 	@Transactional(readOnly = true)
@@ -426,6 +439,129 @@ public class AccAccountController extends AbstractReadWriteDtoController<AccAcco
 				})
 	public ResponseEntity<IdmBulkActionDto> preprocessBulkAction(@Valid @RequestBody IdmBulkActionDto bulkAction) {
 		return super.preprocessBulkAction(bulkAction);
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/{backendId}/form-definitions", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
+	@ApiOperation(
+			value = "Account extended attributes form definitions", 
+			nickname = "getAccountFormDefinitions", 
+			tags = { AccAccountController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = ""),
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_DEFINITION_AUTOCOMPLETE, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = ""),
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_DEFINITION_AUTOCOMPLETE, description = "")})
+				})
+	public ResponseEntity<?> getFormDefinitions(
+			@ApiParam(value = "Account's uuid identifier.", required = true)
+			@PathVariable @NotNull String backendId) {
+		return super.getFormDefinitions(backendId);
+	}
+	
+	@Override
+	@ResponseBody
+	@RequestMapping(value = "/form-values/prepare", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
+	@ApiOperation(
+			value = "Account form definition - prepare available values", 
+			nickname = "prepareAccountFormValues", 
+			tags = { AccAccountController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")})
+				})
+	public Resource<?> prepareFormValues(
+			@ApiParam(value = "Code of form definition (default will be used if no code is given).", required = false, defaultValue = FormService.DEFAULT_DEFINITION_CODE)
+			@RequestParam(name = IdmFormAttributeFilter.PARAMETER_FORM_DEFINITION_CODE, required = false) String definitionCode) {
+		return super.prepareFormValues(definitionCode);
+	}
+	
+	/**
+	 * Returns filled form values
+	 * 
+	 * @param backendId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/{backendId}/form-values", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
+	@ApiOperation(
+			value = "Account form definition - read values", 
+			nickname = "getAccountFormValues", 
+			tags = { AccAccountController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")})
+				})
+	public Resource<?> getFormValues(
+			@ApiParam(value = "Account's uuid identifier.", required = true)
+			@PathVariable @NotNull String backendId, 
+			@ApiParam(value = "Code of form definition (default will be used if no code is given).", required = false, defaultValue = FormService.DEFAULT_DEFINITION_CODE)
+			@RequestParam(name = IdmFormAttributeFilter.PARAMETER_FORM_DEFINITION_CODE, required = false) String definitionCode) {
+		AccAccountDto dto = getDto(backendId);
+		if (dto == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		//
+		IdmFormDefinitionDto formDefinition = formDefinitionController.getDefinition(
+				AccAccount.class, 
+				definitionCode, 
+				IdmBasePermission.AUTOCOMPLETE);
+		//
+		return formDefinitionController.getFormValues(dto, formDefinition, IdmBasePermission.READ);
+	}
+	
+	/**
+	 * Save form values.
+	 * 
+	 * @param backendId
+	 * @param formValues
+	 * @return
+	 */
+	@ResponseBody
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_UPDATE + "')"
+			+ "or hasAuthority('" + CoreGroupPermission.FORM_VALUE_UPDATE + "')")
+	@RequestMapping(value = "/{backendId}/form-values", method = { RequestMethod.POST, RequestMethod.PATCH })
+	@ApiOperation(
+			value = "Account form definition - save values", 
+			nickname = "postAccountFormValues", 
+			tags = { AccAccountController.TAG }, 
+			notes = "Only given form attributes by the given values will be saved.",
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_UPDATE, description = ""),
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_UPDATE, description = "")}),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_UPDATE, description = ""),
+						@AuthorizationScope(scope = CoreGroupPermission.FORM_VALUE_UPDATE, description = "")})
+				})
+	public Resource<?> saveFormValues(
+			@ApiParam(value = "Account uuid identifier.", required = true)
+			@PathVariable @NotNull String backendId,
+			@ApiParam(value = "Code of form definition (default will be used if no code is given).", required = false, defaultValue = FormService.DEFAULT_DEFINITION_CODE)
+			@RequestParam(name = IdmFormAttributeFilter.PARAMETER_FORM_DEFINITION_CODE, required = false) String definitionCode,
+			@ApiParam(value = "Filled form data.", required = true)
+			@RequestBody @Valid List<IdmFormValueDto> formValues) {		
+		AccAccountDto dto = getDto(backendId);
+		if (dto == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		//
+		IdmFormDefinitionDto formDefinition = formDefinitionController.getDefinition(
+				AccAccount.class, 
+				definitionCode, 
+				IdmBasePermission.AUTOCOMPLETE);
+		//
+		return formDefinitionController.saveFormValues(dto, formDefinition, formValues, IdmBasePermission.UPDATE);
 	}
 	
 	@Override

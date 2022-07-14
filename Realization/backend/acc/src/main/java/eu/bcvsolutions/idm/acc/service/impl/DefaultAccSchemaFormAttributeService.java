@@ -1,6 +1,12 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
 import java.util.List;
+import java.util.UUID;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -19,6 +25,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.AccSchemaFormAttribute;
+import eu.bcvsolutions.idm.acc.entity.AccSchemaFormAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaObjectClass_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.repository.AccSchemaFormAttributeRepository;
@@ -38,6 +45,8 @@ import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormDefinitionFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
+import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute_;
+import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
@@ -61,6 +70,31 @@ implements AccSchemaFormAttributeService {
 		super(repository, entityEventManager);
 	}
 
+	@Override
+	protected List<Predicate> toPredicates(Root<AccSchemaFormAttribute> root, CriteriaQuery<?> query,
+			CriteriaBuilder builder, AccSchemaFormAttributeFilter filter) {
+		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
+
+		// Schema
+		UUID schema = filter.getSchema();
+		if (schema != null) {
+			predicates.add(builder.equal(root.get(AccSchemaFormAttribute_.schema).get(SysSchemaObjectClass_.id), schema));
+		}
+		// Form definition
+		UUID definition = filter.getFormDefinition();
+		if (definition != null) {
+			predicates.add(builder.equal(root.get(AccSchemaFormAttribute_.formAttribute)
+					.get(IdmFormAttribute_.formDefinition).get(IdmFormDefinition_.id), definition));
+		}
+		// Form attribute
+		UUID attribute = filter.getFormAttribute();
+		if (attribute != null) {
+			predicates.add(
+					builder.equal(root.get(AccSchemaFormAttribute_.formAttribute).get(IdmFormAttribute_.id), attribute));
+		}
+		return predicates;
+	}
+	
 	@Override
 	public AuthorizableType getAuthorizableType() {
 		return new AuthorizableType(AccGroupPermission.ACCOUNTFORMVALUE, getEntityClass());
@@ -109,23 +143,22 @@ implements AccSchemaFormAttributeService {
 		if (formAttribute == null) {
 			// create
 			formAttribute = createFormAttribute(schemaAttribute, schemaFormDefinition);
+			AccSchemaFormAttributeDto schemaFormAttribute = new AccSchemaFormAttributeDto();
+			schemaFormAttribute.setFormAttribute(formAttribute.getId());
+			schemaFormAttribute.setSchema(schemaAttribute.getObjectClass());
+			schemaFormAttribute = this.saveInternal(schemaFormAttribute);
+			return schemaFormAttribute;
 		} else {
 			// update
 			updateFormAttribute(schemaAttribute, schemaFormDefinition, formAttribute);
-			return null; // TODO this is temporary
+			AccSchemaFormAttributeFilter formAttributeFilter = new AccSchemaFormAttributeFilter();
+			formAttributeFilter.setFormAttribute(formAttribute.getId());
+			return this.find(formAttributeFilter, null).stream().findFirst().orElse(null);
 		}
-				
-		
-		AccSchemaFormAttributeDto schemaFormAttribute = new AccSchemaFormAttributeDto();
-		schemaFormAttribute.setFormAttribute(formAttribute.getId());
-		schemaFormAttribute.setSchema(schemaAttribute.getObjectClass());
-		
-		return this.save(schemaFormAttribute);
 	}
 
 	private IdmFormAttributeDto findFormAttribute(SysSchemaAttributeDto schemaAttribute,
 			IdmFormDefinitionDto schemaFormDefinition) {
-		//TODO maybe use the new filter and implement toPredicate
 		IdmFormAttributeFilter filter = new IdmFormAttributeFilter();
 		filter.setCode(schemaAttribute.getName());
 		filter.setDefinitionId(schemaFormDefinition.getId());
@@ -149,7 +182,6 @@ implements AccSchemaFormAttributeService {
 		formAttribute.setReadonly(!schemaAttribute.isCreateable());
 		formAttribute.setConfidential(schemaAttribute.getClassType().equals(GuardedString.class.getCanonicalName()));
 		formAttribute.setPersistentType(getPersistentType(schemaAttribute));
-		// TODO maybe add more / remove some?
 		
 		return formAttributeService.save(formAttribute);
 	}
@@ -242,11 +274,10 @@ implements AccSchemaFormAttributeService {
 
 	@Override
 	public IdmFormInstanceDto getFormInstanceForAccount(AccAccountDto account) {
-		// TODO this is not going to work very well
-		SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system, SysSystemDto.class);
-		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
-		formDefinitionFilter.setText(system.getName());
-		IdmFormDefinitionDto formDefinition = formDefinitionService.find(formDefinitionFilter, null).stream().findFirst().orElse(null);
+		IdmFormDefinitionDto formDefinition = DtoUtils.getEmbedded(account, AccAccount_.formDefinition, IdmFormDefinitionDto.class);
+		if (formDefinition == null) {
+			return null;
+		}
 		
 		return formService.getFormInstance(account, formDefinition);
 	}

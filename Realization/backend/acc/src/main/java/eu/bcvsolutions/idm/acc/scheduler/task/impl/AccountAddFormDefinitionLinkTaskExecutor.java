@@ -70,7 +70,10 @@ public class AccountAddFormDefinitionLinkTaskExecutor extends AbstractSchedulabl
 			for (Iterator<AccAccountDto> i = accounts.iterator(); i.hasNext() && canContinue;) {
 				// set the form definition
 				AccAccountDto account = i.next();
-				SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+				SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
+				if (mapping == null) {
+					continue;
+				}
 				UUID formDefinitionId = mappingToFormDefinitionMap.get(mapping);
 				if (formDefinitionId == null) {
 					IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(mapping);

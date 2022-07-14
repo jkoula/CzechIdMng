@@ -12,13 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
+import eu.bcvsolutions.idm.acc.entity.TestResource;
+import eu.bcvsolutions.idm.acc.repository.filter.AccSchemaFormAttributeFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -47,16 +51,20 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 	@Autowired
 	private AccAccountService accountService;
 	@Autowired
+	private AccSchemaFormAttributeService schemaFormAttributeService;
+	@Autowired
 	private FormService formService;
 	
 	@Test
 	public void testFormDefinitionCreationOnSchemaCreation() {
+		String systemName = helper.createName();
 		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
 		formDefinitionFilter.setType(AccAccount.class.getCanonicalName());
+		formDefinitionFilter.setText(systemName);
 		List<IdmFormDefinitionDto> formDefinitions = formDefinitionService.find(formDefinitionFilter, null).getContent();
 		assertTrue(formDefinitions.isEmpty());
 		
-		SysSystemDto system = helper.createSystem("test_resource");
+		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME, systemName);
 		// we're generating the schema now so the definition should be created
 		helper.createMapping(system);
 		formDefinitions = formDefinitionService.find(formDefinitionFilter, null).getContent();
@@ -67,12 +75,24 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 	
 	@Test
 	public void testFormAttributeCreationOnSchemaCreation() {
-		SysSystemDto system = helper.createSystem("test_resource");
+		String systemName = helper.createName();
+		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME, systemName);
 		// we're generating the schema now so the definition should be created
 		helper.createMapping(system);
 		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
 		formDefinitionFilter.setType(AccAccount.class.getCanonicalName());
+		formDefinitionFilter.setText(systemName);
 		IdmFormDefinitionDto formDefinition = formDefinitionService.find(formDefinitionFilter, null).stream().findFirst().orElse(null);
+		//
+		// check that schema form attributes exist and are
+		AccSchemaFormAttributeFilter schemaFormAttributeFilter = new AccSchemaFormAttributeFilter();
+		schemaFormAttributeFilter.setFormDefinition(formDefinition.getId());
+		List<AccSchemaFormAttributeDto> schemaFormAttributes = schemaFormAttributeService.find(schemaFormAttributeFilter, null).getContent();
+		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
+		schemaAttributeFilter.setSystemId(system.getId());
+		List<SysSchemaAttributeDto> schemaAttributes = schemaAttributeService.find(schemaAttributeFilter, null).getContent();
+		assertEquals(schemaAttributes.size(), schemaFormAttributes.size());
+		//
 		IdmFormAttributeFilter formAttributeFilter = new IdmFormAttributeFilter();
 		formAttributeFilter.setDefinitionId(formDefinition.getId());
 		List<IdmFormAttributeDto> formAttributes = formAttributeService.find(formAttributeFilter, null).getContent();
@@ -97,11 +117,13 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 	
 	@Test
 	public void testUpdateFormAttributeOnSchemaChange() {
-		SysSystemDto system = helper.createSystem("test_resource");
+		String systemName = helper.createName();
+		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME, systemName);
 		// we're generating the schema now so the definition should be created
 		helper.createMapping(system);
 		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
 		formDefinitionFilter.setType(AccAccount.class.getCanonicalName());
+		formDefinitionFilter.setText(systemName);
 		IdmFormDefinitionDto formDefinition = formDefinitionService.find(formDefinitionFilter, null).stream().findFirst().orElse(null);
 		IdmFormAttributeFilter formAttributeFilter = new IdmFormAttributeFilter();
 		formAttributeFilter.setDefinitionId(formDefinition.getId());
@@ -117,7 +139,7 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 		List<SysSchemaAttributeDto> schemaAttributes = schemaAttributeService.find(schemaAttributeFilter, null).getContent();
 		SysSchemaAttributeDto enableSchemaAttribute = schemaAttributes.stream().filter(sa -> sa.getName().equals("__ENABLE__")).findFirst().orElse(null);
 		enableSchemaAttribute.setClassType(Boolean.class.getCanonicalName());
-		schemaAttributeService.save(enableSchemaAttribute);
+		enableSchemaAttribute = schemaAttributeService.save(enableSchemaAttribute);
 		//
 		formAttributes = formAttributeService.find(formAttributeFilter, null).getContent();
 		assertFalse(formAttributes.isEmpty());
@@ -132,7 +154,8 @@ public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegratio
 	@Test
 	public void testCreateAccountFormValue() {
 		// create system
-		SysSystemDto system = helper.createSystem("test_resource");
+		String systemName = helper.createName();
+		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME, systemName);
 		helper.createMapping(system);
 		IdmRoleDto role = helper.createRole();
 		helper.createRoleSystem(role, system);

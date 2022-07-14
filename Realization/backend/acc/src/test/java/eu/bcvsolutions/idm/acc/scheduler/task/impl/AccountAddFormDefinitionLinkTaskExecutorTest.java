@@ -15,6 +15,7 @@ import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
+import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -39,7 +40,8 @@ public class AccountAddFormDefinitionLinkTaskExecutorTest extends AbstractIntegr
 	public void testCreateAccountFormValue() {
 		helper.loginAdmin();
 		// create system
-		SysSystemDto system = helper.createSystem("test_resource");
+		String systemName = helper.createName();
+		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME, systemName);
 		helper.createMapping(system);
 		IdmRoleDto role = helper.createRole();
 		helper.createRoleSystem(role, system);
@@ -74,7 +76,8 @@ public class AccountAddFormDefinitionLinkTaskExecutorTest extends AbstractIntegr
 	public void testCreateAccountFormValueSystemFilter() {
 		helper.loginAdmin();
 		// create system
-		SysSystemDto system = helper.createSystem("test_resource");
+		String systemName = helper.createName();
+		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME, systemName);
 		helper.createMapping(system);
 		IdmRoleDto role = helper.createRole();
 		helper.createRoleSystem(role, system);

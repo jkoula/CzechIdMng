@@ -12,6 +12,7 @@ import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.event.AccountEvent.AccountEventType;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
@@ -87,10 +88,19 @@ public class AccountSaveProcessor extends CoreEventProcessor<AccAccountDto> impl
 		
 		
 		if (entity.getFormDefinition() == null) {
-			SysSchemaObjectClassDto schema = schemaObjectClassService.get(mapping.getObjectClass());
-			IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(systemDto, schema);
-			if (formDefinition != null) {
-				entity.setFormDefinition(formDefinition.getId());
+			SysSchemaObjectClassDto schema = null;
+			if (mapping != null) {
+				schema = schemaObjectClassService.get(mapping.getObjectClass());
+			} else {
+				// no provisioning mapping just yet so we need to find the object class for synchronization
+				schema = getObjectClassSchema(entity);
+			}
+			
+			if (schema != null) {
+				IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(systemDto, schema);
+				if (formDefinition != null) {
+					entity.setFormDefinition(formDefinition.getId());
+				}
 			}
 		}
 
@@ -98,6 +108,26 @@ public class AccountSaveProcessor extends CoreEventProcessor<AccAccountDto> impl
 		event.setContent(entity);
 
 		return new DefaultEventResult<>(event, this);
+	}
+
+	/**
+	 * Try to find the object class schema for the account.
+	 * 
+	 * @param entity
+	 * @return
+	 */
+	private SysSchemaObjectClassDto getObjectClassSchema(AccAccountDto entity) {
+		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
+		mappingFilter.setSystemId(entity.getSystem());
+		mappingFilter.setEntityType(entity.getEntityType());
+		// we will use the first one found - this should almost certainly be correct
+		SysSystemMappingDto mapping = systemMappingService.find(mappingFilter, null).stream().findFirst().orElse(null);
+		
+		if (mapping != null && mapping.getObjectClass() != null) {
+			return schemaObjectClassService.get(mapping.getObjectClass());
+		}
+		
+		return null;
 	}
 
 	@Override

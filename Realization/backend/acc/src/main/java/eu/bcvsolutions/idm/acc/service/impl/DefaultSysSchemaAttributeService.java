@@ -86,4 +86,11 @@ public class DefaultSysSchemaAttributeService extends AbstractReadWriteDtoServic
 		return super.save(dto, permission);
 	}
 	
+
+	@Override
+	public Iterable<SysSchemaAttributeDto> saveAll(Iterable<SysSchemaAttributeDto> dtos, BasePermission... permission) {
+		dtos.forEach(dto -> schemaFormAttributeService.createFormAttribute(dto));
+		
+		return super.saveAll(dtos, permission);
+	}
 }
