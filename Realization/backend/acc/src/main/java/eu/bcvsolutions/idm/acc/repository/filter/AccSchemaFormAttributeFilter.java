@@ -8,6 +8,13 @@ import org.springframework.util.MultiValueMap;
 import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 
+/**
+ * Filter for relation between an account and definition of form-attribution. It is an
+ * elementary part of the account form "subdefinition".
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 public class AccSchemaFormAttributeFilter extends DataFilter {
 
 	private UUID schema;

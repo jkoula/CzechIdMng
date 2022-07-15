@@ -95,6 +95,7 @@ import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
  * @author Radek Tomiška
  * @author svandav
  * @author Roman Kucera
+ * @author Tomáš Doischer
  *
  */
 @Service("accAccountService")

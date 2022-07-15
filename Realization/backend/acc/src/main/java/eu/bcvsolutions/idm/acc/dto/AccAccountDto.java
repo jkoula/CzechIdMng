@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  * 
  * @author Svanda
  * @author Roman Kucera
+ * @author Tomáš Doischer
  *
  */
 

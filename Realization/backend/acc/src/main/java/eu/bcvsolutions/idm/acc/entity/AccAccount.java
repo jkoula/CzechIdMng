@@ -36,6 +36,7 @@ import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition;
  * 
  * @author Radek Tomiška
  * @author Roman Kucera
+ * @author Tomáš Doischer
  *
  */
 @Entity

@@ -23,6 +23,13 @@ import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute;
 
+/**
+ * Relation between an account and definition of form-attribution. It is an elementary part
+ * of the account form "sub-definition".
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 @Entity
 @Audited
 @Table(name = "acc_schema_form_attribute", indexes = {

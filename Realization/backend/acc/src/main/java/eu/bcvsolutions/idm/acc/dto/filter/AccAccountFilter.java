@@ -17,6 +17,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.FormableFilter;
  * 
  * @author Radek Tomiška
  * @author Roman Kucera
+ * @author Tomáš Doischer
  *
  */
 public class AccAccountFilter extends DataFilter implements ExternalIdentifiableFilter, FormableFilter {

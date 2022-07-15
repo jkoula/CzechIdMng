@@ -11,6 +11,13 @@ import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 
+/**
+ * Relation between an account and definition of form-attribution. It is an elementary part
+ * of the account form "sub-definition".
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 @Relation(collectionRelation = "schemaFormAttributes")
 public class AccSchemaFormAttributeDto extends AbstractDto {
 	private static final long serialVersionUID = 1L;

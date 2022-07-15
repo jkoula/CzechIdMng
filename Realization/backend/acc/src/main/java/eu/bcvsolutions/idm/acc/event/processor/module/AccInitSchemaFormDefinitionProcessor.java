@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.event.processor.module;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -18,12 +19,13 @@ import eu.bcvsolutions.idm.core.api.event.processor.AbstractInitApplicationProce
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 
 /**
- * TODO Does not support update which is not needed.
+ * Creates schema form definitions for schemas which do not have any yet. Needed to override standard mapping. Does not support update which is not needed.
  * 
  * @author Tomáš Doischer
  *
  */
 @Component(AccInitSchemaFormDefinitionProcessor.PROCESSOR_NAME)
+@Description("Creates schema form definitions for schemas which do not have any yet.")
 public class AccInitSchemaFormDefinitionProcessor extends AbstractInitApplicationProcessor {
 	
 	@Autowired
@@ -52,8 +54,8 @@ public class AccInitSchemaFormDefinitionProcessor extends AbstractInitApplicatio
 			IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(schema);
 			if (formDefinition == null) {
 				// create form definition and attributes 
-				LOG.info("Creating form definition for object class [{}] with ID [{}].", schema.getObjectClassName(), schema.getId());
-				schemaFormAttributeService.createFormAttributes(schema);
+				LOG.info("Creating form definition and attributes for object class [{}] with ID [{}].", schema.getObjectClassName(), schema.getId());
+				schemaFormAttributeService.createSchemaFormAttributes(schema);
 			}
 		}
 		

@@ -25,6 +25,12 @@ import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
+/**
+ * Tests for {@link AccountAddFormDefinitionLinkTaskExecutor}.
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 public class AccountAddFormDefinitionLinkTaskExecutorTest extends AbstractIntegrationTest {
 	
 	@Autowired

@@ -38,6 +38,12 @@ import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
+/**
+ * Tests for {@link DefaultAccSchemaFormAttributeService}.
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 public class DefaultAccSchemaFormAttributeServiceTest extends AbstractIntegrationTest {
 
 	@Autowired

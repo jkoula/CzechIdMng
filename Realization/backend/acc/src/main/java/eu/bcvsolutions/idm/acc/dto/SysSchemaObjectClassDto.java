@@ -12,6 +12,7 @@ import eu.bcvsolutions.idm.core.api.dto.FormableDto;
  * DTO for {@link SysSchemaObjectClass}
  * 
  * @author Ondrej Kopr <kopr@xyxy.cz>
+ * @author Tomáš Doischer
  *
  */
 

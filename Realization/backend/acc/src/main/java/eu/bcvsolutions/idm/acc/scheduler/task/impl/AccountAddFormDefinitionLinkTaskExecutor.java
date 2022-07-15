@@ -30,6 +30,12 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 
+/**
+ * Add account form definition links. The form definitions are needed to manually set the account attribute's values. This task is used for migration only.
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 @DisallowConcurrentExecution
 @Component(AccountAddFormDefinitionLinkTaskExecutor.TASK_NAME)
 public class AccountAddFormDefinitionLinkTaskExecutor extends AbstractSchedulableTaskExecutor<Boolean> {

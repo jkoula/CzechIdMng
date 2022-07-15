@@ -27,10 +27,11 @@ import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 
 /**
- * Save account processor
+ * Save account processor. Persists data and adds links to mapping and form definition.
  * 
  * @author Svanda
  * @author Roman Kucera
+ * @author Tomáš Doischer
  */
 @Component("accAccountSaveProcessor")
 @Description("Ensures referential integrity. Cannot be disabled.")

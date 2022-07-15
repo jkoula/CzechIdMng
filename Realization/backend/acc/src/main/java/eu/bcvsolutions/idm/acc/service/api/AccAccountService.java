@@ -20,6 +20,7 @@ import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
  * Accounts on target system
  * 
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  *
  */
 public interface AccAccountService extends//

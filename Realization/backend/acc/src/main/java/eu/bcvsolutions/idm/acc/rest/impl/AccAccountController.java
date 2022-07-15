@@ -75,6 +75,7 @@ import io.swagger.annotations.AuthorizationScope;;
  * Accounts on target system
  * 
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  *
  */
 @RestController

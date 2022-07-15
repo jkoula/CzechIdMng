@@ -51,6 +51,13 @@ import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
+/**
+ * Service for relation between an account and definition of form-attribution. It is an elementary part
+ * of the account form "sub-definition".
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 @Service("accSchemaFormAttributeService")
 public class DefaultAccSchemaFormAttributeService extends AbstractEventableDtoService<AccSchemaFormAttributeDto, AccSchemaFormAttribute, AccSchemaFormAttributeFilter>
 implements AccSchemaFormAttributeService {
@@ -102,7 +109,7 @@ implements AccSchemaFormAttributeService {
 	}
 
 	@Override
-	public AccSchemaFormAttributeDto createFormAttribute(SysSchemaAttributeDto schemaAttribute) {
+	public AccSchemaFormAttributeDto createSchemaFormAttribute(SysSchemaAttributeDto schemaAttribute) {
 		SysSchemaObjectClassDto objectClass = sysSchemaObjectClassService.get(schemaAttribute.getObjectClass());
 		SysSystemDto system = DtoUtils.getEmbedded(objectClass, SysSchemaObjectClass_.system, SysSystemDto.class);
 		
@@ -115,7 +122,7 @@ implements AccSchemaFormAttributeService {
 	}
 	
 	@Override
-	public List<AccSchemaFormAttributeDto> createFormAttributes(SysSchemaObjectClassDto objectClass) {
+	public List<AccSchemaFormAttributeDto> createSchemaFormAttributes(SysSchemaObjectClassDto objectClass) {
 		List<AccSchemaFormAttributeDto> schemaFormAttributes = Lists.newArrayList();
 		
 		SysSystemDto system = DtoUtils.getEmbedded(objectClass, SysSchemaObjectClass_.system, SysSystemDto.class);
@@ -277,7 +284,7 @@ implements AccSchemaFormAttributeService {
 
 	@Override
 	public IdmFormInstanceDto getFormInstanceForAccount(AccAccountDto account) {
-		IdmFormDefinitionDto formDefinition = DtoUtils.getEmbedded(account, AccAccount_.formDefinition, IdmFormDefinitionDto.class);
+		IdmFormDefinitionDto formDefinition = DtoUtils.getEmbedded(account, AccAccount_.formDefinition, IdmFormDefinitionDto.class, null);
 		if (formDefinition == null) {
 			return null;
 		}

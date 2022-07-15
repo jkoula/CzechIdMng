@@ -23,6 +23,7 @@ import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
  * This entity keeps relation on object class in resource
  * 
  * @author svandav
+ * @author Tomáš Doischer
  *
  */
 @Entity

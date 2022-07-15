@@ -26,6 +26,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
  * Default schema attributes
  * 
  * @author svandav
+ * @author Tomáš Doischer
  *
  */
 @Service
@@ -81,7 +82,7 @@ public class DefaultSysSchemaAttributeService extends AbstractReadWriteDtoServic
 	@Override
 	@Transactional
 	public SysSchemaAttributeDto save(SysSchemaAttributeDto dto, BasePermission... permission) {
-		schemaFormAttributeService.createFormAttribute(dto);
+		schemaFormAttributeService.createSchemaFormAttribute(dto);
 		
 		return super.save(dto, permission);
 	}
@@ -89,7 +90,7 @@ public class DefaultSysSchemaAttributeService extends AbstractReadWriteDtoServic
 
 	@Override
 	public Iterable<SysSchemaAttributeDto> saveAll(Iterable<SysSchemaAttributeDto> dtos, BasePermission... permission) {
-		dtos.forEach(dto -> schemaFormAttributeService.createFormAttribute(dto));
+		dtos.forEach(dto -> schemaFormAttributeService.createSchemaFormAttribute(dto));
 		
 		return super.saveAll(dtos, permission);
 	}
