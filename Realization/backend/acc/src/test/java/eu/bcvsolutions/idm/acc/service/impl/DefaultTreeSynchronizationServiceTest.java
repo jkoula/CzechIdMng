@@ -9,8 +9,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemFilter;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -19,6 +23,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.ImmutableList;
 
@@ -125,12 +130,13 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	private SysSchemaObjectClassService schemaObjectClassService;
 	@Autowired
 	private AccTreeAccountService treeAccountService;
+	@Autowired
+	private TransactionTemplate transactionTemplate;
 
-	private SysSystemDto system;
+	private static SysSystemDto system;
 
-	@Test
-	@Transactional
-	public void doCreateSyncConfig() {
+	@Before
+	public void prepareConfig() {
 		initData();
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
@@ -149,21 +155,35 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 			return attribute.isUid();
 		}).findFirst().get();
 
-		// Create default synchronization config
-		AbstractSysSyncConfigDto syncConfigCustom = new SysSyncTreeConfigDto();
-		syncConfigCustom.setReconciliation(true);
-		syncConfigCustom.setCustomFilter(true);
-		syncConfigCustom.setSystemMapping(mapping.getId());
-		syncConfigCustom.setCorrelationAttribute(uidAttribute.getId());
-		syncConfigCustom.setReconciliation(true);
-		syncConfigCustom.setName(SYNC_CONFIG_NAME);
-		syncConfigCustom.setLinkedAction(SynchronizationLinkedActionType.IGNORE);
-		syncConfigCustom.setUnlinkedAction(SynchronizationUnlinkedActionType.IGNORE);
-		syncConfigCustom.setMissingEntityAction(SynchronizationMissingEntityActionType.CREATE_ENTITY);
-		syncConfigCustom.setMissingAccountAction(ReconciliationMissingAccountActionType.IGNORE);
+		SysSyncConfigFilter configFilter = new SysSyncConfigFilter();
+		configFilter.setName(SYNC_CONFIG_NAME);
+		long count = syncConfigService.count(configFilter);
 
-		syncConfigService.save(syncConfigCustom);
+		if (count == 0) {
+			// Create default synchronization config
+			AbstractSysSyncConfigDto syncConfigCustom = new SysSyncTreeConfigDto();
+			syncConfigCustom.setReconciliation(true);
+			syncConfigCustom.setCustomFilter(true);
+			syncConfigCustom.setSystemMapping(mapping.getId());
+			syncConfigCustom.setCorrelationAttribute(uidAttribute.getId());
+			syncConfigCustom.setReconciliation(true);
+			syncConfigCustom.setName(SYNC_CONFIG_NAME);
+			syncConfigCustom.setLinkedAction(SynchronizationLinkedActionType.IGNORE);
+			syncConfigCustom.setUnlinkedAction(SynchronizationUnlinkedActionType.IGNORE);
+			syncConfigCustom.setMissingEntityAction(SynchronizationMissingEntityActionType.CREATE_ENTITY);
+			syncConfigCustom.setMissingAccountAction(ReconciliationMissingAccountActionType.IGNORE);
 
+			syncConfigService.save(syncConfigCustom);
+		}
+	}
+
+	@After
+	public void cleanUp() {
+		syncLogService.findIds(null).getContent().forEach(syncLogService::deleteById);
+	}
+
+	@Test
+	public void doCreateSyncConfig() {
 		SysSyncConfigFilter configFilter = new SysSyncConfigFilter();
 		configFilter.setSystemId(system.getId());
 		Assert.assertEquals(1, syncConfigService.find(configFilter, null).getTotalElements());
@@ -202,13 +222,13 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		SysSyncItemLogFilter itemLogFilter = new SysSyncItemLogFilter();
 		itemLogFilter.setSyncActionLogId(createEntityActionLog.getId());
 		List<SysSyncItemLogDto> items = syncItemLogService.find(itemLogFilter, null).getContent();
-		Assert.assertEquals(6, items.size());
+		Assert.assertEquals(12, items.size());
 
 		IdmTreeTypeDto treeType = treeTypeService.find(null).getContent().stream().filter(tree -> {
 			return tree.getName().equals(TREE_TYPE_TEST);
 		}).findFirst().get();
 
-		Assert.assertEquals(1, treeNodeService.findRoots(treeType.getId(), null).getContent().size());
+		Assert.assertEquals(2, treeNodeService.findRoots(treeType.getId(), null).getContent().size());
 
 		// Delete log
 		syncLogService.delete(log);
@@ -266,7 +286,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		SysSyncItemLogFilter itemLogFilter = new SysSyncItemLogFilter();
 		itemLogFilter.setSyncActionLogId(actionLog.getId());
 		List<SysSyncItemLogDto> items = syncItemLogService.find(itemLogFilter, null).getContent();
-		Assert.assertEquals(6, items.size());
+		Assert.assertEquals(12, items.size());
 
 		// Check state after sync
 		treeNode = treeNodeService.get(treeNode.getId());
@@ -327,6 +347,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	}
 
 	@Test
+	@Transactional
 	public void doStartSyncC_MissingEntity() {
 		SysSyncConfigFilter configFilter = new SysSyncConfigFilter();
 		configFilter.setName(SYNC_CONFIG_NAME);
@@ -388,7 +409,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	public void provisioningA_CreateAccount_withOutMapping() {
 
 		// Delete all resource data
-		this.deleteAllResourceData();
+		this.getBean().deleteAllResourceData();
 
 		IdmTreeTypeDto treeType = treeTypeService.find(null).getContent().stream().filter(tree -> {
 			return tree.getName().equals(TREE_TYPE_TEST);
@@ -537,9 +558,10 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	}
 	
 	@Test
+	@Transactional
 	public void syncCorellationAttribute() {
-		this.getBean().deleteAllResourceData();
-		this.getBean().initTreeData();
+//		this.getBean().deleteAllResourceData();
+//		this.getBean().initTreeData();
 
 		SysSyncConfigFilter configFilter = new SysSyncConfigFilter();
 		configFilter.setName(SYNC_CONFIG_NAME);
@@ -688,67 +710,78 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 
 	}
 
-	private void initData() {
+	public void initData() {
+		SysSystemFilter systemFilter = new SysSystemFilter();
+		systemFilter.setText(SYSTEM_NAME);
+		long count = systemService.count(systemFilter);
 
-		// create test system
-		system = helper.createSystem("test_tree_resource");
-		system.setName(SYSTEM_NAME);
-		system = systemService.save(system);
-		// key to EAV
-		IdmFormDefinitionDto formDefinition = systemService.getConnectorFormDefinition(system);
-		formService.saveValues(system, formDefinition, "keyColumn", ImmutableList.of("ID"));
+		if (count == 0) {
+			// create test system
+			system = helper.createSystem("test_tree_resource");
+			system.setName(SYSTEM_NAME);
+			system = systemService.save(system);
+			// key to EAV
+			IdmFormDefinitionDto formDefinition = systemService.getConnectorFormDefinition(system);
+			formService.saveValues(system, formDefinition, "keyColumn", ImmutableList.of("ID"));
 
-		// generate schema for system
-		List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
+			// generate schema for system
+			List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
 
-		IdmTreeTypeDto treeType = new IdmTreeTypeDto();
-		treeType.setCode(TREE_TYPE_TEST);
-		treeType.setName(TREE_TYPE_TEST);
-		treeType = treeTypeService.save(treeType);
+			IdmTreeTypeDto treeType = new IdmTreeTypeDto();
+			treeType.setCode(TREE_TYPE_TEST);
+			treeType.setName(TREE_TYPE_TEST);
+			treeType = treeTypeService.save(treeType);
 
-		// Create synchronization mapping
-		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
-		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.TREE);
-		syncSystemMapping.setTreeType(treeType.getId());
-		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
-		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
-		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
+			// Create synchronization mapping
+			SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
+			syncSystemMapping.setName("default_" + System.currentTimeMillis());
+			syncSystemMapping.setEntityType(SystemEntityType.TREE);
+			syncSystemMapping.setTreeType(treeType.getId());
+			syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
+			syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+			final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
-		createMapping(system, syncMapping);
-		deleteAllResourceData();
-		initTreeData();
+			createMapping(system, syncMapping);
+			this.getBean().deleteAllResourceData();
+			initTreeData();
 
-		syncConfigService.find(null).getContent().forEach(config -> {
-			syncConfigService.delete(config);
-		});
-
+			syncConfigService.find(null).getContent().forEach(config -> {
+				syncConfigService.delete(config);
+			});
+		}
 	}
 
 	@Transactional
 	public void initTreeData() {
+		transactionTemplate.execute(status -> {
+			entityManager.persist(this.createNode("1", null));
+			entityManager.persist(this.createNode("2", null));
 
-		entityManager.persist(this.createNode("1", ""));
-		entityManager.persist(this.createNode("2", "2"));
+			entityManager.persist(this.createNode("11", "1"));
+			entityManager.persist(this.createNode("12", "1"));
+			entityManager.persist(this.createNode("111", "11"));
+			entityManager.persist(this.createNode("112", "11"));
+			entityManager.persist(this.createNode("1111", "111"));
 
-		entityManager.persist(this.createNode("11", "1"));
-		entityManager.persist(this.createNode("12", "1"));
-		entityManager.persist(this.createNode("111", "11"));
-		entityManager.persist(this.createNode("112", "11"));
-		entityManager.persist(this.createNode("1111", "111"));
-
-		entityManager.persist(this.createNode("21", "2"));
-		entityManager.persist(this.createNode("22", "2"));
-		entityManager.persist(this.createNode("211", "21"));
-		entityManager.persist(this.createNode("212", "21"));
-		entityManager.persist(this.createNode("2111", "211"));
+			entityManager.persist(this.createNode("21", "2"));
+			entityManager.persist(this.createNode("22", "2"));
+			entityManager.persist(this.createNode("211", "21"));
+			entityManager.persist(this.createNode("212", "21"));
+			entityManager.persist(this.createNode("2111", "211"));
+			status.flush();
+			return null;
+		});
 	}
 	
 	@Transactional
 	public void deleteAllResourceData() {
-		// Delete all
-		Query q = entityManager.createNativeQuery("DELETE FROM test_tree_resource");
-		q.executeUpdate();
+		transactionTemplate.execute(status -> {
+			// Delete all
+			Query q = entityManager.createNativeQuery("DELETE FROM test_tree_resource");
+			q.executeUpdate();
+			status.flush();
+			return null;
+		});
 	}
 
 	private TestTreeResource createNode(String code, String parent) {
