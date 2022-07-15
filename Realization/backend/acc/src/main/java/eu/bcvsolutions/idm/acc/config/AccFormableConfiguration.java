@@ -20,7 +20,7 @@ public class AccFormableConfiguration {
         return new AbstractFormValueService<AccAccount, AccAccountFormValue>(repository) {
 
             /**
-             * Identity form values supports authorization policies.
+             * Account form values supports authorization policies.
              */
             @Override
             public AuthorizableType getAuthorizableType() {

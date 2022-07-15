@@ -26,6 +26,7 @@ CREATE TABLE acc_schema_form_attribute (
 	validation_regex varchar(2000) NULL,
 	required bool NOT NULL,
 	validation_unique bool NOT NULL,
+    validation_message varchar(2000) NULL,
 	CONSTRAINT acc_schema_form_attribute_pkey PRIMARY KEY (id),
 	CONSTRAINT ux_acc_schema_form_att_r_a UNIQUE (attribute_id, schema_id)
 );
@@ -63,7 +64,7 @@ CREATE TABLE acc_schema_form_attribute_a (
 	attribute_id bytea NULL,
 	form_attribute_m bool NULL,
 	schema_id bytea NULL,
-	schema_id_m bool NULL,
+	schema_m bool NULL,
 	validation_max numeric(38,4) NULL,
 	max_m bool NULL,
 	validation_min numeric(38,4) NULL,
@@ -73,6 +74,8 @@ CREATE TABLE acc_schema_form_attribute_a (
 	required bool NULL,
 	required_m bool NULL,
 	validation_unique bool NULL,
+    validation_message varchar(2000) NULL,
+    validation_message_m bool NULL,
 	unique_m bool NULL,
 	CONSTRAINT acc_schema_form_attribute_a_pkey PRIMARY KEY (id, rev),
 	CONSTRAINT fk3ubuashgqm0c7eomt2dxkemty FOREIGN KEY (rev) REFERENCES idm_audit(id)
@@ -181,7 +184,7 @@ ALTER TABLE acc_account_a ADD COLUMN system_mapping_id bytea;
 ALTER TABLE acc_account_a ADD COLUMN system_mapping_m bool;
 ALTER TABLE acc_account_a ADD COLUMN form_definition_id bytea;
 ALTER TABLE acc_account_a ADD COLUMN form_definition_m bool;
-ALTER TABLE acc_account_a ADD COLUMN external_id bytea;
+ALTER TABLE acc_account_a ADD COLUMN external_id character varying(255);
 ALTER TABLE acc_account_a ADD COLUMN external_id_m bool;
 
 CREATE INDEX idx_acc_account_sys_mapping ON acc_account USING btree (system_mapping_id);

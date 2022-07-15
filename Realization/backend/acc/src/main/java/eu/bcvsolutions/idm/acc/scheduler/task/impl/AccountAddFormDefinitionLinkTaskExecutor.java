@@ -52,6 +52,7 @@ public class AccountAddFormDefinitionLinkTaskExecutor extends AbstractSchedulabl
 	}
 	@Override
 	public Boolean process() {
+		this.counter = 0L;
 		Map<SysSystemMappingDto, UUID> mappingToFormDefinitionMap = Maps.newHashMap();
 		
 		AccAccountFilter accountFilter = new AccAccountFilter();
@@ -72,6 +73,7 @@ public class AccountAddFormDefinitionLinkTaskExecutor extends AbstractSchedulabl
 				AccAccountDto account = i.next();
 				SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
 				if (mapping == null) {
+					count--;
 					continue;
 				}
 				UUID formDefinitionId = mappingToFormDefinitionMap.get(mapping);

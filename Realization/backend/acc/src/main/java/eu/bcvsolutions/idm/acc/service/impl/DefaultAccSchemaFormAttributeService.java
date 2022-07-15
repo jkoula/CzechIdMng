@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.beust.jcommander.internal.Lists;
 
+import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
@@ -247,6 +248,8 @@ implements AccSchemaFormAttributeService {
 		formDefinition.setCode(createFormDefinitionCode(system, objectClass));
 		formDefinition.setName(createFormDefinitionName(system, objectClass));
 		formDefinition.setType(AccAccount.class.getCanonicalName());
+		formDefinition.setModule(AccModuleDescriptor.MODULE_ID);
+		formDefinition.setUnmodifiable(true);
 		
 		return formDefinitionService.save(formDefinition);
 	}
