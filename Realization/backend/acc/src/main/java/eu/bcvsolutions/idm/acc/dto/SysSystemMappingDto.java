@@ -13,6 +13,7 @@ import org.springframework.hateoas.core.Relation;
  * DTO for entity {@link SysSystemMapping}
  *
  * @author Ondrej Kopr <kopr@xyxy.cz>
+ * @author Roman Kucera
  */
 
 @Relation(collectionRelation = "systemMappings")
@@ -35,6 +36,8 @@ public class SysSystemMappingDto extends AbstractDto {
 	private boolean addContextIdentityRoles = false;
 	private boolean addContextIdentityRolesForSystem = false;
 	private boolean addContextConnectorObject = false;
+	@Embedded(dtoClass = SysSystemMappingDto.class)
+	private UUID connectedSystemMappingId;
 
 	public String getName() {
 		return name;
@@ -138,5 +141,13 @@ public class SysSystemMappingDto extends AbstractDto {
 
 	public void setAddContextConnectorObject(boolean addContextConnectorObject) {
 		this.addContextConnectorObject = addContextConnectorObject;
+	}
+
+	public UUID getConnectedSystemMappingId() {
+		return connectedSystemMappingId;
+	}
+
+	public void setConnectedSystemMappingId(UUID connectedSystemMappingId) {
+		this.connectedSystemMappingId = connectedSystemMappingId;
 	}
 }

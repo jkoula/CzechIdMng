@@ -452,6 +452,10 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
     const forceSearchParameters = new Domain.SearchParameters()
       .setFilter('systemMappingId', _mapping ? _mapping.id : Domain.SearchParameters.BLANK_UUID);
     const objectClassSearchParameters = new Domain.SearchParameters().setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
+    const forceSearchMappings = new Domain.SearchParameters()
+    .setFilter('operationType', isSelectedProvisioning ? SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.SYNCHRONIZATION) : SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
+    .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
+
     return (
       <div>
         <Helmet title={this.i18n('title')}/>
@@ -485,6 +489,12 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     label={this.i18n('acc:entity.SystemMapping.operationType')}
                     required
                     clearable={false}/>
+                  <Basic.SelectBox
+                    ref="connectedSystemMappingId"
+                    manager={systemMappingManager}
+                    forceSearchParameters={forceSearchMappings}
+                    label={this.i18n('acc:entity.RoleSystem.systemMapping')}
+                    placeholder={systemId ? null : this.i18n('systemMapping.systemPlaceholder')} />
                   <Basic.TextField
                     ref="name"
                     label={this.i18n('acc:entity.SystemMapping.name')}

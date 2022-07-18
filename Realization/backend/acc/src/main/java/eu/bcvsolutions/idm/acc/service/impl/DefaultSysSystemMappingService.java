@@ -86,6 +86,7 @@ import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
  * @author svandav
  * @author Ondrej Husnik
  * @author Radek Tomiška
+ * @author Roman Kucera
  */
 @Service
 public class DefaultSysSystemMappingService
@@ -628,6 +629,15 @@ public class DefaultSysSystemMappingService
 		SystemEntityType entityType = filter.getEntityType();
 		if (entityType != null) {
 			predicates.add(builder.equal(root.get(SysSystemMapping_.entityType), entityType));
+		}
+		UUID connectedSystemMappingId = filter.getConnectedSystemMappingId();
+		if (connectedSystemMappingId != null) {
+			predicates.add(
+					builder.equal(
+							root.get(SysSystemMapping_.connectedSystemMappingId).get(SysSystemMapping_.id),
+							treeTypeId
+					)
+			);
 		}
 		//
 		return predicates;

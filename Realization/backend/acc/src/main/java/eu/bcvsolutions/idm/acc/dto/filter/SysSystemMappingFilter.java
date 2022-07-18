@@ -16,6 +16,7 @@ import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
  * 
  * @author Svanda
  * @author Radek Tomiška
+ * @author Roman Kucera
  */
 public class SysSystemMappingFilter extends DataFilter {
 	
@@ -24,6 +25,7 @@ public class SysSystemMappingFilter extends DataFilter {
 	public static final String PARAMETER_OPERATION_TYPE = "operationType";
 	public static final String PARAMETER_ENTITY_TYPE = "entityType";
 	public static final String PARAMETER_TREE_TYPE_ID = "treeTypeId";
+	public static final String PARAMETER_CONNECTED_SYSTEM_MAPPING_ID = "connectedSystemMappingId";
 
 	public SysSystemMappingFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -75,5 +77,13 @@ public class SysSystemMappingFilter extends DataFilter {
 
 	public void setTreeTypeId(UUID treeTypeId) {
 		set(PARAMETER_TREE_TYPE_ID, treeTypeId);
+	}
+
+	public UUID getConnectedSystemMappingId() {
+		return getParameterConverter().toUuid(getData(), PARAMETER_CONNECTED_SYSTEM_MAPPING_ID);
+	}
+
+	public void setConnectedSystemMappingId(UUID connectedSystemMappingId) {
+		set(PARAMETER_CONNECTED_SYSTEM_MAPPING_ID, connectedSystemMappingId);
 	}
 }

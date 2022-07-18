@@ -31,6 +31,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmTreeType;
  * entity
  * 
  * @author svandav
+ * @author Roman Kucera
  *
  */
 @Entity
@@ -38,7 +39,8 @@ import eu.bcvsolutions.idm.core.model.entity.IdmTreeType;
 		@Index(name = "ux_sys_s_mapping_name", columnList = "name, object_class_id", unique = true),
 		@Index(name = "idx_sys_s_mapping_o_c_id", columnList = "object_class_id"),
 		@Index(name = "idx_sys_s_mapping_o_type", columnList = "operation_type"),
-		@Index(name = "idx_sys_s_mapping_e_type", columnList = "entity_type")
+		@Index(name = "idx_sys_s_mapping_e_type", columnList = "entity_type"),
+		@Index(name = "idx_sys_s_mapping_c_s_mapping", columnList = "connected_system_mapping_id")
 		})
 public class SysSystemMapping extends AbstractEntity {
 
@@ -98,6 +100,10 @@ public class SysSystemMapping extends AbstractEntity {
 	@Column(name = "add_context_con_obj", nullable = false)
 	// Add all connector object (calls connector).
 	private boolean addContextConnectorObject = false;
+	@Audited
+	@ManyToOne
+	@JoinColumn(name = "connected_system_mapping_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	private SysSystemMapping connectedSystemMappingId;
 
 	public void setName(String name) {
 		this.name = name;
@@ -209,5 +215,13 @@ public class SysSystemMapping extends AbstractEntity {
 
 	public void setAddContextConnectorObject(boolean addContextConnectorObject) {
 		this.addContextConnectorObject = addContextConnectorObject;
+	}
+
+	public SysSystemMapping getConnectedSystemMappingId() {
+		return connectedSystemMappingId;
+	}
+
+	public void setConnectedSystemMappingId(SysSystemMapping connectedSystemMappingId) {
+		this.connectedSystemMappingId = connectedSystemMappingId;
 	}
 }
