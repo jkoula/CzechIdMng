@@ -3458,6 +3458,10 @@
       "title": "Validation of system mapping {{name}} was not successful",
       "message": "Validation of system mapping {{name}} was not successful. Check this mapping settings."
     },
+    "SYSTEM_MAPPING_CONNECTED_MAPPING_SAME_TYPE": {
+      "title": "Conflict in connected mapping",
+      "message": "Connected mapping [{{mapping}}] has the same type as the one, that should be created. Only mappings with opposite types can be connected!"
+    },
     "PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE": {
       "title": "Provisioning does not supports this type",
       "message": "Provisioning does not supports this entity type [{{entityType}}]"

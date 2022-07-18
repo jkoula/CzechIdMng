@@ -148,6 +148,13 @@ public class DefaultSysSystemMappingService
 			throw new ResultCodeException(AccResultCode.PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE, ImmutableMap.of("entityType", entityType));
 		}
 
+		if (dto.getConnectedSystemMappingId() != null) {
+			SysSystemMappingDto connectedSystemMappingDto = this.get(dto.getConnectedSystemMappingId());
+			if (dto.getOperationType().equals(connectedSystemMappingDto.getOperationType())) {
+				throw new ResultCodeException(AccResultCode.SYSTEM_MAPPING_CONNECTED_MAPPING_SAME_TYPE, ImmutableMap.of("mapping", connectedSystemMappingDto.getName()));
+			}
+		}
+
 		// Validate all sub attributes
 		getAttributeMappingService()
 				.findBySystemMapping(dto).forEach(attribute -> {

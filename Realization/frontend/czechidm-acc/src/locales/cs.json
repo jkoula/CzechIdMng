@@ -3460,6 +3460,10 @@
       "title": "Validace mapování pro systém [{{name}}] byla neúspěšná",
       "message": "Validace mapování pro systém [{{name}}] byla neúspěšná. Zkontrolujte nastavení mapování pro tento systém."
     },
+    "SYSTEM_MAPPING_CONNECTED_MAPPING_SAME_TYPE": {
+      "title": "Konfliktní související mapování",
+      "message": "Související mapování [{{mapping}}] je stejného typu jako to, které má být vytvořeno. Související mapování musí být opačného typu!"
+    },
     "PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE": {
       "title": "Provisioning není podporován",
       "message": "Provisioning není podporován pro type entity [{{entityType}}]"
