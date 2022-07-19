@@ -505,7 +505,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     ref="connectedSystemMappingId"
                     manager={systemMappingManager}
                     forceSearchParameters={forceSearchMappings}
-                    label={this.i18n('acc:entity.RoleSystem.systemMapping')}
+                    label={this.i18n('acc:entity.SystemMapping.connectedMapping')}
                     placeholder={systemId ? null : this.i18n('systemMapping.systemPlaceholder')} />
                   <Basic.TextField
                     ref="name"
