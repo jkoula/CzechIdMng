@@ -388,6 +388,7 @@ public class DefaultTestHelper implements TestHelper {
 		waitForResult(res -> {
 			IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
 			filter.setOperationStates(Lists.newArrayList(OperationState.CREATED, OperationState.RUNNING));
+			filter.setRunning(true);
 			filter.setTransactionId(transactionId);
 			//
 			List<IdmLongRunningTaskDto> tasks = taskManager.findLongRunningTasks(filter, null).getContent();
