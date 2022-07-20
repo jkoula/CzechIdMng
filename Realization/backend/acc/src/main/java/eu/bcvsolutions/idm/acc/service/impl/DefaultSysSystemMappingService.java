@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
@@ -653,6 +654,10 @@ public class DefaultSysSystemMappingService
 							connectedSystemMappingId
 					)
 			);
+		}
+		AccountType accountType = filter.getAccountType();
+		if (accountType != null) {
+			predicates.add(builder.equal(root.get(SysSystemMapping_.accountType), accountType));
 		}
 		//
 		return predicates;

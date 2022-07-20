@@ -47,7 +47,6 @@ public class IdentityAccountByRoleEvaluatorIntegrationTest extends AbstractEvalu
 		AccAccountDto accountOne = new AccAccountDto();
 		accountOne.setSystem(system.getId());
 		accountOne.setUid(identity.getUsername());
-		accountOne.setAccountType(AccountType.PERSONAL);
 		accountOne = accountService.save(accountOne);
 
 		AccIdentityAccountDto accountIdentityOne = new AccIdentityAccountDto();
@@ -101,7 +100,6 @@ public class IdentityAccountByRoleEvaluatorIntegrationTest extends AbstractEvalu
 		AccAccountDto accountOne = new AccAccountDto();
 		accountOne.setSystem(system.getId());
 		accountOne.setUid(identity.getUsername());
-		accountOne.setAccountType(AccountType.PERSONAL);
 		accountOne = accountService.save(accountOne);
 
 		AccIdentityAccountDto accountIdentityOne = new AccIdentityAccountDto();

@@ -1055,7 +1055,6 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid(identity.getUsername());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account = accountService.save(account);
 

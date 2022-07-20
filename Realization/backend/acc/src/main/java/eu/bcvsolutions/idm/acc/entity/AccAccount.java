@@ -57,13 +57,7 @@ public class AccAccount extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type")
 	private SystemEntityType entityType;
-	
-	@Audited
-	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(name = "account_type", nullable = false)
-	private AccountType accountType;
-	
+
 	@Audited
 	@NotNull
 	@ManyToOne(optional = false)
@@ -92,14 +86,6 @@ public class AccAccount extends AbstractEntity {
 	@ManyToOne
 	@JoinColumn(name = "system_mapping_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private SysSystemMapping systemMapping;
-
-	public void setAccountType(AccountType accountType) {
-		this.accountType = accountType;
-	}
-	
-	public AccountType getAccountType() {
-		return accountType;
-	}
 
 	public SysSystem getSystem() {
 		return system;

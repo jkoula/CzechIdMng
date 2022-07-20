@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.connector;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
@@ -403,6 +404,7 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 			mappingDto.setOperationType(SystemOperationType.SYNCHRONIZATION);
 			mappingDto.setEntityType(SystemEntityType.ROLE);
 			mappingDto.setName("AD role sync mapping.");
+			mappingDto.setAccountType(AccountType.PERSONAL);
 			mappingDto = getSystemMappingService().publish(
 					new SystemMappingEvent(
 							SystemMappingEvent.SystemMappingEventType.CREATE,

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
@@ -566,6 +567,7 @@ public class DefaultRoleSynchronizationServiceTest extends AbstractIntegrationTe
 		systemMapping.setEntityType(SystemEntityType.ROLE);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(systemMappingSync.getObjectClass());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(systemMapping);
 
 		createMapping(systemService.get(schemaObjectClassService.get(systemMappingSync.getObjectClass()).getSystem()),
@@ -589,6 +591,7 @@ public class DefaultRoleSynchronizationServiceTest extends AbstractIntegrationTe
 		syncSystemMapping.setEntityType(SystemEntityType.ROLE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 		createMapping(system, syncMapping);

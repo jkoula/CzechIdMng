@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.dto;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping;
@@ -38,6 +39,8 @@ public class SysSystemMappingDto extends AbstractDto {
 	private boolean addContextConnectorObject = false;
 	@Embedded(dtoClass = SysSystemMappingDto.class)
 	private UUID connectedSystemMappingId;
+
+	private AccountType accountType;
 
 	public String getName() {
 		return name;
@@ -149,5 +152,13 @@ public class SysSystemMappingDto extends AbstractDto {
 
 	public void setConnectedSystemMappingId(UUID connectedSystemMappingId) {
 		this.connectedSystemMappingId = connectedSystemMappingId;
+	}
+
+	public AccountType getAccountType() {
+		return accountType;
+	}
+
+	public void setAccountType(AccountType accountType) {
+		this.accountType = accountType;
 	}
 }

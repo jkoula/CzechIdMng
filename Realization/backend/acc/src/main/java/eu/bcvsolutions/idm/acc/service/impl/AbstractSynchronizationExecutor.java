@@ -1330,7 +1330,6 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	protected AccAccountDto doCreateIdmAccount(String uid, SysSystemDto system) {
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(uid);
 		account.setEntityType(getEntityType());
 		return account;

@@ -764,7 +764,6 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		SysSystemDto system = systemService.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
 		accountOne.setSystem(system.getId());
 		accountOne.setUid("x" + IDENTITY_USERNAME_THREE);
-		accountOne.setAccountType(AccountType.PERSONAL);
 		accountOne.setEntityType(SystemEntityType.IDENTITY);
 		accountOne = accountService.save(accountOne);
 
@@ -1479,6 +1478,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto provisioningMapping = systemMappingService.save(systemMapping);
 
 		createMapping(system, provisioningMapping);
@@ -1489,6 +1489,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 		createMapping(system, syncMapping);

@@ -22,6 +22,7 @@ import eu.bcvsolutions.idm.acc.connector.AbstractConnectorType;
 import eu.bcvsolutions.idm.acc.connector.CsvConnectorType;
 import eu.bcvsolutions.idm.acc.connector.DefaultConnectorType;
 import eu.bcvsolutions.idm.acc.connector.PostgresqlConnectorType;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -230,6 +231,7 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		syncMapping.setName("Mapping");
 		syncMapping.setEntityType(SystemEntityType.IDENTITY);
 		syncMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
+		syncMapping.setAccountType(AccountType.PERSONAL);
 		syncMapping = mappingService.publish(
 				new SystemMappingEvent(
 						SystemMappingEvent.SystemMappingEventType.CREATE,
@@ -265,6 +267,7 @@ public class DefaultConnectorManagerTest extends AbstractIntegrationTest {
 		mappingDto.setName("Mapping");
 		mappingDto.setEntityType(SystemEntityType.IDENTITY);
 		mappingDto.setOperationType(SystemOperationType.PROVISIONING);
+		mappingDto.setAccountType(AccountType.PERSONAL);
 		mappingDto = mappingService.publish(
 				new SystemMappingEvent(
 						SystemMappingEvent.SystemMappingEventType.CREATE,

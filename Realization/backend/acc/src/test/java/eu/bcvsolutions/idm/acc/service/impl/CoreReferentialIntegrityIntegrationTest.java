@@ -83,7 +83,6 @@ public class CoreReferentialIntegrityIntegrationTest extends AbstractIntegration
 		account.setSystem(system.getId());
 		account.setSystemEntity(systemEntity.getId());
 		account.setUid(systemEntity.getUid());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account = accountService.save(account);
 		
@@ -121,6 +120,7 @@ public class CoreReferentialIntegrityIntegrationTest extends AbstractIntegration
 		systemMapping.setObjectClass(objectClass.getId());
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		systemMapping = systemEntityHandlingService.save(systemMapping);
 		SysRoleSystemDto roleSystem = new SysRoleSystemDto();
 		roleSystem.setSystem(system.getId());

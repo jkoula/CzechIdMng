@@ -76,7 +76,6 @@ public class PasswordPreValidationIntegrationTest extends AbstractIntegrationTes
 		AccAccountDto acc = new AccAccountDto();
 		acc.setId(UUID.randomUUID());
 		acc.setUid(System.currentTimeMillis() + "");
-		acc.setAccountType(AccountType.PERSONAL);
 		acc.setSystem(system.getId());
 		//
 		acc = accountService.save(acc);
@@ -136,7 +135,6 @@ public class PasswordPreValidationIntegrationTest extends AbstractIntegrationTes
 		AccAccountDto acc = new AccAccountDto();
 		acc.setId(UUID.randomUUID());
 		acc.setUid(System.currentTimeMillis() + "");
-		acc.setAccountType(AccountType.PERSONAL);
 		acc.setSystem(system.getId());
 		//
 		acc = accountService.save(acc);
@@ -195,7 +193,6 @@ public class PasswordPreValidationIntegrationTest extends AbstractIntegrationTes
 		AccAccountDto acc = new AccAccountDto();
 		acc.setId(UUID.randomUUID());
 		acc.setUid(System.currentTimeMillis() + "");
-		acc.setAccountType(AccountType.PERSONAL);
 		acc.setSystem(system.getId());
 		//
 		acc = accountService.save(acc);
@@ -256,7 +253,6 @@ public class PasswordPreValidationIntegrationTest extends AbstractIntegrationTes
 		AccAccountDto acc = new AccAccountDto();
 		acc.setId(UUID.randomUUID());
 		acc.setUid(System.currentTimeMillis() + "");
-		acc.setAccountType(AccountType.PERSONAL);
 		acc.setSystem(system.getId());
 		//
 		acc = accountService.save(acc);
@@ -349,7 +345,6 @@ public class PasswordPreValidationIntegrationTest extends AbstractIntegrationTes
 		AccAccountDto acc = new AccAccountDto();
 		acc.setId(UUID.randomUUID());
 		acc.setUid(System.currentTimeMillis() + "");
-		acc.setAccountType(AccountType.PERSONAL);
 		acc.setSystem(system.getId());
 		//
 		acc = accountService.save(acc);
