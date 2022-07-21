@@ -12,6 +12,7 @@ import { SchemaObjectClassManager, SystemAttributeMappingManager, SystemManager,
 import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 import ValidationMessageSystemMapping from './ValidationMessageSystemMapping';
+import AccountTypeEnum from '../../domain/AccountTypeEnum';
 
 const uiKey = 'system-mappings';
 const uiKeyAttributes = 'system-attribute-mappings';
@@ -27,6 +28,7 @@ const scriptManager = new Managers.ScriptManager();
  * System mapping detail.
  *
  * @author Vít Švanda
+ * @author Roman Kucera
  */
 class SystemMappingDetail extends Advanced.AbstractTableContent {
 
@@ -134,7 +136,8 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
           name: 'Mapping',
           system: entityId,
           entityType: SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY),
-          operationType: SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING)
+          operationType: SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING),
+          accountType: AccountTypeEnum.findKeyBySymbol(AccountTypeEnum.PERSONAL)
         }
       });
     } else {
@@ -535,6 +538,12 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     required={isSelectedTree}
                     manager={treeTypeManager}
                   />
+                  <Basic.EnumSelectBox
+                    ref="accountType"
+                    enum={AccountTypeEnum}
+                    label={this.i18n('acc:entity.Account.accountType')}
+                    hidden={!isSelectedIdentity}
+                    required={isSelectedIdentity} />
                   <Basic.Checkbox
                     ref="protectionEnabled"
                     label={this.i18n('acc:entity.SystemMapping.protectionEnabled')}
