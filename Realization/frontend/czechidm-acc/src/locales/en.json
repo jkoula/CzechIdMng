@@ -1638,6 +1638,7 @@
     },
     "AccountTypeEnum": {
       "PERSONAL": "Personal",
+      "PERSONAL_OTHER": "Personal other account",
       "TECHNICAL": "Technical"
     },
     "ReconciliationMissingAccountActionTypeEnum": {
