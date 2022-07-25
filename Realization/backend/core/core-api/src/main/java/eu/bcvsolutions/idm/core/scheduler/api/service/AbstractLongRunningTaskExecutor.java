@@ -205,7 +205,6 @@ public abstract class AbstractLongRunningTaskExecutor<V> implements
 			IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
 			filter.setTaskType(taskType);
 			filter.setOperationState(OperationState.RUNNING);
-			filter.setRunning(Boolean.TRUE); // ignore waiting tasks
 			List<UUID> runningTasks = longRunningTaskService
 					.findIds(filter, null)
 					.getContent()
@@ -240,7 +239,6 @@ public abstract class AbstractLongRunningTaskExecutor<V> implements
 				IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
 				filter.setTaskType(concurrentTaskType);
 				filter.setOperationState(OperationState.RUNNING);
-				filter.setRunning(Boolean.TRUE); // ignore waiting tasks
 				List<UUID> runningTasks = longRunningTaskService
 						.findIds(filter, null)
 						.getContent()
