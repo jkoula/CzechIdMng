@@ -169,8 +169,11 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity);
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -198,8 +201,11 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity);
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -210,6 +216,35 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		system = systemService.get(system.getId());
 		assertEquals(Boolean.TRUE, system.getBlockedOperation().getUpdateOperation());
+		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getCreateOperation());
+		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getDeleteOperation());
+	}
+
+	@Test
+	public void testUpdateOperationEmptyProvisioning() {
+		SysSystemDto system = getHelper().createTestResourceSystem(true);
+		IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
+		SysProvisioningBreakConfigDto breakConfig = createProvisioningBreak(20l, 2, null, ProvisioningEventType.UPDATE,
+				system.getId());
+		IdmIdentityDto recipient = getHelper().createIdentity((GuardedString) null);
+		createRecipient(breakConfig.getId(), recipient.getId(), null);
+		//
+		this.createAccount(system, identity);
+		//
+		//
+		provisioningService.doProvisioning(identity); // create
+		provisioningService.doProvisioning(identity);
+		provisioningService.doProvisioning(identity);
+		provisioningService.doProvisioning(identity);
+		//
+		IdmNotificationFilter filter = new IdmNotificationFilter();
+		filter.setRecipient(recipient.getUsername());
+		List<IdmNotificationLogDto> content = notificationLogService.find(filter, null).getContent();
+		assertEquals(0, content.size()); // two notification (notification +
+		// parent)
+		//
+		system = systemService.get(system.getId());
+		assertEquals(Boolean.FALSE, system.getBlockedOperation().getUpdateOperation());
 		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getCreateOperation());
 		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getDeleteOperation());
 	}
@@ -227,6 +262,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -254,6 +290,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -413,7 +450,9 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity); // warning
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -427,7 +466,9 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getCreateOperation());
 		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getDeleteOperation());
 		//
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 4);
 		provisioningService.doProvisioning(identity); // block
 		//
 		filter = new IdmNotificationFilter();
@@ -487,7 +528,9 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		assertTrue(content.isEmpty());
 		//
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity); // block
 		//
 		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
@@ -557,7 +600,9 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
 		//
 		SysProvisioningBreakItems cacheProcessedItems = provisioningBreakConfig.getCacheProcessedItems(system.getId());
@@ -570,6 +615,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 			execudedItems.set(execudedItems.indexOf(item), item - subtrackMinutes);
 		}
 		//
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity); // block
 		//
 		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
@@ -698,8 +744,11 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		this.createAccount(system, identity);
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity); // block
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -761,8 +810,11 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		this.createAccount(system, identity);
 		//
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity);
 		//
 		IdmNotificationFilter filter = new IdmNotificationFilter();
@@ -775,6 +827,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getCreateOperation());
 		assertNotEquals(Boolean.TRUE, system.getBlockedOperation().getDeleteOperation());
 		//
+		identity.setLastName(identity.getLastName() + 4);
 		provisioningService.doProvisioning(identity); // block
 		//
 		filter = new IdmNotificationFilter();
@@ -834,8 +887,11 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		this.createAccount(system, identity);
 
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity);
 
 		content = notificationLogService.find(filter, null).getContent();
@@ -888,8 +944,11 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		this.createAccount(system, identity);
 
 		provisioningService.doProvisioning(identity); // create
+		identity.setLastName(identity.getLastName() + 1);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity);
+		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity);
 
 		content = notificationLogService.find(filter, null).getContent();
