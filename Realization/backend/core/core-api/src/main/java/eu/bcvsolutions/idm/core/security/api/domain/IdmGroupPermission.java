@@ -10,12 +10,14 @@ import java.util.List;
  */
 public enum IdmGroupPermission implements GroupPermission {
 	
-	APP(IdmBasePermission.ADMIN); // wildcard - system admin has all permissions
-	
+	APP(IdmBasePermission.ADMIN), // wildcard - system admin has all permissions
+	APPSKIPCAS(IdmBasePermission.ADMIN);
+
 	// String constants could be used in pre / post authotize SpEl expressions
 	
 	public static final String APP_ADMIN = "APP" + BasePermission.SEPARATOR + "ADMIN"; // big boss
-	
+	public static final String APPSKIPCAS_ADMIN = "APPSKIPCAS" + BasePermission.SEPARATOR + "ADMIN"; // user can log without CAS even if CAS is enabled
+
 	private final List<BasePermission> permissions;
 
 	private IdmGroupPermission(BasePermission... permissions) {
