@@ -9,7 +9,9 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemFilter;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 
 import org.junit.After;
@@ -132,6 +134,8 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	private AccTreeAccountService treeAccountService;
 	@Autowired
 	private TransactionTemplate transactionTemplate;
+	@Autowired
+	private AccAccountService accountService;
 
 	private static SysSystemDto system;
 
@@ -241,7 +245,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		List<AbstractSysSyncConfigDto> syncConfigs = syncConfigService.find(configFilter, null).getContent();
 
 		// Change node code to changed
-		this.getBean().changeOne();
+		this.getBean().changeOne("111", CHANGED);
 
 		Assert.assertEquals(1, syncConfigs.size());
 		AbstractSysSyncConfigDto syncConfigCustom = syncConfigs.get(0);
@@ -294,7 +298,10 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 
 		// Delete log
 		syncLogService.delete(log);
-
+		// change back
+		treeNode.setCode("111");
+		treeNode.setName("111");
+		treeNodeService.saveInternal(treeNode);
 	}
 
 	@Test
@@ -347,8 +354,9 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	}
 
 	@Test
-	@Transactional
 	public void doStartSyncC_MissingEntity() {
+		createOne("111", "11");
+
 		SysSyncConfigFilter configFilter = new SysSyncConfigFilter();
 		configFilter.setName(SYNC_CONFIG_NAME);
 		List<AbstractSysSyncConfigDto> syncConfigs = syncConfigService.find(configFilter, null).getContent();
@@ -392,7 +400,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		SysSyncItemLogFilter itemLogFilter = new SysSyncItemLogFilter();
 		itemLogFilter.setSyncActionLogId(createEntityActionLog.getId());
 		List<SysSyncItemLogDto> items = syncItemLogService.find(itemLogFilter, null).getContent();
-		Assert.assertEquals(6, items.size());
+		Assert.assertEquals(2, items.size());
 
 		IdmTreeTypeDto treeType = treeTypeService.find(null).getContent().stream().filter(tree -> {
 			return tree.getName().equals(TREE_TYPE_TEST);
@@ -402,6 +410,12 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 
 		// Delete log
 		syncLogService.delete(log);
+		this.getBean().deleteOne("111");
+		treeAccountService.findIds(null).getContent().forEach(treeAccountService::deleteInternalById);
+
+		AccAccountFilter accountFilter = new AccAccountFilter();
+		accountFilter.setEntityType(SystemEntityType.TREE);
+		accountService.findIds(accountFilter, null).getContent().forEach(accountService::deleteInternalById);
 	}
 
 	@Test
@@ -558,10 +572,9 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	}
 	
 	@Test
-	@Transactional
 	public void syncCorellationAttribute() {
-//		this.getBean().deleteAllResourceData();
-//		this.getBean().initTreeData();
+		this.getBean().deleteAllResourceData();
+		this.getBean().initTreeData();
 
 		SysSyncConfigFilter configFilter = new SysSyncConfigFilter();
 		configFilter.setName(SYNC_CONFIG_NAME);
@@ -642,7 +655,6 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		syncLogService.delete(log);
 
 		treeNodeService.delete(node);
-		
 		// Create node for tree type One
 		node = new IdmTreeNodeDto();
 		node.setTreeType(treeTypeOne.getId());
@@ -794,9 +806,24 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 	}
 
 	@Transactional
-	public void changeOne() {
-		TestTreeResource one = entityManager.find(TestTreeResource.class, "111");
-		one.setCode(CHANGED);
+	public void createOne(String code, String parent) {
+		transactionTemplate.execute(status -> {
+			entityManager.persist(this.createNode(code, parent));
+			status.flush();
+			return null;
+		});
+	}
+
+	@Transactional
+	public void deleteOne(String code) {
+		TestTreeResource one = entityManager.find(TestTreeResource.class, code);
+		entityManager.remove(one);
+	}
+
+	@Transactional
+	public void changeOne(String from, String to) {
+		TestTreeResource one = entityManager.find(TestTreeResource.class, from);
+		one.setCode(to);
 		entityManager.persist(one);
 	}
 
