@@ -59,7 +59,7 @@ public class AccountAddFormDefinitionLinkTaskExecutor extends AbstractSchedulabl
 	@Override
 	public Boolean process() {
 		this.counter = 0L;
-		Map<SysSystemMappingDto, UUID> mappingToFormDefinitionMap = Maps.newHashMap();
+		Map<UUID, UUID> mappingToFormDefinitionMap = Maps.newHashMap();
 		
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setHasFormDefinition(Boolean.FALSE);
@@ -77,17 +77,18 @@ public class AccountAddFormDefinitionLinkTaskExecutor extends AbstractSchedulabl
 			for (Iterator<AccAccountDto> i = accounts.iterator(); i.hasNext() && canContinue;) {
 				// set the form definition
 				AccAccountDto account = i.next();
-				SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
-				if (mapping == null) {
+				
+				if (account.getSystemMapping() == null) {
 					count--;
 					continue;
 				}
-				UUID formDefinitionId = mappingToFormDefinitionMap.get(mapping);
+				UUID formDefinitionId = mappingToFormDefinitionMap.get(account.getSystemMapping());
 				if (formDefinitionId == null) {
+					SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
 					IdmFormDefinitionDto formDefinition = schemaFormAttributeService.getSchemaFormDefinition(mapping);
 					if (formDefinition != null && formDefinition.getId() != null) {
 						formDefinitionId = formDefinition.getId();
-						mappingToFormDefinitionMap.put(mapping, formDefinitionId);
+						mappingToFormDefinitionMap.put(account.getSystemMapping(), formDefinitionId);
 					}
 				}
 				

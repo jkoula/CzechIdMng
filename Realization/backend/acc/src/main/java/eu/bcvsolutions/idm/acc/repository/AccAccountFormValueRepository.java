@@ -5,7 +5,7 @@ import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.core.eav.repository.AbstractFormValueRepository;
 
 /**
- * Extended attributes for accounts.
+ * Extended attributes' values for accounts.
  * 
  * @author Tomáš Doischer
  *

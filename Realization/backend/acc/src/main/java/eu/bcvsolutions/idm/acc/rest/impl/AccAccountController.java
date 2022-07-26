@@ -42,7 +42,6 @@ import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
-import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
@@ -58,6 +57,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.eav.rest.impl.AbstractFormableDtoController;
 import eu.bcvsolutions.idm.core.eav.rest.impl.IdmFormDefinitionController;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -93,6 +93,7 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 	protected static final String TAG = "Accounts";
 	//
 	@Autowired private SysSystemEntityService systemEntityService;
+	@Autowired private IdmFormDefinitionService formDefinitionService;
 	private final IdmFormDefinitionController formDefinitionController;
 	
 	@Autowired
@@ -481,6 +482,7 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 	public Resource<?> prepareFormValues(
 			@ApiParam(value = "Code of form definition (default will be used if no code is given).", required = false, defaultValue = FormService.DEFAULT_DEFINITION_CODE)
 			@RequestParam(name = IdmFormAttributeFilter.PARAMETER_FORM_DEFINITION_CODE, required = false) String definitionCode) {
+		
 		return super.prepareFormValues(definitionCode);
 	}
 	
@@ -505,20 +507,18 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 				})
 	public Resource<?> getFormValues(
 			@ApiParam(value = "Account's uuid identifier.", required = true)
-			@PathVariable @NotNull String backendId, 
-			@ApiParam(value = "Code of form definition (default will be used if no code is given).", required = false, defaultValue = FormService.DEFAULT_DEFINITION_CODE)
-			@RequestParam(name = IdmFormAttributeFilter.PARAMETER_FORM_DEFINITION_CODE, required = false) String definitionCode) {
+			@PathVariable @NotNull String backendId) {
 		AccAccountDto dto = getDto(backendId);
 		if (dto == null) {
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
 		}
+		IdmFormDefinitionDto formDefinition = getFormDefinitionForAccount(dto);
+		if (formDefinition == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, String.format("No form definition found for %s.", backendId));
+		}
 		//
-		IdmFormDefinitionDto formDefinition = formDefinitionController.getDefinition(
-				AccAccount.class, 
-				definitionCode, 
-				IdmBasePermission.AUTOCOMPLETE);
 		//
-		return formDefinitionController.getFormValues(dto, formDefinition, IdmBasePermission.READ);
+		return formDefinitionController.getFormValues(dto, formDefinition, IdmBasePermission.READ); //TODO
 	}
 	
 	/**
@@ -548,8 +548,6 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 	public Resource<?> saveFormValues(
 			@ApiParam(value = "Account uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId,
-			@ApiParam(value = "Code of form definition (default will be used if no code is given).", required = false, defaultValue = FormService.DEFAULT_DEFINITION_CODE)
-			@RequestParam(name = IdmFormAttributeFilter.PARAMETER_FORM_DEFINITION_CODE, required = false) String definitionCode,
 			@ApiParam(value = "Filled form data.", required = true)
 			@RequestBody @Valid List<IdmFormValueDto> formValues) {		
 		AccAccountDto dto = getDto(backendId);
@@ -557,10 +555,10 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
 		}
 		//
-		IdmFormDefinitionDto formDefinition = formDefinitionController.getDefinition(
-				AccAccount.class, 
-				definitionCode, 
-				IdmBasePermission.AUTOCOMPLETE);
+		IdmFormDefinitionDto formDefinition = getFormDefinitionForAccount(dto);
+		if (formDefinition == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, String.format("No form definition found for %s.", backendId));
+		}
 		//
 		return formDefinitionController.saveFormValues(dto, formDefinition, formValues, IdmBasePermission.UPDATE);
 	}
@@ -608,5 +606,13 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 		} catch (IllegalArgumentException ex) {
 			LOG.debug("Class [{}] not found on classpath (e.g. module was uninstalled)", dto.getTargetEntityType(), ex);
 		}
+	}
+	
+	private IdmFormDefinitionDto getFormDefinitionForAccount(AccAccountDto account) {
+		if (account.getFormDefinition() != null) {
+			return formDefinitionService.get(account.getFormDefinition());
+		}
+		
+		return null;
 	}
 }

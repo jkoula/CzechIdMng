@@ -144,7 +144,6 @@ public class AccSchemaFormAttribute extends AbstractEntity {
 	 * Custom message, when validation fails - localization key can be used.
 	 * 
 	 * @return
-	 * @since 9.4.0
 	 */
 	public String getValidationMessage() {
 		return validationMessage;
@@ -154,7 +153,6 @@ public class AccSchemaFormAttribute extends AbstractEntity {
 	 * Custom message, when validation fails - localization key can be used.
 	 * 
 	 * @param validationMessage
-	 * @since 9.4.0
 	 */
 	public void setValidationMessage(String validationMessage) {
 		this.validationMessage = validationMessage;

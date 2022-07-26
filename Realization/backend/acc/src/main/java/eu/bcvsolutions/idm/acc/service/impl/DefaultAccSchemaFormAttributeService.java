@@ -158,7 +158,7 @@ implements AccSchemaFormAttributeService {
 			return schemaFormAttribute;
 		} else {
 			// update
-			updateFormAttribute(schemaAttribute, schemaFormDefinition, formAttribute);
+			updateFormAttribute(schemaAttribute, formAttribute);
 			AccSchemaFormAttributeFilter formAttributeFilter = new AccSchemaFormAttributeFilter();
 			formAttributeFilter.setFormAttribute(formAttribute.getId());
 			return this.find(formAttributeFilter, null).stream().findFirst().orElse(null);
@@ -173,7 +173,7 @@ implements AccSchemaFormAttributeService {
 		return formAttributeService.find(filter, null).stream().findFirst().orElse(null);
 	}
 
-	private IdmFormAttributeDto updateFormAttribute(SysSchemaAttributeDto schemaAttribute, IdmFormDefinitionDto schemaFormDefinition,
+	private IdmFormAttributeDto updateFormAttribute(SysSchemaAttributeDto schemaAttribute,
 			IdmFormAttributeDto formAttribute) {
 		formAttribute.setPersistentType(getPersistentType(schemaAttribute));
 		
