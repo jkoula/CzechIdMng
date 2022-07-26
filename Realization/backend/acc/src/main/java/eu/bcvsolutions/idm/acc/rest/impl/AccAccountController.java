@@ -512,13 +512,13 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 		if (dto == null) {
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
 		}
+		//
 		IdmFormDefinitionDto formDefinition = getFormDefinitionForAccount(dto);
 		if (formDefinition == null) {
 			throw new ResultCodeException(CoreResultCode.NOT_FOUND, String.format("No form definition found for %s.", backendId));
 		}
 		//
-		//
-		return formDefinitionController.getFormValues(dto, formDefinition, IdmBasePermission.READ); //TODO
+		return formDefinitionController.getFormValues(dto, formDefinition, IdmBasePermission.READ);
 	}
 	
 	/**
