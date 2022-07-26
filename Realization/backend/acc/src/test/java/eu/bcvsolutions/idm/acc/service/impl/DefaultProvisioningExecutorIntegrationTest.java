@@ -25,8 +25,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.testng.collections.Lists;
 
-import com.zaxxer.hikari.HikariDataSource;
-
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
@@ -545,12 +543,12 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 	@Test
 	public void testRetryProvisioningAfterPrepareConnectorObjectFailed() {
 		SysSystemDto system = getHelper().createTestResourceSystem(true);
-		// set the wrong password
+		// set the wrong table name
 		IdmFormDefinitionDto savedFormDefinition = systemService.getConnectorFormDefinition(system);
 		List<IdmFormValueDto> values = new ArrayList<>();
-		IdmFormValueDto password = new IdmFormValueDto(savedFormDefinition.getMappedAttributeByCode("password"));
-		password.setValue("wrong");
-		values.add(password);
+		IdmFormValueDto table = new IdmFormValueDto(savedFormDefinition.getMappedAttributeByCode("table"));
+		table.setValue("wrong");
+		values.add(table);
 		formService.saveValues(system, savedFormDefinition, values);
 		//
 		SysProvisioningOperationDto provisioningOperation = createProvisioningOperation(system, "firstname");
@@ -558,7 +556,6 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		String uid = (String) accoutObject.get(getProvisioningAttribute(TestHelper.ATTRIBUTE_MAPPING_NAME));
 		ZonedDateTime now = ZonedDateTime.now();
 		//
-		// publish event
 		// publish event
 		provisioningExecutor.execute(provisioningOperation); // 1 - create
 		// is necessary to get again operation from service
@@ -592,8 +589,8 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		batch.setNextAttempt(ZonedDateTime.now());
 		provisioningBatchService.save(batch);
 		//
-		// retry - expected success now - set the good password
-		password.setValue(((HikariDataSource) dataSource).getPassword());
+		// retry - expected success now - set the good table
+		table.setValue(TestResource.TABLE_NAME);
 		formService.saveValues(system, savedFormDefinition, values);
 		//
 		retryProvisioningTaskExecutor = new RetryProvisioningTaskExecutor();
