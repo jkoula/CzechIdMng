@@ -2543,6 +2543,11 @@
         "help": "$t(action.delete.action) selected systems. <strong>System must not contains any accounts and unresolved provisioning operations</strong>.",
         "icon": "$t(action.delete.icon)"
       },
+      "account-delete-bulk-action": {
+        "label": "$t(action.delete.action) accounts",
+        "help": "$t(action.delete.action) selected accounts.",
+        "icon": "$t(action.delete.icon)"
+      },
       "sys-system-group-delete-bulk-action": {
         "label": "$t(action.delete.action) system groups",
         "help": "Delete selected system groups.",

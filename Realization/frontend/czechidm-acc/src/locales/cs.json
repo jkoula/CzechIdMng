@@ -2546,6 +2546,11 @@
         "help": "Smaže vybrané systémy. <strong>Systém nesmí obsahovat žádné účty ani nevyřešené provisioning operace</strong>.",
         "icon": "$t(action.delete.icon)"
       },
+      "account-delete-bulk-action": {
+        "label": "$t(action.delete.action) účty",
+        "help": "Smaže vybrané účty.",
+        "icon": "$t(action.delete.icon)"
+      },
       "sys-system-group-delete-bulk-action": {
         "label": "$t(action.delete.action) skupiny systémů",
         "help": "Smaže vybrané skupiny systémů.",
