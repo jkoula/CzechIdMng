@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -38,6 +39,7 @@ import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
  *
  */
 
+@Transactional
 public class ScriptRedeployBulkActionIntegrationTest extends AbstractBulkActionTest {
 	
 	private static final String TEST_SCRIPT_CODE_1 = "testScript1";
