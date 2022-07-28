@@ -30,13 +30,10 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    #- name: Set environment variables
-    #  uses: allenevans/set-env@v2.0.1
-    #  with:
-    #    MAVEN_HOME: '/usr/bin/mvn'
     - name: Maven tests
       #run: mvn test --fail-at-end --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
       run: |
-        whereis mvn
+        export MAVEN_HOME=/usr/bin/mvn
+        echo $MAVEN_HOME
         mvn test -fn --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
     
