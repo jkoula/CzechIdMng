@@ -57,8 +57,8 @@ public class AccountProvisioningBulkActionTest extends AbstractBulkActionTest {
 		system = systemService.save(system);
 
 		helper.createRoleSystem(role, system);
+		
 		getHelper().createIdentityRole(identity, role);
-
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(identity.getId());
@@ -71,7 +71,7 @@ public class AccountProvisioningBulkActionTest extends AbstractBulkActionTest {
 		accountFilter.setSystemId(system.getId());
 		List<UUID> accountIds = accountService.findIds(accountFilter, null).getContent();
 		//
-		IdmBulkActionDto bulkAction = this.findBulkAction(AccAccount.class, AccountManagementBulkAction.NAME);
+		IdmBulkActionDto bulkAction = this.findBulkAction(AccAccount.class, AccountProvisioningBulkAction.NAME);
 		bulkAction.setIdentifiers(Sets.newHashSet(accountIds));
 		IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
 		
