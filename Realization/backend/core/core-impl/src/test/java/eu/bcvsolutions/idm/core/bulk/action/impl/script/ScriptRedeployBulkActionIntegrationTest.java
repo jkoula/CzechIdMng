@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.bulk.action.impl.script;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -59,6 +60,13 @@ public class ScriptRedeployBulkActionIntegrationTest extends AbstractBulkActionT
 	
 	@After
 	public void logout() {
+		IdmScriptDto script1 = scriptService.getByCode(TEST_SCRIPT_CODE_1);
+		if (script1 != null) {
+			script1.setDescription(null);
+			scriptService.save(script1);
+			script1 = scriptService.getByCode(TEST_SCRIPT_CODE_1);
+			assertNull(script1.getDescription());
+		}
 		super.logout();
 	}
 	

@@ -343,6 +343,7 @@ public class DefaultIdmPasswordServiceIntegrationTest extends AbstractIntegratio
 
 		IdmPasswordFilter filter = new IdmPasswordFilter();
 		filter.setMustChange(true);
+		filter.setIdentityId(identity.getId());
 		long countBefore = passwordService.count(filter);
 
 		filter = new IdmPasswordFilter();
@@ -358,6 +359,7 @@ public class DefaultIdmPasswordServiceIntegrationTest extends AbstractIntegratio
 
 		filter = new IdmPasswordFilter();
 		filter.setMustChange(true);
+		filter.setIdentityId(identity.getId());
 		passwords = passwordService.find(filter, null).getContent();
 		assertEquals(countBefore + 1, passwords.size());
 		IdmPasswordDto passwordDtoTwo = passwords.get(0);
