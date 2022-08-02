@@ -20,6 +20,7 @@ import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccContractSliceAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleCatalogueAccountDto;
@@ -130,50 +131,52 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 		identityAccountFilter.setAccountId(account.getId());
 		List<AccIdentityAccountDto> identityAccounts = identityAccountService.find(identityAccountFilter, null)
 				.getContent();
-		identityAccounts.forEach(identityAccount -> {
-			identityAccountService.delete(identityAccount);
-		});
+		for (AccIdentityAccountDto identityAccount : identityAccounts) {
+			identityAccountService.delete(identityAccount, deleteTargetAccount);
+		}
 
 		// delete all role accounts
 		AccRoleAccountFilter roleAccountFilter = new AccRoleAccountFilter();
 		roleAccountFilter.setAccountId(account.getId());
 		List<AccRoleAccountDto> roleAccounts = roleAccountService.find(roleAccountFilter, null).getContent();
-		roleAccounts.forEach(roleAccount -> {
-			roleAccountService.delete(roleAccount);
-		});
+		for (AccRoleAccountDto roleAccount : roleAccounts) {
+			roleAccountService.delete(roleAccount, deleteTargetAccount);
+		}
 
 		// delete all roleCatalogue accounts
 		AccRoleCatalogueAccountFilter roleCatalogueAccountFilter = new AccRoleCatalogueAccountFilter();
 		roleCatalogueAccountFilter.setAccountId(account.getId());
 		List<AccRoleCatalogueAccountDto> roleCatalogueAccounts = roleCatalogueAccountService
 				.find(roleCatalogueAccountFilter, null).getContent();
-		roleCatalogueAccounts.forEach(roleCatalogueAccount -> {
-			roleCatalogueAccountService.delete(roleCatalogueAccount);
-		});
+		for (AccRoleCatalogueAccountDto roleCatalogueAccount : roleCatalogueAccounts) {
+			roleCatalogueAccountService.delete(roleCatalogueAccount, deleteTargetAccount);
+		}
 
 		// delete all tree accounts
 		AccTreeAccountFilter treeAccountFilter = new AccTreeAccountFilter();
 		treeAccountFilter.setAccountId(account.getId());
 		List<AccTreeAccountDto> treeAccounts = treeAccountService.find(treeAccountFilter, null).getContent();
-		treeAccounts.forEach(treeAccount -> {
-			treeAccountService.delete(treeAccount);
-		});
+		for (AccTreeAccountDto treeAccount : treeAccounts) {
+			treeAccountService.delete(treeAccount, deleteTargetAccount);
+		}
 
 		// delete all contract accounts
 		AccContractAccountFilter contractAccountFilter = new AccContractAccountFilter();
 		contractAccountFilter.setAccountId(account.getId());
 		List<AccContractAccountDto> contractAccounts = contractAccountService.find(contractAccountFilter, null)
 				.getContent();
-		contractAccounts.forEach(contractAccount -> {
-			contractAccountService.delete(contractAccount);
-		});
+		for (AccContractAccountDto contractAccount : contractAccounts) {
+			contractAccountService.delete(contractAccount, deleteTargetAccount);
+		}
 
 		// delete all contract slice accounts
 		AccContractSliceAccountFilter contractSliceAccountFilter = new AccContractSliceAccountFilter();
 		contractSliceAccountFilter.setAccountId(account.getId());
-		contractAccountSliceService.find(contractSliceAccountFilter, null).forEach(contractAccount -> {
-			contractAccountSliceService.delete(contractAccount);
-		});
+		List<AccContractSliceAccountDto> contractSliceAccounts = contractAccountSliceService.find(contractSliceAccountFilter, null)
+				.getContent();
+		for (AccContractSliceAccountDto contractSliceAccount : contractSliceAccounts) {
+			contractAccountSliceService.delete(contractSliceAccount, deleteTargetAccount);
+		}
 
 		//
 		AccAccountDto refreshAccount = accountService.get(account.getId());

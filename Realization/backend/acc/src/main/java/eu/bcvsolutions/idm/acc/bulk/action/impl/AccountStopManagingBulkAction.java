@@ -19,10 +19,15 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.bulk.action.AbstractBulkAction;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
-import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 
+/**
+ * Delete an account in IdM without provisioning.
+ * 
+ * @author Tomáš Doischer
+ *
+ */
 @Enabled(AccModuleDescriptor.MODULE_ID)
 @Component(AccountStopManagingBulkAction.NAME)
 @Description("Stops managing an account (delete without provisioning)")
@@ -32,8 +37,6 @@ public class AccountStopManagingBulkAction extends AbstractBulkAction<AccAccount
 
 	@Autowired
 	private AccAccountService accountService;
-	@Autowired
-	private EntityEventManager entityEventManager;
 
 	@Override
 	public ReadWriteDtoService<AccAccountDto, AccAccountFilter> getService() {
@@ -42,9 +45,8 @@ public class AccountStopManagingBulkAction extends AbstractBulkAction<AccAccount
 
 	@Override
 	protected OperationResult processDto(AccAccountDto dto) {
-		AccountEvent event = new AccountEvent(AccountEventType.DELETE, dto, 
-				Map.of(AccAccountService.DELETE_TARGET_ACCOUNT_PROPERTY, false));
-		entityEventManager.process(event);
+		accountService.publish(new AccountEvent(AccountEventType.DELETE, dto,
+				Map.of(AccAccountService.DELETE_TARGET_ACCOUNT_PROPERTY, Boolean.FALSE)));
 		
 		return new OperationResult(OperationState.EXECUTED);
 	}
@@ -52,5 +54,10 @@ public class AccountStopManagingBulkAction extends AbstractBulkAction<AccAccount
 	@Override
 	protected List<String> getAuthoritiesForEntity() {
 		return Lists.newArrayList(AccGroupPermission.ACCOUNT_DELETE);
+	}
+	
+	@Override
+	public String getName() {
+		return NAME;
 	}
 }
