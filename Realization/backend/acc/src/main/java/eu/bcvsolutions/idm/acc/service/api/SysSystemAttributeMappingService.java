@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
-import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import java.beans.IntrospectionException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
+import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -17,7 +17,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.service.CloneableService;
-import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
+import eu.bcvsolutions.idm.core.api.service.EventableDtoService;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
 
@@ -25,10 +25,11 @@ import eu.bcvsolutions.idm.ic.api.IcAttribute;
  * Schema attribute handling service
  * 
  * @author svandav
+ * @author Roman Kucera
  *
  */
 public interface SysSystemAttributeMappingService
-		extends ReadWriteDtoService<SysSystemAttributeMappingDto, SysSystemAttributeMappingFilter>,
+		extends EventableDtoService<SysSystemAttributeMappingDto, SysSystemAttributeMappingFilter>,
 		CloneableService<SysSystemAttributeMappingDto>,
 		AuthorizableService<SysSystemAttributeMappingDto> {
 
