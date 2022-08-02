@@ -152,9 +152,7 @@ public class SystemOwnerEvaluator extends AbstractAuthorizationEvaluator<SysSyst
 				.findValidRoles(securityService.getCurrentId(), null)
 				.getContent()
 				.stream()
-				.filter(ir -> ownerRoles.contains(ir.getRole()))
-				.findFirst()
-				.orElse(null) != null) {
+				.anyMatch(ir -> ownerRoles.contains(ir.getRole()))) {
 			permissions.addAll(policy.getPermissions());
 		}
 
