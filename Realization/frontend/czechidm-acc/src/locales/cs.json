@@ -2551,6 +2551,11 @@
         "help": "Smaže vybrané účty.",
         "icon": "$t(action.delete.icon)"
       },
+      "account-stop-managing-bulk-action": {
+        "label": "Přestat spravovat účty",
+        "help": "Smaže vybrané účty v IdM bez provedení provisioningu.",
+        "icon": "$t(action.delete.icon)"
+      },
       "sys-system-group-delete-bulk-action": {
         "label": "$t(action.delete.action) skupiny systémů",
         "help": "Smaže vybrané skupiny systémů.",
