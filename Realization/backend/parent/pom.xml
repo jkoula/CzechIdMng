@@ -83,7 +83,8 @@
 		<!-- Sonar-JaCoCo properties -->
 		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-		<sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
+<!--		We are not using this right now, so sonar default is used. There was some issue with .. in path-->
+<!--		<sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../target/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
 		<sonar.language>java</sonar.language>
 		<!--
 			properties are used in test and release profile, test: swagger.json
@@ -614,15 +615,22 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.7</version>
-				<configuration>
-					<destFile>${sonar.jacoco.reportPath}</destFile>
-					<append>true</append>
-				</configuration>
+<!--				Using sonar default for now.-->
+<!--				<configuration>-->
+<!--					<destFile>${sonar.coverage.jacoco.xmlReportPaths}</destFile>-->
+<!--					<append>true</append>-->
+<!--				</configuration>-->
 				<executions>
 					<execution>
 						<id>agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>

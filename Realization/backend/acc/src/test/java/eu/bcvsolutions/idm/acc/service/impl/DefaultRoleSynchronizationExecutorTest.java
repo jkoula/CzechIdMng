@@ -292,7 +292,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertEquals(1, roleSystemAttributeDtos.size());
 			Assert.assertEquals(userEmailAttribute.getId(), roleSystemAttributeDtos.get(0).getSystemAttributeMapping());
 		});
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -402,7 +402,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertEquals(0, roleSystemDtos.size());
 		});
 
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -528,7 +528,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertTrue(roleSystem.isForwardAccountManagemen());
 		});
 
-		cleanAfterTest(syncConfigCustom, systemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, systemId, log, roleAccountDtos);
 	}
 	
 	@Test
@@ -662,7 +662,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertTrue(roleSystemAttributeDtos.get(0).isSkipValueIfExcluded());
 		});
 
-		cleanAfterTest(syncConfigCustom, systemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, systemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -783,7 +783,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertTrue(transformScript.contains(updatedScriptValue));
 		});
 
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 	
 	@Test
@@ -923,7 +923,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 5, OperationResultType.IGNORE);
 
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -1076,7 +1076,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertEquals(1, identityRoleService.find(identityRoleFilter, null).getContent().size());
 		});
 		
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -1292,7 +1292,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		});
 
 		// Clean after test.
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -1400,7 +1400,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertEquals(mainRoleCatalogue.getId(), roleCatalogueRoleDtos.get(0).getRoleCatalogue());
 		});
 
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 	
 	@Test
@@ -1574,7 +1574,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertEquals(1, roleCatalogueRoleDtos.size());
 		});
 
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
 	@Test
@@ -1750,10 +1750,11 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 			Assert.assertEquals(mainRoleCatalogue.getId(), roleCatalogueRoleDtos.get(0).getRoleCatalogue());
 		});
 
-		cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
+		this.getBean().cleanAfterTest(syncConfigCustom, roleSystemId, log, roleAccountDtos);
 	}
 
-	private void cleanAfterTest(AbstractSysSyncConfigDto syncConfigCustom, UUID roleSystemId, SysSyncLogDto log, List<AccRoleAccountDto> roleAccountDtos) {
+	@Transactional
+	public void cleanAfterTest(AbstractSysSyncConfigDto syncConfigCustom, UUID roleSystemId, SysSyncLogDto log, List<AccRoleAccountDto> roleAccountDtos) {
 		// Delete a log.
 		syncLogService.delete(log);
 		// Delete roles.
@@ -1768,25 +1769,19 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	}
 
 	private void forceRoleDelete(IdmRoleDto role) {
-		// remove role async
-		try {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, true);
+		// remove role sync
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(RoleProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE);
+		// Delete by bulk action.
+		IdmBulkActionDto bulkAction = this.findBulkAction(IdmRole.class, RoleDeleteBulkAction.NAME);
+		bulkAction.setIdentifiers(Sets.newHashSet(role.getId()));
+		bulkAction.setProperties(properties);
+		bulkActionManager.processAction(bulkAction);
 
-			Map<String, Object> properties = new HashMap<>();
-			properties.put(RoleProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE);
-			// Delete by bulk action.
-			IdmBulkActionDto bulkAction = this.findBulkAction(IdmRole.class, RoleDeleteBulkAction.NAME);
-			bulkAction.setIdentifiers(Sets.newHashSet(role.getId()));
-			bulkAction.setProperties(properties);
-			bulkActionManager.processAction(bulkAction);
-
-			getHelper().waitForResult(res -> {
-				return roleService.get(role) != null;
-			});
-			Assert.assertNull(roleService.get(role));
-		} finally {
-			getHelper().setConfigurationValue(EventConfiguration.PROPERTY_EVENT_ASYNCHRONOUS_ENABLED, false);
-		}
+		getHelper().waitForResult(res -> {
+			return roleService.get(role) != null;
+		});
+		Assert.assertNull(roleService.get(role));
 	}
 
 	@Transactional

@@ -134,15 +134,17 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		Assert.assertFalse(log.isRunning());
 		Assert.assertFalse(log.isContainsError());
 
-		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 6, OperationResultType.SUCCESS);
+		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 12, OperationResultType.SUCCESS);
 
 		Assert.assertEquals(1, treeNodeService.findRoots(treeType.getId(), null).getContent().size());
 		IdmTreeNodeDto root = treeNodeService.findRoots(treeType.getId(), null).getContent().get(0);
 		Assert.assertEquals(root, treeNodeExistedNode);
 		List<IdmTreeNodeDto> children = treeNodeService.findChildrenByParent(root.getId(), null).getContent();
-		Assert.assertEquals(1, children.size());
+		Assert.assertEquals(2, children.size());
 		IdmTreeNodeDto child = children.get(0);
+		IdmTreeNodeDto child2 = children.get(1);
 		Assert.assertEquals(child.getCode(), "1");
+		Assert.assertEquals(child2.getCode(), "2");
 		// Delete log
 		syncLogService.delete(log);
 	}
@@ -177,7 +179,7 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		Assert.assertFalse(log.isRunning());
 		Assert.assertFalse(log.isContainsError());
 		
-		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 6, OperationResultType.SUCCESS);
+		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 12, OperationResultType.SUCCESS);
 		
 		// Enable different sync.
 		syncConfigCustom.setDifferentialSync(true);
@@ -187,23 +189,25 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		// Start sync with enable different sync - no change was made, so only ignore
 		// update should be made.
 		helper.startSynchronization(syncConfigCustom);
-		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 6, OperationResultType.IGNORE);
+		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 12, OperationResultType.IGNORE);
 		Assert.assertFalse(log.isRunning());
 		Assert.assertFalse(log.isContainsError());
 
 		// Change code of node
 		IdmTreeNodeDto root = treeNodeService.findRoots(treeType.getId(), null).getContent().get(0);
 		List<IdmTreeNodeDto> children = treeNodeService.findChildrenByParent(root.getId(), null).getContent();
-		Assert.assertEquals(1, children.size());
+		Assert.assertEquals(2, children.size());
 		IdmTreeNodeDto child = children.get(0);
+		IdmTreeNodeDto child2 = children.get(1);
 		Assert.assertEquals(child.getCode(), "1");
+		Assert.assertEquals(child2.getCode(), "2");
 		child.setCode(helper.createName());
 		treeNodeService.save(child);
 
 		// Start sync with enable different sync - Node code value changed, so standard update should be made.
 		helper.startSynchronization(syncConfigCustom);
 		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 1, OperationResultType.SUCCESS);
-		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 5, OperationResultType.IGNORE);
+		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 11, OperationResultType.IGNORE);
 		Assert.assertFalse(log.isRunning());
 		Assert.assertFalse(log.isContainsError());
 
@@ -237,7 +241,7 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		Assert.assertFalse(log.isRunning());
 		Assert.assertFalse(log.isContainsError());
 		//
-		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 6, OperationResultType.SUCCESS);
+		helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.CREATE_ENTITY, 12, OperationResultType.SUCCESS);
 		//
 		// prepare contracts 
 		IdmTreeNodeFilter nodeFilter = new IdmTreeNodeFilter();
@@ -260,7 +264,7 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		// change tree structure and synchronize
 		this.getBean().changeParent("1111", "112");
 		helper.startSynchronization(syncConfigCustom);
-		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 6, OperationResultType.SUCCESS);
+		log = helper.checkSyncLog(syncConfigCustom, SynchronizationActionType.UPDATE_ENTITY, 12, OperationResultType.SUCCESS);
 		Assert.assertFalse(log.isRunning());
 		Assert.assertFalse(log.isContainsError());
 		//
@@ -362,7 +366,7 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		deleteAllResourceData(); // FIXME: data are not deleted here - DefaultTreeSynchronizationServiceTest
 
 		entityManager.persist(this.createNode("1", null));
-		entityManager.persist(this.createNode("2", "2"));
+		entityManager.persist(this.createNode("2", null));
 
 		entityManager.persist(this.createNode("11", "1"));
 		entityManager.persist(this.createNode("12", "1"));

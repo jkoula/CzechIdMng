@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
@@ -40,6 +41,7 @@ import eu.bcvsolutions.idm.test.api.TestHelper;
  * @author Radek Tomiška
  *
  */
+@Transactional
 public class ConfigurationSwitchInstanceBulkActionIntegrationTest extends AbstractBulkActionTest {
 
 	@Autowired private IdmEntityEventService entityEventService;

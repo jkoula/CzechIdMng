@@ -350,6 +350,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		SysRoleSystemDto roleSystem = new SysRoleSystemDto();
 		roleSystem.setRole(role.getId());
 		roleSystem.setSystem(system.getId());
+		roleSystem.setCreateAccountByDefault(true);
 		// default mapping
 		List<SysSystemMappingDto> mappings = systemMappingService.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
 		// required ...
