@@ -17,9 +17,6 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: idm.war
-        path: Realization/backend/app/target
+      run: |
+        export MAVEN_HOME=/usr/bin/mvn
+        mvn -B package -fn --file Realization/backend/aggregator/pom.xml -Prelease -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
