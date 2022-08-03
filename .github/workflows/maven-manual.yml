@@ -31,6 +31,20 @@ jobs:
       with:
         java-version: 11
     - name: Maven tests
-      #run: mvn test --fail-at-end --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test
-      run: mvn test -fn --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
+      run: |
+        export MAVEN_HOME=/usr/bin/mvn
+        # mvn test -fn --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
+        mvn -B package -fn --file Realization/backend/aggregator/pom.xml -Prelease -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
+    - name: Upload logs
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: logs-all
+        path: |
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/core/core-impl/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/tool/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/acc/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/rpt/rpt-impl/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/vs/target/surefire-reports
+        retention-days: 5
     
