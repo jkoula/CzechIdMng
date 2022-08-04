@@ -201,8 +201,10 @@ public enum AccResultCode implements ResultCode {
 	MONITORING_PROVISIONING_OPERATION_ERROR(HttpStatus.CONFLICT, "Provisioning queue contains [%s] errors.", NotificationLevel.ERROR),
 	SYSTEM_GROUP_SCRIPT_RESULT_IS_NOT_LIST(HttpStatus.BAD_REQUEST, "System group - Result of script for find connector values from system [%s] have to return List!"),
 	// Identity-role
-	ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE(HttpStatus.FOUND, "Role system [%s] is used [%s] in identity-roles!");
-	
+	ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE(HttpStatus.FOUND, "Role system [%s] is used [%s] in identity-roles!"),
+	SYSTEM_ATTRIBUTE_MAPPING_RECALCULATION_EXECUTED(HttpStatus.OK, "%s"),
+	SYSTEM_ATTRIBUTE_MAPPING_RECALCULATION_NOT_EXECUTED(HttpStatus.CONFLICT, "%s");
+
 	private final HttpStatus status;
 	private final String message;
 	private final NotificationLevel level;

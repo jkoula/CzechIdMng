@@ -6,8 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -62,9 +64,11 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
+import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.eav.api.domain.BaseFaceType;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -93,9 +97,6 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ChangesOnSystemReportExecutor.class);
 
 	public static final String REPORT_NAME = "changes-on-system-report";
-	public static final String PARAMETER_SYSTEM = "system";
-	public static final String PARAMETER_MAPPING_ATTRIBUTES = "mappingAttributes";
-	public static final String PARAMETER_SYSTEM_MAPPING = "systemMapping";
 	public static final String PARAMETER_ONLY_IDENTITY = "identities";
 	public static final String PARAMETER_TREE_NODE = "treeNode";
 	public static final String PARAMETER_SKIP_UNCHANGED_VALUES = "skipUnchangedValues";
@@ -122,7 +123,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 
 	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
-		IdmFormAttributeDto mappingSelect = new IdmFormAttributeDto(PARAMETER_MAPPING_ATTRIBUTES, "MappingAttributes",
+		IdmFormAttributeDto mappingSelect = new IdmFormAttributeDto(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES, "MappingAttributes",
 				PersistentType.TEXT);
 		mappingSelect.setFaceType(AccFaceType.SYSTEM_MAPPING_ATTRIBUTE_FILTERED_SELECT);
 		//
@@ -144,9 +145,9 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	protected IdmAttachmentDto generateData(RptReportDto report) {
 		// get system related configuration
 		MultiValueMap<String, UUID> configuration = parseAttributeConfig(report);
-		SysSystemDto systemDto = getSystemById(configuration.getFirst(PARAMETER_SYSTEM));
-		SysSystemMappingDto systemMapping = getSystemMappingById(configuration.getFirst(PARAMETER_SYSTEM_MAPPING));
-		List<SysSystemAttributeMappingDto> attributes = getAttributesById(configuration.get(PARAMETER_MAPPING_ATTRIBUTES), systemMapping);
+		SysSystemDto systemDto = getSystemById(configuration.getFirst(ParameterConverter.PARAMETER_SYSTEM));
+		SysSystemMappingDto systemMapping = getSystemMappingById(configuration.getFirst(ParameterConverter.PARAMETER_SYSTEM_MAPPING));
+		List<SysSystemAttributeMappingDto> attributes = getAttributesById(configuration.get(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES), systemMapping);
 		List<String> selectedAttributeNames = getSelectedAttributeNames(attributes)
 				.stream()
 				.sorted()
@@ -209,7 +210,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	/**
 	 * Get system from report configuration
 	 *
-	 * @param report
+	 * @param systemId
 	 * @return
 	 */
 	private SysSystemDto getSystemById(UUID systemId) {
@@ -223,7 +224,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	/**
 	 * Get system mapping from report configuration
 	 *
-	 * @param report
+	 * @param mappingId
 	 * @return
 	 */
 	private SysSystemMappingDto getSystemMappingById(UUID mappingId) {
@@ -237,7 +238,8 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	/**
 	 * Get defined attributes for report
 	 *
-	 * @param list of attribute Ids
+	 * @param attributeIds of attribute Ids
+	 * @param mapping
 	 * @return
 	 */
 	private List<SysSystemAttributeMappingDto> getAttributesById(List<UUID> attributeIds, SysSystemMappingDto mapping) {
@@ -342,47 +344,16 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	 */
 	private MultiValueMap<String, UUID> parseAttributeConfig(RptReportDto report) {
 		IdmFormInstanceDto formInstance = new IdmFormInstanceDto(report, getFormDefinition(), report.getFilter());
-		Serializable value = formInstance.toSinglePersistentValue(PARAMETER_MAPPING_ATTRIBUTES);
-		MultiValueMap<String, UUID> output = new LinkedMultiValueMap<String, UUID>();
-		//
-		if (!(value instanceof String)) {
-			throw new ResultCodeException(RptResultCode.REPORT_WRONG_CONFIGURATION, ImmutableMap.of("attribute","all")); 
-		}
-		//
-		// TODO: create json java POJO representation
-		String stringValue = (String) value;
+		Serializable value = formInstance.toSinglePersistentValue(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES);
+
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES, value);
+
 		try {
-			String nodeValue;
-			JsonNode treeNode = getMapper().readTree(stringValue);
-
-			// get system id form config
-			JsonNode node = treeNode.get(PARAMETER_SYSTEM);
-			if (node == null) {
-				throw new ResultCodeException(RptResultCode.REPORT_WRONG_CONFIGURATION, ImmutableMap.of("attribute", PARAMETER_SYSTEM));
-			}
-			nodeValue = node.asText();
-			output.add(PARAMETER_SYSTEM, DtoUtils.toUuid(nodeValue));
-
-			// get system mapping id form config
-			node = treeNode.get(PARAMETER_SYSTEM_MAPPING);
-			if (node == null) {
-				throw new ResultCodeException(RptResultCode.REPORT_WRONG_CONFIGURATION, ImmutableMap.of("attribute", PARAMETER_SYSTEM_MAPPING));
-			}
-			nodeValue = node.asText();
-			output.add(PARAMETER_SYSTEM_MAPPING, UUID.fromString(nodeValue));
-
-			// get system mapping attributes id form config
-			JsonNode nodeArray = treeNode.get(PARAMETER_MAPPING_ATTRIBUTES);
-			if (nodeArray == null || !nodeArray.isArray()) {
-				throw new ResultCodeException(RptResultCode.REPORT_WRONG_CONFIGURATION, ImmutableMap.of("attribute", PARAMETER_MAPPING_ATTRIBUTES));
-			}
-			for (JsonNode item : nodeArray) {
-				output.add(PARAMETER_MAPPING_ATTRIBUTES, UUID.fromString(item.asText()));
-			}
-		} catch (Exception ex) {
+			return getParameterConverter().toSystemMappingAttribute(properties, RptResultCode.REPORT_WRONG_CONFIGURATION);
+		} catch (CoreException ex) {
 			throw new ReportRenderException(report.getName(), ex);
 		}
-		return output;
 	}
 
 	/*********************************************************************
@@ -457,11 +428,12 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	 * Creates report object for saving to output json file. It invokes record
 	 * generating for every account/identity
 	 * 
-	 * @param changeDataDto
+	 * @param jGenerator
 	 * @param accountFilter
 	 * @param identityIds
 	 * @param systemId
-	 * @param attributes
+	 * @param selectedAttributeNames
+	 * @param skipUnchangedMultivalue
 	 * @return
 	 * @throws IOException
 	 * @throws JsonMappingException
