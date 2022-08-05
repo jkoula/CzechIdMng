@@ -52,6 +52,9 @@ public class GeneralEntityExport extends AbstractFormableEntityExport<AbstractDt
 	@Autowired
 	private List<AbstractFormValueService> formValueServices;
 	
+	@SuppressWarnings("rawtypes")
+	private AbstractFormValueService foundFormService;
+	
 	private ReadWriteDtoService<AbstractDto, BaseFilter> localService;
 
 	public GeneralEntityExport(RptReportService reportService, AttachmentManager attachmentManager, ObjectMapper mapper, FormService formService) {
@@ -99,8 +102,12 @@ public class GeneralEntityExport extends AbstractFormableEntityExport<AbstractDt
 	 * @return 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	public ReadWriteDtoService<AbstractDto, BaseFilter> getService() {
+		if (foundFormService != null) {
+			return foundFormService;
+		}
+		
 		if (localService != null) {
 			if (this.getEntityClass().equals(IdmFormValue.class)) {
 				localService = getFormValueService();
@@ -131,6 +138,7 @@ public class GeneralEntityExport extends AbstractFormableEntityExport<AbstractDt
 			IdmFormDefinitionDto formDef = formService.getDefinition(formDefId);
 			for (AbstractFormValueService formValueService : formValueServices) {
 				if (formValueService.getOwnerClass().getCanonicalName().equals(formDef.getType())) {
+					foundFormService = formValueService;
 					return formValueService;
 				}
 			}
@@ -143,6 +151,7 @@ public class GeneralEntityExport extends AbstractFormableEntityExport<AbstractDt
 			for (AbstractFormValueService formValueService : formValueServices) {
 				formValue = formValueService.get(identifier);
 				if (formValue != null) {
+					foundFormService = formValueService;
 					return formValueService;
 				}
 			}
