@@ -296,7 +296,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	public void tc01NewEmploymentCommencing() {
 		IdmLongRunningTaskFilter longRunningTaskFilter = new IdmLongRunningTaskFilter();
 		longRunningTaskFilter.setRunning(true);
-		getHelper().waitForResult(s -> longRunningTaskManager.findLongRunningTasks(longRunningTaskFilter, null).getContent().size() != 0);
+		getHelper().waitForResult(s -> longRunningTaskManager.findLongRunningTasks(longRunningTaskFilter, null).getContent().size() != 0, 1000, 300);
 
 		// test case data preparation
 		Map<String,String> identityPattern = getIdentityPattern(dvorakUsername);
