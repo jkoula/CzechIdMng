@@ -388,7 +388,7 @@ public class DefaultIdmConfidentialStorageIntegrationTest extends AbstractIntegr
 		
 		confidentalStorage.saveGuardedString(identityOne.getId(), IdmIdentity.class, identityOne.getUsername(), new GuardedString(passwordOne));
 		confidentalStorage.saveGuardedString(identityTwo.getId(), IdmIdentity.class, identityTwo.getUsername(), new GuardedString(passwordTwo));
-		confidentalStorage.saveGuardedString(identityThree, identityThree.getUsername(), new GuardedString(passwordThree));
+		confidentalStorage.saveGuardedString(identityThree.getId(), IdmIdentity.class, identityThree.getUsername(), new GuardedString(passwordThree));
 
 		Serializable serializable = confidentalStorage.get(identityOne.getId(), IdmIdentity.class, identityOne.getUsername());
 		Assert.assertEquals(passwordOne, serializable);
@@ -651,7 +651,7 @@ public class DefaultIdmConfidentialStorageIntegrationTest extends AbstractIntegr
 	
 	/**
 	 * Create and run task for generating a new initialization vector for values in the confidential storage.
-	 * Task {@link GenerateConfidentialStorageInitializationVectorTaskExecutor}
+	 * Task {@link GenerateConfidentialStorageInitializationVectorsTaskExecutor}
 	 */
 	private void runGenerateInitializationVectorsTask() {
 		GenerateConfidentialStorageInitializationVectorsTaskExecutor task = new GenerateConfidentialStorageInitializationVectorsTaskExecutor();

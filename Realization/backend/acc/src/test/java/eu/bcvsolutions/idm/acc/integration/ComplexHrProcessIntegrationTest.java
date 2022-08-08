@@ -294,6 +294,10 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 	 */
 	@Test
 	public void tc01NewEmploymentCommencing() {
+		IdmLongRunningTaskFilter longRunningTaskFilter = new IdmLongRunningTaskFilter();
+		longRunningTaskFilter.setRunning(true);
+		getHelper().waitForResult(s -> longRunningTaskManager.findLongRunningTasks(longRunningTaskFilter, null).getContent().size() != 0);
+
 		// test case data preparation
 		Map<String,String> identityPattern = getIdentityPattern(dvorakUsername);
 		Map<String,String> contractPattern = getContractPattern(dvorakContractId0, LocalDate.now().minusDays(2).toString(), LocalDate.now().plusDays(2).toString());
