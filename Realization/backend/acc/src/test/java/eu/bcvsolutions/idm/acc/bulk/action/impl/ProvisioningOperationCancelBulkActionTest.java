@@ -107,6 +107,12 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 			return opr.getId().equals(provisioningOperationDto.getId());
 		}).findAny().orElse(null);
 		assertNull(orElse);
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -147,6 +153,12 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -190,6 +202,12 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size()); // Must be zero
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -236,6 +254,12 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size()); // Must be zero
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -290,6 +314,13 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size()); // Must be zero
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteIdentity(identityTwo.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -341,6 +372,13 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size()); // Must be zero
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteIdentity(identityTwo.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -380,6 +418,12 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(allOperations, newOperations.size()); // Must be same
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -420,5 +464,11 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 
 		operations = provisioningOperationService.find(filter, null).getContent();
 		assertTrue(operations.isEmpty());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 }
