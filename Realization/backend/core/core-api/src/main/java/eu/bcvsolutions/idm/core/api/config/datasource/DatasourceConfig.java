@@ -83,6 +83,8 @@ public class DatasourceConfig {
             // We do not use Flyway for H2 database
             vendorAdapter.setGenerateDdl(true);
         }
+        vendorAdapter.setGenerateDdl(true);
+        vendorAdapter.setShowSql(true);
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
 

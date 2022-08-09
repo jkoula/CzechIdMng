@@ -3,14 +3,7 @@ package eu.bcvsolutions.idm.core.model.entity;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -20,7 +13,6 @@ import org.springframework.util.Assert;
 import eu.bcvsolutions.idm.core.api.domain.AuditSearchable;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
-import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
@@ -43,7 +35,7 @@ import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 		@Index(name = "idx_idm_identity_role_d_r_id", columnList = "direct_role_id"),
 		@Index(name = "idx_idm_identity_role_comp_id", columnList = "role_composition_id")
 })
-public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, AuditSearchable, ExternalIdentifiable, FormableEntity {
+public class IdmIdentityRole extends AbstractRoleAssignment implements ValidableEntity, AuditSearchable, ExternalIdentifiable, FormableEntity {
 
 	private static final long serialVersionUID = 9208706652291035265L;
 	
@@ -51,7 +43,8 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 	@Size(max = DefaultFieldLengths.NAME)
 	@Column(name = "external_id", length = DefaultFieldLengths.NAME)
 	private String externalId;
-	
+
+	// this cannot be abstracted in AbstractRoleAssignment, because of different column names in each subclass
 	@Audited
 	@NotNull
 	@ManyToOne(optional = false)
@@ -62,42 +55,9 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 	@ManyToOne(optional = true)
 	@JoinColumn(name = "contract_position_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private IdmContractPosition contractPosition;
-	
-	@NotNull
-	@Audited
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	private IdmRole role;
-	
-	@Audited
-	@ManyToOne
-	@JoinColumn(name = "automatic_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	private IdmAutomaticRole automaticRole; // Assigned role depends on automatic role
-	
-	@Audited
-	@Column(name = "valid_from")
-	private LocalDate validFrom;
-	
-	@Audited
-	@Column(name = "valid_till")
-	private LocalDate validTill;
-	
-	@Audited
-	@ManyToOne
-	@JoinColumn(name = "direct_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	private IdmIdentityRole directRole;
-	
-	@Audited
-	@ManyToOne
-	@JoinColumn(name = "role_composition_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	private IdmRoleComposition roleComposition;
-
-	// Relation on sys-system form ACC. We need to working with that also in the core module (cross-domains). 
-	@Audited
-	@Column(name = "role_system_id", length = 16)
-	private UUID roleSystem;
 
 	public IdmIdentityRole() {
+		super();
 	}
 
 	public IdmIdentityRole(UUID id) {
@@ -105,36 +65,10 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 	}
 	
 	public IdmIdentityRole(IdmIdentityContract identityContract) {
-		Assert.notNull(identityContract, "Contract is required, when has to be set into assigned role.");
+		super(identityContract);
 		//
 		this.identityContract = identityContract;
-		this.validFrom = identityContract.getValidFrom();
-		this.validTill = identityContract.getValidTill();
  	}
-
-	public LocalDate getValidFrom() {
-		return validFrom;
-	}
-
-	public void setValidFrom(LocalDate validFrom) {
-		this.validFrom = validFrom;
-	}
-
-	public LocalDate getValidTill() {
-		return validTill;
-	}
-
-	public void setValidTill(LocalDate validTo) {
-		this.validTill = validTo;
-	}
-
-	public IdmRole getRole() {
-		return role;
-	}
-
-	public void setRole(IdmRole role) {
-		this.role = role;
-	}
 	
 	public IdmIdentityContract getIdentityContract() {
 		return identityContract;
@@ -142,14 +76,6 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 	
 	public void setIdentityContract(IdmIdentityContract identityContract) {
 		this.identityContract = identityContract;
-	}
-	
-	public IdmAutomaticRole getAutomaticRole() {
-		return automaticRole;
-	}
-
-	public void setAutomaticRole(IdmAutomaticRole automaticRole) {
-		this.automaticRole = automaticRole;
 	}
 
 	/**
@@ -200,35 +126,11 @@ public class IdmIdentityRole extends AbstractEntity implements ValidableEntity, 
 		return externalId;
 	}
 
-	public IdmIdentityRole getDirectRole() {
-		return directRole;
-	}
-
-	public void setDirectRole(IdmIdentityRole directRole) {
-		this.directRole = directRole;
-	}
-
-	public IdmRoleComposition getRoleComposition() {
-		return roleComposition;
-	}
-
-	public void setRoleComposition(IdmRoleComposition roleComposition) {
-		this.roleComposition = roleComposition;
-	}
-	
 	public IdmContractPosition getContractPosition() {
 		return contractPosition;
 	}
 	
 	public void setContractPosition(IdmContractPosition contractPosition) {
 		this.contractPosition = contractPosition;
-	}
-
-	public UUID getRoleSystem() {
-		return roleSystem;
-	}
-
-	public void setRoleSystem(UUID roleSystem) {
-		this.roleSystem = roleSystem;
 	}
 }
