@@ -38,7 +38,6 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExe
  * @author Roman Kucera
  * @since 12.3.0
  */
-@DisallowConcurrentExecution
 @Component(SystemAttributeMappingStrategyRecalculationTaskExecutor.TASK_NAME)
 public class SystemAttributeMappingStrategyRecalculationTaskExecutor extends AbstractSchedulableTaskExecutor<Boolean> {
 
