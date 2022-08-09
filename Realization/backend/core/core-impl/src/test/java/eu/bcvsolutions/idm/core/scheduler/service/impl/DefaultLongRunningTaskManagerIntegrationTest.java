@@ -446,7 +446,7 @@ public class DefaultLongRunningTaskManagerIntegrationTest extends AbstractBulkAc
 		filter.setOperationState(OperationState.EXECUTED);
 		getHelper().waitForResult(res -> {
 			return service.find(filter, null).getContent().size() != 3;
-		}, 500, 30);
+		}, 1000, 60);
 		//
 		List<IdmLongRunningTaskDto> ltrs = manager.findLongRunningTasks(filter, null).getContent();
 		//
