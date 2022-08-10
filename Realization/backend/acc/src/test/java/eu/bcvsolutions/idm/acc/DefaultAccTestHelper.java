@@ -532,5 +532,4 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		//
 		return systemOwnerRoleService.save(dto);
 	}
-
 }
