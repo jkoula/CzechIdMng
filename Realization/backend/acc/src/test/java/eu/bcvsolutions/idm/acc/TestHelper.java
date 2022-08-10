@@ -91,6 +91,14 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	SysSystemDto createTestResourceSystem(boolean withMapping, String systemName);
 	
 	/**
+	 * Creates default provisioning mapping for the given system and entity type
+	 * 
+	 * @param system
+	 * @return
+	 */
+	SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType);
+
+	/**
 	 * Creates default provisioning mapping for the given system
 	 * 
 	 * @param system
