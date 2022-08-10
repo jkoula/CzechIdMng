@@ -49,6 +49,7 @@ import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -583,6 +584,23 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 		filter.setSupportChangePassword(getParameterConverter().toBoolean(parameters, "supportChangePassword"));
 		filter.setIncludeEcho(getParameterConverter().toBoolean(parameters, "includeEcho"));
 		filter.setEntityType(getParameterConverter().toString(parameters, "entityType"));
+		filter.setInProtection(getParameterConverter().toBoolean(parameters, "inProtection"));
+		// OR is supported only
+		if (parameters.containsKey(AccAccountFilter.PARAMETER_ROLE_IDS)) {
+			for (Object role : parameters.get(AccAccountFilter.PARAMETER_ROLE_IDS)) {
+				if (role != null) {
+					filter.getRoleIds().add(getParameterConverter().toEntityUuid((String) role, IdmRoleDto.class));
+				}
+			}
+		}
+		// OR is supported only
+		if (parameters.containsKey(AccAccountFilter.PARAMETER_IDENTITY_IDS)) {
+			for (Object identity : parameters.get(AccAccountFilter.PARAMETER_IDENTITY_IDS)) {
+				if (identity != null) {
+					filter.getIdentities().add(getParameterConverter().toEntityUuid((String) identity, IdmIdentityDto.class));
+				}
+			}
+		}
 		//
 		return filter;
 	}

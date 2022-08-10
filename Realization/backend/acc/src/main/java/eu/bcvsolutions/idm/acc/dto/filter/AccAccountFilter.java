@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.dto.filter;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.util.LinkedMultiValueMap;
@@ -22,6 +23,8 @@ import eu.bcvsolutions.idm.core.api.dto.filter.FormableFilter;
 public class AccAccountFilter extends DataFilter implements ExternalIdentifiableFilter, FormableFilter {
 	
 	public static final String PARAMETER_IDENTITY_ID = "identity";
+	public static final String PARAMETER_IDENTITY_IDS = "identities";
+	public static final String PARAMETER_ROLE_IDS = "roles";
 	//
 	private UUID systemEntityId;	
 	private UUID systemId;	
@@ -174,5 +177,21 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 
 	public void setHasFormDefinition(Boolean hasFormDefinition) {
 		this.hasFormDefinition = hasFormDefinition;
+	}
+	
+	public List<UUID> getRoleIds() {
+		return getParameterConverter().toUuids(getData(), PARAMETER_ROLE_IDS);
+	}
+
+	public void setRoleIds(List<UUID> roleIds) {
+		put(PARAMETER_ROLE_IDS, roleIds);
+	}
+	
+	public List<UUID> getIdentities() {
+		return getParameterConverter().toUuids(getData(), PARAMETER_IDENTITY_IDS);
+	}
+
+	public void setIdentities(List<UUID> identityIds) {
+		put(PARAMETER_IDENTITY_IDS, identityIds);
 	}
 }

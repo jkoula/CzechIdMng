@@ -125,6 +125,39 @@ module.exports = {
             ]
           },
           {
+            id: 'accounts',
+            labelKey: 'acc:content.accounts.label',
+            titleKey: 'acc:content.accounts.title',
+            order: 15,
+            priority: 0,
+            icon: 'fa:external-link',
+            path: '/accounts/accounts-all',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: [{
+              id: 'accounts-all',
+              type: 'TAB',
+              labelKey: 'acc:content.accounts.all.label',
+              titleKey: 'acc:content.accounts.all.title',
+              order: 15,
+              icon: '',
+              path: '/accounts/accounts-all',
+              access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+              items: []
+            },
+            {
+              id: 'accounts-personal',
+              type: 'TAB',
+              labelKey: 'acc:content.accounts.personal.label',
+              titleKey: 'acc:content.accounts.personal.title',
+              order: 20,
+              icon: '',
+              path: '/accounts/accounts-personal',
+              access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+              items: []
+            },
+            ]
+          },
+          {
             id: 'sys-connector-servers',
             labelKey: 'acc:content.connector-servers.label',
             titleKey: 'acc:content.connector-servers.title',

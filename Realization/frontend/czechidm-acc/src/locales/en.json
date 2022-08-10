@@ -24,6 +24,43 @@
   "content": {
     "dashboard": {
     },
+    "accounts": {
+      "header": "Accounts",
+      "label": "$t(acc:content.accounts.header)",
+      "title": "Accounts",
+      "all": {
+        "header": "All accounts",
+        "label": "$t(acc:content.accounts.all.header)"
+      },
+      "personal": {
+        "header": "Personal accounts",
+        "label": "$t(acc:content.accounts.personal.header)"
+      },
+      "filter": {
+        "accounts":{
+          "identifier": {
+            "placeholder": "Account identifier"
+          },
+          "system": {
+            "placeholder": "System"
+          },
+          "roles": {
+            "placeholder": "Created by role"
+          },
+          "identity": {
+            "placeholder": "Account owner"
+          },
+          "type": {
+            "placeholder": "Account type"
+          },
+          "protected": {
+            "placeholder": "Protected from deletion",
+            "yes": "Yes",
+            "no": "No"
+          }
+        }
+      }
+    },
     "systems": {
       "header": "Systems",
       "title": "$t(acc:content.systems.header)",
@@ -1102,7 +1139,7 @@
     "SystemEntity": {
       "_type": "Entity in system",
       "entityType": "Entity type",
-      "uid": "Identifier in system",
+      "uid": "Account identifier",
       "system": "Connected system",
       "wish": {
         "label": "Wish",

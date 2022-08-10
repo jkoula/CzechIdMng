@@ -81,7 +81,10 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractFormableService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
@@ -374,6 +377,43 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 			} else {
 				predicate = builder.and(predicate, identityPredicate, ownerPredicate);
 			}
+
+			identityAccountSubquery.where(predicate);
+			predicates.add(builder.exists(identityAccountSubquery));
+		}
+		if (filter.getRoleIds() != null && !filter.getRoleIds().isEmpty()) {
+			Subquery<AccIdentityAccount> identityAccountSubquery = query.subquery(AccIdentityAccount.class);
+			Root<AccIdentityAccount> subRootIdentityAccount = identityAccountSubquery.from(AccIdentityAccount.class);
+			
+			Subquery<IdmIdentityRole> identityRoleSubquery = query.subquery(IdmIdentityRole.class);
+			Root<IdmIdentityRole> subRootIdentityRole = identityRoleSubquery.from(IdmIdentityRole.class);
+			
+			identityRoleSubquery.select(subRootIdentityRole);
+			
+			identityRoleSubquery.where(
+					builder.and(subRootIdentityRole.get(IdmIdentityRole_.role).get(IdmRole_.id).in(filter.getRoleIds()),
+							builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.identityRole), subRootIdentityRole))
+			);
+			
+			identityAccountSubquery.select(subRootIdentityAccount);
+			identityAccountSubquery.where(
+                    builder.and(
+                    		builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.account), root), // correlation attr
+                    		builder.exists(identityRoleSubquery))
+            );			
+			predicates.add(builder.exists(identityAccountSubquery));
+		}
+		if (filter.getIdentities() != null && !filter.getIdentities().isEmpty()) {
+			Subquery<AccIdentityAccount> identityAccountSubquery = query.subquery(AccIdentityAccount.class);
+			Root<AccIdentityAccount> subRootIdentityAccount = identityAccountSubquery.from(AccIdentityAccount.class);
+			identityAccountSubquery.select(subRootIdentityAccount);
+
+			Predicate predicate = builder
+					.and(builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.account), root));
+			Predicate identityPredicate = 
+					subRootIdentityAccount.get(AccIdentityAccount_.identity).get(IdmIdentity_.id).in(filter.getIdentities());
+
+			predicate = builder.and(predicate, identityPredicate);
 
 			identityAccountSubquery.where(predicate);
 			predicates.add(builder.exists(identityAccountSubquery));

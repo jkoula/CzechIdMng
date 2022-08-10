@@ -15,6 +15,8 @@ const systemEntityManager = new SystemEntityManager();
 const systemManager = new SystemManager();
 const systemMappingManager = new SystemMappingManager();
 const systemEntityTypeManager = new SystemEntityTypeManager();
+const roleManager = new Managers.RoleManager();
+const identityManager = new Managers.IdentityManager();
 
 /**
  * Accounts on target system
@@ -106,6 +108,18 @@ export class AccountTable extends Advanced.AbstractTableContent {
   }
 
   renderTargetEntity({rowIndex, data}) {
+    return (
+      <Advanced.EntityInfo
+        entityType={ this._getType(data[rowIndex].targetEntityType) }
+        entityIdentifier={ data[rowIndex].targetEntityId}
+        entity={ data[rowIndex]._embedded ? data[rowIndex]._embedded.targetEntityId : null }
+        showIcon
+        face="popover"
+        showEntityType/>
+    );
+  }
+
+  renderAccountOwner({rowIndex, data}) {
     return (
       <Advanced.EntityInfo
         entityType={ this._getType(data[rowIndex].targetEntityType) }
@@ -240,32 +254,6 @@ export class AccountTable extends Advanced.AbstractTableContent {
             face="datetime"
             sort
             rendered={ _.includes(columns, 'endOfProtection') }/>
-          <Advanced.Column
-            property="_embedded.systemEntity.uid"
-            rendered={ _.includes(columns, 'systemEntity') }
-            header={ this.i18n('acc:entity.Account.systemEntity') }
-            sort
-            sortProperty="systemEntity.uid"
-            face="text" />
-          <Advanced.Column
-            property="_embedded.echo.accountId"
-            rendered={ _.includes(columns, 'echo') && _showEchoMetadata }
-            header={ this.i18n('acc:entity.Account.echo.label') }
-            cell={
-              ({rowIndex, data}) => {
-                const echo = data[rowIndex]._embedded.echo;
-                if (echo) {
-                  return (
-                    <Advanced.EntityInfo
-                      entityType="echo"
-                      entity={ echo }
-                      face="popover"
-                      showIcon/>
-                  );
-                }
-                return null;
-              }
-            }/>
         </Advanced.Table>
 
         <Basic.Modal
@@ -411,20 +399,44 @@ class Filter extends Advanced.Filter {
       <Advanced.Filter onSubmit={ onSubmit }>
         <Basic.AbstractForm ref="filterForm">
           <Basic.Row>
-            <Basic.Col lg={ 8 }>
+            <Basic.Col lg={ 2 }>
               <Advanced.Filter.TextField
                 ref="text"
-                placeholder={ this.i18n('acc:content.system.accounts.filter.text.placeholder') }/>
+                placeholder={ this.i18n('acc:content.accounts.filter.accounts.identifier.placeholder') }/>
+            </Basic.Col>
+            <Basic.Col lg={ 3 }>
+              <Advanced.Filter.SelectBox
+                ref="systemId"
+                manager={ systemManager }
+                placeholder={ this.i18n('acc:content.accounts.filter.accounts.system.placeholder') }/>
+            </Basic.Col>
+            <Basic.Col lg={ 3 }>
+            <Advanced.Filter.RoleSelect
+                ref="roles"
+                label={ null }
+                manager={ roleManager }
+                placeholder={ this.i18n('acc:content.accounts.filter.accounts.roles.placeholder') }
+                header={ this.i18n('filter.role.placeholder') }
+                rendered={ Managers.SecurityManager.hasAuthority('ROLE_AUTOCOMPLETE') }
+                multiSelect/>
             </Basic.Col>
             <Basic.Col lg={ 4 } className="text-right">
               <Advanced.Filter.FilterButtons cancelFilter={ onCancel }/>
             </Basic.Col>
           </Basic.Row>
           <Basic.Row className="last">
-            <Basic.Col lg={ 4 }>
+            <Basic.Col lg={ 3 }>
+              <Advanced.Filter.IdentitySelect
+                label={ null }
+                manager={ identityManager }
+                placeholder={ this.i18n('acc:content.accounts.filter.accounts.identity.placeholder') }
+                multiSelect
+                ref="identities"/>
+            </Basic.Col>
+            <Basic.Col lg={ 2 }>
               <Advanced.Filter.EnumSelectBox
                 ref="accountType"
-                placeholder={ this.i18n('acc:entity.Account.accountType') }
+                placeholder={ this.i18n('acc:content.accounts.filter.accounts.type.placeholder') }
                 enum={ AccountTypeEnum }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
@@ -436,6 +448,16 @@ class Filter extends Advanced.Filter {
                 manager={ systemEntityTypeManager }
                 rendered={ !forceSearchParameters.getFilters().has('entityType') }/>
             </Basic.Col>
+            <Basic.Col lg={ 2 }>
+              <Advanced.Filter.BooleanSelectBox
+                ref="inProtection"
+                placeholder={ this.i18n('acc:content.accounts.filter.accounts.protected.placeholder') }
+                options={ [
+                  { value: 'true', niceLabel: this.i18n('acc:content.accounts.filter.accounts.protected.yes') },
+                  { value: 'false', niceLabel: this.i18n('acc:content.accounts.filter.accounts.protected.no') }
+                ]}/>
+            </Basic.Col>
+            
             <Basic.Col lg={ 4 } />
           </Basic.Row>
         </Basic.AbstractForm>

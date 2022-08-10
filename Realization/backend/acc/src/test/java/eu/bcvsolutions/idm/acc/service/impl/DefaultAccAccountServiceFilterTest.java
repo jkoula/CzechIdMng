@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.testng.collections.Lists;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
@@ -23,7 +24,9 @@ import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
@@ -43,6 +46,8 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	private AccIdentityAccountService identityAccoutnService;
 	@Autowired
 	private SysSystemAttributeMappingService attributeMappingService;
+	@Autowired
+	private SysSystemService systemService;
 
 	@Before
 	public void login() {
@@ -207,6 +212,48 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 		testFilter.setId(accountTwo.getId());
 		accounts = accAccountService.find(testFilter, null).getContent();
 		Assert.assertTrue(accounts.isEmpty());
+	}
+	
+	@Test
+	public void testRoleId() {
+		IdmRoleDto role = getHelper().createRole();
+		IdmIdentityDto identity = getHelper().createIdentity();
+
+		SysSystemDto system = helper.createTestResourceSystem(true);
+		system.setDisabled(true);
+		system = systemService.save(system);
+
+		helper.createRoleSystem(role, system);
+		//
+		// different account on the system
+		IdmIdentityDto identityTwo = helper.createIdentity("test-" + System.currentTimeMillis());
+		createAccount(system.getId(), identityTwo.getId(), identityTwo.getUsername(), false);
+		//
+
+		getHelper().createIdentityRole(identity, role);
+		
+		AccAccountFilter testFilter = new AccAccountFilter();
+		testFilter.setRoleIds(Lists.newArrayList(role.getId()));
+		List<AccAccountDto> accounts = accAccountService.find(testFilter, null).getContent();
+		Assert.assertEquals(1, accounts.size());
+		Assert.assertEquals(identity.getUsername(), accounts.get(0).getUid());
+	}
+	
+	@Test
+	public void testIdentities() {
+		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
+		SysSystemDto system = helper.createTestResourceSystem(true);
+		createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
+		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
+		SysSystemDto system2 = helper.createTestResourceSystem(true);
+		createAccount(system2.getId(), identity.getId(), identity.getUsername(), false);
+		AccAccountDto account3 = createAccount(system2.getId(), identity2.getId(), identity2.getUsername(),
+				false);
+		AccAccountFilter testFilter = new AccAccountFilter();
+		testFilter.setIdentities(Lists.newArrayList(identity2.getId()));
+		Page<AccAccountDto> pages = accAccountService.find(testFilter, null);
+		assertEquals(1, pages.getTotalElements());
+		assertEquals(account3.getId(), pages.getContent().get(0).getId());
 	}
 
 	private AccAccountDto createAccount(UUID systemId, UUID identityId, String uid,	Boolean ownership) {
