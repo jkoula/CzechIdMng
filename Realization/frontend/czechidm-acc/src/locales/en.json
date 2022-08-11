@@ -3463,6 +3463,10 @@
       "title": "Conflict in connected mapping",
       "message": "Connected mapping [{{mapping}}] has the same type as the one, that should be created. Only mappings with opposite types can be connected!"
     },
+    "SYSTEM_MAPPING_CONNECTED_MAPPING_ALREADY_MAPPED": {
+      "title": "Mapping is already connected",
+      "message": "Connected mapping [{{mapping}}] is already set in some other mapping!"
+    },
     "PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE": {
       "title": "Provisioning does not supports this type",
       "message": "Provisioning does not supports this entity type [{{entityType}}]"

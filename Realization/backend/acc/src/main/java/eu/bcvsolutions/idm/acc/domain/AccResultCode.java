@@ -54,6 +54,7 @@ public enum AccResultCode implements ResultCode {
 	SYSTEM_MAPPING_PASSWORD_OVERRIDE(HttpStatus.BAD_REQUEST, "Password can't be overridden."),
 	SYSTEM_MAPPING_PASSWORD_EXITS_OVERRIDDEN(HttpStatus.CONFLICT, "The attribute can't be mapped as password. Exists overridden attribute in role: [%s]."),
 	SYSTEM_MAPPING_CONNECTED_MAPPING_SAME_TYPE(HttpStatus.BAD_REQUEST, "Connected mapping [%s] has the same operation type as the one, that should be created. Only mappings with opposite types can be connected!"),
+	SYSTEM_MAPPING_CONNECTED_MAPPING_ALREADY_MAPPED(HttpStatus.BAD_REQUEST, "Connected mapping [%s] is already set in some other mapping!"),
 	//
 	// system entity
 	SYSTEM_ENTITY_DELETE_FAILED_HAS_OPERATIONS(HttpStatus.BAD_REQUEST, "System entity [%s] on system [%s] cannot be deleted. It is used in active provisioning operations!"),

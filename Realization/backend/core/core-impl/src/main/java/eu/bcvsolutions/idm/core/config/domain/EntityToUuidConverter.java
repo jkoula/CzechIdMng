@@ -76,7 +76,8 @@ public class EntityToUuidConverter implements Converter<BaseEntity, UUID> {
 				Field fieldTyp = getFirstFieldInClassHierarchy(parentContext.getDestinationType(), field);
 				if (fieldTyp.isAnnotationPresent(Embedded.class)) {
 					Embedded embeddedAnnotation = fieldTyp.getAnnotation(Embedded.class);
-					if (embeddedAnnotation.enabled()) {
+					// if embedded has same type as parent we don't want to make it embedded, otherwise it will cycle.
+					if (embeddedAnnotation.enabled() && !embeddedAnnotation.dtoClass().equals(parentDto.getClass())) {
 						// If has field Embedded (enabled) annotation, then
 						// we will create new
 						// instance of DTO.

@@ -153,6 +153,14 @@ public class DefaultSysSystemMappingService
 			if (dto.getOperationType().equals(connectedSystemMappingDto.getOperationType())) {
 				throw new ResultCodeException(AccResultCode.SYSTEM_MAPPING_CONNECTED_MAPPING_SAME_TYPE, ImmutableMap.of("mapping", connectedSystemMappingDto.getName()));
 			}
+			SysSystemMappingFilter systemMappingFilter = new SysSystemMappingFilter();
+			systemMappingFilter.setConnectedSystemMappingId(connectedSystemMappingDto.getId());
+			List<UUID> connectedMappingsIds = this.findIds(systemMappingFilter, null).getContent();
+			connectedMappingsIds.forEach(uuid -> {
+				if (!uuid.equals(dto.getId())) {
+					throw new ResultCodeException(AccResultCode.SYSTEM_MAPPING_CONNECTED_MAPPING_ALREADY_MAPPED, ImmutableMap.of("mapping", connectedSystemMappingDto.getName()));
+				}
+			});
 		}
 
 		// Validate all sub attributes
@@ -642,7 +650,7 @@ public class DefaultSysSystemMappingService
 			predicates.add(
 					builder.equal(
 							root.get(SysSystemMapping_.connectedSystemMappingId).get(SysSystemMapping_.id),
-							treeTypeId
+							connectedSystemMappingId
 					)
 			);
 		}
