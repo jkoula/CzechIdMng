@@ -2664,6 +2664,10 @@
           }
         }
       },
+      "acc-system-attribute-strategy-recalculation-long-running-task": {
+        "label": "Recalculation of overiden mapping attributes",
+        "help": "It will unite strategy for overiden attributes based on strategy in system mapping."
+      },
       "acc-account-protection-expiration-long-running-task": {
         "label": "Removes accounts with expired protection interval",
         "help": "Removes accounts with expired protection interval. To really delete the IdM account (and thus the account on the end system), it will occur after the expiration of the protection interval.",
