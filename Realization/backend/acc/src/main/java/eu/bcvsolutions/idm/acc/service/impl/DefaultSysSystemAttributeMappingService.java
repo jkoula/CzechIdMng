@@ -1,7 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,6 +54,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysAttributeControlledValueFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute;
@@ -78,6 +77,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
@@ -88,8 +88,9 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
+import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
+import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.GroovyScriptService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
@@ -119,7 +120,7 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
  */
 @Service
 public class DefaultSysSystemAttributeMappingService 
-		extends AbstractReadWriteDtoService<SysSystemAttributeMappingDto, SysSystemAttributeMapping, SysSystemAttributeMappingFilter>
+		extends AbstractEventableDtoService<SysSystemAttributeMappingDto, SysSystemAttributeMapping, SysSystemAttributeMappingFilter>
 		implements SysSystemAttributeMappingService {
 
 	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory
@@ -157,8 +158,8 @@ public class DefaultSysSystemAttributeMappingService
 			SysRoleSystemAttributeRepository roleSystemAttributeRepository, FormPropertyManager formPropertyManager,
 			SysSyncConfigRepository syncConfigRepository, List<AbstractScriptEvaluator> evaluators,
 			ConfidentialStorage confidentialStorage, SysSchemaAttributeService schemaAttributeService,
-			SysSchemaObjectClassService schemaObjectClassService, SysSystemMappingService systemMappingService) {
-		super(repository);
+			SysSchemaObjectClassService schemaObjectClassService, SysSystemMappingService systemMappingService, EntityEventManager entityEventManager) {
+		super(repository, entityEventManager);
 		//
 		Assert.notNull(groovyScriptService, "Groovy script service is required.");
 		Assert.notNull(formService, "Form service (eav) is required.");
