@@ -88,6 +88,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
+import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
@@ -228,7 +229,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					.stream()
 					.filter(entityAccount -> account.equals(entityAccount.getAccount()))
 					.findFirst()
-					.orElseThrow();
+					.orElseThrow(() -> new CoreException(String.format("No entity account found for account uuid %s", account)));
 
 			AccAccountDto accountDto = DtoUtils.getEmbedded((AbstractDto) entityAccountDto,
 					AccIdentityAccount_.account.getName(), AccAccountDto.class, null);
@@ -529,7 +530,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					.filter(a -> a.getRealUid().equals(result.getSystemEntityUid())
 							&& a.getSystem().equals(operation.getSystem()))
 					.findFirst()
-					.orElseThrow();
+					.orElseThrow(() -> new CoreException(String.format("No account found for uid %s on system %s", result.getSystemEntityUid(), operation.getSystem())));
 
 			SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
 			//
