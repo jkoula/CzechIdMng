@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -20,6 +19,8 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
+import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
@@ -87,7 +88,7 @@ public abstract class AbstractAccAuthenticator extends AbstractAuthenticator {
 	 */
 	protected IcUidAttribute authenticateOverSystem(SysSystemDto system, LoginDto loginDto, IdmIdentityDto identity) {
 		// search authentication attribute for system with provisioning mapping, only for identity
-		SysSystemAttributeMappingDto attribute = systemAttributeMappingService.getAuthenticationAttribute(system.getId(), SystemEntityType.IDENTITY);
+		SysSystemAttributeMappingDto attribute = systemAttributeMappingService.getAuthenticationAttribute(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		//
 		if (attribute == null) {
 			// attribute doesn't exists
@@ -139,7 +140,7 @@ public abstract class AbstractAccAuthenticator extends AbstractAuthenticator {
 			// authentication over system, when password or username not exist or bad credentials - throw error
 			try {
 				// authentication against system
-				auth = provisioningService.authenticate(transformUsername, loginDto.getPassword(), system, SystemEntityType.IDENTITY);
+				auth = provisioningService.authenticate(transformUsername, loginDto.getPassword(), system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 				// check auth
 				if (auth == null || auth.getValue() == null) {
 					// failed, continue to another account

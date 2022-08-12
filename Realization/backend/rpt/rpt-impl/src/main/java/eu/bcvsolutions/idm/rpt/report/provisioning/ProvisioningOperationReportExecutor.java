@@ -140,7 +140,7 @@ public class ProvisioningOperationReportExecutor extends AbstractReportExecutor 
 	private RptProvisioningOperationDto transferSysProvisioningOperationDto(SysProvisioningOperationDto operation) {
 		RptProvisioningOperationDto rptOperationDto = new RptProvisioningOperationDto(operation);
 		SysSystemDto system = DtoUtils.getEmbedded(operation, SysProvisioningOperation_.system);
-		rptOperationDto.setSystemEntityType(operation.getEntityType().name());
+		rptOperationDto.setSystemEntityType(operation.getEntityType());
 		rptOperationDto.setSystem(system.getCode());
 		rptOperationDto.setSystemEntityUid(operation.getSystemEntityUid());
 		rptOperationDto.setOperationType(operation.getOperationType());

@@ -27,7 +27,6 @@ import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
@@ -54,6 +53,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.impl.IdentityProvisioningExecutor;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.domain.IdmPasswordPolicyType;
@@ -321,7 +321,7 @@ public class IdentityPasswordProvisioningTest extends AbstractIntegrationTest {
 		assertNull(findResource);
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(1, operations.size());
@@ -493,7 +493,7 @@ public class IdentityPasswordProvisioningTest extends AbstractIntegrationTest {
 		//
 		// cancel the first provisioning operation
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		Assert.assertEquals(2, operations.size());

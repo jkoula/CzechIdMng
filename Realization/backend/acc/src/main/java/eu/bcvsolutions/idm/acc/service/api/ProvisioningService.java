@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
@@ -94,7 +93,7 @@ public interface ProvisioningService {
 	 * @param entityId - Id of entity connected to the account. Can be null, but provisioning archive will not have correct information.
 	 * 
 	 */
-	void doDeleteProvisioning(AccAccountDto account, SystemEntityType entityType, UUID entityId);
+	void doDeleteProvisioning(AccAccountDto account, String entityType, UUID entityId);
 	
 	/**
 	 * 
@@ -128,7 +127,7 @@ public interface ProvisioningService {
 	 * @param entityType
 	 * @return
 	 */
-	IcUidAttribute authenticate(String username, GuardedString password, SysSystemDto system, SystemEntityType entityType);
+	IcUidAttribute authenticate(String username, GuardedString password, SysSystemDto system, String entityType);
 
 	/**
 	 * Return all mapped attributes for this account (include overloaded attributes)
@@ -140,7 +139,7 @@ public interface ProvisioningService {
 	 * @param entityType
 	 * @return
 	 */
-	List<AttributeMapping> resolveMappedAttributes(AccAccountDto account, AbstractDto dto, SysSystemDto system, SystemEntityType entityType);
+	List<AttributeMapping> resolveMappedAttributes(AccAccountDto account, AbstractDto dto, SysSystemDto system, String entityType);
 
 	/**
 	 * Create final list of attributes for provisioning.
@@ -151,7 +150,7 @@ public interface ProvisioningService {
 	 * @return
 	 */
 	List<AttributeMapping> compileAttributes(List<? extends AttributeMapping> defaultAttributes,
-			List<SysRoleSystemAttributeDto> overloadingAttributes, SystemEntityType entityType);
+			List<SysRoleSystemAttributeDto> overloadingAttributes, String entityType);
 	
 	/**
 	 * Do provisioning for given account and dto. For internal purpose without emit event.

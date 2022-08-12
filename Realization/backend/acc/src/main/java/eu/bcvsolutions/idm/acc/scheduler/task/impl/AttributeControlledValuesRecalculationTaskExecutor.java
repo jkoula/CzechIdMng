@@ -17,7 +17,6 @@ import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
@@ -26,6 +25,7 @@ import eu.bcvsolutions.idm.acc.eav.domain.AccFaceType;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -57,7 +57,7 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 
 	private UUID systemId;
 	private boolean onlyEvicted;
-	private SystemEntityType entityType;
+	private String entityType;
 	
 	@Override
 	public String getName() {
@@ -70,7 +70,7 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 
 		systemId = getParameterConverter().toUuid(properties, PARAMETER_SYSTEM_UUID);
 		onlyEvicted = getParameterConverter().toBoolean(properties, PARAMETER_ONLY_EVICTED);
-		entityType = getParameterConverter().toEnum(properties, PARAMETER_ENTITY_TYPE, SystemEntityType.class);
+		entityType = getParameterConverter().toString(properties, PARAMETER_ENTITY_TYPE);
 	}
 
 	@Override
@@ -146,7 +146,7 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 		evictedAttribute.setRequired(false);
 		IdmFormAttributeDto entityTypeAttribute = new IdmFormAttributeDto(PARAMETER_ENTITY_TYPE, PARAMETER_ENTITY_TYPE,
 				PersistentType.SHORTTEXT);
-		entityTypeAttribute.setDefaultValue(String.valueOf(SystemEntityType.IDENTITY));
+		entityTypeAttribute.setDefaultValue(String.valueOf(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE));
 		entityTypeAttribute.setRequired(true);
 		//
 		return Lists.newArrayList(systemAttribute, entityTypeAttribute, evictedAttribute);

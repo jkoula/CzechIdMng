@@ -14,7 +14,6 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleCatalogueAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
@@ -31,9 +30,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueService;
@@ -51,6 +52,9 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 public class RoleCatalogueProvisioningExecutor extends AbstractProvisioningExecutor<IdmRoleCatalogueDto> {
  
 	public static final String NAME = "roleCatalogueProvisioningService";
+	
+	public static final String SYSTEM_ENTITY_TYPE = "ROLE_CATALOGUE";
+	
 	private final AccRoleCatalogueAccountService catalogueAccountService;
 	private final IdmRoleCatalogueService catalogueService;
 	
@@ -64,12 +68,13 @@ public class RoleCatalogueProvisioningExecutor extends AbstractProvisioningExecu
 			EntityEventManager entityEventManager, SysSchemaAttributeService schemaAttributeService,
 			SysSchemaObjectClassService schemaObjectClassService,
 			SysSystemAttributeMappingService systemAttributeMappingService,
-			IdmRoleService roleService) {
+			IdmRoleService roleService,
+			SysSystemEntityManager systemEntityManager) {
 		
 		super(systemMappingService, attributeMappingService, connectorFacade, systemService, roleSystemService,
 				roleSystemAttributeService, systemEntityService, accountService,
 				provisioningExecutor, entityEventManager, schemaAttributeService, schemaObjectClassService,
-				systemAttributeMappingService, roleService);
+				systemAttributeMappingService, roleService, systemEntityManager);
 		
 		Assert.notNull(catalogueAccountService, "Service is required.");
 		Assert.notNull(catalogueService, "Service is required.");
@@ -115,7 +120,7 @@ public class RoleCatalogueProvisioningExecutor extends AbstractProvisioningExecu
 	
 	@Override
 	protected List<SysRoleSystemAttributeDto> findOverloadingAttributes(IdmRoleCatalogueDto entity, SysSystemDto system,
-			AccAccountDto account, SystemEntityType entityType) {
+			AccAccountDto account, String entityType) {
 		// Overloading attributes is not implemented for RoleCatalogue
 		return new ArrayList<>();
 	}
@@ -140,5 +145,15 @@ public class RoleCatalogueProvisioningExecutor extends AbstractProvisioningExecu
 	@Override
 	protected IdmRoleCatalogueService getService() {
 		return catalogueService;
+	}
+
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
+	}
+	
+	@Override
+	public boolean supports(SystemEntityTypeRegistrable delimiter) {
+		return delimiter.isSupportsProvisioning();
 	}
 }

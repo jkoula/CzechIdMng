@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperation;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
@@ -117,7 +116,7 @@ public class DefaultSysSystemEntityService
 	@Transactional(readOnly = true)
 	public SysSystemEntityDto getBySystemAndEntityTypeAndUid(
 			SysSystemDto system, 
-			SystemEntityType entityType,
+			String entityType,
 			String uid) {
 		return toDto(repository.findOneBySystem_IdAndEntityTypeAndUid(system.getId(), entityType, uid));
 	}
@@ -174,7 +173,7 @@ public class DefaultSysSystemEntityService
 		if (StringUtils.isNotEmpty(uid)) {
 			predicates.add(builder.equal(root.get(SysSystemEntity_.uid), uid));
 		}
-		SystemEntityType entityType = filter.getEntityType();
+		String entityType = filter.getEntityType();
 		if (entityType != null) {
 			predicates.add(builder.equal(root.get(SysSystemEntity_.entityType), entityType));
 		}

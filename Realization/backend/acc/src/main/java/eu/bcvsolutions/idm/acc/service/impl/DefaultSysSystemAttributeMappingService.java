@@ -40,7 +40,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.IdmAttachmentWithDataDto;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeControlledValueDto;
@@ -772,7 +771,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, SystemEntityType entityType) {
+	public SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, String entityType) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
 		// authentication attribute is only from provisioning operation type
@@ -971,7 +970,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public List<Serializable> getControlledAttributeValues(UUID systemId, SystemEntityType entityType,
+	public List<Serializable> getControlledAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
@@ -1024,7 +1023,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, SystemEntityType entityType,
+	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
@@ -1077,7 +1076,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, SystemEntityType entityType,
+	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
 			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping) {
 		
 		// Computes values

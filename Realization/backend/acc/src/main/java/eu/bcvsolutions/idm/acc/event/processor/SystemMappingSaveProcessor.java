@@ -72,7 +72,7 @@ public class SystemMappingSaveProcessor extends CoreEventProcessor<SysSystemMapp
 		//
 		return new DefaultEventResult<>(event, this);
 	}
-	
+
 	@Override
 	public String getName() {
 		return PROCESSOR_NAME;

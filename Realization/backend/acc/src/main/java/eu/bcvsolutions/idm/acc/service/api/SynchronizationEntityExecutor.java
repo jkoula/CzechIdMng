@@ -9,9 +9,9 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExecutor;
 
@@ -21,7 +21,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExe
  * @author svandav
  *
  */
-public interface SynchronizationEntityExecutor extends Plugin<SystemEntityType> {
+public interface SynchronizationEntityExecutor extends Plugin<SystemEntityTypeRegistrable> {
 
 	/**
 	 * Execute synchronization by given config
@@ -76,5 +76,12 @@ public interface SynchronizationEntityExecutor extends Plugin<SystemEntityType> 
 	 * @return
 	 */
 	AbstractDto getDtoByAccount(UUID entityId, AccAccountDto account);
+	
+	/**
+	 * entity type for this synchronization executor
+	 * 
+	 * @return
+	 */
+	String getSystemEntityType();
 
 }

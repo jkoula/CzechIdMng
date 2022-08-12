@@ -16,7 +16,7 @@
 
 Input variables:
 - uid (String),
-- entityType (enum SystemEntityType),
+- entityType (String),
 + icAttributes (List of IcAttribute),
 - syncConfigId (UUID for SysSyncConfig),
 - actionType (String)

@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -57,9 +56,8 @@ public class SysProvisioningArchive extends AbstractEntity {
 	private ProvisioningContext provisioningContext; 
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type", nullable = false)
-	private SystemEntityType entityType;
+	private String entityType;
 	
 	@Column(name = "entity_identifier")
 	private UUID entityIdentifier;
@@ -105,11 +103,11 @@ public class SysProvisioningArchive extends AbstractEntity {
 	 * 
 	 * @return
 	 */
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 

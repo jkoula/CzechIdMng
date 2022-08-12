@@ -24,7 +24,6 @@ import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.bulk.action.impl.IdentityAccountManagementBulkAction;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -51,6 +50,8 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
+import eu.bcvsolutions.idm.acc.service.impl.RoleSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.bulk.action.BulkActionManager;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
@@ -132,7 +133,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initData();
 		Assert.assertNotNull(system);
 		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), SystemEntityType.ROLE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(mapping);
 		mapping.setCanBeAccountCreatedScript("return entity.getPriority() == 1000;");
 		mapping = systemMappingService.save(mapping);
@@ -169,7 +170,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initData();
 		Assert.assertNotNull(system);
 		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), SystemEntityType.ROLE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(mapping);
 		mapping.setCanBeAccountCreatedScript("return Boolean.FALSE;");
 		mapping = systemMappingService.save(mapping);
@@ -197,7 +198,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), SystemEntityType.IDENTITY);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(mapping);
 		mapping.setCanBeAccountCreatedScript("return Boolean.FALSE;");
 		mapping = systemMappingService.save(mapping);
@@ -794,7 +795,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), SystemEntityType.ROLE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(mapping);
 		mapping.setMappingContextScript("context.put(\"test\", \"testOne\");");
 		mapping = systemMappingService.save(mapping);
@@ -817,7 +818,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		// Create mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.ROLE);
+		syncSystemMapping.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);
@@ -925,7 +926,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		// Create mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
+		syncSystemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);

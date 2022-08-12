@@ -20,7 +20,6 @@ import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
@@ -29,7 +28,9 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningEntityExecutor;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -47,8 +48,11 @@ import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 public class DefaultProvisioningService implements ProvisioningService {
 
 	private final SysSystemEntityService systemEntityService;
-	private final PluginRegistry<ProvisioningEntityExecutor<?>, SystemEntityType> pluginExecutors;
+	private final PluginRegistry<ProvisioningEntityExecutor<?>, SystemEntityTypeRegistrable> pluginExecutors;
 
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
+	
 	@Autowired
 	public DefaultProvisioningService(List<ProvisioningEntityExecutor<?>>  executors,
 			SysSystemEntityService systemEntityService) {
@@ -62,7 +66,7 @@ public class DefaultProvisioningService implements ProvisioningService {
 	@Override
 	public void doProvisioning(AbstractDto entity) {
 		Assert.notNull(entity, "Entity is required.");
-		this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doProvisioning(entity);		
+		this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).doProvisioning(entity);		
 	}
 
 	@Override
@@ -76,32 +80,32 @@ public class DefaultProvisioningService implements ProvisioningService {
 	public void doProvisioning(AccAccountDto account, AbstractDto entity) {
 		Assert.notNull(account, "Account is required.");
 		Assert.notNull(entity, "Entity is required.");
-		this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doProvisioning(account, entity);
+		this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).doProvisioning(account, entity);
 	}
 
 	@Override
 	public EventContext<AccAccountDto> doProvisioning(AccAccountDto account, AbstractDto entity, Map<String,Serializable> properties) {
 		Assert.notNull(account, "Account is required.");
 		Assert.notNull(entity, "Entity is required.");
-		return this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doProvisioning(account, entity, properties);
+		return this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).doProvisioning(account, entity, properties);
 	}
 
 	@Override
 	public void doInternalProvisioning(AccAccountDto account, AbstractDto entity) {
 		Assert.notNull(account, "Account is required.");
 		Assert.notNull(entity, "Entity is required.");
-		this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doInternalProvisioning(account, entity);
+		this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).doInternalProvisioning(account, entity);
 	}
 	
 	@Override
 	public SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, AbstractDto entity, boolean isDryRun) {
 		Assert.notNull(account, "Account is required.");
 		Assert.notNull(entity, "Entity is required.");
-		return this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doInternalProvisioning(account, entity, isDryRun);
+		return this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).doInternalProvisioning(account, entity, isDryRun);
 	}
 
 	@Override
-	public void doDeleteProvisioning(AccAccountDto account, SystemEntityType entityType, UUID entityId) {
+	public void doDeleteProvisioning(AccAccountDto account, String entityType, UUID entityId) {
 		Assert.notNull(account, "Account is required.");
 		this.getExecutor(entityType).doDeleteProvisioning(account, entityId);
 	}
@@ -110,7 +114,7 @@ public class DefaultProvisioningService implements ProvisioningService {
 	public List<OperationResult> changePassword(AbstractDto entity, PasswordChangeDto passwordChange) {
 		Assert.notNull(entity, "Entity is required.");
 		//
-		return this.getExecutor(SystemEntityType.getByClass(entity.getClass())).changePassword(entity, passwordChange);
+		return this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).changePassword(entity, passwordChange);
 	}
 
 	@Override
@@ -118,26 +122,26 @@ public class DefaultProvisioningService implements ProvisioningService {
 			ProvisioningOperationType operationType, AbstractDto entity) {
 		Assert.notNull(entity, "Entity is required.");
 		//
-		this.getExecutor(SystemEntityType.getByClass(entity.getClass())).doProvisioningForAttribute(systemEntity, mappedAttribute, value, operationType, entity);
+		this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).doProvisioningForAttribute(systemEntity, mappedAttribute, value, operationType, entity);
 	}
 
 	@Override
 	public IcUidAttribute authenticate(String username, GuardedString password, SysSystemDto system,
-			SystemEntityType entityType) {
+			String entityType) {
 		Assert.notNull(entityType, "Entity type is required.");
 		return this.getExecutor(entityType).authenticate(username, password, system, entityType);
 	}
 
 	@Override
 	public List<AttributeMapping> resolveMappedAttributes(AccAccountDto account, AbstractDto entity,
-			SysSystemDto system, SystemEntityType entityType) {
+			SysSystemDto system, String entityType) {
 		Assert.notNull(entityType, "Entity type is required.");
 		return this.getExecutor(entityType).resolveMappedAttributes(account, entity, system, entityType);
 	}
 
 	@Override
 	public List<AttributeMapping> compileAttributes(List<? extends AttributeMapping> defaultAttributes,
-			List<SysRoleSystemAttributeDto> overloadingAttributes, SystemEntityType entityType) {
+			List<SysRoleSystemAttributeDto> overloadingAttributes, String entityType) {
 		Assert.notNull(entityType, "Entity type is required.");
 		return this.getExecutor(entityType).compileAttributes(defaultAttributes, overloadingAttributes, entityType);
 	}
@@ -145,7 +149,7 @@ public class DefaultProvisioningService implements ProvisioningService {
 	@Override
 	public boolean accountManagement(AbstractDto entity) {
 		Assert.notNull(entity, "Entity is required.");
-		return this.getExecutor(SystemEntityType.getByClass(entity.getClass())).accountManagement(entity);
+		return this.getExecutor(systemEntityManager.getSystemEntityByClass(entity.getClass()).getSystemEntityCode()).accountManagement(entity);
 	}
 	
 	@Override
@@ -198,10 +202,11 @@ public class DefaultProvisioningService implements ProvisioningService {
 	 * @param entityType
 	 * @return
 	 */
-	private ProvisioningEntityExecutor<AbstractDto> getExecutor(SystemEntityType entityType){
+	private ProvisioningEntityExecutor<AbstractDto> getExecutor(String entityType){
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
 		
 		@SuppressWarnings("unchecked")
-		ProvisioningEntityExecutor<AbstractDto> executor =  (ProvisioningEntityExecutor<AbstractDto>) pluginExecutors.getPluginFor(entityType);
+		ProvisioningEntityExecutor<AbstractDto> executor =  (ProvisioningEntityExecutor<AbstractDto>) pluginExecutors.getPluginFor(systemEntityType);
 		if (executor == null) {
 			throw new UnsupportedOperationException(
 					MessageFormat.format("Provisioning executor for SystemEntityType {0} is not supported!", entityType));

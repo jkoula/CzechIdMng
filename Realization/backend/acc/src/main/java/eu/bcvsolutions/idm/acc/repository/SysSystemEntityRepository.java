@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSystemEntity;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
@@ -35,7 +34,7 @@ public interface SysSystemEntityRepository extends AbstractEntityRepository<SysS
 	        " (?#{[0].entityType} is null or e.entityType = ?#{[0].entityType})")
 	Page<SysSystemEntity> find(SysSystemEntityFilter filter, Pageable pageable);
 	
-	SysSystemEntity findOneBySystem_IdAndEntityTypeAndUid(@Param("systemId") UUID systemId, @Param("entityType") SystemEntityType entityType, @Param("uid") String uid);
+	SysSystemEntity findOneBySystem_IdAndEntityTypeAndUid(@Param("systemId") UUID systemId, @Param("entityType") String entityType, @Param("uid") String uid);
 	
 	Long countBySystem_Id(@Param("systemId") UUID systemId);	
 }

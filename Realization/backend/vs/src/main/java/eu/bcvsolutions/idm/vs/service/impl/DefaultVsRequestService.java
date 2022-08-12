@@ -25,7 +25,6 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableMap;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -321,7 +320,7 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 		}
 		AccAccountDto account = accAccountService.getAccount(dto.getUid(), dto.getSystem());
 		if (account != null) {
-			SystemEntityType entityType = account.getEntityType();
+			String entityType = account.getEntityType();
 			if (entityType != null && entityType.isSupportsSync()) {
 				SynchronizationEntityExecutor executor = accAccountService.getSyncExecutor(entityType);
 				return executor.getDtoByAccount(null, account);

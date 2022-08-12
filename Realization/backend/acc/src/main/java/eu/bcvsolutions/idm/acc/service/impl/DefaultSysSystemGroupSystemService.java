@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -74,7 +73,7 @@ public class DefaultSysSystemGroupSystemService
 			systemAttributeMappingFilter.setId(mergeAttributeId);
 			systemAttributeMappingFilter.setSystemId(systemId);
 			systemAttributeMappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-			systemAttributeMappingFilter.setEntityType(SystemEntityType.IDENTITY);
+			systemAttributeMappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 
 			long count = attributeMappingService.count(systemAttributeMappingFilter);
 			Assert.isTrue(count ==1, "Merge attribute was not found for given system.");

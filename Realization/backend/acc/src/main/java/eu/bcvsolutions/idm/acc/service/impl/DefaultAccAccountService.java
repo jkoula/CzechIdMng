@@ -3,7 +3,6 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import com.google.common.collect.ImmutableMap;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -43,7 +42,9 @@ import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationEntityExecutor;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -102,7 +103,7 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 	private final SysSchemaAttributeService schemaAttributeService;
 	@Autowired
 	private List<SynchronizationEntityExecutor> executors;
-	private PluginRegistry<SynchronizationEntityExecutor, SystemEntityType> pluginExecutors;
+	private PluginRegistry<SynchronizationEntityExecutor, SystemEntityTypeRegistrable> pluginExecutors;
 	@Lazy
 	@Autowired
 	private PasswordFilterManager passwordFilterManager;
@@ -110,6 +111,8 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 	private LookupService lookupService;
 	@Autowired
 	private ConnectorManager connectorManager;
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
 
 	@Autowired
 	public DefaultAccAccountService(AccAccountRepository accountRepository,
@@ -152,11 +155,12 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 			}
 			// Load and set target entity. For loading a target entity is using sync
 			// executor.
-			SystemEntityType entityType = newDto.getEntityType();
-			if (entityType != null && entityType.isSupportsSync()) {
+			String entityType = newDto.getEntityType();
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+			if (systemEntityType != null && systemEntityType.isSupportsSync()) {
 				SynchronizationEntityExecutor executor = this.getSyncExecutor(entityType);
 				UUID targetEntity = executor.getEntityByAccount(newDto.getId());
-				newDto.setTargetEntityType(entityType.getEntityType().getName());
+				newDto.setTargetEntityType(systemEntityType.getSystemEntityCode());
 				newDto.setTargetEntityId(targetEntity);
 			}
 		}
@@ -277,7 +281,7 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 		if (accountDto == null) {
 			return null;
 		}
-		if (context != null && accountDto.getEntityType() == SystemEntityType.IDENTITY && BooleanUtils.isTrue(context.getIncludeEcho())) {
+		if (context != null && accountDto.getEntityType().equals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE) && BooleanUtils.isTrue(context.getIncludeEcho())) {
 			Map<String, BaseDto> embedded = accountDto.getEmbedded();
 			embedded.put(AccAccountDto.PROPERTY_ECHO, passwordFilterManager.getEcho(accountDto.getId()));
 		}
@@ -459,7 +463,7 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 											builder.and(
 												builder.equal(subRootMapping.get(SysSystemMapping_.objectClass), subRootSchema), // Correlation attribute - connection to mapping
 												builder.equal(subRootMapping.get(SysSystemMapping_.operationType), SystemOperationType.PROVISIONING), // System mapping must be provisioning
-												builder.equal(subRootMapping.get(SysSystemMapping_.entityType), SystemEntityType.IDENTITY), // Password change is now allowed only for identities
+												builder.equal(subRootMapping.get(SysSystemMapping_.entityType), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE), // Password change is now allowed only for identities
 												builder.exists(
 													subqueryAttributeMapping.where(
 														builder.and(
@@ -489,12 +493,13 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 	}
 
 	@Override
-	public SynchronizationEntityExecutor getSyncExecutor(SystemEntityType entityType) {
+	public SynchronizationEntityExecutor getSyncExecutor(String entityType) {
 
 		if (this.pluginExecutors == null) {
 			this.pluginExecutors = OrderAwarePluginRegistry.create(executors);
 		}
-		SynchronizationEntityExecutor executor = this.pluginExecutors.getPluginFor(entityType);
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+		SynchronizationEntityExecutor executor = this.pluginExecutors.getPluginFor(systemEntityType);
 		if (executor == null) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Synchronization executor for SystemEntityType {0} is not supported!", entityType));

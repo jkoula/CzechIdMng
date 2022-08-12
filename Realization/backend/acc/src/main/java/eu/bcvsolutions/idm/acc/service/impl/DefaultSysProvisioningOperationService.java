@@ -44,7 +44,6 @@ import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.EmptyProvisioningType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
@@ -166,7 +165,7 @@ public class DefaultSysProvisioningOperationService
 			predicates.add(builder.equal(root.get(SysProvisioningOperation_.operationType), operationType));
 		}
 		// Entity type
-		SystemEntityType entityType = filter.getEntityType();
+		String entityType = filter.getEntityType();
 		if (entityType != null) {
 			predicates.add(builder.equal(root.get(SysProvisioningOperation_.entityType), entityType));
 		}

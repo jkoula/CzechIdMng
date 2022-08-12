@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.google.common.annotations.Beta;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 
@@ -38,7 +37,7 @@ public class AccAccountDto extends AbstractDto {
 	private boolean inProtection;
 	private ZonedDateTime endOfProtection;
 	private String realUid;
-	private SystemEntityType entityType;
+	private String entityType;
 	@Beta
 	private UUID targetEntityId;
 	@Beta
@@ -113,11 +112,11 @@ public class AccAccountDto extends AbstractDto {
 		this.realUid = realUid;
 	}
 	
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 	
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 

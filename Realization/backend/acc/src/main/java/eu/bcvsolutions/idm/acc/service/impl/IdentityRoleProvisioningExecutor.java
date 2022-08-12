@@ -9,7 +9,6 @@ import org.springframework.util.Assert;
 
 import com.google.common.collect.Lists;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityRoleAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
@@ -26,9 +25,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
@@ -47,6 +48,9 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 public class IdentityRoleProvisioningExecutor extends AbstractProvisioningExecutor<IdmIdentityRoleDto> {
  
 	public static final String NAME = "identityRoleProvisioningService";
+	
+	public static final String SYSTEM_ENTITY_TYPE = "IDENTITY_ROLE";
+	
 	@Autowired
 	private AccIdentityRoleAccountService identityRoleAccountService;
 	@Autowired
@@ -68,15 +72,17 @@ public class IdentityRoleProvisioningExecutor extends AbstractProvisioningExecut
 			SysSchemaAttributeService schemaAttributeService,
 			SysSchemaObjectClassService schemaObjectClassService,
 			SysSystemAttributeMappingService systemAttributeMappingService,
-			IdmRoleService identityRoleService) {
+			IdmRoleService identityRoleService,
+			SysSystemEntityManager systemEntityManager) {
 		
 		super(systemMappingService, attributeMappingService, connectorFacade, systemService, identityRoleSystemService,
 				identityRoleSystemAttributeService, systemEntityService, accountService,
 				provisioningExecutor, entityEventManager, schemaAttributeService, schemaObjectClassService,
-				systemAttributeMappingService, identityRoleService);
+				systemAttributeMappingService, identityRoleService, systemEntityManager);
 		//
 	}
 	
+	@Override
 	public void doProvisioning(AccAccountDto account) {
 		Assert.notNull(account, "Account is required.");
 
@@ -95,7 +101,7 @@ public class IdentityRoleProvisioningExecutor extends AbstractProvisioningExecut
 	
 	@Override
 	protected List<SysRoleSystemAttributeDto> findOverloadingAttributes(IdmIdentityRoleDto dto, SysSystemDto system,
-			AccAccountDto account, SystemEntityType entityType) {
+			AccAccountDto account, String entityType) {
 		// Overrider of identity-role attributes are not supported
 		return Lists.newArrayList();
 	}
@@ -121,5 +127,15 @@ public class IdentityRoleProvisioningExecutor extends AbstractProvisioningExecut
 	@Override
 	protected IdmIdentityRoleService getService() {
 		return identityRoleService;
+	}
+
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
+	}
+
+	@Override
+	public boolean supports(SystemEntityTypeRegistrable delimiter) {
+		return delimiter.isSupportsProvisioning();
 	}
 }

@@ -52,7 +52,6 @@ import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
@@ -83,6 +82,8 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.ContractSynchronizationExecutor;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleComparison;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
@@ -776,7 +777,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName(getHelper().createName());
-		syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
+		syncSystemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);
@@ -869,7 +870,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName(getHelper().createName());
-		syncSystemMapping.setEntityType(SystemEntityType.CONTRACT);
+		syncSystemMapping.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);
@@ -1444,7 +1445,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		// Provisioning mapping
 		SysSystemMappingDto mapping = new SysSystemMappingDto();
 		mapping.setName(getHelper().createName());
-		mapping.setEntityType(SystemEntityType.IDENTITY);
+		mapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mapping.setOperationType(SystemOperationType.PROVISIONING);
 		mapping.setObjectClass(objectClass.getId());
 		mapping.setAccountType(AccountType.PERSONAL);
@@ -1825,7 +1826,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		UUID systemId = systemService.getByCode(systemCode).getId();
 		SysProvisioningOperationFilter provisioningFilter = new SysProvisioningOperationFilter();
 		provisioningFilter.setSystemId(systemId);
-		provisioningFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> provisioningOps = provisioningOperationService.find(provisioningFilter, null).getContent();
 		Assert.assertTrue(provisioningOps.size() > 0);
 		
@@ -1854,7 +1855,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		UUID systemId = systemService.getByCode(systemCode).getId();
 		SysProvisioningOperationFilter provisioningFilter = new SysProvisioningOperationFilter();
 		provisioningFilter.setSystemId(systemId);
-		provisioningFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> provisioningOps = provisioningOperationService.find(provisioningFilter, null).getContent();
 		provisioningOperationService.deleteAll(provisioningOps);
 	}

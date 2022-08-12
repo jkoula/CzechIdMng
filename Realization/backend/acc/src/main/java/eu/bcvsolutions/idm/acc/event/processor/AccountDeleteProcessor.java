@@ -17,7 +17,6 @@ import org.springframework.util.Assert;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractSliceAccountDto;
@@ -186,7 +185,7 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 			accountService.deleteInternal(refreshAccount);
 		}
 		if (deleteTargetAccount && account.getEntityType() != null) {
-			SystemEntityType entityType = account.getEntityType();
+			String entityType = account.getEntityType();
 			if (!entityType.isSupportsProvisioning()) {
 				LOG.warn(MessageFormat.format("Provisioning is not supported for [{1}] now [{0}]!", account.getUid(),
 						entityType));

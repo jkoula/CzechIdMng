@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccRoleAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncItemLogDto;
@@ -35,6 +34,8 @@ public class IdentityRoleSynchronizationExecutor extends AbstractSynchronization
 	@Autowired
 	private AccRoleAccountService identityRoleAccountService;
 
+	public static final String SYSTEM_ENTITY_TYPE = "IDENTITY_ROLE";
+	
 	/**
 	 * Call provisioning for given account
 	 * 
@@ -43,7 +44,7 @@ public class IdentityRoleSynchronizationExecutor extends AbstractSynchronization
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmIdentityRoleDto entity, SystemEntityType entityType, SysSyncItemLogDto logItem) {
+	protected void callProvisioningForEntity(IdmIdentityRoleDto entity, String entityType, SysSyncItemLogDto logItem) {
 		addToItemLog(logItem,
 				MessageFormat.format(
 						"Call provisioning (process IdentityRoleEvent.UPDATE) for identity-role ({0}).",
@@ -98,5 +99,10 @@ public class IdentityRoleSynchronizationExecutor extends AbstractSynchronization
 	@Override
 	protected IdmIdentityRoleDto createEntityDto() {
 		return new IdmIdentityRoleDto();
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
 	}
 }

@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.ImmutableList;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
@@ -41,6 +40,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -257,7 +257,7 @@ public class IdentityAccountManagementTest extends AbstractIntegrationTest {
 	@Test
 	public void defaultAccountEntitySystemExist() {
 		SysSystemEntityFilter filter = new SysSystemEntityFilter();
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setUid("x" + IDENTITY_USERNAME);
 		Assert.assertEquals("SystemEntity must be after account was created!", 1,
 				systemEntityService.find(filter, null).getContent().size());
@@ -303,7 +303,7 @@ public class IdentityAccountManagementTest extends AbstractIntegrationTest {
 	@Test
 	public void defaultAccountRemovedEntitySystemExist() {
 		SysSystemEntityFilter filter = new SysSystemEntityFilter();
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setUid("x" + IDENTITY_USERNAME);
 		Assert.assertEquals("SystemEntity must not be after account was deleted!", 0,
 				systemEntityService.find(filter, null).getContent().size());

@@ -182,7 +182,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 		UUID syncConfigId = config.getId();
 		SysSystemMappingDto mapping = systemMappingService.get(config.getSystemMapping());
 		Assert.notNull(mapping, "Mapping is required.");
-		SystemEntityType entityType = mapping.getEntityType();
+		String entityType = mapping.getEntityType();
 
 		SynchronizationEntityExecutor executor = getSyncExecutor(entityType, syncConfigId);
 		executor.setLongRunningTaskExecutor(longRunningTaskExecutor);
@@ -219,7 +219,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveMissingEntitySituation(String uid, SystemEntityType entityType,
+	public SysSyncItemLogDto resolveMissingEntitySituation(String uid, String entityType,
 			List<IcAttribute> icAttributes, UUID configId, String actionType) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -259,7 +259,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveLinkedSituation(String uid, SystemEntityType entityType,
+	public SysSyncItemLogDto resolveLinkedSituation(String uid, String entityType,
 			List<IcAttribute> icAttributes, UUID accountId, UUID configId, String actionType) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -299,7 +299,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveUnlinkedSituation(String uid, SystemEntityType entityType, UUID entityId,
+	public SysSyncItemLogDto resolveUnlinkedSituation(String uid, String entityType, UUID entityId,
 			UUID configId, String actionType, List<IcAttribute> icAttributes) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -343,7 +343,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveMissingAccountSituation(String uid, SystemEntityType entityType, UUID accountId,
+	public SysSyncItemLogDto resolveMissingAccountSituation(String uid, String entityType, UUID accountId,
 			UUID configId, String actionType) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -371,7 +371,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 		return itemLog;
 	}
 
-	private SysSystemEntityDto findSystemEntity(String uid, SysSystemDto system, SystemEntityType entityType) {
+	private SysSystemEntityDto findSystemEntity(String uid, SysSystemDto system, String entityType) {
 		SysSystemEntityFilter systemEntityFilter = new SysSystemEntityFilter();
 		systemEntityFilter.setEntityType(entityType);
 		systemEntityFilter.setSystemId(system.getId());
@@ -387,7 +387,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SynchronizationEntityExecutor getSyncExecutor(SystemEntityType entityType, UUID syncConfigId) {
+	public SynchronizationEntityExecutor getSyncExecutor(String entityType, UUID syncConfigId) {
 		ValueWrapper value = this.idmCacheManager.getValue(SYNC_EXECUTOR_CACHE_NAME, syncConfigId);
 		if (value == null) {
 			return getExecutor(entityType, syncConfigId);
@@ -395,7 +395,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 		return (SynchronizationEntityExecutor) value.get();
 	}
 
-	private SynchronizationEntityExecutor getExecutor(SystemEntityType entityType, UUID syncConfigId) {
+	private SynchronizationEntityExecutor getExecutor(String entityType, UUID syncConfigId) {
 		SynchronizationEntityExecutor executor = pluginExecutors.getPluginFor(entityType);
 		if (executor == null) {
 			throw new UnsupportedOperationException(MessageFormat

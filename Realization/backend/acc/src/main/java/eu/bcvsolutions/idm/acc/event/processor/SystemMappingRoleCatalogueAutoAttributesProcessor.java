@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.event.SystemMappingEvent.SystemMappingEventType;
+import eu.bcvsolutions.idm.acc.service.impl.RoleCatalogueSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
@@ -74,8 +74,8 @@ public class SystemMappingRoleCatalogueAutoAttributesProcessor extends AbstractS
 	}
 	
 	@Override
-	SystemEntityType getSystemEntityType() {
-		return SystemEntityType.ROLE_CATALOGUE;
+	String getSystemEntityType() {
+		return RoleCatalogueSynchronizationExecutor.SYSTEM_ENTITY_TYPE;
 	}
 	
 

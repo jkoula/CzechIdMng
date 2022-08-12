@@ -9,12 +9,12 @@ import org.springframework.plugin.core.Plugin;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -28,7 +28,7 @@ import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
  * @author svandav
  *
  */
-public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plugin<SystemEntityType> {
+public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plugin<SystemEntityTypeRegistrable> {
 
 	/**
 	 * Do provisioning for given dto on all connected systems
@@ -111,7 +111,7 @@ public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plu
 	 * @return
 	 */
 	IcUidAttribute authenticate(String username, GuardedString password, SysSystemDto system,
-			SystemEntityType entityType);
+			String entityType);
 
 	/**
 	 * Return all mapped attributes for this account (include overloaded attributes)
@@ -123,7 +123,7 @@ public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plu
 	 * @return
 	 */
 	List<AttributeMapping> resolveMappedAttributes(AccAccountDto account, DTO dto, SysSystemDto system,
-			SystemEntityType entityType);
+			String entityType);
 
 	/**
 	 * Create final list of attributes for provisioning.
@@ -134,7 +134,7 @@ public interface ProvisioningEntityExecutor<DTO extends AbstractDto> extends Plu
 	 * @return
 	 */
 	List<AttributeMapping> compileAttributes(List<? extends AttributeMapping> defaultAttributes,
-			List<SysRoleSystemAttributeDto> overloadingAttributes, SystemEntityType entityType);
+			List<SysRoleSystemAttributeDto> overloadingAttributes, String entityType);
 
 	/**
 	 * Do provisioning for given account and identity. For internal purpose without

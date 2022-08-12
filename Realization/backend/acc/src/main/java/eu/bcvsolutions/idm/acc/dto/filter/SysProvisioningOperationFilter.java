@@ -9,7 +9,6 @@ import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.acc.domain.EmptyProvisioningType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
@@ -85,11 +84,11 @@ public class SysProvisioningOperationFilter
 		set(PARAMETER_OPERATION_TYPE, operationType);
 	}
 
-	public SystemEntityType getEntityType() {
-		return getParameterConverter().toEnum(getData(), PARAMETER_ENTITY_TYPE, SystemEntityType.class);
+	public String getEntityType() {
+		return getParameterConverter().toString(getData(), PARAMETER_ENTITY_TYPE);
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		set(PARAMETER_ENTITY_TYPE, entityType);
 	}
 

@@ -1,13 +1,12 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import java.time.ZonedDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
@@ -82,5 +81,5 @@ public interface AccAccountService extends//
 	 * @param entityType
 	 * @return
 	 */
-	SynchronizationEntityExecutor getSyncExecutor(SystemEntityType entityType);
+	SynchronizationEntityExecutor getSyncExecutor(String entityType);
 }

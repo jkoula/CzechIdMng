@@ -3,7 +3,6 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
@@ -153,7 +152,7 @@ public class DefaultSysRoleSystemService
 
 		// Only Identity supports ACM by role
 		SysSystemMappingDto systemMappingDto = systemMappingService.get(dto.getSystemMapping());
-		if (systemMappingDto != null && SystemEntityType.IDENTITY != systemMappingDto.getEntityType()) {
+		if (systemMappingDto != null && !IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(systemMappingDto.getEntityType())) {
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_SUPPORTS_ONLY_IDENTITY,
 					ImmutableMap.of("entityType", systemMappingDto.getEntityType().name()));
 		}

@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -157,7 +156,7 @@ public interface SysSystemAttributeMappingService
 	 * @param entityType
 	 * @return
 	 */
-	SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, SystemEntityType entityType);
+	SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, String entityType);
 
 	/**
 	 * Find value for this mapped attribute by property name. Returned value can be
@@ -243,7 +242,7 @@ public interface SysSystemAttributeMappingService
 	 * @param schemaAttributeName
 	 * @return
 	 */
-	List<Serializable> getControlledAttributeValues(UUID system, SystemEntityType entityType,
+	List<Serializable> getControlledAttributeValues(UUID system, String entityType,
 			String schemaAttributeName);
 
 	/**
@@ -256,7 +255,7 @@ public interface SysSystemAttributeMappingService
 	 * @param schemaAttributeName
 	 * @return
 	 */
-	List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, SystemEntityType entityType,
+	List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName);
 
 	/**
@@ -269,7 +268,7 @@ public interface SysSystemAttributeMappingService
 	 * @param attributeMapping
 	 * @return
 	 */
-	List<Serializable> recalculateAttributeControlledValues(UUID systemId, SystemEntityType entityType,
+	List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
 			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping);
 
 	/**

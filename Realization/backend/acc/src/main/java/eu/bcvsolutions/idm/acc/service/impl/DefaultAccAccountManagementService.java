@@ -25,8 +25,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
@@ -667,11 +665,14 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		// system mapping
 		SysSystemDto system = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.system);
 		SysSystemMappingDto mapping = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.systemMapping);
+		if (mapping == null) {
+			return null;
+		}
 		if (!this.canBeAccountCreated(uid, identity, mapping, system)) {
 			LOG.info(MessageFormat.format(
 					"For entity [{0}] and entity type [{1}] cannot be created the account (on system [{2}]),"
 							+ " because script \"Can be account created\" on the mapping returned \"false\"!",
-					identity.getCode(), SystemEntityType.IDENTITY, system.getName()));
+					identity.getCode(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getName()));
 			return null;
 		}
 
@@ -692,7 +693,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	private AccAccountDto createAccount(String uid, SysRoleSystemDto roleSystem, UUID mappingId) {
 		AccAccountDto account = new AccAccountDto();
 		account.setUid(uid);
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystem(roleSystem.getSystem());
 		account.setSystemMapping(mappingId);
 		

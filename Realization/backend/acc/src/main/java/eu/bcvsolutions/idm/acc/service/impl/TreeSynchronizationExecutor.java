@@ -26,7 +26,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccTreeAccountDto;
@@ -89,6 +88,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(TreeSynchronizationExecutor.class);
 	public final static String PARENT_FIELD = "parent";
 	public final static String CODE_FIELD = "code";
+	public static final String SYSTEM_ENTITY_TYPE = "TREE";
 
 	@Autowired
 	private IdmTreeNodeService treeNodeService;
@@ -189,7 +189,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmTreeNodeDto entity, SystemEntityType entityType,
+	protected void callProvisioningForEntity(IdmTreeNodeDto entity, String entityType,
 			SysSyncItemLogDto logItem) {
 		addToItemLog(logItem,
 				MessageFormat.format(
@@ -229,7 +229,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 	 * @param account
 	 */
 	@Override
-	protected void doCreateEntity(SystemEntityType entityType, List<SysSystemAttributeMappingDto> mappedAttributes,
+	protected void doCreateEntity(String entityType, List<SysSystemAttributeMappingDto> mappedAttributes,
 			SysSyncItemLogDto logItem, String uid, List<IcAttribute> icAttributes, AccAccountDto account,
 			SynchronizationContext context) {
 		// We will create new TreeNode
@@ -309,7 +309,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 				logItem.setDisplayName(treeNode.getName());
 			}
 
-			SystemEntityType entityType = context.getEntityType();
+			String entityType = context.getEntityType();
 			if ( context.isEntityDifferent() && this.isProvisioningImplemented(entityType, logItem)) {
 				// Call provisioning for this entity
 				callProvisioningForEntity(treeNode, entityType, logItem);
@@ -365,13 +365,12 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 	 * Delete entity linked with given account
 	 * 
 	 * @param account
-	 * @param entityType
 	 * @param log
 	 * @param logItem
 	 * @param actionLogs
 	 */
 	@Override
-	protected void doDeleteEntity(AccAccountDto account, SystemEntityType entityType, SysSyncLogDto log,
+	protected void doDeleteEntity(AccAccountDto account, SysSyncLogDto log,
 			SysSyncItemLogDto logItem, List<SysSyncActionLogDto> actionLogs) {
 		IdmTreeNodeDto treeNode =  this.getDtoByAccount(null, account);
 		if (treeNode == null) {
@@ -485,7 +484,7 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 	private void processTreeSync(SynchronizationContext context, Map<String, IcConnectorObject> accountsMap) {
 
 		AbstractSysSyncConfigDto config = context.getConfig();
-		SystemEntityType entityType = context.getEntityType();
+		String entityType = context.getEntityType();
 		SysSystemDto system = context.getSystem();
 		List<SysSystemAttributeMappingDto> mappedAttributes = context.getMappedAttributes();
 		SysSyncLogDto log = context.getLog();
@@ -737,5 +736,10 @@ public class TreeSynchronizationExecutor extends AbstractSynchronizationExecutor
 		}
 		
 		return synchronizationLogService.save(log);
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
 	}
 }

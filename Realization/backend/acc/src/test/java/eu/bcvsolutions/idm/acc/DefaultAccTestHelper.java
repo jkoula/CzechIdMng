@@ -25,7 +25,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
@@ -70,6 +69,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemOwnerService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.impl.DefaultSysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -263,7 +263,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	}
 
 	@Override
-	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType, AccountType accountType) {
+	public SysSystemMappingDto createMapping(SysSystemDto system, String entityType, AccountType accountType) {
 		//
 		// generate schema for system
 		List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
@@ -337,17 +337,17 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 
 	@Override
 	public SysSystemMappingDto createMapping(SysSystemDto system, AccountType accountType) {
-		return createMapping(system, SystemEntityType.IDENTITY, accountType);
+		return createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, accountType);
 	}
 
 	@Override
-	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType) {
+	public SysSystemMappingDto createMapping(SysSystemDto system, String entityType) {
 		return createMapping(system, entityType, AccountType.PERSONAL);
 	}
 
 	@Override
 	public SysSystemMappingDto createMapping(SysSystemDto system) {
-		return createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
+		return createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL);
 	}
 
 	@Override
@@ -359,7 +359,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	
 	@Override
 	public SysSystemMappingDto getDefaultMapping(UUID systemId) {
-		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(systemId, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(systemId, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		if(mappings.isEmpty()) {
 			throw new CoreException(String.format("Default mapping for system[%s] not found", systemId));
 		}
@@ -374,7 +374,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		roleSystem.setSystem(system.getId());
 		roleSystem.setCreateAccountByDefault(true);
 		// default mapping
-		List<SysSystemMappingDto> mappings = systemMappingService.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> mappings = systemMappingService.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		// required ...
 		roleSystem.setSystemMapping(mappings.get(0).getId());
 		//
@@ -383,7 +383,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	
 	@Override
 	public SysSystemEntityDto createSystemEntity(SysSystemDto system) {
-		SysSystemEntityDto systemEntity = new SysSystemEntityDto(createName(), SystemEntityType.IDENTITY);
+		SysSystemEntityDto systemEntity = new SysSystemEntityDto(createName(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemEntity.setSystem(system.getId());
 		systemEntity.setWish(true);
 		return systemEntityService.save(systemEntity);
@@ -394,7 +394,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid(identity.getUsername());
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account = accountService.save(account);
 
 		AccIdentityAccountDto accountIdentity = new AccIdentityAccountDto();
@@ -406,11 +406,11 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	}
 
 	@Override
-	public SysSystemMappingDto createMappingSystem(SystemEntityType type, SysSchemaObjectClassDto objectClass) {
+	public SysSystemMappingDto createMappingSystem(String systemEntityType, SysSchemaObjectClassDto objectClass) {
 		// system mapping
 		SysSystemMappingDto mapping = new SysSystemMappingDto();
 		mapping.setName(createName());
-		mapping.setEntityType(type);
+		mapping.setEntityType(systemEntityType);
 		mapping.setObjectClass(objectClass.getId());
 		mapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		mapping.setAccountType(AccountType.PERSONAL);

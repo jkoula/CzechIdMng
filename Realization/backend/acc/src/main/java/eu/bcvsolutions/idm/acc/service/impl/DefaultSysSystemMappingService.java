@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -144,7 +143,7 @@ public class DefaultSysSystemMappingService
 	@Override
 	@Transactional
 	public SysSystemMappingDto saveInternal(SysSystemMappingDto dto) {
-		SystemEntityType entityType = dto.getEntityType();
+		String entityType = dto.getEntityType();
 		if (SystemOperationType.PROVISIONING == dto.getOperationType() && !entityType.isSupportsProvisioning()) {
 			throw new ResultCodeException(AccResultCode.PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE, ImmutableMap.of("entityType", entityType));
 		}
@@ -174,7 +173,7 @@ public class DefaultSysSystemMappingService
 
 	@Override
 	public List<SysSystemMappingDto> findBySystem(SysSystemDto system, SystemOperationType operation,
-			SystemEntityType entityType) {
+			String entityType) {
 		Assert.notNull(system, "System is required.");
 		//
 		return findBySystemId(system.getId(), operation, entityType);
@@ -184,7 +183,7 @@ public class DefaultSysSystemMappingService
 	public List<SysSystemMappingDto> findBySystemId(
 			UUID systemId, 
 			SystemOperationType operation,
-			SystemEntityType entityType) {
+			String entityType) {
 		Assert.notNull(systemId, "System identifier is required.");
 		//
 		SysSystemMappingFilter filter = new SysSystemMappingFilter();
@@ -199,7 +198,7 @@ public class DefaultSysSystemMappingService
 	public List<SysSystemMappingDto> findByObjectClass(
 			SysSchemaObjectClassDto objectClass,
 			SystemOperationType operation, 
-			SystemEntityType entityType) {
+			String entityType) {
 		Assert.notNull(objectClass, "Object class is required.");
 		//
 		SysSystemMappingFilter filter = new SysSystemMappingFilter();
@@ -343,7 +342,7 @@ public class DefaultSysSystemMappingService
 		final String idmProperty = "identity";
 		boolean isError = true;
 		if (systemMapping.getOperationType() == SystemOperationType.SYNCHRONIZATION
-				&& systemMapping.getEntityType() == SystemEntityType.CONTRACT) {
+				&& systemMapping.getEntityType().equals(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE)) {
 			for (SysSystemAttributeMappingDto attribute : attributesList) {
 				if (attribute.isEntityAttribute() && attribute.getIdmPropertyName().equals(idmProperty)) {
 					isError = false;
@@ -369,7 +368,7 @@ public class DefaultSysSystemMappingService
 	private Map<String, Object> validateIdentityStateAndDisabled(Map<String, Object> errors,
 			SysSystemMappingDto systemMapping, List<SysSystemAttributeMappingDto> attributesList) {
 		
-		if (SystemEntityType.IDENTITY == systemMapping.getEntityType()) {
+		if (IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE == systemMapping.getEntityType()) {
 			Set<String> attrs = attributesList
 					.stream()
 					.map(SysSystemAttributeMappingDto::getIdmPropertyName)
@@ -418,7 +417,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
-	public SysSystemMappingDto findProvisioningMapping(UUID systemId, SystemEntityType entityType) {
+	public SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
@@ -642,7 +641,7 @@ public class DefaultSysSystemMappingService
 			);
 		}
 		//
-		SystemEntityType entityType = filter.getEntityType();
+		String entityType = filter.getEntityType();
 		if (entityType != null) {
 			predicates.add(builder.equal(root.get(SysSystemMapping_.entityType), entityType));
 		}

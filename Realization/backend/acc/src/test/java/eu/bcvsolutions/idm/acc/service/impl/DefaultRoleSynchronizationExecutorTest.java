@@ -9,7 +9,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleAccountDto;
@@ -46,7 +45,6 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
-import eu.bcvsolutions.idm.core.api.config.domain.EventConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
 import eu.bcvsolutions.idm.core.api.domain.RoleType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -207,7 +205,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesMembership() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -242,7 +240,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -300,7 +298,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncDeleteRolesMembership() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -335,7 +333,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -410,7 +408,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesForwardAcm() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -445,7 +443,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(systemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -536,7 +534,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesSkipValueIfExcluded() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -571,7 +569,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(systemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -670,7 +668,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncUpdateRolesMembership() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -705,7 +703,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -795,7 +793,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		syncConfigCustom = syncConfigService.save(syncConfigCustom);
 		
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -830,7 +828,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -931,7 +929,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesAssignToUsers() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -975,7 +973,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -1084,7 +1082,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesDeleteAssignedFromUsers() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -1128,7 +1126,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -1300,7 +1298,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesCatalogueUnderMain() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -1335,7 +1333,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -1416,7 +1414,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesCatalogueByDn() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -1451,7 +1449,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -1582,7 +1580,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 	public void testSyncRolesCatalogueRemoveUnderMain() {
 		AbstractSysSyncConfigDto syncConfigCustom = createSyncConfig();
 		SysSystemDto userSystem = helper.createTestResourceSystem(true);
-		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> userSystemMappings = systemMappingService.findBySystem(userSystem, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(userSystemMappings);
 		Assert.assertEquals(1, userSystemMappings.size());
 		SysSystemMappingDto userMappingDto = userSystemMappings.get(0);
@@ -1617,7 +1615,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 		SysSystemDto roleSystemDto = new SysSystemDto();
 		roleSystemDto.setId(roleSystemId);
-		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, SystemEntityType.ROLE);
+		List<SysSystemMappingDto> roleSystemMappings = systemMappingService.findBySystem(roleSystemDto, SystemOperationType.SYNCHRONIZATION, RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertNotNull(roleSystemMappings);
 		Assert.assertEquals(1, roleSystemMappings.size());
 		SysSystemMappingDto roleMappingDto = roleSystemMappings.get(0);
@@ -1803,7 +1801,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName(getHelper().createName());
-		syncSystemMapping.setEntityType(SystemEntityType.ROLE);
+		syncSystemMapping.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);
@@ -1913,7 +1911,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		SysSystemDto system = initData();
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.ROLE);
+		mappingFilter.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -1946,7 +1944,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 
 	public SysSyncIdentityConfigDto createUserSyncConfig(SysSystemDto system) {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
