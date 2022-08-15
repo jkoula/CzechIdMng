@@ -110,7 +110,15 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	SysSystemMappingDto createMapping(SysSystemDto system);
 
 	/**
-	 * Creates default provisioning mapping for the given system and type
+	 * Creates default provisioning mapping for the given system, entity type, account type
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType, AccountType accountType);
+
+	/**
+	 * reates default provisioning mapping for the given system, account type
 	 * @param system
 	 * @param accountType
 	 * @return

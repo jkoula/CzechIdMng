@@ -261,7 +261,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		//
 		return system;
 	}
-	
+
 	@Override
 	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType, AccountType accountType) {
 		//
@@ -333,6 +333,16 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 			}
 		}
 		return systemMapping;
+	}
+
+	@Override
+	public SysSystemMappingDto createMapping(SysSystemDto system, AccountType accountType) {
+		return createMapping(system, SystemEntityType.IDENTITY, accountType);
+	}
+
+	@Override
+	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType) {
+		return createMapping(system, entityType, AccountType.PERSONAL);
 	}
 
 	@Override
