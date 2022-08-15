@@ -22,7 +22,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -45,9 +44,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.config.cache.domain.ValueWrapper;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
@@ -77,7 +78,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	private final SysSyncLogService synchronizationLogService;
 	private final SysSystemEntityService systemEntityService;
 	private final AccAccountService accountService;
-	private final PluginRegistry<SynchronizationEntityExecutor, SystemEntityType> pluginExecutors;
+	private final PluginRegistry<SynchronizationEntityExecutor, SystemEntityTypeRegistrable> pluginExecutors;
 	private final SysSystemMappingService systemMappingService;
 	private final SysSchemaObjectClassService schemaObjectClassService;
 	//
@@ -89,6 +90,8 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	private IdmCacheManager idmCacheManager;
 	@Autowired
 	private LongRunningTaskManager longRunningTaskManager;
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
 
 	@Autowired
 	public DefaultSynchronizationService(SysSystemAttributeMappingService attributeHandlingService,
@@ -396,7 +399,8 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	private SynchronizationEntityExecutor getExecutor(String entityType, UUID syncConfigId) {
-		SynchronizationEntityExecutor executor = pluginExecutors.getPluginFor(entityType);
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+		SynchronizationEntityExecutor executor = pluginExecutors.getPluginFor(systemEntityType);
 		if (executor == null) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Synchronization executor for SystemEntityType {0} is not supported!", entityType));

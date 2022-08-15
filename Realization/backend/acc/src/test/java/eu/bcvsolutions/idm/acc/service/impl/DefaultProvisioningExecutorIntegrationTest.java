@@ -30,7 +30,6 @@ import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
@@ -189,7 +188,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		assertEquals(uid, attribute.getUidValue());
 		//
 		// check system entity
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertFalse(systemEntity.isWish());
 	}
 	
@@ -367,7 +366,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		filter.setSystemId(system.getId());
 		SysProvisioningOperationDto operation = provisioningOperationService.find(filter, null).getContent().get(0);
 		assertEquals(OperationState.CREATED, operation.getResultState());
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertTrue(systemEntity.isWish());
 		assertNull(getHelper().findResource(uid));
 		//
@@ -378,7 +377,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		assertTrue(result);
 		IdmLongRunningTaskDto lrt = longRunningTaskManager.getLongRunningTask(provisioningQueueExecutor.getLongRunningTaskId());
 		assertEquals(0L, lrt.getCount().longValue());
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertTrue(systemEntity.isWish());
 		assertNull(getHelper().findResource(uid));
 		//
@@ -388,7 +387,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		assertTrue(result);
 		lrt = longRunningTaskManager.getLongRunningTask(provisioningQueueExecutor);
 		assertEquals(1L, lrt.getCount().longValue());
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertFalse(systemEntity.isWish());
 		assertNotNull(getHelper().findResource(uid));
 	}
@@ -412,14 +411,14 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		SysProvisioningOperationDto readOnlyOperation = provisioningOperationService.find(filter, null).getContent().get(0);
 		assertEquals(OperationState.NOT_EXECUTED, readOnlyOperation.getResultState());
 		assertEquals(AccResultCode.PROVISIONING_SYSTEM_READONLY.name(), readOnlyOperation.getResult().getModel().getStatusEnum());
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		provisioningExecutor.execute(updateProvisioningOperation(systemEntity, firstname + 2)); // 2 - update
 		//
 		getHelper().waitForResult(null, 1, 1); // FIXME: how to order operations created in the same milis?
 		//
 		provisioningExecutor.execute(updateProvisioningOperation(systemEntity, firstname + 3)); // 3 - update
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertTrue(systemEntity.isWish());
 		assertNull(getHelper().findResource(uid));
 		//
@@ -437,7 +436,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		provisioningExecutor.execute(readOnlyOperation);
 		Assert.assertNull(provisioningOperationService.get(readOnlyOperation.getId()));
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertFalse(systemEntity.isWish());
 		TestResource resource = getHelper().findResource(uid);
 		assertNotNull(resource);
@@ -478,7 +477,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 			Assert.assertEquals(1, operation.getCurrentAttempt());
 			Assert.assertTrue(operation.getMaxAttempts() > 1);
 			Assert.assertTrue(batch.getNextAttempt().isAfter(now));
-			SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+			SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 			Assert.assertTrue(systemEntity.isWish());
 			Assert.assertNull(getHelper().findResource(uid));
 			// check failed operation is in archive too
@@ -522,7 +521,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 			retryProvisioningTaskExecutor = new RetryProvisioningTaskExecutor();
 			longRunningTaskManager.executeSync(retryProvisioningTaskExecutor);
 			//
-			systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+			systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 			Assert.assertFalse(systemEntity.isWish());
 			Assert.assertNotNull(getHelper().findResource(uid));
 			batch = provisioningBatchService.get(batch.getId());
@@ -569,7 +568,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		Assert.assertEquals(1, operation.getCurrentAttempt());
 		Assert.assertTrue(operation.getMaxAttempts() > 1);
 		Assert.assertTrue(batch.getNextAttempt().isAfter(now));
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		Assert.assertTrue(systemEntity.isWish());
 		Assert.assertNull(getHelper().findResource(uid));
 		//
@@ -597,7 +596,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		result = longRunningTaskManager.executeSync(retryProvisioningTaskExecutor);
 		Assert.assertTrue(result);
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		Assert.assertFalse(systemEntity.isWish());
 		Assert.assertNotNull(getHelper().findResource(uid));
 		batch = provisioningBatchService.get(batch.getId());
@@ -623,7 +622,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		filter.setSystemId(system.getId());
 		SysProvisioningOperationDto operation = provisioningOperationService.find(filter, null).getContent().get(0);
 		assertEquals(OperationState.CREATED, operation.getResultState());
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		assertTrue(systemEntity.isWish());
 		assertNull(getHelper().findResource(uid));
 		SysProvisioningBatchDto batch = DtoUtils.getEmbedded(operation, SysProvisioningOperation_.batch);
@@ -678,7 +677,7 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 		result = longRunningTaskManager.executeSync(retryProvisioningTaskExecutor);
 		Assert.assertTrue(result);
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, uid);
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, uid);
 		Assert.assertFalse(systemEntity.isWish());
 		resource = getHelper().findResource(uid);
 		Assert.assertNotNull(resource);

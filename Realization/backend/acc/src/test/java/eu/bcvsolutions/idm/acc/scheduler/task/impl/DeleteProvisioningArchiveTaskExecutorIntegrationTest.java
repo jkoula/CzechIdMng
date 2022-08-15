@@ -14,13 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningAttribute;
 import eu.bcvsolutions.idm.acc.repository.SysProvisioningAttributeRepository;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.impl.ContractSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
@@ -110,7 +110,7 @@ public class DeleteProvisioningArchiveTaskExecutorIntegrationTest extends Abstra
 		dto.setSystem(system.getId());
 		dto.setEntityIdentifier(UUID.randomUUID());
 		dto.setOperationType(provisioningEventType);
-		dto.setEntityType(SystemEntityType.CONTRACT);
+		dto.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		dto.setProvisioningContext(new ProvisioningContext());
 		dto.setResult(new OperationResult(state));
 		//

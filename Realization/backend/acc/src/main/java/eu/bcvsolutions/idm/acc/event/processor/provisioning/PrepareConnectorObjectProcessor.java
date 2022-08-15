@@ -110,6 +110,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	@Autowired private UniformPasswordManager uniformPasswordManager;
 	@Autowired private ConnectorManager connectorManager;
 	@Autowired private SysSystemEntityManager systemEntityManager;
+
 	@Autowired
 	private AccAccountService accountService;
 	@Autowired
@@ -247,6 +248,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 						&& provisioningOperation.getTransactionId() != null) {
 					
 					if (uniformPasswordManager.isSystemInUniformPasswordAgenda(provisioningOperation.getSystem())) {
+						
 						generatedPassword = uniformPasswordManager.generateUniformPassword(
 								provisioningOperation.getEntityIdentifier(),
 								systemEntityType.getEntityType(),

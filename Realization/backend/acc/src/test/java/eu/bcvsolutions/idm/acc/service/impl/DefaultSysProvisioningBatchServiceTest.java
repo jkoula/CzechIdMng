@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -99,7 +98,7 @@ public class DefaultSysProvisioningBatchServiceTest extends AbstractIntegrationT
 		operation.setProvisioningContext(new ProvisioningContext());
 		operation.setOperationType(ProvisioningEventType.CREATE);
 		operation.setSystem(systemEntity.getSystem());
-		operation.setEntityType(SystemEntityType.IDENTITY);
+		operation.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		operation.setSystemEntity(systemEntity.getId());
 		operation.setResult(new OperationResult(OperationState.CREATED));
 		//

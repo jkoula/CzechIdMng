@@ -20,7 +20,6 @@ import eu.bcvsolutions.idm.acc.DefaultAccTestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceValueDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
@@ -61,8 +60,8 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	@Transactional
 	public void testReferentiralIntegrity() {
 		SysSystemDto system = createSystem();
-		SysProvisioningArchiveDto archiveOne = createProvisioningArchive(SystemEntityType.CONTRACT, system);
-		SysProvisioningArchiveDto archiveTwo = createProvisioningArchive(SystemEntityType.IDENTITY, system);
+		SysProvisioningArchiveDto archiveOne = createProvisioningArchive(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
+		SysProvisioningArchiveDto archiveTwo = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 		SysProvisioningAttribute attributeOne = new SysProvisioningAttribute(archiveOne.getId(), getHelper().createName());
 		attributeOne = provisioningAttributeRepository.save(attributeOne);
 		SysProvisioningAttribute attributeTwo = new SysProvisioningAttribute(archiveTwo.getId(), getHelper().createName());
@@ -79,13 +78,13 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	public void typeFilterTest() {
 		SysSystemDto system = createSystem();
 
-		SysProvisioningArchiveDto provisioningOperation1 = createProvisioningArchive(SystemEntityType.CONTRACT, system);
-		SysProvisioningArchiveDto provisioningOperation2 = createProvisioningArchive(SystemEntityType.IDENTITY, system);
-		SysProvisioningArchiveDto provisioningOperation3 = createProvisioningArchive(SystemEntityType.CONTRACT, system);
+		SysProvisioningArchiveDto provisioningOperation1 = createProvisioningArchive(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
+		SysProvisioningArchiveDto provisioningOperation2 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
+		SysProvisioningArchiveDto provisioningOperation3 = createProvisioningArchive(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setSystemId(system.getId());
-		filter.setEntityType(SystemEntityType.CONTRACT);
+		filter.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 
 		Page<SysProvisioningArchiveDto> result = service.find(filter, null);
 		assertEquals(2, result.getTotalElements());
@@ -97,15 +96,13 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	@Test
 	@Transactional
 	public void operationTypeFilterTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
-
 		SysSystemDto system = createSystem();
 
-		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(entityType, system);
-		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
+		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 		provisioningArchive2.setOperationType(ProvisioningEventType.UPDATE);
 		service.save(provisioningArchive2);
-		SysProvisioningArchiveDto provisioningArchive3 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive3 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 		provisioningArchive3.setOperationType(ProvisioningEventType.UPDATE);
 		service.save(provisioningArchive3);
 
@@ -123,14 +120,12 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	@Test
 	@Transactional
 	public void systemIdFilterTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
-
 		SysSystemDto system1 = createSystem();
 		SysSystemDto system2 = createSystem();
 
-		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(entityType, system1);
-		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(entityType, system1);
-		SysProvisioningArchiveDto provisioningArchive3 = createProvisioningArchive(entityType, system2);
+		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system1);
+		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system1);
+		SysProvisioningArchiveDto provisioningArchive3 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system2);
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setSystemId(system1.getId());
@@ -145,13 +140,11 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	@Test
 	@Transactional
 	public void systemEntityUidFilterTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
-
 		SysSystemDto system = createSystem();
 
-		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(entityType, system);
-		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(entityType, system);
-		SysProvisioningArchiveDto provisioningArchive3 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
+		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
+		SysProvisioningArchiveDto provisioningArchive3 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setSystemEntityUid(provisioningArchive1.getSystemEntityUid());
@@ -166,15 +159,14 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	@Test
 	@Transactional
 	public void entityIdentifierFilterTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		SysSystemDto system = createSystem();
 
-		createProvisioningArchive(entityType, system);
+		createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 
-		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 		provisioningArchive1.setEntityIdentifier(UUID.randomUUID());
 		provisioningArchive1 = service.save(provisioningArchive1);
-		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(provisioningArchive1.getEntityIdentifier());
@@ -188,15 +180,14 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 	@Test
 	@Transactional
 	public void resultStateFilterTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		SysSystemDto system = createSystem();
 
 		OperationResult resultState = new OperationResult();
 		resultState.setState(OperationState.CREATED);
 
-		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive1 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 
-		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(entityType, system);
+		SysProvisioningArchiveDto provisioningArchive2 = createProvisioningArchive(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system);
 		provisioningArchive2.setResult(resultState);
 		service.save(provisioningArchive2);
 
@@ -218,7 +209,7 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 		operation.setSystem(system.getId());
 		operation.setEntityIdentifier(UUID.randomUUID());
 		operation.setOperationType(ProvisioningEventType.CANCEL);
-		operation.setEntityType(SystemEntityType.CONTRACT);
+		operation.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		operation.setProvisioningContext(new ProvisioningContext());
 		operation.setResult(new OperationResult(OperationState.CANCELED));
 		operation.setSystemEntity(getHelper().createSystemEntity(system).getId());
@@ -450,7 +441,7 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 		return systemService.save(system);
 	}
 
-	private SysProvisioningArchiveDto createProvisioningArchive(SystemEntityType type, SysSystemDto system) {
+	private SysProvisioningArchiveDto createProvisioningArchive(String type, SysSystemDto system) {
 		SysProvisioningArchiveDto provisioningArchive = new SysProvisioningArchiveDto();
 		provisioningArchive.setEntityType(type);
 		provisioningArchive.setOperationType(ProvisioningEventType.CREATE);
@@ -470,7 +461,7 @@ public class DefaultSysProvisioningArchiveServiceIntegrationTest extends Abstrac
 		operation.setSystem(system.getId());
 		operation.setEntityIdentifier(UUID.randomUUID());
 		operation.setOperationType(ProvisioningEventType.CANCEL);
-		operation.setEntityType(SystemEntityType.CONTRACT);
+		operation.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		operation.setProvisioningContext(new ProvisioningContext());
 		operation.setResult(new OperationResult(OperationState.CANCELED));
 		operation.setSystemEntity(getHelper().createSystemEntity(system).getId());

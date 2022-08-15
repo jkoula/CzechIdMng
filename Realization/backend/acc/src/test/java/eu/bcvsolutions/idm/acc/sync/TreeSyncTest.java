@@ -24,7 +24,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -46,6 +45,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.TreeSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.RecursionType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -279,7 +279,7 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		initData(treeTypeCode);
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.TREE);
+		mappingFilter.setEntityType(TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -348,7 +348,7 @@ public class TreeSyncTest extends AbstractIntegrationTest {
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.TREE);
+		syncSystemMapping.setEntityType(TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setTreeType(treeType.getId());
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());

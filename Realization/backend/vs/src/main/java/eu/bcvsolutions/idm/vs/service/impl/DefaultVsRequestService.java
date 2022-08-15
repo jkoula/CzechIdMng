@@ -32,7 +32,9 @@ import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationEntityExecutor;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -117,6 +119,8 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 	private AccAccountService accAccountService;
 	@Autowired
 	private SysProvisioningArchiveService provisioningArchiveService;
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
 
 	@Autowired
 	public DefaultVsRequestService(VsRequestRepository repository, EntityEventManager entityEventManager,
@@ -321,7 +325,8 @@ public class DefaultVsRequestService extends AbstractReadWriteDtoService<VsReque
 		AccAccountDto account = accAccountService.getAccount(dto.getUid(), dto.getSystem());
 		if (account != null) {
 			String entityType = account.getEntityType();
-			if (entityType != null && entityType.isSupportsSync()) {
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+			if (systemEntityType != null && systemEntityType.isSupportsSync()) {
 				SynchronizationEntityExecutor executor = accAccountService.getSyncExecutor(entityType);
 				return executor.getDtoByAccount(null, account);
 			}

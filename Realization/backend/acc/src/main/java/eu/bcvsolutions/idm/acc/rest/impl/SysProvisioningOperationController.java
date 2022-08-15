@@ -43,6 +43,8 @@ import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningExecutor;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.bulk.action.BulkActionManager;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
@@ -86,6 +88,7 @@ public class SysProvisioningOperationController
 	@Autowired private ProvisioningExecutor provisioningExecutor;
 	@Autowired private BulkActionManager bulkActionManager;
 	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
+	@Autowired private SysSystemEntityManager systemEntityManager;
 
 	@Autowired
 	public SysProvisioningOperationController(SysProvisioningOperationService service) {
@@ -130,7 +133,8 @@ public class SysProvisioningOperationController
 			})
 			.forEach(operation -> {
 				if (!loadedDtos.containsKey(operation.getEntityIdentifier())) {
-					loadedDtos.put(operation.getEntityIdentifier(), getLookupService().lookupDto(operation.getEntityType().getEntityType(), operation.getEntityIdentifier()));
+					SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(operation.getEntityType());
+					loadedDtos.put(operation.getEntityIdentifier(), getLookupService().lookupDto(systemEntityType.getEntityType(), operation.getEntityIdentifier()));
 				}
 				operation.getEmbedded().put("entity", loadedDtos.get(operation.getEntityIdentifier()));
 			});

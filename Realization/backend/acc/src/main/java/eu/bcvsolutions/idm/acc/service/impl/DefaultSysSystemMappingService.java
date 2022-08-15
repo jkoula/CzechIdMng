@@ -55,8 +55,10 @@ import eu.bcvsolutions.idm.acc.repository.SysSystemMappingRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
@@ -121,6 +123,8 @@ public class DefaultSysSystemMappingService
 	@Lazy
 	@Autowired
 	private SysSystemEntityService systemEntityService;
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
 
 	@Autowired
 	public DefaultSysSystemMappingService(
@@ -144,7 +148,8 @@ public class DefaultSysSystemMappingService
 	@Transactional
 	public SysSystemMappingDto saveInternal(SysSystemMappingDto dto) {
 		String entityType = dto.getEntityType();
-		if (SystemOperationType.PROVISIONING == dto.getOperationType() && !entityType.isSupportsProvisioning()) {
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+		if (SystemOperationType.PROVISIONING == dto.getOperationType() && !systemEntityType.isSupportsProvisioning()) {
 			throw new ResultCodeException(AccResultCode.PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE, ImmutableMap.of("entityType", entityType));
 		}
 

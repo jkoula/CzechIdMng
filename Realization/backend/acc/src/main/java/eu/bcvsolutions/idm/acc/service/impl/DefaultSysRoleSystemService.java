@@ -154,7 +154,7 @@ public class DefaultSysRoleSystemService
 		SysSystemMappingDto systemMappingDto = systemMappingService.get(dto.getSystemMapping());
 		if (systemMappingDto != null && !IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(systemMappingDto.getEntityType())) {
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_SUPPORTS_ONLY_IDENTITY,
-					ImmutableMap.of("entityType", systemMappingDto.getEntityType().name()));
+					ImmutableMap.of("entityType", systemMappingDto.getEntityType()));
 		}
 		
 		// Used System mapping has to belong to the System the role is assigned to

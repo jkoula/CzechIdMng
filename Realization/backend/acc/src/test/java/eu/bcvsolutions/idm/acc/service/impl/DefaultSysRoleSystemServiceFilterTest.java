@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -54,7 +53,7 @@ public class DefaultSysRoleSystemServiceFilterTest extends AbstractIntegrationTe
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		//
 		SysSystemMappingDto sysSystemMappingDto = mappingService
-				.findBySystemId(system.getId(), SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystemId(system.getId(), SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		SysRoleSystemDto roleSystem = createRoleSystem(role.getId(), system.getId(), sysSystemMappingDto.getId());
 		createRoleSystem(role2.getId(), system.getId(), sysSystemMappingDto.getId());
 		//
@@ -74,9 +73,9 @@ public class DefaultSysRoleSystemServiceFilterTest extends AbstractIntegrationTe
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
 		//
 		SysSystemMappingDto sysSystemMapping1Dto = mappingService
-				.findBySystemId(system1.getId(), SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystemId(system1.getId(), SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		SysSystemMappingDto sysSystemMapping2Dto = mappingService
-				.findBySystemId(system2.getId(), SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystemId(system2.getId(), SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		createRoleSystem(role1.getId(), system1.getId(), sysSystemMapping1Dto.getId());
 		SysRoleSystemDto roleSystem2 = createRoleSystem(role2.getId(), system2.getId(), sysSystemMapping2Dto.getId());
 		//
@@ -96,9 +95,9 @@ public class DefaultSysRoleSystemServiceFilterTest extends AbstractIntegrationTe
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
 		//
 		SysSystemMappingDto sysSystemMappingDto1 = mappingService
-				.findBySystemId(system1.getId(), SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystemId(system1.getId(), SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		SysSystemMappingDto sysSystemMappingDto2 = mappingService
-				.findBySystemId(system2.getId(), SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystemId(system2.getId(), SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		SysRoleSystemDto roleSystem1 = createRoleSystem(role1.getId(), system1.getId(), sysSystemMappingDto1.getId());
 		createRoleSystem(role2.getId(), system2.getId(), sysSystemMappingDto2.getId());
 		//

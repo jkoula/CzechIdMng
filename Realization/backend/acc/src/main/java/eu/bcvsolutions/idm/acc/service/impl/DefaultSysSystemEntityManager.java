@@ -3,15 +3,17 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 
+@Component("systemEntityManager")
 public class DefaultSysSystemEntityManager implements SysSystemEntityManager {
 
 	@Autowired
-	private List<SystemEntityTypeRegistrable> systemEntityTypes;;
+	private List<SystemEntityTypeRegistrable> systemEntityTypes;
 	
 	@Override
 	public SystemEntityTypeRegistrable getSystemEntityByCode(String code) {

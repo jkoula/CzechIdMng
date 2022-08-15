@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -398,7 +397,7 @@ public class DefaultSysSystemAttributeMappingServiceFilterTest extends AbstractI
 		
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 		filter.setSystemId(system.getId());
-		filter.setEntityType(SystemEntityType.CONTRACT);
+		filter.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysSystemAttributeMappingDto> attributeMappings = systemAttributeMappingService.find(filter, null).getContent();
 		assertEquals(0, attributeMappings.size());
 	}
@@ -416,7 +415,7 @@ public class DefaultSysSystemAttributeMappingServiceFilterTest extends AbstractI
 		
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 		filter.setSystemId(system.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysSystemAttributeMappingDto> attributeMappings = systemAttributeMappingService.find(filter, null).getContent();
 		assertEquals(6, attributeMappings.size()); // Six is default for standard test resource
 	}
@@ -434,7 +433,7 @@ public class DefaultSysSystemAttributeMappingServiceFilterTest extends AbstractI
 		
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 		filter.setSystemId(system.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setOperationType(SystemOperationType.PROVISIONING);
 		List<SysSystemAttributeMappingDto> attributeMappings = systemAttributeMappingService.find(filter, null).getContent();
 		assertEquals(6, attributeMappings.size()); // Six is default for standard test resource
@@ -453,7 +452,7 @@ public class DefaultSysSystemAttributeMappingServiceFilterTest extends AbstractI
 		
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 		filter.setSystemId(system.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemAttributeMappingDto> attributeMappings = systemAttributeMappingService.find(filter, null).getContent();
 		assertEquals(0, attributeMappings.size());
@@ -472,7 +471,7 @@ public class DefaultSysSystemAttributeMappingServiceFilterTest extends AbstractI
 		
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
 		filter.setSystemId(system.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		filter.setOperationType(SystemOperationType.PROVISIONING);
 		filter.setIsUid(Boolean.FALSE);
 		List<SysSystemAttributeMappingDto> attributeMappings = systemAttributeMappingService.find(filter, null).getContent();

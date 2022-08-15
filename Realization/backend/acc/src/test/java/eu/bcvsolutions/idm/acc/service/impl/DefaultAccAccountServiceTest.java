@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -101,7 +100,7 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		// Change resources (set state on exclude) .. must be call in transaction
 		this.getBean().persistResource(createResource(userOneName, ZonedDateTime.now()));
 		AccAccountDto account = new AccAccountDto();
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystem(system.getId());
 		account.setUid(userOneName);
 		account = accountService.save(account);
@@ -151,7 +150,7 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		// Change resources (set state on exclude) .. must be call in transaction
 		this.getBean().persistResource(createResource(userOneName, ZonedDateTime.now()));
 		AccAccountDto account = new AccAccountDto();
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystem(system.getId());
 		account.setUid(userOneName);
 		account = accountService.save(account);
@@ -187,7 +186,7 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		// Change resources (set state on exclude) .. must be call in transaction
 		this.getBean().persistResource(createResource(userOneName, ZonedDateTime.now()));
 		AccAccountDto account = new AccAccountDto();
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystem(system.getId());
 		account.setUid(userOneName);
 		account = accountService.save(account);
@@ -244,7 +243,7 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		// Change resources (set state on exclude) .. must be call in transaction
 		this.getBean().persistResource(createResource(userOneName, ZonedDateTime.now()));
 		AccAccountDto account = new AccAccountDto();
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystem(system.getId());
 		account.setUid(userOneName);
 		account = accountService.save(account);
@@ -278,7 +277,7 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		String userOneName = "UserOne";
 		SysSystemDto system = initData();
 		AccAccountDto account = new AccAccountDto();
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystem(system.getId());
 		account.setUid(userOneName);
 		account = accountService.save(account);

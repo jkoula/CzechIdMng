@@ -58,7 +58,9 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -109,6 +111,8 @@ public class DefaultSysRoleSystemAttributeService extends
 	private RequestManager requestManager;
 	@Autowired
 	private SysAttributeControlledValueService attributeControlledValueService;
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
 
 	@Autowired
 	public DefaultSysRoleSystemAttributeService(SysRoleSystemAttributeRepository repository) {
@@ -176,7 +180,8 @@ public class DefaultSysRoleSystemAttributeService extends
 		}
 
 		SysSystemMappingDto systemMapping = systemMappingService.get(systemAttributeMapping.getSystemMapping());
-		Class<? extends Identifiable> entityType = systemMapping.getEntityType().getEntityType();
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(systemMapping.getEntityType());
+		Class<? extends Identifiable> entityType = systemEntityType.getEntityType();
 		if (dto.isExtendedAttribute() && formService.isFormable(entityType)) {
 			systemAttributeMappingService.createExtendedAttributeDefinition(dto, entityType);
 		}

@@ -10,7 +10,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccUniformPasswordDto;
@@ -304,7 +303,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 			// Create uniform password definition.
 			AccUniformPasswordDto uniformPasswordDef = createUniformPasswordDef(targetSystemOne, targetSystemTwo);
 
-			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), SystemEntityType.IDENTITY);
+			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			List<SysSystemAttributeMappingDto> attributeMappingDtos = schemaAttributeMappingService.findBySystemMapping(provisioningMapping);
 			SysSystemAttributeMappingDto uidAttribute = schemaAttributeMappingService.getUidAttribute(attributeMappingDtos, targetSystemTwo);
 			uidAttribute.setTransformToResourceScript("return attributeValue + \"" + targetSystemTwoSuffix + "\"");
@@ -463,7 +462,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 			uniformPasswordDef.setChangeInIdm(true);
 			uniformPasswordService.save(uniformPasswordDef);
 
-			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), SystemEntityType.IDENTITY);
+			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			List<SysSystemAttributeMappingDto> attributeMappingDtos = schemaAttributeMappingService.findBySystemMapping(provisioningMapping);
 			SysSystemAttributeMappingDto uidAttribute = schemaAttributeMappingService.getUidAttribute(attributeMappingDtos, targetSystemTwo);
 			uidAttribute.setTransformToResourceScript("return attributeValue + \"" + targetSystemTwoSuffix + "\"");
@@ -613,7 +612,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 			// Create system two with account suffix "_targetSystemTwo".
 			String targetSystemTwoSuffix = "_targetSystemTwo";
 			SysSystemDto targetSystemTwo = helper.createTestResourceSystem(true);
-			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), SystemEntityType.IDENTITY);
+			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			List<SysSystemAttributeMappingDto> attributeMappingDtos = schemaAttributeMappingService.findBySystemMapping(provisioningMapping);
 			SysSystemAttributeMappingDto uidAttribute = schemaAttributeMappingService.getUidAttribute(attributeMappingDtos, targetSystemTwo);
 			uidAttribute.setTransformToResourceScript("return attributeValue + \"" + targetSystemTwoSuffix + "\"");
@@ -750,7 +749,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 			uniformPasswordDef.setDisabled(true);
 			uniformPasswordDef = uniformPasswordService.save(uniformPasswordDef);
 			
-			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), SystemEntityType.IDENTITY);
+			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(targetSystemTwo.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			List<SysSystemAttributeMappingDto> attributeMappingDtos = schemaAttributeMappingService.findBySystemMapping(provisioningMapping);
 			SysSystemAttributeMappingDto uidAttribute = schemaAttributeMappingService.getUidAttribute(attributeMappingDtos, targetSystemTwo);
 			uidAttribute.setTransformToResourceScript("return attributeValue + \"" + targetSystemTwoSuffix + "\"");
@@ -886,7 +885,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 	public AbstractSysSyncConfigDto doCreateSyncConfig(SysSystemDto system, IdmTreeTypeDto treeType) {
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.CONTRACT);
+		mappingFilter.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -955,7 +954,7 @@ public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegr
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.CONTRACT);
+		syncSystemMapping.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);

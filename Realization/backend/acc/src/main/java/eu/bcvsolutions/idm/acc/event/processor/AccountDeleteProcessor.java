@@ -41,6 +41,8 @@ import eu.bcvsolutions.idm.acc.service.api.AccRoleAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccRoleCatalogueAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccTreeAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -70,6 +72,7 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 	private final ProvisioningService provisioningService;
 	@Autowired
 	private AccContractSliceAccountService contractAccountSliceService;
+	@Autowired private SysSystemEntityManager systemEntityManager;
 
 	private static final Logger LOG = LoggerFactory.getLogger(AccountDeleteProcessor.class);
 
@@ -186,7 +189,8 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 		}
 		if (deleteTargetAccount && account.getEntityType() != null) {
 			String entityType = account.getEntityType();
-			if (!entityType.isSupportsProvisioning()) {
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+			if (!systemEntityType.isSupportsProvisioning()) {
 				LOG.warn(MessageFormat.format("Provisioning is not supported for [{1}] now [{0}]!", account.getUid(),
 						entityType));
 				return new DefaultEventResult<>(event, this);

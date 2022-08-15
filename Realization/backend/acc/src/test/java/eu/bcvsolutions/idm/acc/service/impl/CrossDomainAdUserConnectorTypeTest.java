@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.acc.service.impl;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -316,7 +315,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -406,7 +405,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -539,7 +538,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -573,7 +572,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('TWO') from the role.
 		provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemTwoDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -724,7 +723,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -751,7 +750,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('TWO') from the role.
 		provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemTwoDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1030,7 +1029,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1117,7 +1116,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1225,7 +1224,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1308,7 +1307,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1411,7 +1410,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1507,7 +1506,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning NOT contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1533,7 +1532,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1638,7 +1637,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning NOT contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1663,7 +1662,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		// Two provisioning were made. First for save identity, second for assign automatic role.
@@ -1761,7 +1760,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning NOT contains ldapGroups attribute with value ('ONE') from the role.
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		List<SysProvisioningOperationDto> provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());
@@ -1787,7 +1786,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 		// Check if provisioning contains ldapGroups attribute with value ('ONE') from the role.
 		provisioningOperationFilter = new SysProvisioningOperationFilter();
 		provisioningOperationFilter.setSystemId(systemDto.getId());
-		provisioningOperationFilter.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperationFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperationFilter.setEntityIdentifier(identity.getId());
 		provisioningOperationDtos = provisioningOperationService.find(provisioningOperationFilter, null).getContent();
 		assertEquals(1, provisioningOperationDtos.size());

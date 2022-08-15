@@ -33,6 +33,8 @@ import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningArchive;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
@@ -64,6 +66,8 @@ import io.swagger.annotations.AuthorizationScope;
 public class SysProvisioningArchiveController extends AbstractReadWriteDtoController<SysProvisioningArchiveDto, SysProvisioningOperationFilter> {
 
 	protected static final String TAG = "Provisioning - archive";
+	
+	@Autowired private SysSystemEntityManager systemEntityManager;
 	
 	@Autowired
 	public SysProvisioningArchiveController(SysProvisioningArchiveService service) {
@@ -143,7 +147,8 @@ public class SysProvisioningArchiveController extends AbstractReadWriteDtoContro
 			})
 			.forEach(operation -> {
 				if (!loadedDtos.containsKey(operation.getEntityIdentifier())) {
-					loadedDtos.put(operation.getEntityIdentifier(), getLookupService().lookupDto(operation.getEntityType().getEntityType(), operation.getEntityIdentifier()));
+					SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(operation.getEntityType());
+					loadedDtos.put(operation.getEntityIdentifier(), getLookupService().lookupDto(systemEntityType.getEntityType(), operation.getEntityIdentifier()));
 				}
 				operation.getEmbedded().put("entity", loadedDtos.get(operation.getEntityIdentifier()));
 			});

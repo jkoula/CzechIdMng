@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
@@ -38,11 +37,11 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 	public void testSystemId() {
 		SysSystemDto system1 = helper.createTestResourceSystem(false);
 		SysSystemDto system2 = helper.createTestResourceSystem(false);
-		createEntitySystem("test1-" + System.currentTimeMillis(), SystemEntityType.CONTRACT, system1.getId(),
+		createEntitySystem("test1-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system1.getId(),
 				UUID.randomUUID());
-		SysSystemEntityDto entity2 = createEntitySystem("test2-" + System.currentTimeMillis(), SystemEntityType.CONTRACT,
+		SysSystemEntityDto entity2 = createEntitySystem("test2-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE,
 				system2.getId(), UUID.randomUUID());
-		createEntitySystem("test3-" + System.currentTimeMillis(), SystemEntityType.CONTRACT, system2.getId(),
+		createEntitySystem("test3-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system2.getId(),
 				UUID.randomUUID());
 		//
 		SysSystemEntityFilter testFilter = new SysSystemEntityFilter();
@@ -57,11 +56,11 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 	@Test
 	public void testUid() {
 		SysSystemDto system = helper.createTestResourceSystem(false);
-		SysSystemEntityDto entity1 = createEntitySystem("test1-" + System.currentTimeMillis(), SystemEntityType.CONTRACT,
+		SysSystemEntityDto entity1 = createEntitySystem("test1-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE,
 				system.getId(), UUID.randomUUID());
-		createEntitySystem("test2-" + System.currentTimeMillis(), SystemEntityType.CONTRACT, system.getId(),
+		createEntitySystem("test2-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
-		createEntitySystem("test3-" + System.currentTimeMillis(), SystemEntityType.CONTRACT, system.getId(),
+		createEntitySystem("test3-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
 		//
 		SysSystemEntityFilter testFilter = new SysSystemEntityFilter();
@@ -74,11 +73,11 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 	@Test
 	public void testFindByText() {
 		SysSystemDto system = helper.createTestResourceSystem(false);
-		SysSystemEntityDto entityOne = createEntitySystem(getHelper().createName(), SystemEntityType.CONTRACT,
+		SysSystemEntityDto entityOne = createEntitySystem(getHelper().createName(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE,
 				system.getId(), UUID.randomUUID());
-		createEntitySystem(getHelper().createName(), SystemEntityType.CONTRACT, system.getId(),
+		createEntitySystem(getHelper().createName(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
-		createEntitySystem(getHelper().createName(), SystemEntityType.CONTRACT, system.getId(),
+		createEntitySystem(getHelper().createName(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
 		//
 		SysSystemEntityFilter testFilter = new SysSystemEntityFilter();
@@ -94,11 +93,11 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 	@Test
 	public void testId() {
 		SysSystemDto system = helper.createTestResourceSystem(false);
-		createEntitySystem("test1-" + System.currentTimeMillis(), SystemEntityType.CONTRACT, system.getId(),
+		createEntitySystem("test1-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
-		createEntitySystem("test2-" + System.currentTimeMillis(), SystemEntityType.CONTRACT, system.getId(),
+		createEntitySystem("test2-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
-		SysSystemEntityDto entity3 = createEntitySystem("test3-" + System.currentTimeMillis(), SystemEntityType.CONTRACT,
+		SysSystemEntityDto entity3 = createEntitySystem("test3-" + System.currentTimeMillis(), ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE,
 				system.getId(), UUID.randomUUID());
 		//
 		SysSystemEntityDto foundedEntity = entityService.get(entity3.getId());
@@ -108,11 +107,11 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 	@Test
 	public void testEntityType() {
 		SysSystemDto system = helper.createTestResourceSystem(false);
-		createEntitySystem("test1-" + System.currentTimeMillis(), SystemEntityType.ROLE, system.getId(),
+		createEntitySystem("test1-" + System.currentTimeMillis(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
-		SysSystemEntityDto entity2 = createEntitySystem("test2-" + System.currentTimeMillis(), SystemEntityType.TREE,
+		SysSystemEntityDto entity2 = createEntitySystem("test2-" + System.currentTimeMillis(), TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE,
 				system.getId(), UUID.randomUUID());
-		createEntitySystem("tes3t-" + System.currentTimeMillis(), SystemEntityType.IDENTITY, system.getId(),
+		createEntitySystem("tes3t-" + System.currentTimeMillis(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, system.getId(),
 				UUID.randomUUID());
 		//
 		SysSystemEntityFilter testFilter = new SysSystemEntityFilter();
@@ -131,7 +130,7 @@ public class DefaultSysSystemEntityServiceFilterTest extends AbstractIntegration
 	 * @param id
 	 * @return
 	 */
-	private SysSystemEntityDto createEntitySystem(String uid, SystemEntityType type, UUID systemId, UUID id) {
+	private SysSystemEntityDto createEntitySystem(String uid, String type, UUID systemId, UUID id) {
 		SysSystemEntityDto entity = new SysSystemEntityDto();
 		entity.setUid(uid);
 		entity.setEntityType(type);

@@ -76,8 +76,10 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
@@ -149,6 +151,8 @@ public class DefaultSysSystemAttributeMappingService
 	private SysSyncConfigService syncConfigService;
 	@Autowired
 	private SysSystemGroupSystemService systemGroupSystemService;
+	@Autowired
+	private SysSystemEntityManager systemEntityManager;
 
 
 	@Autowired
@@ -524,7 +528,8 @@ public class DefaultSysSystemAttributeMappingService
 			groovyScriptService.validateScript(dto.getTransformToResourceScript());
 		}
 
-		Class<? extends Identifiable> entityType = systemMappingDto.getEntityType().getExtendedAttributeOwnerType();
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(systemMappingDto.getEntityType());
+		Class<? extends Identifiable> entityType = systemEntityType.getExtendedAttributeOwnerType();
 		if (entityType != null && dto.isExtendedAttribute() && formService.isFormable(entityType)) {
 			createExtendedAttributeDefinition(dto, entityType);
 		}
@@ -1096,7 +1101,8 @@ public class DefaultSysSystemAttributeMappingService
 			SysSystemMappingDto mapping = DtoUtils.getEmbedded(attribute,
 					SysSystemAttributeMapping_.systemMapping.getName(), SysSystemMappingDto.class);
 	
-			Class<? extends Identifiable> entityType = mapping.getEntityType().getExtendedAttributeOwnerType();
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(mapping.getEntityType());
+			Class<? extends Identifiable> entityType = systemEntityType.getExtendedAttributeOwnerType();
 			if (entityType != null && attribute.isExtendedAttribute() && formService.isFormable(entityType)) {
 				IdmFormAttributeDto formAttribute = formService.getAttribute(entityType, attribute.getIdmPropertyName());
 				if (formAttribute != null) {

@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.acc.domain.SynchronizationInactiveOwnerBehaviorType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -350,7 +349,7 @@ public class AdUserConnectorTypeTest extends AbstractIntegrationTest {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(systemDto.getId());
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 
 		List<SysSystemMappingDto> mappingDtos = mappingService.find(mappingFilter, null).getContent();
 		assertEquals(1, mappingDtos.size());
@@ -360,7 +359,7 @@ public class AdUserConnectorTypeTest extends AbstractIntegrationTest {
 		assertTrue(mappingDtos.get(0).isAddContextConnectorObject());
 
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 
 		mappingDtos = mappingService.find(mappingFilter, null).getContent();
 		// Sync mapping must exists.

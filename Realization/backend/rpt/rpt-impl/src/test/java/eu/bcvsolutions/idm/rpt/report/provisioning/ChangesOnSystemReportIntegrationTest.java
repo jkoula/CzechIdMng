@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -19,6 +18,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
@@ -76,7 +76,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setIdentityId(identityTwo.getId());
 		accountFilter.setSystemId(system.getId());
-		accountFilter.setEntityType(SystemEntityType.IDENTITY);
+		accountFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<AccAccountDto> accounts = accountService.find(accountFilter, null).getContent();
 		Assert.assertEquals(1, accounts.size());
 		//
@@ -119,7 +119,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setIdentityId(identityTwo.getId());
 		accountFilter.setSystemId(system.getId());
-		accountFilter.setEntityType(SystemEntityType.IDENTITY);
+		accountFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<AccAccountDto> accounts = accountService.find(accountFilter, null).getContent();
 		Assert.assertEquals(1, accounts.size());
 		//
@@ -167,7 +167,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setIdentityId(identityTwo.getId());
 		accountFilter.setSystemId(system.getId());
-		accountFilter.setEntityType(SystemEntityType.IDENTITY);
+		accountFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<AccAccountDto> accounts = accountService.find(accountFilter, null).getContent();
 		Assert.assertEquals(1, accounts.size());
 		//
