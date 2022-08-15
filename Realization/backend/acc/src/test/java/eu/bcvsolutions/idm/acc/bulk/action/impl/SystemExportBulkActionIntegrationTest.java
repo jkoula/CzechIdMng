@@ -38,6 +38,7 @@ import eu.bcvsolutions.idm.acc.entity.SysSystem;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBreakConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBreakRecipientService;
+import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysRemoteServerService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
@@ -63,6 +64,7 @@ import eu.bcvsolutions.idm.core.api.service.ImportManager;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.scheduler.task.impl.ImportTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
@@ -109,7 +111,9 @@ public class SystemExportBulkActionIntegrationTest extends AbstractExportBulkAct
 	private SysRemoteServerService remoteServerService;
 	@Autowired 
 	private ConfidentialStorage confidentialStorage;
-	
+	@Autowired
+	private SysProvisioningOperationService provisioningOperationService;
+
 	@Before
 	public void login() {
 		loginAsAdmin();
@@ -720,6 +724,12 @@ public class SystemExportBulkActionIntegrationTest extends AbstractExportBulkAct
 		Assert.assertNotNull(originalSync);
 		Assert.assertEquals(treeTypeNew.getId(), originalSync.getDefaultTreeType());
 		Assert.assertEquals(treeNodeNew.getId(), originalSync.getDefaultTreeNode());
+
+		getHelper().deleteTreeNode(treeNodeNew.getId());
+		getHelper().deleteTreeType(treeTypeNew.getId());
+		provisioningOperationService.deleteAllOperations();
+		synchronizationConfigService.delete(originalSync);
+		systemService.delete(system);
 	}
 
 	@Test

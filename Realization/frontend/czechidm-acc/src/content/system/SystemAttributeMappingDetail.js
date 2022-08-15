@@ -566,7 +566,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
               style={{marginBottom: 0, paddingTop: 15, paddingRight: 15, paddingLeft: 15}}/>
             <RoleSystemAttributeTable
               uiKey={`attribute-mapping-overridden-${attribute.id}`}
-              rendered={activeKey === 3}
+              rendered
               columns={['role', 'transformScript', 'strategyType']}
               linkMenu={null}
               roleSystem={null}

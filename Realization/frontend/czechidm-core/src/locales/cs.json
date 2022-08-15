@@ -1216,6 +1216,7 @@
     "group": {
       "AUTHORIZATIONPOLICY": "Oprávnění",
       "APP": "Správa aplikace",
+      "APPSKIPCAS": "Přihlášení bez CAS",
       "AUDIT": "Audit",
       "CONFIGURATION": "Konfigurace aplikace",
       "IDENTITY": "Uživatelé",
@@ -7873,6 +7874,10 @@
     "LONG_RUNNING_TASK_NOT_RECOVERABLE": {
       "title": "Úlohu nelze spustit",
       "message": "Úlohu [{{taskType}}] nelze spustit znovu,tuto funkci úloha nepodporuje."
+    },
+    "LONG_RUNNING_TASK_WRONG_CONFIGURATION": {
+      "title": "Úlohu nelze spustit",
+      "message": "Konfigurace úlohy selhala. Chyba během čtení [{{attribute}}] atributu."
     },
     "FOREST_INDEX_DISABLED": {
       "title": "Index je vypnutý",

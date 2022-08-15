@@ -180,7 +180,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			UUID transactionId = TransactionContextHolder.getContext().getTransactionId();
 			Assert.assertNotNull(transactionId);
 			//
-			getHelper().enableAsynchronousProcessing();
+//			getHelper().enableAsynchronousProcessing();
 			// prepare role composition
 			IdmRoleDto superior = getHelper().createRole();
 			IdmIdentityDto identity = getHelper().createIdentity((GuardedString) null);
@@ -241,7 +241,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			Assert.assertTrue(assignedRoles.isEmpty());
 			Assert.assertNull(accountService.getAccount(identity.getUsername(), system.getId()));
 		} finally {
-			getHelper().disableAsynchronousProcessing();
+//			getHelper().disableAsynchronousProcessing();
 		}
 	}
 	

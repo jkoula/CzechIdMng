@@ -99,6 +99,12 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(operations.size(), newOperations.size());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -138,6 +144,12 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(operations.size(), newOperations.size());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -181,6 +193,12 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(operations.size() - 1, newOperations.size());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -225,6 +243,12 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -268,6 +292,12 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		List<SysProvisioningOperationDto> newOperations = provisioningOperationService.find(filter, null).getContent();
 		assertEquals(0, newOperations.size());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 
 	@Test
@@ -309,5 +339,11 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		operations = provisioningOperationService.find(filter, null).getContent();
 		assertTrue(operations.isEmpty());
+
+		getHelper().deleteIdentity(identity.getId());
+		getHelper().deleteRole(role.getId());
+		helper.deleteAllResourceData();
+		provisioningOperationService.deleteAllOperations();
+		systemService.delete(system);
 	}
 }

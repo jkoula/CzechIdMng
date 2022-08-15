@@ -476,34 +476,44 @@ export default class AutomaticRoleAttributeRuleDetail extends Basic.AbstractCont
     });
   }
 
-  _comparsionChange(option) {
+  _formAttributeOrComparisonChange(option) {
+    let { entity } = this.state;
+    let formAttribute = null;
+    let comparison = null;
+    if (option && option.id) {
+      formAttribute = option;
+      comparison = entity.comparison;
+    } else {
+      comparison = option;
+      formAttribute = entity.formAttribute;
+    }
+
     let valueRequired = true;
     let hideValueField = false;
     let incompatibleWithMultiple = true;
-    if (option && (
-      option.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_EMPTY) ||
-      option.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_NOT_EMPTY))) {
+    
+    if (comparison && comparison.value && (comparison.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_EMPTY) ||
+    comparison.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_NOT_EMPTY)) &&
+    (!formAttribute || !formAttribute.persistentType || formAttribute.persistentType !== 'TEXT')) {
       valueRequired = false;
       hideValueField = true;
     }
-    if (option && (
-      option.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.EQUALS) ||
-      option.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_EMPTY) ||
-      option.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_NOT_EMPTY))) {
+    if (comparison && (
+      comparison.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.EQUALS) ||
+      comparison.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_EMPTY) ||
+      comparison.value === AutomaticRoleAttributeRuleComparisonEnum.findKeyBySymbol(AutomaticRoleAttributeRuleComparisonEnum.IS_NOT_EMPTY))) {
       incompatibleWithMultiple = false;
     }
+
+    entity.comparison = comparison;
+    entity.formAttribute = formAttribute;
     //
     this.setState({
+      entity,
+      formAttribute,
       valueRequired,
       hideValueField,
       incompatibleWithMultiple
-    });
-  }
-
-  _formAttributeChange(option) {
-    // just change formAttribute
-    this.setState({
-      formAttribute: option
     });
   }
 
@@ -757,7 +767,7 @@ export default class AutomaticRoleAttributeRuleDetail extends Basic.AbstractCont
             ref="formAttribute"
             clearable={ false }
             returnProperty={ null }
-            onChange={ this._formAttributeChange.bind(this) }
+            onChange={ this._formAttributeOrComparisonChange.bind(this) }
             forceSearchParameters={ typeForceSearchParameters }
             label={ this.i18n('entity.AutomaticRole.attribute.formAttribute') }
             hidden={ typeForceSearchParameters === null }
@@ -772,7 +782,7 @@ export default class AutomaticRoleAttributeRuleDetail extends Basic.AbstractCont
                 clearable={ false }
                 required
                 useFirst
-                onChange={ this._comparsionChange.bind(this) }
+                onChange={ this._formAttributeOrComparisonChange.bind(this) }
                 label={ this.i18n('entity.AutomaticRole.attribute.comparison') }
                 enum={ AutomaticRoleAttributeRuleComparisonEnum }/>
             </Basic.Col>

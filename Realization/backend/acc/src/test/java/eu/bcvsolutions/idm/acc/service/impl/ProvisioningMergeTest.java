@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysAttributeControlledValueFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
+import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.service.api.SysAttributeControlledValueService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
@@ -41,13 +43,20 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
+import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
@@ -81,6 +90,10 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 	private IdmIdentityContractService identityContractService;
 	@Autowired
 	private IdmIdentityService identityService;
+	@Autowired
+	private IdmRoleRequestService roleRequestService;
+	@Autowired
+	private IdmConceptRoleRequestService conceptRoleRequestService;
 
 	@Test
 	public void testAttribteControlledValues() {
@@ -149,6 +162,66 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		assertEquals(2, controlledAttributeValues.size());
 		assertTrue(controlledAttributeValues.contains(ONE_VALUE));
 		assertTrue(controlledAttributeValues.contains(TWO_VALUE));
+	}
+
+	@Test(expected = ProvisioningException.class)
+	public void testAttribteConflictStrategy() {
+		SysSystemDto system = helper.createSystem("test_resource");
+		SysSystemMappingDto mapping = helper.createMapping(system);
+		IdmRoleDto roleOne = helper.createRole();
+
+		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
+
+		SysSchemaAttributeDto rightsSchemaAttribute = new SysSchemaAttributeDto();
+		rightsSchemaAttribute.setObjectClass(mapping.getObjectClass());
+		rightsSchemaAttribute.setName(RIGHTS_ATTRIBUTE);
+		rightsSchemaAttribute.setMultivalued(true);
+		rightsSchemaAttribute.setClassType(String.class.getName());
+		rightsSchemaAttribute.setReadable(true);
+		rightsSchemaAttribute.setUpdateable(true);
+
+		rightsSchemaAttribute = schemaAttributeService.save(rightsSchemaAttribute);
+
+		SysSystemAttributeMappingDto rightsAttribute = new SysSystemAttributeMappingDto();
+		rightsAttribute.setSchemaAttribute(rightsSchemaAttribute.getId());
+		rightsAttribute.setSystemMapping(mapping.getId());
+		rightsAttribute.setName(RIGHTS_ATTRIBUTE);
+		rightsAttribute.setStrategyType(AttributeMappingStrategyType.MERGE);
+		rightsAttribute = attributeMappingService.save(rightsAttribute);
+
+		SysRoleSystemAttributeDto roleAttributeOne = new SysRoleSystemAttributeDto();
+		roleAttributeOne.setName(RIGHTS_ATTRIBUTE);
+		roleAttributeOne.setRoleSystem(roleSystemOne.getId());
+		roleAttributeOne.setStrategyType(AttributeMappingStrategyType.SET);
+		roleAttributeOne.setSystemAttributeMapping(rightsAttribute.getId());
+		roleAttributeOne.setTransformToResourceScript("return '" + ONE_VALUE + "';");
+		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
+
+		IdmIdentityDto identity = getHelper().createIdentity();
+		IdmIdentityContractDto primeContract = getHelper().getPrimeContract(identity);
+
+		getHelper().loginAdmin();
+
+		// create request
+		IdmRoleRequestDto request = new IdmRoleRequestDto();
+		request.setApplicant(identity.getId());
+		request.setExecuteImmediately(true);
+		request.setRequestedByType(RoleRequestedByType.MANUALLY);
+		request.setState(RoleRequestState.EXECUTED);
+		request = roleRequestService.save(request);
+		Assert.assertEquals(RoleRequestState.CONCEPT, request.getState());
+		IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
+		concept = new IdmConceptRoleRequestDto();
+		concept.setRoleRequest(request.getId());
+		concept.setState(RoleRequestState.EXECUTED);
+		concept.setOperation(ConceptRoleRequestOperation.ADD);
+		concept.setRole(roleOne.getId());
+		concept.setIdentityContract(primeContract.getId());
+		concept = conceptRoleRequestService.save(concept);
+		Assert.assertEquals(RoleRequestState.CONCEPT, concept.getState());
+
+		getHelper().startRequestInternal(request, true, true);
+		request = roleRequestService.get(request.getId());
 	}
 
 	@Test

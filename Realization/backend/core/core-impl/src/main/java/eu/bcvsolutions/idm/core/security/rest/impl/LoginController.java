@@ -33,6 +33,7 @@ import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.security.api.authentication.AuthenticationManager;
 import eu.bcvsolutions.idm.core.security.api.domain.IdentityBasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmJwtAuthentication;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginRequestDto;
@@ -97,7 +98,7 @@ public class LoginController implements BaseController {
 			throw new ResultCodeException(CoreResultCode.AUTH_FAILED, "Username and password must be filled");
 		}
 		LoginDto authenticate = authenticationManager.authenticate(new LoginDto(loginDto));
-		if (!casConfiguration.isDisabled() && !securityService.isAdmin()) {
+		if (!casConfiguration.isDisabled() && !securityService.hasAnyAuthority(IdmGroupPermission.APP_ADMIN, IdmGroupPermission.APPSKIPCAS_ADMIN)) {
 			authenticationManager.logout();
 			//
 			throw new ResultCodeException(CoreResultCode.CAS_IDM_LOGIN_ADMIN_ONLY);

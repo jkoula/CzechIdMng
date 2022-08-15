@@ -1183,6 +1183,7 @@
     "group": {
       "AUTHORIZATIONPOLICY": "Permissions",
       "APP": "App configuration",
+      "APPSKIPCAS": "Login without CAS",
       "AUDIT": "Audit",
       "CONFIGURATION": "Configuration (app)",
       "IDENTITY": "Users",
@@ -7820,6 +7821,10 @@
     "LONG_RUNNING_TASK_NOT_RECOVERABLE": {
       "title": "Task cannot be executed",
       "message": "Task [{{taskType}}] cannot be executed again. Task does not support this feature."
+    },
+    "LONG_RUNNING_TASK_WRONG_CONFIGURATION": {
+      "title": "Task cannot be executed",
+      "message": "Task configuration failed. Failed while reading [{{attribute}}] property."
     },
     "FOREST_INDEX_DISABLED": {
       "title": "Index is inactive",

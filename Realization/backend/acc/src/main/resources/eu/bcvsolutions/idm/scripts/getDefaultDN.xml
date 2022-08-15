@@ -59,6 +59,12 @@ if (deletedOu != null && originalDn.endsWith(deletedOu)) {
     return defaultDn;
 }
 // Otherwise we do not move the user anywhere.
+// But we will check that the last name was not changed
+if (!originalDn.startsWith("CN=$cn") && originalDn.contains(",")) {
+    String currentOu = originalDn.substring(originalDn.indexOf(",") + 1);
+    String originalDnUpdated = "CN=$cn,$currentOu";
+    return originalDnUpdated;
+}
 return originalDn;
 
 

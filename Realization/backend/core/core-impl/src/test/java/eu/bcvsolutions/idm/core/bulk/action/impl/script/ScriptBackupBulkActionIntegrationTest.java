@@ -77,6 +77,13 @@ public class ScriptBackupBulkActionIntegrationTest extends AbstractBulkActionTes
 	
 	@After
 	public void logout() {
+		IdmScriptDto script1 = scriptService.getByCode(TEST_SCRIPT_CODE_1);
+		if (script1 != null) {
+			script1.setDescription(null);
+			scriptService.save(script1);
+			script1 = scriptService.getByCode(TEST_SCRIPT_CODE_1);
+			assertNull(script1.getDescription());
+		}
 		super.logout();
 	}
 	

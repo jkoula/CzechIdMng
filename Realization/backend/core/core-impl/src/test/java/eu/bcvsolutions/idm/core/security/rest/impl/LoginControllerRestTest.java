@@ -892,7 +892,37 @@ public class LoginControllerRestTest extends AbstractRestTest {
 			);
 		}
 	}
-	
+
+	@Test
+	public void testLogInWithCasEnabledSkipCas() {
+		try {
+			getHelper().setConfigurationValue(
+					publicCasConfiguration.getConfigurationPropertyName(ConfigurationService.PROPERTY_ENABLED), true
+			);
+
+			GuardedString pass = new GuardedString("userskipcas");
+			IdmIdentityDto user = getHelper().createIdentity("userskipcas", pass);
+			IdmRoleDto skipcas = getHelper().createRole("skipcas");
+			getHelper().createBasePolicy(skipcas.getId(), IdmGroupPermission.APPSKIPCAS, (Class<?>) null, IdmBasePermission.ADMIN);
+			getHelper().createIdentityRole(user, skipcas);
+
+			LoginDto loginDto = new LoginDto();
+			loginDto.setUsername(user.getUsername());
+			loginDto.setPassword(pass);
+			Resource<LoginDto> response = loginController.login(loginDto);
+
+			IdmJwtAuthenticationDto authentication = response.getContent().getAuthentication();
+
+			Assert.assertNotNull(authentication);
+			Assert.assertEquals(user.getUsername(), authentication.getCurrentUsername());
+			Assert.assertEquals(user.getUsername(), authentication.getOriginalUsername());
+		} finally {
+			getHelper().setConfigurationValue(
+					publicCasConfiguration.getConfigurationPropertyName(ConfigurationService.PROPERTY_ENABLED), false
+			);
+		}
+	}
+
 	@Test(expected = ResultCodeException.class)
 	public void testLogInWithoutPrincipal() throws Exception {
 		loginController.login(null);

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -62,6 +63,8 @@ public abstract class AbstractLongRunningTaskExecutor<V> implements
 	//
 	@Autowired private IdmLongRunningTaskService longRunningTaskService;
 	@Autowired private LookupService lookupService;
+	@Autowired
+	private ObjectMapper objectMapper;
 	@Autowired private EntityEventManager entityEventManager;
 	@Autowired private IdmProcessedTaskItemService itemService;
 	@Autowired private ConfigurationService configurationService;
@@ -205,7 +208,6 @@ public abstract class AbstractLongRunningTaskExecutor<V> implements
 			IdmLongRunningTaskFilter filter = new IdmLongRunningTaskFilter();
 			filter.setTaskType(taskType);
 			filter.setOperationState(OperationState.RUNNING);
-			filter.setRunning(Boolean.TRUE); // ignore waiting tasks
 			List<UUID> runningTasks = longRunningTaskService
 					.findIds(filter, null)
 					.getContent()
@@ -476,7 +478,7 @@ public abstract class AbstractLongRunningTaskExecutor<V> implements
 	 */
 	protected ParameterConverter getParameterConverter() {
 		if (parameterConverter == null) {
-			parameterConverter = new ParameterConverter(lookupService);
+			parameterConverter = new ParameterConverter(lookupService, objectMapper);
 		}
 		return parameterConverter;
 	}

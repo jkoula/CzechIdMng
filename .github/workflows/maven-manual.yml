@@ -8,11 +8,6 @@ on:
       branch:
         description: 'Define branch name'     
         required: true
-      tests:
-        type: boolean
-        description: 'Run tests'
-        required: true
-        default: 'true'
   pull_request:
     branches: [ develop ]
 jobs:
@@ -35,14 +30,21 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-    - name: Build with Maven with tests
-#       if: ${{ github.event.inputs.tests == 'true' }}
-      run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -DdocumentationOnly=true
-#     - name: Build with Maven without tests
-#       if: ${{ github.event.inputs.tests == 'false' }}
-#       run: mvn -B package --file Realization/backend/aggregator/pom.xml -Prelease -Dmaven.test.skip=true
-    - name: Upload artifact
-      uses: actions/upload-artifact@v1.0.0
+    - name: Maven tests
+      run: |
+        export MAVEN_HOME=/usr/bin/mvn
+        # mvn test -fn --file Realization/backend/aggregator/pom.xml -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
+        mvn -B clean install -fn --file Realization/backend/aggregator/pom.xml -Prelease -Dspring.profiles.active=test | perl -pe 'END { exit $status } $status=1 if /BUILD FAILURE/;'
+    - name: Upload logs
+      uses: actions/upload-artifact@v3
+      if: failure()
       with:
-        name: idm.war
-        path: Realization/backend/app/target
+        name: logs-all
+        path: |
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/core/core-impl/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/tool/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/acc/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/rpt/rpt-impl/target/surefire-reports
+          /home/runner/work/CzechIdMng/CzechIdMng/Realization/backend/vs/target/surefire-reports
+        retention-days: 5
+    

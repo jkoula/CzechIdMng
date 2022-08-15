@@ -94,7 +94,9 @@ public class DefaultRptReportManagerIntegrationTest extends AbstractIntegrationT
 	
 	@Test
 	public void testSupportedReports() {
+		getHelper().loginAdmin();
 		List<RptReportExecutorDto> reports = manager.getExecutors();
+		getHelper().logout();
 		//
 		Assert.assertTrue(reports.size() > 0);
 		Assert.assertTrue(reports.stream().anyMatch(e -> e.getName().equals(TestReportExecutor.REPORT_NAME)));
