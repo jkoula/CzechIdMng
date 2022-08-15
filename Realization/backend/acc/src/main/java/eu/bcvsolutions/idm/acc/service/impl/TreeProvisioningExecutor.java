@@ -195,6 +195,6 @@ public class TreeProvisioningExecutor extends AbstractProvisioningExecutor<IdmTr
 	
 	@Override
 	public boolean supports(SystemEntityTypeRegistrable delimiter) {
-		return delimiter.isSupportsProvisioning();
+		return delimiter.getSystemEntityCode().equals(SYSTEM_ENTITY_TYPE) && delimiter.isSupportsProvisioning();
 	}
 }

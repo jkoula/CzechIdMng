@@ -396,6 +396,6 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 
 	@Override
 	public boolean supports(SystemEntityTypeRegistrable delimiter) {
-		return delimiter.isSupportsProvisioning();
+		return delimiter.getSystemEntityCode().equals(SYSTEM_ENTITY_TYPE) && delimiter.isSupportsProvisioning();
 	}
 }
