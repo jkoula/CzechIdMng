@@ -33,6 +33,10 @@ export default class AccountService extends Services.AbstractService {
     return true;
   }
 
+  supportsBulkAction() {
+    return true;
+  }
+
   /**
   * Get connector object by given account. Call directly connector.
   */

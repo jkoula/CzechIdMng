@@ -130,10 +130,12 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		//
 		AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
 		filter.setAccountId(account.getId());
-		identityAccountService.find(filter, null).getContent().stream()
-				.filter(AccIdentityAccountDto::isOwnership)
-				.forEach(identityAccount -> doProvisioning(account,
-					DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.identity, IdmIdentityDto.class)));
+		filter.setOwnership(Boolean.TRUE);
+		AccIdentityAccountDto identityAccount = identityAccountService.find(filter, null).stream().findFirst().orElse(null);
+		if (identityAccount != null) {
+			doProvisioning(account,
+					DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.identity, IdmIdentityDto.class));
+		}
 	}
 
 	/**
