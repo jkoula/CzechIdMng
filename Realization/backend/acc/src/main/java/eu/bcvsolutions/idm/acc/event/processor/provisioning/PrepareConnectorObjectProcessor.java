@@ -248,7 +248,6 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 						&& provisioningOperation.getTransactionId() != null) {
 					
 					if (uniformPasswordManager.isSystemInUniformPasswordAgenda(provisioningOperation.getSystem())) {
-						
 						generatedPassword = uniformPasswordManager.generateUniformPassword(
 								provisioningOperation.getEntityIdentifier(),
 								systemEntityType.getEntityType(),
@@ -800,7 +799,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 
 		AbstractDto abstractDto = null;
 		if (entityIdentifier != null) {
-			BaseDto dto = lookupService.lookupDto(provisioningOperation.getEntityType(), entityIdentifier);
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(provisioningOperation.getEntityType());
+			BaseDto dto = lookupService.lookupDto(systemEntityType.getEntityType(), entityIdentifier);
 			if (dto instanceof AbstractDto) {
 				abstractDto = (AbstractDto) dto;
 			} else {
