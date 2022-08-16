@@ -2583,8 +2583,8 @@
       },
       "acc-account-provisioning-bulk-action": {
         "icon": "link",
-        "label": "Provisioning a přepočet účtů",
-        "help": ""
+        "label": "Přepočet účtů a provisioning",
+        "help": "Tato operace vyvolá pro každý vybraný účet <strong>provisioning</strong> na koncové systémy. Samotný provisioning je prováděn <strong>asynchronně</strong>. Postup můžete sledovat v agendě spravující <strong>Události</strong>."
       },
       "provisioning-operation-cancel-bulk-action": {
         "label": "Zrušit operaci",

@@ -2580,8 +2580,8 @@
       },
       "acc-account-provisioning-bulk-action": {
         "icon": "link",
-        "label": "Provision and recalculate an account without recalculation",
-        "help": ""
+        "label": "Recalculate accounts and provision",
+        "help": "This operation invokes <strong>account management</strong> for each selected account. Account management itself and subsequent provisioning are performed <strong>asynchronously</strong>.  You can see progress of this operations in the <strong>Events</strong> agenda."
       },
       "provisioning-operation-cancel-bulk-action": {
         "label": "Cancel operation",
