@@ -124,6 +124,12 @@ public class SystemMappingDeleteProcessor extends CoreEventProcessor<SysSystemMa
 		roleSystemService.find(roleSystemFilter, null).forEach(roleSystem -> {
 			roleSystemService.delete(roleSystem);
 		});
+		// remove relation from connected mapping
+		if (systemMapping.getConnectedSystemMappingId() != null) {
+			SysSystemMappingDto sysSystemMappingDto = systemMappingService.get(systemMapping.getConnectedSystemMappingId());
+			sysSystemMappingDto.setConnectedSystemMappingId(null);
+			systemMappingService.saveInternal(sysSystemMappingDto);
+		}
 		//
 		systemMappingService.deleteInternal(systemMapping);
 		//

@@ -274,6 +274,10 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
     this.setState({_entityType: entity.value});
   }
 
+  _onChangeOperationType(entity) {
+    this.setState({_operationType: entity.value});
+  }
+
   _showValidateSystemMessage(mappingId) {
     systemMappingManager.validate(mappingId)
       .then(response => {
@@ -421,7 +425,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
 
   render() {
     const { _showLoading, _mapping, showOnlyAttributes, showOnlyMapping } = this.props;
-    const { _entityType, activeKey, validationError} = this.state;
+    const { _entityType, activeKey, validationError, _operationType} = this.state;
     const isNew = this._getIsNew();
     const mapping = isNew ? this.state.mapping : _mapping;
 
@@ -443,15 +447,26 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
       isSelectedIdentity = true;
     }
 
+    let operationTypeToFilter = SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.SYNCHRONIZATION);
     let isSelectedProvisioning = false;
     if (mapping && mapping.operationType === 'PROVISIONING') {
       isSelectedProvisioning = true;
+      operationTypeToFilter = SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING);
+    }
+
+    if (_operationType !== undefined) {
+      operationTypeToFilter = _operationType;
     }
 
     const systemId = this.props.match.params.entityId;
     const forceSearchParameters = new Domain.SearchParameters()
       .setFilter('systemMappingId', _mapping ? _mapping.id : Domain.SearchParameters.BLANK_UUID);
     const objectClassSearchParameters = new Domain.SearchParameters().setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
+    const forceSearchMappings = new Domain.SearchParameters()
+    .setFilter('operationType', operationTypeToFilter === SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING) ? 
+    SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.SYNCHRONIZATION) : SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
+    .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
+
     return (
       <div>
         <Helmet title={this.i18n('title')}/>
@@ -482,9 +497,16 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                   <Basic.EnumSelectBox
                     ref="operationType"
                     enum={SystemOperationTypeEnum}
+                    onChange={this._onChangeOperationType.bind(this)}
                     label={this.i18n('acc:entity.SystemMapping.operationType')}
                     required
                     clearable={false}/>
+                  <Basic.SelectBox
+                    ref="connectedSystemMappingId"
+                    manager={systemMappingManager}
+                    forceSearchParameters={forceSearchMappings}
+                    label={this.i18n('acc:entity.SystemMapping.connectedMapping')}
+                    placeholder={systemId ? null : this.i18n('systemMapping.systemPlaceholder')} />
                   <Basic.TextField
                     ref="name"
                     label={this.i18n('acc:entity.SystemMapping.name')}

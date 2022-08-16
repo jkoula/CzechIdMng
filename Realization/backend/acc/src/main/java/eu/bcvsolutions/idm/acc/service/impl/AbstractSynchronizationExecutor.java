@@ -145,6 +145,7 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
  * Abstract executor for do synchronization and reconciliation.
  *
  * @author svandav
+ * @author Roman Kucera
  * @param <DTO>
  *
  */
@@ -1050,6 +1051,8 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			return;
 		case UNLINK:
 			// Linked action is UNLINK
+			setMappingIdToAccount(context, account, true);
+
 			updateAccountUid(context);
 			doUnlink(account, false, log, logItem, actionLogs);
 
@@ -1058,6 +1061,8 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			return;
 		case UNLINK_AND_REMOVE_ROLE:
 			// Linked action is UNLINK_AND_REMOVE_ROLE
+			setMappingIdToAccount(context, account, true);
+
 			updateAccountUid(context);
 			doUnlink(account, true, log, logItem, actionLogs);
 
@@ -1075,11 +1080,14 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 						actionLogs);
 				return;
 			}
+			setMappingIdToAccount(context, account, true);
 			initSyncActionLog(SynchronizationActionType.UPDATE_ENTITY, OperationResultType.SUCCESS, logItem, log,
 					actionLogs);
 			return;
 		case UPDATE_ACCOUNT:
 			// Linked action is UPDATE_ACCOUNT
+			setMappingIdToAccount(context, account, true);
+
 			updateAccountUid(context);
 			doUpdateAccount(account, entityType, log, logItem, actionLogs);
 			initSyncActionLog(SynchronizationActionType.UPDATE_ACCOUNT, OperationResultType.SUCCESS, logItem, log,
@@ -1110,7 +1118,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 
 		addToItemLog(logItem, "Account and entity don't exist (missing entity).");
 		addToItemLog(logItem, MessageFormat.format("Missing entity action is [{0}]", actionType));
-		
+
 		switch (actionType) {
 		case IGNORE:
 			// Ignore we will do nothing
@@ -1137,6 +1145,8 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 
 			// Find and set SystemEntity (must exist)
 			account.setSystemEntity(this.findSystemEntity(uid, system, entityType).getId());
+
+			setMappingIdToAccount(context, account, false);
 
 			// Apply specific settings - check, if the account and the entity can be created
 			account = this.applySpecificSettingsBeforeLink(account, null, context);
@@ -1913,7 +1923,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			}
 			case SET: {
 				return true;
-			}	
+			}
 			case WRITE_IF_NULL: {
 				Object value = systemAttributeMappingService.getAttributeValue(uid, dto, attribute);
 				return value == null;
@@ -2413,6 +2423,8 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 			account.setSystemEntity(systemEntity.getId());
 		}
 
+		setMappingIdToAccount(context, account, false);
+
 		account = this.applySpecificSettingsBeforeLink(account, dto, context);
 
 		if (account == null) {
@@ -2735,15 +2747,26 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	protected boolean skipEntityUpdate(DTO entity, SynchronizationContext context) {
 		return false;
 	}
-	
+
 	/**
 	 * Check that the strategy was set to IGNORE_AND_DO_NOT_LOG.
-	 * 
+	 *
 	 * @param lastResult
 	 * @return
 	 */
 	private boolean shouldBeIgnored(EventResult<SysSyncItemLogDto> lastResult) {
 		return lastResult != null && lastResult.getEvent().getContent() != null &&
 				lastResult.getEvent().getContent().getLog().contains(SynchronizationActionType.IGNORE_AND_DO_NOT_LOG.name());
+	}
+
+	private void setMappingIdToAccount(SynchronizationContext context, AccAccountDto account, boolean saveIt) {
+		SysSystemMappingDto systemMappingDto = systemMappingService.get(context.getConfig().getSystemMapping());
+		if (systemMappingDto != null && systemMappingDto.getConnectedSystemMappingId() != null &&
+				!systemMappingDto.getConnectedSystemMappingId().equals(account.getSystemMapping())) {
+			account.setSystemMapping(systemMappingDto.getConnectedSystemMappingId());
+			if (saveIt) {
+				accountService.save(account);
+			}
+		}
 	}
 }

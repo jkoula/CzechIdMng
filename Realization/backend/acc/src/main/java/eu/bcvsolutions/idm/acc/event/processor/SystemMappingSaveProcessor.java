@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -44,9 +46,29 @@ public class SystemMappingSaveProcessor extends CoreEventProcessor<SysSystemMapp
 	@Override
 	public EventResult<SysSystemMappingDto> process(EntityEvent<SysSystemMappingDto> event) {
 		SysSystemMappingDto dto = event.getContent();
-		SysSystemMappingDto result = systemMappingService.saveInternal(dto);
+		dto = systemMappingService.saveInternal(dto);
+
+		// Save id of mapping from event into connectedMapping Dto.
+		SysSystemMappingDto originalSource = event.getOriginalSource();
+		if (originalSource == null || dto.getConnectedSystemMappingId() != originalSource.getConnectedSystemMappingId()) {
+			UUID connectedSystemMappingId = dto.getConnectedSystemMappingId();
+			if (originalSource != null && originalSource.getConnectedSystemMappingId() != null) {
+				SysSystemMappingDto connectedMappingDto = systemMappingService.get(originalSource.getConnectedSystemMappingId());
+				if (connectedMappingDto.getConnectedSystemMappingId() != null) {
+					connectedMappingDto.setConnectedSystemMappingId(null);
+					systemMappingService.saveInternal(connectedMappingDto);
+				}
+			}
+			if (connectedSystemMappingId != null) {
+				SysSystemMappingDto connectedMappingDto = systemMappingService.get(connectedSystemMappingId);
+				if (connectedMappingDto.getConnectedSystemMappingId() != dto.getConnectedSystemMappingId()) {
+					connectedMappingDto.setConnectedSystemMappingId(dto.getId());
+					systemMappingService.saveInternal(connectedMappingDto);
+				}
+			}
+		}
 		// update content
-		event.setContent(result);
+		event.setContent(dto);
 		//
 		return new DefaultEventResult<>(event, this);
 	}

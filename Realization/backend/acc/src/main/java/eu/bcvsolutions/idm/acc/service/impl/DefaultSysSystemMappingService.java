@@ -86,6 +86,7 @@ import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
  * @author svandav
  * @author Ondrej Husnik
  * @author Radek Tomiška
+ * @author Roman Kucera
  */
 @Service
 public class DefaultSysSystemMappingService
@@ -145,6 +146,21 @@ public class DefaultSysSystemMappingService
 		SystemEntityType entityType = dto.getEntityType();
 		if (SystemOperationType.PROVISIONING == dto.getOperationType() && !entityType.isSupportsProvisioning()) {
 			throw new ResultCodeException(AccResultCode.PROVISIONING_NOT_SUPPORTS_ENTITY_TYPE, ImmutableMap.of("entityType", entityType));
+		}
+
+		if (dto.getConnectedSystemMappingId() != null) {
+			SysSystemMappingDto connectedSystemMappingDto = this.get(dto.getConnectedSystemMappingId());
+			if (dto.getOperationType().equals(connectedSystemMappingDto.getOperationType())) {
+				throw new ResultCodeException(AccResultCode.SYSTEM_MAPPING_CONNECTED_MAPPING_SAME_TYPE, ImmutableMap.of("mapping", connectedSystemMappingDto.getName()));
+			}
+			SysSystemMappingFilter systemMappingFilter = new SysSystemMappingFilter();
+			systemMappingFilter.setConnectedSystemMappingId(connectedSystemMappingDto.getId());
+			List<UUID> connectedMappingsIds = this.findIds(systemMappingFilter, null).getContent();
+			connectedMappingsIds.forEach(uuid -> {
+				if (!uuid.equals(dto.getId())) {
+					throw new ResultCodeException(AccResultCode.SYSTEM_MAPPING_CONNECTED_MAPPING_ALREADY_MAPPED, ImmutableMap.of("mapping", connectedSystemMappingDto.getName()));
+				}
+			});
 		}
 
 		// Validate all sub attributes
@@ -628,6 +644,15 @@ public class DefaultSysSystemMappingService
 		SystemEntityType entityType = filter.getEntityType();
 		if (entityType != null) {
 			predicates.add(builder.equal(root.get(SysSystemMapping_.entityType), entityType));
+		}
+		UUID connectedSystemMappingId = filter.getConnectedSystemMappingId();
+		if (connectedSystemMappingId != null) {
+			predicates.add(
+					builder.equal(
+							root.get(SysSystemMapping_.connectedSystemMappingId).get(SysSystemMapping_.id),
+							connectedSystemMappingId
+					)
+			);
 		}
 		//
 		return predicates;
