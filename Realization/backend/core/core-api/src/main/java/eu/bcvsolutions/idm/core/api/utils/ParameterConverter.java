@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.api.utils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -14,15 +15,21 @@ import java.util.UUID;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.domain.ResultCode;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
+import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 
 /**
  * Rest controller helpers
@@ -31,22 +38,37 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
  * TODO: toDto, toDtoId
  * 
  * @author Radek Tomiška
+ * @author Roman Kucera
  */
 public class ParameterConverter {
 
+	public static final String PARAMETER_SYSTEM = "system";
+	public static final String PARAMETER_SYSTEM_MAPPING = "systemMapping";
+	public static final String PARAMETER_MAPPING_ATTRIBUTES = "mappingAttributes";
+
 	private LookupService lookupService;
-	
+	private ObjectMapper objectMapper;
+
 	public ParameterConverter() {
 	}
 	
 	public ParameterConverter(LookupService lookupService) {
 		this.lookupService = lookupService;
 	}
-	
+
+	public ParameterConverter(LookupService lookupService, ObjectMapper objectMapper) {
+		this.lookupService = lookupService;
+		this.objectMapper = objectMapper;
+	}
+
 	public void setLookupService(LookupService lookupService) {
 		this.lookupService = lookupService;
 	}
-	
+
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
+
 	/**
 	 * Reads {@code String} parameter from given parameters.
 	 * 
@@ -502,7 +524,6 @@ public class ParameterConverter {
 	 * Converts parameter to given {@code identifiableType} from given parameters.
 	 * 
 	 * @param parameterValue
-	 * @param parameterName
 	 * @param identifiableType
 	 * @return
 	 */
@@ -635,5 +656,48 @@ public class ParameterConverter {
 			}
 		}
 		return singleValueMap;
+	}
+
+	public MultiValueMap<String, UUID> toSystemMappingAttribute(Map<String, Object> parameters, ResultCode codeConfig) {
+		Object value = parameters.get(PARAMETER_MAPPING_ATTRIBUTES);
+		MultiValueMap<String, UUID> output = new LinkedMultiValueMap<String, UUID>();
+		if (!(value instanceof String)) {
+			throw new ResultCodeException(codeConfig, ImmutableMap.of("attribute","all"));
+		}
+		//
+		// TODO: create json java POJO representation
+		String stringValue = (String) value;
+		try {
+			String nodeValue;
+			JsonNode treeNode = objectMapper.readTree(stringValue);
+
+			// get system id form config
+			JsonNode node = treeNode.get(PARAMETER_SYSTEM);
+			if (node == null) {
+				throw new ResultCodeException(codeConfig, ImmutableMap.of("attribute", PARAMETER_SYSTEM));
+			}
+			nodeValue = node.asText();
+			output.add(PARAMETER_SYSTEM, DtoUtils.toUuid(nodeValue));
+
+			// get system mapping id form config
+			node = treeNode.get(PARAMETER_SYSTEM_MAPPING);
+			if (node == null) {
+				throw new ResultCodeException(codeConfig, ImmutableMap.of("attribute", PARAMETER_SYSTEM_MAPPING));
+			}
+			nodeValue = node.asText();
+			output.add(PARAMETER_SYSTEM_MAPPING, UUID.fromString(nodeValue));
+
+			// get system mapping attributes id form config
+			JsonNode nodeArray = treeNode.get(PARAMETER_MAPPING_ATTRIBUTES);
+			if (nodeArray == null || !nodeArray.isArray()) {
+				throw new ResultCodeException(codeConfig, ImmutableMap.of("attribute", PARAMETER_MAPPING_ATTRIBUTES));
+			}
+			for (JsonNode item : nodeArray) {
+				output.add(PARAMETER_MAPPING_ATTRIBUTES, UUID.fromString(item.asText()));
+			}
+		} catch (Exception ex) {
+			throw new CoreException(ex);
+		}
+		return output;
 	}
 }

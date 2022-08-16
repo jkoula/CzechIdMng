@@ -23,6 +23,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
@@ -84,7 +85,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		report.setExecutorName(reportExecutor.getName());
 		IdmFormDto filter = new IdmFormDto();
 		IdmFormDefinitionDto definition = reportExecutor.getFormDefinition();
-		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ChangesOnSystemReportExecutor.PARAMETER_MAPPING_ATTRIBUTES));
+		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES));
 		// TODO: create json java POJO representation
 		filterValue.setStringValue("{ \"system\": \"" + system.getId() + "\", \"systemMapping\": \"" + getHelper().getDefaultMapping(system).getId() + "\", \"mappingAttributes\": [] }");
 		filter.getValues().add(filterValue);
@@ -127,7 +128,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		report.setExecutorName(reportExecutor.getName());
 		IdmFormDto filter = new IdmFormDto();
 		IdmFormDefinitionDto definition = reportExecutor.getFormDefinition();
-		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ChangesOnSystemReportExecutor.PARAMETER_MAPPING_ATTRIBUTES));
+		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES));
 		// TODO: create json java POJO representation
 		filterValue.setStringValue("{ \"system\": \"" + system.getId() + "\", \"systemMapping\": \"" + defaultMapping.getId() + "\", \"mappingAttributes\": [ \"" + attributeName.getId() + "\" ] }");
 		filter.getValues().add(filterValue);
@@ -185,7 +186,7 @@ public class ChangesOnSystemReportIntegrationTest extends AbstractIntegrationTes
 		report.setExecutorName(reportExecutor.getName());
 		IdmFormDto filter = new IdmFormDto();
 		IdmFormDefinitionDto definition = reportExecutor.getFormDefinition();
-		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ChangesOnSystemReportExecutor.PARAMETER_MAPPING_ATTRIBUTES));
+		IdmFormValueDto filterValue = new IdmFormValueDto(definition.getMappedAttributeByCode(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES));
 		// TODO: create json java POJO representation
 		filterValue.setStringValue("{ \"system\": \"" + system.getId() + "\", \"systemMapping\": \"" + defaultMapping.getId() + "\", \"mappingAttributes\": [ ] }");
 		filter.getValues().add(filterValue);

@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.connector.DefaultConnectorType;
+import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysConnectorKeyDto;
@@ -165,7 +166,7 @@ public class DefaultSysSystemService
 
 	@Override
 	public AuthorizableType getAuthorizableType() {
-		return null; // TODO: new AuthorizableType(AccGroupPermission.SYSTEM, getEntityClass());
+		return new AuthorizableType(AccGroupPermission.SYSTEM, getEntityClass());
 	}
 
 	@Override

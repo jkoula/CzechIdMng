@@ -6,7 +6,9 @@ import static org.junit.Assert.assertTrue;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +77,16 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 	private AccIdentityAccountService identityAccountService;
 	@Autowired
 	private IdmIdentityContractService identityContractService;
+
+	@Before
+	public void login() {
+		getHelper().loginAdmin();
+	}
+
+	@After
+	public void logout() {
+		super.logout();
+	}
 
 	@Test
 	public void testAttribteControlledValues() {

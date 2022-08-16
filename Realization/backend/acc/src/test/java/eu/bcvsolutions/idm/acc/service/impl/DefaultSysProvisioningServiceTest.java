@@ -1002,6 +1002,18 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		
 		initOverloadedAttributes(overloadingAttributes, defaultAttributes);
 
+		// defOne
+		SysSystemAttributeMappingDto one = (SysSystemAttributeMappingDto) defaultAttributes.get(0);
+		one.setStrategyType(AttributeMappingStrategyType.MERGE);
+		one = systemAttributeMappingService.save(one);
+		defaultAttributes.set(0, one);
+
+		// defTwo
+		SysSystemAttributeMappingDto two = (SysSystemAttributeMappingDto) defaultAttributes.get(1);
+		two.setStrategyType(AttributeMappingStrategyType.MERGE);
+		two = systemAttributeMappingService.save(two);
+		defaultAttributes.set(1, two);
+
 		// roleOne
 		SysRoleSystemDto roleSystem1 = roleSystemService.get(overloadingAttributes.get(0).getRoleSystem());
 		IdmRoleDto roleDto = roleService.get(roleSystem1.getRole());
@@ -1043,6 +1055,18 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		initDataSystem();
 		
 		initOverloadedAttributes(overloadingAttributes, defaultAttributes);
+
+		// defOne
+		SysSystemAttributeMappingDto one = (SysSystemAttributeMappingDto) defaultAttributes.get(0);
+		one.setStrategyType(AttributeMappingStrategyType.AUTHORITATIVE_MERGE);
+		one = systemAttributeMappingService.save(one);
+		defaultAttributes.set(0, one);
+
+		// defTwo
+		SysSystemAttributeMappingDto two = (SysSystemAttributeMappingDto) defaultAttributes.get(1);
+		two.setStrategyType(AttributeMappingStrategyType.AUTHORITATIVE_MERGE);
+		two = systemAttributeMappingService.save(two);
+		defaultAttributes.set(1, two);
 
 		// roleOne
 		SysRoleSystemDto roleSystem1 = roleSystemService.get(overloadingAttributes.get(0).getRoleSystem());
@@ -1191,6 +1215,18 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		
 		initOverloadedAttributes(overloadingAttributes, defaultAttributes);
 
+		// defOne
+		SysSystemAttributeMappingDto one = (SysSystemAttributeMappingDto) defaultAttributes.get(0);
+		one.setStrategyType(AttributeMappingStrategyType.AUTHORITATIVE_MERGE);
+		one = systemAttributeMappingService.save(one);
+		defaultAttributes.set(0, one);
+
+		// defTwo
+		SysSystemAttributeMappingDto two = (SysSystemAttributeMappingDto) defaultAttributes.get(1);
+		two.setStrategyType(AttributeMappingStrategyType.AUTHORITATIVE_MERGE);
+		two = systemAttributeMappingService.save(two);
+		defaultAttributes.set(1, two);
+
 		// roleOne
 		SysRoleSystemDto roleSystem1 = roleSystemService.get(overloadingAttributes.get(0).getRoleSystem());
 		IdmRoleDto roleDto = roleService.get(roleSystem1.getRole());
@@ -1268,6 +1304,18 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		initDataSystem();
 		
 		initOverloadedAttributes(overloadingAttributes, defaultAttributes);
+
+		// defOne
+		SysSystemAttributeMappingDto one = (SysSystemAttributeMappingDto) defaultAttributes.get(0);
+		one.setStrategyType(AttributeMappingStrategyType.CREATE);
+		one = systemAttributeMappingService.save(one);
+		defaultAttributes.set(0, one);
+
+		// defTwo
+		SysSystemAttributeMappingDto two = (SysSystemAttributeMappingDto) defaultAttributes.get(1);
+		two.setStrategyType(AttributeMappingStrategyType.CREATE);
+		two = systemAttributeMappingService.save(two);
+		defaultAttributes.set(1, two);
 
 		// roleOne
 		SysRoleSystemDto roleSystem1 = roleSystemService.get(overloadingAttributes.get(0).getRoleSystem());

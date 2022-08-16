@@ -274,7 +274,8 @@ class RoleSystemAttributeDetail extends Advanced.AbstractTableContent {
                 enum={AttributeMappingStrategyTypeEnum}
                 onChange={this._strategyTypeChange.bind(this)}
                 label={this.i18n('acc:entity.RoleSystemAttribute.strategyType')}
-                required/>
+                required
+                readOnly/>
               <Basic.Checkbox
                 ref="uid"
                 readOnly = {_isDisabled}
