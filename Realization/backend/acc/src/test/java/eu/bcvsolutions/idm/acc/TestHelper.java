@@ -14,6 +14,8 @@ import eu.bcvsolutions.idm.acc.dto.SysSyncLogDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto;
 import eu.bcvsolutions.idm.acc.entity.SysSystem;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -210,4 +212,20 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * Manual delete. Because previous tests didn't make a delete well.
 	 */
 	void cleaner();
+
+	/**
+	 * create system owner by identity
+	 * @param system
+	 * @param owner
+	 * @return
+	 */
+	SysSystemOwnerDto createSystemOwner(SysSystemDto system, IdmIdentityDto owner);
+
+	/**
+	 * create system owner by role
+	 * @param system
+	 * @param owner
+	 * @return
+	 */
+	SysSystemOwnerRoleDto createSystemOwnerRole(SysSystemDto system, IdmRoleDto owner);
 }

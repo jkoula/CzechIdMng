@@ -28,6 +28,7 @@ public class CommonVsRequestControllerRestTest extends AbstractReadWriteDtoContr
 	
 	@Override
 	protected VsRequestDto prepareDto() {
+		getHelper().loginAdmin();
 		VsRequestDto dto = new VsRequestDto();
 		SysSystemDto virtualSystem = helper.createVirtualSystem(helper.createName());
 		dto.setSystem(virtualSystem.getId());
@@ -36,6 +37,7 @@ public class CommonVsRequestControllerRestTest extends AbstractReadWriteDtoContr
 		dto.setOperationType(VsOperationType.CREATE);
 		dto.setState(VsRequestState.CONCEPT);
 		//
+		getHelper().logout();
 		return dto;
 	}
 	
