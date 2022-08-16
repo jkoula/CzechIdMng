@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -35,6 +36,7 @@ import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
@@ -48,6 +50,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.EntityAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
@@ -80,10 +83,12 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
+import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
@@ -104,6 +109,7 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
  * 
  * @author svandav
  * @author Radek Tomiška
+ * @author Roman Kucera
  *
  * @param <DTO>
  *            provisioned dto
@@ -212,23 +218,32 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				.getContent();
 
 		List<UUID> accounts = new ArrayList<>();
-		entityAccountList.stream().forEach((entityAccount) -> {
+		entityAccountList.forEach(entityAccount -> {
 			if (!accounts.contains(entityAccount.getAccount())) {
 				accounts.add(entityAccount.getAccount());
 			}
 		});
 
-		accounts.stream().forEach(account -> {
+		accounts.forEach(account -> {
 			EntityAccountDto entityAccountDto = entityAccountList
 					.stream()
 					.filter(entityAccount -> account.equals(entityAccount.getAccount()))
 					.findFirst()
-					.get();
+					.orElseThrow(() -> new CoreException(String.format("No entity account found for account uuid %s", account)));
+
 			AccAccountDto accountDto = DtoUtils.getEmbedded((AbstractDto) entityAccountDto,
 					AccIdentityAccount_.account.getName(), AccAccountDto.class, null);
 			if (accountDto == null) {
 				accountDto = accountService.get(account);
 			}
+
+			// if account has no provisioning mapping, get one from account or system
+			UUID systemMappingId = getSystemMappingForAccount(entityAccountDto, accountDto);
+			if (systemMappingId != null) {
+				accountDto.setSystemMapping(systemMappingId);
+				accountDto = accountService.saveInternal(accountDto);
+			}
+
 			this.doProvisioning(accountDto, dto);
 		});
 	}
@@ -242,7 +257,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		entityEventManager.process(new ProvisioningEvent(ProvisioningEvent.ProvisioningEventType.START, account,
 				ImmutableMap.of(ProvisioningService.DTO_PROPERTY_NAME, dto)));
 	}
-	
+
 	@Override
 	public EventContext<AccAccountDto> doProvisioning(AccAccountDto account, DTO dto, Map<String,Serializable> properties) {
 		Assert.notNull(account, "Account cannot be null!");
@@ -261,7 +276,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	public void doInternalProvisioning(AccAccountDto account, DTO dto) {
 		doInternalProvisioning(account,dto,false);
 	}
-	
+
 	@Override
 	public SysProvisioningOperationDto doInternalProvisioning(AccAccountDto account, DTO dto, boolean isDryRun) {
 		Assert.notNull(account, "Account is required.");
@@ -303,17 +318,21 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			// nothing to do - mapping is empty
 			return null;
 		}
-
-		return doProvisioning(systemEntity, dto, dto.getId(), operationType, finalAttributes, isDryRun);
+		SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		return doProvisioning(systemEntity, dto, dto.getId(), operationType, finalAttributes, isDryRun, systemMappingDto);
 	}
 
 	@Override
 	public void doDeleteProvisioning(AccAccountDto account, UUID entityId) {
 		Assert.notNull(account, "Account is required.");
 		SysSystemEntityDto systemEntity = getSystemEntity(account);
+		SysSystemMappingDto systemMappingDto = null;
+		if (account.getSystemMapping() != null) {
+			systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		}
 		//
 		if (systemEntity != null) {
-			doProvisioning(systemEntity, null, entityId, ProvisioningOperationType.DELETE, null);
+			doProvisioning(systemEntity, null, entityId, ProvisioningOperationType.DELETE, null, systemMappingDto);
 		}
 	}
 
@@ -327,9 +346,6 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		EntityAccountFilter filter = this.createEntityAccountFilter();
 		filter.setEntityId(dto.getId());
 		List<? extends EntityAccountDto> entityAccountList = getEntityAccountService().find(filter, null).getContent();
-		if (entityAccountList == null) {
-			return Collections.<OperationResult>emptyList();
-		}
 
 		// Distinct by accounts
 		List<UUID> accountIds = new ArrayList<>();
@@ -377,7 +393,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			if (account.getSystemEntity() == null) {
 				throw new SystemEntityNotFoundException(
 						AccResultCode.PROVISIONING_PASSWORD_SYSTEM_ENTITY_NOT_FOUND,
-						String.valueOf(account.getUid()), 
+						String.valueOf(account.getUid()),
 						system.getCode()
 				);
 			}
@@ -398,7 +414,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					}).findFirst().orElse(null);
 			//
 			// get all another passwords, list with all passwords (included primary password marked as __PASSWORD__)
-			SysSystemMappingDto systemMappingDto = getMapping(system, systemEntity.getEntityType());
+			SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
 			List<SysSystemAttributeMappingDto> passwordAttributes = attributeMappingService
 					.getAllPasswordAttributes(system.getId(), systemMappingDto.getId());
 			//
@@ -437,7 +453,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					account, dto, system, systemEntity.getEntityType());
 			if (!additionalPasswordChangeAttributes.isEmpty()) {
 				additionalProvisioningOperation = prepareProvisioning(systemEntity, dto, dto.getId(),
-						ProvisioningOperationType.UPDATE, additionalPasswordChangeAttributes);
+						ProvisioningOperationType.UPDATE, additionalPasswordChangeAttributes, systemMappingDto);
 			}
 			//
 			// add another password
@@ -445,7 +461,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				if (additionalProvisioningOperation == null) {
 					// if additional operation is null create one
 					additionalProvisioningOperation = prepareProvisioningOperationForAdditionalPassword(systemEntity,
-							dto, dto.getId(), ProvisioningOperationType.UPDATE, systemMappingDto,
+							dto.getId(), ProvisioningOperationType.UPDATE, systemMappingDto,
 							accountObjectWithAnotherPassword);
 				} else {
 					// if additional operation exists just add all account object with additional passwords
@@ -494,7 +510,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 							systemEntity.getUid(), dto);
 					//
 					operation = prepareProvisioningForAttribute(systemEntity, mappedAttribute,
-							transformPassword, ProvisioningOperationType.UPDATE, dto);
+							transformPassword, dto);
 					preparedOperations.add(operation);
 				}
 				//
@@ -508,14 +524,14 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		// execute prepared operations
 		List<OperationResult> results = preparedOperations.stream().map(operation -> {
 			SysProvisioningOperationDto result = provisioningExecutor.executeSync(operation);
-			Map<String, Object> parameters = new LinkedHashMap<String, Object>();			
+			Map<String, Object> parameters = new LinkedHashMap<>();
 			AccAccountDto account = accounts
 					.stream()
-					.filter(a -> {					
-						return a.getRealUid().equals(result.getSystemEntityUid()) 
-								&& a.getSystem().equals(operation.getSystem());
-					})
-					.findFirst().get();				
+					.filter(a -> a.getRealUid().equals(result.getSystemEntityUid())
+							&& a.getSystem().equals(operation.getSystem()))
+					.findFirst()
+					.orElseThrow(() -> new CoreException(String.format("No account found for uid %s on system %s", result.getSystemEntityUid(), operation.getSystem())));
+
 			SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
 			//
 			parameters.put(IdmAccountDto.PARAMETER_NAME, createResultAccount(account, system));
@@ -538,7 +554,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		results.addAll(notExecutedPasswordChanged);
 		return results;
 	}
-	
+
 	@Override
 	public boolean accountManagement(DTO dto) {
 		SystemEntityType entityType = SystemEntityType.getByClass(dto.getClass());
@@ -552,7 +568,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				return;
 			}
 			SysSystemDto system = DtoUtils.getEmbedded(schemaObjectClassDto, SysSchemaObjectClass_.system);
-			
+
 			List<SysSystemAttributeMappingDto> mappedAttributes = attributeMappingService.findBySystemMapping(mapping);
 			SysSystemAttributeMappingDto uidAttribute = attributeMappingService.getUidAttribute(mappedAttributes,
 					system);
@@ -575,7 +591,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			// Create AccAccount and relation between account and entity
 			createEntityAccount(uid, dto.getId(), systemId);
 		});
-		
+
 		return true;
 	}
 
@@ -585,7 +601,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Returns system entity associated to given account
-	 * 
+	 *
 	 * @param account
 	 * @return
 	 */
@@ -669,7 +685,8 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	}
 
 	private SysProvisioningOperationDto prepareProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
-			ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes) {
+															ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes,
+															SysSystemMappingDto systemMappingDto) {
 		Assert.notNull(systemEntity, "System entity is required.");
 		Assert.notNull(systemEntity.getUid(), "System entity uid is required.");
 		Assert.notNull(systemEntity.getEntityType(), "System entity type is required.");
@@ -677,7 +694,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		//
 		// If are input attributes null, then we load default mapped attributes
 		if (attributes == null) {
-			attributes = findAttributeMappings(system, systemEntity.getEntityType());
+			attributes = findAttributeMappings(systemMappingDto);
 		}
 		if (attributes == null || attributes.isEmpty()) {
 			return null;
@@ -685,19 +702,18 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 		// One IDM object can be mapped to one connector object (= one connector
 		// class).
-		SysSystemMappingDto mapping = getMapping(system, systemEntity.getEntityType());
-		if (mapping == null) {
+		if (systemMappingDto == null) {
 			// mapping not found - nothing to do
 			// TODO: delete operation?
 			return null;
 		}
 		// Create mapping context from the script defined on the mapping and by checked options.
 		// This context will be propagate to all attributes (transformation to the system).
-		MappingContext mappingContext = systemMappingService.getMappingContext(mapping, systemEntity, dto, system);
+		MappingContext mappingContext = systemMappingService.getMappingContext(systemMappingDto, systemEntity, dto, system);
 
 		Map<ProvisioningAttributeDto, Object> accountAttributes = prepareMappedAttributesValues(dto, operationType,
 				systemEntity, attributes, mappingContext);
-		
+
 		UUID roleRequestId = null;
 		if(ProvisioningOperationType.DELETE == operationType) {
 			// Return ID of role-request from system-entity's context.
@@ -708,12 +724,12 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		}
 
 		// public provisioning event
-		SysSchemaObjectClassDto schemaObjectClassDto = schemaObjectClassService.get(mapping.getObjectClass());
+		SysSchemaObjectClassDto schemaObjectClassDto = schemaObjectClassService.get(systemMappingDto.getObjectClass());
 		IcConnectorObject connectorObject = new IcConnectorObjectImpl(systemEntity.getUid(),
 				new IcObjectClassImpl(schemaObjectClassDto.getObjectClassName()), null);
 		// Propagate the role-request ID to the connector (for virtual systems ...)
 		connectorObject.getObjectClass().setRoleRequestId(roleRequestId);
-		
+
 		SysProvisioningOperationDto.Builder operationBuilder = new SysProvisioningOperationDto.Builder()
 				.setOperationType(operationType) //
 				.setSystemEntity(systemEntity) //
@@ -727,7 +743,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	/**
 	 * Return ID of role-request from DTO's context. If context or value missing,
 	 * then return null.
-	 * 
+	 *
 	 * @param dto
 	 * @return
 	 */
@@ -747,26 +763,27 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Do provisioning on given system for given entity
-	 * 
+	 *
 	 * @param systemEntity
 	 * @param dto
 	 * @param operationType
 	 * @param attributes
 	 */
 	private void doProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
-			ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes) {
+								ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, SysSystemMappingDto systemMappingDto) {
 		SysProvisioningOperationDto provisioningOperation = prepareProvisioning(systemEntity, dto, entityId,
-				operationType, attributes);
+				operationType, attributes, systemMappingDto);
 		//
 		if (provisioningOperation != null) {
 			provisioningExecutor.execute(provisioningOperation);
-		}	
+		}
 	}
-	
+
 	private SysProvisioningOperationDto doProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
-			ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, boolean isDryRun) {
+													   ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, boolean isDryRun,
+													   SysSystemMappingDto systemMappingDto) {
 		SysProvisioningOperationDto provisioningOperation = prepareProvisioning(systemEntity, dto, entityId,
-				operationType, attributes);
+				operationType, attributes, systemMappingDto);
 		//
 		if (provisioningOperation != null) {
 			provisioningOperation.setDryRun(isDryRun);
@@ -777,7 +794,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Prepare all mapped attribute values (= account)
-	 * 
+	 *
 	 * @param dto
 	 * @param operationType
 	 * @param systemEntity
@@ -798,40 +815,38 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		}
 
 		// First we will resolve attribute without MERGE strategy
-		attributes.stream().filter(attribute -> {
-			return !attribute.isDisabledAttribute() && !attribute.isPasswordAttribute()
-					&& AttributeMappingStrategyType.AUTHORITATIVE_MERGE != attribute.getStrategyType()
-					&& AttributeMappingStrategyType.MERGE != attribute.getStrategyType();
-		}).forEach(attribute -> {
-			SysSchemaAttributeDto schemaAttributeDto = getSchemaAttribute(attribute);
-			if (attribute.isUid()) {
-				// TODO: now we set UID from SystemEntity, may be UID from
-				// AccAccount will be more correct
-				Object uidValue = getAttributeValue(uid, dto, attribute, system, mappingContext);
-				if (uidValue == null) {
-					throw new ProvisioningException(AccResultCode.PROVISIONING_GENERATED_UID_IS_NULL,
-							ImmutableMap.of("system", system.getName()));
-				}
-				if (!(uidValue instanceof String)) {
-					throw new ProvisioningException(AccResultCode.PROVISIONING_ATTRIBUTE_UID_IS_NOT_STRING,
-							ImmutableMap.of("uid", uidValue, "system", system.getName()));
-				}
-				updateAccountUid(account, uid, (String) uidValue);
-				accountAttributes.put(ProvisioningAttributeDto.createProvisioningAttributeKey(attribute,
-						schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), uidValue);
-			} else {
-				accountAttributes.put(ProvisioningAttributeDto.createProvisioningAttributeKey(attribute,
-						schemaAttributeDto.getName(),schemaAttributeDto.getClassType()), getAttributeValue(uid, dto, attribute, system, mappingContext));
-			}
-		});
+		attributes.stream().filter(attribute -> !attribute.isDisabledAttribute() && !attribute.isPasswordAttribute()
+						&& AttributeMappingStrategyType.AUTHORITATIVE_MERGE != attribute.getStrategyType()
+						&& AttributeMappingStrategyType.MERGE != attribute.getStrategyType())
+				.forEach(attribute -> {
+					SysSchemaAttributeDto schemaAttributeDto = getSchemaAttribute(attribute);
+					if (attribute.isUid()) {
+						// TODO: now we set UID from SystemEntity, may be UID from
+						// AccAccount will be more correct
+						Object uidValue = getAttributeValue(uid, dto, attribute, system, mappingContext);
+						if (uidValue == null) {
+							throw new ProvisioningException(AccResultCode.PROVISIONING_GENERATED_UID_IS_NULL,
+									ImmutableMap.of("system", system.getName()));
+						}
+						if (!(uidValue instanceof String)) {
+							throw new ProvisioningException(AccResultCode.PROVISIONING_ATTRIBUTE_UID_IS_NOT_STRING,
+									ImmutableMap.of("uid", uidValue, "system", system.getName()));
+						}
+						updateAccountUid(account, uid, (String) uidValue);
+						accountAttributes.put(ProvisioningAttributeDto.createProvisioningAttributeKey(attribute,
+								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), uidValue);
+					} else {
+						accountAttributes.put(ProvisioningAttributeDto.createProvisioningAttributeKey(attribute,
+								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), getAttributeValue(uid, dto, attribute, system, mappingContext));
+					}
+				});
 
 		// Second we will resolve MERGE attributes
-		List<? extends AttributeMapping> attributesMerge = attributes.stream().filter(attribute -> {
-			return !attribute.isDisabledAttribute()
-					&& (AttributeMappingStrategyType.AUTHORITATIVE_MERGE == attribute.getStrategyType()
-							|| AttributeMappingStrategyType.MERGE == attribute.getStrategyType());
-
-		}).collect(Collectors.toList());
+		List<? extends AttributeMapping> attributesMerge = attributes.stream()
+				.filter(attribute -> !attribute.isDisabledAttribute()
+						&& (AttributeMappingStrategyType.AUTHORITATIVE_MERGE == attribute.getStrategyType()
+						|| AttributeMappingStrategyType.MERGE == attribute.getStrategyType()))
+				.collect(Collectors.toList());
 
 		for (AttributeMapping attributeParent : attributesMerge) {
 			SysSchemaAttributeDto schemaAttributeParent = getSchemaAttribute(attributeParent);
@@ -859,9 +874,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 							// If is value collection, then we add all its items to
 							// main list!
 							if (value instanceof Collection) {
-								Collection<?> collectionNotNull = ((Collection<?>) value).stream().filter(item -> {
-									return item != null;
-								}).collect(Collectors.toList());
+								Collection<?> collectionNotNull = ((Collection<?>) value).stream().filter(Objects::nonNull).collect(Collectors.toList());
 								mergedValues.addAll(collectionNotNull);
 							} else {
 								mergedValues.add(value);
@@ -884,11 +897,11 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	public void doProvisioningForAttribute(SysSystemEntityDto systemEntity, AttributeMapping attributeMapping,
 			Object value, ProvisioningOperationType operationType, DTO dto) {
 		provisioningExecutor
-				.execute(prepareProvisioningForAttribute(systemEntity, attributeMapping, value, operationType, dto));
+				.execute(prepareProvisioningForAttribute(systemEntity, attributeMapping, value, dto));
 	}
 
 	private SysProvisioningOperationDto prepareProvisioningForAttribute(SysSystemEntityDto systemEntity,
-			AttributeMapping attributeMapping, Object value, ProvisioningOperationType operationType, DTO dto) {
+			AttributeMapping attributeMapping, Object value, DTO dto) {
 
 		Assert.notNull(systemEntity, "System entity is required.");
 		Assert.notNull(systemEntity.getSystem(), "Relation to system is required for system entity.");
@@ -908,10 +921,9 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		String objectClassName = schemaObjectClassDto.getObjectClassName();
 		// We do transformation to system if is attribute only constant
 		Object valueTransformed = value;
-		if (!attributeMapping.isEntityAttribute() && !attributeMapping.isExtendedAttribute()) {
-			// If is attribute handling resolve as constant, then we don't want
-			// do transformation again (was did in getAttributeValue)
-		} else {
+		// If is attribute handling resolve as constant, then we don't want
+		// do transformation again (was did in getAttributeValue)
+		if (attributeMapping.isEntityAttribute() || attributeMapping.isExtendedAttribute()) {
 			valueTransformed = attributeMappingService.transformValueToResource(systemEntity.getUid(), value,
 					attributeMapping, dto);
 		}
@@ -967,7 +979,11 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				account, entityType);
 
 		// All default mapped attributes from system
-		List<? extends AttributeMapping> defaultAttributes = findAttributeMappings(system, entityType);
+		SysSystemMappingDto systemMappingDto = null;
+		if (account.getSystemMapping() != null) {
+			systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		}
+		List<? extends AttributeMapping> defaultAttributes = findAttributeMappings(systemMappingDto);
 
 		// Final list of attributes use for provisioning
 		return compileAttributes(defaultAttributes, roleSystemAttributesAll, entityType);
@@ -976,7 +992,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	private List<AttributeMapping> resolveAdditionalPasswordChangeAttributes(AccAccountDto account, DTO dto,
 			SysSystemDto system, SystemEntityType entityType) {
 
-		SysSystemMappingDto mapping = getMapping(system, entityType);
+		UUID mapping = account.getSystemMapping();
 		if (mapping == null) {
 			return Collections.<AttributeMapping>emptyList();
 		}
@@ -984,7 +1000,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		// All additional mapped attributes from system, witch has to be send on
 		// password change
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
-		attributeFilter.setSystemMappingId(mapping.getId());
+		attributeFilter.setSystemMappingId(mapping);
 		attributeFilter.setSendOnPasswordChange(Boolean.TRUE);
 		// we want only active attributes
 		attributeFilter.setDisabledAttribute(Boolean.FALSE);
@@ -1016,7 +1032,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			return null;
 		}
 
-		defaultAttributes.stream().forEach(defaultAttribute -> {
+		defaultAttributes.forEach(defaultAttribute -> {
 			for (AttributeMappingStrategyType strategy : AttributeMappingStrategyType.values()) {
 				finalAttributes.addAll(compileAtributeForStrategy(strategy, defaultAttribute, overloadingAttributes));
 			}
@@ -1030,11 +1046,11 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Compile given attribute for strategy
-	 * 
+	 *
 	 * @param strategy
 	 * @param defaultAttribute
 	 * @param overloadingAttributes
-	 * 
+	 *
 	 * @return
 	 */
 	protected List<AttributeMapping> compileAtributeForStrategy(AttributeMappingStrategyType strategy,
@@ -1059,9 +1075,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		// We have some overloaded attributes
 		if (!attributesOrdered.isEmpty()) {
 			List<SysRoleSystemAttributeDto> attributesOrderedGivenStrategy = attributesOrdered.stream()
-					.filter(attribute -> {
-						return strategy == attribute.getStrategyType();
-					}).collect(Collectors.toList());
+					.filter(attribute -> strategy == attribute.getStrategyType()).collect(Collectors.toList());
 
 			// We do not have overloaded attributes for given strategy
 			if (attributesOrderedGivenStrategy.isEmpty()) {
@@ -1074,19 +1088,23 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 			// We will search for attribute with highest priority (and role
 			// name)
+			// Filter attributes by max priority
+			// Second filtering, if we have same priority, then
+			// we will sort by role name
+			//
 			Optional<SysRoleSystemAttributeDto> highestPriorityAttributeOptional = attributesOrderedGivenStrategy
 					.stream().filter(attribute -> {
 						IdmRoleDto roleDto = this.getRole(attribute);
 						// Filter attributes by max priority
 						return maxPriority == roleDto.getPriority();
-					}).sorted((att1, att2) -> {
+					}).min((att1, att2) -> {
 						// Second filtering, if we have same priority, then
 						// we will sort by role name
 						IdmRoleDto roleDto1 = this.getRole(att1);
 						IdmRoleDto roleDto2 = this.getRole(att2);
 						//
 						return roleDto2.getCode().compareTo(roleDto1.getCode());
-					}).findFirst();
+					});
 
 			if (highestPriorityAttributeOptional.isPresent()) {
 				SysRoleSystemAttributeDto highestPriorityAttribute = highestPriorityAttributeOptional.get();
@@ -1166,41 +1184,22 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	protected abstract List<SysRoleSystemAttributeDto> findOverloadingAttributes(DTO dto, SysSystemDto system,
 			AccAccountDto account, SystemEntityType entityType);
 
-	protected SysSystemMappingDto getMapping(SysSystemDto system, SystemEntityType entityType) {
-		List<SysSystemMappingDto> systemMappings = systemMappingService.findBySystem(system,
-				SystemOperationType.PROVISIONING, entityType);
-		if (systemMappings == null || systemMappings.isEmpty()) {
-			LOG.info(MessageFormat.format(
-					"System [{0}] does not have provisioning mapping set, provisioning will not be executed. Add provisioning mapping for entity type [{1}]",
-					system.getName(), entityType));
-			return null;
-		}
-		if (systemMappings.size() != 1) {
-			throw new IllegalStateException(MessageFormat.format(
-					"System [{0}] is not configured properly! Remove duplicit provisioning mapping for entity type [{1}]", system.getName(),
-					entityType));
-		}
-		return systemMappings.get(0);
-	}
-
 	/**
 	 * Find list of {@link SysSystemAttributeMapping} by provisioning type and
 	 * entity type on given system
 	 *
-	 * @param entityType
-	 * @param system
+	 * @param systemMappingDto
 	 * @return
 	 */
-	protected List<? extends AttributeMapping> findAttributeMappings(SysSystemDto system, SystemEntityType entityType) {
-		SysSystemMappingDto mapping = getMapping(system, entityType);
-		if (mapping == null) {
+	protected List<? extends AttributeMapping> findAttributeMappings(SysSystemMappingDto systemMappingDto) {
+		if (systemMappingDto == null) {
 			return null;
 		}
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
-		filter.setSystemMappingId(mapping.getId());
+		filter.setSystemMappingId(systemMappingDto.getId());
 		// We don't want attributes for password change only.
 		filter.setSendOnlyOnPasswordChange(Boolean.FALSE);
-		
+
 		return attributeMappingService.find(filter, null).getContent();
 	}
 
@@ -1213,7 +1212,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Create AccAccount and relation between account and entity
-	 * 
+	 *
 	 * @param uid
 	 * @param entityId
 	 * @param systemId
@@ -1287,21 +1286,21 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Returns service, which controls DTO's accounts
-	 * 
+	 *
 	 * @return
 	 */
 	protected abstract <A extends EntityAccountDto, F extends EntityAccountFilter> ReadWriteDtoService<A, F> getEntityAccountService();
 
 	/**
 	 * Returns service, which controls DTO
-	 * 
+	 *
 	 * @return
 	 */
 	protected abstract ReadWriteDtoService<DTO, ?> getService();
 
 	/**
 	 * Method get {@link SysSystemDto} from uuid schemaAttribute.
-	 * 
+	 *
 	 * @param schemaAttributeId
 	 * @return
 	 */
@@ -1312,7 +1311,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Method get {@link SysSystemDto} from {@link SysSchemaAttributeDto}.
-	 * 
+	 *
 	 * @param attribute
 	 * @return
 	 */
@@ -1323,7 +1322,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	/**
 	 * Method get {@link SysSystemDto} from {@link SysSchemaObjectClassDto}.
-	 * 
+	 *
 	 * @param schemaObjectClass
 	 * @return
 	 */
@@ -1363,8 +1362,8 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			if (attributeMapping instanceof SysRoleSystemAttributeDto) {
 				SysSystemAttributeMappingDto systemAttributeMappingDto = DtoUtils.getEmbedded(
 						(SysRoleSystemAttributeDto) attributeMapping,
-						SysRoleSystemAttribute_.systemAttributeMapping, 
-						SysSystemAttributeMappingDto.class, 
+						SysRoleSystemAttribute_.systemAttributeMapping,
+						SysSystemAttributeMappingDto.class,
 						null
 				);
 				if (systemAttributeMappingDto != null) {
@@ -1388,7 +1387,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			return schemaAttributeService.get(dto.getSchemaAttribute());
 		}
 	}
-	
+
 	/**
 	 * Method returns schema attribute ID from interface attribute mapping. Schema
 	 * can be null for RoleSystemAttribute.
@@ -1407,7 +1406,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			return null;
 		}
 	}
-	
+
 
 	/**
 	 * Transform password via transformation stored in {@link AttributeMapping}.
@@ -1433,7 +1432,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 *
 	 */
 	private SysProvisioningOperationDto prepareProvisioningOperationForAdditionalPassword(
-			SysSystemEntityDto systemEntity, DTO dto, UUID entityId, ProvisioningOperationType operationType,
+			SysSystemEntityDto systemEntity, UUID entityId, ProvisioningOperationType operationType,
 			SysSystemMappingDto systemMappingDto,
 			Map<ProvisioningAttributeDto, Object> accountObjectWithAnotherPassword) {
 		SysSchemaObjectClassDto schemaObjectClassDto = schemaObjectClassService.get(systemMappingDto.getObjectClass());
@@ -1458,5 +1457,54 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		resultAccountDto.setSystemId(system.getId());
 		resultAccountDto.setSystemName(system.getName());
 		return resultAccountDto;
+	}
+
+	/**
+	 * Get mapping from role for identity if the role has some. In other cases, get mapping from system
+	 * @param entityAccountDto entity account for which we want the mapping
+	 * @param accountDto account dto for which we want the mapping
+	 * @return UUID of mapping
+	 */
+	private UUID getSystemMappingForAccount(EntityAccountDto entityAccountDto, AccAccountDto accountDto) {
+		if (accountDto.getSystemMapping() != null) {
+			return accountDto.getSystemMapping();
+		}
+
+		if (entityAccountDto instanceof AccIdentityAccountDto) {
+			// for user we will use mapping from role, if there is some, otherwise we will user first from system
+			AccIdentityAccountDto identityAccountDto = (AccIdentityAccountDto) entityAccountDto;
+			if (identityAccountDto.getIdentityRole() != null) {
+				IdmIdentityRoleDto identityRoleDto = DtoUtils.getEmbedded(identityAccountDto, AccIdentityAccount_.identityRole, IdmIdentityRoleDto.class);
+
+				SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
+				roleSystemFilter.setSystemId(accountDto.getSystem());
+				roleSystemFilter.setRoleId(identityRoleDto.getRole());
+				List<SysRoleSystemDto> roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
+
+				if (!roleSystemDtos.isEmpty()) {
+					SysRoleSystemDto roleSystem = roleSystemDtos.get(0);
+					if (roleSystem.getSystemMapping() != null) {
+						return roleSystem.getSystemMapping();
+					}
+				}
+			}
+		}
+		return getMappingFromSystem(accountDto.getSystem(), accountDto.getEntityType());
+	}
+
+	/**
+	 * Get first provisioning mapping from system
+	 * @param system UUID of system
+	 * @param entityType type of entity
+	 * @return UUID of mapping or null if there is none provisioning mapping
+	 */
+	private UUID getMappingFromSystem(UUID system, SystemEntityType entityType) {
+		// This is fallback, if account is not found, but system has some provisioning mapping, get first one
+		List<SysSystemMappingDto> systemMappings = systemMappingService.findBySystemId(system,
+				SystemOperationType.PROVISIONING, entityType);
+		if (systemMappings == null || systemMappings.isEmpty()) {
+			return null;
+		}
+		return systemMappings.get(0).getId();
 	}
 }

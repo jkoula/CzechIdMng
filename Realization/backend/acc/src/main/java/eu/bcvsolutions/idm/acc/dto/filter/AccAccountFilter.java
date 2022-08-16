@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
  * Filter for accounts
  * 
  * @author Radek Tomiška
+ * @author Roman Kucera
  *
  */
 public class AccAccountFilter extends DataFilter {
@@ -32,6 +33,7 @@ public class AccAccountFilter extends DataFilter {
 	private UUID uniformPasswordId; // Used for unite password change and validate
 	private Boolean supportPasswordFilter;
 	private Boolean includeEcho; // Returned account will contains echo record in embedded
+	private UUID systemMapping;
 	
 	public AccAccountFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -137,4 +139,11 @@ public class AccAccountFilter extends DataFilter {
 		this.includeEcho = includeEcho;
 	}
 
+	public UUID getSystemMapping() {
+		return systemMapping;
+	}
+
+	public void setSystemMapping(UUID systemMapping) {
+		this.systemMapping = systemMapping;
+	}
 }
