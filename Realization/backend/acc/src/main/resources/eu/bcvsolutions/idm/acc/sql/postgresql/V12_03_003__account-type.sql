@@ -18,6 +18,9 @@ alter table sys_system_mapping
     add column
         account_type varchar(255);
 
+-- set default value
+update sys_system_mapping set account_type = 'PERSONAL' where account_type is null;
+
 -- System mapping entity audit - add account type column
 alter table sys_system_mapping_a
     add column
