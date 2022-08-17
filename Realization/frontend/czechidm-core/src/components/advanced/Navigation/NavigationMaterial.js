@@ -213,7 +213,8 @@ function NavigationMaterial(props) {
           <AppBar
             position="fixed"
             className={ classes.appBarRoot }>
-            <Toolbar>
+            <Toolbar
+            style={{height:'100%'}}>
               {
                 applicationLogo
                 ?

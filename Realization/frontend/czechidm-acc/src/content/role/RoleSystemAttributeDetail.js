@@ -359,7 +359,8 @@ class RoleSystemAttributeDetail extends Advanced.AbstractTableContent {
                 headerText={isMerge ? '' : this.i18n('acc:entity.SystemAttributeMapping.transformToResourceScriptSelectBox.label')}
                 helpBlock={isMerge ? '' : this.i18n('acc:entity.SystemAttributeMapping.transformToResourceScriptSelectBox.help')}
                 label={this.i18n('acc:entity.SystemAttributeMapping.transformToResourceScript.label')}
-                scriptManager={scriptManager} />
+                scriptManager={scriptManager} 
+               />
             </Basic.AbstractForm>
             <Basic.PanelFooter>
               <Basic.Button type="button" level="link"

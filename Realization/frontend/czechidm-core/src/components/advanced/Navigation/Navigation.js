@@ -41,14 +41,17 @@ export class Navigation extends Basic.AbstractContent {
   _renderNavigationItems(items, userContext, selectedNavigationItems, face = 'list') {
     if (!items) {
       return null;
+      
     }
     const renderedItems = [];
     for (const item of items) {
       const renderedItem = this.renderNavigationItem(item, userContext, selectedNavigationItems[0], null, face);
       if (renderedItem) { // can be null
+        console.log('show')
         renderedItems.push(renderedItem);
       }
     }
+    
     return renderedItems;
   }
 

@@ -234,11 +234,17 @@ export class ScriptArea extends AbstractFormComponent {
         )
       }>
         <FormComponentLabel
-          className={ labelClassName }
+          // style={{display:'none'}}
+          // className=  {labelClassName + "aaa"}
+          className=  {labelClassName}
           readOnly={disabled || readOnly}
-          label={ _label }/>
+          // label={ _label }
+          />
+          {/* <div className= "aab"></div> */}
         <div className={componentSpan}>
+        
           <Tooltip ref="popover" placement={ this.getTitlePlacement() } value={ this.getTitle() }>
+       
             <span>
               { this.getOptionsButton() }
               {/* Editor cannot be hidden here if modal is show, because Ace editor will be null after closing the modal dialog.*/}
@@ -260,7 +266,8 @@ export class ScriptArea extends AbstractFormComponent {
           </Tooltip>
           { this.renderHelpBlock() }
         </div>
-      </div>
+
+        </div>
     );
   }
 

@@ -7,6 +7,8 @@ import OperationStateEnum from '../../../enums/OperationStateEnum';
 import { AttachmentService } from '../../../services';
 import OperationResultDownloadButton from './OperationResultDownloadButton';
 
+
+
 /**
 * Operation result component - shows enum value and result code with flash message
 *
@@ -19,6 +21,7 @@ export default class OperationResult extends Basic.AbstractContextComponent {
   constructor(props, context) {
     super(props, context);
     this.attachmentService = new AttachmentService();
+    this.state={toggle:true}
   }
 
   getComponentKey() {
@@ -83,6 +86,8 @@ export default class OperationResult extends Basic.AbstractContextComponent {
       </span>
     );
     //
+
+     
     return (
       <Basic.Panel>
         <Basic.PanelBody style={{ padding: 2 }}>
@@ -128,6 +133,17 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     this.props.detailLink();
   }
 
+    onWrap =()=>{
+      this.setState({toggle:!this.state.toggle});
+    }
+    onCopy =(i)=> {
+    navigator.clipboard.writeText(i.stackTrace);
+    this.addMessage({
+      level: 'success',
+      message: this.i18n(`textCopy`)
+      })
+     }
+
   /**
    * Renders full info card (with exception stacktrace etc.)
    */
@@ -136,6 +152,7 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     const message = this.getFlashManager().convertFromResultModel(value.model);
     const _level = this._getLevel(level, message);
     //
+ 
     return (
       <Basic.Div>
         <Basic.ContentHeader text={ header === null ? this.i18n('result.header') : header }/>
@@ -166,17 +183,36 @@ export default class OperationResult extends Basic.AbstractContextComponent {
         {
           (!value || !value.stackTrace)
           ||
+          
           <Basic.Div>
-            <Basic.TextArea
-              rows="10"
-              value={ value.stackTrace }
-              readOnly/>
+          <Basic.Button
+          title= {this.i18n('copyClipboard')}
+          className ="customButton"
+          icon="fa:copy"
+          onClick= {this.onCopy.bind(this, value)}>
+          </Basic.Button>
+
+          <Basic.Button 
+          title={this.i18n(this.state.toggle ? 'wrapOff' : 'wrapOn')}
+          className="customButton" 
+          onClick= {this.onWrap.bind(this)}
+          icon={this.state.toggle ? "fa:angle-left": "fa:angle-right"}>
+          </Basic.Button>
+
+          <Basic.TextArea
+            rows="10"
+            value={ value.stackTrace }
+            level="success"
+            notEdit
+            // readOnly/> 
+            className={this.state.toggle ? 'customTextAre':'customTextAreNot'}>
+          </Basic.TextArea>
           </Basic.Div>
         }
       </Basic.Div>
     );
   }
-
+ 
   render() {
     const { value, face, rendered, showLoading } = this.props;
     if (!rendered || !value) {
