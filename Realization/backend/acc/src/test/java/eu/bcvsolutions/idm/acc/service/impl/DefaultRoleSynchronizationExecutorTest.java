@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.service.impl;
 
 import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.acc.TestHelper;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
@@ -1805,6 +1806,7 @@ public class DefaultRoleSynchronizationExecutorTest extends AbstractBulkActionTe
 		syncSystemMapping.setEntityType(SystemEntityType.ROLE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 		createMapping(system, syncMapping);

@@ -59,11 +59,10 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testSystemId() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(),
-				AccountType.PERSONAL, false);
+		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
 		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
-		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), AccountType.PERSONAL, false);
+		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), false);
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setSystemId(system.getId());
 		Page<AccAccountDto> pages = accAccountService.find(testFilter, null);
@@ -75,12 +74,11 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testIdentityId() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		createAccount(system.getId(), identity.getId(), identity.getUsername(), AccountType.PERSONAL, false);
+		createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
 		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
-		createAccount(system2.getId(), identity.getId(), identity.getUsername(), AccountType.PERSONAL, false);
-		AccAccountDto account3 = createAccount(system2.getId(), identity2.getId(), identity2.getUsername(),
-				AccountType.PERSONAL, false);
+		createAccount(system2.getId(), identity.getId(), identity.getUsername(), false);
+		AccAccountDto account3 = createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), false);
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setIdentityId(identity2.getId());
 		Page<AccAccountDto> pages = accAccountService.find(testFilter, null);
@@ -92,11 +90,10 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testUid() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(),
-				AccountType.PERSONAL, false);
+		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
 		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
-		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), AccountType.PERSONAL, false);
+		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), false);
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setUid(account.getUid());
 		Page<AccAccountDto> pages = accAccountService.find(testFilter, null);
@@ -108,13 +105,17 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testAccountType() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		createAccount(system.getId(), identity.getId(), identity.getUsername(), AccountType.PERSONAL, false);
+		createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
 		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
-		AccAccountDto account2 = createAccount(system2.getId(), identity2.getId(), identity2.getUsername(),
-				AccountType.TECHNICAL, false);
+		AccAccountDto account2 = createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), false);
+
+		SysSystemMappingDto mapping = helper.createMapping(system2, AccountType.TECHNICAL);
+		account2.setSystemMapping(mapping.getId());
+		account2 = accAccountService.save(account2);
+
 		AccAccountFilter testFilter = new AccAccountFilter();
-		testFilter.setAccountType(account2.getAccountType());
+		testFilter.setAccountType(AccountType.TECHNICAL);
 		Page<AccAccountDto> pages = accAccountService.find(testFilter, null);
 		assertEquals(1, pages.getTotalElements());
 		assertEquals(account2.getId(), pages.getContent().get(0).getId());
@@ -124,9 +125,8 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testOwnership() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(),
-				AccountType.PERSONAL, true);
-		createAccount(system.getId(), identity.getId(), identity.getUsername() + "2", AccountType.PERSONAL, false);
+		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(), true);
+		createAccount(system.getId(), identity.getId(), identity.getUsername() + "2", false);
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setOwnership(true);
 		testFilter.setIdentityId(identity.getId());
@@ -139,11 +139,10 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testSystemEntityType() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(),
-				AccountType.PERSONAL, false);
+		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
 		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
-		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), AccountType.PERSONAL, false);
+		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), false);
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setEntityType(account.getEntityType());
 		testFilter.setSystemId(system.getId());
@@ -156,11 +155,10 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 	public void testSupportChangePassword() {
 		IdmIdentityDto identity = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system = helper.createTestResourceSystem(true);
-		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(),
-				AccountType.PERSONAL, false);
+		AccAccountDto account = createAccount(system.getId(), identity.getId(), identity.getUsername(), false);
 		IdmIdentityDto identity2 = helper.createIdentity("test-" + System.currentTimeMillis());
 		SysSystemDto system2 = helper.createTestResourceSystem(true);
-		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), AccountType.PERSONAL, false);
+		createAccount(system2.getId(), identity2.getId(), identity2.getUsername(), false);
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setUid(identity.getUsername());
 		testFilter.setSupportChangePassword(true);
@@ -190,14 +188,12 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 		AccAccountDto accountOne = new AccAccountDto();
 		accountOne.setSystem(system.getId());
 		accountOne.setUid(UUID.randomUUID().toString());
-		accountOne.setAccountType(AccountType.PERSONAL);
 		accountOne.setEntityType(SystemEntityType.IDENTITY);
 		accountOne = accAccountService.save(accountOne);
 		
 		AccAccountDto accountTwo = new AccAccountDto();
 		accountTwo.setSystem(system.getId());
 		accountTwo.setUid(UUID.randomUUID().toString());
-		accountTwo.setAccountType(AccountType.PERSONAL);
 		accountTwo.setEntityType(SystemEntityType.ROLE);
 		accountTwo = accAccountService.save(accountTwo);
 		//
@@ -214,12 +210,10 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 		Assert.assertTrue(accounts.isEmpty());
 	}
 
-	private AccAccountDto createAccount(UUID systemId, UUID identityId, String uid, AccountType accountType,
-			Boolean ownership) {
+	private AccAccountDto createAccount(UUID systemId, UUID identityId, String uid,	Boolean ownership) {
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(systemId);
 		account.setUid(uid);
-		account.setAccountType(accountType);
 		account = accAccountService.save(account);
 
 		AccIdentityAccountDto accountIdentity = new AccIdentityAccountDto();

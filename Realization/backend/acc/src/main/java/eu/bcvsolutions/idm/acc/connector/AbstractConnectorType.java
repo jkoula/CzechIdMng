@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.connector;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
@@ -342,6 +343,7 @@ public abstract class AbstractConnectorType implements
 		mappingDto.setEntityType(systemEntityType);
 		mappingDto.setOperationType(systemOperationType);
 		mappingDto.setObjectClass(schemaDto.getId());
+		mappingDto.setAccountType(AccountType.PERSONAL);
 		// Save mapping. Event must be publish with property for enable automatic mapping.
 		mappingDto = systemMappingService.publish(
 				new SystemMappingEvent(

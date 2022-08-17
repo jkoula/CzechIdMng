@@ -1,15 +1,14 @@
 package eu.bcvsolutions.idm.acc.dto;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import java.time.ZonedDateTime;
 import org.springframework.hateoas.core.Relation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.google.common.annotations.Beta;
 
-import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -31,7 +30,6 @@ public class AccAccountDto extends AbstractDto {
 	public static final String PROPERTY_ECHO = "echo";
 
 	private String uid;
-	private AccountType accountType;
 	@Embedded(dtoClass = SysSystemDto.class)
 	private UUID system;
 	@Embedded(dtoClass = SysSystemEntityDto.class)
@@ -54,14 +52,6 @@ public class AccAccountDto extends AbstractDto {
 
 	public void setUid(String uid) {
 		this.uid = uid;
-	}
-
-	public AccountType getAccountType() {
-		return accountType;
-	}
-
-	public void setAccountType(AccountType accountType) {
-		this.accountType = accountType;
 	}
 
 	public UUID getSystem() {

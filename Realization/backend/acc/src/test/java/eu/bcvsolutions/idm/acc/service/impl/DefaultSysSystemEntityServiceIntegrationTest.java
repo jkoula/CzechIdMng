@@ -48,7 +48,6 @@ public class DefaultSysSystemEntityServiceIntegrationTest extends AbstractIntegr
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid("test_uid_" + System.currentTimeMillis());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setSystemEntity(systemEntity.getId());
 		account = accountService.save(account);
 		

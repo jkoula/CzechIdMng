@@ -28,6 +28,9 @@ export default class AccountTypeEnum extends Enums.AbstractEnum {
       case this.PERSONAL: {
         return 'success';
       }
+      case this.PERSONAL_OTHER: {
+        return 'success';
+      }
       case this.TECHNICAL: {
         return 'primary';
       }
@@ -39,4 +42,5 @@ export default class AccountTypeEnum extends Enums.AbstractEnum {
 }
 
 AccountTypeEnum.PERSONAL = Symbol('PERSONAL');
+AccountTypeEnum.PERSONAL_OTHER = Symbol('PERSONAL_OTHER');
 AccountTypeEnum.TECHNICAL = Symbol('TECHNICAL');

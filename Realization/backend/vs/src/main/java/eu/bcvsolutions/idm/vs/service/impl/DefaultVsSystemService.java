@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
@@ -526,6 +527,7 @@ public class DefaultVsSystemService implements VsSystemService {
 			newMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 			newMapping.setObjectClass(schemaId);
 			newMapping.setProtectionEnabled(true);
+			newMapping.setAccountType(AccountType.PERSONAL);
 			newMapping = systemMappingService.save(newMapping);
 		} else {
 			newMapping = foundMapping;
@@ -549,6 +551,7 @@ public class DefaultVsSystemService implements VsSystemService {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(schema.getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		systemMapping = systemMappingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();

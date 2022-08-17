@@ -103,7 +103,6 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setSystem(system.getId());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(userOneName);
 		account = accountService.save(account);
 
@@ -154,7 +153,6 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setSystem(system.getId());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(userOneName);
 		account = accountService.save(account);
 
@@ -191,7 +189,6 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setSystem(system.getId());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(userOneName);
 		account = accountService.save(account);
 
@@ -249,7 +246,6 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setSystem(system.getId());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(userOneName);
 		account = accountService.save(account);
 
@@ -284,7 +280,6 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setSystem(system.getId());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(userOneName);
 		account = accountService.save(account);
 

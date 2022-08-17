@@ -357,7 +357,7 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 			predicates.add(builder.exists(identityAccountSubquery));
 		}
 		if (filter.getAccountType() != null) {
-			predicates.add(builder.equal(root.get(AccAccount_.accountType), filter.getAccountType()));
+			predicates.add(builder.equal(root.get(AccAccount_.systemMapping).get(SysSystemMapping_.accountType), filter.getAccountType()));
 		}
 
 		if (filter.getSupportChangePassword() != null && filter.getSupportChangePassword()) {

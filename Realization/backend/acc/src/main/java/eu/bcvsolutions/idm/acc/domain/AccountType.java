@@ -9,5 +9,6 @@ package eu.bcvsolutions.idm.acc.domain;
 public enum AccountType {
 
 	PERSONAL,
+	PERSONAL_OTHER,
 	TECHNICAL
 }

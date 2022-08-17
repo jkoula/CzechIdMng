@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 
 import org.junit.After;
@@ -715,6 +716,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		systemMapping.setTreeType(systemMappingSync.getTreeType());
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(systemMappingSync.getObjectClass());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(systemMapping);
 		SysSystemDto system = systemService
 				.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
@@ -744,14 +746,15 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 			treeType.setName(TREE_TYPE_TEST);
 			treeType = treeTypeService.save(treeType);
 
-			// Create synchronization mapping
-			SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
-			syncSystemMapping.setName("default_" + System.currentTimeMillis());
-			syncSystemMapping.setEntityType(SystemEntityType.TREE);
-			syncSystemMapping.setTreeType(treeType.getId());
-			syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
-			syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
-			final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
+		// Create synchronization mapping
+		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
+		syncSystemMapping.setName("default_" + System.currentTimeMillis());
+		syncSystemMapping.setEntityType(SystemEntityType.TREE);
+		syncSystemMapping.setTreeType(treeType.getId());
+		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
+		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
+		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 			createMapping(system, syncMapping);
 			this.getBean().deleteAllResourceData();

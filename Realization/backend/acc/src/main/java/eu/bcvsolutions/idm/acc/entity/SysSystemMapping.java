@@ -19,6 +19,7 @@ import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -104,6 +105,12 @@ public class SysSystemMapping extends AbstractEntity {
 	@ManyToOne
 	@JoinColumn(name = "connected_system_mapping_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private SysSystemMapping connectedSystemMappingId;
+
+	@Audited
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	@Column(name = "account_type", nullable = false)
+	private AccountType accountType;
 
 	public void setName(String name) {
 		this.name = name;
@@ -223,5 +230,13 @@ public class SysSystemMapping extends AbstractEntity {
 
 	public void setConnectedSystemMappingId(SysSystemMapping connectedSystemMappingId) {
 		this.connectedSystemMappingId = connectedSystemMappingId;
+	}
+
+	public AccountType getAccountType() {
+		return accountType;
+	}
+
+	public void setAccountType(AccountType accountType) {
+		this.accountType = accountType;
 	}
 }

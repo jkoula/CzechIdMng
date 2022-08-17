@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
@@ -121,6 +122,7 @@ public class SysSystemMappingServiceValidationTest extends AbstractIntegrationTe
 		mapping.setOperationType(type);
 		mapping.setObjectClass(objectClass);
 		mapping.setEntityType(SystemEntityType.IDENTITY);
+		mapping.setAccountType(AccountType.PERSONAL);
 		mapping = mappingService.save(mapping);
 		return mapping;
 	}

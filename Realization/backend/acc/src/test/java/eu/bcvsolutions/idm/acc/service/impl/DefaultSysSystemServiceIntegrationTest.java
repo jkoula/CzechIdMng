@@ -185,6 +185,7 @@ public class DefaultSysSystemServiceIntegrationTest extends AbstractIntegrationT
 		systemMapping.setObjectClass(objectClass.getId());
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		systemMapping = systemMappingService.save(systemMapping);
 		SysSystemMappingFilter entityHandlingFilter = new SysSystemMappingFilter();
 		entityHandlingFilter.setSystemId(system.getId());
@@ -333,7 +334,6 @@ public class DefaultSysSystemServiceIntegrationTest extends AbstractIntegrationT
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid("test_uid_" + System.currentTimeMillis());
-		account.setAccountType(AccountType.PERSONAL);
 		account = accountService.save(account);
 		
 		systemService.delete(system);

@@ -454,7 +454,6 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(clonedSystem.getId());
 		account.setUid("y" + IDENTITY_USERNAME);
-		account.setAccountType(AccountType.PERSONAL);
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account.setSystemEntity(sysEntity.getId());
 		account = accountService.save(account);
@@ -1575,6 +1574,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		systemMapping = systemMappingService.save(systemMapping);
 	}
 
@@ -1690,7 +1690,6 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		accountOne = new AccAccountDto();
 		accountOne.setSystem(system.getId());
 		accountOne.setUid("x" + IDENTITY_USERNAME);
-		accountOne.setAccountType(AccountType.PERSONAL);
 		accountOne.setEntityType(SystemEntityType.IDENTITY);
 		accountOne = accountService.save(accountOne);
 
@@ -1710,7 +1709,6 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		AccAccountDto accountTwo = new AccAccountDto();
 		accountTwo.setSystem(system.getId());
 		accountTwo.setUid("x" + IDENTITY_USERNAME_TWO);
-		accountTwo.setAccountType(AccountType.PERSONAL);
 		accountTwo.setEntityType(SystemEntityType.IDENTITY);
 		accountTwo = accountService.save(accountTwo);
 
@@ -1726,6 +1724,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto entityHandlingResult = systemEntityHandlingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
@@ -1789,7 +1788,6 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		AccAccountDto accountOne = new AccAccountDto();
 		accountOne.setSystem(getSystem().getId());
 		accountOne.setUid("x" + identity.getUsername());
-		accountOne.setAccountType(AccountType.PERSONAL);
 		accountOne.setEntityType(SystemEntityType.IDENTITY);
 		accountOne = accountService.save(accountOne);
 		//

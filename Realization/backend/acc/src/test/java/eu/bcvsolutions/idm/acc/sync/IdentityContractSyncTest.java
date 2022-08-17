@@ -13,6 +13,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
@@ -1418,6 +1419,7 @@ public class IdentityContractSyncTest extends AbstractIntegrationTest {
 		syncSystemMapping.setEntityType(SystemEntityType.CONTRACT);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 		createMapping(system, syncMapping);

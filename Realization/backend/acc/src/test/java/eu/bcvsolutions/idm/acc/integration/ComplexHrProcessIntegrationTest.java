@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -778,6 +779,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		syncSystemMapping = systemMappingService.save(syncSystemMapping);
 		
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
@@ -870,6 +872,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		syncSystemMapping.setEntityType(SystemEntityType.CONTRACT);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		syncSystemMapping = systemMappingService.save(syncSystemMapping);
 		
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
@@ -1444,6 +1447,7 @@ public class ComplexHrProcessIntegrationTest extends AbstractIntegrationTest {
 		mapping.setEntityType(SystemEntityType.IDENTITY);
 		mapping.setOperationType(SystemOperationType.PROVISIONING);
 		mapping.setObjectClass(objectClass.getId());
+		mapping.setAccountType(AccountType.PERSONAL);
 		mapping = systemMappingService.save(mapping);
 		
 		ImmutableMap<String, String> mappingConfig = new ImmutableMap.Builder<String, String>()

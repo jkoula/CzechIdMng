@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationInactiveOwnerBehaviorType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
@@ -1098,6 +1099,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			mappingDto.setEntityType(SystemEntityType.IDENTITY);
 			mappingDto.setName("AD users provisioning mapping.");
 			mappingDto.setProtectionEnabled(protectedModeSwitch);
+			mappingDto.setAccountType(AccountType.PERSONAL);
 			mappingDto = systemMappingService.publish(
 							new SystemMappingEvent(
 									SystemMappingEvent.SystemMappingEventType.CREATE,
@@ -1215,6 +1217,7 @@ public class AdUserConnectorType extends DefaultConnectorType {
 			mappingDto.setOperationType(SystemOperationType.SYNCHRONIZATION);
 			mappingDto.setEntityType(SystemEntityType.IDENTITY);
 			mappingDto.setName("Pairing sync mapping");
+			mappingDto.setAccountType(AccountType.PERSONAL);
 			mappingDto = systemMappingService.save(mappingDto);
 			mappingSyncId = mappingDto.getId().toString();
 			connectorType.getMetadata().put(MAPPING_SYNC_ID, mappingSyncId);

@@ -693,7 +693,6 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		AccAccountDto account = new AccAccountDto();
 		account.setUid(uid);
 		account.setEntityType(SystemEntityType.IDENTITY);
-		account.setAccountType(AccountType.PERSONAL);
 		account.setSystem(roleSystem.getSystem());
 		account.setSystemMapping(mappingId);
 		

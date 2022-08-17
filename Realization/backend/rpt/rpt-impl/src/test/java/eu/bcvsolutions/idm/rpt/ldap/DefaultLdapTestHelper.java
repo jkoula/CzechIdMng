@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
@@ -127,6 +128,7 @@ public class DefaultLdapTestHelper implements LdapTestHelper {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClass.getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		systemMapping = systemMappingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();

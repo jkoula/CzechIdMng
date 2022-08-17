@@ -166,7 +166,7 @@ export class AccountTable extends Advanced.AbstractTableContent {
                 level="success"
                 key="add_button"
                 className="btn-xs"
-                onClick={ this.showDetail.bind(this, { system: systemId, accountType: AccountTypeEnum.findKeyBySymbol(AccountTypeEnum.PERSONAL) })}
+                onClick={ this.showDetail.bind(this, { system: systemId })}
                 rendered={ showAddButton && Managers.SecurityManager.hasAnyAuthority(['ACCOUNT_CREATE']) }
                 icon="fa:plus">
                 { this.i18n('button.add') }
@@ -309,11 +309,6 @@ export class AccountTable extends Advanced.AbstractTableContent {
                     forceSearchParameters={ forceSystemEntitySearchParameters }
                     onChange={ this.onChangeSystemEntity.bind(this) }/>
                 }
-                <Basic.EnumSelectBox
-                  ref="accountType"
-                  enum={ AccountTypeEnum }
-                  label={ this.i18n('acc:entity.Account.accountType') }
-                  required/>
                 <Basic.EnumSelectBox
                   ref="entityType"
                   useSymbol={ false }

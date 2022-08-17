@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.config.domain.AuthenticatorConfiguration;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -308,6 +309,7 @@ public class DefaultAccAuthenticatorTest extends AbstractIntegrationTest {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto entityHandlingResult = systemEntityHandlingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
@@ -391,6 +393,7 @@ public class DefaultAccAuthenticatorTest extends AbstractIntegrationTest {
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto entityHandlingResult = systemEntityHandlingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -261,7 +262,7 @@ public class DefaultSysSystemMappingServiceIntegrationTest extends AbstractInteg
 		mappingDto.setEntityType(SystemEntityType.IDENTITY);
 		mappingDto.setObjectClass(schema.getId());
 		mappingDto.setOperationType(SystemOperationType.PROVISIONING);
-
+		mappingDto.setAccountType(AccountType.PERSONAL);
 		mappingDto = mappingService.publish(
 				new SystemMappingEvent(
 						SystemMappingEvent.SystemMappingEventType.CREATE,
@@ -363,7 +364,7 @@ public class DefaultSysSystemMappingServiceIntegrationTest extends AbstractInteg
 		mappingDto.setEntityType(SystemEntityType.TREE);
 		mappingDto.setObjectClass(schema.getId());
 		mappingDto.setOperationType(SystemOperationType.PROVISIONING);
-
+		mappingDto.setAccountType(AccountType.PERSONAL);
 		mappingDto = mappingService.publish(
 				new SystemMappingEvent(
 						SystemMappingEvent.SystemMappingEventType.CREATE,
@@ -426,7 +427,7 @@ public class DefaultSysSystemMappingServiceIntegrationTest extends AbstractInteg
 		mappingDto.setEntityType(SystemEntityType.ROLE_CATALOGUE);
 		mappingDto.setObjectClass(schema.getId());
 		mappingDto.setOperationType(SystemOperationType.PROVISIONING);
-
+		mappingDto.setAccountType(AccountType.PERSONAL);
 		mappingDto = mappingService.publish(
 				new SystemMappingEvent(
 						SystemMappingEvent.SystemMappingEventType.CREATE,
@@ -646,6 +647,7 @@ public class DefaultSysSystemMappingServiceIntegrationTest extends AbstractInteg
 		mapping.setEntityType(type);
 		mapping.setObjectClass(objectClass.getId());
 		mapping.setOperationType(SystemOperationType.PROVISIONING);
+		mapping.setAccountType(AccountType.PERSONAL);
 		return mappingService.save(mapping);
 	}
 }

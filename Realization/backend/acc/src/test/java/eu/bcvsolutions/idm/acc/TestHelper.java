@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc;
 
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
@@ -107,6 +108,22 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @return
 	 */
 	SysSystemMappingDto createMapping(SysSystemDto system);
+
+	/**
+	 * Creates default provisioning mapping for the given system, entity type, account type
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType, AccountType accountType);
+
+	/**
+	 * reates default provisioning mapping for the given system, account type
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysSystemMappingDto createMapping(SysSystemDto system, AccountType accountType);
 
 	/**
 	 * Returns default mapping - provisioning, identity

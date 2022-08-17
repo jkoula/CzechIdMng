@@ -261,9 +261,9 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		//
 		return system;
 	}
-	
+
 	@Override
-	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType) {
+	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType, AccountType accountType) {
 		//
 		// generate schema for system
 		List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
@@ -273,6 +273,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		systemMapping.setEntityType(entityType);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(accountType);
 		systemMapping = systemMappingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
@@ -335,10 +336,20 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	}
 
 	@Override
-	public SysSystemMappingDto createMapping(SysSystemDto system) {
-		return createMapping(system, SystemEntityType.IDENTITY);
+	public SysSystemMappingDto createMapping(SysSystemDto system, AccountType accountType) {
+		return createMapping(system, SystemEntityType.IDENTITY, accountType);
 	}
-	
+
+	@Override
+	public SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType) {
+		return createMapping(system, entityType, AccountType.PERSONAL);
+	}
+
+	@Override
+	public SysSystemMappingDto createMapping(SysSystemDto system) {
+		return createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
+	}
+
 	@Override
 	public SysSystemMappingDto getDefaultMapping(SysSystemDto system) {
 		Assert.notNull(system, "System is required to get mapping.");
@@ -383,7 +394,6 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid(identity.getUsername());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account = accountService.save(account);
 
@@ -403,6 +413,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		mapping.setEntityType(type);
 		mapping.setObjectClass(objectClass.getId());
 		mapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
+		mapping.setAccountType(AccountType.PERSONAL);
 		//
 		return mappingService.save(mapping);
 	}

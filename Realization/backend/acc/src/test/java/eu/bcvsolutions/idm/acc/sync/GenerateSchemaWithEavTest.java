@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -125,6 +126,7 @@ public class GenerateSchemaWithEavTest extends AbstractIntegrationTest {
 		syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 		createMapping(system, syncMapping);

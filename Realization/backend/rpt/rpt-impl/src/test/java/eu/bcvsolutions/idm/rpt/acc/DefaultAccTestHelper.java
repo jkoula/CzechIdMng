@@ -235,6 +235,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL);
 		systemMapping = systemMappingService.save(systemMapping);
 
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
@@ -339,7 +340,6 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid(identity.getUsername());
-		account.setAccountType(AccountType.PERSONAL);
 		account.setEntityType(SystemEntityType.IDENTITY);
 		account = accountService.save(account);
 

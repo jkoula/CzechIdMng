@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
@@ -685,6 +686,7 @@ public class RoleWorkflowAdSyncTest  extends AbstractIntegrationTest{
 			syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
 			syncSystemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		}
+		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 		createMapping(system, syncMapping);
 		if (!isProvisioning) {

@@ -1221,7 +1221,6 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	protected UUID createEntityAccount(String uid, UUID entityId, UUID systemId) {
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(systemId);
-		account.setAccountType(AccountType.PERSONAL);
 		account.setUid(uid);
 		account.setEntityType(getEntityType());
 		account = accountService.save(account);
