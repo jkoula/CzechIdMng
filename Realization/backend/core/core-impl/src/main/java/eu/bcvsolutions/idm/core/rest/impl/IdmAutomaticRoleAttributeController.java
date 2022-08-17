@@ -162,7 +162,7 @@ public class IdmAutomaticRoleAttributeController extends AbstractReadWriteDtoCon
 			@PathVariable @NotNull String backendId) {
 		IdmAutomaticRoleAttributeDto automaticRole = this.getDto(backendId);
 		Assert.notNull(automaticRole, "Automatic role is required.");
-		requestService.deleteAutomaticRole(automaticRole, AutomaticRoleRequestType.ATTRIBUTE);
+		requestService.deleteAutomaticRoleByLrt(automaticRole);
 		throw new AcceptedException();
 	}
 	

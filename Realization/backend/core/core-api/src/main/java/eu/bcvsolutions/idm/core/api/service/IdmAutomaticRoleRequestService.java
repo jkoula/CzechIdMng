@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.api.service;
 
-import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleRequestType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
@@ -18,11 +17,10 @@ public interface IdmAutomaticRoleRequestService
 		AuthorizableService<IdmAutomaticRoleRequestDto>, RequestService<IdmAutomaticRoleRequestDto> {
 
 	/**
-	 * Creates and executes request for delete of the given automatic role
+	 * Deletes automatic role via LRT {@link eu.bcvsolutions.idm.core.scheduler.task.impl.RemoveAutomaticRoleTaskExecutor}
 	 * @param automaticRole
-	 * @param type
 	 */
-	void deleteAutomaticRole(AbstractIdmAutomaticRoleDto automaticRole, AutomaticRoleRequestType type);
+	void deleteAutomaticRoleByLrt(AbstractIdmAutomaticRoleDto automaticRole);
 
 	/**
 	 * Creates and executes request for create new tree automatic role

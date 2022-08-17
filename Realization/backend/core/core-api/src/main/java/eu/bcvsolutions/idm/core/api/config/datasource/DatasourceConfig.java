@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -44,7 +43,7 @@ import eu.bcvsolutions.idm.core.api.repository.ExtendedJpaRepositoryFactoryBean;
                         value = CoreDatasourceExcluded.class
                 )
         })
-@EnableTransactionManagement(mode = AdviceMode.ASPECTJ)
+@EnableTransactionManagement
 public class DatasourceConfig {
 
     public static final String CORE_ENTITY_MANAGER = "coreEntityManager";

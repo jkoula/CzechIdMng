@@ -57,6 +57,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -71,6 +72,8 @@ import eu.bcvsolutions.idm.core.model.event.AutomaticRoleRequestEvent;
 import eu.bcvsolutions.idm.core.model.event.AutomaticRoleRequestEvent.AutomaticRoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.role.RoleRequestApprovalProcessor;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRequestRepository;
+import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
+import eu.bcvsolutions.idm.core.scheduler.task.impl.RemoveAutomaticRoleTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowFilterDto;
@@ -111,6 +114,8 @@ public class DefaultIdmAutomaticRoleRequestService extends
 	private IdmAutomaticRoleAttributeService automaticRoleAttributeService;
 	@Autowired
 	private IdmRoleTreeNodeService automaticRoleTreeService;
+	@Autowired
+	private LongRunningTaskManager longRunningTaskManager;
 	private IdmAutomaticRoleRequestService roleRequestService;
 
 	@Autowired
@@ -447,22 +452,14 @@ public class DefaultIdmAutomaticRoleRequestService extends
 	}
 	
 	@Override
-	public void deleteAutomaticRole(AbstractIdmAutomaticRoleDto automaticRole, AutomaticRoleRequestType type) {
-		Assert.notNull(automaticRole, "Automatic role is required.");
-		Assert.notNull(type, "Type is required.");
-
-		IdmAutomaticRoleRequestDto request = new IdmAutomaticRoleRequestDto();
-		request.setAutomaticRole(automaticRole.getId());
-		request.setName(automaticRole.getName());
-		request.setRequestType(type);
-		request.setOperation(RequestOperationType.REMOVE);
-		request.setResult(new OperationResultDto.Builder(OperationState.CREATED).build());
-		// call it this way in order to execute it in transaction
-		request = getIdmAutomaticRoleRequestService().save(request);
-
-		this.getIdmAutomaticRoleRequestService().startRequest(request.getId(), true);
+	public void deleteAutomaticRoleByLrt(AbstractIdmAutomaticRoleDto automaticRole) {
+		RemoveAutomaticRoleTaskExecutor automaticRoleTask = AutowireHelper.createBean(RemoveAutomaticRoleTaskExecutor.class);
+		automaticRoleTask.setAutomaticRoleId(automaticRole.getId());
+		automaticRoleTask.setContinueOnException(true);
+		automaticRoleTask.setRequireNewTransaction(true);
+		longRunningTaskManager.execute(automaticRoleTask);
 	}
-	
+
 	@Override
 	public IdmRoleTreeNodeDto createTreeAutomaticRole(IdmRoleTreeNodeDto automaticRole) {
 		Assert.notNull(automaticRole, "Automatic role is required.");

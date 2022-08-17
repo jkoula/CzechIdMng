@@ -11,7 +11,6 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.EnableLoadTimeWeaving;
 import org.springframework.plugin.core.config.EnablePluginRegistries;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -34,7 +33,6 @@ import eu.bcvsolutions.idm.core.api.domain.ModuleDescriptor;
 @EnableCaching
 @EnableScheduling
 @EnablePluginRegistries({ ModuleDescriptor.class })
-@EnableLoadTimeWeaving(aspectjWeaving = EnableLoadTimeWeaving.AspectJWeaving.AUTODETECT)
 public class IdmApplication extends SpringBootServletInitializer {
 	
 	@Override
