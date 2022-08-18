@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
-import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -308,7 +307,7 @@ public class DefaultAccAccountServiceTest extends AbstractIntegrationTest {
 		account = accountService.get(account.getId());
 		
 		Assert.assertEquals(identity.getId(), account.getTargetEntityId());
-		Assert.assertEquals(IdmIdentityDto.class.getName(), account.getTargetEntityType());
+		Assert.assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, account.getTargetEntityType());
 
 	}
 

@@ -752,6 +752,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 			syncSystemMapping.setTreeType(treeType.getId());
 			syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 			syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+			syncSystemMapping.setAccountType(AccountType.PERSONAL);
 			final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 			createMapping(system, syncMapping);

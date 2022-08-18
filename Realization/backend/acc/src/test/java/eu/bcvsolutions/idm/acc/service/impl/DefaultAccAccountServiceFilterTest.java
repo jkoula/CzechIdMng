@@ -213,6 +213,7 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(systemId);
 		account.setUid(uid);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account = accAccountService.save(account);
 
 		AccIdentityAccountDto accountIdentity = new AccIdentityAccountDto();

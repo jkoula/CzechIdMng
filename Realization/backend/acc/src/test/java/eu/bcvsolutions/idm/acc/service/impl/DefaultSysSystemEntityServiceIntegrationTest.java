@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
@@ -48,6 +47,7 @@ public class DefaultSysSystemEntityServiceIntegrationTest extends AbstractIntegr
 		account.setSystem(system.getId());
 		account.setUid("test_uid_" + System.currentTimeMillis());
 		account.setSystemEntity(systemEntity.getId());
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account = accountService.save(account);
 		
 		SysSystemEntityDto systemEntityDto = DtoUtils.getEmbedded(account, AccAccount_.systemEntity);
