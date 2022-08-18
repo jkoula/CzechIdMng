@@ -289,49 +289,45 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 				//
 				List<IdmConceptRoleRequestDto> concepts = conceptRequestService.find(conceptRequestFilter, null).getContent();
 
-				int propagationBehavior = transactionTemplate.getPropagationBehavior();
-				transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-				transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-					@Override
-					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
-						for (IdmConceptRoleRequestDto concept : concepts) {
-							IdmRoleRequestDto request = roleRequestService.get(concept.getRoleRequest());
-							String message = null;
-							if (concept.getState().isTerminatedState()) {
-								message = MessageFormat.format(
-										"Automatic role [{0}] (reqested in concept [{1}]) was deleted (not from this role request)!",
-										getAutomaticRoleId(), concept.getId());
-							} else {
-								message = MessageFormat.format(
-										"Request change in concept [{0}], was not executed, because requested automatic role [{1}] was deleted (not from this role request)!",
-										concept.getId(), getAutomaticRoleId());
-								concept.setState(RoleRequestState.CANCELED);
-							}
-							roleRequestService.addToLog(request, message);
-							conceptRequestService.addToLog(concept, message);
-							concept.setAutomaticRole(null);
+				for (IdmConceptRoleRequestDto concept : concepts) {
+					IdmRoleRequestDto request = roleRequestService.get(concept.getRoleRequest());
+					String message = null;
+					if (concept.getState().isTerminatedState()) {
+						message = MessageFormat.format(
+								"Automatic role [{0}] (reqested in concept [{1}]) was deleted (not from this role request)!",
+								getAutomaticRoleId(), concept.getId());
+					} else {
+						message = MessageFormat.format(
+								"Request change in concept [{0}], was not executed, because requested automatic role [{1}] was deleted (not from this role request)!",
+								concept.getId(), getAutomaticRoleId());
+						concept.setState(RoleRequestState.CANCELED);
+					}
+					roleRequestService.addToLog(request, message);
+					conceptRequestService.addToLog(concept, message);
+					concept.setAutomaticRole(null);
 
-							roleRequestService.save(request);
-							conceptRequestService.save(concept);
-						}
-						//
-						// by default is this allowed
-						if (isDeleteEntity()) {
-							// delete entity
-							if (getAutomaticRole() instanceof IdmRoleTreeNodeDto) {
-								roleTreeNodeService.deleteInternalById(getAutomaticRole().getId());
-							} else {
-
-								// remove all rules
+					roleRequestService.save(request);
+					conceptRequestService.save(concept);
+				}
+				//
+				// by default is this allowed
+				if (isDeleteEntity()) {
+					// delete entity
+					if (getAutomaticRole() instanceof IdmRoleTreeNodeDto) {
+						roleTreeNodeService.deleteInternalById(getAutomaticRole().getId());
+					} else {
+						int propagationBehavior = transactionTemplate.getPropagationBehavior();
+						transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+						transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+							@Override
+							protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
 								automaticRoleAttributeRuleService.deleteAllByAttribute(getAutomaticRole().getId());
 								automaticRoleAttributeService.deleteInternalById(getAutomaticRole().getId());
-
 							}
-						}
-						transactionStatus.flush();
+						});
+						transactionTemplate.setPropagationBehavior(propagationBehavior);
 					}
-				});
-				transactionTemplate.setPropagationBehavior(propagationBehavior);
+				}
 				//
 				LOG.debug("End: Remove role [{}] by automatic role [{}].", role.getCode(), getAutomaticRole().getId());
 				//
