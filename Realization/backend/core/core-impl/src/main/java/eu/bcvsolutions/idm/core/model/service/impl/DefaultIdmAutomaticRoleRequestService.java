@@ -57,7 +57,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
-import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -72,8 +71,6 @@ import eu.bcvsolutions.idm.core.model.event.AutomaticRoleRequestEvent;
 import eu.bcvsolutions.idm.core.model.event.AutomaticRoleRequestEvent.AutomaticRoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.role.RoleRequestApprovalProcessor;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRequestRepository;
-import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
-import eu.bcvsolutions.idm.core.scheduler.task.impl.RemoveAutomaticRoleTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import eu.bcvsolutions.idm.core.security.api.service.SecurityService;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowFilterDto;
@@ -114,8 +111,6 @@ public class DefaultIdmAutomaticRoleRequestService extends
 	private IdmAutomaticRoleAttributeService automaticRoleAttributeService;
 	@Autowired
 	private IdmRoleTreeNodeService automaticRoleTreeService;
-	@Autowired
-	private LongRunningTaskManager longRunningTaskManager;
 	private IdmAutomaticRoleRequestService roleRequestService;
 
 	@Autowired
