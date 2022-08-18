@@ -450,14 +450,22 @@ public class DefaultIdmAutomaticRoleRequestService extends
 		}
 		return requestEntity;
 	}
-	
+
 	@Override
-	public void deleteAutomaticRoleByLrt(AbstractIdmAutomaticRoleDto automaticRole) {
-		RemoveAutomaticRoleTaskExecutor automaticRoleTask = AutowireHelper.createBean(RemoveAutomaticRoleTaskExecutor.class);
-		automaticRoleTask.setAutomaticRoleId(automaticRole.getId());
-		automaticRoleTask.setContinueOnException(true);
-		automaticRoleTask.setRequireNewTransaction(true);
-		longRunningTaskManager.execute(automaticRoleTask);
+	public void deleteAutomaticRole(AbstractIdmAutomaticRoleDto automaticRole, AutomaticRoleRequestType type) {
+		Assert.notNull(automaticRole, "Automatic role is required.");
+		Assert.notNull(type, "Type is required.");
+
+		IdmAutomaticRoleRequestDto request = new IdmAutomaticRoleRequestDto();
+		request.setAutomaticRole(automaticRole.getId());
+		request.setName(automaticRole.getName());
+		request.setRequestType(type);
+		request.setOperation(RequestOperationType.REMOVE);
+		request.setResult(new OperationResultDto.Builder(OperationState.CREATED).build());
+		// call it this way in order to execute it in transaction
+		request = getIdmAutomaticRoleRequestService().save(request);
+
+		this.getIdmAutomaticRoleRequestService().startRequest(request.getId(), true);
 	}
 
 	@Override
