@@ -26,6 +26,7 @@ import NavigationMonitoring from './NavigationMonitoring';
 import NavigationLanguage from './NavigationLanguage';
 import NavigationIdentity from './NavigationIdentity';
 import NavigationEnvironment from './NavigationEnvironment';
+import BasicAlert from '../../basic/Alert/Alert';
 //
 const identityManager = new IdentityManager();
 const configurationManager = new ConfigurationManager();
@@ -213,8 +214,8 @@ function NavigationMaterial(props) {
           <AppBar
             position="fixed"
             className={ classes.appBarRoot }>
-            <Toolbar
-            style={{height:'100%'}}>
+            <Basic.Div>
+              
               {
                 applicationLogo
                 ?
@@ -233,7 +234,7 @@ function NavigationMaterial(props) {
               {
                 toogleDarkButton
               }
-            </Toolbar>
+            </Basic.Div>
           </AppBar>
           <Toolbar />
         </div>
@@ -290,6 +291,7 @@ function NavigationMaterial(props) {
             }
           )
         }>
+
         <Toolbar>
           <IconButton
             color="inherit"
@@ -339,10 +341,11 @@ function NavigationMaterial(props) {
           }
         </Toolbar>
       </AppBar>
-      <Toolbar />
+      
       <nav className={ classes.drawer }>
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden mdUp>
+        
           <Drawer
             variant="temporary"
             open={ mobileOpen }
@@ -352,12 +355,28 @@ function NavigationMaterial(props) {
             }}
             ModalProps={{
               keepMounted: true, // Better open performance on mobile.
+            }}
+            SlideProps={{
+              style: {
+              position:'fixed',
+              overflow:'auto',
+              height:'100vh'
+              }
             }}>
+              mdUpaaaaaaa
             { drawer }
           </Drawer>
         </Hidden>
         <Hidden smDown>
+        smDownaaaaaaaaaa
           <Drawer
+          PaperProps={{
+            style: {
+            position:'relative',
+            overflowY:'hidden',
+            height:'100%'
+            }
+          }}
             variant="permanent"
             className={
               clsx(
@@ -376,11 +395,13 @@ function NavigationMaterial(props) {
                 }
               ),
             }}
+            
             open>
             { drawer }
           </Drawer>
         </Hidden>
       </nav>
+      <Toolbar />
       <main className={ classes.content }>
         <div className={ classes.toolbar }/>
         { children }

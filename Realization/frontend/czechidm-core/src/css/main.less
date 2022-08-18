@@ -5,9 +5,13 @@
 @import "../content/identity/IdentityDetail.less";
 
 
+// Trash box with a gap
 .makeStyles-error-44 {
     margin-right: 11px;
 }
+
+
+//Horizontal Scroll bar in a stack trace inserted int the text area
   div.customTextAre.form-group{
         textarea {   
                overflow-x: auto;
@@ -21,31 +25,51 @@ div.customTextAreNot.form-group {
     }
 }
 
-.makeStyles-sidebar-14.sidebar{
-    overflow-y: hidden;
-    // scrollbar-width: none;
-}
 
-.makeStyles-sidebar-14.sidebar::-webkit-scrollbar {
-    /* Safari and Chrome */
-    display: none;
-  }
-ul > #side-menu.nav{
+
+// .makeStyles-sidebar-14.sidebar::-webkit-scrollbar {
+//     /* Safari and Chrome */
+//     display: none;
+//   }
+// ul > #side-menu.nav{
   
-    background-color: red;
-    width: 100%;
-    height: 100%;
+//     background-color: red;
+//     width: 100%;
+//     height: 100%;
+// }
+
+// ul > #side-menu-2 > li{
+//     width: 100%;
+//     height: 99%;
+//     border: 1px solid blue;
+//     overflow: auto;
+//     padding-right: 15px;
+// }
+
+
+// Main scrollbar without scrolling line
+// .MuiDrawer-paper {
+//     -webkit-overflow-scrolling: touch;
+//     margin-left: 0rem;
+//     position: unset;
+//     overflow: visible;
+//     overscroll-behavior: auto;
+//     border: 2px solid red;
+// }
+
+.makeStyles-sidebar-14.sidebar{
+    overflow-y: auto;
 }
 
-ul > #side-menu-2 > li{
-    width: 100%;
-    height: 99%;
-    border: 1px solid blue;
-    overflow: auto;
-    padding-right: 15px;
-}
-.MuiDrawer-paper {
-    -webkit-overflow-scrolling: touch;
-    margin-left: -51px;
-    position: unset;
-}
+//     ::-webkit-scrollbar {
+//     width: 1px;
+//     color:pink;
+//   }
+//   ::-webkit-scrollbar-track {
+//     background: transparent;
+//   }
+//   ::-webkit-scrollbar-thumb {
+//     background-color: rgba(255, 0, 225, 0.5);
+//     border-radius: 20px;
+//     border: transparent;
+//   }
