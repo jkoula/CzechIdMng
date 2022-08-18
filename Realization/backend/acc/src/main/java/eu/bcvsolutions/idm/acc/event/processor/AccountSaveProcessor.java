@@ -89,6 +89,14 @@ public class AccountSaveProcessor extends CoreEventProcessor<AccAccountDto> impl
 		
 		
 		if (entity.getFormDefinition() == null) {
+			if (systemDto == null) {
+				systemDto = systemService.get(entity.getSystem());
+			}
+			//
+			if (mapping == null && entity.getSystemMapping() != null) {
+					mapping = systemMappingService.get(entity.getSystemMapping());
+			}
+			//
 			SysSchemaObjectClassDto schema = null;
 			if (mapping != null) {
 				schema = schemaObjectClassService.get(mapping.getObjectClass());
