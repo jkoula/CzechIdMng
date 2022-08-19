@@ -55,7 +55,7 @@ import eu.bcvsolutions.idm.acc.repository.SysSystemMappingRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
@@ -124,7 +124,7 @@ public class DefaultSysSystemMappingService
 	@Autowired
 	private SysSystemEntityService systemEntityService;
 	@Autowired
-	private SysSystemEntityManager systemEntityManager;
+	private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public DefaultSysSystemMappingService(

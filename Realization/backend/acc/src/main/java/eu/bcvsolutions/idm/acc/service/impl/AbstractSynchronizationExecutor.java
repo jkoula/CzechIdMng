@@ -88,7 +88,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncItemLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
@@ -205,7 +205,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 	@Autowired(required = false)
 	private IdmCacheManager idmCacheManager;
 	@Autowired
-	private SysSystemEntityManager systemEntityManager;
+	private SysSystemEntityTypeManager systemEntityManager;
 	// Instance of LRT
 	protected AbstractSchedulableTaskExecutor<Boolean> longRunningTaskExecutor;
 	// Context for whole sync.

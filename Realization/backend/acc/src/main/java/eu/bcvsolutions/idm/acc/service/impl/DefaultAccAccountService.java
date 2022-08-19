@@ -42,7 +42,7 @@ import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationEntityExecutor;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
@@ -112,7 +112,7 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 	@Autowired
 	private ConnectorManager connectorManager;
 	@Autowired
-	private SysSystemEntityManager systemEntityManager;
+	private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public DefaultAccAccountService(AccAccountRepository accountRepository,

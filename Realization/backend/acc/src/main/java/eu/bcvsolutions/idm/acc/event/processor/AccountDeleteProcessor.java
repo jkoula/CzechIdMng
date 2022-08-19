@@ -41,7 +41,7 @@ import eu.bcvsolutions.idm.acc.service.api.AccRoleAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccRoleCatalogueAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccTreeAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
@@ -72,7 +72,7 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 	private final ProvisioningService provisioningService;
 	@Autowired
 	private AccContractSliceAccountService contractAccountSliceService;
-	@Autowired private SysSystemEntityManager systemEntityManager;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	private static final Logger LOG = LoggerFactory.getLogger(AccountDeleteProcessor.class);
 

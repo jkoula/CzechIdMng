@@ -33,7 +33,7 @@ import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningArchive;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
@@ -67,7 +67,7 @@ public class SysProvisioningArchiveController extends AbstractReadWriteDtoContro
 
 	protected static final String TAG = "Provisioning - archive";
 	
-	@Autowired private SysSystemEntityManager systemEntityManager;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 	
 	@Autowired
 	public SysProvisioningArchiveController(SysProvisioningArchiveService service) {

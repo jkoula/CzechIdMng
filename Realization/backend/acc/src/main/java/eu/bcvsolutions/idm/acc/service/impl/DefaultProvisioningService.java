@@ -28,7 +28,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningEntityExecutor;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -51,7 +51,7 @@ public class DefaultProvisioningService implements ProvisioningService {
 	private final PluginRegistry<ProvisioningEntityExecutor<?>, SystemEntityTypeRegistrable> pluginExecutors;
 
 	@Autowired
-	private SysSystemEntityManager systemEntityManager;
+	private SysSystemEntityTypeManager systemEntityManager;
 	
 	@Autowired
 	public DefaultProvisioningService(List<ProvisioningEntityExecutor<?>>  executors,

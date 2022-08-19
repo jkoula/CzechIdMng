@@ -43,7 +43,7 @@ import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningExecutor;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.bulk.action.BulkActionManager;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
@@ -88,7 +88,7 @@ public class SysProvisioningOperationController
 	@Autowired private ProvisioningExecutor provisioningExecutor;
 	@Autowired private BulkActionManager bulkActionManager;
 	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
-	@Autowired private SysSystemEntityManager systemEntityManager;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public SysProvisioningOperationController(SysProvisioningOperationService service) {

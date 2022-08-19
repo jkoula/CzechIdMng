@@ -52,7 +52,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
@@ -109,7 +109,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	@Autowired private SysProvisioningAttributeService provisioningAttributeService;
 	@Autowired private UniformPasswordManager uniformPasswordManager;
 	@Autowired private ConnectorManager connectorManager;
-	@Autowired private SysSystemEntityManager systemEntityManager;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	private AccAccountService accountService;

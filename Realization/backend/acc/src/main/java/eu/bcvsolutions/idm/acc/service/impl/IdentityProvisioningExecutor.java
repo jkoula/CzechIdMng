@@ -40,7 +40,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
@@ -108,7 +108,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 			ProvisioningExecutor provisioningExecutor, EntityEventManager entityEventManager,
 			SysSchemaObjectClassService schemaObjectClassService, SysSchemaAttributeService schemaAttributeService,
 			SysSystemAttributeMappingService systemAttributeMappingService, IdmRoleService roleService,
-			IdmIdentityService identityService, SysSystemEntityManager systemEntityManager) {
+			IdmIdentityService identityService, SysSystemEntityTypeManager systemEntityManager) {
 
 		super(systemMappingService, attributeMappingService, connectorFacade, systemService, roleSystemService,
 				roleSystemAttributeService, systemEntityService, accountService, provisioningExecutor,

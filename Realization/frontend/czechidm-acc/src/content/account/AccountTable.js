@@ -9,11 +9,13 @@ import AccountTypeEnum from '../../domain/AccountTypeEnum';
 import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 import AttributeTable from './AttributeTable';
+import SystemEntityTypeManager from '../../redux/SystemEntityTypeManager';
 
 const manager = new AccountManager();
 const systemEntityManager = new SystemEntityManager();
 const systemManager = new SystemManager();
 const systemMappingManager = new SystemMappingManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * Accounts on target system
@@ -427,10 +429,11 @@ class Filter extends Advanced.Filter {
                 enum={ AccountTypeEnum }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
-              <Advanced.Filter.EnumSelectBox
+              <Advanced.Filter.SelectBox
                 ref="entityType"
                 placeholder={ this.i18n('acc:entity.SystemEntity.entityType') }
-                enum={ SystemEntityTypeEnum }
+                multiSelect={ false }
+                manager={ systemEntityTypeManager }
                 rendered={ !forceSearchParameters.getFilters().has('entityType') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 } />

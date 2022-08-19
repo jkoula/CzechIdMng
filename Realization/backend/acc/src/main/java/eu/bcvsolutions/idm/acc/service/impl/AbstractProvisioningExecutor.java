@@ -71,7 +71,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityManager;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
@@ -130,7 +130,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	private final SysSystemAttributeMappingService systemAttributeMappingService;
 	protected final SysRoleSystemService roleSystemService;
 	private final IdmRoleService roleService;
-	private final SysSystemEntityManager systemEntityManager;
+	private final SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public AbstractProvisioningExecutor(SysSystemMappingService systemMappingService,
@@ -141,7 +141,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			EntityEventManager entityEventManager, SysSchemaAttributeService schemaAttributeService,
 			SysSchemaObjectClassService schemaObjectClassService,
 			SysSystemAttributeMappingService systemAttributeMappingService, IdmRoleService roleService,
-			SysSystemEntityManager systemEntityManager) {
+			SysSystemEntityTypeManager systemEntityManager) {
 
 		Assert.notNull(systemMappingService, "Service is required.");
 		Assert.notNull(attributeMappingService, "Service is required.");
