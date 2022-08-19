@@ -1353,6 +1353,14 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		if (account != null && !account.getUid().equals(uidValue)) {
 			// UID value must be string
 			account.setUid(uidValue);
+
+			AccAccountFilter accountFilter = new AccAccountFilter();
+			accountFilter.setUid(uidValue);
+			List<UUID> content = accountService.findIds(accountFilter, null).getContent();
+			if (content.size() > 0 && !content.get(0).equals(account.getId())) {
+				throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,
+						ImmutableMap.of("uid", uidValue, "account", account.getId(), "system", account.getSystem()));
+			}
 			account = accountService.save(account);
 		}
 		return account;

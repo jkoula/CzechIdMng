@@ -107,6 +107,7 @@ public enum AccResultCode implements ResultCode {
 	PROVISIONING_EX_ATTR_CONTROLED_VALUE_RECALC(HttpStatus.BAD_REQUEST, "Error occured durring recalculation controlled value of attribute [%s] on system [%s]!"),
 	PROVISONING_OPERATION_RETRY_CANCEL_NOT_FOUND(HttpStatus.NO_CONTENT, "Provisioning operation [%s] not found - was processed in batch."),
 	MAPPING_CONTEXT_SCRIPT_RETURNS_WRONG_TYPE(HttpStatus.BAD_REQUEST, "Script 'get mapping context' on the system [%s] must return 'MappingContext' type!"),
+	PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS(HttpStatus.INTERNAL_SERVER_ERROR, "Uid [%] already exists. Change uid for account [%s] for system [%s]"),
 	//
 	// Synchronization,
 	SYNCHRONIZATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Synchronization [%s] not found!"),

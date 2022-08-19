@@ -4,6 +4,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import java.io.Serializable;
@@ -204,7 +205,6 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		// Is role valid in this moment
 		resolveIdentityAccountForCreate(identity, Lists.newArrayList(), identityRolesList, identityAccountsToCreate,
 				Lists.newArrayList(), true, accounts);
-
 		// Create new identity accounts
 		identityAccountsToCreate.forEach(identityAccount ->
 			// Check if this identity-account already exists, if yes then is his account ID
@@ -747,13 +747,37 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		// Check if on exist same identity-account (for same identity-role, account and
 		// role-system)
 		long count = identityAccountService.count(identityAccountFilter);
-		if (count == 0) {
-			AccIdentityAccountDto identityAccountDto = identityAccountService.save(identityAccount);
-			accounts.add(identityAccountDto.getAccount());
+
+		// check if account should be provisioned based on role mapping, must be same as the one for account
+		AccAccountDto accountDto = DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.account, AccAccountDto.class, null);
+		long accountWithSameMapping = 0;
+		UUID accountSystem = null;
+		UUID accountId = null;
+		String accountUid = null;
+		if (accountDto != null) {
+			accountSystem = accountDto.getSystem();
+			accountId = accountDto.getId();
+			accountUid = accountDto.getUid();
+
+			IdmIdentityRoleDto idmIdentityRoleDto = identityRoleService.get(identityAccount.getIdentityRole());
+			SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
+			roleSystemFilter.setRoleId(idmIdentityRoleDto.getRole());
+			roleSystemFilter.setSystemId(accountSystem);
+			roleSystemFilter.setSystemMappingId(accountDto.getSystemMapping());
+			accountWithSameMapping = roleSystemService.count(roleSystemFilter);
+		}
+		if (accountWithSameMapping > 0) {
+			if (count == 0) {
+				AccIdentityAccountDto identityAccountDto = identityAccountService.save(identityAccount);
+				accounts.add(identityAccountDto.getAccount());
+			} else {
+				// If this identity-account already exists, then we need to add his account ID
+				// (for execute the provisioning).
+				accounts.add(identityAccountService.find(identityAccountFilter, null).getContent().get(0).getAccount());
+			}
 		} else {
-			// If this identity-account already exists, then we need to add his account ID
-			// (for execute the provisioning).
-			accounts.add(identityAccountService.find(identityAccountFilter, null).getContent().get(0).getAccount());
+			throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,
+					ImmutableMap.of("uid", accountUid, "account", accountId, "system", accountSystem));
 		}
 	}
 	

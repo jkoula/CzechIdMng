@@ -3807,6 +3807,10 @@
       "title": "Operace pro provisioning byla již zpracována či zrušena",
       "message": "Byly zpracovány všechny operace pro dané entity na koncovém systému v čase, jakém byly zaznamenány do fronty."
     },
+    "PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS": {
+      "title": "Duplicitní uid pro účet!",
+      "message": "Uid [{{uid}}] již existuje. Změňte uid pro účet [{{account}}] na systému [{{system}}]"
+    },
     "SYSTEM_MAPPING_NOT_FOUND": {
       "title": "Nenalezeno systémové mapování",
       "message": "Nenalezeno systémové mapování na systému [{{systemId}}] pro 'object class name' [{{objectClassName}}]."

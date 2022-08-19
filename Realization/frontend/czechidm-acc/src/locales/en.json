@@ -3805,6 +3805,10 @@
       "title": "Provisioning operation was already processed or canceled",
       "message": "Provisioning operation was processed in batch."
     },
+    "PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS": {
+      "title": "Duplicate uid for account!",
+      "message": "Uid [{{uid}}] already exists. Change uid for account [{{account}}] on system [{{system}}]"
+    },
     "SYSTEM_MAPPING_NOT_FOUND": {
       "title": "Cannot find system mapping",
       "message": "Cannot find system mapping on system [{{systemId}}] for object class name [{{objectClassName}}]."
