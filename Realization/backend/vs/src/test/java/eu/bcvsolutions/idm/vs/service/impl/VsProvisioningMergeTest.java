@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeControlledValueDto;
@@ -35,6 +34,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysAttributeControlledValueService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -101,7 +101,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 
 		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
 		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(roleTwo, system);
-		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), SystemEntityType.IDENTITY);
+		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 		attributeFilter.setSystemMappingId(mapping.getId());
@@ -164,7 +164,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 
 		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
 		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(roleTwo, system);
-		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), SystemEntityType.IDENTITY);
+		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 		attributeFilter.setSystemMappingId(mapping.getId());
@@ -235,7 +235,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 
 		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
 		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(roleTwo, system);
-		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), SystemEntityType.IDENTITY);
+		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 		attributeFilter.setSystemMappingId(mapping.getId());
@@ -366,7 +366,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 			IdmRoleDto role = helper.createRole();
 			String mergeValue = role.getCode();
 			SysRoleSystemDto roleSystem = helper.createRoleSystem(role, system);
-			SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), SystemEntityType.IDENTITY);
+			SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			
 			SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 			attributeFilter.setSystemMappingId(mapping.getId());

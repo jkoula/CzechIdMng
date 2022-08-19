@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableList;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysConnectorServerDto;
@@ -28,6 +27,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
@@ -196,7 +196,7 @@ public class VsSystemServiceTest extends AbstractIntegrationTest {
 		Assert.assertTrue(system.isVirtual());
 		//
 		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(system.getId(),
-				SystemOperationType.SYNCHRONIZATION, SystemEntityType.IDENTITY);
+				SystemOperationType.SYNCHRONIZATION, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals("Wrong size of found mappings!", 1, mappings.size());
 		SysSystemMappingDto mapping = mappings.get(0);
 		Assert.assertNotNull("Mapping is null!", mapping);
