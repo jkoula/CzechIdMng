@@ -214,7 +214,7 @@ function NavigationMaterial(props) {
           <AppBar
             position="fixed"
             className={ classes.appBarRoot }>
-            <Basic.Div>
+            <Toolbar>
               
               {
                 applicationLogo
@@ -234,7 +234,7 @@ function NavigationMaterial(props) {
               {
                 toogleDarkButton
               }
-            </Basic.Div>
+            </Toolbar>
           </AppBar>
           <Toolbar />
         </div>
@@ -363,12 +363,10 @@ function NavigationMaterial(props) {
               height:'100vh'
               }
             }}>
-              mdUpaaaaaaa
             { drawer }
           </Drawer>
         </Hidden>
         <Hidden smDown>
-        smDownaaaaaaaaaa
           <Drawer
           PaperProps={{
             style: {

@@ -132,15 +132,16 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     // use link function
     this.props.detailLink();
   }
-
-    onWrap =()=>{
-      this.setState({toggle:!this.state.toggle});
+  // Wrap button 
+  onWrap =()=>{
+    this.setState({toggle:!this.state.toggle});
     }
-    onCopy =(i)=> {
+  // Copy button
+  onCopy =(i)=> {
     navigator.clipboard.writeText(i.stackTrace);
     this.addMessage({
-      level: 'success',
-      message: this.i18n(`textCopy`)
+    level: 'success',
+    message: this.i18n(`textCopy`)
       })
      }
 
@@ -186,17 +187,16 @@ export default class OperationResult extends Basic.AbstractContextComponent {
           
           <Basic.Div>
           <Basic.Button
-          title= {this.i18n('copyClipboard')}
-          className ="customButton"
-          icon="fa:copy"
-          onClick= {this.onCopy.bind(this, value)}>
+            title= {this.i18n('copyClipboard')}
+            className ="customButton"
+            icon="fa:copy"
+            onClick= {this.onCopy.bind(this, value)}>
           </Basic.Button>
-
           <Basic.Button 
-          title={this.i18n(this.state.toggle ? 'wrapOff' : 'wrapOn')}
-          className="customButton" 
-          onClick= {this.onWrap.bind(this)}
-          icon={this.state.toggle ? "fa:angle-left": "fa:angle-right"}>
+            title={this.i18n(this.state.toggle ? 'wrapOff' : 'wrapOn')}
+            className="customButton" 
+            onClick= {this.onWrap.bind(this)}
+            icon={this.state.toggle ? "fa:angle-left": "fa:angle-right"}>
           </Basic.Button>
 
           <Basic.TextArea
