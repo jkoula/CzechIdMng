@@ -153,6 +153,15 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system);
 
 	/**
+	 * Assing system to given role with mapping (provisioning, identity)
+	 * @param role
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType);
+
+	/**
 	 * Find account on target system
 	 * 
 	 * @param uid
@@ -252,4 +261,6 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @return
 	 */
 	SysSystemOwnerRoleDto createSystemOwnerRole(SysSystemDto system, IdmRoleDto owner);
+
+	void deleteSystem(UUID systemId);
 }

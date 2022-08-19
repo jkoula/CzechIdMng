@@ -369,18 +369,28 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	
 	@Override
 	public SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system) {
+		return createRoleSystem(role, system, AccountType.PERSONAL);
+	}
+
+	@Override
+	public SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType) {
 		SysRoleSystemDto roleSystem = new SysRoleSystemDto();
 		roleSystem.setRole(role.getId());
 		roleSystem.setSystem(system.getId());
 		roleSystem.setCreateAccountByDefault(true);
 		// default mapping
-		List<SysSystemMappingDto> mappings = systemMappingService.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingFilter systemMappingFilter = new SysSystemMappingFilter();
+		systemMappingFilter.setSystemId(system.getId());
+		systemMappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		systemMappingFilter.setOperationType(SystemOperationType.PROVISIONING);
+		systemMappingFilter.setAccountType(accountType);
+		List<SysSystemMappingDto> mappings = systemMappingService.find(systemMappingFilter, null).getContent();
 		// required ...
 		roleSystem.setSystemMapping(mappings.get(0).getId());
 		//
 		return roleSystemService.save(roleSystem);
 	}
-	
+
 	@Override
 	public SysSystemEntityDto createSystemEntity(SysSystemDto system) {
 		SysSystemEntityDto systemEntity = new SysSystemEntityDto(createName(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
@@ -537,5 +547,10 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		dto.setOwnerRole(owner.getId());
 		//
 		return systemOwnerRoleService.save(dto);
+	}
+
+	@Override
+	public void deleteSystem(UUID systemId) {
+		systemService.deleteById(systemId);
 	}
 }
