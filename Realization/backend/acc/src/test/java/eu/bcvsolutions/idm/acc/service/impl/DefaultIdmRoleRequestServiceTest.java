@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import eu.bcvsolutions.idm.acc.dto.*;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
@@ -54,6 +56,12 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 	@Autowired
 	private AccAccountService accountService;
 
+	@Autowired
+	private AccAccountConceptRoleRequestService accAccountConceptRoleRequestService;
+
+	@Autowired
+	private AccAccountRoleService accAccountRoleService;
+
 	@Before
 	public void login() {
 		loginAsAdmin();
@@ -74,7 +82,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountDto accAccountDto = accountService.get(identityAccount.getAccount());
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(accAccountDto.getId());
+		request.setApplicant(identity.getId());
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED); // can not be saved (after
@@ -96,7 +104,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		conceptA.setValidFrom(validFrom);
 		conceptA.setValidTill(validTill);
 		conceptA.setAccAccount(accAccountDto.getId());
-		/*conceptA = conceptRoleRequestService.save(conceptA);
+		conceptA = accAccountConceptRoleRequestService.save(conceptA);
 
 		Assert.assertEquals(RoleRequestState.CONCEPT, conceptA.getState());
 
@@ -104,12 +112,12 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		request = roleRequestService.get(request.getId());
 
 		Assert.assertEquals(RoleRequestState.EXECUTED, request.getState());
-		List<IdmIdentityRoleDto> identityRoles = identityRoleService.findAllByIdentity(testA.getId());
+
+		List<AccAccountRoleDto> identityRoles = accAccountRoleService.findByAccountId(accAccountDto.getId());
 		Assert.assertEquals(1, identityRoles.size());
 		Assert.assertEquals(validFrom, identityRoles.get(0).getValidFrom());
 		Assert.assertEquals(validTill, identityRoles.get(0).getValidTill());
-		Assert.assertEquals(contractA.getId(), identityRoles.get(0).getIdentityContract());
-		Assert.assertEquals(roleA.getId(), identityRoles.get(0).getRole());*/
+		Assert.assertEquals(roleA.getId(), identityRoles.get(0).getRole());
 
 	}
 

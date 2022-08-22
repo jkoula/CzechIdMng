@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -295,7 +296,7 @@ public class IdmIdentityRoleController extends AbstractReadWriteDtoController<Id
 		IdmIdentityRoleFilter filter = new  IdmIdentityRoleFilter(parameters);
 		// TODO: resolve codeable parameters automatically ...
 		filter.setIdentityId(getParameterConverter().toEntityUuid(parameters, IdmIdentityRoleFilter.PARAMETER_IDENTITY_ID, IdmIdentityDto.class));
-		filter.setRoleId(getParameterConverter().toEntityUuid(parameters, IdmIdentityRoleFilter.PARAMETER_ROLE_ID, IdmRoleDto.class));
+		filter.setRoleId(getParameterConverter().toEntityUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID, IdmRoleDto.class));
 		//
 		return filter;
 	}

@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.model.entity;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
+import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import org.hibernate.envers.Audited;
 import org.springframework.util.Assert;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class AbstractRoleAssignment extends AbstractEntity implements BaseEntity {
+public class AbstractRoleAssignment extends AbstractEntity implements FormableEntity, ValidableEntity {
 
     @NotNull
     @Audited

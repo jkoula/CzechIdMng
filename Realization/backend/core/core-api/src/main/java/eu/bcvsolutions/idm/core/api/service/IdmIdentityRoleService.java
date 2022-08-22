@@ -13,9 +13,6 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
-import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
-import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
-import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 
 /**
  * Operations with identity roles
@@ -26,8 +23,7 @@ import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
  *
  */
 public interface IdmIdentityRoleService extends
-		EventableDtoService<IdmIdentityRoleDto, IdmIdentityRoleFilter>,
-		AuthorizableService<IdmIdentityRoleDto>,
+		IdmRoleAssignmentService<IdmIdentityRoleDto, IdmIdentityRoleFilter>,
 		ScriptEnabled {
 	
 	String SKIP_CHECK_AUTHORITIES = "skipCheckAuthorities";
@@ -51,15 +47,15 @@ public interface IdmIdentityRoleService extends
 	/**
 	 * Returns all roles related to given {@link IdmContractPositionDto}
 	 * 
-	 * @param identityContractId
+	 * @param contractPositionId
 	 * @return
 	 */
 	List<IdmIdentityRoleDto> findAllByContractPosition(UUID contractPositionId);
 	
 	/**
 	 * Returns assigned roles by given automatic role.
-	 * 
-	 * @param roleTreeNodeId	
+	 *
+	 * @param roleTreeNodeId
 	 * @return
 	 */
 	Page<IdmIdentityRoleDto> findByAutomaticRole(UUID roleTreeNodeId, Pageable pageable);
@@ -102,21 +98,7 @@ public interface IdmIdentityRoleService extends
 	 */
 	Page<IdmIdentityRoleDto> findValidRoles(UUID identityId, Pageable pageable);
 
-	/**
-	 * Get form instance for given identity role
-	 * 
-	 * @param dto
-	 * @return
-	 */
-	IdmFormInstanceDto getRoleAttributeValues(IdmIdentityRoleDto dto);
 
-	/**
-	 * Validate form attributes for given identityRole
-	 * 
-	 * @param identityRole
-	 * @return
-	 */
-	List<InvalidFormAttributeDto> validateFormAttributes(IdmIdentityRoleDto identityRole);
 
 	/**
 	 * Check if {@link IdmIdentityRoleDto} <b>ONE</b> is duplicit against {@link IdmIdentityRoleDto} <b>TWO</b>.</br></br>

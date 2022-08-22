@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +28,6 @@ import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
@@ -187,9 +187,9 @@ public class IdmRequestIdentityRoleController
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter(parameters);
 		filter.setIdentityId(getParameterConverter().toUuid(parameters, "identityId"));
 		filter.setIdentityContractId(getParameterConverter().toUuid(parameters, "identityContractId"));
-		filter.setRoleId(getParameterConverter().toUuid(parameters, IdmIdentityRoleFilter.PARAMETER_ROLE_ID));
-		filter.setRoleText(getParameterConverter().toString(parameters, IdmIdentityRoleFilter.PARAMETER_ROLE_TEXT));
-		filter.setRoleEnvironments(getParameterConverter().toStrings(parameters, IdmIdentityRoleFilter.PARAMETER_ROLE_ENVIRONMENT));
+		filter.setRoleId(getParameterConverter().toUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID));
+		filter.setRoleText(getParameterConverter().toString(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_TEXT));
+		filter.setRoleEnvironments(getParameterConverter().toStrings(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ENVIRONMENT));
 		filter.setRoleRequestId(getParameterConverter().toUuid(parameters, "roleRequestId"));
 		filter.setState(getParameterConverter().toEnum(parameters, "state", RoleRequestState.class));
 		filter.setOnlyChanges(getParameterConverter().toBoolean(parameters, "onlyChanges", false));

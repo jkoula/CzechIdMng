@@ -43,8 +43,4 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
         this.accountRole = accountRole;
     }
 
-    @Override
-    public boolean hasEntity() {
-        return getAccountRole() != null;
-    }
 }
