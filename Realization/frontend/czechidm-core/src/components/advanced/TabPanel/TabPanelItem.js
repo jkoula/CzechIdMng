@@ -31,6 +31,7 @@ export default function TabPanelItem(props) {
   if (_icon) {
     iconContent = (
       <Basic.Icon icon={ _icon } color={ iconColor } showLoading={ showLoading }/>
+
     );
   }
   //

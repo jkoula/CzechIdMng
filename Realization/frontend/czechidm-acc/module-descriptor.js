@@ -68,6 +68,16 @@ module.exports = {
                 icon: 'fa:external-link',
                 access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
               },
+              // Adding a tab in nav menu 
+              {
+                id: 'system-owner',
+                type: 'TAB',
+                labelKey: 'acc:content.system.owner.title',
+                order: 25,
+                path: '/system/:entityId/owner',
+                icon: 'fa:user',
+                access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
+              },
               {
                 id: 'system-entities',
                 type: 'TAB',

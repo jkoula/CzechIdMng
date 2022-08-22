@@ -211,9 +211,9 @@ if (logger.isTraceEnabled()) {
 midlewares = [...midlewares, thunkMiddleware, promiseMiddleware, reduxQueue];
 const createStoreWithMiddleware = applyMiddleware(...midlewares)(createPersistentStore);
 // redux store
-const store = createStoreWithMiddleware(reducer);
+// const store = createStoreWithMiddleware(reducer);
 // const store = createStore(reducer);
-// const store = createStoreWithMiddleware(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const store = createStoreWithMiddleware(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 // Required for replaying actions from devtools to work
 // reduxRouterMiddleware.listenForReplays(store);
 

@@ -95,6 +95,7 @@ import MonitoringResultService from './MonitoringResultService';
 import RoleSystemService from './RoleSystemService';
 import UniversalSearchService from './UniversalSearchService';
 
+
 const ServiceRoot = {
   RestApiService,
   AbstractService,

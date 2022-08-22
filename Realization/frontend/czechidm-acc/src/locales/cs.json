@@ -373,6 +373,9 @@
         "header": "Detail logu položky",
         "title": "Detail logu položky"
       },
+      "owner": {
+        "title": "Vlastník"
+      },
       "accounts": {
         "header": "Účty na koncovém systému <small>uložené v IdM</small>",
         "title": "Účty na systému",

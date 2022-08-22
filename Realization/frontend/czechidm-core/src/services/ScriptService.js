@@ -26,11 +26,11 @@ class ScriptService extends AbstractService {
 
   // dto
   supportsPatch() {
-    return false;
+    return true;
   }
 
   supportsBulkAction() {
-    return true;
+    return false;
   }
 
   /**
