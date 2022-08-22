@@ -678,7 +678,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(((BigDecimal)formValueDto.getValue()).longValue(), ((BigDecimal)value).longValue());
 		IdmFormAttributeDto mappedAttribute = formInstance.getMappedAttribute(formValue.getFormAttribute());
 		Assert.assertNotNull(mappedAttribute);
-		Assert.assertNull(formInstance.getValidationErrors());
+		Assert.assertEquals(0, formInstance.getValidationErrors().size());
 
 		identityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
 		assertEquals(1, identityRoles.size());
@@ -777,7 +777,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(((BigDecimal)formValueDto.getValue()).longValue(), ((BigDecimal)value).longValue());
 		IdmFormAttributeDto mappedAttribute = formInstance.getMappedAttribute(formValue.getFormAttribute());
 		Assert.assertNotNull(mappedAttribute);
-		Assert.assertNull(formInstance.getValidationErrors());
+		Assert.assertEquals(0, formInstance.getValidationErrors().size());
 
 		identityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
 		assertEquals(1, identityRoles.size());

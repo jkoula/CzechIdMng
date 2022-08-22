@@ -132,24 +132,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
             predicates.add(builder.exists(roleCatalogueRoleSubquery));
         }
         //
-        Boolean valid = filter.getValid();
-        if (valid != null) {
-            // Only valid identity-role include check on contract validity too
-            if (valid) {
-                final LocalDate today = LocalDate.now();
-                predicates.add(
-                        RepositoryUtils.getValidPredicate(root, builder, today)
-                );
-            }
-            // Only invalid identity-role
-            if (!valid) {
-                final LocalDate today = LocalDate.now();
-                predicates.add(
-                        builder.not(RepositoryUtils.getValidPredicate(root, builder, today))
-                );
-            }
-        }
-        //
         // is automatic role
         Boolean automaticRole = filter.getAutomaticRole();
         if (automaticRole != null) {
