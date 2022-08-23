@@ -1616,6 +1616,29 @@
       "system": "System",
       "systemGroup": "Group",
       "mergeAttribute": "Attribute for controlling groups"
+    },
+    "SystemEntityType": {
+      "IDENTITY": {
+        "label": "Identity"
+      },
+      "ROLE": {
+        "label": "Role"
+      },
+      "TREE": {
+        "label": "Tree"
+      },
+      "ROLE_CATALOGUE": {
+        "label": "Role catalogue"
+      },
+      "CONTRACT": {
+        "label": "Identity contract"
+      }, 
+      "CONTRACT_SLICE": {
+        "label": "Contract time slices"
+      },
+      "IDENTITY_ROLE": {
+        "label": "Assigned roles (alfa version)"
+      }
     }
   },
   "enums" : {

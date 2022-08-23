@@ -6,7 +6,6 @@ import _ from 'lodash';
 import { Basic, Advanced, Managers, Utils, Domain } from 'czechidm-core';
 import { AccountManager, SystemEntityManager, SystemManager, SystemMappingManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 import AttributeTable from './AttributeTable';
 import SystemEntityTypeManager from '../../redux/SystemEntityTypeManager';
@@ -311,11 +310,11 @@ export class AccountTable extends Advanced.AbstractTableContent {
                     forceSearchParameters={ forceSystemEntitySearchParameters }
                     onChange={ this.onChangeSystemEntity.bind(this) }/>
                 }
-                <Basic.EnumSelectBox
+                <Basic.SelectBox
                   ref="entityType"
-                  useSymbol={ false }
-                  enum={ SystemEntityTypeEnum }
                   label={ this.i18n('acc:entity.SystemEntity.entityType') }
+                  multiSelect={ false }
+                  manager={ systemEntityTypeManager }
                   hidden={ systemEntity }/>
                 <Basic.SelectBox
                   ref="systemMapping"
@@ -433,6 +432,7 @@ class Filter extends Advanced.Filter {
                 ref="entityType"
                 placeholder={ this.i18n('acc:entity.SystemEntity.entityType') }
                 multiSelect={ false }
+                face='text'
                 manager={ systemEntityTypeManager }
                 rendered={ !forceSearchParameters.getFilters().has('entityType') }/>
             </Basic.Col>

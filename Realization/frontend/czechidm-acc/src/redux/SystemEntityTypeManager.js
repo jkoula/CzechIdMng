@@ -20,13 +20,16 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
         return this.service;
     }
 
+    getEntityType() {
+        return SystemEntityTypeManager.UI_KEY_SUPPORTED_ENTITY_TYPES;
+    }
+
     /**
     * Loads registered system entity types
     *
     * @return {action}
     */
-    fetchSupportedTasks() {
-        const uiKey = SystemEntityTypeManager.UI_KEY_SUPPORTED_TASKS;
+    fetchEntities(searchParameters, uiKey, cb) {
         //
         return (dispatch, getState) => {
         const loaded = Managers.DataManager.getData(getState(), uiKey);
@@ -36,38 +39,35 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
         } else {
             dispatch(this.dataManager.requestData(uiKey));
             this.getService().getSupportedEntityTypes()
-            .then(json => {
-                let tasks = new Immutable.Map();
-                if (json._embedded && json._embedded.types) {
-                json._embedded.types.forEach(item => {
-                    types = types.set(item.type, item);
-                });
+            .then(json => {``
+                let types = new Immutable.Map();
+                if (json._embedded && json._embedded.systemEntityTypes) {
+                    json._embedded.systemEntityTypes.forEach(item => {
+                        item.id = item.systemEntityCode
+                        types = types.set(item.value, item.systemEntityCode);
+                    });
                 }
-                dispatch(this.dataManager.receiveData(uiKey, tasks));
+                cb(json, null, uiKey)
+                dispatch(this.dataManager.receiveData(uiKey, types));
             })
             .catch(error => {
+                cb(null, error, uiKey)
                 dispatch(this.dataManager.receiveError(null, uiKey, error));
             });
         }
         };
     }
 
-    // getNiceLabel(entity, showDescription = true, supportedTasks = null) {
-    //     let _taskType;
-    //     if (supportedTasks && supportedTasks.has(entity.taskType)) {
-    //       _taskType = supportedTasks.get(entity.taskType);
-    //     }
-    //     if (_taskType && _taskType.formDefinition) {
-    //       const simpleTaskType = Utils.Ui.getSimpleJavaType(entity.taskType);
-    //       let _label = formAttributeManager.getLocalization(_taskType.formDefinition, null, 'label', simpleTaskType);
-    //       if (_label !== simpleTaskType) {
-    //         _label += ` (${ simpleTaskType })`;
-    //       }
-    //       return _label;
-    //     }
-    //     return this.getService().getNiceLabel(entity, showDescription);
-    // }
+    getNiceLabelForEntityType(entityType) {
+        if (entityType && entityType._embedded && entityType._embedded.systemEntityType) {
+            return this.getService().getNiceLabel(entityType._embedded.systemEntityType);
+        }
+    } 
+
+    getCollectionType() {
+        return 'systemEntityTypes';
+    }
 }
 
 SystemEntityTypeManager.UI_KEY_TASKS = 'system-entity-types';
-SystemEntityTypeManager.UI_KEY_SUPPORTED_TASKS = 'supported-system-entity-types';
+SystemEntityTypeManager.UI_KEY_SUPPORTED_ENTITY_TYPES = 'supported-system-entity-types';

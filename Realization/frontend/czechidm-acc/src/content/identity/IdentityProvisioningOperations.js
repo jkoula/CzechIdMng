@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { Basic, Advanced, Domain, Managers } from 'czechidm-core';
 import ProvisioningOperations from '../provisioning/ProvisioningOperations';
 import { ProvisioningOperationTable } from '../provisioning/ProvisioningOperationTable';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 
 const identityManager = new Managers.IdentityManager();
 
@@ -33,7 +32,7 @@ class IdentityProvisioningOperations extends Advanced.AbstractTableContent {
     }
     const forceSearchParameters = new Domain.SearchParameters()
       .setFilter('entityIdentifier', entity.id)
-      .setFilter('entityType', SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY));
+      .setFilter('entityType', 'IDENTITY');
     let columns = ProvisioningOperationTable.defaultProps.columns;
     columns = _.difference(columns, ['entityType', 'entityIdentifier']);
     //

@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.service.api;
 
 import java.util.List;
 
+import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 
@@ -11,5 +12,7 @@ public interface SysSystemEntityTypeManager {
 	
 	SystemEntityTypeRegistrable getSystemEntityByClass(Class<? extends AbstractDto> clazz);
 	
-	List<SystemEntityTypeRegistrable> getSupportedEntityTypes();
+	List<SystemEntityTypeRegistrableDto> getSupportedEntityTypes();
+	
+	SystemEntityTypeRegistrableDto getSystemEntityDtoByCode(String code);
 }

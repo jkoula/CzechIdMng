@@ -278,6 +278,7 @@ class AbstractForm extends AbstractContextComponent {
         }
       }
     }
+    console.log("fcking debug", result)
     return result;
   }
 

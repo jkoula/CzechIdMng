@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
 import { TreeAccountManager, AccountManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 
 const uiKey = 'tree-accounts-table';
 const manager = new TreeAccountManager();
@@ -78,7 +77,7 @@ class TreeAccounts extends Advanced.AbstractTableContent {
     const { detail } = this.state;
     const forceSearchParameters = new Domain.SearchParameters().setFilter('treeNodeId', entityId);
     const accountSearchParameters = new Domain.SearchParameters()
-      .setFilter('entityType', SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE));
+      .setFilter('entityType', 'TREE');
     //
     return (
       <Basic.Div>

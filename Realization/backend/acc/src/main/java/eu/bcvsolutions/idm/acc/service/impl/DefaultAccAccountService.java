@@ -1,6 +1,33 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.text.MessageFormat;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.plugin.core.OrderAwarePluginRegistry;
+import org.springframework.plugin.core.PluginRegistry;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
+
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
@@ -10,6 +37,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
@@ -60,29 +88,6 @@ import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
 import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
-import java.text.MessageFormat;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.plugin.core.OrderAwarePluginRegistry;
-import org.springframework.plugin.core.PluginRegistry;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * Accounts on target system.
@@ -162,6 +167,16 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 				UUID targetEntity = executor.getEntityByAccount(newDto.getId());
 				newDto.setTargetEntityType(systemEntityType.getSystemEntityCode());
 				newDto.setTargetEntityId(targetEntity);
+			}
+			if (systemEntityType != null) {
+				Map<String, BaseDto> embedded = newDto.getEmbedded();
+				SystemEntityTypeRegistrableDto systemEntityTypeDto = 
+						systemEntityManager.getSystemEntityDtoByCode(entityType);
+				if (systemEntityTypeDto != null) {
+					embedded.put(SystemEntityTypeRegistrableDto.EMBEDDED_TYPE, 
+							systemEntityTypeDto);
+					newDto.setEmbedded(embedded);
+				}
 			}
 		}
 		return newDto;

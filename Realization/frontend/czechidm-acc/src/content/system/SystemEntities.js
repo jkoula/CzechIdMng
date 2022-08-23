@@ -5,13 +5,13 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 //
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
-import { SystemEntityManager, SystemManager } from '../../redux';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
+import { SystemEntityManager, SystemManager, SystemEntityTypeManager } from '../../redux';
 import AttributeTable from '../account/AttributeTable';
 
 const uiKey = 'system-entities-table';
 const manager = new SystemEntityManager();
 const systemManager = new SystemManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * Entities in target system.
@@ -107,7 +107,7 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
                   level="success"
                   key="add_button"
                   className="btn-xs"
-                  onClick={this.showDetail.bind(this, { entityType: SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY) })}
+                  onClick={this.showDetail.bind(this, { entityType: 'IDENTITY' })}
                   rendered={Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE'])}>
                   <Basic.Icon type="fa" icon="plus"/>
                   {' '}
@@ -150,8 +150,18 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
               width={ 75 }
               header={ this.i18n('acc:entity.SystemEntity.entityType') }
               sort
-              face="enum"
-              enumClass={SystemEntityTypeEnum} />
+              face="text"
+              cell={
+                ({ rowIndex, data }) => {
+                  const entity = data[rowIndex];
+                  if (!entity || !entity.entityType) {
+                    return null;
+                  }
+                  return (
+                    systemEntityTypeManager.getNiceLabelForEntityType(entity)
+                  );
+                }
+              } />
             <Advanced.Column
               property="wish"
               sort
@@ -188,9 +198,9 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
                   label={this.i18n('acc:entity.SystemEntity.uid')}
                   required
                   max={1000}/>
-                <Basic.EnumSelectBox
+                <Basic.SelectBox
                   ref="entityType"
-                  enum={SystemEntityTypeEnum}
+                  manager={ systemEntityTypeManager }
                   label={this.i18n('acc:entity.SystemEntity.entityType')}
                   required/>
                 <Basic.Checkbox
@@ -270,10 +280,10 @@ class Filter extends Advanced.Filter {
                 placeholder={ this.i18n('acc:content.system.entities.filter.text.placeholder') }/>
             </Basic.Col>
             <Basic.Col lg={ 4 }>
-              <Advanced.Filter.EnumSelectBox
+              <Advanced.Filter.SelectBox
                 ref="entityType"
                 placeholder={ this.i18n('acc:entity.SystemEntity.entityType') }
-                enum={ SystemEntityTypeEnum }/>
+                manager={ systemEntityTypeManager }/>
             </Basic.Col>
             <Basic.Col lg={ 4 } className="text-right">
               <Advanced.Filter.FilterButtons cancelFilter={ onCancel }/>

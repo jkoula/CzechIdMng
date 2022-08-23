@@ -11,7 +11,6 @@ import SynchronizationLinkedActionTypeEnum from '../../domain/SynchronizationLin
 import SynchronizationMissingEntityActionTypeEnum from '../../domain/SynchronizationMissingEntityActionTypeEnum';
 import SynchronizationUnlinkedActionTypeEnum from '../../domain/SynchronizationUnlinkedActionTypeEnum';
 import IcFilterOperationTypeEnum from '../../domain/IcFilterOperationTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import SyncIdentityConfig from '../sync/SyncIdentityConfig';
 import SyncContractConfig from '../sync/SyncContractConfig';
 import SyncTreeConfig from '../sync/SyncTreeConfig';
@@ -143,15 +142,15 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
     // Merge filter data to form.
     _.merge(formEntity, filterData);
 
-    if (entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.CONTRACT)) {
+    if (entityType === 'CONTRACT') {
       formEntity._type = 'SysSyncContractConfigDto';
-    } else if (entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.CONTRACT_SLICE)) {
+    } else if (entityType === 'CONTRACT_SLICE') {
       formEntity._type = 'SysSyncContractConfigDto';
-    } else if (entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY)) {
+    } else if (entityType === 'IDENTITY') {
       formEntity._type = 'SysSyncIdentityConfigDto';
-    } else if (entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.ROLE)) {
+    } else if (entityType === 'ROLE') {
       formEntity._type = 'SysSyncRoleConfigDto';
-    } else if (entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE)) {
+    } else if (entityType === 'TREE') {
       formEntity._type = 'SysSyncTreeConfigDto';
     } else {
       formEntity._type = 'SysSyncConfigDto';
@@ -287,8 +286,8 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
   _onChangeSystemMapping(systemMapping) {
     const systemMappingId = systemMapping ? systemMapping.id : null;
     const entityType = systemMapping ? systemMapping.entityType : null;
-    const isSelectedTree = (entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE) ||
-      entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.ROLE_CATALOGUE));
+    const isSelectedTree = (entityType === 'TREE' ||
+      entityType === 'ROLE_CATALOGUE');
     this.setState({
       systemMappingId,
       entityType
@@ -633,43 +632,43 @@ class SystemSynchronizationConfigDetail extends Advanced.AbstractTableContent {
     let specificConfiguration = null;
     const finalEntityType = this._getEntityType(synchronizationConfig, entityType);
     if (finalEntityType) {
-      if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE)) {
+      if (finalEntityType === 'TREE') {
         isSelectedTree = true;
       }
-      if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.ROLE_CATALOGUE)) {
+      if (finalEntityType === 'ROLE_CATALOGUE') {
         isRoleCatalogue = true;
       }
     }
     if (finalEntityType) {
-      if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.CONTRACT)) {
+      if (finalEntityType === 'CONTRACT') {
         specificConfiguration = <SyncContractConfig
           ref="formSpecific"
           synchronizationConfig={synchronizationConfig}
           showLoading={innerShowLoading}
           isNew={isNew}
           className="panel-body"/>;
-      } else if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.CONTRACT_SLICE)) {
+      } else if (finalEntityType === 'CONTRACT_SLICE') {
         specificConfiguration = <SyncContractConfig
           ref="formSpecific"
           synchronizationConfig={synchronizationConfig}
           showLoading={innerShowLoading}
           isNew={isNew}
           className="panel-body"/>;
-      } else if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY)) {
+      } else if (finalEntityType === 'IDENTITY') {
         specificConfiguration = <SyncIdentityConfig
           ref="formSpecific"
           synchronizationConfig={synchronizationConfig}
           showLoading={innerShowLoading}
           isNew={isNew}
           className="panel-body"/>;
-      } else if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.ROLE)) {
+      } else if (finalEntityType === 'ROLE') {
         specificConfiguration = <SyncRoleConfig
           ref="formSpecific"
           synchronizationConfig={synchronizationConfig}
           showLoading={innerShowLoading}
           isNew={isNew}
           className="panel-body"/>;
-      } else if (finalEntityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE)) {
+      } else if (finalEntityType === 'TREE') {
         specificConfiguration = (
           <SyncTreeConfig
             ref="formSpecific"

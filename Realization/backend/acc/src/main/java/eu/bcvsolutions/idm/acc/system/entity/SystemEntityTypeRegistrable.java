@@ -6,6 +6,8 @@ public interface SystemEntityTypeRegistrable {
 
 	String getSystemEntityCode();
 	
+	String getModule();
+	
 	Class<? extends AbstractDto> getEntityType();
 	
 	Class<? extends AbstractDto> getExtendedAttributeOwnerType();

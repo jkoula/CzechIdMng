@@ -8,7 +8,7 @@ import { Services, Utils } from 'czechidm-core';
 export default class SystemEntityTypeService extends Services.AbstractService {
 
     getApiPath() {
-        return '/system-entity-type';
+        return '/system-entity-types';
     }
     
     supportsAuthorization() {
@@ -20,7 +20,7 @@ export default class SystemEntityTypeService extends Services.AbstractService {
      *
      * @return {promise}
      */
-    getSupportedTasks() {
+     getSupportedEntityTypes() {
         return Services.RestApiService
         .get(this.getApiPath() + '/search/supported')
         .then(response => {
@@ -32,5 +32,9 @@ export default class SystemEntityTypeService extends Services.AbstractService {
             }
             return json;
         });
+    }
+
+    getNiceLabel(entity) {
+        return Services.LocalizationService.i18n(`${entity.module}:entity.SystemEntityType.${entity.systemEntityCode}.label`);
     }
 }

@@ -1617,6 +1617,29 @@
       "system": "Systém",
       "systemGroup": "Skupina",
       "mergeAttribute": "Atribut kontrolující skupiny"
+    },
+    "SystemEntityType": {
+      "IDENTITY": {
+        "label": "Identita"
+      },
+      "ROLE": {
+        "label": "Role"
+      },
+      "TREE": {
+        "label": "Strom"
+      },
+      "ROLE_CATALOGUE": {
+        "label": "Katalog rolí"
+      },
+      "CONTRACT": {
+        "label": "Pracovní pozice"
+      }, 
+      "CONTRACT_SLICE": {
+        "label": "Časové řezy pozic"
+      },
+      "IDENTITY_ROLE": {
+        "label": "Přiřazené role (alfa verze)"
+      }
     }
   },
   "enums" : {

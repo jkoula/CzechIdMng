@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -29,6 +30,7 @@ import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto.Builder;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningArchive;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningArchive_;
@@ -40,9 +42,11 @@ import eu.bcvsolutions.idm.acc.repository.SysProvisioningArchiveRepository;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
@@ -66,6 +70,7 @@ public class DefaultSysProvisioningArchiveService
 	@Autowired private SysSystemEntityService systemEntityService;
 	@Autowired private SysProvisioningAttributeService provisioningAttributeService;
 	@Autowired private SysSystemService systemService;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public DefaultSysProvisioningArchiveService(SysProvisioningArchiveRepository repository) {
@@ -361,5 +366,22 @@ public class DefaultSysProvisioningArchiveService
 		}
 		//
 		return predicates;
+	}
+
+	@Override
+	protected SysProvisioningArchiveDto toDto(SysProvisioningArchive entity, SysProvisioningArchiveDto dto) {
+		SysProvisioningArchiveDto archiveDto = super.toDto(entity, dto);
+		if (archiveDto.getEntityType() != null) {
+			Map<String, BaseDto> embedded = archiveDto.getEmbedded();
+			SystemEntityTypeRegistrableDto systemEntityTypeDto = 
+					systemEntityManager.getSystemEntityDtoByCode(archiveDto.getEntityType());
+			if (systemEntityTypeDto != null) {
+				embedded.put(SystemEntityTypeRegistrableDto.EMBEDDED_TYPE, 
+						systemEntityTypeDto);
+				archiveDto.setEmbedded(embedded);
+			}
+		}
+		
+		return archiveDto;
 	}
 }

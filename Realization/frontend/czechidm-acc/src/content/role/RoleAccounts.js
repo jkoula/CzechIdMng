@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
 import { RoleAccountManager, AccountManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 
 const uiKey = 'role-accounts-table';
 const manager = new RoleAccountManager();
@@ -81,7 +80,7 @@ class RoleAccounts extends Advanced.AbstractTableContent {
     const { _showLoading, _permissions } = this.props;
     const { detail } = this.state;
     const forceSearchParameters = new Domain.SearchParameters().setFilter('role', entityId);
-    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.ROLE));
+    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', 'ROLE');
     //
     return (
       <div>

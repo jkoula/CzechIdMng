@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.system.entity;
 
 import org.springframework.stereotype.Component;
 
+import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 
@@ -35,4 +36,8 @@ public class RoleSystemEntityType implements SystemEntityTypeRegistrable {
 		return true;
 	}
 
+	@Override
+	public String getModule() {
+		return AccModuleDescriptor.MODULE_ID;
+	}
 }

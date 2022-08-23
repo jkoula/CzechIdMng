@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -25,6 +26,7 @@ import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
+import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemEntityFilter;
@@ -39,7 +41,9 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBatchService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
@@ -69,6 +73,7 @@ public class DefaultSysSystemEntityService
 	@Autowired private SysSystemService systemService;
 	@Autowired private LookupService lookupService;
 	@Autowired private ConnectorManager connectorManager;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public DefaultSysSystemEntityService(SysSystemEntityRepository systemEntityRepository) {
@@ -179,5 +184,22 @@ public class DefaultSysSystemEntityService
 		}
 		//
 		return predicates;
+	}
+
+	@Override
+	protected SysSystemEntityDto toDto(SysSystemEntity entity, SysSystemEntityDto dto) {
+		SysSystemEntityDto newDto = super.toDto(entity, dto);
+		if (newDto.getEntityType() != null) {
+			Map<String, BaseDto> embedded = newDto.getEmbedded();
+			SystemEntityTypeRegistrableDto systemEntityTypeDto = 
+					systemEntityManager.getSystemEntityDtoByCode(newDto.getEntityType());
+			if (systemEntityTypeDto != null) {
+				embedded.put(SystemEntityTypeRegistrableDto.EMBEDDED_TYPE, 
+						systemEntityTypeDto);
+				newDto.setEmbedded(embedded);
+			}
+		}
+		
+		return newDto;
 	}
 }

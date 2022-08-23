@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
 import { IdentityAccountManager, AccountManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import AccountTableComponent, { AccountTable } from '../account/AccountTable';
 
 const uiKey = 'identity-accounts-table';
@@ -77,12 +76,10 @@ class IdentityAccountsContent extends Advanced.AbstractTableContent {
     const { _showLoading, _permissions } = this.props;
     const { detail } = this.state;
     const forceSearchParameters = new Domain.SearchParameters().setFilter('identity', entityId);
-    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType',
-      SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY));
+    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', 'CONTRACT');
     const forceAccountSearchParameters = new Domain.SearchParameters().setFilter('identity', entityId).setFilter('entityType',
-      SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY)).setFilter('includeEcho', true);
-    const forceSystemEntitySearchParameters = new Domain.SearchParameters().setFilter('entityType',
-      SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY));
+      'CONTRACT').setFilter('includeEcho', true);
+    const forceSystemEntitySearchParameters = new Domain.SearchParameters().setFilter('entityType', 'IDENTITY');
     //
     return (
       <Basic.Div>

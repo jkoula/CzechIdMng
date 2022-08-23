@@ -8,8 +8,7 @@ import _ from 'lodash';
 import uuid from 'uuid';
 import { Advanced, Basic, Domain, Enums, Managers, Utils } from 'czechidm-core';
 import MappingContextCompleters from 'czechidm-core/src/content/script/completers/MappingContextCompleters';
-import { SchemaObjectClassManager, SystemAttributeMappingManager, SystemManager, SystemMappingManager } from '../../redux';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
+import { SchemaObjectClassManager, SystemAttributeMappingManager, SystemManager, SystemMappingManager, SystemEntityTypeManager } from '../../redux';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 import ValidationMessageSystemMapping from './ValidationMessageSystemMapping';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
@@ -23,6 +22,7 @@ const systemMappingManager = new SystemMappingManager();
 const schemaObjectClassManager = new SchemaObjectClassManager();
 const SYSTEM_MAPPING_VALIDATION = 'SYSTEM_MAPPING_VALIDATION';
 const scriptManager = new Managers.ScriptManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * System mapping detail.
@@ -135,7 +135,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
         mapping: {
           name: 'Mapping',
           system: entityId,
-          entityType: SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY),
+          entityType: 'IDENTITY',
           operationType: SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING),
           accountType: AccountTypeEnum.findKeyBySymbol(AccountTypeEnum.PERSONAL)
         }
@@ -434,19 +434,19 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
 
     let isSelectedTree = false;
     if (_entityType !== undefined) {
-      if (_entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE)) {
+      if (_entityType === 'TREE') {
         isSelectedTree = true;
       }
-    } else if (mapping && mapping.entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.TREE)) {
+    } else if (mapping && mapping.entityType === 'TREE') {
       isSelectedTree = true;
     }
 
     let isSelectedIdentity = false;
     if (_entityType !== undefined) {
-      if (_entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY)) {
+      if (_entityType === 'IDENTITY') {
         isSelectedIdentity = true;
       }
-    } else if (mapping && mapping.entityType === SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.IDENTITY)) {
+    } else if (mapping && mapping.entityType === 'IDENTITY') {
       isSelectedIdentity = true;
     }
 
@@ -523,9 +523,10 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     readOnly={!Utils.Entity.isNew(mapping)}
                     required
                     clearable={false}/>
-                  <Basic.EnumSelectBox
+                  <Basic.SelectBox
                     ref="entityType"
-                    enum={SystemEntityTypeEnum}
+                    multiSelect={ false }
+                    manager={ systemEntityTypeManager }
                     onChange={this._onChangeEntityType.bind(this)}
                     label={this.i18n('acc:entity.SystemMapping.entityType')}
                     readOnly={!Utils.Entity.isNew(mapping)}

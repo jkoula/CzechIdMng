@@ -41,6 +41,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
+import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
@@ -665,5 +666,22 @@ public class DefaultSysSystemMappingService
 		}
 		//
 		return predicates;
+	}
+
+	@Override
+	protected SysSystemMappingDto toDto(SysSystemMapping entity, SysSystemMappingDto dto) {
+		SysSystemMappingDto newDto = super.toDto(entity, dto);
+		if (newDto.getEntityType() != null) {
+			Map<String, BaseDto> embedded = newDto.getEmbedded();
+			SystemEntityTypeRegistrableDto systemEntityTypeDto = 
+					systemEntityManager.getSystemEntityDtoByCode(newDto.getEntityType());
+			if (systemEntityTypeDto != null) {
+				embedded.put(SystemEntityTypeRegistrableDto.EMBEDDED_TYPE, 
+						systemEntityTypeDto);
+				newDto.setEmbedded(embedded);
+			}
+		}
+		
+		return newDto;
 	}
 }
