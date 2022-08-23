@@ -1,6 +1,6 @@
 import React from 'react';
 //
-import EntitySelectBox from '../EntitySelectBox/EntitySelectBox';
+import EntitySelectBox from '../../EntitySelectBox';
 import IdentityOptionDecorator from './IdentityOptionDecorator';
 import IdentityValueDecorator from './IdentityValueDecorator';
 

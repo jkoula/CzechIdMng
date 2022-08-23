@@ -3,7 +3,8 @@ import AbstractService from "czechidm-core/src/services/AbstractService";
 class SystemOwnerService extends AbstractService {
 
     getApiPath() {
-        return '/scripts';
+        return '/system-owners';
+        // 1
       }
     
       getNiceLabel(entity) {
@@ -16,13 +17,12 @@ class SystemOwnerService extends AbstractService {
         return `${ entity.name } (${ entity.code })`;
       }
     
-      // dto
       supportsPatch() {
         return false;
       }
     
       supportsBulkAction() {
-        return true;
+        return false;
       }
 }
 export default SystemOwnerService;

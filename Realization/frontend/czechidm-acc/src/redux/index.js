@@ -27,6 +27,11 @@ import UniformPasswordSystemManager from './UniformPasswordSystemManager';
 import RemoteServerManager from './RemoteServerManager';
 import SystemGroupManager from './SystemGroupManager';
 import SystemGroupSystemManager from './SystemGroupSystemManager';
+import _ from 'lodash';
+import EntityManager from 'czechidm-core/src/redux/data/EntityManager';
+import IdentityManager from 'czechidm-core/src/redux/data/IdentityManager';
+
+
 
 const ManagerRoot = {
   SystemManager,
@@ -57,8 +62,15 @@ const ManagerRoot = {
   UniformPasswordSystemManager,
   RemoteServerManager,
   SystemGroupManager,
-  SystemGroupSystemManager
+  SystemGroupSystemManager,
+  EntityManager,
+  IdentityManager
 };
 
 ManagerRoot.version = '0.0.1';
 module.exports = ManagerRoot;
+
+
+
+
+
