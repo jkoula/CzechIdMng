@@ -21,7 +21,7 @@ export default class SystemOwnerManager extends EntityManager{
       }
 
       getCollectionType() {
-        return 'scripts';
+        return 'systemOwners';
       }
    
 }

@@ -15,13 +15,14 @@ import { IdentityManager, SystemManager} from '../../redux';
     class SystemOwner extends Advanced.AbstractTableContent {
         constructor(props){
             super(props);
-            // state = {
-
-            // }
-            this.form = React.createRef();
-            this.role = React.createRef();
-            this.guarantee = React.createRef();
-            this.confirmDelete = React.createRef();
+        //    state = {
+        //     open:false,
+        //     };
+            // this.form = React.createRef();
+            // this.role = React.createRef();
+            // this.guarantee = React.createRef();
+            // this.confirmDelete = React.createRef();
+            // this.formEntity = React.createRef();
         }
 
     
@@ -45,16 +46,31 @@ import { IdentityManager, SystemManager} from '../../redux';
       //
       showDetail(entity){
           super.showDetail(entity, () => {
-            this.guarantee.current.focus();
+            // this.refs.owner.focus();
           });
       }
 
+    //
+    save=(entity,event)=> {
+        const formEntity = this.refs.form.getData();
+        // 
+        super.save(formEntity, event);
+      }
+    
+      handleSubmit=(event)=>{
+        console.log('Close');
+        // if(!this.state.close){
+        //     this.setState({close:true}
+        //     )
+        // }
+      }
+    
     render(){
-        const { _showLoading } = this.props;
+        const {  _showLoading } = this.props;
         return(
             <Basic.Div>
                 <Basic.Confirm 
-                ref={this.confirmDelete}
+                ref="confirmDelete"
                 level="danger"/>
                 <Advanced.Table
                           ref="table"
@@ -82,9 +98,11 @@ import { IdentityManager, SystemManager} from '../../redux';
                     title={this.i18n('button.detail')}
                     onClick={this.showDetail.bind(this,)}
                     sort={false}/>
+                    
                 );
               }
-            }>
+            }
+            > 
                     </Advanced.Column>
                     <Advanced.Column
             property="owner"
@@ -104,7 +122,8 @@ import { IdentityManager, SystemManager} from '../../redux';
                     showIcon/>
                 );
               }
-            }/>
+            }
+            />
             <Advanced.Column
             property="type"
             width={ 125 }
@@ -122,48 +141,46 @@ import { IdentityManager, SystemManager} from '../../redux';
           />
             <Advanced.Column>dfsdfss</Advanced.Column>
                 </Advanced.Table>
-                
         <Basic.Modal
           bsSize="large"
            show={this.state.detail.show}
-        //   onHide={this.closeDetail.bind(this)}
+          onHide={this.closeDetail.bind(this)}
           backdrop="static"
-        //   keyboard={!_showLoading}
+          keyboard={!_showLoading}
           >
 
-          <form onSubmit={this.save.bind(this, {})}>
+          <form onSubmit={this.save.bind({}, this)}>
             <Basic.Modal.Header
              closeButton={ !_showLoading } 
              text={ this.i18n('create.header')} 
             //  rendered={ Utils.Entity.isNew(detail.entity) }
             />
             <Basic.Modal.Header
-            //   closeButton={ !_showLoading }
+              closeButton={ !_showLoading }
             //   text={ this.i18n('edit.header', { name: manager.getNiceLabel(detail.entity) }) }
             //   rendered={ !Utils.Entity.isNew(detail.entity) }
               />
             <Basic.Modal.Body>
               <Basic.AbstractForm
-                ref={this.form}
-                // showLoading={ _showLoading }
+                ref="form"
+                showLoading={ _showLoading }
                 // readOnly={ !manager.canSave(detail.entity, _permissions) }
                 >
-                    {/* SystemSelect */}
-                <Advanced.SystemSelect
-                  ref={this.role}
+                 <Advanced.SystemSelect
+                  ref="system"
                   manager={ systemManager }
-                //   label={ this.i18n('entity.RoleGuaranteeRole.role.label') }
-                  readOnly
+                  label={ this.i18n('entity.RoleGuaranteeRole.role.label') }
+                //   readOnly
                 //   required
                   />
 
                   <Advanced.IdentitySelect
-                  ref={this.guarantee}
+                  ref="owner"
                   manager={ identityManager }
-                //   label={ this.i18n('entity.RoleGuarantee.guarantee.label') }
-                //   helpBlock={ this.i18n('entity.RoleGuarantee.guarantee.help') }
-                //   required
-                  />
+                  label={ this.i18n('entity.RoleGuarantee.guarantee.label') }
+                  helpBlock={ this.i18n('entity.RoleGuarantee.guarantee.help') }
+                  required
+                  /> 
 
               </Basic.AbstractForm>
             </Basic.Modal.Body>
@@ -172,7 +189,8 @@ import { IdentityManager, SystemManager} from '../../redux';
               <Basic.Button
                 level="link"
                 // onClick={ this.closeDetail.bind(this) }
-                // showLoading={ _showLoading }>
+                showLoading={ _showLoading }
+                onClick= {this.handleSubmit}
                 >
                 { this.i18n('button.close') }
               </Basic.Button>
@@ -180,11 +198,11 @@ import { IdentityManager, SystemManager} from '../../redux';
                 type="submit"
                 level="success"
                 // // rendered={ manager.canSave(detail.entity, _permissions) }
-                // // showLoading={ _showLoading}
-                // showLoadingIcon
-                // showLoadingText={ this.i18n('button.saving') }
+                showLoading={ _showLoading}
+                showLoadingIcon
+                showLoadingText={ this.i18n('button.saving') }
                 >
-                // {this.i18n('button.save')}
+                {this.i18n('button.save')}
               </Basic.Button>
             </Basic.Modal.Footer>
           </form>
@@ -197,7 +215,7 @@ import { IdentityManager, SystemManager} from '../../redux';
 function select(state, props) {
     
     return {
-        owners: state.data.trimmed.Owners
+        // owners: state.data.trimmed.Owners
     };
   }
 export default connect(select)(SystemOwner);

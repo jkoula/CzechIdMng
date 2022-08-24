@@ -156,7 +156,9 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
           keyboard={!_showLoading}>
 
           <form onSubmit={this.save.bind(this, {})}>
-            <Basic.Modal.Header closeButton={ !_showLoading } text={ this.i18n('create.header')} rendered={ Utils.Entity.isNew(detail.entity) }/>
+            <Basic.Modal.Header closeButton={ !_showLoading }
+            text={ this.i18n('create.header')} 
+            rendered={ Utils.Entity.isNew(detail.entity) }/>
             <Basic.Modal.Header
               closeButton={ !_showLoading }
               text={ this.i18n('edit.header', { name: manager.getNiceLabel(detail.entity) }) }

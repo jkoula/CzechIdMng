@@ -75,7 +75,7 @@ import CodeableField from './CodeableField/CodeableField';
 import ReadDtoServiceSelect from './ReadDtoServiceSelect/ReadDtoServiceSelect';
 import PanelHeader from './Panel/PanelHeader';
 import AbstractUniversalSearchType from './AbstractUniversalSearchType/AbstractUniversalSearchType';
-
+import SystemSelect from '../../../../czechidm-acc/src/content/system/SystemSelect/SystemSelect';
 const Components = {
   Table,
   Column,
@@ -157,7 +157,8 @@ const Components = {
   Panel: {
     Header: PanelHeader
   },
-  AbstractUniversalSearchType
+  AbstractUniversalSearchType,
+  SystemSelect
 };
 
 Components.version = '12.0.0';

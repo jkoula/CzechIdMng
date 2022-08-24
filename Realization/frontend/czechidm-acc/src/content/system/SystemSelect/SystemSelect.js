@@ -1,6 +1,8 @@
 import React from 'react';
 //
-import EntitySelectBox from '../EntitySelectBox/EntitySelectBox';
+import EntitySelectBox from 'czechidm-core/src/components/advanced/EntitySelectBox/EntitySelectBox';
+// import IdentityOptionDecorator from 'czechidm-core/src/components/advanced/IdentitySelect/IdentityOptionDecorator';
+// import IdentityValueDecorator from 'czechidm-core/src/components/advanced/IdentitySelect/IdentityValueDecorator';
 
 export default class SystemSelect extends EntitySelectBox {
 
@@ -28,4 +30,12 @@ export default class SystemSelect extends EntitySelectBox {
     SystemSelect.defaultProps = {
     ...EntitySelectBox.defaultProps,
   };
+  // SystemSelect.propTypes = {
+  //   ...EntitySelectBox.propTypes
+  // };
+  // SystemSelect.defaultProps = {
+  //   ...EntitySelectBox.defaultProps,
+  //   optionComponent: IdentityOptionDecorator,
+  //   valueComponent: IdentityValueDecorator
+  // };
   
