@@ -1,6 +1,10 @@
 package eu.bcvsolutions.idm.acc.system.entity;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -39,5 +43,24 @@ public class IdentitySystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public String getModule() {
 		return AccModuleDescriptor.MODULE_ID;
+	}
+
+	@Override
+	public List<String> getSupportedAttributes() {
+		return Lists.newArrayList(
+				"USERNAME",
+				"EXTERNAL_CODE",
+				"DISABLED",
+				"FIRSTNAME",
+				"LASTNAME",
+				"EMAIL",
+				"PHONE",
+				"TITLE_BEFORE",
+				"TITLE_AFTER",
+				"DESCRIPTION",
+				"STATE",
+				"ASSIGNED_ROLES",
+				"ASSIGNED_ROLES_FOR_SYSTEM",
+				"FORM_PROJECTION");
 	}
 }

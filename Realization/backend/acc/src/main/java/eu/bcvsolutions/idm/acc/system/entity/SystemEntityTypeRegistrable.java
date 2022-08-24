@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.acc.system.entity;
 
+import java.util.List;
+
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 
 public interface SystemEntityTypeRegistrable {
@@ -15,4 +17,6 @@ public interface SystemEntityTypeRegistrable {
 	boolean isSupportsProvisioning();
 	
 	boolean isSupportsSync();
+	
+	List<String> getSupportedAttributes();
 }

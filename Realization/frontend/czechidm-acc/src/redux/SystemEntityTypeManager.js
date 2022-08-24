@@ -62,7 +62,7 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
         if (entityType && entityType._embedded && entityType._embedded.systemEntityType) {
             return this.getService().getNiceLabel(entityType._embedded.systemEntityType);
         }
-    } 
+    }
 
     getCollectionType() {
         return 'systemEntityTypes';

@@ -1,7 +1,11 @@
 package eu.bcvsolutions.idm.acc.system.entity;
 
+import java.util.List;
+
 import org.springframework.hateoas.core.Relation;
 import org.springframework.stereotype.Component;
+
+import com.beust.jcommander.internal.Lists;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -42,5 +46,22 @@ public class ContractSliceSystemEntityType implements SystemEntityTypeRegistrabl
 	@Override
 	public String getModule() {
 		return AccModuleDescriptor.MODULE_ID;
+	}
+
+	@Override
+	public List<String> getSupportedAttributes() {
+		return Lists.newArrayList(
+				"CONTRACT_CODE",
+				"IDENTITY",
+				"VALID_FROM",
+				"CONTRACT_VALID_FROM",
+				"CONTRACT_VALID_TILL",
+				"MAIN",
+				"STATE",
+				"POSITION",
+				"WORK_POSITION",
+				"EXTERNE",
+				"GUARANTEES",
+				"DESCRIPTION");
 	}
 }

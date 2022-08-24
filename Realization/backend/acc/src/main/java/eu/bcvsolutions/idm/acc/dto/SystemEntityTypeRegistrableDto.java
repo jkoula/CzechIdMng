@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.acc.dto;
 
+import java.util.List;
+
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -15,6 +17,7 @@ public class SystemEntityTypeRegistrableDto extends AbstractDto {
 	private boolean isSupportsProvisioning;
 	private boolean isSupportsSync;
 	private String module;
+	private List<String> supportedAttributes;
 	
 	public String getSystemEntityCode() {
 		return systemEntityCode;
@@ -54,5 +57,13 @@ public class SystemEntityTypeRegistrableDto extends AbstractDto {
 	
 	public void setModule(String module) {
 		this.module = module;
+	}
+
+	public List<String> getSupportedAttributes() {
+		return supportedAttributes;
+	}
+
+	public void setSupportedAttributes(List<String> supportedAttributes) {
+		this.supportedAttributes = supportedAttributes;
 	}
 }

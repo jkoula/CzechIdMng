@@ -302,6 +302,13 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
       _idmPropertyName,
       sendOnPasswordChange
     } = this.state;
+    
+    let attributeOptions;
+    if (this.props._systemMapping && this.props._systemMapping._embedded &&
+      this.props._systemMapping._embedded.systemEntityType && 
+      this.props._systemMapping._embedded.systemEntityType.supportedAttributes) {
+      attributeOptions = this.props._systemMapping._embedded.systemEntityType.supportedAttributes;
+    }
 
     const isNew = this._getIsNew();
     const attribute = isNew ? this.state.attribute : _attribute;
@@ -404,7 +411,8 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
                       <Basic.EnumSelectBox
                         ref="idmPropertyEnum"
                         readOnly={_isDisabled || !_isEntityAttribute || passwordAttribute}
-                        enum={entityTypeEnum}
+                        // enum={entityTypeEnum}
+                        options={attributeOptions}
                         helpBlock={this.i18n(`acc:${propertyHelpBlockLabel}`, {escape: false})}
                         onChange={this._onChangeEntityEnum.bind(this)}
                         label={this.i18n('acc:entity.SystemAttributeMapping.idmPropertyEnum')}

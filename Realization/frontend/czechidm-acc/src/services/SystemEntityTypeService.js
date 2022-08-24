@@ -37,4 +37,10 @@ export default class SystemEntityTypeService extends Services.AbstractService {
     getNiceLabel(entity) {
         return Services.LocalizationService.i18n(`${entity.module}:entity.SystemEntityType.${entity.systemEntityCode}.label`);
     }
+
+    getNiceLabelForEntityType(entityType) {
+        if (entityType && entityType._embedded && entityType._embedded.systemEntityType) {
+            return this.getNiceLabel(entityType._embedded.systemEntityType);
+        }
+    }
 }

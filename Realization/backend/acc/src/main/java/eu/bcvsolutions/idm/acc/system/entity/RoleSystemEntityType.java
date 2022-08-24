@@ -1,6 +1,10 @@
 package eu.bcvsolutions.idm.acc.system.entity;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
+
+import com.beust.jcommander.internal.Lists;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -39,5 +43,23 @@ public class RoleSystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public String getModule() {
 		return AccModuleDescriptor.MODULE_ID;
+	}
+
+	@Override
+	public List<String> getSupportedAttributes() {
+		return Lists.newArrayList(
+				"NAME",
+				"BASE_CODE",
+				"ENVIRONMENT",
+				"ROLE_TYPE",
+				"PRIORITY",
+				"APPROVE_REMOVE",
+				"DESCRIPTION",
+				"DISABLED",
+				"ROLE_MEMBERSHIP_ID",
+				"ROLE_FORWARD_ACM",
+				"ROLE_SKIP_VALUE_IF_EXCLUDED",
+				"ROLE_MEMBERS_FIELD",
+				"ROLE_CATALOGUE_FIELD");
 	}
 }

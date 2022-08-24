@@ -1,6 +1,10 @@
 package eu.bcvsolutions.idm.acc.system.entity;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
+
+import com.beust.jcommander.internal.Lists;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -39,5 +43,21 @@ public class ContractSystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public String getModule() {
 		return AccModuleDescriptor.MODULE_ID;
+	}
+
+	@Override
+	public List<String> getSupportedAttributes() {
+		return Lists.newArrayList(
+				"IDENTITY",
+				"MAIN",
+				"STATE",
+				"POSITION",
+				"WORK_POSITION",
+				"VALID_FROM",
+				"VALID_TILL",
+				"EXTERNE",
+				"DESCRIPTION",
+				"GUARANTEES",
+				"POSITIONS");
 	}
 }
