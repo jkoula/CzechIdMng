@@ -2,27 +2,20 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { connect } from 'react-redux';
-import { Advanced, Basic } from 'czechidm-core';
+import { Advanced, Basic, Managers } from 'czechidm-core';
 import SystemOwnerManager from './SystemOwnerManager';
 import _ from 'lodash';
-import { IdentityManager, SystemManager} from '../../redux';
+import { SystemManager} from '../../redux';
+import SystemSelect from '../../components/SystemSelect/SystemSelect';
 
     const manager = new SystemOwnerManager();
-    const identityManager = new IdentityManager();
+    const identityManager = new Managers.IdentityManager();
     const systemManager = new SystemManager();
 
 
     class SystemOwner extends Advanced.AbstractTableContent {
         constructor(props){
             super(props);
-        //    state = {
-        //     open:false,
-        //     };
-            // this.form = React.createRef();
-            // this.role = React.createRef();
-            // this.guarantee = React.createRef();
-            // this.confirmDelete = React.createRef();
-            // this.formEntity = React.createRef();
         }
 
     
@@ -35,11 +28,12 @@ import { IdentityManager, SystemManager} from '../../redux';
     }
 
     getContentKey() {
-        return 'content.system.owner';
+        return 'acc:content.system.owner';
       }
       getUiKey() {
         return this.props.uiKey;
       }
+
       getNavigationKey() {
         return this.getRequestNavigationKey('system-owner', this.props.match.params);
       }
@@ -57,20 +51,12 @@ import { IdentityManager, SystemManager} from '../../redux';
         super.save(formEntity, event);
       }
     
-      handleSubmit=(event)=>{
-        console.log('Close');
-        // if(!this.state.close){
-        //     this.setState({close:true}
-        //     )
-        // }
-      }
-    
     render(){
         const {  _showLoading } = this.props;
         return(
             <Basic.Div>
                 <Basic.Confirm 
-                ref="confirmDelete"
+                ref="confirm-delete"
                 level="danger"/>
                 <Advanced.Table
                           ref="table"
@@ -108,7 +94,7 @@ import { IdentityManager, SystemManager} from '../../redux';
             property="owner"
             sortProperty="owner.name"
             face="text"
-            header={ this.i18n('entity.RoleGuarantee.guarantee.label') }
+            header={ this.i18n('acc:entity.SystemOwner.owner.label') }
             sort
             cell={
               ({ rowIndex, data }) => {
@@ -128,13 +114,13 @@ import { IdentityManager, SystemManager} from '../../redux';
             property="type"
             width={ 125 }
             face="text"
-            header={ this.i18n('entity.RoleGuarantee.type.label') }
+            header={ this.i18n('acc:entity.SystemOwner.type.label') }
             sort
             // rendered={ guaranteeTypes.length > 0 }
             cell={
               ({ rowIndex, data, property }) => {
                 return (
-                  <Advanced.CodeListValue code="guarantee-type" value={ data[rowIndex][property] }/>
+                  <Advanced.CodeListValue code="owner-type" value={ data[rowIndex][property] }/>
                 );
               }
             }
@@ -166,19 +152,19 @@ import { IdentityManager, SystemManager} from '../../redux';
                 showLoading={ _showLoading }
                 // readOnly={ !manager.canSave(detail.entity, _permissions) }
                 >
-                 <Advanced.SystemSelect
+                 <SystemSelect
                   ref="system"
                   manager={ systemManager }
-                  label={ this.i18n('entity.RoleGuaranteeRole.role.label') }
-                //   readOnly
-                //   required
+                  label={ this.i18n('acc:entity.SystemOwner.system.label') }
+                  // readOnly
+                  required
                   />
 
                   <Advanced.IdentitySelect
                   ref="owner"
                   manager={ identityManager }
-                  label={ this.i18n('entity.RoleGuarantee.guarantee.label') }
-                  helpBlock={ this.i18n('entity.RoleGuarantee.guarantee.help') }
+                  label={ this.i18n('acc:entity.SystemOwner.owner.label') }
+                  helpBlock={ this.i18n('acc:entity.SystemOwner.owner.help') }
                   required
                   /> 
 
@@ -188,9 +174,8 @@ import { IdentityManager, SystemManager} from '../../redux';
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"
-                // onClick={ this.closeDetail.bind(this) }
+                onClick={ this.closeDetail.bind(this) }
                 showLoading={ _showLoading }
-                onClick= {this.handleSubmit}
                 >
                 { this.i18n('button.close') }
               </Basic.Button>

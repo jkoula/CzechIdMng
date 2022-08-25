@@ -374,6 +374,11 @@
         "title": "Detail logu položky"
       },
       "owner": {
+        "create":{
+          "header": "Nový vlastník systému"
+        },
+        "label": "Vlastík - identita",
+        "help": "Vybraná identita se stane vlastníkem systému.",
         "title": "Vlastník"
       },
       "accounts": {
@@ -1031,6 +1036,7 @@
         "notVirtual": "Bez virtuálních",
         "all": "Všechny systémy"
       }
+      
     },
     "ConnectorServer": {
       "name": "Jméno",
@@ -1620,6 +1626,18 @@
       "system": "Systém",
       "systemGroup": "Skupina",
       "mergeAttribute": "Atribut kontrolující skupiny"
+    },
+    "SystemOwner": {
+      "owner": {
+        "label": "Vlastník",
+        "help": "Identity mající vybranou roli se stanou vlastníkem systému."
+      },
+      "system":{
+        "label":"Systém"
+      },
+      "type": {
+        "label": "Typ vlastníka"
+      }
     }
   },
   "enums" : {

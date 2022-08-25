@@ -373,6 +373,14 @@
         "header": "Item log details",
         "title": "Item log details"
       },
+      "owner": {
+        "create":{
+          "header": "New system owner"
+        },
+        "label": "Owner-identity",
+        "help": "Selected identity will be the system owner.",
+        "title": "Owner"
+      },
       "accounts": {
         "header": "Accounts in system <small>managed in IdM</small>",
         "title": "Accounts",
@@ -1616,6 +1624,18 @@
       "system": "System",
       "systemGroup": "Group",
       "mergeAttribute": "Attribute for controlling groups"
+    },
+    "SystemOwner": {
+      "owner": {
+        "label": "Vlastník",
+        "help": "Identity mající vybranou roli se stanou vlastníkem systému."
+      },
+      "system":{
+        "label":"Systém"
+      },
+      "type": {
+        "label": "Typ vlastníka"
+      }
     }
   },
   "enums" : {
