@@ -1619,25 +1619,195 @@
     },
     "SystemEntityType": {
       "IDENTITY": {
-        "label": "Identity"
+        "label": "Identity",
+        "attributes": {
+          "USERNAME": "User name (String)",
+          "EXTERNAL_CODE": "Personal number (String)",
+          "DISABLED": "Disabled (boolean)",
+          "FIRSTNAME": "First name (String)",
+          "LASTNAME": "Surname (String)",
+          "TITLE_BEFORE": "Title before (String)",
+          "TITLE_AFTER": "Title after (String)",
+          "DESCRIPTION": "Description (String)",
+          "PHONE": "Phone (String)",
+          "EMAIL": "Email (String)",
+          "STATE": "State (IdentityState)",
+          "PASSWORD": "Password (GuardedString)",
+          "ASSIGNED_ROLES": "User assigned roles",
+          "ASSIGNED_ROLES_FOR_SYSTEM": "User assigned roles (for this system)",
+          "FORM_PROJECTION": "User type (IdmFormProjectionDto)",
+          "helpBlock": {
+            "USERNAME": "",
+            "EXTERNAL_CODE": "",
+            "DISABLED": "",
+            "FIRSTNAME": "",
+            "LASTNAME": "",
+            "TITLE_BEFORE": "",
+            "TITLE_AFTER": "",
+            "DESCRIPTION": "",
+            "PHONE": "",
+            "EMAIL": "",
+            "STATE": "Default transformation is able to deduce (case insensitive) following states - CREATED, VALID, NO_CONTRACT, FUTURE_CONTRACT, LEFT, DISABLED, DISABLED_MANUALLY",
+            "PASSWORD": "",
+            "ASSIGNED_ROLES": "Input for transforming into the system (<strong>attributeValue</strong>) is a list of all <strong>valid</strong> user roles (list of AssignedRoleDto). This attribute is only for <strong>provisioning</strong> and for default strategy (SET).",
+            "ASSIGNED_ROLES_FOR_SYSTEM": "Input for transforming into the system (<strong>attributeValue</strong>) is a list of all <strong>valid</strong> user roles which <strong>assigned this system</strong> (list of AssignedRoleDto). This attribute is only for <strong>provisioning</strong> and for default strategy (SET).",
+            "FORM_PROJECTION": "<strong>Sync - </strong> You can use an identifier or <strong>projection code</strong> to get a user-type (projection).<br/><strong>Provisioning - </strong> Input value in transformation to the system (<strong> attributeValue </strong>) is the entire user-type object (IdmFormProjectionDto)."
+          }
+        }
       },
       "ROLE": {
-        "label": "Role"
+        "label": "Role",
+        "attributes": {
+          "NAME": "Name (String)",
+          "BASE_CODE": "Code (String)",
+          "ENVIRONMENT": "Environment (String)",
+          "ROLE_TYPE": "Type of role (String - RoleType)",
+          "APPROVE_REMOVE": "Approve remove (Boolean)",
+          "PRIORITY": "Priority (Integer)",
+          "DESCRIPTION": "Description (String)",
+          "DISABLED": "Disabled (boolean)",
+          "ROLE_MEMBERSHIP_ID": "Membership - Role identifier (String)",
+          "ROLE_FORWARD_ACM": "Membership - Forward provisioning (boolean)",
+          "ROLE_SKIP_VALUE_IF_EXCLUDED": "Membership - Skip value if contract is excluded (boolean)",
+          "ROLE_CATALOGUE_FIELD": "Membership - Role catalog (List <IdmRoleCatalogueDto>)",
+          "ROLE_MEMBERS_FIELD": "Membership - Identifiers of users (List <String>)",
+          "helpBlock": {
+            "NAME": "",
+            "BASE_CODE": "",
+            "ENVIRONMENT": "",
+            "ROLE_TYPE": "",
+            "APPROVE_REMOVE": "",
+            "PRIORITY": "",
+            "DESCRIPTION": "",
+            "DISABLED": "",
+            "ROLE_MEMBERSHIP_ID": "Resolves group memberships. Returns the role identifier (DN) that will be used in the role-system relation. The output value is String, if the value will be 'null', then the link between the role and the system will be removed! ",
+            "ROLE_FORWARD_ACM": "Resolves group membership. Specifically manages the 'Forward provisioning' parameter",
+            "ROLE_SKIP_VALUE_IF_EXCLUDED": "Resolves group membership. Specifically, it manages the 'Skip value if contract is excluded' parameter.",
+            "ROLE_CATALOGUE_FIELD": "Returns a list of role catalog nodes to which the role is to be assigned. If a more complex structure needs to be solved, then each node can contain (in embedded.parent) another catalog node. ",
+            "ROLE_MEMBERS_FIELD": "Returns a list of users to be assigned the role. The output is a list of identifiers from the system (typically DNs)."
+          }
+        }
       },
       "TREE": {
-        "label": "Tree"
+        "label": "Tree",
+        "attributes": {
+          "CODE": "Code (String)",
+          "NAME": "Name (String)",
+          "PARENT": "Parent (String)",
+          "EXTERNAL_ID": "External ID (String)",
+          "DISABLED": "Disabled (boolean)",
+          "helpBlock": {
+            "CODE": "",
+            "NAME": "",
+            "PARENT": "",
+            "EXTERNAL_ID": "",
+            "DISABLED": ""
+          }
+        }
       },
       "ROLE_CATALOGUE": {
-        "label": "Role catalogue"
+        "label": "Role catalogue",
+        "attributes": {
+          "CODE": "Code (String)",
+          "NAME": "Name (String)",
+          "PARENT": "Parent (String)",
+          "DESCRIPTION": "Description (String)",
+          "URL": "URL (String)",
+          "URL_TITLE": "URL title (String)",
+          "helpBlock": {
+            "CODE": "",
+            "NAME": "",
+            "PARENT": "",
+            "DESCRIPTION": "",
+            "URL": "",
+            "URL_TITLE": ""
+          }
+        }
       },
       "CONTRACT": {
-        "label": "Identity contract"
+        "label": "Identity contract",
+        "attributes": {
+          "IDENTITY": "Owner (IdmIdentity - Id or username)",
+          "VALID_FROM": "Valid from (LocalDate)",
+          "VALID_TILL": "Valid till (LocalDate)",
+          "WORK_POSITION": "Work position (IdmTreeNode - Id or code)",
+          "POSITION": "Name of position (String)",
+          "EXTERNE": "Externe (boolean)",
+          "MAIN": "Main relation (boolean)",
+          "DESCRIPTION": "Description (String)",
+          "DISABLED": "Disabled (boolean)",
+          "GUARANTEES": "Guarantees (IdmIdentity - List of ids or usernames)",
+          "POSITIONS": "Other positions (IdmTreeNode - List of ids or codes)",
+          "STATE": "State (ContractState - String)",
+          "helpBlock": {
+            "IDENTITY": "",
+            "VALID_FROM": "",
+            "VALID_TILL": "",
+            "WORK_POSITION": "",
+            "POSITION": "",
+            "EXTERNE": "",
+            "MAIN": "",
+            "DESCRIPTION": "",
+            "DISABLED": "",
+            "GUARANTEES": "",
+            "POSITIONS": "",
+            "STATE": ""
+          }
+        }
       }, 
       "CONTRACT_SLICE": {
-        "label": "Contract time slices"
+        "label": "Contract time slices",
+        "attributes": {
+          "IDENTITY": "Owner (IdmIdentity - Id or username)",
+          "VALID_FROM": "Valid from of slice (LocalDate)",
+          "CONTRACT_VALID_FROM": "Valid from of contract (LocalDate)",
+          "CONTRACT_VALID_TILL": "Valid till of contract (LocalDate)",
+          "WORK_POSITION": "Work position (IdmTreeNode - Id or code)",
+          "POSITION": "Name of position (String)",
+          "EXTERNE": "Externe (boolean)",
+          "MAIN": "Main relation (boolean)",
+          "DESCRIPTION": "Description (String)",
+          "DISABLED": "Disabled (boolean)",
+          "GUARANTEES": "Guarantees (IdmIdentity - List of ids or usernames)",
+          "STATE": "State (ContractState - String)",
+          "CONTRACT_CODE": "Code of the parent contract (String - same for all slices)",
+          "helpBlock": {
+            "IDENTITY": "",
+            "VALID_FROM": "",
+            "CONTRACT_VALID_FROM": "",
+            "CONTRACT_VALID_TILL": "",
+            "WORK_POSITION": "",
+            "POSITION": "",
+            "EXTERNE": "",
+            "MAIN": "",
+            "DESCRIPTION": "",
+            "DISABLED": "",
+            "GUARANTEES": "",
+            "STATE": "",
+            "CONTRACT_CODE": ""
+          }
+        }
       },
       "IDENTITY_ROLE": {
-        "label": "Assigned roles (alfa version)"
+        "label": "Assigned roles (alfa version)",
+        "attributes": {
+          "IDENTITY_CONTRACT": "Identity contract (IdmIdentityContract - UUID)",
+          "ROLE": "Role (IdmRole - UUID)",
+          "VALID_FROM": "Valid from (LocalDate)",
+          "VALID_TILL": "Valid till (LocalDate)",
+          "ROLE_COMPOSITION": "Assigned by business role (IdmRoleComposition - UUID)",
+          "CONTRACT_POSITION": "Next position on the contract (IdmContractPosition - UUID)",
+          "EXTERNAL_ID": "External identifier (String)",
+          "helpBlock": {
+            "IDENTITY_CONTRACT": "",
+            "ROLE": "",
+            "VALID_FROM": "",
+            "VALID_TILL": "",
+            "ROLE_COMPOSITION": "",
+            "CONTRACT_POSITION": "",
+            "EXTERNAL_ID": ""
+          }
+        }
       }
     }
   },

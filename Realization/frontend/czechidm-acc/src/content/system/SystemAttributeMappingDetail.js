@@ -11,6 +11,7 @@ import AttributeMappingStrategyTypeEnum from '../../domain/AttributeMappingStrat
 import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import AttributeControlledValueTable from './AttributeControlledValueTable';
 import { RoleSystemAttributeTable } from '../role/RoleSystemAttributeTable';
+import SystemAttributeMappingValueDecorator from '../../components/SystemMappingAttribute/SystemAttributeMappingValueDecorator';
 
 const uiKey = 'system-attribute-mapping';
 const manager = new SystemAttributeMappingManager();
@@ -291,6 +292,29 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     );
   }
 
+  localizeAttributeOptionValue(value, entityType, module) {
+    if (value && entityType && module) {
+      return this.i18n(`${module}:entity.SystemEntityType.${entityType}.attributes.${value}`);
+    }
+
+    return '';
+  }
+
+  localizeAttributeOptionHelp(value, entityType, module) {
+    if (value && entityType && module) {
+      console.log("value", value);
+      console.log("entityType", entityType);
+      console.log("module", module);
+      let key = this.i18n(`${module}:entity.SystemEntityType.${entityType}.attributes.helpBlock.${value}`);
+      console.log("key", key);
+      return key;
+      return this.i18n(`${module}:entity.SystemEntityType.${entityType}.attributes.helpBlock.${value}`);
+    }
+
+    console.log("returning empty")
+    return '';
+  }
+
   render() {
     const { _showLoading, _attribute, _systemMapping } = this.props;
     const { disabledAttribute,
@@ -303,11 +327,22 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
       sendOnPasswordChange
     } = this.state;
     
-    let attributeOptions;
+    var attributeOptions = [];
+    var module;
+    var entityType;
     if (this.props._systemMapping && this.props._systemMapping._embedded &&
       this.props._systemMapping._embedded.systemEntityType && 
       this.props._systemMapping._embedded.systemEntityType.supportedAttributes) {
-      attributeOptions = this.props._systemMapping._embedded.systemEntityType.supportedAttributes;
+      const attributeOptionsLoaded = this.props._systemMapping._embedded.systemEntityType.supportedAttributes;
+      module = this.props._systemMapping._embedded.systemEntityType.module;
+      entityType = this.props._systemMapping._embedded.systemEntityType.systemEntityCode;
+      for (const option in attributeOptionsLoaded) {
+        const value = attributeOptionsLoaded[option];
+        const localizedValue = this.localizeAttributeOptionValue(value, entityType, module)
+        const attributeOption = {value:value, niceLabel:localizedValue};
+        attributeOptions.push(attributeOption);
+      }
+       
     }
 
     const isNew = this._getIsNew();
@@ -329,6 +364,8 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
 
     const entityTypeEnum = SystemEntityTypeEnum.getEntityEnum(_systemMapping ? _systemMapping.entityType : 'IDENTITY');
     const _idmPropertyNameKey = _idmPropertyName !== undefined ? _idmPropertyName : attribute.idmPropertyName;
+    // const propertyHelpBlockLabel = this.localizeAttributeOptionHelp(_idmPropertyNameKey, entityType, module);
+    // console.log("propertyHelpBlockLabel", propertyHelpBlockLabel);
     const propertyHelpBlockLabel = _idmPropertyNameKey && entityTypeEnum.getEnum(_idmPropertyNameKey) ?
       entityTypeEnum.getHelpBlockLabel(
         entityTypeEnum.findKeyBySymbol(
@@ -416,6 +453,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
                         helpBlock={this.i18n(`acc:${propertyHelpBlockLabel}`, {escape: false})}
                         onChange={this._onChangeEntityEnum.bind(this)}
                         label={this.i18n('acc:entity.SystemAttributeMapping.idmPropertyEnum')}
+                        valueComponent={ SystemAttributeMappingValueDecorator }
                       />
                     </div>
                     <div className="col-lg-6">
