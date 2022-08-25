@@ -499,7 +499,13 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		// Delete all groups.
 		systemGroupService.deleteAll(systemGroupService.find(new SysSystemGroupFilter(), null));
 		// Delete all mappings.
-		systemMappingService.deleteAll(systemMappingService.find(new SysSystemMappingFilter(), null).getContent());
+		systemMappingService.find(new SysSystemMappingFilter(), null).getContent().forEach(sysSystemMappingDto -> {
+			try {
+				systemMappingService.delete(sysSystemMappingDto);
+			} catch (Exception e) {
+				// we don't care about exception, because some test broke some data, continue with next record
+			}
+		});
 		// Delete all uniform password definitions.
 		uniformPasswordService.deleteAll(uniformPasswordService.find(new AccUniformPasswordFilter(), null).getContent());
 	}
