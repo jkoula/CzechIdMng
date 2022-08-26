@@ -1,9 +1,9 @@
 package eu.bcvsolutions.idm.acc.service.api;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import java.time.ZonedDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,7 +11,7 @@ import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
-import eu.bcvsolutions.idm.core.api.service.EventableDtoService;
+import eu.bcvsolutions.idm.core.eav.api.service.FormableDtoService;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
@@ -20,10 +20,11 @@ import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
  * Accounts on target system
  * 
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  *
  */
 public interface AccAccountService extends//
-		EventableDtoService<AccAccountDto, AccAccountFilter>, //
+		FormableDtoService<AccAccountDto, AccAccountFilter>, //
 		ScriptEnabled, //
 		AuthorizableService<AccAccountDto> {
 
