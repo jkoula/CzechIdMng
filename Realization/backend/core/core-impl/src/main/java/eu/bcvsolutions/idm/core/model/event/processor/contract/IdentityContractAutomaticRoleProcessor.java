@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -81,7 +82,7 @@ public class IdentityContractAutomaticRoleProcessor extends CoreEventProcessor<I
 		Set<AbstractIdmAutomaticRoleDto> allNotPassedAutomaticRoleForContract = automaticRoleAttributeService
 				.getRulesForContract(false, type, contractId);
 		// we don't know precious size - guava is used instead simple ArrayList constructor
-		List<IdmConceptRoleRequestDto> concepts = Lists.newArrayListWithExpectedSize(
+		List<AbstractConceptRoleRequestDto> concepts = Lists.newArrayListWithExpectedSize(
 				allNewPassedAutomaticRoleForContract.size() + allNotPassedAutomaticRoleForContract.size()
 		);
 		//

@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public class AbstractConceptRoleRequestDto extends FormableDto implements Loggable {
+public abstract class AbstractConceptRoleRequestDto extends FormableDto implements Loggable {
 
     public static final String WF_PROCESS_FIELD = "wfProcessId";
     public static final String DUPLICATES = "duplicates";
@@ -312,4 +312,14 @@ public class AbstractConceptRoleRequestDto extends FormableDto implements Loggab
         systemState = (OperationResultDto) readFields.get("systemState", null);
         roleSystem = (UUID) readFields.get("roleSystem", null);
     }
+
+    public abstract UUID getRoleAssignmentUuid();
+
+    public abstract void setRoleAssignmentUuid(UUID id);
+
+    public abstract UUID getOwnerUuid();
+
+    public abstract void setOwnerUuid(UUID id);
+
+    public abstract AbstractConceptRoleRequestDto copy();
 }

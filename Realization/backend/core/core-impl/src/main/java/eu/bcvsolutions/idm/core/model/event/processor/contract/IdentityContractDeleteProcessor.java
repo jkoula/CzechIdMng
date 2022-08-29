@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -124,7 +125,7 @@ public class IdentityContractDeleteProcessor
 		});
 		//
 		// delete referenced roles
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		identityRoleService.findAllByContract(contractId).forEach(identityRole -> {
 			// Sub roles are removed different way (processor on direct identity role),
 			// but automatic roles has to be removed in the same request.

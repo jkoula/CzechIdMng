@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -85,7 +86,7 @@ public class IdentityContractCreateByAutomaticRoleProcessor
 			return new DefaultEventResult<>(event, this);
 		}
 		// assign automatic roles by role request
-		List<IdmConceptRoleRequestDto> concepts = automaticRoles
+		List<AbstractConceptRoleRequestDto> concepts = automaticRoles
 				.stream()
 				.map(autoRole -> {
 					IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();

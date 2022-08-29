@@ -4,6 +4,7 @@ import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRole;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -43,4 +44,38 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
         this.accountRole = accountRole;
     }
 
+    @Override
+    public UUID getRoleAssignmentUuid() {
+        return getAccountRole();
+    }
+
+    @Override
+    public void setRoleAssignmentUuid(UUID id) {
+        setAccAccount(id);
+    }
+
+    @Override
+    public UUID getOwnerUuid() {
+        return getAccAccount();
+    }
+
+    @Override
+    public void setOwnerUuid(UUID id) {
+        setAccAccount(id);
+    }
+
+    @Override
+    public AccAccountConceptRoleRequestDto copy() {
+        AccAccountConceptRoleRequestDto conceptRoleRequest = new AccAccountConceptRoleRequestDto();
+        conceptRoleRequest.setRoleRequest(getRoleRequest());
+        conceptRoleRequest.setOperation(getOperation());
+        // from concept
+        conceptRoleRequest.setValidFrom(getValidFrom());
+        conceptRoleRequest.setValidTill(getValidTill());
+        conceptRoleRequest.setAccAccount(getAccAccount());
+        // from assigned (~changed) sub role
+        conceptRoleRequest.setDirectConcept(getId());
+        // save and add to concepts to be processed
+        return conceptRoleRequest;
+    }
 }

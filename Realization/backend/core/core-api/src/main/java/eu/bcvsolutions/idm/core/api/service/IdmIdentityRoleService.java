@@ -3,14 +3,12 @@ package eu.bcvsolutions.idm.core.api.service;
 import java.util.List;
 import java.util.UUID;
 
-import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.script.ScriptEnabled;
 
@@ -51,44 +49,7 @@ public interface IdmIdentityRoleService extends
 	 * @return
 	 */
 	List<IdmIdentityRoleDto> findAllByContractPosition(UUID contractPositionId);
-	
-	/**
-	 * Returns assigned roles by given automatic role.
-	 *
-	 * @param roleTreeNodeId
-	 * @return
-	 */
-	Page<IdmIdentityRoleDto> findByAutomaticRole(UUID roleTreeNodeId, Pageable pageable);
-	
-	/**
-	 * Returns all roles with date lower than given expiration date.
-	 * 
-	 * @param expirationDate valid till < expirationDate
-	 * @param pageable add sort if needed
-	 * @return all expired roles 
-	 * @see #findDirectExpiredRoles(LocalDate, Pageable)
-	 */
-	Page<IdmIdentityRoleDto> findExpiredRoles(LocalDate expirationDate, Pageable pageable);
-	
-	/**
-	 * Returns all direct roles with date lower than given expiration date. Automatic roles are included, sub roles not.
-	 * 
-	 * @param expirationDate valid till < expirationDate
-	 * @param pageable add sort if needed
-	 * @return expired roles without sub roles
-	 * @since 10.2.0
-	 */
-	Page<IdmIdentityRoleDto> findDirectExpiredRoles(LocalDate expirationDate, Pageable pageable);
-	
-	/**
-	 * Returns all direct roles with date lower than given expiration date. Automatic roles are included, sub roles not.
-	 * 
-	 * @param expirationDate valid till < expirationDate
-	 * @return expired role identifiers (without sub roles)
-	 * @since 10.6.5, 10.7.2
-	 */
-	List<UUID> findDirectExpiredRoleIds(LocalDate expirationDate);
-	
+
 	/**
 	 * Find valid identity-roles in this moment. Includes check on contract validity. 
 	 * 
@@ -99,31 +60,4 @@ public interface IdmIdentityRoleService extends
 	Page<IdmIdentityRoleDto> findValidRoles(UUID identityId, Pageable pageable);
 
 
-
-	/**
-	 * Check if {@link IdmIdentityRoleDto} <b>ONE</b> is duplicit against {@link IdmIdentityRoleDto} <b>TWO</b>.</br></br>
-	 * Method check these states:</br>
-	 * - If {@link IdmIdentityRoleDto} has same {@link IdmRoleDto}</br>
-	 * - If {@link IdmIdentityRoleDto} has same {@link IdmIdentityContractDto}</br>
-	 * - If both roles are automatically added (in this case is return always false)</br>
-	 * - If role <b>ONE</b> is duplicity with validity to role <b>TWO</b>. When are both roles manually added is also check if
-	 * role <b>TWO</b> is duplicity with validity to role <b>ONE</b>
-	 * - If {@link IdmIdentityRoleDto} has same definition and values (this can be skipped by parameter @param <b>skipSubdefinition</b>)</br>
-	 * </br>
-	 * <b>Beware,</b> for check subdefinition is needed that given identity role has filled <b>_eavs</b> attribute with form instance. Form
-	 * definition with values is not get by database.
-	 * 
-	 * @param one
-	 * @param two
-	 * @param skipSubdefinition
-	 * @return true if {@link IdmIdentityRoleDto} are same or similar. Otherwise false if {@link IdmIdentityRoleDto} are different
-	 * @since 9.5.0
-	 * @see <a href="https://wiki.czechidm.com/devel/documentation/roles/dev/identity-role-deduplication">Documentation link</a> for more information
-	 */
-	IdmIdentityRoleDto getDuplicated(IdmIdentityRoleDto one, IdmIdentityRoleDto two, Boolean skipSubdefinition);
-
-	/**
-	 * Returns true, if given identity-role is automatic or business role.
-	 */
-	boolean isRoleAutomaticOrComposition(IdmIdentityRoleDto identityRole);
 }

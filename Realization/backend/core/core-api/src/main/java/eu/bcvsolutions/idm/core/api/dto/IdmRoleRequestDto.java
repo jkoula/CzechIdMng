@@ -33,7 +33,7 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
     //In embedded map, is under wfProcessId key actual task - WorkflowProcessInstanceDto.class
     private String wfProcessId;
     private String originalRequest;
-    private List<IdmConceptRoleRequestDto> conceptRoles;
+    private List<AbstractConceptRoleRequestDto> conceptRoles;
     private boolean executeImmediately = false;
     @Embedded(dtoClass = IdmRoleRequestDto.class)
     private UUID duplicatedToRequest;
@@ -75,14 +75,14 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
         this.applicant = applicant;
     }
 
-    public List<IdmConceptRoleRequestDto> getConceptRoles() {
+    public List<AbstractConceptRoleRequestDto> getConceptRoles() {
         if (conceptRoles == null) {
             conceptRoles = new ArrayList<>();
         }
         return conceptRoles;
     }
 
-    public void setConceptRoles(List<IdmConceptRoleRequestDto> conceptRoles) {
+    public void setConceptRoles(List<AbstractConceptRoleRequestDto> conceptRoles) {
         this.conceptRoles = conceptRoles;
     }
 

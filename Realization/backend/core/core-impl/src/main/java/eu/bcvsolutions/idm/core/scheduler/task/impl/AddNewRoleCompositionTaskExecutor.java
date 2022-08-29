@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -132,7 +133,7 @@ public class AddNewRoleCompositionTaskExecutor extends AbstractSchedulableStatef
 					compositionFilter.setSuperiorId(identityRole.getRole());
 					compositionFilter.setId(roleCompositionId);
 					//
-					List<IdmConceptRoleRequestDto> concepts = roleCompositionService
+					List<AbstractConceptRoleRequestDto> concepts = roleCompositionService
 							.find(compositionFilter, null)
 							.stream()
 							.map(subRole -> {

@@ -1,8 +1,12 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleSystemFilter;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -13,6 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -88,6 +93,11 @@ public class DefaultIdmRequestIdentityRoleService extends
 	@Autowired(required = false)
 	@SuppressWarnings(value = "rawtypes")
 	private IdmRoleSystemService roleSystemService;
+
+	@Autowired
+	IdmRoleAssignmentManager roleAssignmentManager;
+	@Autowired
+	IdmConceptRoleRequestManager conceptRoleRequestManager;
 
 	@Override
 	public Page<IdmRequestIdentityRoleDto> find(IdmRequestIdentityRoleFilter filter, Pageable pageable,
@@ -272,11 +282,11 @@ public class DefaultIdmRequestIdentityRoleService extends
 			}
 			IdmRoleRequestDto mockRequest = new IdmRoleRequestDto();
 			mockRequest.setId(requestId);
-			IdmConceptRoleRequestDto concept = roleRequestService.createConcept(mockRequest, identityContractDto, identityRoleDto.getId(), identityRoleDto.getRole(),
+			AbstractConceptRoleRequestDto concept = roleRequestService.createConcept(mockRequest, identityContractDto, identityRoleDto.getId(), identityRoleDto.getRole(),
 					ConceptRoleRequestOperation.REMOVE);
 			if (request != null) {
 				// Add request to concept. Will be used on the FE (prevent loading of request).
-				concept.getEmbedded().put(IdmConceptRoleRequest_.roleRequest.getName(), request);
+				concept.getEmbedded().put(AbstractConceptRoleRequest_.roleRequest.getName(), request);
 			}
 			
 			return this.conceptToRequestIdentityRole(concept, null);
@@ -461,17 +471,17 @@ public class DefaultIdmRequestIdentityRoleService extends
 		UUID identityId = filter.getIdentityId();
 		LOG.debug(MessageFormat.format("Start searching duplicates for identity [{1}].", identityId));
 		Assert.notNull(identityId, "Identity identifier is required.");
-		List<IdmIdentityRoleDto> identityRoles = identityRoleService.findValidRoles(identityId, null).getContent();
+		List<AbstractRoleAssignmentDto> identityRoles = new ArrayList<>(identityRoleService.findValidRoles(identityId, null).getContent());
 		// Add to all identity roles form instance. For identity role can exists only
 		// one form instance.
 		identityRoles.forEach(identityRole -> {
-			IdmFormInstanceDto formInstance = identityRoleService.getRoleAttributeValues(identityRole);
+			IdmFormInstanceDto formInstance = roleAssignmentManager.getServiceForAssignment(identityRole).getRoleAttributeValues(identityRole);
 			if (formInstance != null) {
 				identityRole.setEavs(Lists.newArrayList(formInstance));
 			}
 		});
 		// Find potential duplicated concepts (only ADD and not in terminated state)
-		List<IdmConceptRoleRequestDto> conceptsForMarkDuplicates = concepts.stream() //
+		List<AbstractConceptRoleRequestDto> conceptsForMarkDuplicates = concepts.stream() //
 				.filter(concept -> ConceptRoleRequestOperation.ADD == concept.getOperation()) //
 				.filter(concept -> !concept.getState().isTerminatedState()) //
 				.collect(Collectors.toList()); //
@@ -495,8 +505,8 @@ public class DefaultIdmRequestIdentityRoleService extends
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private IdmRequestIdentityRoleDto conceptToRequestIdentityRole(IdmConceptRoleRequestDto concept,
-			IdmRequestIdentityRoleFilter filter) {
+	private IdmRequestIdentityRoleDto conceptToRequestIdentityRole(AbstractConceptRoleRequestDto concept,
+																   IdmRequestIdentityRoleFilter filter) {
 		IdmRequestIdentityRoleDto requestIdentityRoleDto = modelMapper.map(concept, IdmRequestIdentityRoleDto.class);
 		// load permission from related contract or role (OR)
 		if (filter != null // from find method only
@@ -542,7 +552,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 				formInstanceDto  = identityRoleService.getRoleAttributeValues(identityRole);
 			} else {
 				// Check on change of values is made only on ended request! 'Original' value is current value and in audit it was confusing (only 'new' value is show now).
-				formInstanceDto = conceptRoleService.getRoleAttributeValues(concept, !concept.getState().isTerminatedState());
+				formInstanceDto = conceptRoleRequestManager.getServiceForConcept(concept).getRoleAttributeValues(concept, !concept.getState().isTerminatedState());
 			}
 			addEav(requestIdentityRoleDto, formInstanceDto);
 		}
@@ -575,7 +585,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	 * @param filter
 	 * @return
 	 */
-	private IdmRequestIdentityRoleDto addCandidates(IdmRequestIdentityRoleDto requestIdentityRoleDto, IdmConceptRoleRequestDto concept, IdmRequestIdentityRoleFilter filter) {
+	private IdmRequestIdentityRoleDto addCandidates(IdmRequestIdentityRoleDto requestIdentityRoleDto, AbstractConceptRoleRequestDto concept, IdmRequestIdentityRoleFilter filter) {
 		if (filter != null && filter.isIncludeCandidates() && concept.getWfProcessId() != null) {
 			// Concept has own process (subprocess), method getApproversForProcess also include approvers for subprocess
 			requestIdentityRoleDto.setCandidates(workflowProcessInstanceService.getApproversForProcess(concept.getWfProcessId()));

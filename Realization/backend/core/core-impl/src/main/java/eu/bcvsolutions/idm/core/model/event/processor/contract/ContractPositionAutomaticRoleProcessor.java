@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -138,7 +139,7 @@ public class ContractPositionAutomaticRoleProcessor
 		addedAutomaticRoles.removeIf(a -> {
 			return previousAutomaticRoles.contains(a.getId());
 		});
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>(removedAutomaticRoles.size() + addedAutomaticRoles.size());
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>(removedAutomaticRoles.size() + addedAutomaticRoles.size());
 		//
 		for(UUID removedAutomaticRole : removedAutomaticRoles) {
 			Iterator<IdmIdentityRoleDto> iter = assignedRoles.iterator();

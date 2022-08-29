@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -117,7 +118,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Applicant must be ours identity
 		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		// cast here is probably ok
+		IdmConceptRoleRequestDto concept = (IdmConceptRoleRequestDto) request.getConceptRoles().get(0);
 		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
@@ -168,7 +170,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
 
 		request.getConceptRoles().forEach(concept -> {
-			Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+			Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 			Assert.assertTrue(roles.contains(concept.getRole()));
 			Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
 			Assert.assertEquals(createdRequestIdentityRole.getValidTill(), concept.getValidTill());
@@ -218,8 +220,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Applicant must be ours identity
 		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(ConceptRoleRequestOperation.REMOVE, concept.getOperation());
 
@@ -263,8 +265,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Applicant must be ours identity
 		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(ConceptRoleRequestOperation.UPDATE, concept.getOperation());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
@@ -310,8 +312,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Applicant must be ours identity
 		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
 		Assert.assertEquals(createdRequestIdentityRole.getValidTill(), concept.getValidTill());
@@ -367,8 +369,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Applicant must be ours identity
 		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(ConceptRoleRequestOperation.UPDATE, concept.getOperation());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());

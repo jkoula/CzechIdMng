@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -87,7 +88,7 @@ public class IdentityAutomaticRoleProcessor extends CoreEventProcessor<IdmIdenti
 			type = AutomaticRoleAttributeRuleType.IDENTITY_EAV;
 		}
 		//
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		//
 		for (IdmIdentityContractDto contract : identityContractService.findAllByIdentity(identityId)) {
 			UUID contractId = contract.getId();

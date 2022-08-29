@@ -23,6 +23,7 @@ import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,7 +230,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	@Override
 	@Transactional
 	public void removeAutomaticRolesInternal(UUID contractId, Set<AbstractIdmAutomaticRoleDto> automaticRoles) {
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<AbstractConceptRoleRequestDto>();
 
 		// Identity id is get from embedded identity role. This is little speedup.
 		UUID identityId = null;
@@ -481,9 +482,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * 
 	 * @param automaticRoleId
 	 * @param rules
-	 * @param onlyNew
 	 * @param passed
-	 * @param identityId
 	 * @param contractId
 	 * @return
 	 */
@@ -802,7 +801,6 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * @param value
 	 * @param cb
 	 * @param comparsion
-	 * @param neq
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -1083,7 +1081,6 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * Cast value in string to given persistent type
 	 *
 	 * @param value
-	 * @param persistentType
 	 * @param comparison
 	 * @return
 	 */
@@ -1109,7 +1106,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * @param automaticRoles
 	 */
 	private void createIdentityRoles(IdmIdentityContractDto contract, IdmContractPositionDto contractPosition, Set<AbstractIdmAutomaticRoleDto> automaticRoles) {		
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>(automaticRoles.size());
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>(automaticRoles.size());
 
 		for (AbstractIdmAutomaticRoleDto autoRole : automaticRoles) {
 			IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();

@@ -11,6 +11,8 @@ import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 
+import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.ADD;
+
 /**
  * Dto for concept role request
  *
@@ -114,6 +116,42 @@ public class IdmConceptRoleRequestDto extends AbstractConceptRoleRequestDto {
 	    identityContract = (UUID) readFields.get("identityContract", null);
 	    contractPosition = (UUID) readFields.get("contractPosition", null);
 	    identityRole = (UUID) readFields.get("identityRole", null);
+    }
+
+    @Override
+    public UUID getRoleAssignmentUuid() {
+        return getIdentityRole();
+    }
+
+    @Override
+    public void setRoleAssignmentUuid(UUID id) {
+        setIdentityRole(id);
+    }
+
+    @Override
+    public UUID getOwnerUuid() {
+        return getIdentityContract();
+    }
+
+    @Override
+    public void setOwnerUuid(UUID id) {
+        setIdentityContract(id);
+    }
+
+    @Override
+    public IdmConceptRoleRequestDto copy() {
+        IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
+        conceptRoleRequest.setRoleRequest(getRoleRequest());
+        conceptRoleRequest.setOperation(getOperation());
+        // from concept
+        conceptRoleRequest.setValidFrom(getValidFrom());
+        conceptRoleRequest.setValidTill(getValidTill());
+        conceptRoleRequest.setIdentityContract(getIdentityContract());
+        conceptRoleRequest.setContractPosition(getContractPosition());
+        // from assigned (~changed) sub role
+        conceptRoleRequest.setDirectConcept(getId());
+        // save and add to concepts to be processed
+        return conceptRoleRequest;
     }
 
 }

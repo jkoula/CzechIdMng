@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,6 @@ import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.event.processor.RoleRequestProcessor;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 
 /**
@@ -80,9 +80,9 @@ public class RoleRequestRealizationProcessor extends CoreEventProcessor<IdmRoleR
 		IdmIdentityDto identity = identityService.get(request.getApplicant());
 
 		Set<IdmIdentityRoleDto> addedIdentityRoles = this
-				.getSetProperty(IdentityRoleEvent.PROPERTY_ASSIGNED_NEW_ROLES, event, IdmIdentityRoleDto.class);
+				.getSetProperty(AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_NEW_ROLES, event, IdmIdentityRoleDto.class);
 		Set<IdmIdentityRoleDto> updatedIdentityRoles = this.getSetProperty(
-				IdentityRoleEvent.PROPERTY_ASSIGNED_UPDATED_ROLES, event, IdmIdentityRoleDto.class);
+				AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_UPDATED_ROLES, event, IdmIdentityRoleDto.class);
 		Set<UUID> removedIdentityAccounts = this.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM,
 				event, UUID.class);
 		Set<UUID> accountsForAdditionalProvisioning = this.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING,

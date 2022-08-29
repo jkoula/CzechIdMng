@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.quartz.DisallowConcurrentExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -120,7 +121,7 @@ public class ProcessAllAutomaticRoleByAttributeTaskExecutor extends AbstractSche
     	boolean canContinue = true;
 		for (UUID contractId : newPassedContracts) {
 			// Concepts that will be added
-			List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+			List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 			//
 			IdmIdentityContractDto contract = identityContractService.get(contractId);
 			//
@@ -154,7 +155,7 @@ public class ProcessAllAutomaticRoleByAttributeTaskExecutor extends AbstractSche
     			filter.setAutomaticRoleId(automaticRoleId);
     			List<IdmIdentityRoleDto> identityRoles = identityRoleService.find(filter, null).getContent();
     			// Concepts that will be added
-    			List<IdmConceptRoleRequestDto> concepts = new ArrayList<>(identityRoles.size());
+    			List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>(identityRoles.size());
     			for (IdmIdentityRoleDto identityRole : identityRoles) {
     				IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
         			concept.setIdentityContract(contractId);

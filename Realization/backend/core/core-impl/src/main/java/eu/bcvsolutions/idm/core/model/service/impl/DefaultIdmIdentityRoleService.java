@@ -98,6 +98,11 @@ public class DefaultIdmIdentityRoleService
 	}
 
 	@Override
+	public Class<IdmIdentityRoleDto> getType() {
+		return IdmIdentityRoleDto.class;
+	}
+
+	@Override
 	protected List<Predicate> toPredicates(Root<IdmIdentityRole> root, CriteriaQuery<?> query, CriteriaBuilder builder, IdmIdentityRoleFilter filter) {
 		List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
 		// quick - by identity's username
