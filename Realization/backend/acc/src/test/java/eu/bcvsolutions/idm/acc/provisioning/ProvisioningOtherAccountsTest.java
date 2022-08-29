@@ -1,31 +1,60 @@
 package eu.bcvsolutions.idm.acc.provisioning;
 
+import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_FIRSTNAME;
+import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_LASTNAME;
+import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_NAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 
 import eu.bcvsolutions.idm.acc.DefaultAccTestHelper;
-import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
+import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
+import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.ProvisioningAttributeDto;
+import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
+import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
+import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
@@ -40,6 +69,20 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	private AccAccountService accountService;
 	@Autowired
 	private SysSystemAttributeMappingService systemAttributeMappingService;
+	@Autowired
+	private SysSystemMappingService systemMappingService;
+	@Autowired
+	private SysSchemaAttributeService schemaAttributeService;
+	@Autowired
+	private IdmFormDefinitionService formDefinitionService;
+	@Autowired
+	private SysSystemService systemService;
+	@Autowired
+	private ProvisioningService provisioningService;
+	@Autowired
+	private SysProvisioningArchiveService provisioningArchiveService;
+	@Autowired
+	private FormService formService;
 
 	@Test
 	public void createOtherAccountAlone() {
@@ -79,7 +122,7 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		SysSystemDto system = helper.createTestResourceSystem(false);
 		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
 		SysSystemMappingDto mapping = helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
-		SysSystemAttributeMappingDto uidAttribute = systemAttributeMappingService.findBySystemMappingAndName(mapping.getId(), TestHelper.ATTRIBUTE_MAPPING_NAME);
+		SysSystemAttributeMappingDto uidAttribute = systemAttributeMappingService.findBySystemMappingAndName(mapping.getId(), ATTRIBUTE_MAPPING_NAME);
 		uidAttribute.setTransformToResourceScript("return 'test_' + attributeValue");
 		systemAttributeMappingService.save(uidAttribute);
 
@@ -154,6 +197,163 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		helper.deleteRole(role.getId());
 		helper.deleteRole(rolePersonal.getId());
 		helper.deleteSystem(system.getId());
+	}
+
+	@Test
+	public void createOtherAccountWithEAVs() {
+		SysSystemDto system = helper.createTestResourceSystem(false);
+		SysSystemMappingDto mapping = createMapping(system);
+
+		List<IdmFormDefinitionDto> allByType = formDefinitionService.findAllByType(AccAccount.class.getName());
+		assertTrue(allByType.size() > 0);
+
+		IdmFormDefinitionDto formDefinitionDto = allByType.get(0);
+
+		formDefinitionDto = formDefinitionService.get(formDefinitionDto.getId());
+
+		List<IdmFormAttributeDto> formAttributes = formDefinitionDto.getFormAttributes().stream()
+				.filter(idmFormAttributeDto -> idmFormAttributeDto.getCode().equals(ATTRIBUTE_MAPPING_FIRSTNAME) || idmFormAttributeDto.getCode().equals(ATTRIBUTE_MAPPING_LASTNAME))
+				.collect(Collectors.toList());
+
+		// add new eav attributes to mapping
+		addAttributesToMapping(formAttributes, system, mapping);
+
+		IdmRoleDto role = helper.createRole();
+		helper.createRoleSystem(role, system, AccountType.PERSONAL_OTHER);
+
+		// Identity
+		IdmIdentityDto identityDto = helper.createIdentity(helper.createName());
+
+		AccAccountFilter accountFilter = new AccAccountFilter();
+		accountFilter.setAccountType(AccountType.PERSONAL_OTHER);
+		long accountsCount = accountService.count(accountFilter);
+		assertEquals(0, accountsCount);
+
+		helper.createIdentityRole(identityDto, role);
+
+		List<AccAccountDto> accounts = accountService.find(accountFilter, null).getContent();
+		assertEquals(1, accounts.size());
+
+		AccAccountDto accountFound = accounts.get(0);
+		assertEquals(system.getId(), accountFound.getSystem());
+		assertEquals(mapping.getId(), accountFound.getSystemMapping());
+		assertEquals(identityDto.getUsername(), accountFound.getUid());
+
+		// set values to EAV
+		IdmFormDefinitionDto finalFormDefinitionDto = formDefinitionDto;
+		formAttributes.forEach(idmFormAttributeDto -> getHelper().setEavValue(accountFound, idmFormAttributeDto, AccAccount.class, getHelper().createName(), PersistentType.SHORTTEXT, finalFormDefinitionDto));
+
+		SysSystemMappingDto accountMapping = DtoUtils.getEmbedded(accountFound, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
+		assertNotNull(accountMapping);
+		assertEquals(AccountType.PERSONAL_OTHER, accountMapping.getAccountType());
+
+		provisioningService.doProvisioning(identityDto);
+
+		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
+		provisioningOperationFilter.setSystemId(system.getId());
+		provisioningOperationFilter.setOperationType(ProvisioningEventType.UPDATE);
+		List<SysProvisioningArchiveDto> provisioningArchiveDtos = provisioningArchiveService.find(provisioningOperationFilter, null).getContent();
+		assertEquals(1, provisioningArchiveDtos.size());
+
+		TestResource resource = helper.findResource(accountFound.getUid());
+		assertNotNull(resource);
+
+		// check values in provisioning archive
+		Map<ProvisioningAttributeDto, Object> accountObject = provisioningArchiveDtos.get(0).getProvisioningContext().getAccountObject();
+		assertNotNull(accountObject);
+		accountObject.forEach((provisioningAttributeDto, o) -> {
+			switch (provisioningAttributeDto.getSchemaAttributeName()) {
+				case ATTRIBUTE_MAPPING_NAME:
+					assertEquals(identityDto.getUsername(), o);
+					assertEquals(resource.getName(), o);
+					break;
+				case ATTRIBUTE_MAPPING_FIRSTNAME: {
+					IdmFormAttributeDto firstNameEav = formAttributes.stream().filter(idmFormAttributeDto -> idmFormAttributeDto.getCode().equals(ATTRIBUTE_MAPPING_FIRSTNAME)).findFirst().orElse(null);
+					assertNotNull(firstNameEav);
+					List<IdmFormValueDto> values = formService.getValues(accountFound, finalFormDefinitionDto, firstNameEav.getCode());
+					assertFalse(values.isEmpty());
+					assertEquals(values.get(0).getValue(), o);
+					assertEquals(resource.getFirstname(), o);
+					break;
+				}
+				case ATTRIBUTE_MAPPING_LASTNAME: {
+					IdmFormAttributeDto lastNameEav = formAttributes.stream().filter(idmFormAttributeDto -> idmFormAttributeDto.getCode().equals(ATTRIBUTE_MAPPING_LASTNAME)).findFirst().orElse(null);
+					assertNotNull(lastNameEav);
+					List<IdmFormValueDto> values = formService.getValues(accountFound, finalFormDefinitionDto, lastNameEav.getCode());
+					assertFalse(values.isEmpty());
+					assertEquals(values.get(0).getValue(), o);
+					assertEquals(resource.getLastname(), o);
+					break;
+				}
+			}
+		});
+
+		allByType.forEach(idmFormDefinitionDto -> {
+			formService.deleteValues(accountFound, finalFormDefinitionDto);
+		});
+		helper.deleteAllResourceData();
+		helper.deleteIdentity(identityDto.getId());
+		helper.deleteRole(role.getId());
+		helper.deleteSystem(system.getId());
+	}
+
+	/**
+	 * custom create mapping just with __NAME__ for identity account
+	 *
+	 * @param system
+	 * @return
+	 */
+	private SysSystemMappingDto createMapping(SysSystemDto system) {
+		//
+		// generate schema for system
+		List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
+		//
+		SysSystemMappingDto systemMapping = new SysSystemMappingDto();
+		systemMapping.setName("default_" + System.currentTimeMillis());
+		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
+		systemMapping.setObjectClass(objectClasses.get(0).getId());
+		systemMapping.setAccountType(AccountType.PERSONAL_OTHER);
+		systemMapping = systemMappingService.save(systemMapping);
+
+		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
+		schemaAttributeFilter.setSystemId(system.getId());
+
+		Page<SysSchemaAttributeDto> schemaAttributesPage = schemaAttributeService.find(schemaAttributeFilter, null);
+		for (SysSchemaAttributeDto schemaAttr : schemaAttributesPage) {
+			if (ATTRIBUTE_MAPPING_NAME.equals(schemaAttr.getName())) {
+				SysSystemAttributeMappingDto attributeMapping = new SysSystemAttributeMappingDto();
+				attributeMapping.setUid(true);
+				attributeMapping.setEntityAttribute(true);
+				attributeMapping.setIdmPropertyName(IdmIdentity_.username.getName());
+				attributeMapping.setName(schemaAttr.getName());
+				attributeMapping.setSchemaAttribute(schemaAttr.getId());
+				attributeMapping.setSystemMapping(systemMapping.getId());
+				systemAttributeMappingService.save(attributeMapping);
+			}
+		}
+		return systemMapping;
+	}
+
+	private void addAttributesToMapping(List<IdmFormAttributeDto> formAttributes, SysSystemDto system, SysSystemMappingDto systemMapping) {
+		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
+		schemaAttributeFilter.setSystemId(system.getId());
+
+		Page<SysSchemaAttributeDto> schemaAttributesPage = schemaAttributeService.find(schemaAttributeFilter, null);
+		for (SysSchemaAttributeDto schemaAttr : schemaAttributesPage) {
+			formAttributes.forEach(idmFormAttributeDto -> {
+				if (idmFormAttributeDto.getCode().equals(schemaAttr.getName())) {
+					SysSystemAttributeMappingDto attributeMapping = new SysSystemAttributeMappingDto();
+					attributeMapping.setEntityAttribute(false);
+					attributeMapping.setExtendedAttribute(false);
+					attributeMapping.setName(schemaAttr.getName());
+					attributeMapping.setSchemaAttribute(schemaAttr.getId());
+					attributeMapping.setSystemMapping(systemMapping.getId());
+					attributeMapping.setStrategyType(AttributeMappingStrategyType.SET);
+					systemAttributeMappingService.save(attributeMapping);
+				}
+			});
+		}
 	}
 
 }

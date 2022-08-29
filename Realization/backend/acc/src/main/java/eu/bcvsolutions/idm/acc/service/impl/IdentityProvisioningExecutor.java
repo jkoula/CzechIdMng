@@ -202,7 +202,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 
 	@Override
 	protected Object getAttributeValue(String uid, IdmIdentityDto dto, AttributeMapping attribute,
-			SysSystemDto system, MappingContext mappingContext) {
+			SysSystemDto system, MappingContext mappingContext, AccAccountDto accountDto) {
 		
 		if (attribute instanceof SysRoleSystemAttributeDto) {
 			SysRoleSystemAttributeDto roleSystemAttributeDto = (SysRoleSystemAttributeDto) attribute;
@@ -308,7 +308,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 			return attributeMappingService.transformValueToResource(uid, state, attribute, dto);
 		}
 		
-		return super.getAttributeValue(uid, dto, attribute, system, mappingContext);
+		return super.getAttributeValue(uid, dto, attribute, system, mappingContext, accountDto);
 	}
 
 	public static AssignedRoleDto convertToAssignedRoleDto(IdmIdentityRoleDto identityRole) {

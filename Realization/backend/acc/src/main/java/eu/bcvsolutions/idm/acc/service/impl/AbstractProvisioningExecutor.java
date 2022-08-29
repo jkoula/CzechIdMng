@@ -835,7 +835,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					if (attribute.isUid()) {
 						// TODO: now we set UID from SystemEntity, may be UID from
 						// AccAccount will be more correct
-						Object uidValue = getAttributeValue(uid, dto, attribute, system, mappingContext);
+						Object uidValue = getAttributeValue(uid, dto, attribute, system, mappingContext, account);
 						if (uidValue == null) {
 							throw new ProvisioningException(AccResultCode.PROVISIONING_GENERATED_UID_IS_NULL,
 									ImmutableMap.of("system", system.getName()));
@@ -849,7 +849,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), uidValue);
 					} else {
 						accountAttributes.put(ProvisioningAttributeDto.createProvisioningAttributeKey(attribute,
-								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), getAttributeValue(uid, dto, attribute, system, mappingContext));
+								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), getAttributeValue(uid, dto, attribute, system, mappingContext, account));
 					}
 				});
 
@@ -879,7 +879,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 								&& schemaAttributeParent.equals(schemaAttribute)
 								&& attributeParent.getStrategyType() == attribute.getStrategyType();
 					}).forEach(attribute -> {
-						Object value = getAttributeValue(uid, dto, attribute, system, mappingContext);
+						Object value = getAttributeValue(uid, dto, attribute, system, mappingContext, account);
 						// We don`t want null item in list (problem with
 						// provisioning in IC)
 						if (value != null) {
@@ -901,8 +901,8 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		return accountAttributes;
 	}
 
-	protected Object getAttributeValue(String uid, DTO dto, AttributeMapping attribute, SysSystemDto system, MappingContext mappingContext) {
-		return attributeMappingService.getAttributeValue(uid, dto, attribute, mappingContext);
+	protected Object getAttributeValue(String uid, DTO dto, AttributeMapping attribute, SysSystemDto system, MappingContext mappingContext, AccAccountDto accountDto) {
+		return attributeMappingService.getAttributeValue(uid, dto, attribute, mappingContext, accountDto);
 	}
 
 	@Override
