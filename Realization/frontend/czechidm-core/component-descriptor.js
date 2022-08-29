@@ -681,6 +681,18 @@ module.exports = {
       component: 'fa:user-slash'
     },
     {
+      id: 'enabled-system-icon',
+      type: 'icon',
+      entityType: ['enabled-system'],
+      component: 'fa:cog'
+    },
+    {
+      id: 'disabled-system-icon',
+      type: 'icon',
+      entityType: ['disabled-system'],
+      component: 'fa:cog'
+    },
+    {
       id: 'deleted-identity-icon',
       type: 'icon',
       entityType: ['deleted-identity'],

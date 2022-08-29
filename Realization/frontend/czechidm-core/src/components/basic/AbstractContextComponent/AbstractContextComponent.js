@@ -210,7 +210,7 @@ class AbstractContextComponent extends AbstractComponent {
   _i18n(key, options = {}) {
     
     let result = i18n(key, options);
-    console.log(key, result,"create.header")
+   
     // escape html
     if (options && options.escape === false && key !== result) {
       result = (

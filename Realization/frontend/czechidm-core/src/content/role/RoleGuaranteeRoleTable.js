@@ -174,7 +174,8 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
                   manager={ roleManager }
                   label={ this.i18n('entity.RoleGuaranteeRole.role.label') }
                   readOnly
-                  required/>
+                  required
+                  />
                 <Advanced.RoleSelect
                   ref="guaranteeRole"
                   manager={ roleManager }

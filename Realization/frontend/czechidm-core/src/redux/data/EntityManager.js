@@ -548,7 +548,6 @@ export default class EntityManager {
    * @return {object} - action
    */
   createEntity(entity, uiKey = null, cb = null) {
-    console.log(entity);
     if (!entity) {
       return {
         type: EMPTY

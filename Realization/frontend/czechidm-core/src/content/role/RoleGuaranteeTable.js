@@ -120,6 +120,7 @@ export class RoleGuaranteeTable extends Advanced.AbstractTableContent {
             cell={
               ({ rowIndex, data }) => {
                 const entity = data[rowIndex];
+                console.log(entity, "GUARANTEE")
                 return (
                   <Advanced.EntityInfo
                     entityType="identity"
@@ -165,13 +166,15 @@ export class RoleGuaranteeTable extends Advanced.AbstractTableContent {
                 ref="form"
                 data={detail.entity}
                 showLoading={ _showLoading }
-                readOnly={ !manager.canSave(detail.entity, _permissions) }>
+                readOnly={ !manager.canSave(detail.entity, _permissions)}
+                >
                 <Advanced.RoleSelect
                   ref="role"
                   manager={ roleManager }
                   label={ this.i18n('entity.RoleGuarantee.role.label') }
                   readOnly
-                  required/>
+                  required
+                  />
                 <Advanced.IdentitySelect
                   ref="guarantee"
                   manager={ identityManager }

@@ -52,15 +52,20 @@ import SystemSelect from '../../components/SystemSelect/SystemSelect';
       }
     
     render(){
-        const {  _showLoading } = this.props;
+        const {_showLoading } = this.props;
+        const { detail } = this.state;
+        // const owner = forceSearchParameters.getFilters().get('owner');
         return(
             <Basic.Div>
                 <Basic.Confirm 
                 ref="confirm-delete"
                 level="danger"/>
+                hhhhhhhh
                 <Advanced.Table
                           ref="table"
                           manager={ manager }
+                         // forceSearchParameters={ forceSearchParameters }
+                         // _searchParameters={ this.getSearchParameters() }
                 buttons={
                     [
                       <Basic.Button
@@ -95,15 +100,16 @@ import SystemSelect from '../../components/SystemSelect/SystemSelect';
             sortProperty="owner.name"
             face="text"
             header={ this.i18n('acc:entity.SystemOwner.owner.label') }
-            sort
+            sort={false}
             cell={
               ({ rowIndex, data }) => {
                 const entity = data[rowIndex];
+                console.log(entity, "OBSAH ENTIT");
                 return (
                   <Advanced.EntityInfo
                     entityType="identity"
-                    entityIdentifier={ entity }
-                    entity={ entity }
+                    entityIdentifier={ entity.owner }
+                    entity={ entity._embedded.owner }
                     face="popover"
                     showIcon/>
                 );
@@ -125,7 +131,7 @@ import SystemSelect from '../../components/SystemSelect/SystemSelect';
               }
             }
           />
-            <Advanced.Column>dfsdfss</Advanced.Column>
+            <Advanced.Column></Advanced.Column>
                 </Advanced.Table>
         <Basic.Modal
           bsSize="large"
@@ -143,20 +149,21 @@ import SystemSelect from '../../components/SystemSelect/SystemSelect';
             />
             <Basic.Modal.Header
               closeButton={ !_showLoading }
-            //   text={ this.i18n('edit.header', { name: manager.getNiceLabel(detail.entity) }) }
+              // text={ this.i18n('edit.header', { name: manager.getNiceLabel(detail.entity) }) }
             //   rendered={ !Utils.Entity.isNew(detail.entity) }
               />
             <Basic.Modal.Body>
               <Basic.AbstractForm
                 ref="form"
                 showLoading={ _showLoading }
-                // readOnly={ !manager.canSave(detail.entity, _permissions) }
+                // readOnly={ !manager.canSave(detail.entity, console.log(detail.entity,"DETAIL ENTITY")) }
                 >
                  <SystemSelect
                   ref="system"
                   manager={ systemManager }
                   label={ this.i18n('acc:entity.SystemOwner.system.label') }
                   // readOnly
+                  disabled
                   required
                   />
 

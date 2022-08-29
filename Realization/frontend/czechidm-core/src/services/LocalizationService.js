@@ -141,7 +141,6 @@ export default class LocalizationService {
     if (!i18nextInstance) {
       return undefined;
     }
-    console.log(key, i18nextInstance)
     return i18nextInstance.t(key, options);
   }
 
