@@ -48,12 +48,12 @@ public class IdentityRoleSystemEntityType implements SystemEntityTypeRegistrable
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"IDENTITY_CONTRACT",
-				"ROLE",
-				"VALID_FROM",
-				"VALID_TILL",
-				"ROLE_COMPOSITION",
-				"CONTRACT_POSITION",
-				"EXTERNAL_ID");
+				"identityContract",
+				"role",
+				"validFrom",
+				"validTill",
+				"roleComposition",
+				"contractPosition",
+				"externalId");
 	}
 }

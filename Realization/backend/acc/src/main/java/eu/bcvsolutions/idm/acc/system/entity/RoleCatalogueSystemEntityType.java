@@ -48,11 +48,11 @@ public class RoleCatalogueSystemEntityType implements SystemEntityTypeRegistrabl
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"CODE",
-				"NAME",
-				"PARENT",
-				"URL",
-				"URL_TITLE",
-				"DESCRIPTION");
+				"code",
+				"name",
+				"parent",
+				"url",
+				"urlTitle",
+				"description");
 	}
 }

@@ -48,19 +48,20 @@ public class IdentitySystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"USERNAME",
-				"EXTERNAL_CODE",
-				"DISABLED",
-				"FIRSTNAME",
-				"LASTNAME",
-				"EMAIL",
-				"PHONE",
-				"TITLE_BEFORE",
-				"TITLE_AFTER",
-				"DESCRIPTION",
-				"STATE",
-				"ASSIGNED_ROLES",
-				"ASSIGNED_ROLES_FOR_SYSTEM",
-				"FORM_PROJECTION");
+				"username",
+				"externalCode",
+				"disabled",
+				"firstName",
+				"lastName",
+				"email",
+				"phone",
+				"titleBefore",
+				"titleAfter",
+				"description",
+				"state",
+				"assignedRoles",
+				"assignedRolesForSystem",
+				"formProjection",
+				"password");
 	}
 }

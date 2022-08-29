@@ -8,7 +8,6 @@ import { Advanced, Basic, Domain, Enums, Managers, Utils } from 'czechidm-core';
 import MappingContextCompleters from 'czechidm-core/src/content/script/completers/MappingContextCompleters';
 import { AttributeControlledValueManager, SchemaAttributeManager, SystemAttributeMappingManager, SystemMappingManager } from '../../redux';
 import AttributeMappingStrategyTypeEnum from '../../domain/AttributeMappingStrategyTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import AttributeControlledValueTable from './AttributeControlledValueTable';
 import { RoleSystemAttributeTable } from '../role/RoleSystemAttributeTable';
 import SystemAttributeMappingValueDecorator from '../../components/SystemMappingAttribute/SystemAttributeMappingValueDecorator';
@@ -210,11 +209,9 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
   }
 
   _onChangeEntityEnum(item) {
-    const {_systemMapping} = this.props;
     if (item) {
-      const field = SystemEntityTypeEnum.getEntityEnum(_systemMapping ? _systemMapping.entityType : 'IDENTITY').getField(item.value);
-      this.refs.idmPropertyName.setValue(field);
-      this.setState({_idmPropertyName: field});
+      this.refs.idmPropertyName.setValue(item.itemFullKey);
+      this.setState({_idmPropertyName: item.itemFullKey});
     } else {
       this.refs.idmPropertyName.setValue(null);
       this.setState({_idmPropertyName: null});
@@ -300,18 +297,11 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     return '';
   }
 
-  localizeAttributeOptionHelp(value, entityType, module) {
+  getHelpBlockLabel(value, entityType, module) {
     if (value && entityType && module) {
-      console.log("value", value);
-      console.log("entityType", entityType);
-      console.log("module", module);
-      let key = this.i18n(`${module}:entity.SystemEntityType.${entityType}.attributes.helpBlock.${value}`);
-      console.log("key", key);
-      return key;
-      return this.i18n(`${module}:entity.SystemEntityType.${entityType}.attributes.helpBlock.${value}`);
+      return `${module}:entity.SystemEntityType.${entityType}.attributes.helpBlock.${value}`;
     }
 
-    console.log("returning empty")
     return '';
   }
 
@@ -342,8 +332,10 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
         const attributeOption = {value:value, niceLabel:localizedValue};
         attributeOptions.push(attributeOption);
       }
-       
     }
+
+    console.log("attributeOptions", attributeOptions);
+    console.log("this.props", this.props);
 
     const isNew = this._getIsNew();
     const attribute = isNew ? this.state.attribute : _attribute;
@@ -362,16 +354,8 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     const _isExtendedAttribute = extendedAttribute;
     const _showNoRepositoryAlert = (!_isExtendedAttribute && !_isEntityAttribute);
 
-    const entityTypeEnum = SystemEntityTypeEnum.getEntityEnum(_systemMapping ? _systemMapping.entityType : 'IDENTITY');
     const _idmPropertyNameKey = _idmPropertyName !== undefined ? _idmPropertyName : attribute.idmPropertyName;
-    // const propertyHelpBlockLabel = this.localizeAttributeOptionHelp(_idmPropertyNameKey, entityType, module);
-    // console.log("propertyHelpBlockLabel", propertyHelpBlockLabel);
-    const propertyHelpBlockLabel = _idmPropertyNameKey && entityTypeEnum.getEnum(_idmPropertyNameKey) ?
-      entityTypeEnum.getHelpBlockLabel(
-        entityTypeEnum.findKeyBySymbol(
-          entityTypeEnum.getEnum(_idmPropertyNameKey)
-        )
-      ) : '';
+    const propertyHelpBlockLabel = this.getHelpBlockLabel(_idmPropertyNameKey, entityType, module);
     const _isRequiredIdmField = (_isEntityAttribute || _isExtendedAttribute) && !_isDisabled && !passwordAttribute;
     const isSynchronization = !!(_systemMapping && _systemMapping.operationType && _systemMapping.operationType === 'SYNCHRONIZATION');
     const strategyTypeTemp = strategyType || attribute.strategyType;
@@ -450,7 +434,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
                         readOnly={_isDisabled || !_isEntityAttribute || passwordAttribute}
                         // enum={entityTypeEnum}
                         options={attributeOptions}
-                        helpBlock={this.i18n(`acc:${propertyHelpBlockLabel}`, {escape: false})}
+                        helpBlock={this.i18n(`${propertyHelpBlockLabel}`)}
                         onChange={this._onChangeEntityEnum.bind(this)}
                         label={this.i18n('acc:entity.SystemAttributeMapping.idmPropertyEnum')}
                         valueComponent={ SystemAttributeMappingValueDecorator }
@@ -699,8 +683,6 @@ function select(state, component) {
     entity.systemMapping = systemMapping;
     entity.schemaAttribute = schemaAttribute;
     entity.objectClassId = schemaAttribute ? schemaAttribute.objectClass : Domain.SearchParameters.BLANK_UUID;
-    entity.idmPropertyEnum = SystemEntityTypeEnum.getEntityEnum(systemMapping ? systemMapping.entityType : 'IDENTITY')
-      .getEnum(entity.idmPropertyName);
   }
   return {
     _attribute: entity,

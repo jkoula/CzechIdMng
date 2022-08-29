@@ -48,9 +48,9 @@ public class TreeSystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"CODE",
-				"NAME",
-				"PARENT",
-				"DISABLED");
+				"code",
+				"name",
+				"parent",
+				"disabled");
 	}
 }

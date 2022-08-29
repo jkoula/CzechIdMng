@@ -48,16 +48,16 @@ public class ContractSystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"IDENTITY",
-				"MAIN",
-				"STATE",
-				"POSITION",
-				"WORK_POSITION",
-				"VALID_FROM",
-				"VALID_TILL",
-				"EXTERNE",
-				"DESCRIPTION",
-				"GUARANTEES",
-				"POSITIONS");
+				"identity",
+				"main",
+				"state",
+				"position",
+				"workPosition",
+				"validFrom",
+				"validTill",
+				"externe",
+				"description",
+				"guarantees",
+				"positions");
 	}
 }

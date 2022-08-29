@@ -51,17 +51,17 @@ public class ContractSliceSystemEntityType implements SystemEntityTypeRegistrabl
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"CONTRACT_CODE",
-				"IDENTITY",
-				"VALID_FROM",
-				"CONTRACT_VALID_FROM",
-				"CONTRACT_VALID_TILL",
-				"MAIN",
-				"STATE",
-				"POSITION",
-				"WORK_POSITION",
-				"EXTERNE",
-				"GUARANTEES",
-				"DESCRIPTION");
+				"contractCode",
+				"identity",
+				"validFrom",
+				"contractValidFrom",
+				"contratcValidTill",
+				"main",
+				"state",
+				"position",
+				"workPosition",
+				"externe",
+				"guarantees",
+				"description");
 	}
 }

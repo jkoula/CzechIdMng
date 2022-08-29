@@ -48,18 +48,18 @@ public class RoleSystemEntityType implements SystemEntityTypeRegistrable {
 	@Override
 	public List<String> getSupportedAttributes() {
 		return Lists.newArrayList(
-				"NAME",
-				"BASE_CODE",
-				"ENVIRONMENT",
-				"ROLE_TYPE",
-				"PRIORITY",
-				"APPROVE_REMOVE",
-				"DESCRIPTION",
-				"DISABLED",
-				"ROLE_MEMBERSHIP_ID",
-				"ROLE_FORWARD_ACM",
-				"ROLE_SKIP_VALUE_IF_EXCLUDED",
-				"ROLE_MEMBERS_FIELD",
-				"ROLE_CATALOGUE_FIELD");
+				"name",
+				"baseCode",
+				"environment",
+				"roleType",
+				"priority",
+				"approveRemove",
+				"description",
+				"disabled",
+				"roleMembershipId",
+				"roleForwardAcm",
+				"roleSkipValueIfExcluded",
+				"roleMembers",
+				"roleCatalogue");
 	}
 }

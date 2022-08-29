@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.event.SystemMappingEvent.SystemMappingEventType;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -48,6 +49,11 @@ public class SystemMappingSaveProcessor extends CoreEventProcessor<SysSystemMapp
 		SysSystemMappingDto dto = event.getContent();
 		dto = systemMappingService.saveInternal(dto);
 
+		if (dto.getEntityType() == null) {
+			// This the default entity type
+			dto.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		}
+		
 		// Save id of mapping from event into connectedMapping Dto.
 		SysSystemMappingDto originalSource = event.getOriginalSource();
 		if (originalSource == null || dto.getConnectedSystemMappingId() != originalSource.getConnectedSystemMappingId()) {
