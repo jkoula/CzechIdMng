@@ -884,7 +884,6 @@ public class DefaultSysSystemAttributeMappingService
 				if (formDefinitionDto == null) {
 					formDefinitionDto = formDefinitionService.get(accountDto.getFormDefinition());
 				}
-
 				List<IdmFormValueDto> values = formService.getValues(accountDto, formDefinitionDto, schemaAttributeDto.getName());
 				idmValue = getValuesFromEav(schemaAttributeDto, values);
 			}
