@@ -48,7 +48,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {_attribute} = nextProps;
+    const {_attribute, _entityType} = nextProps;
 
     if (_attribute && _attribute !== this.props._attribute) {
       if (_attribute) {
@@ -89,12 +89,18 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
           echoTimeout: 180 // Standard timeout for echo - 3 min
         }
       });
-    //  this.context.store.dispatch(systemMappingManager.fetchEntity(props.location.query.mappingId));
     } else {
       this.context.store.dispatch(this.getManager().fetchEntity(attributeId, null, (entity, error) => {
-        if (entity) {
-          systemEntityTypeManager.fetchEntity(entity.entityType);
-        } else {
+        if (entity && entity.entityType) {
+          this.context.store.dispatch(systemEntityTypeManager.fetchEntity(entity.entityType));
+        } else if (entity && entity._embedded.systemMapping) {
+          this.context.store.dispatch(systemEntityTypeManager.fetchEntity(entity._embedded.systemMapping.entityType, null, (type) => {
+            if (entity.entityAttribute) {
+              const option = this.createSystemEntityTypeOption(type.module, type.systemEntityCode, entity.idmPropertyName);
+              this.refs.idmPropertyEnum.setValue(option);
+            }
+          }));
+        } else if (error) {
           this.addError(error);
         }
       }));
@@ -312,6 +318,11 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     return '';
   }
 
+  createSystemEntityTypeOption(module, entityType, option) {
+      const localizedValue = this.localizeAttributeOptionValue(option, entityType, module)
+      return {value:option, niceLabel:localizedValue};
+  }
+
   render() {
     const { _showLoading, _attribute, _systemMapping } = this.props;
     const { disabledAttribute,
@@ -327,23 +338,15 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     var attributeOptions = [];
     var module;
     var entityType;
-    if (this.props._systemMapping && this.props._systemMapping._embedded &&
-      this.props._systemMapping._embedded.systemEntityType && 
-      this.props._systemMapping._embedded.systemEntityType.supportedAttributes) {
-      const attributeOptionsLoaded = this.props._systemMapping._embedded.systemEntityType.supportedAttributes;
-      module = this.props._systemMapping._embedded.systemEntityType.module;
-      entityType = this.props._systemMapping._embedded.systemEntityType.systemEntityCode;
+    if (this.props._entityType) {
+      const attributeOptionsLoaded = this.props._entityType.supportedAttributes;
+      module = this.props._entityType.module;
+      entityType = this.props._entityType.systemEntityCode;
       for (const option in attributeOptionsLoaded) {
         const value = attributeOptionsLoaded[option];
-        const localizedValue = this.localizeAttributeOptionValue(value, entityType, module)
-        const attributeOption = {value:value, niceLabel:localizedValue};
+        const attributeOption = this.createSystemEntityTypeOption(module, entityType, value)
         attributeOptions.push(attributeOption);
       }
-    }
-
-    if (this.props._systemMapping && this.props._systemMapping.entityType) {
-      let et = this.props._entityType;
-      console.log("entityType", et);
     }
 
     const isNew = this._getIsNew();
@@ -364,7 +367,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     const _showNoRepositoryAlert = (!_isExtendedAttribute && !_isEntityAttribute);
 
     const _idmPropertyNameKey = _idmPropertyName !== undefined ? _idmPropertyName : attribute.idmPropertyName;
-    const propertyHelpBlockLabel = this.getHelpBlockLabel(_idmPropertyNameKey, entityType, module);
+    const propertyHelpBlockLabel = this.props._attribute.entityAttribute ? this.getHelpBlockLabel(_idmPropertyNameKey, entityType, module) : '';
     const _isRequiredIdmField = (_isEntityAttribute || _isExtendedAttribute) && !_isDisabled && !passwordAttribute;
     const isSynchronization = !!(_systemMapping && _systemMapping.operationType && _systemMapping.operationType === 'SYNCHRONIZATION');
     const strategyTypeTemp = strategyType || attribute.strategyType;
@@ -441,7 +444,6 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
                       <Basic.EnumSelectBox
                         ref="idmPropertyEnum"
                         readOnly={_isDisabled || !_isEntityAttribute || passwordAttribute}
-                        // enum={entityTypeEnum}
                         options={attributeOptions}
                         helpBlock={this.i18n(`${propertyHelpBlockLabel}`)}
                         onChange={this._onChangeEntityEnum.bind(this)}
@@ -681,10 +683,7 @@ SystemAttributeMappingDetail.defaultProps = {
 };
 
 function select(state, component) {
-  console.log("state", state);
   const entity = Utils.Entity.getEntity(state, manager.getEntityType(), component.match.params.attributeId);
-  console.log("entity", entity);
-
   let systemMapping = null;
   if (component && component.location && component.location.query && component.location.query.new) {
     systemMapping = Utils.Entity.getEntity(state, systemMappingManager.getEntityType(), component.location.query.mappingId);
@@ -695,20 +694,13 @@ function select(state, component) {
     entity.systemMapping = systemMapping;
     entity.schemaAttribute = schemaAttribute;
     entity.objectClassId = schemaAttribute ? schemaAttribute.objectClass : Domain.SearchParameters.BLANK_UUID;
-  }
-  if (state.data.entity && state.data.entity.SupportedSystemEntityTypes) {
-    console.log("entity", state.data.entity);
-    console.log("SupportedSystemEntityTypes", state.data.entity.SupportedSystemEntityTypes);
-  }
-  if (entity && entity.systemMapping && entity.systemMapping.entityType) {
-    console.log("entity.systemMapping.entityType", entity.systemMapping.entityType);
+    entity.idmPropertyEnum = entity.entityAttribute ? entity.idmPropertyName : null;
   }
   return {
     _attribute: entity,
     _showLoading: Utils.Ui.isShowLoading(state, `${uiKey}-detail`),
     _systemMapping: systemMapping,
     _entityType: systemMapping ? Utils.Entity.getEntity(state, systemEntityTypeManager.getEntityType(), systemMapping.entityType) : null
-    // _entityType: entity && state && state.data && state.data.entity && state.data.entity.SupportedSystemEntityTypes ? state.data.entity.SupportedSystemEntityTypes.get(entity.systemMapping.entityType) : 'aaa'
   };
 }
 
