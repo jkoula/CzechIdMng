@@ -16,11 +16,9 @@ class SystemOwnerService extends AbstractService {
         }
         return `${ entity.name } (${ entity.code })`;
       }
-    
       supportsPatch() {
         return false;
       }
-    
       supportsBulkAction() {
         return false;
       }
