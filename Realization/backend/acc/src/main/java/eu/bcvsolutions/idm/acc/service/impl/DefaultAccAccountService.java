@@ -37,7 +37,6 @@ import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
-import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
@@ -167,16 +166,6 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 				UUID targetEntity = executor.getEntityByAccount(newDto.getId());
 				newDto.setTargetEntityType(systemEntityType.getSystemEntityCode());
 				newDto.setTargetEntityId(targetEntity);
-			}
-			if (systemEntityType != null) {
-				Map<String, BaseDto> embedded = newDto.getEmbedded();
-				SystemEntityTypeRegistrableDto systemEntityTypeDto = 
-						systemEntityManager.getSystemEntityDtoByCode(entityType);
-				if (systemEntityTypeDto != null) {
-					embedded.put(SystemEntityTypeRegistrableDto.EMBEDDED_TYPE, 
-							systemEntityTypeDto);
-					newDto.setEmbedded(embedded);
-				}
 			}
 		}
 		return newDto;

@@ -20,7 +20,6 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.sql.DataSource;
 
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,6 @@ import eu.bcvsolutions.idm.acc.dto.SysProvisioningBatchDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
-import eu.bcvsolutions.idm.acc.dto.SystemEntityTypeRegistrableDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningArchive_;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningAttribute;
@@ -65,12 +63,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBatchService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
-import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModel;
@@ -125,7 +122,6 @@ public class DefaultSysProvisioningOperationService
 	private EntityManager entityManager;
 	@Autowired private IdmFlywayMigrationStrategy flywayMigrationStrategy;
 	@Autowired private DataSource dataSource;
-	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public DefaultSysProvisioningOperationService(SysProvisioningOperationRepository repository) {
@@ -332,16 +328,6 @@ public class DefaultSysProvisioningOperationService
 			dto.setProvisioningContext(new ProvisioningContext(dto.getProvisioningContext()));
 			if (entity != null && entity.getSystemEntity() != null) {
 				dto.setSystemEntityUid(entity.getSystemEntity().getUid());
-			}
-			if (dto.getEntityType() != null) {
-				Map<String, BaseDto> embedded = dto.getEmbedded();
-				SystemEntityTypeRegistrableDto systemEntityTypeDto = 
-						systemEntityManager.getSystemEntityDtoByCode(dto.getEntityType());
-				if (systemEntityTypeDto != null) {
-					embedded.put(SystemEntityTypeRegistrableDto.EMBEDDED_TYPE, 
-							systemEntityTypeDto);
-					dto.setEmbedded(embedded);
-				}
 			}
 		}
 		return dto;
