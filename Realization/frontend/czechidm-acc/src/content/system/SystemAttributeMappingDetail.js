@@ -6,7 +6,7 @@ import Joi from 'joi';
 //
 import { Advanced, Basic, Domain, Enums, Managers, Utils } from 'czechidm-core';
 import MappingContextCompleters from 'czechidm-core/src/content/script/completers/MappingContextCompleters';
-import { AttributeControlledValueManager, SchemaAttributeManager, SystemAttributeMappingManager, SystemMappingManager } from '../../redux';
+import { AttributeControlledValueManager, SchemaAttributeManager, SystemAttributeMappingManager, SystemMappingManager, SystemEntityTypeManager } from '../../redux';
 import AttributeMappingStrategyTypeEnum from '../../domain/AttributeMappingStrategyTypeEnum';
 import AttributeControlledValueTable from './AttributeControlledValueTable';
 import { RoleSystemAttributeTable } from '../role/RoleSystemAttributeTable';
@@ -18,6 +18,7 @@ const controlledValueManager = new AttributeControlledValueManager();
 const systemMappingManager = new SystemMappingManager();
 const schemaAttributeManager = new SchemaAttributeManager();
 const scriptManager = new Managers.ScriptManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 // password attributes is from 9.3.0 marked as passwordAttribute (boolean),
 // constant is used for automatic check passwordAttribute
 const PASSWORD_ATTRIBUTE = '__PASSWORD__';
@@ -90,7 +91,13 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
       });
     //  this.context.store.dispatch(systemMappingManager.fetchEntity(props.location.query.mappingId));
     } else {
-      this.context.store.dispatch(this.getManager().fetchEntity(attributeId));
+      this.context.store.dispatch(this.getManager().fetchEntity(attributeId, null, (entity, error) => {
+        if (entity) {
+          systemEntityTypeManager.fetchEntity(entity.entityType);
+        } else {
+          this.addError(error);
+        }
+      }));
     }
     this.selectNavigationItems(['sys-systems', 'system-mappings']);
   }
@@ -334,8 +341,10 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
       }
     }
 
-    console.log("attributeOptions", attributeOptions);
-    console.log("this.props", this.props);
+    if (this.props._systemMapping && this.props._systemMapping.entityType) {
+      let et = this.props._entityType;
+      console.log("entityType", et);
+    }
 
     const isNew = this._getIsNew();
     const attribute = isNew ? this.state.attribute : _attribute;
@@ -672,7 +681,10 @@ SystemAttributeMappingDetail.defaultProps = {
 };
 
 function select(state, component) {
+  console.log("state", state);
   const entity = Utils.Entity.getEntity(state, manager.getEntityType(), component.match.params.attributeId);
+  console.log("entity", entity);
+
   let systemMapping = null;
   if (component && component.location && component.location.query && component.location.query.new) {
     systemMapping = Utils.Entity.getEntity(state, systemMappingManager.getEntityType(), component.location.query.mappingId);
@@ -684,10 +696,19 @@ function select(state, component) {
     entity.schemaAttribute = schemaAttribute;
     entity.objectClassId = schemaAttribute ? schemaAttribute.objectClass : Domain.SearchParameters.BLANK_UUID;
   }
+  if (state.data.entity && state.data.entity.SupportedSystemEntityTypes) {
+    console.log("entity", state.data.entity);
+    console.log("SupportedSystemEntityTypes", state.data.entity.SupportedSystemEntityTypes);
+  }
+  if (entity && entity.systemMapping && entity.systemMapping.entityType) {
+    console.log("entity.systemMapping.entityType", entity.systemMapping.entityType);
+  }
   return {
     _attribute: entity,
     _showLoading: Utils.Ui.isShowLoading(state, `${uiKey}-detail`),
-    _systemMapping: systemMapping
+    _systemMapping: systemMapping,
+    _entityType: systemMapping ? Utils.Entity.getEntity(state, systemEntityTypeManager.getEntityType(), systemMapping.entityType) : null
+    // _entityType: entity && state && state.data && state.data.entity && state.data.entity.SupportedSystemEntityTypes ? state.data.entity.SupportedSystemEntityTypes.get(entity.systemMapping.entityType) : 'aaa'
   };
 }
 

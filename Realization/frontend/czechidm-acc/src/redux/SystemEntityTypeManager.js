@@ -24,6 +24,10 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
         return SystemEntityTypeManager.UI_KEY_SUPPORTED_ENTITY_TYPES;
     }
 
+    getUiKey() {
+        return 'entity-type';
+    }
+
     /**
     * Loads registered system entity types
     *
@@ -70,4 +74,4 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
 }
 
 SystemEntityTypeManager.UI_KEY_TASKS = 'system-entity-types';
-SystemEntityTypeManager.UI_KEY_SUPPORTED_ENTITY_TYPES = 'supported-system-entity-types';
+SystemEntityTypeManager.UI_KEY_SUPPORTED_ENTITY_TYPES = 'SupportedSystemEntityTypes';

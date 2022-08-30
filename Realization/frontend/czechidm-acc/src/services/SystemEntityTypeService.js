@@ -20,7 +20,7 @@ export default class SystemEntityTypeService extends Services.AbstractService {
      *
      * @return {promise}
      */
-     getSupportedEntityTypes() {
+    getSupportedEntityTypes() {
         return Services.RestApiService
         .get(this.getApiPath() + '/search/supported')
         .then(response => {

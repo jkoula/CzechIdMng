@@ -373,6 +373,7 @@ export default class EntityManager {
       //
       uiKey = this.resolveUiKey(uiKey, id);
       dispatch(this.requestEntity(id, uiKey));
+      
       this.getService()
         .getById(id)
         .then(json => {
