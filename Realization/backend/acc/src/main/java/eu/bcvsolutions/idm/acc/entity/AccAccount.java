@@ -23,13 +23,17 @@ import org.hibernate.envers.Audited;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
+import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
+import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
+import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition;
 
 /**
  * Account on target system
  * 
  * @author Radek Tomiška
  * @author Roman Kucera
+ * @author Tomáš Doischer
  *
  */
 @Entity
@@ -38,9 +42,10 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 		@Index(name = "ux_account_uid", columnList = "uid,system_id", unique = true),
 		@Index(name = "idx_acc_account_sys_id", columnList = "system_id"),
 		@Index(name = "idx_acc_account_sys_entity", columnList = "system_entity_id"),
-		@Index(name = "idx_acc_account_sys_mapping", columnList = "system_mapping_id")
+		@Index(name = "idx_acc_account_sys_mapping", columnList = "system_mapping_id"),
+		@Index(name = "idx_acc_account_form_def", columnList = "form_definition_id")
 		})
-public class AccAccount extends AbstractEntity {
+public class AccAccount extends AbstractEntity implements FormableEntity, ExternalIdentifiable {
 	
 	private static final long serialVersionUID = -565558977675057360L;
 
@@ -81,7 +86,17 @@ public class AccAccount extends AbstractEntity {
 	@ManyToOne
 	@JoinColumn(name = "system_mapping_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private SysSystemMapping systemMapping;
-
+	
+	@Audited
+	@ManyToOne
+	@JoinColumn(name = "form_definition_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	private IdmFormDefinition formDefinition;
+	
+	@Audited
+	@Size(max = DefaultFieldLengths.NAME)
+	@Column(name = "external_id", length = DefaultFieldLengths.NAME)
+	private String externalId;
+	
 	public SysSystem getSystem() {
 		return system;
 	}
@@ -142,12 +157,29 @@ public class AccAccount extends AbstractEntity {
 	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
-
 	public SysSystemMapping getSystemMapping() {
 		return systemMapping;
 	}
 
 	public void setSystemMapping(SysSystemMapping systemMapping) {
 		this.systemMapping = systemMapping;
+	}
+
+	public IdmFormDefinition getFormDefinition() {
+		return formDefinition;
+	}
+
+	public void setFormDefinition(IdmFormDefinition formDefinition) {
+		this.formDefinition = formDefinition;
+	}
+
+	@Override
+	public void setExternalId(String externalId) {
+		this.externalId = externalId;
+	}
+	
+	@Override
+	public String getExternalId() {
+		return externalId;
 	}
 }

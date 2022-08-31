@@ -988,12 +988,26 @@ public interface TestHelper {
 	/**
 	 * Save value to eav with code
 	 * 
-	 * @param ownerId
-	 * @param code
+	 * @param owner
+	 * @param attribute
 	 * @param clazz
 	 * @param value
+	 * @param type
 	 */
 	void setEavValue(Identifiable owner, IdmFormAttributeDto attribute, Class<? extends Identifiable> clazz, Serializable value, PersistentType type);
+	
+	/**
+	 * Save value to eav with code
+	 * 
+	 * @param owner
+	 * @param attribute
+	 * @param clazz
+	 * @param value
+	 * @param type
+	 * @param formDefinition
+	 */
+	void setEavValue(Identifiable owner, IdmFormAttributeDto attribute, Class<? extends Identifiable> clazz, Serializable value, PersistentType type, 
+			IdmFormDefinitionDto formDefinition);
 	
 	/**
 	 * Method create new automatic role by attribute for role id

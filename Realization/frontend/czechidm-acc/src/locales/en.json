@@ -2903,6 +2903,17 @@
         "label": "Retry provisioning periodically",
         "help": "Retry failed operations in provisioning queue. Failed provisioning operations are automatically scheduled. This task runs such operations at scheduled time.",
         "icon": "component:scheduled-task"
+      },
+      "acc-account-add-form-definition-link-long-running-task": {
+        "label": "Add account form definition links",
+        "help": "Add account form definition links. The form definitions are needed to manually set the account attribute's values. This task is used for migration only.",
+        "icon": "component:scheduled-task",
+        "attributes": {
+          "system": {
+            "label": "System",
+            "help": "Optionally select a system to prevent the task running too long if you have a large number of accounts (>100,000)."
+          }
+        }
       }
     },
     "monitoring-evaluator": {

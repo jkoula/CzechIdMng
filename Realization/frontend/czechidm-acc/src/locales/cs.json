@@ -2906,6 +2906,17 @@
         "label": "Opakovat provisioning operace (retry)",
         "help": "Opakovat neprovedené operace uložené ve frontě provisioningu (retry mechanismus). Při selhání provisioning operace se automaticky naplánuje čas dalšího pokusu. Tato úloha spustí operace v naplánovaném časem dalšího pokusu.",
         "icon": "component:scheduled-task"
+      },
+      "acc-account-add-form-definition-link-long-running-task": {
+        "label": "Doplnit vazby definic formulářů pro účty",
+        "help": "Doplnit vazby definic formulářů pro existující účty. Definice formulářů slouží k ruční úpravě hodnot atributů účtu. Úloha slouží pro migraci existujících účtů.",
+        "icon": "component:scheduled-task",
+        "attributes": {
+          "system": {
+            "label": "Systém",
+            "help": "Volitelně vyberte konkrétní systém, abyste předešli příliš dlouhému běhu úlohy, pokud máte mnoho účtů v IdM (>100 000)."
+          }
+        }
       }
     },
     "monitoring-evaluator": {

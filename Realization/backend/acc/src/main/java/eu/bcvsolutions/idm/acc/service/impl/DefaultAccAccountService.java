@@ -75,10 +75,12 @@ import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.eav.api.service.AbstractFormableService;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
@@ -94,10 +96,11 @@ import eu.bcvsolutions.idm.ic.impl.IcConnectorObjectImpl;
  * @author Radek Tomiška
  * @author svandav
  * @author Roman Kucera
+ * @author Tomáš Doischer
  *
  */
 @Service("accAccountService")
-public class DefaultAccAccountService extends AbstractEventableDtoService<AccAccountDto, AccAccount, AccAccountFilter>
+public class DefaultAccAccountService extends AbstractFormableService<AccAccountDto, AccAccount, AccAccountFilter>
 		implements AccAccountService {
 
 	private final AccAccountRepository accountRepository;
@@ -122,8 +125,8 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 	public DefaultAccAccountService(AccAccountRepository accountRepository,
 			AccIdentityAccountService identityAccountService, SysSystemService systemService,
 			SysSchemaObjectClassService schemaObjectClassService, SysSchemaAttributeService schemaAttributeService,
-			EntityEventManager entityEventManager) {
-		super(accountRepository, entityEventManager);
+			FormService formService, EntityEventManager entityEventManager) {
+		super(accountRepository, entityEventManager, formService);
 		//
 		Assert.notNull(identityAccountService, "Service is required.");
 		Assert.notNull(accountRepository, "Repository is required.");
@@ -332,6 +335,17 @@ public class DefaultAccAccountService extends AbstractEventableDtoService<AccAcc
 		if (filter.getSystemEntityId() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.systemEntity).get(SysSystemEntity_.id),
 					filter.getSystemEntityId()));
+		}
+		if (filter.getFormDefinitionId() != null) {
+			predicates.add(builder.equal(root.get(AccAccount_.formDefinition).get(IdmFormDefinition_.id),
+					filter.getFormDefinitionId()));
+		}
+		if (filter.getHasFormDefinition() != null) {
+			if (BooleanUtils.isTrue(filter.getHasFormDefinition())) {
+				predicates.add(builder.isNotNull(root.get(AccAccount_.formDefinition)));
+			} else {
+				predicates.add(builder.isNull(root.get(AccAccount_.formDefinition)));
+			}
 		}
 		if (filter.getSystemMapping() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.systemMapping).get(SysSystemMapping_.id),
