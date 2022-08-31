@@ -12,13 +12,13 @@ import javax.validation.constraints.Size;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 @Entity
-@Table(name = "idm_account_role", indexes = {
-        @Index(name = "idx_idm_account_role_ident_a", columnList = "account_id"),
-        @Index(name = "idx_idm_account_role_role", columnList = "role_id"),
-        @Index(name = "idx_idm_account_role_aut_r", columnList = "automatic_role_id"),
-        @Index(name = "idx_idm_account_role_ext_id", columnList = "external_id"),
-        @Index(name = "idx_idm_account_role_d_r_id", columnList = "direct_role_id"),
-        @Index(name = "idx_idm_account_role_comp_id", columnList = "role_composition_id")
+@Table(name = "acc_account_role_assignment", indexes = {
+        @Index(name = "idx_acc_account_role_assign_ident_a", columnList = "account_id"),
+        @Index(name = "idx_acc_account_role_assign_role", columnList = "role_id"),
+        @Index(name = "idx_acc_account_role_assign_aut_r", columnList = "automatic_role_id"),
+        @Index(name = "idx_acc_account_role_assign_ext_id", columnList = "external_id"),
+        @Index(name = "idx_acc_account_role_assign_d_r_id", columnList = "direct_role_id"),
+        @Index(name = "idx_acc_account_role_assign_comp_id", columnList = "role_composition_id")
 })
 public class AccAccountRoleAssignment extends AbstractRoleAssignment {
 
