@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -108,7 +106,6 @@ public class DefaultProvisioningExecutorIntegrationTest extends AbstractIntegrat
 	@Autowired private SysProvisioningBatchService provisioningBatchService;
 	@Autowired private TestProvisioningExceptionProcessor testProvisioningExceptionProcessor;
 	@Autowired private FormService formService;
-	@Autowired private DataSource dataSource;
 	@Autowired private EntityEventManager entityEventManager;
 	@Autowired private IdmEntityEventService entityEventService;
 	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
