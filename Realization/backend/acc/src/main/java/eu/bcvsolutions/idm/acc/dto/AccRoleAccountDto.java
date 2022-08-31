@@ -15,7 +15,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
  *
  */
 @Relation(collectionRelation = "roleAccounts")
-public class AccRoleAccountDto extends AbstractDto implements EntityAccountDto {
+public class AccRoleAccountDto extends AbstractRoleAssignmentDto implements EntityAccountDto {
 
 	private static final long serialVersionUID = 1L;
 	
