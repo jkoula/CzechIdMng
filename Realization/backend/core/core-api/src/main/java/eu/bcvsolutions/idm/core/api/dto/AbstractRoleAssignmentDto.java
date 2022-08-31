@@ -119,4 +119,6 @@ public abstract class AbstractRoleAssignmentDto extends FormableDto implements V
         roleComposition = (UUID) readFields.get("roleComposition", null);
         roleSystem = (UUID) readFields.get("roleSystem", null);
     }
+
+    public abstract UUID getEntity();
 }

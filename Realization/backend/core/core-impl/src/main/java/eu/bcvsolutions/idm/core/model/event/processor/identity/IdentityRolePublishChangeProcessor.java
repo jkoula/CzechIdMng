@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.model.event.processor.identity;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,6 @@ import eu.bcvsolutions.idm.core.api.event.processor.IdentityRoleProcessor;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 
 /**
  * Publish identity role change event
@@ -32,7 +32,7 @@ public class IdentityRolePublishChangeProcessor
 	@Autowired private LookupService lookupService;
 	
 	public IdentityRolePublishChangeProcessor() {
-		super(IdentityRoleEventType.CREATE, IdentityRoleEventType.UPDATE, CoreEventType.EAV_SAVE);
+		super(AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE, AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE, CoreEventType.EAV_SAVE);
 	}
 	
 	@Override

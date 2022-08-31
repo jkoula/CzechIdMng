@@ -12,10 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -51,5 +53,15 @@ public class DefaultIdmConceptRoleRequestManager implements IdmConceptRoleReques
                                 idmGeneralConceptRoleRequestService.findAllByRoleRequest(id, pageable, permissions)
                         ));
         return result;
+    }
+
+    @Override
+    public Collection<AbstractConceptRoleRequestDto> findAllByRoleAssignment(UUID identityRoleId) {
+        return conceptServices.values().stream().flatMap(idmGeneralConceptRoleRequestService -> {
+            final IdmBaseConceptRoleRequestFilter filter = idmGeneralConceptRoleRequestService.getFilter();
+            filter.setRoleAssignmentUuid(identityRoleId);
+            final Stream<? extends AbstractConceptRoleRequestDto> concepts = idmGeneralConceptRoleRequestService.find(filter, null).stream();
+            return concepts;
+        }).collect(Collectors.toList());
     }
 }

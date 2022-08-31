@@ -10,6 +10,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
+import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
@@ -117,6 +119,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Autowired private SysSystemGroupService systemGroupService;
 	@Autowired private SysSystemOwnerService systemOwnerService;
 	@Autowired private SysSystemOwnerRoleService systemOwnerRoleService;
+	@Autowired private AccAccountRoleAssignmentService accAccountRoleAssignmentService;
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -359,7 +362,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	
 	@Override
 	public SysSystemMappingDto getDefaultMapping(UUID systemId) {
-		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(systemId, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(systemId, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
 		if(mappings.isEmpty()) {
 			throw new CoreException(String.format("Default mapping for system[%s] not found", systemId));
 		}
@@ -553,4 +556,13 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	public void deleteSystem(UUID systemId) {
 		systemService.deleteById(systemId);
 	}
+
+	@Override
+	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA) {
+		AccAccountRoleAssignmentDto roleAssignmentDto = new AccAccountRoleAssignmentDto();
+		roleAssignmentDto.setAccount(accAccountDto.getId());
+		roleAssignmentDto.setRole(roleA.getId());
+		return accAccountRoleAssignmentService.save(roleAssignmentDto);
+	}
+
 }

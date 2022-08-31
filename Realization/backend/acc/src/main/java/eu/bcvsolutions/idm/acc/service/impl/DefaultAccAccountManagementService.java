@@ -2,9 +2,11 @@ package eu.bcvsolutions.idm.acc.service.impl;
 
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import java.io.Serializable;
@@ -26,6 +28,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
+import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
@@ -205,6 +208,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		// Is role valid in this moment
 		resolveIdentityAccountForCreate(identity, Lists.newArrayList(), identityRolesList, identityAccountsToCreate,
 				Lists.newArrayList(), true, accounts);
+
 		// Create new identity accounts
 		identityAccountsToCreate.forEach(identityAccount ->
 			// Check if this identity-account already exists, if yes then is his account ID
@@ -690,6 +694,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			// Create and persist new account
 			return createAccount(uid, roleSystem, mapping.getId());
 		}
+
 	}
 
 	private AccAccountDto createAccount(String uid, SysRoleSystemDto roleSystem, UUID mappingId) {
@@ -727,7 +732,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	 * @return
 	 */
 	private AccIdentityAccountDto findAlreadyExistsIdentityAccount(List<AccIdentityAccountDto> identityAccountList,
-			List<AccIdentityAccountDto> identityAccountsToDelete, IdmIdentityRoleDto identityRole, SysRoleSystemDto roleSystem) {
+			List<AccIdentityAccountDto> identityAccountsToDelete, AbstractRoleAssignmentDto identityRole, SysRoleSystemDto roleSystem) {
 		return identityAccountList.stream() //
 				.filter(identityAccount -> {
 			if (identityRole.getId().equals(identityAccount.getIdentityRole())
@@ -797,7 +802,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	/**
 	 * Method for noting identity-accounts for delayed account management or delete.
 	 */
-	private void notingIdentityAccountForDelayedAcm(EntityEvent<IdmIdentityRoleDto> event,
+	private void notingIdentityAccountForDelayedAcm(EntityEvent<AbstractRoleAssignmentDto> event,
 			AccIdentityAccountDto identityAccount, String key) {
 		Assert.notNull(identityAccount, "Identity account is required.");
 		Assert.notNull(identityAccount.getId(), "Identity account identifier is required.");

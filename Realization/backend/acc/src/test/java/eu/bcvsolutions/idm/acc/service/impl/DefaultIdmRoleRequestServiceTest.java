@@ -4,11 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 import eu.bcvsolutions.idm.acc.dto.*;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
-import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleService;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
@@ -60,7 +61,8 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 	private AccAccountConceptRoleRequestService accAccountConceptRoleRequestService;
 
 	@Autowired
-	private AccAccountRoleService accAccountRoleService;
+	private AccAccountRoleAssignmentService accAccountRoleService;
+
 
 	@Before
 	public void login() {
@@ -113,11 +115,90 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 
 		Assert.assertEquals(RoleRequestState.EXECUTED, request.getState());
 
-		List<AccAccountRoleDto> identityRoles = accAccountRoleService.findByAccountId(accAccountDto.getId());
+		List<AccAccountRoleAssignmentDto> identityRoles = accAccountRoleService.findByAccountId(accAccountDto.getId());
 		Assert.assertEquals(1, identityRoles.size());
 		Assert.assertEquals(validFrom, identityRoles.get(0).getValidFrom());
 		Assert.assertEquals(validTill, identityRoles.get(0).getValidTill());
 		Assert.assertEquals(roleA.getId(), identityRoles.get(0).getRole());
+	}
+	@Test
+	@Transactional
+	public void changePermissionViaRoleRequestTest() {
+		this.addPermissionViaRoleRequestTest();
+		final SysSystemDto testResourceSystem = helper.createTestResourceSystem(true);
+		final IdmRoleDto roleA = getHelper().createRole();
+		final IdmIdentityDto identity = getHelper().createIdentity();
+		final AccIdentityAccountDto identityAccount = helper.createIdentityAccount(testResourceSystem, identity);
+		final AccAccountDto accAccountDto = accountService.get(identityAccount.getAccount());
+		final AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(accAccountDto, roleA);
+
+		IdmRoleRequestDto request = new IdmRoleRequestDto();
+		request.setApplicant(identity.getId());
+		request.setExecuteImmediately(true);
+		request.setRequestedByType(RoleRequestedByType.MANUALLY);
+		request = roleRequestService.save(request);
+
+		Collection<? extends AbstractRoleAssignmentDto> identityRoles = accAccountRoleService.findAllByIdentity(identity.getId());
+		Assert.assertEquals(1, identityRoles.size());
+
+		LocalDate validFrom = LocalDate.now().minusDays(1);
+		AccAccountConceptRoleRequestDto conceptA = new AccAccountConceptRoleRequestDto();
+		conceptA.setRoleRequest(request.getId());
+		conceptA.setRole(identityRoles.stream().findFirst().get().getRole());
+		conceptA.setOperation(ConceptRoleRequestOperation.UPDATE);
+		conceptA.setValidFrom(validFrom);
+		conceptA.setValidTill(null);
+		conceptA.setAccAccount(accAccountDto.getId());
+		conceptA.setAccountRole(identityRoles.stream().findFirst().get().getId());
+		conceptA = accAccountConceptRoleRequestService.save(conceptA);
+
+		getHelper().startRequestInternal(request, true, true);
+		request = roleRequestService.get(request.getId());
+
+		Assert.assertEquals(RoleRequestState.EXECUTED, request.getState());
+		identityRoles = accAccountRoleService.findAllByIdentity(identity.getId());
+		Assert.assertEquals(1, identityRoles.size());
+		Assert.assertEquals(validFrom, identityRoles.stream().findFirst().get().getValidFrom());
+		Assert.assertEquals(null, identityRoles.stream().findFirst().get().getValidTill());
+		Assert.assertEquals(accAccountDto.getId(), identityRoles.stream().findFirst().get().getEntity());
+		Assert.assertEquals(roleA.getId(), identityRoles.stream().findFirst().get().getRole());
+
+	}
+
+	@Test
+	@Transactional
+	public void removePermissionViaRoleRequestTest() {
+		this.addPermissionViaRoleRequestTest();
+		final SysSystemDto testResourceSystem = helper.createTestResourceSystem(true);
+		final IdmRoleDto roleA = getHelper().createRole();
+		final IdmIdentityDto identity = getHelper().createIdentity();
+		final AccIdentityAccountDto identityAccount = helper.createIdentityAccount(testResourceSystem, identity);
+		final AccAccountDto accAccountDto = accountService.get(identityAccount.getAccount());
+		final AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(accAccountDto, roleA);
+
+		IdmRoleRequestDto request = new IdmRoleRequestDto();
+		request.setApplicant(identity.getId());
+		request.setExecuteImmediately(true);
+		request.setRequestedByType(RoleRequestedByType.MANUALLY);
+		request = roleRequestService.save(request);
+
+		Collection<? extends AbstractRoleAssignmentDto> identityRoles = accAccountRoleService.findAllByIdentity(identity.getId());
+		Assert.assertEquals(1, identityRoles.size());
+
+		AccAccountConceptRoleRequestDto conceptA = new AccAccountConceptRoleRequestDto();
+		conceptA.setAccountRole(identityRoles.stream().findFirst().get().getId());
+		conceptA.setRoleRequest(request.getId());
+		conceptA.setRole(identityRoles.stream().findFirst().get().getRole());
+		conceptA.setOperation(ConceptRoleRequestOperation.REMOVE);
+		conceptA.setAccAccount(accAccountDto.getId());
+		conceptA = accAccountConceptRoleRequestService.save(conceptA);
+
+		getHelper().startRequestInternal(request, true, true);
+		request = roleRequestService.get(request.getId());
+
+		Assert.assertEquals(RoleRequestState.EXECUTED, request.getState());
+		identityRoles = accAccountRoleService.findAllByIdentity(identity.getId());
+		Assert.assertEquals(0, identityRoles.size());
 
 	}
 

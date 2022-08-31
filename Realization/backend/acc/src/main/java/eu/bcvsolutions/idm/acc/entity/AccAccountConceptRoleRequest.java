@@ -30,13 +30,13 @@ public class AccAccountConceptRoleRequest extends AbstractConceptRoleRequest {
     @ManyToOne(optional = true)
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "identity_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private AccAccountRole accountRole;
+    private AccAccountRoleAssignment accountRole;
 
-    public AccAccountRole getAccountRole() {
+    public AccAccountRoleAssignment getAccountRole() {
         return accountRole;
     }
 
-    public void setAccountRole(AccAccountRole accountRole) {
+    public void setAccountRole(AccAccountRoleAssignment accountRole) {
         this.accountRole = accountRole;
     }
 

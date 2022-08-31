@@ -28,6 +28,11 @@ public class IdmConceptRoleRequestFilter extends IdmBaseConceptRoleRequestFilter
 		super(IdmConceptRoleRequestDto.class, data);
 	}
 
+    @Override
+    public void setRoleAssignmentUuid(UUID identityRoleId) {
+        setIdentityRoleId(identityRoleId);
+    }
+
     public UUID getIdentityRoleId() {
         return identityRoleId;
     }

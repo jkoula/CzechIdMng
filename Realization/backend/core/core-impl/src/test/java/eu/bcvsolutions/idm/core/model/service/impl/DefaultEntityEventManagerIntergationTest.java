@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,7 +67,6 @@ import eu.bcvsolutions.idm.core.model.event.IdentityContractEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityContractEvent.IdentityContractEventType;
 import eu.bcvsolutions.idm.core.model.event.IdentityEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityEvent.IdentityEventType;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.EntityGenerateValuesProcessor;
 import eu.bcvsolutions.idm.core.model.event.processor.NeverEndingProcessor;
@@ -800,7 +800,7 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertEquals(identity.getId(), events.get(0).getSuperOwnerId());
 			//
 			filter.setOwnerId(assignedRoles.get(0).getId());
-			filter.setEventType(IdentityRoleEventType.CREATE.name());
+			filter.setEventType(AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE.name());
 			events = entityEventService.find(filter, null).getContent();
 			Assert.assertEquals(1, events.size());
 			Assert.assertEquals(transactionId, events.get(0).getTransactionId());

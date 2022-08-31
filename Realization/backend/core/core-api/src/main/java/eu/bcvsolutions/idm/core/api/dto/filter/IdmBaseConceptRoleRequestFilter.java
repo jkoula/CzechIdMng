@@ -15,7 +15,7 @@ import java.util.UUID;
  *
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public class IdmBaseConceptRoleRequestFilter extends DataFilter {
+public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 
     private UUID roleRequestId;
     private RoleRequestState state;
@@ -113,4 +113,6 @@ public class IdmBaseConceptRoleRequestFilter extends DataFilter {
 	public void setRoleText(String roleText) {
 		this.roleText = roleText;
 	}
+
+    public abstract void setRoleAssignmentUuid(UUID identityRoleId);
 }

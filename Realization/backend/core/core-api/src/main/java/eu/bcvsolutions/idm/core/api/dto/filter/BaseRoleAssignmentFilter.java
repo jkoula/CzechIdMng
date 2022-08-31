@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.core.api.dto.filter;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
-import org.bouncycastle.asn1.dvcs.Data;
 import org.springframework.util.MultiValueMap;
 
 import java.util.List;
@@ -23,6 +22,7 @@ public abstract class BaseRoleAssignmentFilter extends DataFilter {
     public static final String PARAMETER_AUTOMATIC_ROLE = "automaticRole"; // true / false
     public static final String PARAMETER_AUTOMATIC_ROLE_ID = "automaticRoleId";
     public static final String PARAMETER_ROLE_SYSTEM_ID = "roleSystemId";
+    public static final String PARAMETER_IDENTITY_ID = "identityId"; // list - OR
 
     public BaseRoleAssignmentFilter(Class<? extends BaseDto> dtoClass) {
         super(dtoClass);
@@ -151,5 +151,13 @@ public abstract class BaseRoleAssignmentFilter extends DataFilter {
      */
     public void setRoleText(String roleText) {
         set(PARAMETER_ROLE_TEXT, roleText);
+    }
+
+    public UUID getIdentityId() {
+    	return getParameterConverter().toUuid(getData(), BaseRoleAssignmentFilter.PARAMETER_IDENTITY_ID);
+    }
+
+    public void setIdentityId(UUID identityId) {
+    	set(BaseRoleAssignmentFilter.PARAMETER_IDENTITY_ID, identityId);
     }
 }

@@ -11,8 +11,11 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
+import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
+import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,6 +259,13 @@ public class DefaultIdmIdentityRoleService
 
 	@Override
 	protected IdmIdentityRoleFilter getFilter() {
-		return null;
+		return new IdmIdentityRoleFilter();
+	}
+
+	@Override
+	public AbstractRoleAssignmentEvent<IdmIdentityRoleDto> getEventForAssignment(IdmIdentityRoleDto assignment, AbstractRoleAssignmentEvent.RoleAssignmentEventType eventType, String... flags) {
+		@SuppressWarnings("deprecation") IdentityRoleEvent event = new IdentityRoleEvent(eventType, assignment, setupFlags(flags));
+		event.setPriority(PriorityType.IMMEDIATE);
+		return event;
 	}
 }

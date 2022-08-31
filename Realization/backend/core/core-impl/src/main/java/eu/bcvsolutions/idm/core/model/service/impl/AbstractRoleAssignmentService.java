@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -11,6 +12,7 @@ import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -33,6 +35,8 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
+import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmRoleAssignmentRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -52,10 +56,14 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -444,6 +452,61 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         return false;
     }
 
+    @Override
+    public void unassignAllSubRoles(UUID identityRoleId, EntityEvent<D> parentEvent) {
+        F filter = getFilter();
+        filter.setDirectRoleId(identityRoleId);
+        find(filter, null)
+        .forEach(subIdentityRole -> {
+            final AbstractRoleAssignmentEvent<D> subEvent = getEventForAssignment(subIdentityRole, AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE);
+            //IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE, subIdentityRole);
+            //
+            publish(subEvent, parentEvent);
+            // Notes identity-accounts to ACM
+            notingIdentityAccountForDelayedAcm(parentEvent, subEvent);
+        });
+    }
+
+    /**
+     * Method for noting identity-accounts for delayed account management
+     *
+     * @param event
+     * @param subEvent
+     */
+    @SuppressWarnings("unchecked")
+    private void notingIdentityAccountForDelayedAcm(EntityEvent<D> event,
+            EntityEvent<D> subEvent) {
+        Assert.notNull(event, "Event is required.");
+        Assert.notNull(subEvent, "Sub event is required.");
+
+        if (!event.getProperties().containsKey(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM)) {
+            event.getProperties().put(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, new HashSet<UUID>());
+        }
+
+        Set<UUID> identityAccounts = (Set<UUID>) subEvent.getProperties()
+                .get(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM);
+        if (identityAccounts != null) {
+            ((Set<UUID>) event.getProperties().get(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM))
+                    .addAll(identityAccounts);
+        }
+
+        if (!event.getProperties().containsKey(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING)) {
+            event.getProperties().put(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, new HashSet<UUID>());
+        }
+
+        Set<UUID> accounts = (Set<UUID>) subEvent.getProperties()
+                .get(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING);
+        if (accounts != null) {
+            ((Set<UUID>) event.getProperties().get(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING))
+                    .addAll(accounts);
+        }
+    }
+
+    protected Map<String, Serializable> setupFlags(String... flags) {
+        return Arrays.stream(Optional.ofNullable(flags).orElse(new String[0]))
+                .collect(Collectors.toMap(s -> s, s -> Boolean.TRUE));
+    }
+
     protected abstract LocalDate getDateForValidTill(D one);
 
 
@@ -524,4 +587,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         // Compare collections
         return CollectionUtils.isEqualCollection(oneValues, twoValues);
     }
+
+
 }

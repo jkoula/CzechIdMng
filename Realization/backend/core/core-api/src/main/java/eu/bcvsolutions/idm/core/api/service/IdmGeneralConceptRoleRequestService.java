@@ -67,9 +67,10 @@ public interface IdmGeneralConceptRoleRequestService<
 
     CoreEvent<A> removeRelatedRoleAssignment(D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
 
-    void updateAssignedRole(List<AbstractConceptRoleRequestDto> allApprovedConcepts, D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
+    void updateAssignedRole(List<D> allApprovedConcepts, D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
 
-    void createAssignedRole(List<AbstractConceptRoleRequestDto> allApprovedConcepts, D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
+    void createAssignedRole(List<D> allApprovedConcepts, D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
+    void removeAssignedRole(D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
 
     Collection<D> getConceptsToRemoveDuplicates(AbstractRoleAssignmentDto tempIdentityRoleSub, List<AbstractRoleAssignmentDto> allByIdentity);
 
@@ -82,4 +83,6 @@ public interface IdmGeneralConceptRoleRequestService<
     A getRoleAssignmentDto(D concept, IdmRoleDto subRole);
 
     Class<D> getType();
+
+    F getFilter();
 }

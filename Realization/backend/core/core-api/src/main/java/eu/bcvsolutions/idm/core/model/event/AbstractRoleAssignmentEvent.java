@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.core.model.event;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EventType;
 
@@ -15,6 +14,7 @@ import java.util.Map;
  *
  */
 public abstract class AbstractRoleAssignmentEvent<A extends AbstractRoleAssignmentDto> extends CoreEvent<A> {
+
 
 	//
 	public static final String PROPERTY_PROCESSED_ROLES = RoleEvent.PROPERTY_PROCESSED_ROLES; // event property, contains Set<UUID> of processed roles (used for role composition processing for the prevent cycles)
@@ -33,4 +33,11 @@ public abstract class AbstractRoleAssignmentEvent<A extends AbstractRoleAssignme
 		super(operation, content, properties);
 	}
 
+	/**
+	 * Supported identity events
+	 *
+	 */
+	public enum RoleAssignmentEventType implements EventType {
+		CREATE, UPDATE, DELETE, NOTIFY
+	}
 }

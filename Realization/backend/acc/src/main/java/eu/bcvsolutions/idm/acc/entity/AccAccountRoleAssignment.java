@@ -20,7 +20,7 @@ import javax.validation.constraints.Size;
         @Index(name = "idx_idm_account_role_d_r_id", columnList = "direct_role_id"),
         @Index(name = "idx_idm_account_role_comp_id", columnList = "role_composition_id")
 })
-public class AccAccountRole extends AbstractRoleAssignment {
+public class AccAccountRoleAssignment extends AbstractRoleAssignment {
 
     private static final long serialVersionUID = 1L;
 

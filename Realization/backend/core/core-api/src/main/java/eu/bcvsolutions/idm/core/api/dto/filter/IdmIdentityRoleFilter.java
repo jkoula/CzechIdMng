@@ -17,7 +17,6 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
  */
 public class IdmIdentityRoleFilter extends BaseRoleAssignmentFilter implements ExternalIdentifiableFilter, CorrelationFilter, FormableFilter {
 
-	public static final String PARAMETER_IDENTITY_ID = "identityId"; // list - OR
 	public static final String PARAMETER_IDENTITY_CONTRACT_ID = "identityContractId";
 	public static final String PARAMETER_CONTRACT_POSITION_ID = "contractPositionId";
 
@@ -29,15 +28,7 @@ public class IdmIdentityRoleFilter extends BaseRoleAssignmentFilter implements E
 		super(IdmIdentityRoleDto.class, data);
 	}
 
-    public UUID getIdentityId() {
-    	return getParameterConverter().toUuid(getData(), PARAMETER_IDENTITY_ID);
-    }
-
-    public void setIdentityId(UUID identityId) {
-    	set(PARAMETER_IDENTITY_ID, identityId);
-    }
-    
-    public List<UUID> getIdentities() {
+	public List<UUID> getIdentities() {
 		return getParameterConverter().toUuids(getData(), PARAMETER_IDENTITY_ID);
 	}
     

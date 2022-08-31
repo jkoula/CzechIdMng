@@ -295,7 +295,7 @@ public class IdmIdentityRoleController extends AbstractReadWriteDtoController<Id
 	protected IdmIdentityRoleFilter toFilter(MultiValueMap<String, Object> parameters) {
 		IdmIdentityRoleFilter filter = new  IdmIdentityRoleFilter(parameters);
 		// TODO: resolve codeable parameters automatically ...
-		filter.setIdentityId(getParameterConverter().toEntityUuid(parameters, IdmIdentityRoleFilter.PARAMETER_IDENTITY_ID, IdmIdentityDto.class));
+		filter.setIdentityId(getParameterConverter().toEntityUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_IDENTITY_ID, IdmIdentityDto.class));
 		filter.setRoleId(getParameterConverter().toEntityUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID, IdmRoleDto.class));
 		//
 		return filter;

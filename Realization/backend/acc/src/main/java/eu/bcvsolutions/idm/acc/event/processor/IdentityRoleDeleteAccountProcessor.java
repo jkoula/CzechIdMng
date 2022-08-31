@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -11,7 +13,6 @@ import eu.bcvsolutions.idm.core.api.event.AbstractEntityEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 
 /**
  * Identity-role delete integrity processor (resolve only identity-account, not identity-role-account)
@@ -20,14 +21,14 @@ import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventT
  */
 @Component(IdentityRoleDeleteAccountProcessor.PROCESSOR_NAME)
 @Description("Executes delete of identity-account before identity-role is deleted. (resolve only identity-account, not identity-role-account)")
-public class IdentityRoleDeleteAccountProcessor extends AbstractEntityEventProcessor<IdmIdentityRoleDto> {
+public class IdentityRoleDeleteAccountProcessor extends AbstractEntityEventProcessor<AbstractRoleAssignmentDto> {
 
 	public static final String PROCESSOR_NAME = "identity-role-delete-account-processor";
 	//
 	@Autowired private AccAccountManagementService accountManagementService;
 
 	public IdentityRoleDeleteAccountProcessor() {
-		super(IdentityRoleEventType.DELETE);
+		super(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE);
 	}
 
 	@Override
@@ -36,7 +37,7 @@ public class IdentityRoleDeleteAccountProcessor extends AbstractEntityEventProce
 	}
 
 	@Override
-	public EventResult<IdmIdentityRoleDto> process(EntityEvent<IdmIdentityRoleDto> event) {
+	public EventResult<AbstractRoleAssignmentDto> process(EntityEvent<AbstractRoleAssignmentDto> event) {
 		accountManagementService.deleteIdentityAccount(event);
 		//
 		return new DefaultEventResult<>(event, this);

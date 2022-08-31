@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,10 +80,10 @@ public class RoleRequestRealizationProcessor extends CoreEventProcessor<IdmRoleR
 		IdmRoleRequestDto request = event.getContent();
 		IdmIdentityDto identity = identityService.get(request.getApplicant());
 
-		Set<IdmIdentityRoleDto> addedIdentityRoles = this
-				.getSetProperty(AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_NEW_ROLES, event, IdmIdentityRoleDto.class);
-		Set<IdmIdentityRoleDto> updatedIdentityRoles = this.getSetProperty(
-				AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_UPDATED_ROLES, event, IdmIdentityRoleDto.class);
+		Set<AbstractRoleAssignmentDto> addedIdentityRoles = this
+				.getSetProperty(AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_NEW_ROLES, event, AbstractRoleAssignmentDto.class);
+		Set<AbstractRoleAssignmentDto> updatedIdentityRoles = this.getSetProperty(
+				AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_UPDATED_ROLES, event, AbstractRoleAssignmentDto.class);
 		Set<UUID> removedIdentityAccounts = this.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM,
 				event, UUID.class);
 		Set<UUID> accountsForAdditionalProvisioning = this.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING,
@@ -95,7 +96,7 @@ public class RoleRequestRealizationProcessor extends CoreEventProcessor<IdmRoleR
 			LOG.debug("Call account management for identity [{}] and new identity-roles [{}]",
 					identity.getUsername(), addedIdentityRoles);
 			List<UUID> accounts = accountManagementService.resolveNewIdentityRoles(identity,
-					addedIdentityRoles.toArray(new IdmIdentityRoleDto[0]));
+					addedIdentityRoles.toArray(new AbstractRoleAssignmentDto[0]));
 			addAccounts(accountsForProvisioning, accounts);
 		}
 
@@ -103,7 +104,7 @@ public class RoleRequestRealizationProcessor extends CoreEventProcessor<IdmRoleR
 			LOG.debug("Call account management for identity [{}] and updated identity-roles [{}]",
 					identity.getUsername(), updatedIdentityRoles);
 			List<UUID> accounts = accountManagementService.resolveUpdatedIdentityRoles(identity,
-					updatedIdentityRoles.toArray(new IdmIdentityRoleDto[0]));
+					updatedIdentityRoles.toArray(new AbstractRoleAssignmentDto[0]));
 			addAccounts(accountsForProvisioning, accounts);
 		}
 

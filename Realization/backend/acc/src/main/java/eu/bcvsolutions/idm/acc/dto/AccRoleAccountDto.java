@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.dto;
 
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
@@ -14,7 +15,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
  *
  */
 @Relation(collectionRelation = "roleAccounts")
-public class AccRoleAccountDto extends AbstractDto implements EntityAccountDto {
+public class AccRoleAccountDto extends AbstractRoleAssignmentDto implements EntityAccountDto {
 
 	private static final long serialVersionUID = 1L;
 	

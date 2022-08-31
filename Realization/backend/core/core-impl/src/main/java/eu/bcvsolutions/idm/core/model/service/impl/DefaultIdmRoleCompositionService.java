@@ -44,7 +44,6 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.model.repository.IdmRoleCompositionRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
@@ -178,7 +177,7 @@ public class DefaultIdmRoleCompositionService
 						subIdentityRole.setRoleComposition(subRoleComposition.getId());
 						//
 						processedRoles.add(subRole.getId());
-						IdentityRoleEvent subEvent = new IdentityRoleEvent(IdentityRoleEventType.CREATE, subIdentityRole, props);
+						IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE, subIdentityRole, props);
 						// 
 						identityRoleService.publish(subEvent, event, permission);
 						// Notes new created assigned role to parent event
@@ -203,7 +202,7 @@ public class DefaultIdmRoleCompositionService
 		identityRoleService
 			.find(filter, null)
 			.forEach(subIdentityRole -> {
-				IdentityRoleEvent subEvent = new IdentityRoleEvent(IdentityRoleEventType.DELETE, subIdentityRole);
+				IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE, subIdentityRole);
 				//
 				identityRoleService.publish(subEvent, event, permission);
 				// Notes identity-accounts to ACM
@@ -232,7 +231,7 @@ public class DefaultIdmRoleCompositionService
 				subIdentityRole.setValidFrom(identityRole.getValidFrom());
 				subIdentityRole.setValidTill(identityRole.getValidTill());
 				//
-				IdentityRoleEvent subEvent = new IdentityRoleEvent(IdentityRoleEventType.UPDATE, subIdentityRole);
+				IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE, subIdentityRole);
 				//
 				identityRoleService.publish(subEvent, event, permission);
 				// Notes updated assigned role to parent event

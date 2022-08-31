@@ -76,6 +76,11 @@ public class IdmIdentityRoleDto extends AbstractRoleAssignmentDto {
 	    contractPosition = (UUID) readFields.get("contractPosition", null);
     }
 
+	@Override
+	public UUID getEntity() {
+		return getIdentityContract();
+	}
+
 	public UUID getContractPosition() {
 		return contractPosition;
 	}

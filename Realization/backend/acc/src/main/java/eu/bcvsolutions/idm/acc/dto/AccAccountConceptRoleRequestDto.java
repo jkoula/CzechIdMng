@@ -1,17 +1,9 @@
 package eu.bcvsolutions.idm.acc.dto;
 
-import eu.bcvsolutions.idm.acc.entity.AccAccount;
-import eu.bcvsolutions.idm.acc.entity.AccAccountRole;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.envers.Audited;
 import org.springframework.hateoas.core.Relation;
 
-import javax.persistence.*;
 import java.util.UUID;
 
 /**
@@ -25,7 +17,7 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
     @Embedded(dtoClass = AccAccountDto.class)
     private UUID accAccount;
 
-    @Embedded(dtoClass = AccAccountRoleDto.class)
+    @Embedded(dtoClass = AccAccountRoleAssignmentDto.class)
     private UUID accountRole;
 
     public UUID getAccAccount() {

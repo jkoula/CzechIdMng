@@ -6,8 +6,10 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
+import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -107,4 +109,9 @@ public interface IdmRoleAssignmentService<D extends AbstractRoleAssignmentDto, F
     Class<D> getType();
 
     Collection<? extends AbstractRoleAssignmentDto> findAllByIdentity(UUID id);
+
+    void unassignAllSubRoles(UUID identityRoleId, EntityEvent<D> parentEvent);
+
+    AbstractRoleAssignmentEvent<D> getEventForAssignment(D assignment, AbstractRoleAssignmentEvent.RoleAssignmentEventType update, String... flags);
+
 }

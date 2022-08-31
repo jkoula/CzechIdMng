@@ -29,6 +29,11 @@ public class AccAccountConceptRoleRequestFilter extends IdmBaseConceptRoleReques
 		super(IdmConceptRoleRequestDto.class, data);
 	}
 
+    @Override
+    public void setRoleAssignmentUuid(UUID identityRoleId) {
+        setAccountRole(identityRoleId);
+    }
+
     public UUID getAccountuuid() {
         return accountuuid;
     }
