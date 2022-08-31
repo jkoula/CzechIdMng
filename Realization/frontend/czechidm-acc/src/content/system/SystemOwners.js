@@ -1,35 +1,60 @@
-import Div from 'czechidm-core/src/components/basic/Div/Div';
 import React from 'react';
 import Helmet from 'react-helmet';
+//
 import * as Basic from '../../components/basic';
-import SystemSelect from '../../components/SystemSelect/SystemSelect';
+import SystemOwnerRole from './SystemOwnerRole';
 import SystemOwner from './SystemOwner';
+import { SecurityManager} from '../../redux';
 
-export default class SystemOwners extends Basic.AbstractContent {
+
+export default class systemOwners extends Basic.AbstractContent {
 
     componentDidMount() {
         super.componentDidMount();
       }
     
       getContentKey() {
-        return "acc:content.system.owners";
+        return "acc:content.system.owner";
       }
-
+    
       getNavigationKey() {
-        return this.getRequestNavigationKey(
-          "system-owner-roles",
-          this.props.match.params
+        return this.getRequestNavigationKey('system-owner-role', this.props.match.params);
+      }
+    
+      render() {
+        //
+        return (
+          <Basic.Div>
+            <Helmet title={ this.i18n('title') } />
+            {
+            //   !SecurityManager.hasAuthority('ROLEGUARANTEEROLE_READ')
+            //   ||
+              <Basic.Div>
+                <Basic.ContentHeader 
+                icon="component:roles" 
+                text={ this.i18n('system.header') } 
+                style={{ marginBottom: 0 }}/>
+                <SystemOwnerRole
+                  uiKey="system-owner-role"
+                //   forceSearchParameters={ forceSearchParameters }
+                  className="no-margin"
+                  match={ this.props.match }></SystemOwnerRole>
+              </Basic.Div>
+            }
+            {
+            //   !SecurityManager.hasAuthority('ROLEGUARANTEE_READ')
+            //   ||
+              <Basic.Div>
+                <Basic.ContentHeader icon="fa:group" text={ this.i18n('identity.header') } style={{ marginBottom: 0 }}/>
+                <SystemOwner
+                  uiKey="system-owner"
+                //   forceSearchParameters={ forceSearchParameters }
+                  className="no-margin"
+                  match={ this.props.match }/>
+              </Basic.Div>
+            }
+          </Basic.Div>
         );
       }
-    render() {
-        return(
-            <Basic.Div>
-                 <Helmet title={ this.i18n('title') } />
-                 <Basic.ContentHeader/>
-                    <SystemSelect/>
-                  <Basic.ContentHeader/>
-                     <SystemSelect/>
-             </Basic.Div>
-        )
     }
-}
+    

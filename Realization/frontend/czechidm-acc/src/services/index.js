@@ -28,7 +28,7 @@ import RemoteServerService from './RemoteServerService';
 import SystemGroupService from './SystemGroupService';
 import SystemGroupSystemService from './SystemGroupSystemService';
 import SystemOwnerService from '../content/system/SystemOwnerService';
-
+import SystemOwnerRoleService from '../content/system/SystemOwnerService';
 const ServiceRoot = {
   SystemService,
   RoleSystemService,
@@ -59,7 +59,8 @@ const ServiceRoot = {
   RemoteServerService,
   SystemGroupService,
   SystemGroupSystemService,
-  SystemOwnerService
+  SystemOwnerService,
+  SystemOwnerRoleService
 };
 
 ServiceRoot.version = '0.1.0';

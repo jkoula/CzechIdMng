@@ -42,6 +42,11 @@ module.exports = {
           access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
         },
         {
+          path:'owner-roles',
+          component: require('./src/content/system/SystemOwnerRole'),
+          access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
+        },
+        {
           path: 'connector',
           component: require('./src/content/system/SystemConnector'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_READ'] } ]

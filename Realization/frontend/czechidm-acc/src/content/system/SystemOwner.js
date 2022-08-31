@@ -1,6 +1,5 @@
 import PropTypes from "prop-types";
 import React from "react";
-
 import { connect } from "react-redux";
 import { Advanced, Basic, Managers } from "czechidm-core";
 import SystemOwnerManager from "./SystemOwnerManager";
@@ -59,7 +58,6 @@ class SystemOwner extends Advanced.AbstractTableContent {
     return (
       <Basic.Div>
         <Basic.Confirm ref="confirm-delete" level="danger" />
-        hhhhhhhh
         <Advanced.Table
           ref="table"
           manager={manager}
@@ -111,6 +109,23 @@ class SystemOwner extends Advanced.AbstractTableContent {
               );
             }}
           />
+          <Advanced.Column
+            property="type"
+            width={125}
+            face="text"
+            header={this.i18n("acc:entity.SystemOwner.type.label")}
+            sort={false}
+            // rendered={ guaranteeTypes.length > 0 }
+            cell={({ rowIndex, data, property }) => {
+              return (
+                <Advanced.CodeListValue
+                  code="owner-type"
+                  value={data[rowIndex][property]}
+                />
+              );
+            }}
+          />
+          <Advanced.Column></Advanced.Column>
         </Advanced.Table>
         <Basic.Modal
           bsSize="large"
