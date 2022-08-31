@@ -197,7 +197,7 @@ export class GenerateValueTable extends Advanced.AbstractTableContent {
     if (generatorType && availableGenerators) {
       const generator = availableGenerators.get(generatorType);
       if (generator) {
-        return this.i18n(`eav.value-generator.${ generator.name }.label`);
+        return `${ generator.module }:eav.value-generator.${ generator.name }.label`;
       }
     }
     // generator type not found
