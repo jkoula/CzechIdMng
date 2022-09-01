@@ -40,6 +40,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
   }
 
   showDetail(entity) {
+    console.log("Show detail", entity);
     super.showDetail(entity, () => {
     });
   }
@@ -49,9 +50,8 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
   };
 
   render() {
-    const { _showLoading } = this.props;
+    const { _showLoading, forceSearchParameters } = this.props;
     const { detail } = this.state;
-    console.log('aaaaa');
     return (
       <Basic.Div>
       <Basic.Confirm ref="confirm-delete" level="danger" />
@@ -63,14 +63,11 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
             level="success"
             key="add_button"
             className="btn-xs"
-            onClick={this.showDetail.bind(this, {
-              system: this.props.match.params.entityId,
-            })}
+            onClick={this.showDetail.bind(this,{})}
           >
             <Basic.Icon type="fa" icon="plus" /> {this.i18n("button.add")}
           </Basic.Button>,
-        ]}
-      >
+        ]}>
         <Advanced.Column
           header=""
           className="detail-button"
@@ -79,17 +76,15 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
               <Advanced.DetailButton
                 title={this.i18n("button.detail")}
                 onClick={this.showDetail.bind(this, data[rowIndex])}
-                sort={false}
               />
             );
           }}
         ></Advanced.Column>
         <Advanced.Column
-          property="owner"
-          sortProperty="owner.name"
+          property="ownerRole"
+          sortProperty="ownerRole.name"
           face="text"
-          header={this.i18n("acc:entity.SystemOwner.owner.label")}
-          sort={false}
+          header={this.i18n("acc:entity.SystemOwnerRole.ownerRole.label")}
           cell={({ rowIndex, data }) => {
             const entity = data[rowIndex];
             console.log(entity, "OBSAH ENTIT");
@@ -108,7 +103,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
           property="type"
           width={125}
           face="text"
-          header={this.i18n("acc:entity.SystemOwner.type.label")}
+          header={this.i18n("acc:entity.SystemOwnerRole.type.label")}
           sort={false}
           cell={({ rowIndex, data, property }) => {
             return (
@@ -142,20 +137,21 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
               showLoading={_showLoading}
             >
               <SystemSelect
-                ref="system"
+                ref="owner"
                 manager={systemManager}
-                label={this.i18n("acc:entity.SystemOwner.system.label")}
+                label={this.i18n("acc:entity.SystemOwnerRole.owner.label")}
                 readOnly
                 required
               />
 
-              <Advanced.IdentitySelect
-                ref="owner"
-                manager={Managers.IdentityManager}
-                label={this.i18n("acc:entity.SystemOwner.owner.label")}
-                helpBlock={this.i18n("acc:entity.SystemOwner.owner.help")}
-                required
+              <Advanced.RoleSelect
+                ref="ownerRole"
+                // manager={ Managers.RoleManager }
+                // label={this.i18n('acc:entity.RoleSystem.role')}
+                // // readOnly={ !isNew || !this._isSystemMenu() }
               />
+
+    
             </Basic.AbstractForm>
           </Basic.Modal.Body>
 

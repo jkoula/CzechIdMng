@@ -97,7 +97,6 @@ class SystemOwner extends Advanced.AbstractTableContent {
             sort={false}
             cell={({ rowIndex, data }) => {
               const entity = data[rowIndex];
-              console.log(entity, "OBSAH ENTIT");
               return (
                 <Advanced.EntityInfo
                   entityType="identity"

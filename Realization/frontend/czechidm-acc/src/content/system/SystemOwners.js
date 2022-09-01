@@ -23,6 +23,7 @@ export default class systemOwners extends Basic.AbstractContent {
       }
     
       render() {
+        // const forceSearchParameters = new SearchParameters().setFilter('system', this.props.match.params.entityId);
         //
         return (
           <Basic.Div>

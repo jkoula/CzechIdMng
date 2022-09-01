@@ -1636,6 +1636,18 @@
       "type": {
         "label": "Typ vlastníka"
       }
+    },
+    "SystemOwnerRole":{
+      "type":{
+        "label":"Vlastník"
+      },
+     "owner": {
+      "lable":"Vlastník"
+     },
+     "ownerRole":{
+      "label":"Vlastník",
+      "help":"Vybraná identita se stane garantem role."
+    }
     }
   },
   "enums" : {
