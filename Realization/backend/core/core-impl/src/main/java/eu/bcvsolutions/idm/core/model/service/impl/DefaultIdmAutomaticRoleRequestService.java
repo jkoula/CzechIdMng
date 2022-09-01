@@ -445,7 +445,7 @@ public class DefaultIdmAutomaticRoleRequestService extends
 		}
 		return requestEntity;
 	}
-	
+
 	@Override
 	public void deleteAutomaticRole(AbstractIdmAutomaticRoleDto automaticRole, AutomaticRoleRequestType type) {
 		Assert.notNull(automaticRole, "Automatic role is required.");
@@ -462,7 +462,7 @@ public class DefaultIdmAutomaticRoleRequestService extends
 
 		this.getIdmAutomaticRoleRequestService().startRequest(request.getId(), true);
 	}
-	
+
 	@Override
 	public IdmRoleTreeNodeDto createTreeAutomaticRole(IdmRoleTreeNodeDto automaticRole) {
 		Assert.notNull(automaticRole, "Automatic role is required.");

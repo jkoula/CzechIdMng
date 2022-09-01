@@ -13,6 +13,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -86,6 +90,8 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 	@Autowired private IdmRoleRequestService roleRequestService;
 	@Autowired private IdmIdentityContractService identityContractService;
 	@Autowired private IdmAutomaticRoleAttributeRuleService automaticRoleAttributeRuleService;
+	@Autowired
+	private TransactionTemplate transactionTemplate;
 	//
 	private boolean deleteEntity = true; // At the end of the task remove whole entity (this isn't possible set via FE parameters)
 	private UUID automaticRoleId = null;
@@ -282,6 +288,7 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 				conceptRequestFilter.setAutomaticRole(getAutomaticRoleId());
 				//
 				List<IdmConceptRoleRequestDto> concepts = conceptRequestService.find(conceptRequestFilter, null).getContent();
+
 				for (IdmConceptRoleRequestDto concept : concepts) {
 					IdmRoleRequestDto request = roleRequestService.get(concept.getRoleRequest());
 					String message = null;
@@ -298,20 +305,27 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 					roleRequestService.addToLog(request, message);
 					conceptRequestService.addToLog(concept, message);
 					concept.setAutomaticRole(null);
-					
+
 					roleRequestService.save(request);
 					conceptRequestService.save(concept);
 				}
 				//
 				// by default is this allowed
-				if (this.isDeleteEntity()) {
+				if (isDeleteEntity()) {
 					// delete entity
 					if (getAutomaticRole() instanceof IdmRoleTreeNodeDto) {
 						roleTreeNodeService.deleteInternalById(getAutomaticRole().getId());
 					} else {
-						// remove all rules
-						automaticRoleAttributeRuleService.deleteAllByAttribute(getAutomaticRole().getId());
-						automaticRoleAttributeService.deleteInternalById(getAutomaticRole().getId());
+						int propagationBehavior = transactionTemplate.getPropagationBehavior();
+						transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+						transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+							@Override
+							protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+								automaticRoleAttributeRuleService.deleteAllByAttribute(getAutomaticRole().getId());
+								automaticRoleAttributeService.deleteInternalById(getAutomaticRole().getId());
+							}
+						});
+						transactionTemplate.setPropagationBehavior(propagationBehavior);
 					}
 				}
 				//
