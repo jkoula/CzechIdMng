@@ -36,14 +36,19 @@ module.exports = {
           component: require('./src/content/system/SystemAccounts'),
           access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
         },
+        // {
+        //   path: 'owner',
+        //   component: require('./src/content/system/SystemOwner'),
+        //   access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
+        // },
+        // {
+        //   path:'owner-roles',
+        //   component: require('./src/content/system/SystemOwnerRole'),
+        //   access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
+        // },
         {
           path: 'owner',
-          component: require('./src/content/system/SystemOwner'),
-          access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
-        },
-        {
-          path:'owner-roles',
-          component: require('./src/content/system/SystemOwnerRole'),
+          component: require('./src/content/system/SystemOwners'),
           access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
         },
         {

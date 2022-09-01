@@ -2,13 +2,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import {Advanced, Basic} from 'czechidm-core';
+import {Advanced, Basic, Managers} from 'czechidm-core';
 import SystemOwnerRoleManager from './SystemOwnerRoleManager';
 import _ from 'lodash';
 import SystemManager from '../../redux/SystemManager';
 import SystemSelect from '../../components/SystemSelect/SystemSelect';
 
 const manager = new SystemOwnerRoleManager();
+const systemManager= new SystemManager();
 
 class SystemOwnerRole extends Advanced.AbstractTableContent {
   constructor(props) {
@@ -28,7 +29,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
   }
 
   getUiKey() {
-    const a= this.props.uiKey;
+    return this.props.uiKey;
   }
 
   getNavigationKey() {
@@ -50,6 +51,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
   render() {
     const { _showLoading } = this.props;
     const { detail } = this.state;
+    console.log('aaaaa');
     return (
       <Basic.Div>
       <Basic.Confirm ref="confirm-delete" level="danger" />
@@ -149,7 +151,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
 
               <Advanced.IdentitySelect
                 ref="owner"
-                manager={identityManager}
+                manager={Managers.IdentityManager}
                 label={this.i18n("acc:entity.SystemOwner.owner.label")}
                 helpBlock={this.i18n("acc:entity.SystemOwner.owner.help")}
                 required

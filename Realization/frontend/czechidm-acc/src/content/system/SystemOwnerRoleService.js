@@ -3,8 +3,7 @@ import AbstractService from "czechidm-core/src/services/AbstractService";
 class SystemOwnerRoleService extends AbstractService {
 
     getApiPath() {
-        // return '/system-owner-roles';
-        return '/scripts';
+        return '/system-owner-roles';
       } 
     
       getNiceLabel(entity) {

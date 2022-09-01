@@ -30,8 +30,8 @@ import SystemGroupSystemManager from './SystemGroupSystemManager';
 import _ from 'lodash';
 import EntityManager from 'czechidm-core/src/redux/data/EntityManager';
 import IdentityManager from 'czechidm-core/src/redux/data/IdentityManager';
-
-
+import SystemOwnerRoleManager from '../content/system/SystemOwnerRoleManager';
+import SystemOwnerManager from '../content/system/SystemOwnerManager';
 
 const ManagerRoot = {
   SystemManager,
@@ -64,7 +64,9 @@ const ManagerRoot = {
   SystemGroupManager,
   SystemGroupSystemManager,
   EntityManager,
-  IdentityManager
+  IdentityManager,
+  SystemOwnerRoleManager,
+  SystemOwnerManager,
 };
 
 ManagerRoot.version = '0.0.1';

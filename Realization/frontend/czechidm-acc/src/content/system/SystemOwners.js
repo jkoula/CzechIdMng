@@ -1,7 +1,8 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 //
-import * as Basic from '../../components/basic';
+import { Basic } from 'czechidm-core';
+// import * as Basic from '../../components/basic';
 import SystemOwnerRole from './SystemOwnerRole';
 import SystemOwner from './SystemOwner';
 import { SecurityManager} from '../../redux';
@@ -38,7 +39,7 @@ export default class systemOwners extends Basic.AbstractContent {
                   uiKey="system-owner-role"
                 //   forceSearchParameters={ forceSearchParameters }
                   className="no-margin"
-                  match={ this.props.match }></SystemOwnerRole>
+                  match={ this.props.match }/>
               </Basic.Div>
             }
             {
