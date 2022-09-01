@@ -8,7 +8,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -19,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.testng.collections.Lists;
 
 import eu.bcvsolutions.idm.core.api.bulk.action.BulkActionManager;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
@@ -28,8 +32,11 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormValueFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
+import eu.bcvsolutions.idm.core.eav.entity.IdmFormValue;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
@@ -39,15 +46,16 @@ import eu.bcvsolutions.idm.rpt.api.dto.RptReportDto;
 import eu.bcvsolutions.idm.rpt.api.dto.filter.RptReportFilter;
 import eu.bcvsolutions.idm.rpt.api.service.ReportManager;
 import eu.bcvsolutions.idm.rpt.api.service.RptReportService;
-import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
 
 /**
  * General formable entity export tests.
  * 
  * @author Peter
  * @author Radek Tomiška
+ * @author Tomáš Doischer
  */
-public class GeneralFormableEntityExportIntegrationTest extends AbstractIntegrationTest {
+public class GeneralFormableEntityExportIntegrationTest extends AbstractBulkActionTest {
 
 	@Autowired private BulkActionManager bulkActionManager;
 	@Autowired private RptReportService reportService;
@@ -179,6 +187,81 @@ public class GeneralFormableEntityExportIntegrationTest extends AbstractIntegrat
 		Assert.assertNotNull(parsed.get(identityOne.getId().toString()));
 		Assert.assertNotNull(parsed.get(identityDisabled.getId().toString()));
 		Assert.assertEquals("TESTVAL", parsed.get(identityOne.getId().toString()).get(eavCode + "_eav1"));
+		reportService.delete(reportDto);
+	}
+	
+	@Test
+	public void testReportWithoutValueFormValue() throws IOException {
+		// prepare test identity
+		IdmIdentityDto identityOne = getHelper().createIdentity((GuardedString) null);
+
+		IdmFormAttributeDto testAttrRpt = getHelper().createEavAttribute("formValueTestOne", IdmIdentity.class, PersistentType.SHORTTEXT);
+		getHelper().setEavValue(identityOne, testAttrRpt, IdmIdentity.class, "TESTVAL", PersistentType.SHORTTEXT);
+
+		IdmFormAttributeDto testAttrRptMulti = getHelper().createEavAttribute("formValueTestTwo", IdmIdentity.class, PersistentType.SHORTTEXT);
+		testAttrRptMulti.setMultiple(true);
+		formAttributeService.save(testAttrRptMulti);
+		formService.saveValues(identityOne, testAttrRptMulti, Arrays.asList("A", "B"));
+		//
+		IdmFormAttributeDto testAttrRptMultiNotPresent = getHelper().createEavAttribute("formValueTestThree", IdmIdentity.class, PersistentType.SHORTTEXT);
+		testAttrRptMultiNotPresent.setMultiple(true);
+		formAttributeService.save(testAttrRptMultiNotPresent);
+		formService.saveValues(identityOne, testAttrRptMultiNotPresent, Arrays.asList("C", "D"));
+		//
+		
+		List<String> possibleEavValues = Lists.newArrayList("TESTVAL", "A", "B");
+		//
+		// find the form values
+		IdmFormValueFilter<IdmIdentity> formValueFilter = new IdmFormValueFilter<>();
+		formValueFilter.setAttributeIds(Lists.newArrayList(testAttrRpt.getId(), testAttrRptMulti.getId()));
+		List<IdmFormValueDto> formValues = formService.findValues(formValueFilter, null).getContent();
+		Set<UUID> formValueIds = formValues
+				.stream()
+				.map(IdmFormValueDto::getId)
+				.collect(Collectors.toSet());
+		//
+		IdmBulkActionDto bulkAction = new IdmBulkActionDto();
+		bulkAction.setEntityClass(IdmFormValue.class.getCanonicalName());
+		bulkAction.setFilterClass(IdmFormValueFilter.class.getCanonicalName());
+		bulkAction.setModule(RptModuleDescriptor.MODULE_ID);
+		bulkAction.setIdentifiers(formValueIds);
+		bulkAction.setId(AbstractFormableEntityExport.REPORT_NAME);
+		bulkAction.setName(AbstractFormableEntityExport.REPORT_NAME);
+
+		bulkActionManager.processAction(bulkAction);
+		//
+		RptReportFilter reportFilter = new RptReportFilter();
+		reportFilter.setText(AbstractFormableEntityExport.REPORT_NAME);
+
+		List<RptReportDto> content = reportService.find(reportFilter, null).getContent();
+
+		Assert.assertFalse(content.isEmpty());
+		Assert.assertEquals(1, content.size());
+
+		RptReportDto reportDto = content.get(0);
+		
+		Assert.assertEquals(
+				CoreResultCode.LONG_RUNNING_TASK_PARTITIAL_DOWNLOAD.getCode(), 
+				longRunningTaskManager.getLongRunningTask(reportDto.getLongRunningTask()).getResult().getCode()
+		);
+
+		RptRenderedReportDto render = reportManager.render(reportDto, FormableEntityXlsxRenderer.NAME);
+
+		Assert.assertNotNull(render);
+
+		XSSFSheet sheetAt = null;
+		try (XSSFWorkbook workbook = new XSSFWorkbook(render.getRenderedReport())) {
+			sheetAt = workbook.getSheetAt(0);
+		}
+
+		Map<String, Map<String, String>> parsed = sheetToMap(sheetAt);
+		Assert.assertTrue(!parsed.isEmpty());
+		
+		// this test behaves unpredictably so we'll check that some content was generated
+		// but not all form values will be present
+		for (Entry<String, Map<String, String>> entry : parsed.entrySet()) {
+			Assert.assertTrue(possibleEavValues.contains(entry.getValue().get("shortTextValue")));
+		}
 		reportService.delete(reportDto);
 	}
 
