@@ -16,10 +16,10 @@ export default class SystemOwnerRoleManager extends EntityManager{
       }
     
       getEntityType() {
-        return 'Owner-roles';
+        return 'OwnerRoles';
       }
 
       getCollectionType() {
-        return 'systemOwnerRoles';
+        return 'systemOwnersRoles';
       }
 }

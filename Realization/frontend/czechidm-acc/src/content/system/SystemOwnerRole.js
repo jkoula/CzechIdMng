@@ -49,7 +49,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
   };
 
   render() {
-    const { _showLoading, forceSearchParameters } = this.props;
+    const { uiKey,_showLoading, forceSearchParameters } = this.props;
     const { detail } = this.state;
     return (
       <Basic.Div>
@@ -57,6 +57,8 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
       <Advanced.Table
         ref="table"
         manager={manager}
+        uiKey = {uiKey}
+        forceSearchParameters = {forceSearchParameters}
         rowClass={({rowIndex, data}) => {
           const embedded = data[rowIndex]._embedded;
           console.log("naaa")

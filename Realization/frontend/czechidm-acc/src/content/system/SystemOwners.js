@@ -6,6 +6,7 @@ import { Basic } from 'czechidm-core';
 import SystemOwnerRole from './SystemOwnerRole';
 import SystemOwner from './SystemOwner';
 import { SecurityManager} from '../../redux';
+import { Domain } from 'czechidm-core';
 
 
 export default class systemOwners extends Basic.AbstractContent {
@@ -23,7 +24,7 @@ export default class systemOwners extends Basic.AbstractContent {
       }
     
       render() {
-        // const forceSearchParameters = new SearchParameters().setFilter('system', this.props.match.params.entityId);
+        const forceSearchParameters = new Domain.SearchParameters().setFilter('system', this.props.match.params.entityId);
         //
         return (
           <Basic.Div>
@@ -38,7 +39,7 @@ export default class systemOwners extends Basic.AbstractContent {
                 style={{ marginBottom: 0 }}/>
                 <SystemOwnerRole
                   uiKey="system-owner-role"
-                //   forceSearchParameters={ forceSearchParameters }
+                  forceSearchParameters={ forceSearchParameters }
                   className="no-margin"
                   match={ this.props.match }/>
               </Basic.Div>
