@@ -1644,6 +1644,9 @@
      "owner": {
       "lable":"Vlastník"
      },
+     "system":{
+      "label":"Systém"
+    },
      "ownerRole":{
       "label":"Vlastník",
       "help":"Vybraná identita se stane garantem role."

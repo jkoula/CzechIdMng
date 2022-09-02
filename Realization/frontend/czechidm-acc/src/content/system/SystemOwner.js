@@ -148,7 +148,6 @@ class SystemOwner extends Advanced.AbstractTableContent {
               <Basic.AbstractForm
                 ref="form"
                 showLoading={_showLoading}
-                // readOnly={ !manager.canSave(detail.entity, console.log(detail.entity,"DETAIL ENTITY")) }
               >
                 <SystemSelect
                   ref="system"

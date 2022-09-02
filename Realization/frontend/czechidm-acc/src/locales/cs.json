@@ -1644,8 +1644,11 @@
         "label":"Vlastník"
       },
       "ownerRole":{
-        "label":"Vlastník",
+        "label":"Vlastník (role)",
         "help":"Vybraná identita se stane garantem role."
+      },
+      "system":{
+        "label":"Systém"
       },
      "owner": {
       "lable":"Vlastník"

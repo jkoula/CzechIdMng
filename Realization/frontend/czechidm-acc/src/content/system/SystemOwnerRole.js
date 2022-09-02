@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import {Advanced, Basic, Managers} from 'czechidm-core';
+import {Advanced, Basic, Managers, Utils} from 'czechidm-core';
 import SystemOwnerRoleManager from './SystemOwnerRoleManager';
 import _ from 'lodash';
 import SystemManager from '../../redux/SystemManager';
@@ -40,7 +40,6 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
   }
 
   showDetail(entity) {
-    console.log("Show detail", entity);
     super.showDetail(entity, () => {
     });
   }
@@ -58,12 +57,20 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
       <Advanced.Table
         ref="table"
         manager={manager}
+        rowClass={({rowIndex, data}) => {
+          const embedded = data[rowIndex]._embedded;
+          console.log("naaa")
+          if (embedded) {
+            return Utils.Ui.getRowClass(embedded.systemOwnersRole);
+          }
+          return '';
+        }}
         buttons={[
           <Basic.Button
             level="success"
             key="add_button"
             className="btn-xs"
-            onClick={this.showDetail.bind(this,{})}
+            onClick={this.showDetail.bind(this,{system: this.props.match.params.entityId})}
           >
             <Basic.Icon type="fa" icon="plus" /> {this.i18n("button.add")}
           </Basic.Button>,
@@ -87,34 +94,23 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
           header={this.i18n("acc:entity.SystemOwnerRole.ownerRole.label")}
           cell={({ rowIndex, data }) => {
             const entity = data[rowIndex];
-            console.log(entity, "OBSAH ENTIT");
+            if (entity) {
+              console.log("entity", entity)
+            } else {
+              console.log("null entity")
+            }
+            console.log("entity", entity)
             return (
               <Advanced.EntityInfo
-                entityType="identity"
-                entityIdentifier={entity.owner}
-                entity={entity._embedded.owner}
+                entityType="role"
+                entityIdentifier={ entity.ownerRole }
+                entity={ entity._embedded.ownerRole }
                 face="popover"
                 showIcon
               />
             );
           }}
         />
-        <Advanced.Column
-          property="type"
-          width={125}
-          face="text"
-          header={this.i18n("acc:entity.SystemOwnerRole.type.label")}
-          sort={false}
-          cell={({ rowIndex, data, property }) => {
-            return (
-              <Advanced.CodeListValue
-                code="owner-type"
-                value={data[rowIndex][property]}
-              />
-            );
-          }}
-        />
-        <Advanced.Column></Advanced.Column>
       </Advanced.Table>
       <Basic.Modal
         bsSize="large"
@@ -137,18 +133,16 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
               showLoading={_showLoading}
             >
               <SystemSelect
-                ref="owner"
+                ref="system"
                 manager={systemManager}
-                label={this.i18n("acc:entity.SystemOwnerRole.owner.label")}
+                label={this.i18n("acc:entity.SystemOwnerRole.system.label")}
                 readOnly
                 required
               />
 
               <Advanced.RoleSelect
                 ref="ownerRole"
-                // manager={ Managers.RoleManager }
-                // label={this.i18n('acc:entity.RoleSystem.role')}
-                // // readOnly={ !isNew || !this._isSystemMenu() }
+                label={this.i18n('acc:entity.SystemOwnerRole.ownerRole.label')}
               />
 
     
