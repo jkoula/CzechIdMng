@@ -1632,7 +1632,7 @@
      
       "owner": {
         "label": "Vlastník",
-        "help": "Identity mající vybranou roli se stanou vlastníkem systému."
+        "help":"Vybraná identita se stane vlastníkem systému."
       },
       "system":{
         "label":"Systém"
@@ -1642,7 +1642,7 @@
       "header":"Vlastník systému - určený rolí",
       "ownerRole":{
         "label":"Role",
-        "help":"Vybraná identita se stane garantem role."
+        "help": "Identity mající vybranou roli se stanou vlastníkem systému."
       },
       "system":{
         "label":"Systém"

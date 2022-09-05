@@ -145,6 +145,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
               <Advanced.RoleSelect
                 ref="ownerRole"
                 label={this.i18n('acc:entity.SystemOwnerRole.ownerRole.label')}
+                helpBlock={this.i18n("acc:entity.SystemOwnerRole.ownerRole.help")}
               />
             </Basic.AbstractForm>
           </Basic.Modal.Body>
