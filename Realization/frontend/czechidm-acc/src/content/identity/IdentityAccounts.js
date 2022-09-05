@@ -76,9 +76,9 @@ class IdentityAccountsContent extends Advanced.AbstractTableContent {
     const { _showLoading, _permissions } = this.props;
     const { detail } = this.state;
     const forceSearchParameters = new Domain.SearchParameters().setFilter('identity', entityId);
-    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', 'CONTRACT');
+    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', 'IDENTITY');
     const forceAccountSearchParameters = new Domain.SearchParameters().setFilter('identity', entityId).setFilter('entityType',
-      'CONTRACT').setFilter('includeEcho', true);
+      'IDENTITY').setFilter('includeEcho', true);
     const forceSystemEntitySearchParameters = new Domain.SearchParameters().setFilter('entityType', 'IDENTITY');
     //
     return (
