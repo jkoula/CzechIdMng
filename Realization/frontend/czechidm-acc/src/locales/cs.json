@@ -1628,7 +1628,8 @@
       "mergeAttribute": "Atribut kontrolující skupiny"
     },
     "SystemOwner": {
-      "header":"Vlastník systému - určený rolí",
+      "header":"Vlastník systému - přímý výběr uživatele",
+     
       "owner": {
         "label": "Vlastník",
         "help": "Identity mající vybranou roli se stanou vlastníkem systému."
@@ -1641,7 +1642,7 @@
       }
     },
     "SystemOwnerRole":{
-      "header":"Vlastník Systému - přímý výběr uživatele",
+      "header":"Vlastník systému - určený rolí",
       "type":{
         "label":"Vlastník"
       },

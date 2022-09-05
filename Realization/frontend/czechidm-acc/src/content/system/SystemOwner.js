@@ -52,17 +52,16 @@ class SystemOwner extends Advanced.AbstractTableContent {
   };
 
   render() {
-    const { _showLoading } = this.props;
+    const { uiKey,_showLoading,forceSearchParameters } = this.props;
     const { detail } = this.state;
-    // const owner = forceSearchParameters.getFilters().get('owner');
     return (
       <Basic.Div>
         <Basic.Confirm ref="confirm-delete" level="danger" />
         <Advanced.Table
           ref="table"
           manager={manager}
-          // forceSearchParameters={ forceSearchParameters }
-          // _searchParameters={ this.getSearchParameters() }
+          uiKey = {uiKey}
+          forceSearchParameters={forceSearchParameters}
           buttons={[
             <Basic.Button
               level="success"
