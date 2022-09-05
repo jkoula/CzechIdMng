@@ -108,22 +108,6 @@ class SystemOwner extends Advanced.AbstractTableContent {
               );
             }}
           />
-          <Advanced.Column
-            property="type"
-            width={125}
-            face="text"
-            header={this.i18n("acc:entity.SystemOwner.type.label")}
-            sort={false}
-            // rendered={ guaranteeTypes.length > 0 }
-            cell={({ rowIndex, data, property }) => {
-              return (
-                <Advanced.CodeListValue
-                  code="owner-type"
-                  value={data[rowIndex][property]}
-                />
-              );
-            }}
-          />
           <Advanced.Column></Advanced.Column>
         </Advanced.Table>
         <Basic.Modal

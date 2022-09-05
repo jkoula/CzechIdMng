@@ -61,7 +61,6 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
         forceSearchParameters = {forceSearchParameters}
         rowClass={({rowIndex, data}) => {
           const embedded = data[rowIndex]._embedded;
-          console.log("naaa")
           if (embedded) {
             return Utils.Ui.getRowClass(embedded.systemOwnersRole);
           }
@@ -104,6 +103,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
             console.log("entity", entity)
             return (
               <Advanced.EntityInfo
+              header={this.i18n("acc:entity.SystemOwnerRole.type.label")}
                 entityType="role"
                 entityIdentifier={ entity.ownerRole }
                 entity={ entity._embedded.ownerRole }
@@ -146,8 +146,6 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
                 ref="ownerRole"
                 label={this.i18n('acc:entity.SystemOwnerRole.ownerRole.label')}
               />
-
-    
             </Basic.AbstractForm>
           </Basic.Modal.Body>
 

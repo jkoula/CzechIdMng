@@ -1626,31 +1626,33 @@
       "mergeAttribute": "Attribute for controlling groups"
     },
     "SystemOwner": {
+      "header":"System owner- defined by identity",
       "owner": {
-        "label": "Vlastník",
-        "help": "Identity mající vybranou roli se stanou vlastníkem systému."
+        "label": "Owner",
+        "help": "Identities with the selected role assigned will be the system owner."
       },
       "system":{
-        "label":"Systém"
+        "label":"System"
       },
       "type": {
-        "label": "Typ vlastníka"
+        "label": "Owner type"
       }
     },
     "SystemOwnerRole":{
+      "header":"System owner - defined by role",
       "type":{
-        "label":"Vlastník"
+        "label":"Owner type"
       },
-     "owner": {
-      "lable":"Vlastník"
-     },
-     "system":{
-      "label":"Systém"
-    },
      "ownerRole":{
-      "label":"Vlastník",
-      "help":"Vybraná identita se stane garantem role."
-    }
+      "label":"Owner",
+      "help":"Selected identity will be the owner role."
+    },
+    "system":{
+      "label":"System"
+    },
+    "owner": {
+      "label":"Owner"
+     }
     }
   },
   "enums" : {

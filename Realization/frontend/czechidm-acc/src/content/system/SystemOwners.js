@@ -35,7 +35,7 @@ export default class systemOwners extends Basic.AbstractContent {
               <Basic.Div>
                 <Basic.ContentHeader 
                 icon="component:roles" 
-                text={ this.i18n('system.header') } 
+                text={ this.i18n('acc:entity.SystemOwnerRole.header') } 
                 style={{ marginBottom: 0 }}/>
                 <SystemOwnerRole
                   uiKey="system-owner-role"
@@ -48,10 +48,10 @@ export default class systemOwners extends Basic.AbstractContent {
             //   !SecurityManager.hasAuthority('ROLEGUARANTEE_READ')
             //   ||
               <Basic.Div>
-                <Basic.ContentHeader icon="fa:group" text={ this.i18n('identity.header') } style={{ marginBottom: 0 }}/>
+                <Basic.ContentHeader icon="fa:group" text={ this.i18n('acc:entity.SystemOwner.header') } style={{ marginBottom: 0 }}/>
                 <SystemOwner
                   uiKey="system-owner"
-                //   forceSearchParameters={ forceSearchParameters }
+                  forceSearchParameters={ forceSearchParameters }
                   className="no-margin"
                   match={ this.props.match }/>
               </Basic.Div>
