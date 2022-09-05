@@ -1636,25 +1636,19 @@
       },
       "system":{
         "label":"Systém"
-      },
-      "type": {
-        "label": "Typ vlastníkaAAAA"
       }
     },
     "SystemOwnerRole":{
       "header":"Vlastník systému - určený rolí",
-      "type":{
-        "label":"Vlastník"
-      },
       "ownerRole":{
-        "label":"Vlastník",
+        "label":"Role",
         "help":"Vybraná identita se stane garantem role."
       },
       "system":{
         "label":"Systém"
       },
      "owner": {
-      "label":"Vlastník"
+      "label":"Role"
      }
     }
   },
