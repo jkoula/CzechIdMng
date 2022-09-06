@@ -522,15 +522,6 @@ module.exports = {
       searchInFields: ['username', 'firstName', 'lastName', 'email', 'description'],
       manager: require('./src/redux').IdentityManager
     },
-    // {
-    //   id: 'system-select-box',
-    //   type: 'entity-select-box',
-    //   priority: 0,
-    //   localizationKey: 'entity.System',
-    //   entityType: ['system'],
-    //   searchInFields: ['code'],
-    //   manager: require('./src/redux').SystemManager
-    // },
     {
       id: 'identity-contract-select-box',
       type: 'entity-select-box',

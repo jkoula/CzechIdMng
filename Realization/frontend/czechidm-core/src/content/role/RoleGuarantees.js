@@ -45,7 +45,7 @@ export default class RoleGuarantees extends Basic.AbstractContent {
               uiKey="role-guarantee-role-table"
               forceSearchParameters={ forceSearchParameters }
               className="no-margin"
-              match={ this.props.match }></RoleGuaranteeRoleTable>
+              match={ this.props.match }/>
           </Basic.Div>
         }
         {

@@ -14,14 +14,11 @@ export default class SystemOptionDecorator extends Basic.SelectBox.OptionDecorat
    */
   getEntityIcon(entity) {
     if (!entity) {
-      // default
       return 'component:system';
     }
     if (Utils.Entity.isDisabled(entity) || (entity._disabled && entity._disabled === true)) {
-      // disabled (+ _disabled by not disableable select box)
       return 'component:disabled-system';
     }
-    // enabled
     return 'component:enabled-system';
   }
 

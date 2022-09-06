@@ -75,6 +75,7 @@ import CodeableField from './CodeableField/CodeableField';
 import ReadDtoServiceSelect from './ReadDtoServiceSelect/ReadDtoServiceSelect';
 import PanelHeader from './Panel/PanelHeader';
 import AbstractUniversalSearchType from './AbstractUniversalSearchType/AbstractUniversalSearchType';
+
 const Components = {
   Table,
   Column,

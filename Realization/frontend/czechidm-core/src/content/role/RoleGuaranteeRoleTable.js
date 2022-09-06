@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-//
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
@@ -168,14 +167,12 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
                 ref="form"
                 showLoading={ _showLoading }
                 readOnly={ !manager.canSave(detail.entity, _permissions) }>
-
                 <Advanced.RoleSelect
                   ref="role"
                   manager={ roleManager }
                   label={ this.i18n('entity.RoleGuaranteeRole.role.label') }
                   readOnly
-                  required
-                  />
+                  required/>
                 <Advanced.RoleSelect
                   ref="guaranteeRole"
                   manager={ roleManager }
@@ -191,7 +188,6 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
                   max={ 255 }/>
               </Basic.AbstractForm>
             </Basic.Modal.Body>
-
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"

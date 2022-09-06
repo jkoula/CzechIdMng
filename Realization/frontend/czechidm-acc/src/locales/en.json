@@ -1637,15 +1637,15 @@
     },
     "SystemOwnerRole":{
       "header":"System owner - defined by role",
-     "ownerRole":{
-      "label":"Role",
-      "help": "Identities with the selected role assigned will be the system owner."
-    },
-    "system":{
-      "label":"System"
-    },
-    "owner": {
-      "label":"Role"
+      "ownerRole":{
+        "label":"Role",
+        "help": "Identities with the selected role assigned will be the system owner."
+      },
+      "system":{
+        "label":"System"
+      },
+      "owner": {
+        "label":"Role"
      }
     }
   },

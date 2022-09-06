@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { Advanced, Basic, Managers } from "czechidm-core";
@@ -27,6 +26,7 @@ class SystemOwner extends Advanced.AbstractTableContent {
   getContentKey() {
     return "acc:content.system.owner";
   }
+
   getUiKey() {
     return this.props.uiKey;
   }
@@ -37,23 +37,19 @@ class SystemOwner extends Advanced.AbstractTableContent {
       this.props.match.params
     );
   }
-  //
+
   showDetail(entity) {
     super.showDetail(entity, () => {
-      // this.refs.owner.focus();
     });
   }
 
-  //
   save = (entity, event) => {
     const formEntity = this.refs.form.getData();
-    //
     super.save(formEntity, event);
   };
 
   render() {
     const { uiKey,_showLoading,forceSearchParameters } = this.props;
-    const { detail } = this.state;
     return (
       <Basic.Div>
         <Basic.Confirm ref="confirm-delete" level="danger" />
@@ -69,12 +65,10 @@ class SystemOwner extends Advanced.AbstractTableContent {
               className="btn-xs"
               onClick={this.showDetail.bind(this, {
                 system: this.props.match.params.entityId,
-              })}
-            >
+              })}>
               <Basic.Icon type="fa" icon="plus" /> {this.i18n("button.add")}
             </Basic.Button>,
-          ]}
-        >
+          ]}>
           <Advanced.Column
             header=""
             className="detail-button"
@@ -86,8 +80,8 @@ class SystemOwner extends Advanced.AbstractTableContent {
                   sort={false}
                 />
               );
-            }}
-          ></Advanced.Column>
+            }}>
+            </Advanced.Column>
           <Advanced.Column
             property="owner"
             sortProperty="owner.name"
@@ -114,58 +108,44 @@ class SystemOwner extends Advanced.AbstractTableContent {
           show={this.state.detail.show}
           onHide={this.closeDetail.bind(this)}
           backdrop="static"
-          keyboard={!_showLoading}
-        >
+          keyboard={!_showLoading}>
           <form onSubmit={this.save.bind({}, this)}>
             <Basic.Modal.Header
               closeButton={!_showLoading}
-              text={this.i18n("create.header")}
-              //  rendered={ Utils.Entity.isNew(detail.entity) }
-            />
+              text={this.i18n("create.header")}/>
             <Basic.Modal.Header
-              closeButton={!_showLoading}
-              // text={ this.i18n('edit.header', { name: manager.getNiceLabel(detail.entity) }) }
-              //   rendered={ !Utils.Entity.isNew(detail.entity) }
-            />
+              closeButton={!_showLoading}/>
             <Basic.Modal.Body>
               <Basic.AbstractForm
                 ref="form"
-                showLoading={_showLoading}
-              >
+                showLoading={_showLoading}>
                 <SystemSelect
                   ref="system"
                   manager={systemManager}
                   label={this.i18n("acc:entity.SystemOwner.system.label")}
                   readOnly
-                  required
-                />
-
+                  required/>
                 <Advanced.IdentitySelect
                   ref="owner"
                   manager={identityManager}
                   label={this.i18n("acc:entity.SystemOwner.owner.label")}
                   helpBlock={this.i18n("acc:entity.SystemOwner.owner.help")}
-                  required
-                />
+                  required/>
               </Basic.AbstractForm>
             </Basic.Modal.Body>
-
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"
                 onClick={this.closeDetail.bind(this)}
-                showLoading={_showLoading}
-              >
+                showLoading={_showLoading}>
                 {this.i18n("button.close")}
               </Basic.Button>
               <Basic.Button
                 type="submit"
                 level="success"
-                // // rendered={ manager.canSave(detail.entity, _permissions) }
                 showLoading={_showLoading}
                 showLoadingIcon
-                showLoadingText={this.i18n("button.saving")}
-              >
+                showLoadingText={this.i18n("button.saving")}>
                 {this.i18n("button.save")}
               </Basic.Button>
             </Basic.Modal.Footer>
@@ -177,8 +157,7 @@ class SystemOwner extends Advanced.AbstractTableContent {
 }
 function select(state, props) {
   return {
-    // owners: state.data.trimmed.Owners
   };
 }
 export default connect(select)(SystemOwner);
-// export default SystemOwner;
+

@@ -4,7 +4,6 @@ class SystemOwnerService extends AbstractService {
 
     getApiPath() {
         return '/system-owners';
-        // 1
       }
     
       getNiceLabel(entity) {
@@ -16,9 +15,11 @@ class SystemOwnerService extends AbstractService {
         }
         return `${ entity.name } (${ entity.code })`;
       }
+
       supportsPatch() {
         return false;
       }
+      
       supportsBulkAction() {
         return false;
       }
