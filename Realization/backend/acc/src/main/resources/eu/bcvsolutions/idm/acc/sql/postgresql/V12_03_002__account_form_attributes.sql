@@ -177,15 +177,11 @@ CREATE TABLE acc_account_form_value_a (
 
 -- Update account with mapping, form definition and external id
 
-ALTER TABLE acc_account ADD COLUMN system_mapping_id bytea;
 ALTER TABLE acc_account ADD COLUMN form_definition_id bytea;
 ALTER TABLE acc_account ADD COLUMN external_id character varying(255);
-ALTER TABLE acc_account_a ADD COLUMN system_mapping_id bytea;
-ALTER TABLE acc_account_a ADD COLUMN system_mapping_m bool;
 ALTER TABLE acc_account_a ADD COLUMN form_definition_id bytea;
 ALTER TABLE acc_account_a ADD COLUMN form_definition_m bool;
 ALTER TABLE acc_account_a ADD COLUMN external_id character varying(255);
 ALTER TABLE acc_account_a ADD COLUMN external_id_m bool;
 
-CREATE INDEX idx_acc_account_sys_mapping ON acc_account USING btree (system_mapping_id);
 CREATE INDEX idx_acc_account_form_def ON acc_account USING btree (form_definition_id);
