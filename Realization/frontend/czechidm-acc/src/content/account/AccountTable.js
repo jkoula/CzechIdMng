@@ -141,7 +141,10 @@ export class AccountTable extends Advanced.AbstractTableContent {
       _permissions,
       showAddButton,
       className,
-      _showEchoMetadata
+      filterOpened,
+      _showEchoMetadata,
+      renderAccountType,
+      renderSystem
     } = this.props;
     const { detail, systemEntity, connectorObject } = this.state;
     //
@@ -152,6 +155,10 @@ export class AccountTable extends Advanced.AbstractTableContent {
     if (systemId == null && detail && detail.entity) {
       systemId = detail.entity.system
     }
+
+    // if (this.refs.filterForm !== undefined) {
+    //   this.refs.filterForm.setData({  });
+    // }
 
     const forceSearchMappings = new Domain.SearchParameters()
       .setFilter('operationType', SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
@@ -193,6 +200,9 @@ export class AccountTable extends Advanced.AbstractTableContent {
               ref="filterForm"
               onSubmit={ this.useFilter.bind(this) }
               onCancel={ this.cancelFilter.bind(this) }
+              filterOpened={ filterOpened }
+              renderAccountType={ renderAccountType }
+              renderSystem={ renderSystem }
               forceSearchParameters={ forceSearchParameters }/>
           }
           _searchParameters={ this.getSearchParameters() }>
@@ -393,7 +403,8 @@ export default connect(select, null, null, { forwardRef: true})(AccountTable);
 class Filter extends Advanced.Filter {
 
   render() {
-    const { onSubmit, onCancel, forceSearchParameters } = this.props;
+    const { onSubmit, onCancel, forceSearchParameters, renderAccountType, renderSystem } = this.props;
+
     //
     return (
       <Advanced.Filter onSubmit={ onSubmit }>
@@ -404,10 +415,11 @@ class Filter extends Advanced.Filter {
                 ref="text"
                 placeholder={ this.i18n('acc:content.accounts.filter.accounts.identifier.placeholder') }/>
             </Basic.Col>
-            <Basic.Col lg={ 3 }>
+            <Basic.Col lg={ 3 } rendered = { renderSystem }>
               <Advanced.Filter.SelectBox
-                ref="systemId"
+                ref="systems"
                 manager={ systemManager }
+                multiSelect
                 placeholder={ this.i18n('acc:content.accounts.filter.accounts.system.placeholder') }/>
             </Basic.Col>
             <Basic.Col lg={ 3 }>
@@ -433,7 +445,7 @@ class Filter extends Advanced.Filter {
                 multiSelect
                 ref="identities"/>
             </Basic.Col>
-            <Basic.Col lg={ 2 }>
+            <Basic.Col lg={ 2 } rendered = { renderAccountType }>
               <Advanced.Filter.EnumSelectBox
                 ref="accountType"
                 placeholder={ this.i18n('acc:content.accounts.filter.accounts.type.placeholder') }

@@ -45,6 +45,7 @@ class SystemAccountsContent extends Advanced.AbstractTableContent {
           <AccountTableComponent
             uiKey="system-accounts-table"
             showLoading={ _showLoading }
+            renderSystem={ false }
             forceSearchParameters={ forceSearchParameters }
             forceSystemEntitySearchParameters={ forceSystemEntitySearchParameters }
             columns={ _.difference(AccountTable.defaultProps.columns, ['system']) }/>

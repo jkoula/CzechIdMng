@@ -335,6 +335,9 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 		if (filter.getSystemId() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.system).get(SysSystem_.id), filter.getSystemId()));
 		}
+		if (filter.getSystems() != null && !filter.getSystems().isEmpty()) {
+			predicates.add(root.get(AccAccount_.system).get(SysSystem_.id).in(filter.getSystems()));
+		}
 		if (filter.getSystemEntityId() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.systemEntity).get(SysSystemEntity_.id),
 					filter.getSystemEntityId()));

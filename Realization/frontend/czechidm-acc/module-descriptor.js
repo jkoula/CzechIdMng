@@ -154,7 +154,7 @@ module.exports = {
               path: '/accounts/accounts-personal',
               access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
               items: []
-            },
+            }
             ]
           },
           {

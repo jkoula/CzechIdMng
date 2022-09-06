@@ -25,6 +25,7 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 	public static final String PARAMETER_IDENTITY_ID = "identity";
 	public static final String PARAMETER_IDENTITY_IDS = "identities";
 	public static final String PARAMETER_ROLE_IDS = "roles";
+	public static final String PARAMETER_SYSTEM_IDS = "systems";
 	//
 	private UUID systemEntityId;	
 	private UUID systemId;	
@@ -65,6 +66,14 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 
 	public void setSystemId(UUID systemId) {
 		this.systemId = systemId;
+	}
+	
+	public List<UUID> getSystems() {
+		return getParameterConverter().toUuids(getData(), PARAMETER_SYSTEM_IDS);
+	}
+
+	public void setSystems(List<UUID> systemIds) {
+		put(PARAMETER_SYSTEM_IDS, systemIds);
 	}
 
 	public UUID getIdentityId() {

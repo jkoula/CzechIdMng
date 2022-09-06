@@ -39,6 +39,7 @@ import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
@@ -48,8 +49,8 @@ import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -598,6 +599,13 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 			for (Object identity : parameters.get(AccAccountFilter.PARAMETER_IDENTITY_IDS)) {
 				if (identity != null) {
 					filter.getIdentities().add(getParameterConverter().toEntityUuid((String) identity, IdmIdentityDto.class));
+				}
+			}
+		}
+		if (parameters.containsKey(AccAccountFilter.PARAMETER_SYSTEM_IDS)) {
+			for (Object system : parameters.get(AccAccountFilter.PARAMETER_SYSTEM_IDS)) {
+				if (system != null) {
+					filter.getSystems().add(getParameterConverter().toEntityUuid((String) system, SysSystemDto.class));
 				}
 			}
 		}

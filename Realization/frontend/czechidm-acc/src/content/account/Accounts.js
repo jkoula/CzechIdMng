@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Basic, Domain } from 'czechidm-core';
 import { AccountManager } from '../../redux';
 import AccountTable from './AccountTable';
+import AccountTypeEnum from '../../domain/AccountTypeEnum';
 
 /**
  * List of accounts.
@@ -27,8 +28,8 @@ class Accounts extends Basic.AbstractContent {
   }
 
   render() {
-    const defaultSearchParameters = new Domain.SearchParameters()
-
+    const defaultSearchParameters = new Domain.SearchParameters();
+    
     return (
       <Basic.Div>
         <Basic.Panel>
@@ -36,7 +37,7 @@ class Accounts extends Basic.AbstractContent {
             history={ this.context.history }
             uiKey="account-table"
             accountManager={ this.accountManager }
-            filterOpened
+            filterOpened = { true }
             forceSearchParameters={ defaultSearchParameters }
             showRowSelection />
         </Basic.Panel>
