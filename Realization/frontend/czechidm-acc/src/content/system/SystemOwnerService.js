@@ -1,4 +1,9 @@
 import AbstractService from "czechidm-core/src/services/AbstractService";
+import IdentityService from "czechidm-core/src/services/IdentityService";
+import SystemService from "../../services/SystemService";
+
+const systemService = new SystemService()
+const identityService = new IdentityService()
 
 class SystemOwnerService extends AbstractService {
 
@@ -6,22 +11,26 @@ class SystemOwnerService extends AbstractService {
         return '/system-owners';
       }
     
-      getNiceLabel(entity) {
-        if (!entity) {
-          return '';
-        }
-        if (entity.name === entity.code) {
-          return entity.name;
-        }
-        return `${ entity.name } (${ entity.code })`;
+    getNiceLabel(entity) {
+      let label = `System:${systemService.getNiceLabel(entity._embedded.system)}`;
+      if (entity.owner) {
+        label += `Identita: ${identityService.getNiceLabel(entity._embedded.owner)}`;
+      }
+      //
+      return label;
+
       }
 
-      supportsPatch() {
+    supportsPatch() {
         return false;
       }
       
-      supportsBulkAction() {
+    supportsBulkAction() {
         return false;
+      }
+
+    getGroupPermission() {
+        return 'SYSTEMOWNER';
       }
 }
 export default SystemOwnerService;
