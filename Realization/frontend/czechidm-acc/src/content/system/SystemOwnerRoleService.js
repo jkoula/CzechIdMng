@@ -1,4 +1,9 @@
 import AbstractService from "czechidm-core/src/services/AbstractService";
+import SystemService from "../../services/SystemService";
+import RoleService from "czechidm-core/src/services/RoleService";
+
+const systemService = new SystemService()
+const roleService = new RoleService()
 
 class SystemOwnerRoleService extends AbstractService {
 
@@ -6,21 +11,25 @@ class SystemOwnerRoleService extends AbstractService {
         return '/system-owner-roles';
       } 
     
-      getNiceLabel(entity) {
-        if (!entity) {
-            return '';
-          }
-          if (entity.name === entity.code) {
-            return entity.name;
-          }
-          return `${ entity.name } (${ entity.code })`;
+    getNiceLabel(entity) {
+        let label = `${systemService.getNiceLabel(entity._embedded.system)}`;
+        if (entity.ownerRole) {
+          label += `${roleService.getNiceLabel(entity._embedded.ownerRole)}`;
+        }
+        //
+        return label;
         }
 
-      supportsPatch() {
+    supportsPatch() {
           return false;
       }
-      supportsBulkAction() {
+
+    supportsBulkAction() {
         return false;
+      }
+
+    getGroupPermission() {
+        return 'SYSTEMOWNERROLE';
       }
 }
 export default SystemOwnerRoleService;

@@ -56,6 +56,7 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
         manager={manager}
         uiKey = {uiKey}
         forceSearchParameters = {forceSearchParameters}
+        showRowSelection={manager.canDelete()}  
         rowClass={({rowIndex, data}) => {
           const embedded = data[rowIndex]._embedded;
           if (embedded) {
@@ -63,6 +64,11 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
           }
           return '';
         }}
+        actions={
+          [
+            { value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false }
+          ]
+        }
         buttons={[
           <Basic.Button
             level="success"
