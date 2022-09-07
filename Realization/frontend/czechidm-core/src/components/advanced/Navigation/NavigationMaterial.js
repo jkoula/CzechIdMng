@@ -1,32 +1,35 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router';
-import { Link } from 'react-router-dom';
-import clsx from 'clsx';
+import React from "react";
+import PropTypes from "prop-types";
+import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
+import clsx from "clsx";
 //
-import AppBar from '@material-ui/core/AppBar';
-import Divider from '@material-ui/core/Divider';
-import Drawer from '@material-ui/core/Drawer';
-import Hidden from '@material-ui/core/Hidden';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import Brightness4Icon from '@material-ui/icons/Brightness4';
-import Brightness7Icon from '@material-ui/icons/Brightness7';
-import InvertColors from '@material-ui/icons/InvertColors';
-import Toolbar from '@material-ui/core/Toolbar';
-import { makeStyles } from '@material-ui/core/styles';
+import AppBar from "@material-ui/core/AppBar";
+import Divider from "@material-ui/core/Divider";
+import Drawer from "@material-ui/core/Drawer";
+import Hidden from "@material-ui/core/Hidden";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
+import InvertColors from "@material-ui/icons/InvertColors";
+import Toolbar from "@material-ui/core/Toolbar";
+import { makeStyles } from "@material-ui/core/styles";
 //
-import { IdentityManager, SecurityManager, ConfigurationManager } from '../../../redux';
-import { collapseNavigation } from '../../../redux/config/actions';
-import { i18n } from '../../../services/LocalizationService';
-import NavigationSearch from './NavigationSearch';
-import NavigationMonitoring from './NavigationMonitoring';
-import NavigationLanguage from './NavigationLanguage';
-import NavigationIdentity from './NavigationIdentity';
-import NavigationEnvironment from './NavigationEnvironment';
-import BasicAlert from '../../basic/Alert/Alert';
+import {
+  IdentityManager,
+  SecurityManager,
+  ConfigurationManager,
+} from "../../../redux";
+import { collapseNavigation } from "../../../redux/config/actions";
+import { i18n } from "../../../services/LocalizationService";
+import NavigationSearch from "./NavigationSearch";
+import NavigationMonitoring from "./NavigationMonitoring";
+import NavigationLanguage from "./NavigationLanguage";
+import NavigationIdentity from "./NavigationIdentity";
+import NavigationEnvironment from "./NavigationEnvironment";
 //
 const identityManager = new IdentityManager();
 const configurationManager = new ConfigurationManager();
@@ -40,134 +43,134 @@ const drawerWidth = 240;
  */
 const useStyles = makeStyles((theme) => ({
   grow: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   root: {
-    display: 'flex'
+    display: "flex",
   },
   appBarRoot: {
-    backgroundColor: theme.palette.type === 'dark' ? '#333' : theme.palette.primary.main, // TODO: hardcoded #333 => from theme
+    backgroundColor:
+      theme.palette.type === "dark" ? "#333" : theme.palette.primary.main, // TODO: hardcoded #333 => from theme
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    [theme.breakpoints.up('md')]: {
-      width: `calc(100% - ${ drawerWidth }px)`,
-      marginLeft: drawerWidth
+    [theme.breakpoints.up("md")]: {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: drawerWidth,
     },
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   appBarClose: {
     zIndex: theme.zIndex.drawer + 1,
-    [theme.breakpoints.up('md')]: {
-      width: `calc(100% - ${ theme.spacing(7) + 1 }px)`,
-      marginLeft: theme.spacing(7) + 1
+    [theme.breakpoints.up("md")]: {
+      width: `calc(100% - ${theme.spacing(7) + 1}px)`,
+      marginLeft: theme.spacing(7) + 1,
     },
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   appBarShift: {
-    [theme.breakpoints.up('md')]: {
-      width: `calc(100% - ${ drawerWidth }px)`,
-      marginLeft: drawerWidth
+    [theme.breakpoints.up("md")]: {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: drawerWidth,
     },
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up('md')]: {
-      display: 'none'
-    }
+    [theme.breakpoints.up("md")]: {
+      display: "none",
+    },
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
-  drawer: {
-  },
+  drawer: {},
   drawerPaper: {
-    width: drawerWidth
+    width: drawerWidth,
   },
   drawerOpen: {
     width: drawerWidth,
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   drawerClose: {
-    transition: theme.transitions.create('width', {
+    transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
-    overflowX: 'hidden',
+    overflowX: "hidden",
     width: theme.spacing(7) + 1,
-    '& .application-logo.collapsed': {
-      display: 'none'
-    }
+    "& .application-logo.collapsed": {
+      display: "none",
+    },
   },
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
     marginLeft: -35, // FIXME: where is gutter?
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: -50 // FIXME: where is gutter?
-    }
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: -50, // FIXME: where is gutter?
+    },
   },
   sidebar: {
-    backgroundColor: theme.palette.type === 'dark' ? '#333' : 'transparent', // TODO: hardcoded #333 => from theme
-    '& .nav li': {
-      '&:hover': {
+    backgroundColor: theme.palette.type === "dark" ? "#333" : "transparent", // TODO: hardcoded #333 => from theme
+    "& .nav li": {
+      "&:hover": {
         color: theme.palette.text.primary,
         backgroundColor: theme.palette.action.hover,
       },
-      '& a': {
+      "& a": {
         color: theme.palette.text.secondary,
-        '&:hover': {
+        "&:hover": {
           color: theme.palette.text.primary,
         },
-        '&:focus': {
+        "&:focus": {
           color: theme.palette.text.primary,
         },
-        '&:visited': {
+        "&:visited": {
           color: theme.palette.text.secondary,
         },
-        '&.active': {
+        "&.active": {
           color: theme.palette.text.primary,
           backgroundColor: theme.palette.action.selected,
-          borderLeftColor: theme.palette.secondary.main
-        }
-      }
-    }
+          borderLeftColor: theme.palette.secondary.main,
+        },
+      },
+    },
   },
   nested: {
-    paddingLeft: theme.spacing(4)
+    paddingLeft: theme.spacing(4),
   },
   hide: {
-    display: 'none',
-  }
+    display: "none",
+  },
 }));
 
 function NavigationMaterial(props) {
-  const {
-    userContext,
-    systemItems,
-    sidebarItems,
-    location,
-    children
-  } = props;
+  const { userContext, systemItems, sidebarItems, location, children } = props;
   const dispatch = useDispatch();
   const classes = useStyles();
-  const [ mobileOpen, setMobileOpen ] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigationCollapsed = userContext.navigationCollapsed;
-  const themeType = useSelector((state) => ConfigurationManager.getApplicationTheme(state).palette.type);
-  const isDevelopment = useSelector((state) => ConfigurationManager.getEnvironmentStage(state) === 'development');
-  const applicationLogo = useSelector((state) => ConfigurationManager.getApplicationLogo(state));
+  const themeType = useSelector(
+    (state) => ConfigurationManager.getApplicationTheme(state).palette.type
+  );
+  const isDevelopment = useSelector(
+    (state) => ConfigurationManager.getEnvironmentStage(state) === "development"
+  );
+  const applicationLogo = useSelector((state) =>
+    ConfigurationManager.getApplicationLogo(state)
+  );
   const history = useHistory();
   //
   const handleDrawerToggle = () => {
@@ -179,9 +182,11 @@ function NavigationMaterial(props) {
     dispatch(collapseNavigation(false));
     // BE save navigation is collapsed
     if (SecurityManager.isAuthenticated(userContext)) {
-      dispatch(identityManager.saveCurrentProfile(userContext.id, {
-        navigationCollapsed: false
-      }));
+      dispatch(
+        identityManager.saveCurrentProfile(userContext.id, {
+          navigationCollapsed: false,
+        })
+      );
     }
   };
   //
@@ -189,9 +194,11 @@ function NavigationMaterial(props) {
     dispatch(collapseNavigation(true));
     // BE save navigation is collapsed
     if (SecurityManager.isAuthenticated(userContext)) {
-      dispatch(identityManager.saveCurrentProfile(userContext.id, {
-        navigationCollapsed: true
-      }));
+      dispatch(
+        identityManager.saveCurrentProfile(userContext.id, {
+          navigationCollapsed: true,
+        })
+      );
     }
   };
   let toogleDarkButton = null;
@@ -200,9 +207,14 @@ function NavigationMaterial(props) {
       <IconButton
         color="inherit"
         onClick={() => {
-          dispatch(configurationManager.fetchApplicationTheme(themeType === 'light' ? 'dark' : 'light'));
-        }}>
-        { themeType === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
+          dispatch(
+            configurationManager.fetchApplicationTheme(
+              themeType === "light" ? "dark" : "light"
+            )
+          );
+        }}
+      >
+        {themeType === "light" ? <Brightness4Icon /> : <Brightness7Icon />}
       </IconButton>
     );
   }
@@ -210,146 +222,146 @@ function NavigationMaterial(props) {
   if (!SecurityManager.isAuthenticated(userContext)) {
     return (
       <div>
-        <div className={ classes.grow }>
-          <AppBar
-            position="fixed"
-            className={ classes.appBarRoot }>
+        <div className={classes.grow}>
+          <AppBar position="fixed" className={classes.appBarRoot}>
             <Toolbar>
-              
-              {
-                applicationLogo
-                ?
+              {applicationLogo ? (
                 <Link to="/" className="application-logo light">
                   {/* lookout: alt is not defined => alr is rendered before image is fully inited otherwise */}
-                  <img src={ applicationLogo } alt=""/>
+                  <img src={applicationLogo} alt="" />
                 </Link>
-                :
+              ) : (
                 <Link to="/" className="application-logo home light">
-                  {' '}
+                  {" "}
                 </Link>
-              }
-              <div className={ classes.grow }/>
+              )}
+              <div className={classes.grow} />
               <NavigationEnvironment />
               <NavigationLanguage />
-              {
-                toogleDarkButton
-              }
+              {toogleDarkButton}
             </Toolbar>
           </AppBar>
           <Toolbar />
         </div>
-        { children }
+        {children}
       </div>
     );
   }
   //
   const drawer = (
-    <div className={ clsx(classes.sidebar, { sidebar: true, collapsed: navigationCollapsed }) }>
-      <div className={ classes.toolbar } style={{ display: 'flex', alignItems: 'center'}}>
-        {
-          applicationLogo
-          ?
-          <Link to="/" className={ !navigationCollapsed ? 'application-logo' : 'application-logo collapsed' }>
+    <div
+      className={clsx(classes.sidebar, {
+        sidebar: true,
+        collapsed: navigationCollapsed,
+      })}
+    >
+      <div
+        className={classes.toolbar}
+        style={{ display: "flex", alignItems: "center" }}
+      >
+        {applicationLogo ? (
+          <Link
+            to="/"
+            className={
+              !navigationCollapsed
+                ? "application-logo"
+                : "application-logo collapsed"
+            }
+          >
             {/* lookout: alt is not defined => alr is rendered before image is fully inited otherwise */}
-            <img src={ applicationLogo } alt=""/>
+            <img src={applicationLogo} alt="" />
           </Link>
-          :
-          <Link to="/" className={ !navigationCollapsed ? 'application-logo home' : 'application-logo home collapsed' }>
-            {' '}
+        ) : (
+          <Link
+            to="/"
+            className={
+              !navigationCollapsed
+                ? "application-logo home"
+                : "application-logo home collapsed"
+            }
+          >
+            {" "}
           </Link>
-        }
-        <div className={ !navigationCollapsed ? classes.grow : 'hidden' }/>
+        )}
+        <div className={!navigationCollapsed ? classes.grow : "hidden"} />
         <Hidden smDown>
           <IconButton
             color="inherit"
             aria-label="open close drawer"
             edge="start"
-            onClick={ !navigationCollapsed ? handleDrawerClose : handleDrawerOpen }
-            style={ !navigationCollapsed ? {} : { marginLeft: 5 } }>
-            { !navigationCollapsed ? <ChevronLeftIcon /> : <MenuIcon /> }
+            onClick={
+              !navigationCollapsed ? handleDrawerClose : handleDrawerOpen
+            }
+            style={!navigationCollapsed ? {} : { marginLeft: 5 }}
+          >
+            {!navigationCollapsed ? <ChevronLeftIcon /> : <MenuIcon />}
           </IconButton>
         </Hidden>
       </div>
       <Divider />
-      {
-        sidebarItems
-      }
+      {sidebarItems}
     </div>
   );
 
   return (
-    <div className={ classes.root }>
+    <div className={classes.root}>
       <AppBar
         position="fixed"
-        className={
-          clsx(
-            classes.appBarRoot,
-            classes.appBar,
-            {
-              [classes.appBarShift]: !navigationCollapsed,
-              [classes.appBarClose]: navigationCollapsed
-            }
-          )
-        }>
-
+        className={clsx(classes.appBarRoot, classes.appBar, {
+          [classes.appBarShift]: !navigationCollapsed,
+          [classes.appBarClose]: navigationCollapsed,
+        })}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
-            onClick={ handleDrawerToggle }
-            className={ classes.menuButton } >
+            onClick={handleDrawerToggle}
+            className={classes.menuButton}
+          >
             <MenuIcon />
           </IconButton>
 
-          <NavigationSearch userContext={ userContext }/>
+          <NavigationSearch userContext={userContext} />
 
-          <div className={ classes.grow }/>
+          <div className={classes.grow} />
 
           <NavigationEnvironment />
 
-          <NavigationLanguage userContext={ userContext }/>
+          <NavigationLanguage userContext={userContext} />
 
-          <NavigationIdentity userContext={ userContext }/>
+          <NavigationIdentity userContext={userContext} />
 
-          {
-            !SecurityManager.hasAuthority('MONITORINGRESULT_READ')
-            ||
-            <NavigationMonitoring location={ location }/>
-          }
-          {
-            toogleDarkButton
-          }
-          {
-            !SecurityManager.hasAuthority('CONFIGURATION_ADMIN')
-            ||
-            !isDevelopment
-            ||
-            <IconButton
-              color="inherit"
-              title={ i18n('content.configuration-theme.action.edit.link.title') }
-              onClick={() => {
-                history.push('/configurations/theme');
-              }}>
-              <InvertColors />
-            </IconButton>
-          }
-          {
-            userContext.isExpired
-            ||
-            systemItems
-          }
+          {!SecurityManager.hasAuthority("MONITORINGRESULT_READ") || (
+            <NavigationMonitoring location={location} />
+          )}
+          {toogleDarkButton}
+          {!SecurityManager.hasAuthority("CONFIGURATION_ADMIN") ||
+            !isDevelopment || (
+              <IconButton
+                color="inherit"
+                title={i18n(
+                  "content.configuration-theme.action.edit.link.title"
+                )}
+                onClick={() => {
+                  history.push("/configurations/theme");
+                }}
+              >
+                <InvertColors />
+              </IconButton>
+            )}
+          {userContext.isExpired || systemItems}
         </Toolbar>
       </AppBar>
-      
-      <nav className={ classes.drawer }>
+
+      <nav className={classes.drawer}>
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Hidden mdUp>
-        
           <Drawer
             variant="temporary"
-            open={ mobileOpen }
-            onClose={ handleDrawerToggle }
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
             classes={{
               paper: classes.drawerPaper,
             }}
@@ -358,51 +370,45 @@ function NavigationMaterial(props) {
             }}
             SlideProps={{
               style: {
-              position:'fixed',
-              overflow:'auto',
-              height:'100vh'
-              }
-            }}>
-            { drawer }
+                position: "fixed",
+                overflow: "auto",
+                height: "100vh",
+              },
+            }}
+          >
+            {drawer}
           </Drawer>
         </Hidden>
         <Hidden smDown>
           <Drawer
-          PaperProps={{
-            style: {
-            position:'relative',
-            overflowY:'hidden',
-            height:'100%'
-            }
-          }}
-            variant="permanent"
-            className={
-              clsx(
-                classes.drawer,
-                {
-                  [classes.drawerOpen]: !navigationCollapsed,
-                  [classes.drawerClose]: navigationCollapsed,
-                }
-              )
-            }
-            classes={{
-              paper: clsx(
-                {
-                  [classes.drawerOpen]: !navigationCollapsed,
-                  [classes.drawerClose]: navigationCollapsed,
-                }
-              ),
+            PaperProps={{
+              style: {
+                position: "relative",
+                overflowY: "hidden",
+                height: "100%",
+              },
             }}
-            
-            open>
-            { drawer }
+            variant="permanent"
+            className={clsx(classes.drawer, {
+              [classes.drawerOpen]: !navigationCollapsed,
+              [classes.drawerClose]: navigationCollapsed,
+            })}
+            classes={{
+              paper: clsx({
+                [classes.drawerOpen]: !navigationCollapsed,
+                [classes.drawerClose]: navigationCollapsed,
+              }),
+            }}
+            open
+          >
+            {drawer}
           </Drawer>
         </Hidden>
       </nav>
       <Toolbar />
-      <main className={ classes.content }>
-        <div className={ classes.toolbar }/>
-        { children }
+      <main className={classes.content}>
+        <div className={classes.toolbar} />
+        {children}
       </main>
     </div>
   );
@@ -412,11 +418,11 @@ NavigationMaterial.propTypes = {
   userContext: PropTypes.object.isRequired,
   location: PropTypes.object,
   systemItems: PropTypes.arrayOf(PropTypes.object).isRequired,
-  sidebarItems: PropTypes.arrayOf(PropTypes.object).isRequired
+  sidebarItems: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 NavigationMaterial.defaultProps = {
-  location: null
+  location: null,
 };
 
 export default NavigationMaterial;

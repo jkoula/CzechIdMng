@@ -747,7 +747,7 @@
         "textCopy":"Text byl zkopírován do schránky",
         "copyClipboard":"Zkopírovat do schránky",
         "wrapOn":"Zapnout zalamování řádku",
-        "wrapOff":"Vypnout Zalamování řádku"
+        "wrapOff":"Vypnout zalamování řádku"
       },
       "CreatableSelectBox": {
         "textCreator": "Vytvořit novou filtrovací hodnotu: [{{value}}]?",

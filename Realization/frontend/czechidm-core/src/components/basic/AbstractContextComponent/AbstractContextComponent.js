@@ -1,13 +1,17 @@
-import React from 'react';
-import { parse } from 'qs';
-import { Route, Switch } from 'react-router-dom';
+import React from "react";
+import { parse } from "qs";
+import { Route, Switch } from "react-router-dom";
 //
-import ConfigLoader from 'czechidm-core/src/utils/ConfigLoader';
-import AbstractComponent from '../AbstractComponent/AbstractComponent';
-import * as Utils from '../../../utils';
-import { FlashMessagesManager, ConfigurationManager, SecurityManager} from '../../../redux';
-import { i18n } from '../../../services/LocalizationService';
-import IdmContext from '../../../context/idm-context';
+import ConfigLoader from "czechidm-core/src/utils/ConfigLoader";
+import AbstractComponent from "../AbstractComponent/AbstractComponent";
+import * as Utils from "../../../utils";
+import {
+  FlashMessagesManager,
+  ConfigurationManager,
+  SecurityManager,
+} from "../../../redux";
+import { i18n } from "../../../services/LocalizationService";
+import IdmContext from "../../../context/idm-context";
 
 /**
  * Automatically injects redux context (store) to component context,
@@ -17,7 +21,6 @@ import IdmContext from '../../../context/idm-context';
  * @author Radek Tomiška
  */
 class AbstractContextComponent extends AbstractComponent {
-
   constructor(props, context) {
     super(props, context);
     this._parseUrlQuery(this.props.location);
@@ -34,17 +37,20 @@ class AbstractContextComponent extends AbstractComponent {
    * Method on the component cannot be called directly (redux component ...).
    */
   _initWizardComponent(props, context) {
-    if (context
-      && context.wizardContext
-      && context.wizardContext.activeStep
-      && context.wizardContext.activeStep.id && props.wizardStepId
+    if (
+      context &&
+      context.wizardContext &&
+      context.wizardContext.activeStep &&
+      context.wizardContext.activeStep.id &&
+      props.wizardStepId
     ) {
       const wizardContext = context.wizardContext;
       if (this.wizardNext) {
         wizardContext.componentCallBackNext = this.wizardNext.bind(this);
       }
       if (this.wizardAddButtons) {
-        wizardContext.activeStep.wizardAddButtons = this.wizardAddButtons.bind(this);
+        wizardContext.activeStep.wizardAddButtons =
+          this.wizardAddButtons.bind(this);
         // Component inner a step is rendered after wizard. Wizard have to be updated by force.
         wizardContext.wizardForceUpdate();
       } else if (wizardContext.activeStep.wizardAddButtons) {
@@ -75,8 +81,7 @@ class AbstractContextComponent extends AbstractComponent {
    * Returns true, if is this component currently in a wizard.
    */
   isWizard() {
-    return !!(this.context
-      && this.context.wizardContext);
+    return !!(this.context && this.context.wizardContext);
   }
 
   /**
@@ -85,18 +90,21 @@ class AbstractContextComponent extends AbstractComponent {
    */
   _initWizardLoading() {
     const context = this.context;
-    if (context
-      && context.wizardContext
-      && context.wizardContext.activeStep
-      && context.wizardContext.activeStep.id && this.props.wizardStepId) {
+    if (
+      context &&
+      context.wizardContext &&
+      context.wizardContext.activeStep &&
+      context.wizardContext.activeStep.id &&
+      this.props.wizardStepId
+    ) {
       const wizardContext = this.context.wizardContext;
       if (this.state && wizardContext.setShowLoading) {
         const { _showLoading, showLoading } = this.state;
         wizardContext.setShowLoading(
-          _showLoading
-          || showLoading
-          || this.props.showLoading
-          || this.props._showLoading
+          _showLoading ||
+            showLoading ||
+            this.props.showLoading ||
+            this.props._showLoading
         );
       }
     }
@@ -111,7 +119,7 @@ class AbstractContextComponent extends AbstractComponent {
     if (location) {
       const { search } = location;
       if (search) {
-        const trimedSearch = search.replace('?', '');
+        const trimedSearch = search.replace("?", "");
         const query = parse(trimedSearch);
         location.query = query;
       }
@@ -154,7 +162,9 @@ class AbstractContextComponent extends AbstractComponent {
     if (event) {
       event.preventDefault();
     }
-    this.context.store.dispatch(this.flashMessagesManager.addError(error, this.context));
+    this.context.store.dispatch(
+      this.flashMessagesManager.addError(error, this.context)
+    );
   }
 
   /**
@@ -168,7 +178,9 @@ class AbstractContextComponent extends AbstractComponent {
     if (event) {
       event.preventDefault();
     }
-    this.context.store.dispatch(this.flashMessagesManager.addErrorMessage(message, error, this.context));
+    this.context.store.dispatch(
+      this.flashMessagesManager.addErrorMessage(message, error, this.context)
+    );
   }
 
   /**
@@ -199,7 +211,9 @@ class AbstractContextComponent extends AbstractComponent {
     let result = i18n(key, options);
     // escape html
     if (options && options.escape === false && key !== result) {
-      result = (<span dangerouslySetInnerHTML={{__html: i18n(key, options)}}/>);
+      result = (
+        <span dangerouslySetInnerHTML={{ __html: i18n(key, options) }} />
+      );
     }
     return result;
   }
@@ -214,15 +228,22 @@ class AbstractContextComponent extends AbstractComponent {
    */
   i18n(key, options = {}) {
     if (!key) {
-      return '';
+      return "";
     }
     //
     const componentKey = this.getComponentKey();
     //
-    const resultKeyWithModule = (key.indexOf(':') > -1 || !componentKey) ? key : `${componentKey}.${key}`;
-    const resultKeyWithoutModule = (resultKeyWithModule.indexOf(':') > -1) ? resultKeyWithModule.split(':')[1] : resultKeyWithModule;
+    const resultKeyWithModule =
+      key.indexOf(":") > -1 || !componentKey ? key : `${componentKey}.${key}`;
+    const resultKeyWithoutModule =
+      resultKeyWithModule.indexOf(":") > -1
+        ? resultKeyWithModule.split(":")[1]
+        : resultKeyWithModule;
     const i18nValue = this._i18n(resultKeyWithModule, options);
-    if (i18nValue === resultKeyWithModule || i18nValue === resultKeyWithoutModule) {
+    if (
+      i18nValue === resultKeyWithModule ||
+      i18nValue === resultKeyWithoutModule
+    ) {
       return this._i18n(key, options);
     }
     return i18nValue;
@@ -255,11 +276,11 @@ class AbstractContextComponent extends AbstractComponent {
     }
 
     // Unbend a path. Some routes are wrong defined in routes.js (missing or excess slash).
-    if (parentId.endsWith('/') && path && path.startsWith('/')) {
+    if (parentId.endsWith("/") && path && path.startsWith("/")) {
       parentId = parentId.substring(0, parentId.length - 1);
     }
 
-    if (path && !path.startsWith('/') && !parentId.endsWith('/')) {
+    if (path && !path.startsWith("/") && !parentId.endsWith("/")) {
       return `${parentId}/${path}`;
     }
     return `${parentId}${path}`;
@@ -269,7 +290,7 @@ class AbstractContextComponent extends AbstractComponent {
    * Finds route definitions for given path.
    */
   _getRouteComponents(path, routes, parentRoute) {
-    let components = routes.filter(route => {
+    let components = routes.filter((route) => {
       const concatedPath = this._getConcatPath(parentRoute.path, route.path);
 
       if (this.trimSlash(concatedPath) === this.trimSlash(path)) {
@@ -283,9 +304,13 @@ class AbstractContextComponent extends AbstractComponent {
     }
     components = [];
 
-    routes.forEach(route => {
+    routes.forEach((route) => {
       if (route.childRoutes && route.childRoutes.length > 0) {
-        const subComponents = this._getRouteComponents(path, route.childRoutes, route);
+        const subComponents = this._getRouteComponents(
+          path,
+          route.childRoutes,
+          route
+        );
         if (subComponents && subComponents.length > 0) {
           components.push(...subComponents);
         }
@@ -308,10 +333,15 @@ class AbstractContextComponent extends AbstractComponent {
     if (route.component) {
       route.concatedPath = parentPath;
       return [route];
-    } if (route.childRoutes) {
-      route.childRoutes.forEach(childRoute => {
-        childRoutesResult.push(...this._getChildrenRoutesWithComponent(childRoute,
-          this._getConcatPath(parentPath, childRoute.path)));
+    }
+    if (route.childRoutes) {
+      route.childRoutes.forEach((childRoute) => {
+        childRoutesResult.push(
+          ...this._getChildrenRoutesWithComponent(
+            childRoute,
+            this._getConcatPath(parentPath, childRoute.path)
+          )
+        );
       });
     }
     return childRoutesResult;
@@ -326,23 +356,30 @@ class AbstractContextComponent extends AbstractComponent {
     const topLevelPath = routes.childRoutes[0].path;
     let currentPath = match.path;
     if (currentPath.startsWith(topLevelPath)) {
-      currentPath = currentPath.substring(topLevelPath.length, currentPath.length);
+      currentPath = currentPath.substring(
+        topLevelPath.length,
+        currentPath.length
+      );
     }
     let currentRoutes = [];
 
     // If currentPath is empty, then we are on top-level, so we can add all direct children.
-    if (currentPath === '') {
+    if (currentPath === "") {
       routes.childRoutes[0].component = {};
       currentRoutes = [routes.childRoutes[0]];
     } else {
-      currentRoutes = this._getRouteComponents(currentPath, routes.childRoutes, routes);
+      currentRoutes = this._getRouteComponents(
+        currentPath,
+        routes.childRoutes,
+        routes
+      );
     }
     const childRoutesResult = [];
     if (currentRoutes) {
-      currentRoutes.forEach(route => {
+      currentRoutes.forEach((route) => {
         const childRoutes = route.childRoutes;
         if (childRoutes) {
-          childRoutes.forEach(routeWithComponent => {
+          childRoutes.forEach((routeWithComponent) => {
             childRoutesResult.push(routeWithComponent);
           });
         }
@@ -365,12 +402,12 @@ class AbstractContextComponent extends AbstractComponent {
     }
     let routePath = route.path;
     routePath = this.trimSlash(routePath);
-    const elements = routePath.split('/');
+    const elements = routePath.split("/");
     let priority = elements.length * 2;
 
     // If is last item ends on dynamic parameter, the we decrease the priority.
     const lastElement = elements[elements.length - 1];
-    if (lastElement.startsWith(':')) {
+    if (lastElement.startsWith(":")) {
       priority -= 1;
     }
 
@@ -392,16 +429,16 @@ class AbstractContextComponent extends AbstractComponent {
   _getComponent(route) {
     if (route.module && !ConfigLoader.isEnabledModule(route.module)) {
       // Maybe useless, because routes are filtered in Index.js!
-      return require('../../../content/error/503').default;
+      return require("../../../content/error/503").default;
     }
     const state = this.context.store.getState();
     const userContext = state.security.userContext;
     // Check access to the component
     if (!SecurityManager.hasAccess(route.access, userContext)) {
       if (SecurityManager.isAuthenticated(userContext)) {
-        return require('../../../content/error/403').default;
+        return require("../../../content/error/403").default;
       }
-      return require('../../../content/Login').default;
+      return require("../../../content/Login").default;
     }
     return route.component;
   }
@@ -409,18 +446,23 @@ class AbstractContextComponent extends AbstractComponent {
   /**
    * Creates react-router Routes components for this component (url).
    */
-  generateRouteComponents(match = this.props.match, location = this.props.location) {
-
+  generateRouteComponents(
+    match = this.props.match,
+    location = this.props.location
+  ) {
     // Found children routes definitions (items from routes.js for this component).
     const childRoutes = this._getRouteDefinitions(match);
     if (!childRoutes) {
       return null;
     }
     const childRoutesWithComponent = [];
-    childRoutes.forEach(route => {
+    childRoutes.forEach((route) => {
       if (!route.component) {
-        const routesWithComponent = this._getChildrenRoutesWithComponent(route, route.path);
-        routesWithComponent.forEach(routeWithComponent => {
+        const routesWithComponent = this._getChildrenRoutesWithComponent(
+          route,
+          route.path
+        );
+        routesWithComponent.forEach((routeWithComponent) => {
           childRoutesWithComponent.push(routeWithComponent);
         });
       } else {
@@ -440,11 +482,11 @@ class AbstractContextComponent extends AbstractComponent {
     const state = this.context.store.getState();
     // Active language will be used as part of component key.
     // Ensure recreation of component, when language will change.
-    const activeLng = state.config.get('i18nReady');
+    const activeLng = state.config.get("i18nReady");
 
     const routes = [];
     // Generate react-redux Router components.
-    childRoutesWithComponent.forEach(route => {
+    childRoutesWithComponent.forEach((route) => {
       const Component = this._getComponent(route);
 
       const routeChildRoutes = route.childRoutes;
@@ -462,25 +504,33 @@ class AbstractContextComponent extends AbstractComponent {
         // Since version 12.0.0 - I use search parameters in key too (location.search). Because we need to create component if search parameters change too.
         // For example for universal search, in situation when identity table is already opened and we want to set different filter value (by change URL).
         // Beware, this can be dangerous change (performance).
-        keyUrl = `${ location.pathname }-${ location.search }`;
+        keyUrl = `${location.pathname}-${location.search}`;
       }
-      const key = `${ route.id }${ keyUrl }${ activeLng }`;
-      routes.push(<Route
-        key={ key }
-        path={ this._getConcatPath(match.path, route.concatedPath ? route.concatedPath : route.path) }
-        render={ (props) => {
-          // Decode params
-          if (props.match && props.match.params) {
-            const params = props.match.params;
-            for (const param in params) {
-              if (params.hasOwnProperty(param)) {
-                const decodedParam = this.decodeURIComponentSafe(params[param]);
-                params[param] = decodedParam;
+      const key = `${route.id}${keyUrl}${activeLng}`;
+      routes.push(
+        <Route
+          key={key}
+          path={this._getConcatPath(
+            match.path,
+            route.concatedPath ? route.concatedPath : route.path
+          )}
+          render={(props) => {
+            // Decode params
+            if (props.match && props.match.params) {
+              const params = props.match.params;
+              for (const param in params) {
+                if (params.hasOwnProperty(param)) {
+                  const decodedParam = this.decodeURIComponentSafe(
+                    params[param]
+                  );
+                  params[param] = decodedParam;
+                }
               }
             }
-          }
-          return <Component { ...props }/>;
-        }}/>);
+            return <Component {...props} />;
+          }}
+        />
+      );
     });
     return routes;
   }
@@ -489,7 +539,7 @@ class AbstractContextComponent extends AbstractComponent {
     if (!s) {
       return s;
     }
-    return decodeURIComponent(s.replace(/%(?![0-9][0-9a-fA-F]+)/g, '%25'));
+    return decodeURIComponent(s.replace(/%(?![0-9][0-9a-fA-F]+)/g, "%25"));
   }
 
   /**
@@ -497,11 +547,7 @@ class AbstractContextComponent extends AbstractComponent {
    */
   getRoutes() {
     const routes = this.generateRouteComponents();
-    return (
-      <Switch>
-        { routes }
-      </Switch>
-    );
+    return <Switch>{routes}</Switch>;
   }
 
   /**
@@ -510,16 +556,20 @@ class AbstractContextComponent extends AbstractComponent {
    * @return {Boolean}
    */
   isDevelopment() {
-    return ConfigurationManager.getEnvironmentStage(this.context.store.getState()) === 'development';
+    return (
+      ConfigurationManager.getEnvironmentStage(
+        this.context.store.getState()
+      ) === "development"
+    );
   }
 }
 
 AbstractContextComponent.propTypes = {
-  ...AbstractComponent.propTypes
+  ...AbstractComponent.propTypes,
 };
 
 AbstractContextComponent.defaultProps = {
-  ...AbstractComponent.defaultProps
+  ...AbstractComponent.defaultProps,
 };
 
 AbstractContextComponent.contextType = IdmContext;
