@@ -161,7 +161,7 @@ export class ScriptArea extends AbstractFormComponent {
         onChange={this.onChange}
         value={this.state.value || ''}
         tabSize={4}
-        fontSize={14}
+        fontSize={16}
         spellcheck
         showGutter
         editorProps={{$blockScrolling: 'Infinity'}}
@@ -169,6 +169,7 @@ export class ScriptArea extends AbstractFormComponent {
           enableBasicAutocompletion: true,
           enableLiveAutocompletion: true
         }}
+        onLoad={function(editor){ editor.renderer.setPadding(10); editor.renderer.setScrollMargin(10); }}
       />);
   }
 
@@ -238,7 +239,7 @@ export class ScriptArea extends AbstractFormComponent {
           // className=  {labelClassName + "aaa"}
           className=  {labelClassName}
           readOnly={disabled || readOnly}
-          // label={ _label }
+          label={ _label }
           />
           {/* <div className= "aab"></div> */}
         <div className={componentSpan}>
