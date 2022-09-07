@@ -1,7 +1,7 @@
-import AbstractService from './AbstractService';
-import SearchParameters from '../domain/SearchParameters';
-import RestApiService from './RestApiService';
-import * as Utils from '../utils';
+import AbstractService from "./AbstractService";
+import SearchParameters from "../domain/SearchParameters";
+import RestApiService from "./RestApiService";
+import * as Utils from "../utils";
 
 /**
  * Scripts.
@@ -9,19 +9,18 @@ import * as Utils from '../utils';
  * @author Ondřej Kopr
  */
 class ScriptService extends AbstractService {
-
   getApiPath() {
-    return '/scripts';
+    return "/scripts";
   }
 
   getNiceLabel(entity) {
     if (!entity) {
-      return '';
+      return "";
     }
     if (entity.name === entity.code) {
       return entity.name;
     }
-    return `${ entity.name } (${ entity.code })`;
+    return `${entity.name} (${entity.code})`;
   }
 
   // dto
@@ -39,7 +38,11 @@ class ScriptService extends AbstractService {
    * @return {object} searchParameters
    */
   getDefaultSearchParameters() {
-    return super.getDefaultSearchParameters().setName(SearchParameters.NAME_QUICK).clearSort().setSort('name');
+    return super
+      .getDefaultSearchParameters()
+      .setName(SearchParameters.NAME_QUICK)
+      .clearSort()
+      .setSort("name");
   }
 
   /**
@@ -50,12 +53,13 @@ class ScriptService extends AbstractService {
    * @return {[type]}
    */
   scriptOperationById(id, operation) {
-    return RestApiService
-      .get(`${ this.getApiPath() }/${ encodeURIComponent(id) }/${ operation }`)
-      .then(response => {
+    return RestApiService.get(
+      `${this.getApiPath()}/${encodeURIComponent(id)}/${operation}`
+    )
+      .then((response) => {
         return response.json();
       })
-      .then(json => {
+      .then((json) => {
         if (Utils.Response.hasError(json)) {
           throw Utils.Response.getFirstError(json);
         }
@@ -63,8 +67,9 @@ class ScriptService extends AbstractService {
           throw Utils.Response.getFirstInfo(json);
         }
         return json;
-      }).catch((error) => {
-        if (error && error.statusEnum === 'SCRIPT_XML_FILE_NOT_FOUND') {
+      })
+      .catch((error) => {
+        if (error && error.statusEnum === "SCRIPT_XML_FILE_NOT_FOUND") {
           return error;
         }
         throw error;
@@ -73,7 +78,9 @@ class ScriptService extends AbstractService {
 
   // script references
   _getScriptReferences(scriptId) {
-    return RestApiService.get(`${ this.getApiPath() }/${ encodeURIComponent(scriptId) }/getScriptReferences`);
+    return RestApiService.get(
+      `${this.getApiPath()}/${encodeURIComponent(scriptId)}/getScriptReferences`
+    );
   }
 
   /**
@@ -84,15 +91,14 @@ class ScriptService extends AbstractService {
    * @since 10.6.0
    */
   deploy(formData) {
-    return RestApiService
-      .upload(`${ this.getApiPath() }/deploy`, formData)
-      .then(response => {
+    return RestApiService.upload(`${this.getApiPath()}/deploy`, formData)
+      .then((response) => {
         if (response.status === 204) {
           return {};
         }
         return response.json();
       })
-      .then(json => {
+      .then((json) => {
         if (Utils.Response.hasError(json)) {
           throw Utils.Response.getFirstError(json);
         }

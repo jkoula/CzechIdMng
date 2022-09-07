@@ -1,15 +1,15 @@
-import { combineReducers, compose, createStore, applyMiddleware } from 'redux';
-import log4js from 'log4js';
-import merge from 'object-assign';
-import Immutable from 'immutable';
-import filter from 'redux-localstorage-filter';
-import persistState, { mergePersistedState } from 'redux-localstorage';
-import ConfigLoader from 'czechidm-core/src/utils/ConfigLoader';
-import { Reducers } from 'czechidm-core';
-import thunkMiddleware from 'redux-thunk';
-import promiseMiddleware from 'redux-promise';
+import { combineReducers, compose, createStore, applyMiddleware } from "redux";
+import log4js from "log4js";
+import merge from "object-assign";
+import Immutable from "immutable";
+import filter from "redux-localstorage-filter";
+import persistState, { mergePersistedState } from "redux-localstorage";
+import ConfigLoader from "czechidm-core/src/utils/ConfigLoader";
+import { Reducers } from "czechidm-core";
+import thunkMiddleware from "redux-thunk";
+import promiseMiddleware from "redux-promise";
 // this parts are genetater dynamicaly to dist - after build will be packed by browserify to sources
-import config from '../dist/config.json';
+import config from "../dist/config.json";
 
 /**
  * Definition of the redux store.
@@ -21,25 +21,28 @@ import config from '../dist/config.json';
 log4js.configure({
   appenders: [
     {
-      type: 'console',
+      type: "console",
       layout: {
-        type: 'pattern',
+        type: "pattern",
         // pattern: '%d{ISO8601} [%-5p%] %c %m'
         // pattern: '%d{ISO8601} [%p] %n%m',
-        pattern: '[%p] %m'
-      }
-    }
+        pattern: "[%p] %m",
+      },
+    },
   ],
   // replaceConsole: true
 });
 const logger = log4js.getLogger();
-const level = ConfigLoader.getConfig('logger.level', !config.logger || !config.logger.level ? 'DEBUG' : config.logger.level);
+const level = ConfigLoader.getConfig(
+  "logger.level",
+  !config.logger || !config.logger.level ? "DEBUG" : config.logger.level
+);
 logger.setLevel(level);
 global.LOGGER = logger;
 
 // debug setting
 // global DEBUG is true only if is application compiled/runned via watchify task. When is application only build, then is always DEBUG set on FALSE.
-if (typeof DEBUG === 'undefined') {
+if (typeof DEBUG === "undefined") {
   global.DEBUG = true;
 }
 
@@ -54,9 +57,10 @@ function adapter(storage) {
     put: function put(key, value, callback) {
       try {
         //
-        if (value.messages) { // RT: flash messages are not persisted now => F5 => starts from scratch => prevent to see some obsolete error messages
+        if (value.messages) {
+          // RT: flash messages are not persisted now => F5 => starts from scratch => prevent to see some obsolete error messages
           value.messages.messages = value.messages.messages.toArray();
-          value.messages.messages.forEach(message => {
+          value.messages.messages.forEach((message) => {
             // prevent to persist react elements
             // FIXME: restore react fragment from text
             message.children = null;
@@ -82,7 +86,7 @@ function adapter(storage) {
       } catch (e) {
         callback(e);
       }
-    }
+    },
   };
 }
 
@@ -94,7 +98,7 @@ const reducersApp = combineReducers({
   logger: (state = logger) => {
     // TODO: can be moved to separate redecuer - now is inline
     return state;
-  }
+  },
 });
 //
 // persistent local storage
@@ -104,7 +108,7 @@ const reducer = compose(
     const result = merge({}, initialState, persistedState);
     if (persistedState.messages) {
       let composedMessages = new Immutable.OrderedMap({});
-      persistedState.messages.messages.forEach(message => {
+      persistedState.messages.messages.forEach((message) => {
         composedMessages = composedMessages.set(message.id, message);
       });
       result.messages.messages = composedMessages;
@@ -117,12 +121,12 @@ const reducer = compose(
 const storage = compose(
   filter([
     // 'messages.messages',    // RT: flash messages are not persisted now => F5 => starts from scratch => prevent to see some obsolete error messages
-    'security.userContext' // logged user context {username, token, etc}
+    "security.userContext", // logged user context {username, token, etc}
   ])
 )(adapter(window.localStorage));
 
 const createPersistentStore = compose(
-  persistState(storage, 'czechidm-storage')
+  persistState(storage, "czechidm-storage")
 )(createStore);
 
 // Sync dispatched route actions to the history
@@ -131,10 +135,10 @@ const createPersistentStore = compose(
 // before dispatch handler
 function dispatchTrace({ getState }) {
   return (next) => (action) => {
-    logger.trace('will dispatch', action);
+    logger.trace("will dispatch", action);
     // Call the next dispatch method in the middleware chain.
     const returnValue = next(action);
-    logger.trace('state after dispatch', getState());
+    logger.trace("state after dispatch", getState());
     // This will likely be the action itself, unless
     // a middleware further in chain changed it.
     return returnValue;
@@ -150,7 +154,7 @@ function reduxQueue({ dispatch, getState }) {
   const running = {}; // running queue ids
 
   function dequeue(key) {
-    const action = queues[key].find(a => {
+    const action = queues[key].find((a) => {
       return !running[key].has(a.id);
     });
     if (!action) {
@@ -159,18 +163,22 @@ function reduxQueue({ dispatch, getState }) {
     running[key] = running[key].add(action.id);
     //
     // execute action
-    action.callback(function next() {
-      queues[key].shift();
-      running[key] = running[key].delete(action.id);
-      if (queues[key].length > 0 && running[key].size < THREAD_COUNT) {
-        dequeue(key);
-      }
-    }, dispatch, getState);
+    action.callback(
+      function next() {
+        queues[key].shift();
+        running[key] = running[key].delete(action.id);
+        if (queues[key].length > 0 && running[key].size < THREAD_COUNT) {
+          dequeue(key);
+        }
+      },
+      dispatch,
+      getState
+    );
   }
   //
-  return next => action => {
+  return (next) => (action) => {
     const { queue: key, callback, id, type } = action || {};
-    if (type === 'RECEIVE_LOGIN') {
+    if (type === "RECEIVE_LOGIN") {
       // its needed to clear the queues after login (queues can contain incomplete requests)
       for (const queueKey in running) {
         if (!running.hasOwnProperty(queueKey)) {
@@ -181,11 +189,11 @@ function reduxQueue({ dispatch, getState }) {
     }
     //
     if (key) {
-      if (typeof callback !== 'function') {
-        throw new Error('Queued actions must have a <callback> property');
+      if (typeof callback !== "function") {
+        throw new Error("Queued actions must have a <callback> property");
       }
       if (!id) {
-        throw new Error('Queued actions must have a <id> property');
+        throw new Error("Queued actions must have a <id> property");
       }
       // Verify array at <key>
       queues[key] = queues[key] || [];
@@ -209,11 +217,16 @@ if (logger.isTraceEnabled()) {
   midlewares.push(dispatchTrace);
 }
 midlewares = [...midlewares, thunkMiddleware, promiseMiddleware, reduxQueue];
-const createStoreWithMiddleware = applyMiddleware(...midlewares)(createPersistentStore);
+const createStoreWithMiddleware = applyMiddleware(...midlewares)(
+  createPersistentStore
+);
 // redux store
 // const store = createStoreWithMiddleware(reducer);
 // const store = createStore(reducer);
-const store = createStoreWithMiddleware(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const store = createStoreWithMiddleware(
+  reducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+);
 // Required for replaying actions from devtools to work
 // reduxRouterMiddleware.listenForReplays(store);
 

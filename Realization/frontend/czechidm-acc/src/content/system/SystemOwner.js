@@ -39,8 +39,7 @@ class SystemOwner extends Advanced.AbstractTableContent {
   }
 
   showDetail(entity) {
-    super.showDetail(entity, () => {
-    });
+    super.showDetail(entity, () => {});
   }
 
   save = (entity, event) => {
@@ -49,30 +48,37 @@ class SystemOwner extends Advanced.AbstractTableContent {
   };
 
   render() {
-    const { uiKey,_showLoading,forceSearchParameters } = this.props;
+    const { uiKey, _showLoading, forceSearchParameters } = this.props;
     return (
       <Basic.Div>
         <Basic.Confirm ref="confirm-delete" level="danger" />
         <Advanced.Table
           ref="table"
           manager={manager}
-          uiKey = {uiKey}
+          uiKey={uiKey}
           forceSearchParameters={forceSearchParameters}
           showRowSelection={manager.canDelete()}
-          actions={
-            [
-              { value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false }
-            ]
-          }
+          actions={[
+            {
+              value: "delete",
+              niceLabel: this.i18n("action.delete.action"),
+              action: this.onDelete.bind(this),
+              disabled: false,
+            },
+          ]}
           buttons={[
             <Basic.Button
               level="success"
               key="add_button"
               className="btn-xs"
-              onClick={this.showDetail.bind(this, {system: this.props.match.params.entityId,})}>
+              onClick={this.showDetail.bind(this, {
+                system: this.props.match.params.entityId,
+              })}
+            >
               <Basic.Icon type="fa" icon="plus" /> {this.i18n("button.add")}
             </Basic.Button>,
-          ]}>
+          ]}
+        >
           <Advanced.Column
             header=""
             className="detail-button"
@@ -84,8 +90,8 @@ class SystemOwner extends Advanced.AbstractTableContent {
                   sort={false}
                 />
               );
-            }}>
-            </Advanced.Column>
+            }}
+          ></Advanced.Column>
           <Advanced.Column
             property="owner"
             sortProperty="owner.name"
@@ -112,36 +118,38 @@ class SystemOwner extends Advanced.AbstractTableContent {
           show={this.state.detail.show}
           onHide={this.closeDetail.bind(this)}
           backdrop="static"
-          keyboard={!_showLoading}>
+          keyboard={!_showLoading}
+        >
           <form onSubmit={this.save.bind({}, this)}>
             <Basic.Modal.Header
               closeButton={!_showLoading}
-              text={this.i18n("create.header")}/>
-            <Basic.Modal.Header
-              closeButton={!_showLoading}/>
+              text={this.i18n("create.header")}
+            />
+            <Basic.Modal.Header closeButton={!_showLoading} />
             <Basic.Modal.Body>
-              <Basic.AbstractForm
-                ref="form"
-                showLoading={_showLoading}>
+              <Basic.AbstractForm ref="form" showLoading={_showLoading}>
                 <SystemSelect
                   ref="system"
                   manager={systemManager}
                   label={this.i18n("acc:entity.SystemOwner.system.label")}
                   readOnly
-                  required/>
+                  required
+                />
                 <Advanced.IdentitySelect
                   ref="owner"
                   manager={identityManager}
                   label={this.i18n("acc:entity.SystemOwner.owner.label")}
                   helpBlock={this.i18n("acc:entity.SystemOwner.owner.help")}
-                  required/>
+                  required
+                />
               </Basic.AbstractForm>
             </Basic.Modal.Body>
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"
                 onClick={this.closeDetail.bind(this)}
-                showLoading={_showLoading}>
+                showLoading={_showLoading}
+              >
                 {this.i18n("button.close")}
               </Basic.Button>
               <Basic.Button
@@ -149,7 +157,8 @@ class SystemOwner extends Advanced.AbstractTableContent {
                 level="success"
                 showLoading={_showLoading}
                 showLoadingIcon
-                showLoadingText={this.i18n("button.saving")}>
+                showLoadingText={this.i18n("button.saving")}
+              >
                 {this.i18n("button.save")}
               </Basic.Button>
             </Basic.Modal.Footer>
@@ -160,8 +169,6 @@ class SystemOwner extends Advanced.AbstractTableContent {
   }
 }
 function select(state, props) {
-  return {
-  };
+  return {};
 }
 export default connect(select)(SystemOwner);
-
