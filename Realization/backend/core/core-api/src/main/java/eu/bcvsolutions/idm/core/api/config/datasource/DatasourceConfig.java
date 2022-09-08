@@ -84,7 +84,7 @@ public class DatasourceConfig {
             vendorAdapter.setGenerateDdl(true);
         }
         vendorAdapter.setGenerateDdl(true);
-        vendorAdapter.setShowSql(true);
+
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
 

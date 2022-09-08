@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -559,9 +560,16 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 
 	@Override
 	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA) {
+		return createAccountRoleAssignment(accAccountDto, roleA, null, null);
+	}
+
+	@Override
+	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to) {
 		AccAccountRoleAssignmentDto roleAssignmentDto = new AccAccountRoleAssignmentDto();
 		roleAssignmentDto.setAccount(accAccountDto.getId());
-		roleAssignmentDto.setRole(roleA.getId());
+		roleAssignmentDto.setRole(role.getId());
+		roleAssignmentDto.setValidFrom(from);
+		roleAssignmentDto.setValidTill(to);
 		return accAccountRoleAssignmentService.save(roleAssignmentDto);
 	}
 

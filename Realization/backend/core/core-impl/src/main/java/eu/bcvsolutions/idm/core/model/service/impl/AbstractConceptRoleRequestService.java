@@ -668,7 +668,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
     public void createAssignedRole(List<D> allApprovedConcepts, D concept,
             EntityEvent<IdmRoleRequestDto> requestEvent) {
         A identityRole = convertConceptRoleToIdentityRole(allApprovedConcepts, concept, null);
-        AbstractRoleAssignmentEvent<A> event = roleAssignmentService.getEventForAssignment(identityRole, AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE,  IdmAccountDto.SKIP_PROPAGATE, EntityEventManager.EVENT_PROPERTY_SKIP_SUB_ROLES);
+        AbstractRoleAssignmentEvent<A> event = roleAssignmentService.getEventForAssignment(identityRole, AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE,  IdmAccountDto.SKIP_PROPAGATE, EntityEventManager.EVENT_PROPERTY_SKIP_SUB_ROLES);
 
 
         // propagate event
@@ -765,7 +765,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
             addToLog(requestEvent.getContent(), message);
             save(concept);
 
-            final AbstractRoleAssignmentEvent<A> event = roleAssignmentService.getEventForAssignment(identityRole, AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE, IdmAccountDto.SKIP_PROPAGATE);
+            final AbstractRoleAssignmentEvent<A> event = roleAssignmentService.getEventForAssignment(identityRole, AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE, IdmAccountDto.SKIP_PROPAGATE);
 
             roleAssignmentService.publish(event, requestEvent);
             return event;

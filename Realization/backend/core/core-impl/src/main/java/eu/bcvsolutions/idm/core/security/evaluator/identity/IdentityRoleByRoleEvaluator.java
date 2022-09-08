@@ -11,6 +11,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment;
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -20,8 +22,6 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.security.api.domain.AuthorizationPolicy;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -40,7 +40,7 @@ import eu.bcvsolutions.idm.core.security.evaluator.AbstractTransitiveEvaluator;
  */
 @Component
 @Description("Permissions to assigned roles by roles (usable e.g. with can be requested permission).")
-public class IdentityRoleByRoleEvaluator extends AbstractTransitiveEvaluator<IdmIdentityRole> {
+public class IdentityRoleByRoleEvaluator extends AbstractTransitiveEvaluator<AbstractRoleAssignment> {
 
 	public static final String EVALUATOR_NAME = "core-identity-role-by-role-evaluator";
 	public static final String PARAMETER_CAN_BE_REQUESTED_ONLY = "can-be-requested-only"; // get can be requested permission only
@@ -54,7 +54,7 @@ public class IdentityRoleByRoleEvaluator extends AbstractTransitiveEvaluator<Idm
 	}
 	
 	@Override
-	protected Identifiable getOwner(IdmIdentityRole entity) {
+	protected Identifiable getOwner(AbstractRoleAssignment entity) {
 		return entity.getRole();
 	}
 	
@@ -64,7 +64,7 @@ public class IdentityRoleByRoleEvaluator extends AbstractTransitiveEvaluator<Idm
 	}
 	
 	@Override
-	public Predicate getPredicate(Root<IdmIdentityRole> root, CriteriaQuery<?> query, CriteriaBuilder builder, AuthorizationPolicy policy, BasePermission... permission) {
+	public Predicate getPredicate(Root<AbstractRoleAssignment> root, CriteriaQuery<?> query, CriteriaBuilder builder, AuthorizationPolicy policy, BasePermission... permission) {
 		if (!hasAuthority(securityService.getCurrentId(), policy, permission)) {
 			return null;
 		}
@@ -74,14 +74,14 @@ public class IdentityRoleByRoleEvaluator extends AbstractTransitiveEvaluator<Idm
 		subquery.select(subRoot);		
 		subquery.where(builder.and(
 				authorizationManager.getPredicate(subRoot, query, builder, permission),
-				builder.equal(root.get(IdmIdentityRole_.role), subRoot)
+				builder.equal(root.get(AbstractRoleAssignment_.role), subRoot)
 				));
 		//
 		return builder.exists(subquery);
 	}
 	
 	@Override
-	public Set<String> getPermissions(IdmIdentityRole entity, AuthorizationPolicy policy) {
+	public Set<String> getPermissions(AbstractRoleAssignment entity, AuthorizationPolicy policy) {
 		Set<String> permissions = super.getPermissions(entity, policy);
 		if (!isCanBeRequestedOnly(policy)) {
 			return super.getPermissions(entity, policy);

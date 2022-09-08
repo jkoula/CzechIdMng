@@ -52,4 +52,8 @@ public class IdmIdentityRoleFilter extends BaseRoleAssignmentFilter implements E
 		set(PARAMETER_CONTRACT_POSITION_ID, contractPositionId);
 	}
 
+	@Override
+	public void setOwnerId(UUID id) {
+		setIdentityContractId(id);
+	}
 }

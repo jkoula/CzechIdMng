@@ -102,56 +102,10 @@ public class IdentityContractDeleteProcessor
 		}
 		//
 		// Find all concepts and remove relation on contract
-		IdmConceptRoleRequestFilter conceptRequestFilter = new IdmConceptRoleRequestFilter();
-		conceptRequestFilter.setIdentityContractId(contractId);
-		conceptRequestService.find(conceptRequestFilter, null).getContent().forEach(concept -> {
-			String message = null;
-			if (concept.getState().isTerminatedState()) {
-				message = MessageFormat.format(
-						"IdentityContract [{0}] (requested in concept [{1}]) was deleted (not from this role request)!",
-						contractId, concept.getId());
-			} else {
-				message = MessageFormat.format(
-						"Request change in concept [{0}], was not executed, because requested IdentityContract [{1}] was deleted (not from this role request)!",
-						concept.getId(), contractId);
-				// Cancel concept and WF
-				concept = conceptRequestService.cancel(concept);
-			}
-			IdmRoleRequestDto request = roleRequestService.get(concept.getRoleRequest());
-			roleRequestService.addToLog(request, message);
-			conceptRequestService.addToLog(concept, message);
-			roleRequestService.save(request);
-			conceptRequestService.save(concept);
-		});
+		removeRelatedConcepts(contractId);
 		//
 		// delete referenced roles
-		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
-		identityRoleService.findAllByContract(contractId).forEach(identityRole -> {
-			// Sub roles are removed different way (processor on direct identity role),
-			// but automatic roles has to be removed in the same request.
-			if (identityRole.getDirectRole() == null) {			
-				IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
-				conceptRoleRequest.setIdentityRole(identityRole.getId());
-				conceptRoleRequest.setRole(identityRole.getRole());
-				conceptRoleRequest.setOperation(ConceptRoleRequestOperation.REMOVE);
-				conceptRoleRequest.setIdentityContract(contractId); // ignore not found
-				//
-				concepts.add(conceptRoleRequest);
-			}
-		});
-		if (forceDelete) { // ~ async with force
-			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(contract.getIdentity());
-			roleRequest.setConceptRoles(concepts);
-			//
-			RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
-			requestEvent.setPriority(PriorityType.HIGH);
-			//
-			roleRequestService.startConcepts(requestEvent, event);
-		} else {
-			// ~ sync
-			roleRequestService.executeConceptsImmediate(contract.getIdentity(), concepts);
-		}
+		removeRelatedAssignedRoles(event, contract, contractId, forceDelete);
 		// delete contract guarantees
 		IdmContractGuaranteeFilter filter = new IdmContractGuaranteeFilter();
 		filter.setIdentityContractId(contractId);
@@ -193,5 +147,56 @@ public class IdentityContractDeleteProcessor
 			service.deleteInternal(contract);
 		}
 		return new DefaultEventResult<>(event, this);
+	}
+
+	private void removeRelatedAssignedRoles(EntityEvent<IdmIdentityContractDto> event, IdmIdentityContractDto contract, UUID contractId, boolean forceDelete) {
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
+		identityRoleService.findAllByContract(contractId).forEach(identityRole -> {
+			// Sub roles are removed different way (processor on direct identity role),
+			// but automatic roles has to be removed in the same request.
+			if (identityRole.getDirectRole() == null) {
+				IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
+				conceptRoleRequest.setIdentityRole(identityRole.getId());
+				conceptRoleRequest.setRole(identityRole.getRole());
+				conceptRoleRequest.setOperation(ConceptRoleRequestOperation.REMOVE);
+				conceptRoleRequest.setIdentityContract(contractId); // ignore not found
+				//
+				concepts.add(conceptRoleRequest);
+			}
+		});
+		if (forceDelete) { // ~ async with force
+			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
+			roleRequest.setApplicant(contract.getIdentity());
+			roleRequest.setConceptRoles(concepts);
+			//
+			RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
+			requestEvent.setPriority(PriorityType.HIGH);
+			//
+			roleRequestService.startConcepts(requestEvent, event);
+		} else {
+			// ~ sync
+			roleRequestService.executeConceptsImmediate(contract.getIdentity(), concepts);
+		}
+	}
+
+	private void removeRelatedConcepts(UUID contractId) {
+		IdmConceptRoleRequestFilter conceptRequestFilter = new IdmConceptRoleRequestFilter();
+		conceptRequestFilter.setIdentityContractId(contractId);
+		conceptRequestService.find(conceptRequestFilter, null).getContent().forEach(concept -> {
+			String message = null;
+			if (concept.getState().isTerminatedState()) {
+				message = MessageFormat.format(
+						"IdentityContract [{0}] (requested in concept [{1}]) was deleted (not from this role request)!", contractId, concept.getId());
+			} else {
+				message = MessageFormat.format(
+						"Request change in concept [{0}], was not executed, because requested IdentityContract [{1}] was deleted (not from this role request)!",
+						concept.getId(), contractId);
+				// Cancel concept and WF
+				concept = conceptRequestService.cancel(concept);
+			}
+			IdmRoleRequestDto request = roleRequestService.get(concept.getRoleRequest());
+			roleRequestService.addToLog(request, message);
+			conceptRequestService.addToLog(concept, message);
+		});
 	}
 }

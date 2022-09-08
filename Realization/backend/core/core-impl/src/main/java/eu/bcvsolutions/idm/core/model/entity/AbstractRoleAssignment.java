@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.model.entity;
 
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
@@ -17,7 +18,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class AbstractRoleAssignment extends AbstractEntity implements FormableEntity, ValidableEntity {
+public class AbstractRoleAssignment extends AbstractEntity implements FormableEntity, ValidableEntity, Identifiable {
 
     @NotNull
     @Audited

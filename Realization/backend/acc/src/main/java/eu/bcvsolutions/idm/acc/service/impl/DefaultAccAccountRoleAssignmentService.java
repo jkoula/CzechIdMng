@@ -1,9 +1,12 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment_;
+import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.event.AccAccountRoleAssignmentEvent;
@@ -18,10 +21,15 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractRoleAssignmentService;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +60,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
 
     @Override
     public AuthorizableType getAuthorizableType() {
-        //TODO
-        return null;
+        return new AuthorizableType(AccGroupPermission.ACCOUNTROLEASSIGNMENT, getEntityClass());
     }
 
     @Override
@@ -75,6 +82,17 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     protected List<Predicate> toPredicates(Root<AccAccountRoleAssignment> root, CriteriaQuery<?> query, CriteriaBuilder builder, AccAccountRoleAssignmentFilter filter) {
         final List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
         //
+        String text = filter.getText();
+        if (StringUtils.isNotEmpty(text)) {
+            text = text.toLowerCase();
+            predicates.add(
+                    builder.like(
+                            builder.lower(root.get(AccAccountRoleAssignment_.account).get(AccAccount_.uid)),
+                            "%" + text + "%")
+            );
+        }
+
+
         Boolean valid = filter.getValid();
         if (valid != null) {
             // Only valid account-role

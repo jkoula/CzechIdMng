@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-@Relation
+@Relation(collectionRelation = "accountRoleAssignments")
 public class AccAccountRoleAssignmentDto extends AbstractRoleAssignmentDto {
 
     private static final long serialVersionUID = 1L;

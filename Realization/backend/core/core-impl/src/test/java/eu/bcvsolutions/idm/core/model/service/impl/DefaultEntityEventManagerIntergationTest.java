@@ -799,9 +799,12 @@ public class DefaultEntityEventManagerIntergationTest extends AbstractIntegratio
 			Assert.assertEquals(transactionId, events.get(0).getTransactionId());
 			Assert.assertEquals(identity.getId(), events.get(0).getSuperOwnerId());
 			//
-			filter.setOwnerId(assignedRoles.get(0).getId());
-			filter.setEventType(AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE.name());
-			events = entityEventService.find(filter, null).getContent();
+			IdmEntityEventFilter filter2 = new IdmEntityEventFilter();
+			events = entityEventService.find(filter2, null).getContent();
+			filter2.setOwnerId(assignedRoles.get(0).getId());
+			events = entityEventService.find(filter2, null).getContent();
+			filter2.setEventType(AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE.name());
+			events = entityEventService.find(filter2, null).getContent();
 			Assert.assertEquals(1, events.size());
 			Assert.assertEquals(transactionId, events.get(0).getTransactionId());
 			Assert.assertEquals(identity.getId(), events.get(0).getSuperOwnerId());

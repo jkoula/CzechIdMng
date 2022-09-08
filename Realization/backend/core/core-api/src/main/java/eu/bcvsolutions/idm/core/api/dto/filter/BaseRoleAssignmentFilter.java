@@ -160,4 +160,6 @@ public abstract class BaseRoleAssignmentFilter extends DataFilter {
     public void setIdentityId(UUID identityId) {
     	set(BaseRoleAssignmentFilter.PARAMETER_IDENTITY_ID, identityId);
     }
+
+    public abstract void setOwnerId(UUID id);
 }

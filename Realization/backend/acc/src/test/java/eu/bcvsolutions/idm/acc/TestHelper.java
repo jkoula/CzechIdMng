@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.AccountType;
@@ -266,4 +267,6 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	void deleteSystem(UUID systemId);
 
     AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA);
+
+    AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to);
 }
