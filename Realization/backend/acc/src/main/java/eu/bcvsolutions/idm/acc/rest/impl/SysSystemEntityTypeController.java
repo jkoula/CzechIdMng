@@ -58,18 +58,34 @@ public class SysSystemEntityTypeController implements BaseController {
 		return new PagedResources<>(systemEntityTypes,
 				new PageMetadata(systemEntityTypes.size(), 0, systemEntityTypes.size(), 1));
 	}
-	
+
 	@ResponseBody
 	@GetMapping(value = "/{backendId}")
 	@ApiOperation(
-			value = "System entity type detail", 
-			nickname = "getSupportedSystemEntityType", 
-			response = SystemEntityTypeRegistrableDto.class, 
+			value = "System entity type detail",
+			nickname = "getSupportedSystemEntityType",
+			response = SystemEntityTypeRegistrableDto.class,
 			tags = { SysSystemEntityTypeController.TAG })
 	public ResponseEntity<?> get(
 			@ApiParam(value = "System entity type code.", required = true)
 			@PathVariable @NotNull String backendId) {
 		SystemEntityTypeRegistrableDto systemEntityType = systemEntityTypeManager.getSystemEntityDtoByCode(backendId);
+		return new ResponseEntity<>(toResource(systemEntityType), HttpStatus.OK);
+	}
+
+	@ResponseBody
+	@GetMapping(value = "/{backendId}/{systemMappingId}")
+	@ApiOperation(
+			value = "System entity type detail by mapping",
+			nickname = "getSupportedSystemEntityTypeByMapping",
+			response = SystemEntityTypeRegistrableDto.class, 
+			tags = { SysSystemEntityTypeController.TAG })
+	public ResponseEntity<?> get(
+			@ApiParam(value = "System entity type code.", required = true)
+			@PathVariable @NotNull String backendId,
+			@ApiParam(value = "System mapping id", required = true)
+			@PathVariable @NotNull String systemMappingId) {
+		SystemEntityTypeRegistrableDto systemEntityType = systemEntityTypeManager.getSystemEntityDtoByCode(backendId, systemMappingId);
 		return new ResponseEntity<>(toResource(systemEntityType), HttpStatus.OK);
 	}
 	

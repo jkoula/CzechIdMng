@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.system.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
@@ -19,4 +20,8 @@ public interface SystemEntityTypeRegistrable {
 	boolean isSupportsSync();
 	
 	List<String> getSupportedAttributes();
+
+	default List<String> getAdditionalAttributes(String mappingId) {
+		return new ArrayList<>();
+	}
 }

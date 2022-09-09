@@ -16,6 +16,29 @@ export default class SystemEntityTypeService extends Services.AbstractService {
     }
 
     /**
+     * Returns options by type by given id and mapping
+     *
+     * @param  {string|number} id of type
+     * @param  {string|number} id of mapping
+     * @return {Promise} promise with response
+     */
+    getByIdAndMapping(id, systemMappingId) {
+        return Services.RestApiService
+        .get(`${ this.getApiPath() }/${ encodeURIComponent(id) }/${ encodeURIComponent(systemMappingId) }`)
+        .then(response => {
+            return response.json();
+        })
+        .then(json => {
+            if (Utils.Response.hasError(json)) {
+            throw Utils.Response.getFirstError(json);
+            }
+            return json;
+        }).catch(ex => {
+            throw this._resolveException(ex);
+        });
+    }
+
+    /**
      * Loads all registered tasks (available for scheduling)
      *
      * @return {promise}

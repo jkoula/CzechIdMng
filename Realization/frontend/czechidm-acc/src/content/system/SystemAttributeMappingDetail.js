@@ -3,6 +3,7 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import Joi from 'joi';
+import i18next from 'i18next';
 //
 import { Advanced, Basic, Domain, Enums, Managers, Utils } from 'czechidm-core';
 import MappingContextCompleters from 'czechidm-core/src/content/script/completers/MappingContextCompleters';
@@ -78,7 +79,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
    * @param  props - properties of component - props For didmount call is this.props for call from willReceiveProps is nextProps.
    */
   _initComponent(props) {
-    const { attributeId} = props.match.params;
+    const { attributeId } = props.match.params;
     if (this._getIsNew(props)) {
       this.setState({
         attribute: {
@@ -91,10 +92,10 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
       });
     } else {
       this.context.store.dispatch(this.getManager().fetchEntity(attributeId, null, (entity, error) => {
-        if (entity && entity.entityType) {
-          this.context.store.dispatch(systemEntityTypeManager.fetchEntity(entity.entityType));
+        if (entity && entity.entityType && entity.systemMapping) {
+          this.context.store.dispatch(systemEntityTypeManager.fetchEntityByMapping(entity.entityType, entity.systemMapping));
         } else if (entity && entity._embedded.systemMapping) {
-          this.context.store.dispatch(systemEntityTypeManager.fetchEntity(entity._embedded.systemMapping.entityType, null, (type) => {
+          this.context.store.dispatch(systemEntityTypeManager.fetchEntityByMapping(entity._embedded.systemMapping.entityType, entity.systemMapping, null, (type) => {
             if (entity.entityAttribute) {
               const option = this.createSystemEntityTypeOption(type.module, type.systemEntityCode, entity.idmPropertyName);
               this.refs.idmPropertyEnum.setValue(option);
@@ -304,6 +305,9 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
 
   localizeAttributeOptionValue(value, entityType, module) {
     if (value && entityType && module) {
+      if (!i18next.exists(`${module}:entity.SystemEntityType.${entityType}.attributes.${value}`)) {
+        return value;
+      }
       return this.i18n(`${module}:entity.SystemEntityType.${entityType}.attributes.${value}`);
     }
 
@@ -367,7 +371,7 @@ class SystemAttributeMappingDetail extends Advanced.AbstractTableContent {
     const _showNoRepositoryAlert = (!_isExtendedAttribute && !_isEntityAttribute);
 
     const _idmPropertyNameKey = _idmPropertyName !== undefined ? _idmPropertyName : attribute.idmPropertyName;
-    const propertyHelpBlockLabel = this.props._attribute.entityAttribute ? this.getHelpBlockLabel(_idmPropertyNameKey, entityType, module) : '';
+    const propertyHelpBlockLabel = attribute.entityAttribute ? this.getHelpBlockLabel(_idmPropertyNameKey, entityType, module) : '';
     const _isRequiredIdmField = (_isEntityAttribute || _isExtendedAttribute) && !_isDisabled && !passwordAttribute;
     const isSynchronization = !!(_systemMapping && _systemMapping.operationType && _systemMapping.operationType === 'SYNCHRONIZATION');
     const strategyTypeTemp = strategyType || attribute.strategyType;

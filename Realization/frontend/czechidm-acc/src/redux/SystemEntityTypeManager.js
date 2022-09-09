@@ -29,6 +29,40 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
     }
 
     /**
+     * Load entity options for specific mapping
+     *
+     * @param  {string|number} id - Entity identifier
+     * @param  {string|number} systemMappingId - System mapping id
+     * @param  {string} uiKey = null - ui key for loading indicator etc
+     * @param  {func} cb - function will be called after entity is fetched
+     * @return {object} - action
+     */
+     fetchEntityByMapping(id, systemMappingId, uiKey = null, cb = null) {
+        console.log("asdfas");
+        return (dispatch, getState) => {
+        if (getState().security.userContext.isExpired) {
+            return dispatch({
+            type: EMPTY
+            });
+        }
+        //
+        uiKey = this.resolveUiKey(uiKey, id);
+        dispatch(this.requestEntity(id, uiKey));
+        
+        this.getService()
+            .getByIdAndMapping(id, systemMappingId)
+            .then(json => {
+            dispatch(this.queueFetchPermissions(id, uiKey, () => {
+                dispatch(this.receiveEntity(id, json, uiKey, cb));
+            }));
+            })
+            .catch(error => {
+            dispatch(this.receiveError({ id }, uiKey, error, cb));
+            });
+        };
+    }
+
+    /**
     * Loads registered system entity types
     *
     * @return {action}

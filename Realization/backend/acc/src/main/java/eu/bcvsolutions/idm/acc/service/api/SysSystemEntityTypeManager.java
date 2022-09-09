@@ -15,4 +15,6 @@ public interface SysSystemEntityTypeManager {
 	List<SystemEntityTypeRegistrableDto> getSupportedEntityTypes();
 	
 	SystemEntityTypeRegistrableDto getSystemEntityDtoByCode(String code);
+
+	SystemEntityTypeRegistrableDto getSystemEntityDtoByCode(String code, String mappingId);
 }

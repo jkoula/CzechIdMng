@@ -1,7 +1,9 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,9 +60,21 @@ public class DefaultSysSystemEntityTypeManager implements SysSystemEntityTypeMan
 
 	@Override
 	public SystemEntityTypeRegistrableDto getSystemEntityDtoByCode(String code) {
+		return getSystemEntityDtoByCode(code, null);
+	}
+
+	@Override
+	public SystemEntityTypeRegistrableDto getSystemEntityDtoByCode(String code, String mappingId) {
 		SystemEntityTypeRegistrable systemEntityType = this.getSystemEntityByCode(code);
 		final SystemEntityTypeRegistrableDto systemEntityTypeDto = new SystemEntityTypeRegistrableDto();
 		mapper.map(systemEntityType, systemEntityTypeDto);
+		// add additional attributes if there are some
+		if (systemEntityTypeDto.getSupportedAttributes() == null) {
+			systemEntityTypeDto.setSupportedAttributes(new ArrayList<>());
+		}
+		if (StringUtils.isNotBlank(mappingId)) {
+			systemEntityTypeDto.getSupportedAttributes().addAll(systemEntityType.getAdditionalAttributes(mappingId));
+		}
 		return systemEntityTypeDto;
 	}
 }
