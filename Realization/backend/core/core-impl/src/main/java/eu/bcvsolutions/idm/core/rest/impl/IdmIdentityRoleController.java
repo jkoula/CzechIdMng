@@ -67,7 +67,7 @@ import io.swagger.annotations.AuthorizationScope;
 		consumes = MediaType.APPLICATION_JSON_VALUE)
 public class IdmIdentityRoleController extends AbstractReadWriteDtoController<IdmIdentityRoleDto, IdmIdentityRoleFilter> {
 	
-	protected static final String TAG = "Identity roles ~ assigned roles";
+	public static final String TAG = "Identity roles ~ assigned roles";
 	//
 	@Autowired private IdmFormDefinitionController formDefinitionController;
 	@Autowired private IdmRoleService roleService;
