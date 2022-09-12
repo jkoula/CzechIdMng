@@ -679,6 +679,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setUid(uid);
 		accountFilter.setSystemId(roleSystem.getSystem());
+		accountFilter.setSystemMapping(mapping.getId());
 		List<AccAccountDto> sameAccounts = accountService.find(accountFilter, null).getContent();
 		if (CollectionUtils.isEmpty(sameAccounts)) {
 			// Create and persist new account
@@ -691,6 +692,14 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	}
 
 	private AccAccountDto createAccount(String uid, SysRoleSystemDto roleSystem, UUID mappingId) {
+		AccAccountFilter accountFilter = new AccAccountFilter();
+		accountFilter.setUid(uid);
+		long numberOfAccountWithSameUid = accountService.count(accountFilter);
+		if (numberOfAccountWithSameUid > 0) {
+			throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,
+					ImmutableMap.of("uid", uid, "account", "", "system", roleSystem.getSystem(), "mapping", mappingId));
+		}
+
 		AccAccountDto account = new AccAccountDto();
 		account.setUid(uid);
 		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
@@ -751,18 +760,20 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		// check if account should be provisioned based on role mapping, must be same as the one for account
 		AccAccountDto accountDto = DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.account, AccAccountDto.class, null);
 		long accountWithSameMapping = 0;
-		UUID accountSystem = null;
-		UUID accountId = null;
-		String accountUid = null;
+		String accountSystem = "";
+		String accountId = "";
+		String accountMappingId = "";
+		String accountUid = "";
 		if (accountDto != null) {
-			accountSystem = accountDto.getSystem();
-			accountId = accountDto.getId();
+			accountSystem = accountDto.getSystem() != null ? accountDto.getSystem().toString() : "";
+			accountId = accountDto.getId() != null ? accountDto.getId().toString() : "";
 			accountUid = accountDto.getUid();
+			accountMappingId = accountDto.getSystemMapping() != null ? accountDto.getSystemMapping().toString() : "";
 
 			IdmIdentityRoleDto idmIdentityRoleDto = identityRoleService.get(identityAccount.getIdentityRole());
 			SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
 			roleSystemFilter.setRoleId(idmIdentityRoleDto.getRole());
-			roleSystemFilter.setSystemId(accountSystem);
+			roleSystemFilter.setSystemId(accountDto.getSystem());
 			roleSystemFilter.setSystemMappingId(accountDto.getSystemMapping());
 			accountWithSameMapping = roleSystemService.count(roleSystemFilter);
 		}
@@ -777,7 +788,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			}
 		} else {
 			throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,
-					ImmutableMap.of("uid", accountUid, "account", accountId, "system", accountSystem));
+					ImmutableMap.of("uid", accountUid, "account", accountId, "system", accountSystem, "mapping", accountMappingId));
 		}
 	}
 	

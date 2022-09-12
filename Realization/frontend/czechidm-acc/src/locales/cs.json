@@ -3809,7 +3809,7 @@
     },
     "PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS": {
       "title": "Duplicitní uid pro účet!",
-      "message": "Uid [{{uid}}] již existuje. Změňte uid pro účet [{{account}}] na systému [{{system}}]"
+      "message": "Uid [{{uid}}] již existuje. Změňte uid pro účet [{{account}}] na systému [{{system}}] v mapování [{{mapping}}]"
     },
     "SYSTEM_MAPPING_NOT_FOUND": {
       "title": "Nenalezeno systémové mapování",

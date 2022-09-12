@@ -1359,7 +1359,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			List<UUID> content = accountService.findIds(accountFilter, null).getContent();
 			if (content.size() > 0 && !content.get(0).equals(account.getId())) {
 				throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,
-						ImmutableMap.of("uid", uidValue, "account", account.getId(), "system", account.getSystem()));
+						ImmutableMap.of("uid", uidValue, "account", account.getId(), "system", account.getSystem(), "mapping", account.getSystemMapping()));
 			}
 			account = accountService.save(account);
 		}
