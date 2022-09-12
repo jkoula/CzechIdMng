@@ -1864,7 +1864,7 @@
     "AccountTypeEnum": {
       "PERSONAL": "Osobní",
       "PERSONAL_OTHER": "Osobní další účet",
-      "TECHNICAL": "Systémový"
+      "TECHNICAL": "Technický"
     },
     "ReconciliationMissingAccountActionTypeEnum": {
       "CREATE_ACCOUNT": "Vytvořit účet",
