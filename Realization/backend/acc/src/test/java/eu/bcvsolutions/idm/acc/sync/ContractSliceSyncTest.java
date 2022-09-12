@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testng.collections.Lists;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
@@ -76,6 +75,7 @@ import eu.bcvsolutions.idm.acc.service.impl.ContractSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmAuditFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractSliceDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -1154,7 +1154,7 @@ public class ContractSliceSyncTest extends AbstractIntegrationTest {
 		helper.startSynchronization(config);
 
 		slices = contractSliceService.find(filter, null).getContent();
-		assertEquals(3, slices.size());
+		assertEquals(2, slices.size());
 
 		for (IdmContractSliceDto slice : slices) {
 			if ("2".equals(slice.getDescription())) {
@@ -1174,11 +1174,10 @@ public class ContractSliceSyncTest extends AbstractIntegrationTest {
 			}
 		}
 
+		// the original contract was deleted and a new one was not created
+		// because HR processes are turned off
 		contracts = contractService.findAllByIdentity(identity.getId());
-		assertEquals(1, contracts.size());
-		IdmIdentityContractDto contract = contracts.get(0);
-		assertEquals(LocalDate.now().minusDays(20), contract.getValidFrom());
-		assertEquals(null, contract.getValidTill());
+		assertEquals(0, contracts.size());
 
 		// some tests expect data as contract slice with id 1. Just for sure we clear test slices
 		slices = contractSliceService.find(filter, null).getContent();
