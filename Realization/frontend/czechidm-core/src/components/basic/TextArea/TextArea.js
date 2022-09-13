@@ -14,6 +14,12 @@ class TextArea extends TextField {
   }
 
   onChange(event) {
+   
+    if(this.props.notEdit){
+      event.preventDefault();
+      return;
+    }
+    
     super.onChange(event);
     this.setState({
       isTrimmableWarning: this.isAnyLineTrimmable(event.target.value)

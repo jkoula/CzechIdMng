@@ -709,7 +709,12 @@
         "result": {
           "header": "Result",
           "code": "Code"
-        }
+        },
+        "button": "Copy",
+        "textCopy": "Text copied to clipboard",
+        "copyClipboard": "Copy to clipboard",
+        "wrapOn": "Turn on line wrapping",
+        "wrapOff": "Turn off line wrapping"
       },
       "CreatableSelectBox": {
         "textCreator": "Create a new filtering option: [{{value}}]?",

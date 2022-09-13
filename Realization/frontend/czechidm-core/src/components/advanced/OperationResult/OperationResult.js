@@ -1,28 +1,28 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import React from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 //
-import * as Basic from '../../basic';
-import OperationStateEnum from '../../../enums/OperationStateEnum';
-import { AttachmentService } from '../../../services';
-import OperationResultDownloadButton from './OperationResultDownloadButton';
+import * as Basic from "../../basic";
+import OperationStateEnum from "../../../enums/OperationStateEnum";
+import { AttachmentService } from "../../../services";
+import OperationResultDownloadButton from "./OperationResultDownloadButton";
 
 /**
-* Operation result component - shows enum value and result code with flash message
-*
-* @author Radek Tomiška
-* @author Patrik Stloukal
-*
-*/
+ * Operation result component - shows enum value and result code with flash message
+ *
+ * @author Radek Tomiška
+ * @author Patrik Stloukal
+ *
+ */
 export default class OperationResult extends Basic.AbstractContextComponent {
-
   constructor(props, context) {
     super(props, context);
     this.attachmentService = new AttachmentService();
+    this.state = { toggle: true };
   }
 
   getComponentKey() {
-    return 'component.advanced.OperationResult';
+    return "component.advanced.OperationResult";
   }
 
   _getLevel(level, message) {
@@ -44,24 +44,32 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     const _level = this._getLevel(level, message);
     //
     return (
-      <Basic.Div style={{ whiteSpace: 'nowrap' }}>
+      <Basic.Div style={{ whiteSpace: "nowrap" }}>
         <Basic.EnumValue
-          level={ _level }
-          value={ value.state }
-          enum={ OperationStateEnum }
-          label={ stateLabel || (message && message.level === 'info' && value.state === 'EXCEPTION' ? this.i18n('label.warning') : null) } />
+          level={_level}
+          value={value.state}
+          enum={OperationStateEnum}
+          label={
+            stateLabel ||
+            (message && message.level === "info" && value.state === "EXCEPTION"
+              ? this.i18n("label.warning")
+              : null)
+          }
+        />
         <Basic.Popover
           ref="popover"
-          trigger={['click']}
-          value={ this._getPopoverContent() }
+          trigger={["click"]}
+          value={this._getPopoverContent()}
           className="abstract-entity-info-popover"
-          rendered={ value.code !== null && value.code !== undefined }>
+          rendered={value.code !== null && value.code !== undefined}
+        >
           <Basic.Button
             level="info"
             buttonSize="xs"
             style={{ padding: 0, marginLeft: 3 }}
-            title={ this.i18n('link.popover.title') }
-            icon="fa:info-circle"/>
+            title={this.i18n("link.popover.title")}
+            icon="fa:info-circle"
+          />
         </Basic.Popover>
       </Basic.Div>
     );
@@ -77,42 +85,40 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     //
     const linkLabel = (
       <span>
-        <Basic.Icon value="fa:angle-double-right"/>
-        {' '}
-        {this.i18n('link.detail.label')}
+        <Basic.Icon value="fa:angle-double-right" />{" "}
+        {this.i18n("link.detail.label")}
       </span>
     );
     //
+
     return (
       <Basic.Panel>
         <Basic.PanelBody style={{ padding: 2 }}>
           <Basic.FlashMessage
-            message={ this.getFlashManager().convertFromResultModel(value.model) }
-            style={{ wordWrap: 'break-word', margin: 0 }}/>
+            message={this.getFlashManager().convertFromResultModel(value.model)}
+            style={{ wordWrap: "break-word", margin: 0 }}
+          />
         </Basic.PanelBody>
         {/* RT: hidden - show as collapse, tooltip instead? */}
-        <Basic.PanelBody rendered={ value.model !== null } style={{ display: 'none' }}>
-          { this.i18n('result.code') }
-          {': '}
-          { value.code }
+        <Basic.PanelBody
+          rendered={value.model !== null}
+          style={{ display: "none" }}
+        >
+          {this.i18n("result.code")}
+          {": "}
+          {value.code}
         </Basic.PanelBody>
-        {
-          !detailLink
-          ||
+        {!detailLink || (
           <Basic.PanelFooter>
-            {
-              typeof detailLink === 'function'
-              ?
-              <a href="#" onClick={ this._showDetail.bind(this) }>
-                { linkLabel }
+            {typeof detailLink === "function" ? (
+              <a href="#" onClick={this._showDetail.bind(this)}>
+                {linkLabel}
               </a>
-              :
-              <Link to={ detailLink }>
-                { linkLabel }
-              </Link>
-            }
+            ) : (
+              <Link to={detailLink}>{linkLabel}</Link>
+            )}
           </Basic.PanelFooter>
-        }
+        )}
       </Basic.Panel>
     );
   }
@@ -127,52 +133,106 @@ export default class OperationResult extends Basic.AbstractContextComponent {
     // use link function
     this.props.detailLink();
   }
+  // Wrap button
+  onWrap = () => {
+    this.setState({ toggle: !this.state.toggle });
+  };
+  // Copy button
+  onCopy = (i) => {
+    navigator.clipboard.writeText(i.stackTrace);
+    this.addMessage({
+      level: "success",
+      message: this.i18n(`textCopy`),
+    });
+  };
 
   /**
    * Renders full info card (with exception stacktrace etc.)
    */
   _renderFull() {
-    const { value, stateLabel, level, header, downloadLinkPrefix, downloadLinkSuffix } = this.props;
+    const {
+      value,
+      stateLabel,
+      level,
+      header,
+      downloadLinkPrefix,
+      downloadLinkSuffix,
+    } = this.props;
     const message = this.getFlashManager().convertFromResultModel(value.model);
     const _level = this._getLevel(level, message);
     //
+
     return (
       <Basic.Div>
-        <Basic.ContentHeader text={ header === null ? this.i18n('result.header') : header }/>
+        <Basic.ContentHeader
+          text={header === null ? this.i18n("result.header") : header}
+        />
 
         <Basic.Div style={{ marginBottom: 15 }}>
-          <Basic.Div style={{ float: 'left' }}>
+          <Basic.Div style={{ float: "left" }}>
             <Basic.EnumValue
-              level={ _level }
-              value={ value.state }
-              enum={ OperationStateEnum }
-              label={ stateLabel || (message && message.level === 'info' && value.state === 'EXCEPTION' ? this.i18n('label.warning') : null) }/>
+              level={_level}
+              value={value.state}
+              enum={OperationStateEnum}
+              label={
+                stateLabel ||
+                (message &&
+                message.level === "info" &&
+                value.state === "EXCEPTION"
+                  ? this.i18n("label.warning")
+                  : null)
+              }
+            />
           </Basic.Div>
-          {
-            (!value || !value.code)
-            ||
-            <Basic.Div style={{ marginLeft: value.state ? 15 : 0, fontStyle: 'italic', float: 'right'}}>
-              { `${ this.i18n('result.code')}: ${ value.code}` }
+          {!value || !value.code || (
+            <Basic.Div
+              style={{
+                marginLeft: value.state ? 15 : 0,
+                fontStyle: "italic",
+                float: "right",
+              }}
+            >
+              {`${this.i18n("result.code")}: ${value.code}`}
             </Basic.Div>
-          }
-          <Basic.Div className="clearfix"/>
-          <Basic.FlashMessage message={ message } style={{ margin: '15px 0 0 0' }}/>
+          )}
+          <Basic.Div className="clearfix" />
+          <Basic.FlashMessage
+            message={message}
+            style={{ margin: "15px 0 0 0" }}
+          />
           <OperationResultDownloadButton
-            style={{ marginTop: '15px' }}
-            downloadLinkPrefix={ downloadLinkPrefix }
-            downloadLinkSuffix={ downloadLinkSuffix }
-            operationResult={ value }/>
+            style={{ marginTop: "15px" }}
+            downloadLinkPrefix={downloadLinkPrefix}
+            downloadLinkSuffix={downloadLinkSuffix}
+            operationResult={value}
+          />
         </Basic.Div>
-        {
-          (!value || !value.stackTrace)
-          ||
+        {!value || !value.stackTrace || (
           <Basic.Div>
+            <Basic.Button
+              title={this.i18n("copyClipboard")}
+              className="customButton"
+              icon="fa:copy"
+              onClick={this.onCopy.bind(this, value)}
+            ></Basic.Button>
+            <Basic.Button
+              title={this.i18n(this.state.toggle ? "wrapOff" : "wrapOn")}
+              className="customButton"
+              onClick={this.onWrap.bind(this)}
+              icon={this.state.toggle ? "fa:angle-left" : "fa:angle-right"}
+            ></Basic.Button>
+
             <Basic.TextArea
               rows="10"
-              value={ value.stackTrace }
-              readOnly/>
+              value={value.stackTrace}
+              level="success"
+              notEdit
+              className={
+                this.state.toggle ? "customTextAre" : "customTextAreNot"
+              }
+            ></Basic.TextArea>
           </Basic.Div>
-        }
+        )}
       </Basic.Div>
     );
   }
@@ -183,13 +243,11 @@ export default class OperationResult extends Basic.AbstractContextComponent {
       return null;
     }
     if (showLoading) {
-      return (
-        <Basic.Icon value="refresh" showLoading />
-      );
+      return <Basic.Icon value="refresh" showLoading />;
     }
     //
     switch (face) {
-      case 'popover': {
+      case "popover": {
         return this._renderPopover();
       }
       default: {
@@ -197,7 +255,6 @@ export default class OperationResult extends Basic.AbstractContextComponent {
       }
     }
   }
-
 }
 
 OperationResult.propTypes = {
@@ -210,7 +267,7 @@ OperationResult.propTypes = {
   /**
    * Decorator
    */
-  face: PropTypes.oneOf(['popover', 'full']),
+  face: PropTypes.oneOf(["popover", "full"]),
   /**
    * Custom label
    */
@@ -220,14 +277,19 @@ OperationResult.propTypes = {
    *
    * @since 11.2.0
    */
-  level: PropTypes.oneOf(['default', 'success', 'warning', 'info', 'danger', 'error', 'primary']),
+  level: PropTypes.oneOf([
+    "default",
+    "success",
+    "warning",
+    "info",
+    "danger",
+    "error",
+    "primary",
+  ]),
   /**
    * link to detail
    */
-  detailLink: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.func
-  ]),
+  detailLink: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   /**
    * Header text
    */
@@ -242,19 +304,19 @@ OperationResult.propTypes = {
    * Download link prefix for specific download url. Suffix can be used only with
    * prefix. Cant be used itself.
    */
-  downloadLinkSuffix: PropTypes.string
+  downloadLinkSuffix: PropTypes.string,
 };
 OperationResult.defaultProps = {
   ...Basic.AbstractContextComponent.defaultProps,
   value: null,
-  face: 'popover',
+  face: "popover",
   stateLabel: null,
   rendered: true,
   detailLink: null,
   header: null, // default text from component locale will be used
   downloadLinkPrefix: null,
   downloadLinkSuffix: null,
-  level: null
+  level: null,
 };
 
 OperationResult.PARTIAL_CONTENT_STATUS = 206;
