@@ -166,6 +166,61 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	}
 
 	@Test
+	public void createOtherAccountWithDifferentUidThenChangeUidMapping() {
+		IdmIdentityDto identity = helper.createIdentity();
+		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
+		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
+		SysSystemMappingDto mapping = helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
+		SysSystemAttributeMappingDto uidAttribute = systemAttributeMappingService.findBySystemMappingAndName(mapping.getId(), ATTRIBUTE_MAPPING_NAME);
+		uidAttribute.setTransformToResourceScript("return 'test_' + attributeValue");
+		systemAttributeMappingService.save(uidAttribute);
+
+		IdmRoleDto role = helper.createRole();
+		IdmRoleDto rolePersonal = helper.createRole();
+		helper.createRoleSystem(role, system, AccountType.PERSONAL);
+		helper.createRoleSystem(rolePersonal, system, AccountType.PERSONAL_OTHER);
+
+		AccAccountFilter accountFilter = new AccAccountFilter();
+		accountFilter.setIdentityId(identity.getId());
+		long accountsCount = accountService.count(accountFilter);
+		assertEquals(0, accountsCount);
+
+		helper.createIdentityRole(identity, role);
+		helper.createIdentityRole(identity, rolePersonal);
+
+		List<AccAccountDto> accounts = accountService.find(accountFilter, null).getContent();
+		assertEquals(2, accounts.size());
+
+		AccAccountDto account = accounts.stream().filter(accAccountDto -> accAccountDto.getUid().equals(identity.getUsername())).findFirst().orElse(null);
+		AccAccountDto account1 = accounts.stream().filter(accAccountDto -> !accAccountDto.getUid().equals(identity.getUsername())).findFirst().orElse(null);
+		assertNotNull(account);
+		assertNotNull(account1);
+		TestResource resource = helper.findResource(account.getUid());
+		TestResource resource1 = helper.findResource(account1.getUid());
+		assertNotNull(resource);
+		assertNotNull(resource1);
+		SysSystemMappingDto accountMapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
+		SysSystemMappingDto accountMapping1 = DtoUtils.getEmbedded(account1, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
+		assertNotNull(accountMapping);
+		assertNotNull(accountMapping1);
+		assertEquals(AccountType.PERSONAL_OTHER, accountMapping.getAccountType());
+		assertEquals(AccountType.PERSONAL, accountMapping1.getAccountType());
+
+		// remove transformation script
+		uidAttribute.setTransformToResourceScript(null);
+		systemAttributeMappingService.save(uidAttribute);
+
+		// Provisioning will fail, because account with same uid already exists
+		assertThrows(ResultCodeException.class, () -> provisioningService.doProvisioning(identity));
+
+		helper.deleteAllResourceData();
+		helper.deleteIdentity(identity.getId());
+		helper.deleteRole(role.getId());
+		helper.deleteRole(rolePersonal.getId());
+		helper.deleteSystem(system.getId());
+	}
+
+	@Test
 	public void createOtherAccountWithSameUid() {
 		IdmIdentityDto identity = helper.createIdentity();
 		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
