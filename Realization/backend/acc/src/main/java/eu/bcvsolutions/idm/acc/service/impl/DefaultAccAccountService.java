@@ -288,7 +288,7 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 		if (accountDto == null) {
 			return null;
 		}
-		if (context != null && accountDto.getEntityType().equals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE) && BooleanUtils.isTrue(context.getIncludeEcho())) {
+		if (context != null && IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(accountDto.getEntityType()) && BooleanUtils.isTrue(context.getIncludeEcho())) {
 			Map<String, BaseDto> embedded = accountDto.getEmbedded();
 			embedded.put(AccAccountDto.PROPERTY_ECHO, passwordFilterManager.getEcho(accountDto.getId()));
 		}
