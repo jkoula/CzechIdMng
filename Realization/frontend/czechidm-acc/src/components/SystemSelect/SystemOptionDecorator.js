@@ -5,8 +5,7 @@ import { Basic, Utils } from "czechidm-core";
  * @author Radek Tomiška
  * @since 10.1.0
  */
-export default class SystemOptionDecorator extends Basic.SelectBox
-  .OptionDecorator {
+export default class SystemOptionDecorator extends Basic.SelectBox.OptionDecorator {
   /**
    * Returns entity icon (null by default - icon will not be rendered)
    *
