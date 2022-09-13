@@ -711,10 +711,10 @@
           "code": "Code"
         },
         "button": "Copy",
-        "textCopy":"Text copied to clipboard",
+        "textCopy": "Text copied to clipboard",
         "copyClipboard":"Copy to clipboard",
-        "wrapOn":"Turn on line wrapping",
-        "wrapOff":"Turn off line wrapping"
+        "wrapOn": "Turn on line wrapping",
+        "wrapOff": "Turn off line wrapping"
       },
       "CreatableSelectBox": {
         "textCreator": "Create a new filtering option: [{{value}}]?",
