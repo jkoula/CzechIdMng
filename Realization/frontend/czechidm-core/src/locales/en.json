@@ -712,7 +712,7 @@
         },
         "button": "Copy",
         "textCopy": "Text copied to clipboard",
-        "copyClipboard":"Copy to clipboard",
+        "copyClipboard": "Copy to clipboard",
         "wrapOn": "Turn on line wrapping",
         "wrapOff": "Turn off line wrapping"
       },
