@@ -679,21 +679,23 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setUid(uid);
 		accountFilter.setSystemId(roleSystem.getSystem());
-		accountFilter.setSystemMapping(mapping.getId());
 		List<AccAccountDto> sameAccounts = accountService.find(accountFilter, null).getContent();
-		if (CollectionUtils.isEmpty(sameAccounts)) {
-			// Create and persist new account
-			return createAccount(uid, roleSystem, mapping.getId());
-		} else {
+		// If account with same uid exists, we can say it's the same as the one that should be created only
+		// if the original account has no mappingId, in other cases we need to compare mappingId
+		if (!CollectionUtils.isEmpty(sameAccounts) && (sameAccounts.get(0).getSystemMapping() == null ||
+				sameAccounts.get(0).getSystemMapping().equals(mapping.getId()))) {
 			// We use existed account
 			return sameAccounts.get(0);
+		} else {
+			// Create and persist new account
+			return createAccount(uid, roleSystem, mapping.getId());
 		}
-
 	}
 
 	private AccAccountDto createAccount(String uid, SysRoleSystemDto roleSystem, UUID mappingId) {
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setUid(uid);
+		accountFilter.setSystemId(roleSystem.getSystem());
 		long numberOfAccountWithSameUid = accountService.count(accountFilter);
 		if (numberOfAccountWithSameUid > 0) {
 			throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,

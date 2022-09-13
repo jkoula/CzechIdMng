@@ -52,6 +52,7 @@ import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormDefinitionFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
@@ -87,7 +88,7 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	@Test
 	public void createOtherAccountAlone() {
 		IdmIdentityDto identity = helper.createIdentity();
-		SysSystemDto system = helper.createTestResourceSystem(false);
+		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
 		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
 		IdmRoleDto role = helper.createRole();
 		helper.createRoleSystem(role, system, AccountType.PERSONAL_OTHER);
@@ -119,7 +120,7 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	@Test
 	public void createOtherAccountWithDifferentUid() {
 		IdmIdentityDto identity = helper.createIdentity();
-		SysSystemDto system = helper.createTestResourceSystem(false);
+		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
 		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
 		SysSystemMappingDto mapping = helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
 		SysSystemAttributeMappingDto uidAttribute = systemAttributeMappingService.findBySystemMappingAndName(mapping.getId(), ATTRIBUTE_MAPPING_NAME);
@@ -167,7 +168,7 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	@Test
 	public void createOtherAccountWithSameUid() {
 		IdmIdentityDto identity = helper.createIdentity();
-		SysSystemDto system = helper.createTestResourceSystem(false);
+		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
 		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
 		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
 
@@ -201,10 +202,14 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 
 	@Test
 	public void createOtherAccountWithEAVs() {
-		SysSystemDto system = helper.createTestResourceSystem(false);
+		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
 		SysSystemMappingDto mapping = createMapping(system);
 
-		List<IdmFormDefinitionDto> allByType = formDefinitionService.findAllByType(AccAccount.class.getName());
+		IdmFormDefinitionFilter formDefinitionFilter = new IdmFormDefinitionFilter();
+		formDefinitionFilter.setText(system.getId().toString());
+		formDefinitionFilter.setType(AccAccount.class.getName());
+		List<IdmFormDefinitionDto> allByType = formDefinitionService.find(formDefinitionFilter, null).getContent();
+		// validate by system id and get the proper one
 		assertTrue(allByType.size() > 0);
 
 		IdmFormDefinitionDto formDefinitionDto = allByType.get(0);
