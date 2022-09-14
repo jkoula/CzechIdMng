@@ -280,4 +280,29 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	List<SysSystemAttributeMappingDto> getAllPasswordAttributes(UUID systemId, UUID systemMappingId);
+	
+	/**
+	 * Returns a list of attributes in which a script is used in transformation to.
+	 * 
+	 * @param scriptCode
+	 * @return
+	 */
+	List<SysSystemAttributeMappingDto> getScriptTransformToUsage(String scriptCode);
+	
+	/**
+	 * Returns a list of attributes in which a script is used in transformation from.
+	 * 
+	 * @param scriptCode
+	 * @return
+	 */
+	List<SysSystemAttributeMappingDto> getScriptTransformFromUsage(String scriptCode);
+	
+	/**
+	 * Returns a list of attributes in which a script is used in transformation.
+	 * Both in transformation to and from.
+	 * 
+	 * @param scriptCode
+	 * @return
+	 */
+	List<SysSystemAttributeMappingDto> getScriptUsage(String scriptCode);
 }

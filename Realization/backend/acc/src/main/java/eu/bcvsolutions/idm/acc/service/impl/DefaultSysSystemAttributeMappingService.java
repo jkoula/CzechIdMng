@@ -356,6 +356,14 @@ public class DefaultSysSystemAttributeMappingService
 		if (filter.getId() != null) {
 			predicates.add(builder.equal(root.get(SysSystemAttributeMapping_.id), filter.getId()));
 		}
+		
+		if (!StringUtils.isEmpty(filter.getTransformToScript())) {
+			predicates.add(builder.like(root.get(SysSystemAttributeMapping_.transformToResourceScript), "%" + filter.getTransformToScript() + "%"));
+		}
+		
+		if (!StringUtils.isEmpty(filter.getTransformFromScript())) {
+			predicates.add(builder.like(root.get(SysSystemAttributeMapping_.transformFromResourceScript), "%" + filter.getTransformFromScript() + "%"));
+		}
 
 		return predicates;
 	}
@@ -1318,6 +1326,33 @@ public class DefaultSysSystemAttributeMappingService
 			}
 		}
 		result.put(SysSystemAttributeMappingService.MAPPING_SCRIPT_FAIL_SCRIPT_PATH_KEY, sb.toString());
+		return result;
+	}
+	
+	@Override
+	public List<SysSystemAttributeMappingDto> getScriptTransformToUsage(String scriptCode) {
+		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
+		attributeFilter.setTransformToScript(scriptCode);
+		//
+		return this.find(attributeFilter, null).getContent();
+	}
+
+	@Override
+	public List<SysSystemAttributeMappingDto> getScriptTransformFromUsage(String scriptCode) {
+		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
+		attributeFilter.setTransformFromScript(scriptCode);
+		//
+		return this.find(attributeFilter, null).getContent();
+	}
+
+	@Override
+	public List<SysSystemAttributeMappingDto> getScriptUsage(String scriptCode) {
+		List<SysSystemAttributeMappingDto> result = new ArrayList<>();
+		List<SysSystemAttributeMappingDto> inTransformationFrom = getScriptTransformFromUsage(scriptCode);
+		result.addAll(inTransformationFrom);
+		List<SysSystemAttributeMappingDto> inTransformationTo = getScriptTransformToUsage(scriptCode);
+		result.addAll(inTransformationTo);
+		
 		return result;
 	}
 }

@@ -31,6 +31,8 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 	private Boolean authenticationAttribute;
 	private Boolean passwordFilter;
 	private AttributeMappingStrategyType strategyType;
+	private String transformToScript;
+	private String transformFromScript;
 
 	public Boolean getIsUid() {
 		return isUid;
@@ -158,5 +160,21 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 
 	public void setStrategyType(AttributeMappingStrategyType strategyType) {
 		this.strategyType = strategyType;
+	}
+	
+	public String getTransformToScript() {
+		return transformToScript;
+	}
+
+	public void setTransformToScript(String scriptCode) {
+		this.transformToScript = scriptCode;
+	}
+	
+	public String getTransformFromScript() {
+		return transformFromScript;
+	}
+
+	public void setTransformFromScript(String scriptCode) {
+		this.transformFromScript = scriptCode;
 	}
 }
