@@ -68,8 +68,8 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemOwnerRoleService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemOwnerService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.impl.DefaultSysSystemMappingService;
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -381,7 +381,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		// default mapping
 		SysSystemMappingFilter systemMappingFilter = new SysSystemMappingFilter();
 		systemMappingFilter.setSystemId(system.getId());
-		systemMappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		systemMappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMappingFilter.setOperationType(SystemOperationType.PROVISIONING);
 		systemMappingFilter.setAccountType(accountType);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(systemMappingFilter, null).getContent();

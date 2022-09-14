@@ -44,6 +44,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
@@ -89,7 +90,7 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	public void createOtherAccountAlone() {
 		IdmIdentityDto identity = helper.createIdentity();
 		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
-		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
+		helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL_OTHER);
 		IdmRoleDto role = helper.createRole();
 		helper.createRoleSystem(role, system, AccountType.PERSONAL_OTHER);
 
@@ -121,8 +122,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	public void createOtherAccountWithDifferentUid() {
 		IdmIdentityDto identity = helper.createIdentity();
 		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
-		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
-		SysSystemMappingDto mapping = helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
+		helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL_OTHER);
+		SysSystemMappingDto mapping = helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL);
 		SysSystemAttributeMappingDto uidAttribute = systemAttributeMappingService.findBySystemMappingAndName(mapping.getId(), ATTRIBUTE_MAPPING_NAME);
 		uidAttribute.setTransformToResourceScript("return 'test_' + attributeValue");
 		systemAttributeMappingService.save(uidAttribute);
@@ -169,8 +170,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	public void createOtherAccountWithDifferentUidThenChangeUidMapping() {
 		IdmIdentityDto identity = helper.createIdentity();
 		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
-		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
-		SysSystemMappingDto mapping = helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
+		helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL_OTHER);
+		SysSystemMappingDto mapping = helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL);
 		SysSystemAttributeMappingDto uidAttribute = systemAttributeMappingService.findBySystemMappingAndName(mapping.getId(), ATTRIBUTE_MAPPING_NAME);
 		uidAttribute.setTransformToResourceScript("return 'test_' + attributeValue");
 		systemAttributeMappingService.save(uidAttribute);
@@ -224,8 +225,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	public void createOtherAccountWithSameUid() {
 		IdmIdentityDto identity = helper.createIdentity();
 		SysSystemDto system = helper.createTestResourceSystem(false, helper.createName());
-		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL_OTHER);
-		helper.createMapping(system, SystemEntityType.IDENTITY, AccountType.PERSONAL);
+		helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL_OTHER);
+		helper.createMapping(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, AccountType.PERSONAL);
 
 		IdmRoleDto role = helper.createRole();
 		IdmRoleDto rolePersonal = helper.createRole();
@@ -370,7 +371,7 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		//
 		SysSystemMappingDto systemMapping = new SysSystemMappingDto();
 		systemMapping.setName("default_" + System.currentTimeMillis());
-		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
 		systemMapping.setAccountType(AccountType.PERSONAL_OTHER);
