@@ -1,4 +1,4 @@
-import { Basic, Utils } from "czechidm-core";
+import {Basic, Utils} from 'czechidm-core';
 /**
  * Identity select option decorator.
  *
@@ -6,6 +6,7 @@ import { Basic, Utils } from "czechidm-core";
  * @since 10.1.0
  */
 export default class SystemOptionDecorator extends Basic.SelectBox.OptionDecorator {
+
   /**
    * Returns entity icon (null by default - icon will not be rendered)
    *
@@ -13,14 +14,12 @@ export default class SystemOptionDecorator extends Basic.SelectBox.OptionDecorat
    */
   getEntityIcon(entity) {
     if (!entity) {
-      return "component:system";
+      return 'component:system';
     }
-    if (
-      Utils.Entity.isDisabled(entity) ||
-      (entity._disabled && entity._disabled === true)
-    ) {
-      return "component:disabled-system";
+    if (Utils.Entity.isDisabled(entity) || (entity._disabled && entity._disabled === true)) {
+      return 'component:disabled-system';
     }
-    return "component:enabled-system";
+    return 'component:enabled-system';
   }
+
 }

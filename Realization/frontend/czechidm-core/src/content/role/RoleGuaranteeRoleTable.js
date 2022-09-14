@@ -1,27 +1,24 @@
-import PropTypes from "prop-types";
-import React from "react";
-import { connect } from "react-redux";
-import * as Basic from "../../components/basic";
-import * as Advanced from "../../components/advanced";
-import * as Utils from "../../utils";
-import {
-  RoleGuaranteeRoleManager,
-  RoleManager,
-  CodeListManager,
-} from "../../redux";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { connect } from 'react-redux';
+import * as Basic from '../../components/basic';
+import * as Advanced from '../../components/advanced';
+import * as Utils from '../../utils';
+import { RoleGuaranteeRoleManager, RoleManager, CodeListManager } from '../../redux';
 
 let manager = new RoleGuaranteeRoleManager();
 let roleManager = new RoleManager();
 const codeListManager = new CodeListManager();
 
 /**
- * Table of role guarantees - by roles.
- *
- * @author Radek Tomiška
- */
+* Table of role guarantees - by roles.
+*
+* @author Radek Tomiška
+*/
 export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
+
   getContentKey() {
-    return "content.role.guarantees";
+    return 'content.role.guarantees';
   }
 
   getUiKey() {
@@ -38,12 +35,7 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
 
   showDetail(entity) {
     if (!Utils.Entity.isNew(entity)) {
-      this.context.store.dispatch(
-        this.getManager().fetchPermissions(
-          entity.id,
-          `${this.getUiKey()}-detail`
-        )
-      );
+      this.context.store.dispatch(this.getManager().fetchPermissions(entity.id, `${this.getUiKey()}-detail`));
     }
     //
     super.showDetail(entity, () => {
@@ -59,114 +51,99 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
 
   afterSave(entity, error) {
     if (!error) {
-      this.addMessage({
-        message: this.i18n("save.success", {
-          count: 1,
-          record: this.getManager().getNiceLabel(entity),
-        }),
-      });
+      this.addMessage({ message: this.i18n('save.success', { count: 1, record: this.getManager().getNiceLabel(entity) }) });
     }
     //
     super.afterSave(entity, error);
   }
 
   render() {
-    const {
-      uiKey,
-      forceSearchParameters,
-      _showLoading,
-      _permissions,
-      className,
-      guaranteeTypes,
-    } = this.props;
+    const { uiKey, forceSearchParameters, _showLoading, _permissions, className, guaranteeTypes } = this.props;
     const { detail } = this.state;
-    const role = forceSearchParameters.getFilters().get("role");
+    const role = forceSearchParameters.getFilters().get('role');
     //
     return (
       <Basic.Div>
-        <Basic.Confirm ref="confirm-delete" level="danger" />
+        <Basic.Confirm ref="confirm-delete" level="danger"/>
         <Advanced.Table
           ref="table"
-          uiKey={uiKey}
-          manager={manager}
-          forceSearchParameters={forceSearchParameters}
-          showRowSelection={manager.canDelete()}
-          className={className}
-          _searchParameters={this.getSearchParameters()}
-          rowClass={({ rowIndex, data }) => {
+          uiKey={ uiKey }
+          manager={ manager }
+          forceSearchParameters={ forceSearchParameters }
+          showRowSelection={ manager.canDelete() }
+          className={ className }
+          _searchParameters={ this.getSearchParameters() }
+          rowClass={({rowIndex, data}) => {
             const embedded = data[rowIndex]._embedded;
             if (embedded) {
               return Utils.Ui.getRowClass(embedded.guaranteeRole);
             }
-            return "";
+            return '';
           }}
-          actions={[
-            {
-              value: "delete",
-              niceLabel: this.i18n("action.delete.action"),
-              action: this.onDelete.bind(this),
-              disabled: false,
-            },
-          ]}
-          buttons={[
-            <Basic.Button
-              level="success"
-              key="add_button"
-              className="btn-xs"
-              onClick={this.showDetail.bind(this, { role })}
-              rendered={manager.canSave()}
-              icon="fa:plus"
-            >
-              {this.i18n("button.add")}
-            </Basic.Button>,
-          ]}
-        >
+          actions={
+            [
+              { value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false }
+            ]
+          }
+          buttons={
+            [
+              <Basic.Button
+                level="success"
+                key="add_button"
+                className="btn-xs"
+                onClick={ this.showDetail.bind(this, { role }) }
+                rendered={ manager.canSave() }
+                icon="fa:plus">
+                { this.i18n('button.add') }
+              </Basic.Button>
+            ]
+          }>
+
           <Advanced.Column
             header=""
             className="detail-button"
-            cell={({ rowIndex, data }) => {
-              return (
-                <Advanced.DetailButton
-                  title={this.i18n("button.detail")}
-                  onClick={this.showDetail.bind(this, data[rowIndex])}
-                />
-              );
-            }}
-            sort={false}
-          />
+            cell={
+              ({ rowIndex, data }) => {
+                return (
+                  <Advanced.DetailButton
+                    title={this.i18n('button.detail')}
+                    onClick={this.showDetail.bind(this, data[rowIndex])}/>
+                );
+              }
+            }
+            sort={false}/>
           <Advanced.Column
             property="guaranteeRole"
             sortProperty="guaranteeRole.name"
             face="text"
-            header={this.i18n("entity.RoleGuaranteeRole.guaranteeRole.label")}
+            header={ this.i18n('entity.RoleGuaranteeRole.guaranteeRole.label') }
             sort
-            cell={({ rowIndex, data }) => {
-              const entity = data[rowIndex];
-              return (
-                <Advanced.EntityInfo
-                  entityType="role"
-                  entityIdentifier={entity.guaranteeRole}
-                  entity={entity._embedded.guaranteeRole}
-                  face="popover"
-                  showIcon
-                />
-              );
-            }}
-          />
+            cell={
+              ({ rowIndex, data }) => {
+                const entity = data[rowIndex];
+                return (
+                  <Advanced.EntityInfo
+                    entityType="role"
+                    entityIdentifier={ entity.guaranteeRole }
+                    entity={ entity._embedded.guaranteeRole }
+                    face="popover"
+                    showIcon/>
+                );
+              }
+            }/>
           <Advanced.Column
             property="type"
-            width={125}
+            width={ 125 }
             face="text"
             sort
-            rendered={guaranteeTypes.length > 0}
-            cell={({ rowIndex, data, property }) => {
-              return (
-                <Advanced.CodeListValue
-                  code="guarantee-type"
-                  value={data[rowIndex][property]}
-                />
-              );
-            }}
+            rendered={ guaranteeTypes.length > 0 }
+            cell={
+              ({ rowIndex, data, property }) => {
+                return (
+                  <Advanced.CodeListValue code="guarantee-type" value={ data[rowIndex][property] }/>
+                );
+              }
+            }
           />
         </Advanced.Table>
 
@@ -175,72 +152,57 @@ export class RoleGuaranteeRoleTable extends Advanced.AbstractTableContent {
           show={detail.show}
           onHide={this.closeDetail.bind(this)}
           backdrop="static"
-          keyboard={!_showLoading}
-        >
+          keyboard={!_showLoading}>
+
           <form onSubmit={this.save.bind(this, {})}>
+            <Basic.Modal.Header closeButton={ !_showLoading }
+            text={ this.i18n('create.header')} 
+            rendered={ Utils.Entity.isNew(detail.entity) }/>
             <Basic.Modal.Header
-              closeButton={!_showLoading}
-              text={this.i18n("create.header")}
-              rendered={Utils.Entity.isNew(detail.entity)}
-            />
-            <Basic.Modal.Header
-              closeButton={!_showLoading}
-              text={this.i18n("edit.header", {
-                name: manager.getNiceLabel(detail.entity),
-              })}
-              rendered={!Utils.Entity.isNew(detail.entity)}
-            />
+              closeButton={ !_showLoading }
+              text={ this.i18n('edit.header', { name: manager.getNiceLabel(detail.entity) }) }
+              rendered={ !Utils.Entity.isNew(detail.entity) }/>
             <Basic.Modal.Body>
               <Basic.AbstractForm
                 ref="form"
-                showLoading={_showLoading}
-                readOnly={!manager.canSave(detail.entity, _permissions)}
-              >
+                showLoading={ _showLoading }
+                readOnly={ !manager.canSave(detail.entity, _permissions) }>
                 <Advanced.RoleSelect
                   ref="role"
-                  manager={roleManager}
-                  label={this.i18n("entity.RoleGuaranteeRole.role.label")}
+                  manager={ roleManager }
+                  label={ this.i18n('entity.RoleGuaranteeRole.role.label') }
                   readOnly
-                  required
-                />
+                  required/>
                 <Advanced.RoleSelect
                   ref="guaranteeRole"
-                  manager={roleManager}
-                  label={this.i18n(
-                    "entity.RoleGuaranteeRole.guaranteeRole.label"
-                  )}
-                  helpBlock={this.i18n(
-                    "entity.RoleGuaranteeRole.guaranteeRole.help"
-                  )}
-                  required
-                />
+                  manager={ roleManager }
+                  label={ this.i18n('entity.RoleGuaranteeRole.guaranteeRole.label') }
+                  helpBlock={ this.i18n('entity.RoleGuaranteeRole.guaranteeRole.help') }
+                  required/>
                 <Advanced.CodeListSelect
                   ref="type"
                   code="guarantee-type"
                   showOnlyIfOptionsExists
-                  label={this.i18n("entity.RoleGuaranteeRole.type.label")}
-                  helpBlock={this.i18n(`entity.RoleGuaranteeRole.type.help`)}
-                  max={255}
-                />
+                  label={ this.i18n('entity.RoleGuaranteeRole.type.label') }
+                  helpBlock={ this.i18n(`entity.RoleGuaranteeRole.type.help`) }
+                  max={ 255 }/>
               </Basic.AbstractForm>
             </Basic.Modal.Body>
             <Basic.Modal.Footer>
               <Basic.Button
                 level="link"
-                onClick={this.closeDetail.bind(this)}
-                showLoading={_showLoading}
-              >
-                {this.i18n("button.close")}
+                onClick={ this.closeDetail.bind(this) }
+                showLoading={ _showLoading }>
+                { this.i18n('button.close') }
               </Basic.Button>
               <Basic.Button
                 type="submit"
                 level="success"
-                rendered={manager.canSave(detail.entity, _permissions)}
-                showLoading={_showLoading}
+                rendered={ manager.canSave(detail.entity, _permissions) }
+                showLoading={ _showLoading}
                 showLoadingIcon
-                showLoadingText={this.i18n("button.saving")}
-              >
-                {this.i18n("button.save")}
+                showLoadingText={ this.i18n('button.saving') }>
+                {this.i18n('button.save')}
               </Basic.Button>
             </Basic.Modal.Footer>
           </form>
@@ -257,23 +219,20 @@ RoleGuaranteeRoleTable.propTypes = {
    */
   forceSearchParameters: PropTypes.object,
   //
-  _showLoading: PropTypes.bool,
+  _showLoading: PropTypes.bool
 };
 
 RoleGuaranteeRoleTable.defaultProps = {
   forceSearchParameters: null,
-  _showLoading: false,
+  _showLoading: false
 };
 
 function select(state, component) {
   return {
     _showLoading: Utils.Ui.isShowLoading(state, `${component.uiKey}-detail`),
-    _permissions: Utils.Permission.getPermissions(
-      state,
-      `${component.uiKey}-detail`
-    ),
+    _permissions: Utils.Permission.getPermissions(state, `${component.uiKey}-detail`),
     _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey),
-    guaranteeTypes: codeListManager.getCodeList(state, "guarantee-type") || [],
+    guaranteeTypes: codeListManager.getCodeList(state, 'guarantee-type') || []
   };
 }
 
