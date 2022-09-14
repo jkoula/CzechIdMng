@@ -850,6 +850,20 @@ public class DefaultSysSystemAttributeMappingService
 		}
 		//
 		SysSchemaAttributeDto schemaAttributeDto = getSchemaAttribute(attributeHandling);
+		// Get value from account EAV = overriding value
+		if (accountDto != null && accountDto.getFormDefinition() != null) {
+			IdmFormDefinitionDto formDefinitionDto = DtoUtils.getEmbedded(accountDto, AccAccount_.formDefinition, IdmFormDefinitionDto.class, null);
+			if (formDefinitionDto == null) {
+				formDefinitionDto = formDefinitionService.get(accountDto.getFormDefinition());
+			}
+
+			List<IdmFormValueDto> values = formService.getValues(accountDto, formDefinitionDto, schemaAttributeDto.getName());
+			idmValue = getValuesFromEav(schemaAttributeDto, values);
+		}
+		// Return overridden value without transformation
+		if (idmValue != null) {
+			return idmValue;
+		}
 		//
 		if (attributeHandling.isExtendedAttribute() && entity != null && formService.isFormable(entity.getClass())) {
 			List<IdmFormValueDto> formValues = formService.getValues(entity, attributeHandling.getIdmPropertyName());
@@ -874,18 +888,6 @@ public class DefaultSysSystemAttributeMappingService
 									attributeHandling.getSchemaAttribute().toString()),
 							ex);
 				}
-			}
-		} else {
-			// If Attribute value is not in entity nor in extended attribute, then idmValue is null.
-			// It means attribute is static or has value in account EAV
-			// We will check EAV, if no value is found, we will call transformation to resource.
-			if (accountDto != null && accountDto.getFormDefinition() != null) {
-				IdmFormDefinitionDto formDefinitionDto = DtoUtils.getEmbedded(accountDto, AccAccount_.formDefinition, IdmFormDefinitionDto.class, null);
-				if (formDefinitionDto == null) {
-					formDefinitionDto = formDefinitionService.get(accountDto.getFormDefinition());
-				}
-				List<IdmFormValueDto> values = formService.getValues(accountDto, formDefinitionDto, schemaAttributeDto.getName());
-				idmValue = getValuesFromEav(schemaAttributeDto, values);
 			}
 		}
 		return this.transformValueToResource(uid, idmValue, attributeHandling, entity, mappingContext);

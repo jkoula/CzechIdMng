@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.provisioning;
 
+import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_EMAIL;
 import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_FIRSTNAME;
 import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_LASTNAME;
 import static eu.bcvsolutions.idm.acc.TestHelper.ATTRIBUTE_MAPPING_NAME;
@@ -47,6 +48,7 @@ import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -84,6 +86,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	private SysProvisioningArchiveService provisioningArchiveService;
 	@Autowired
 	private FormService formService;
+	@Autowired
+	private IdmIdentityService identityService;
 
 	@Test
 	public void createOtherAccountAlone() {
@@ -283,6 +287,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 
 		// Identity
 		IdmIdentityDto identityDto = helper.createIdentity(helper.createName());
+		identityDto.setEmail("someemail@test.cz");
+		identityDto = identityService.save(identityDto);
 
 		AccAccountFilter accountFilter = new AccAccountFilter();
 		accountFilter.setAccountType(AccountType.PERSONAL_OTHER);
@@ -321,10 +327,11 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		// check values in provisioning archive
 		Map<ProvisioningAttributeDto, Object> accountObject = provisioningArchiveDtos.get(0).getProvisioningContext().getAccountObject();
 		assertNotNull(accountObject);
+		IdmIdentityDto finalIdentityDto = identityDto;
 		accountObject.forEach((provisioningAttributeDto, o) -> {
 			switch (provisioningAttributeDto.getSchemaAttributeName()) {
 				case ATTRIBUTE_MAPPING_NAME:
-					assertEquals(identityDto.getUsername(), o);
+					assertEquals(finalIdentityDto.getUsername(), o);
 					assertEquals(resource.getName(), o);
 					break;
 				case ATTRIBUTE_MAPPING_FIRSTNAME: {
@@ -345,6 +352,40 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 					assertEquals(resource.getLastname(), o);
 					break;
 				}
+				case ATTRIBUTE_MAPPING_EMAIL: {
+					assertEquals(finalIdentityDto.getEmail(), o);
+					assertEquals(resource.getEmail(), o);
+					break;
+				}
+			}
+		});
+
+		// we will test overriding of value
+		// save EAV to for email attribute
+		IdmFormAttributeDto emailAttribute = formDefinitionDto.getFormAttributes().stream()
+				.filter(idmFormAttributeDto -> idmFormAttributeDto.getCode().equals(ATTRIBUTE_MAPPING_EMAIL))
+				.findFirst().orElse(null);
+		assertNotNull(emailAttribute);
+		getHelper().setEavValue(accountFound, emailAttribute, AccAccount.class, "overriden value", PersistentType.SHORTTEXT, finalFormDefinitionDto);
+
+		// do provisioning
+		provisioningService.doProvisioning(identityDto);
+
+		provisioningArchiveDtos = provisioningArchiveService.find(provisioningOperationFilter, null).getContent();
+		assertEquals(2, provisioningArchiveDtos.size());
+
+		TestResource resource1 = helper.findResource(accountFound.getUid());
+		assertNotNull(resource1);
+
+		// check values in provisioning archive
+		accountObject = provisioningArchiveDtos.get(1).getProvisioningContext().getAccountObject();
+		assertNotNull(accountObject);
+		accountObject.forEach((provisioningAttributeDto, o) -> {
+			if (ATTRIBUTE_MAPPING_EMAIL.equals(provisioningAttributeDto.getSchemaAttributeName())) {
+				List<IdmFormValueDto> values = formService.getValues(accountFound, finalFormDefinitionDto, emailAttribute.getCode());
+				assertFalse(values.isEmpty());
+				assertEquals(values.get(0).getValue(), o);
+				assertEquals(resource1.getEmail(), o);
 			}
 		});
 
@@ -386,6 +427,16 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 				attributeMapping.setUid(true);
 				attributeMapping.setEntityAttribute(true);
 				attributeMapping.setIdmPropertyName(IdmIdentity_.username.getName());
+				attributeMapping.setName(schemaAttr.getName());
+				attributeMapping.setSchemaAttribute(schemaAttr.getId());
+				attributeMapping.setSystemMapping(systemMapping.getId());
+				systemAttributeMappingService.save(attributeMapping);
+			}
+			if (ATTRIBUTE_MAPPING_EMAIL.equals(schemaAttr.getName())) {
+				SysSystemAttributeMappingDto attributeMapping = new SysSystemAttributeMappingDto();
+				attributeMapping.setUid(false);
+				attributeMapping.setEntityAttribute(true);
+				attributeMapping.setIdmPropertyName(IdmIdentity_.email.getName());
 				attributeMapping.setName(schemaAttr.getName());
 				attributeMapping.setSchemaAttribute(schemaAttr.getId());
 				attributeMapping.setSystemMapping(systemMapping.getId());
