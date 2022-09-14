@@ -6,7 +6,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.ExternalIdentifiableFilter;
@@ -31,7 +30,7 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 	private AccountType accountType;
 	private Boolean ownership;
 	private Boolean supportChangePassword;
-	private SystemEntityType entityType;
+	private String entityType;
 	private Boolean inProtection;
 	private UUID uniformPasswordId; // Used for unite password change and validate
 	private Boolean supportPasswordFilter;
@@ -105,11 +104,11 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 		this.supportChangePassword = supportChangePassword;
 	}
 	
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 	
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 

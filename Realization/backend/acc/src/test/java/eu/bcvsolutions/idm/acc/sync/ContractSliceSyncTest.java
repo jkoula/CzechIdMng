@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,13 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testng.collections.Lists;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
@@ -72,10 +70,12 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.ContractSliceSynchronizationExecutor;
 import eu.bcvsolutions.idm.acc.service.impl.ContractSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.audit.dto.IdmAuditDto;
 import eu.bcvsolutions.idm.core.api.audit.dto.filter.IdmAuditFilter;
 import eu.bcvsolutions.idm.core.api.audit.service.IdmAuditService;
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractSliceDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -1154,7 +1154,7 @@ public class ContractSliceSyncTest extends AbstractIntegrationTest {
 		helper.startSynchronization(config);
 
 		slices = contractSliceService.find(filter, null).getContent();
-		assertEquals(3, slices.size());
+		assertEquals(2, slices.size());
 
 		for (IdmContractSliceDto slice : slices) {
 			if ("2".equals(slice.getDescription())) {
@@ -1174,11 +1174,10 @@ public class ContractSliceSyncTest extends AbstractIntegrationTest {
 			}
 		}
 
+		// the original contract was deleted and a new one was not created
+		// because HR processes are turned off
 		contracts = contractService.findAllByIdentity(identity.getId());
-		assertEquals(1, contracts.size());
-		IdmIdentityContractDto contract = contracts.get(0);
-		assertEquals(LocalDate.now().minusDays(20), contract.getValidFrom());
-		assertEquals(null, contract.getValidTill());
+		assertEquals(0, contracts.size());
 
 		// some tests expect data as contract slice with id 1. Just for sure we clear test slices
 		slices = contractSliceService.find(filter, null).getContent();
@@ -1289,7 +1288,7 @@ public class ContractSliceSyncTest extends AbstractIntegrationTest {
 	public AbstractSysSyncConfigDto doCreateSyncConfig(SysSystemDto system) {
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.CONTRACT_SLICE);
+		mappingFilter.setEntityType(ContractSliceSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -1356,7 +1355,7 @@ public class ContractSliceSyncTest extends AbstractIntegrationTest {
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.CONTRACT_SLICE);
+		syncSystemMapping.setEntityType(ContractSliceSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);

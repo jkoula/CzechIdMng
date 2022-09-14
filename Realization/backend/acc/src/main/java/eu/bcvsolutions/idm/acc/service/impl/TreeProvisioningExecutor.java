@@ -14,7 +14,6 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccTreeAccountDto;
@@ -36,9 +35,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
@@ -57,6 +58,9 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 public class TreeProvisioningExecutor extends AbstractProvisioningExecutor<IdmTreeNodeDto> {
  
 	public static final String NAME = "treeProvisioningService";
+	
+	public static final String SYSTEM_ENTITY_TYPE = "TREE";
+	
 	private final AccTreeAccountService treeAccountService;
 	private final IdmTreeNodeService treeNodeService;
 	
@@ -78,13 +82,14 @@ public class TreeProvisioningExecutor extends AbstractProvisioningExecutor<IdmTr
 			SysSchemaObjectClassService schemaObjectClassService,
 			SysSystemAttributeMappingService systemAttributeMappingService,
 			IdmRoleService roleService,
-			IdmTreeNodeService treeNodeService) {
+			IdmTreeNodeService treeNodeService,
+			SysSystemEntityTypeManager systemEntityManager) {
 		
 		super(systemMappingService, attributeMappingService, connectorFacade, systemService, roleSystemService,
 				roleSystemAttributeService, systemEntityService, accountService,
 				provisioningExecutor, entityEventManager, schemaAttributeService,
 				schemaObjectClassService, systemAttributeMappingService,
-				roleService);
+				roleService, systemEntityManager);
 		//
 		Assert.notNull(treeAccountService, "Service is required.");
 		Assert.notNull(treeNodeService, "Service is required.");
@@ -146,13 +151,13 @@ public class TreeProvisioningExecutor extends AbstractProvisioningExecutor<IdmTr
 	
 	@Override
 	protected List<SysRoleSystemAttributeDto> findOverloadingAttributes(IdmTreeNodeDto entity, SysSystemDto system,
-			AccAccountDto account, SystemEntityType entityType) {
+			AccAccountDto account, String entityType) {
 		// Overloading attributes is not implemented for TreeNode
 		return new ArrayList<>();
 	}
 	
 	@Override
-	protected List<SysSystemMappingDto> findSystemMappingsForEntityType(IdmTreeNodeDto entity, SystemEntityType entityType) {
+	protected List<SysSystemMappingDto> findSystemMappingsForEntityType(IdmTreeNodeDto entity, String entityType) {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setEntityType(entityType);
 		mappingFilter.setTreeTypeId(entity.getTreeType());
@@ -181,5 +186,15 @@ public class TreeProvisioningExecutor extends AbstractProvisioningExecutor<IdmTr
 	@Override
 	protected IdmTreeNodeService getService() {
 		return treeNodeService;
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
+	}
+	
+	@Override
+	public boolean supports(SystemEntityTypeRegistrable delimiter) {
+		return delimiter.getSystemEntityCode().equals(SYSTEM_ENTITY_TYPE) && delimiter.isSupportsProvisioning();
 	}
 }

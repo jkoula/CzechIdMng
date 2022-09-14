@@ -17,11 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractGuaranteeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractSliceDto;
@@ -93,7 +93,7 @@ public class ContractGuaranteeSaveAndDeleteProcessorTest extends AbstractIntegra
 		assertEquals(1, content.size());
 		SysProvisioningArchiveDto sysProvisioningArchiveDto = content.get(0);
 		assertEquals(ProvisioningEventType.CREATE, sysProvisioningArchiveDto.getOperationType());
-		assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 		//
 		IdmIdentityDto guarantee = testHelper.createIdentity();
@@ -105,7 +105,7 @@ public class ContractGuaranteeSaveAndDeleteProcessorTest extends AbstractIntegra
 		assertEquals(2, content.size());
 		sysProvisioningArchiveDto = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).orElse(null);
 		assertEquals(ProvisioningEventType.UPDATE, sysProvisioningArchiveDto.getOperationType());
-		assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 	}
 	
@@ -136,7 +136,7 @@ public class ContractGuaranteeSaveAndDeleteProcessorTest extends AbstractIntegra
 		SysProvisioningArchiveDto last = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).orElse(null);;
 		assertNotNull(last);
 		assertEquals(ProvisioningEventType.UPDATE, last.getOperationType());
-		assertEquals(SystemEntityType.IDENTITY, last.getEntityType());
+		assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, last.getEntityType());
 		assertEquals(identity.getId(), last.getEntityIdentifier());
 	}
 	
@@ -162,7 +162,7 @@ public class ContractGuaranteeSaveAndDeleteProcessorTest extends AbstractIntegra
 		assertEquals(3, content.size()); // create, add contract guarantee and delete = 3 operation
 		SysProvisioningArchiveDto last = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).get();
 		assertEquals(ProvisioningEventType.UPDATE, last.getOperationType());
-		assertEquals(SystemEntityType.IDENTITY, last.getEntityType());
+		assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, last.getEntityType());
 		assertEquals(identity.getId(), last.getEntityIdentifier());
 	}
 	

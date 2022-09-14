@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 import { Basic, Advanced, Utils, Domain, Managers, Enums } from 'czechidm-core';
 import { RoleSystemAttributeManager, RoleSystemManager, SystemAttributeMappingManager} from '../../redux';
 import AttributeMappingStrategyTypeEnum from '../../domain/AttributeMappingStrategyTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 
 const uiKey = 'role-system-attribute';
 let roleSystemAttributeManager = null;
@@ -174,7 +173,7 @@ class RoleSystemAttributeDetail extends Advanced.AbstractTableContent {
     const idmPropertyName = value.idmPropertyName;
     if (idmPropertyName) {
       this.refs.idmPropertyEnum.setValue(
-        SystemEntityTypeEnum.getEntityEnum('IDENTITY').getEnum(idmPropertyName)
+        Enums.IdentityAttributeEnum.getEnum(idmPropertyName)
       );
     }
     this.refs.idmPropertyName.setValue(value.idmPropertyName);
@@ -184,7 +183,7 @@ class RoleSystemAttributeDetail extends Advanced.AbstractTableContent {
 
   _onChangeEntityEnum(item) {
     if (item) {
-      const field = SystemEntityTypeEnum.getEntityEnum('IDENTITY').getField(item.value);
+      const field = Enums.IdentityAttributeEnum.getField(item.value);
       this.refs.idmPropertyName.setValue(field);
     } else {
       this.refs.idmPropertyName.setValue(null);
@@ -312,7 +311,7 @@ class RoleSystemAttributeDetail extends Advanced.AbstractTableContent {
                   <Basic.EnumSelectBox
                     ref="idmPropertyEnum"
                     readOnly = {_isDisabled || !_isEntityAttribute}
-                    enum={SystemEntityTypeEnum.getEntityEnum('IDENTITY')}
+                    enum={Enums.IdentityAttributeEnum}
                     onChange={this._onChangeEntityEnum.bind(this)}
                     label={this.i18n('acc:entity.SystemAttributeMapping.idmPropertyEnum')}
                     />
@@ -401,7 +400,7 @@ function select(state, component) {
   if (entity) {
     entity.roleSystem = entity._embedded && entity._embedded.roleSystem ? entity._embedded.roleSystem : null;
     entity.systemAttributeMapping = entity._embedded && entity._embedded.systemAttributeMapping ? entity._embedded.systemAttributeMapping : null;
-    entity.idmPropertyEnum = SystemEntityTypeEnum.getEntityEnum('IDENTITY').getEnum(entity.idmPropertyName);
+    entity.idmPropertyEnum = Enums.IdentityAttributeEnum.getEnum(entity.idmPropertyName);
     systemMappingId = entity._embedded && entity._embedded.roleSystem ? entity._embedded.roleSystem.systemMapping : null;
   }
   return {

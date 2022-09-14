@@ -1,6 +1,6 @@
 import { Services, Domain, Utils } from 'czechidm-core';
 //
-import SystemEntityTypeEnum from '../domain/SystemEntityTypeEnum';
+import { SystemEntityTypeService } from '../services/SystemEntityTypeService';
 
 /**
  * @author Svanda
@@ -16,7 +16,7 @@ export default class SystemEntityService extends Services.AbstractService {
     if (!entity) {
       return '';
     }
-    return `${entity._embedded.system.name}:${SystemEntityTypeEnum.getNiceLabel(entity.entityType)}:${entity.uid}`;
+    return `${entity._embedded.system.name}:${SystemEntityTypeService.getNiceLabelForEntityType(entity)}:${entity.uid}`;
   }
 
   getApiPath() {

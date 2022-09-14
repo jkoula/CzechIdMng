@@ -1,6 +1,6 @@
 import { Services, Domain } from 'czechidm-core';
-import SystemEntityTypeEnum from '../domain/SystemEntityTypeEnum';
 import SystemOperationTypeEnum from '../domain/SystemOperationTypeEnum';
+import { SystemEntityTypeService } from '../services/SystemEntityTypeService';
 
 export default class SystemMappingService extends Services.AbstractService {
 
@@ -17,7 +17,7 @@ export default class SystemMappingService extends Services.AbstractService {
     if (!entity) {
       return '';
     }
-    return `${entity.name} (${SystemEntityTypeEnum.getNiceLabel(entity.entityType)} - ${SystemOperationTypeEnum.getNiceLabel(entity.operationType)})`;
+    return `${entity.name} (${entity.entityType} - ${SystemOperationTypeEnum.getNiceLabel(entity.operationType)})`;
   }
 
   getApiPath() {

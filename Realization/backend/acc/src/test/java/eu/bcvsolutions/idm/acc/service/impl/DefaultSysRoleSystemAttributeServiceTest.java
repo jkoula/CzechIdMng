@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeControlledValueDto;
@@ -199,7 +198,7 @@ public class DefaultSysRoleSystemAttributeServiceTest extends AbstractIntegratio
 		attributeMapping = systemAttributeMappingService.get(attributeMapping.getId());
 		Assert.assertTrue(attributeMapping.isEvictControlledValuesCache());
 		// Manual recalculation of the attribute
-		systemAttributeMappingService.recalculateAttributeControlledValues(system.getId(), SystemEntityType.IDENTITY, attributeName, attributeMapping);
+		systemAttributeMappingService.recalculateAttributeControlledValues(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, attributeName, attributeMapping);
 		// Attribute must be recalculated now
 		attributeMapping = systemAttributeMappingService.get(attributeMapping.getId());
 		Assert.assertFalse(attributeMapping.isEvictControlledValuesCache());

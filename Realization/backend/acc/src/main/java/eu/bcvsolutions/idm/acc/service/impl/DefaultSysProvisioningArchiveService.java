@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +12,6 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
 import org.apache.commons.lang3.StringUtils;
-import java.time.ZonedDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceValueDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
@@ -270,7 +269,7 @@ public class DefaultSysProvisioningArchiveService
 			predicates.add(builder.equal(root.get(SysProvisioningArchive_.operationType), operationType));
 		}
 		// Entity type
-		SystemEntityType entityType = filter.getEntityType();
+		String entityType = filter.getEntityType();
 		if (entityType != null) {
 			predicates.add(builder.equal(root.get(SysProvisioningArchive_.entityType), entityType));
 		}

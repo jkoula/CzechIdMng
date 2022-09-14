@@ -6,7 +6,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
@@ -57,11 +56,11 @@ public class SysSystemMappingFilter extends DataFilter {
 		set(PARAMETER_OPERATION_TYPE, operationType);
 	}
 
-	public SystemEntityType getEntityType() {
-		return getParameterConverter().toEnum(getData(), PARAMETER_ENTITY_TYPE, SystemEntityType.class);
+	public String getEntityType() {
+		return getParameterConverter().toString(getData(), PARAMETER_ENTITY_TYPE);
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		set(PARAMETER_ENTITY_TYPE, entityType);
 	}
 

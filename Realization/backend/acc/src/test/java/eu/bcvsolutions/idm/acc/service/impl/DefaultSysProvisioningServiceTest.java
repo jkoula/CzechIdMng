@@ -31,7 +31,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -393,12 +392,12 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 
 		// Check correct password One
 		provisioningService.authenticate(accountService.get(accountIdentityOne.getAccount()).getUid(),
-				new GuardedString(IDENTITY_PASSWORD_ONE), system, SystemEntityType.IDENTITY);
+				new GuardedString(IDENTITY_PASSWORD_ONE), system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 
 		// Check incorrect password
 		try {
 			provisioningService.authenticate(accountService.get(accountIdentityOne.getAccount()).getUid(),
-					new GuardedString(IDENTITY_PASSWORD_TWO), system, SystemEntityType.IDENTITY);
+					new GuardedString(IDENTITY_PASSWORD_TWO), system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			fail("Bad credentials exception is expected here!");
 		} catch (ResultCodeException ex) {
 			//
@@ -410,7 +409,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		// Check correct password Two
 		accountIdentityOne = identityAccountService.get(accountIdentityOne.getId());
 		provisioningService.authenticate(accountService.get(accountIdentityOne.getAccount()).getUid(),
-				new GuardedString(IDENTITY_PASSWORD_TWO), system, SystemEntityType.IDENTITY);
+				new GuardedString(IDENTITY_PASSWORD_TWO), system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 	}
 	
 	@Test
@@ -447,14 +446,14 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		uidAttribute.setTransformToResourceScript("if(attributeValue){return \"y\"+ attributeValue;}");
 		uidAttribute = systemAttributeMappingService.save(uidAttribute);
 		
-		SysSystemEntityDto sysEntity = new SysSystemEntityDto("y" + IDENTITY_USERNAME, SystemEntityType.IDENTITY);
+		SysSystemEntityDto sysEntity = new SysSystemEntityDto("y" + IDENTITY_USERNAME, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		sysEntity.setSystem(clonedSystem.getId());
 		sysEntity = systemEntityService.save(sysEntity);
 		
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(clonedSystem.getId());
 		account.setUid("y" + IDENTITY_USERNAME);
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account.setSystemEntity(sysEntity.getId());
 		account = accountService.save(account);
 		
@@ -829,7 +828,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		defaultAttributes.add(defTwo);
 
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(1, compilledAttributes.size());
 		Assert.assertEquals("defTwo", compilledAttributes.get(0).getName());
 	}
@@ -896,7 +895,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.add(overloadedOne);
 
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(2, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloaded".equals(attribute.getName());
@@ -914,7 +913,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		initOverloadedAttributes(overloadingAttributes, defaultAttributes);
 
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(2, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloadedRoleTwo".equals(attribute.getName());
@@ -933,7 +932,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.forEach(attributeOver -> {
 			freshOverloadingAttributes.add(roleSystemAttributeService.get(attributeOver.getId()));
 		});
-		compilledAttributes = provisioningService.compileAttributes(defaultAttributes, freshOverloadingAttributes, SystemEntityType.IDENTITY);
+		compilledAttributes = provisioningService.compileAttributes(defaultAttributes, freshOverloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(2, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloaded".equals(attribute.getName());
@@ -951,7 +950,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.forEach(attributeOver -> {
 			freshOverloadingAttributes.add(roleSystemAttributeService.get(attributeOver.getId()));
 		});
-		compilledAttributes = provisioningService.compileAttributes(defaultAttributes, freshOverloadingAttributesTwo, SystemEntityType.IDENTITY);
+		compilledAttributes = provisioningService.compileAttributes(defaultAttributes, freshOverloadingAttributesTwo, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(1, compilledAttributes.size());
 	}
 
@@ -984,7 +983,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		});
 		
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				freshOverloadingAttributes, SystemEntityType.IDENTITY);
+				freshOverloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(2, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloaded".equals(attribute.getName());
@@ -1038,7 +1037,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.set(1, attribute2);
 
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(3, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloadedRoleTwo".equals(attribute.getName());
@@ -1091,7 +1090,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.set(1, attribute2);
 
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(3, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloadedRoleTwo".equals(attribute.getName());
@@ -1251,7 +1250,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.set(1, attribute2);
 
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(2, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloaded".equals(attribute.getName());
@@ -1291,7 +1290,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		roleSystemAttribute2 = roleSystemAttributeService.save(roleSystemAttribute2);
 		overloadingAttributes.set(1, roleSystemAttribute2);
 
-		provisioningService.compileAttributes(defaultAttributes, overloadingAttributes, SystemEntityType.IDENTITY);
+		provisioningService.compileAttributes(defaultAttributes, overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 	}
 
 	@Test
@@ -1340,7 +1339,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		overloadingAttributes.set(1, attribute2);
 		
 		List<AttributeMapping> compilledAttributes = provisioningService.compileAttributes(defaultAttributes,
-				overloadingAttributes, SystemEntityType.IDENTITY);
+				overloadingAttributes, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		Assert.assertEquals(2, compilledAttributes.size());
 		Assert.assertTrue(compilledAttributes.stream().filter(attribute -> {
 			return "defOneOverloadedRoleTwo".equals(attribute.getName());
@@ -1571,7 +1570,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		// Create mapped attributes to schema
 		systemMapping = new SysSystemMappingDto();
 		systemMapping.setName("default_" + System.currentTimeMillis());
-		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
 		systemMapping.setAccountType(AccountType.PERSONAL);
@@ -1690,7 +1689,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		accountOne = new AccAccountDto();
 		accountOne.setSystem(system.getId());
 		accountOne.setUid("x" + IDENTITY_USERNAME);
-		accountOne.setEntityType(SystemEntityType.IDENTITY);
+		accountOne.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountOne = accountService.save(accountOne);
 
 		accountIdentityOne = new AccIdentityAccountDto();
@@ -1709,7 +1708,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		AccAccountDto accountTwo = new AccAccountDto();
 		accountTwo.setSystem(system.getId());
 		accountTwo.setUid("x" + IDENTITY_USERNAME_TWO);
-		accountTwo.setEntityType(SystemEntityType.IDENTITY);
+		accountTwo.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountTwo = accountService.save(accountTwo);
 
 		AccIdentityAccountDto accountIdentityTwo = new AccIdentityAccountDto();
@@ -1721,7 +1720,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 
 		SysSystemMappingDto systemMapping = new SysSystemMappingDto();
 		systemMapping.setName("default_" + System.currentTimeMillis());
-		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
 		systemMapping.setAccountType(AccountType.PERSONAL);
@@ -1788,7 +1787,7 @@ public class DefaultSysProvisioningServiceTest extends AbstractIntegrationTest {
 		AccAccountDto accountOne = new AccAccountDto();
 		accountOne.setSystem(getSystem().getId());
 		accountOne.setUid("x" + identity.getUsername());
-		accountOne.setEntityType(SystemEntityType.IDENTITY);
+		accountOne.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountOne = accountService.save(accountOne);
 		//
 		AccIdentityAccountDto accountIdentityOne = new AccIdentityAccountDto();

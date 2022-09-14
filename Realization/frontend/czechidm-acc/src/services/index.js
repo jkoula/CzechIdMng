@@ -27,6 +27,7 @@ import UniformPasswordSystemService from './UniformPasswordSystemService';
 import RemoteServerService from './RemoteServerService';
 import SystemGroupService from './SystemGroupService';
 import SystemGroupSystemService from './SystemGroupSystemService';
+import SystemEntityTypeService from './SystemEntityTypeService';
 
 const ServiceRoot = {
   SystemService,
@@ -57,7 +58,8 @@ const ServiceRoot = {
   UniformPasswordSystemService,
   RemoteServerService,
   SystemGroupService,
-  SystemGroupSystemService
+  SystemGroupSystemService,
+  SystemEntityTypeService
 };
 
 ServiceRoot.version = '0.1.0';

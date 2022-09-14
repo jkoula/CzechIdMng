@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -188,18 +187,18 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 		AccAccountDto accountOne = new AccAccountDto();
 		accountOne.setSystem(system.getId());
 		accountOne.setUid(UUID.randomUUID().toString());
-		accountOne.setEntityType(SystemEntityType.IDENTITY);
+		accountOne.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountOne = accAccountService.save(accountOne);
 		
 		AccAccountDto accountTwo = new AccAccountDto();
 		accountTwo.setSystem(system.getId());
 		accountTwo.setUid(UUID.randomUUID().toString());
-		accountTwo.setEntityType(SystemEntityType.ROLE);
+		accountTwo.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountTwo = accAccountService.save(accountTwo);
 		//
 		AccAccountFilter testFilter = new AccAccountFilter();
 		testFilter.setId(accountOne.getId());
-		testFilter.setEntityType(SystemEntityType.IDENTITY);
+		testFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<AccAccountDto> accounts = accAccountService.find(testFilter, null).getContent();
 		//
 		Assert.assertEquals(1, accounts.size());
@@ -214,6 +213,7 @@ public class DefaultAccAccountServiceFilterTest extends AbstractIntegrationTest 
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(systemId);
 		account.setUid(uid);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account = accAccountService.save(account);
 
 		AccIdentityAccountDto accountIdentity = new AccIdentityAccountDto();

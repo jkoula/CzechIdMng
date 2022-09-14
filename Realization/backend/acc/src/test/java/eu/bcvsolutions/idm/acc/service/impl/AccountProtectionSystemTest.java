@@ -16,7 +16,6 @@ import eu.bcvsolutions.idm.acc.dto.*;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.dto.*;
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
@@ -103,7 +102,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);
@@ -138,7 +137,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);
@@ -190,7 +189,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);
@@ -330,7 +329,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(intervalInDays);
 		mapping = systemMappingService.save(mapping);
@@ -372,7 +371,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(intervalInDays);
 		systemMappingService.save(mapping);
@@ -423,7 +422,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);
@@ -463,7 +462,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);
@@ -502,7 +501,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);
@@ -554,7 +553,7 @@ public class AccountProtectionSystemTest extends AbstractIntegrationTest {
 
 		// Set system to protected mode
 		SysSystemMappingDto mapping = systemMappingService
-				.findBySystem(system, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY).get(0);
+				.findBySystem(system, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE).get(0);
 		mapping.setProtectionEnabled(Boolean.TRUE);
 		mapping.setProtectionInterval(null);
 		systemMappingService.save(mapping);

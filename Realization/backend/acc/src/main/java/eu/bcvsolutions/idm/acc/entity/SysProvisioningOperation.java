@@ -1,5 +1,6 @@
 	package eu.bcvsolutions.idm.acc.entity;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -18,11 +19,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import java.time.ZonedDateTime;
-
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 
@@ -62,9 +60,8 @@ public class SysProvisioningOperation extends AbstractEntity {
 	private SysSystem system;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type", nullable = false)
-	private SystemEntityType entityType;
+	private String entityType;
 	
 	@NotFound(action = NotFoundAction.IGNORE) // system entity can be deleted in the meantime
 	@ManyToOne(optional = true)
@@ -115,11 +112,11 @@ public class SysProvisioningOperation extends AbstractEntity {
 		this.system = system;
 	}
 
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}	
 	
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 	

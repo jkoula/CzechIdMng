@@ -12,12 +12,12 @@ import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Maps;
 
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccUniformPasswordDto;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
@@ -100,7 +100,7 @@ public class ProvisioningUniformPasswordNotificationProcessor extends AbstractEn
 	public EventResult<SysProvisioningOperationDto> process(EntityEvent<SysProvisioningOperationDto> event) {
 		SysProvisioningOperationDto provisioningOperation = event.getContent();
 		IdmIdentityDto identityDto = null;
-		if (provisioningOperation.getEntityIdentifier() != null && SystemEntityType.IDENTITY == provisioningOperation.getEntityType()) {
+		if (provisioningOperation.getEntityIdentifier() != null && IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(provisioningOperation.getEntityType())) {
 			identityDto = identityService.get(provisioningOperation.getEntityIdentifier());
 		}
 

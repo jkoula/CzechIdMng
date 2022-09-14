@@ -373,6 +373,7 @@ export default class SearchParameters {
   static getFilterData(filterForm) {
     const filters = {};
     const filterValues = filterForm.getData();
+
     for (const property in filterValues) {
       if (!filterValues.hasOwnProperty(property)) {
         continue;

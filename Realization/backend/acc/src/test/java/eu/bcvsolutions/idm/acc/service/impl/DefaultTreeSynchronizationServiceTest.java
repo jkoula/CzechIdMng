@@ -36,7 +36,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccTreeAccountDto;
@@ -145,7 +144,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		initData();
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.TREE);
+		mappingFilter.setEntityType(TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -415,7 +414,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		treeAccountService.findIds(null).getContent().forEach(treeAccountService::deleteInternalById);
 
 		AccAccountFilter accountFilter = new AccAccountFilter();
-		accountFilter.setEntityType(SystemEntityType.TREE);
+		accountFilter.setEntityType(TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountService.findIds(accountFilter, null).getContent().forEach(accountService::deleteInternalById);
 	}
 
@@ -712,7 +711,7 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 		// Create provisioning mapping
 		SysSystemMappingDto systemMapping = new SysSystemMappingDto();
 		systemMapping.setName("default_" + System.currentTimeMillis());
-		systemMapping.setEntityType(SystemEntityType.TREE);
+		systemMapping.setEntityType(TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping.setTreeType(systemMappingSync.getTreeType());
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(systemMappingSync.getObjectClass());
@@ -746,15 +745,15 @@ public class DefaultTreeSynchronizationServiceTest extends AbstractIntegrationTe
 			treeType.setName(TREE_TYPE_TEST);
 			treeType = treeTypeService.save(treeType);
 
-		// Create synchronization mapping
-		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
-		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.TREE);
-		syncSystemMapping.setTreeType(treeType.getId());
-		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
-		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
-		syncSystemMapping.setAccountType(AccountType.PERSONAL);
-		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
+			// Create synchronization mapping
+			SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
+			syncSystemMapping.setName("default_" + System.currentTimeMillis());
+			syncSystemMapping.setEntityType(TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+			syncSystemMapping.setTreeType(treeType.getId());
+			syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
+			syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
+			syncSystemMapping.setAccountType(AccountType.PERSONAL);
+			final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 
 			createMapping(system, syncMapping);
 			this.getBean().deleteAllResourceData();

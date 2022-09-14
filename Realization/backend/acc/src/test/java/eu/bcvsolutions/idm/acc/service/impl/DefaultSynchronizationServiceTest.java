@@ -34,7 +34,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
@@ -155,7 +154,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		initData();
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -764,7 +763,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		SysSystemDto system = systemService.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
 		accountOne.setSystem(system.getId());
 		accountOne.setUid("x" + IDENTITY_USERNAME_THREE);
-		accountOne.setEntityType(SystemEntityType.IDENTITY);
+		accountOne.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		accountOne = accountService.save(accountOne);
 
 		AccIdentityAccountDto accountIdentityOne = new AccIdentityAccountDto();
@@ -897,7 +896,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		
 		// Find email attribute and change startegy on CREATE
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto systemMapping = systemMappingService.get(syncConfigCustom.getSystemMapping());
 		SysSystemDto system = systemService.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
 		mappingFilter.setSystemId(system.getId());
@@ -1015,7 +1014,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		
 		// Find email attribute and change strategy on WRITE_IF_NULL
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto systemMapping = systemMappingService.get(syncConfigCustom.getSystemMapping());
 		SysSystemDto system = systemService.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
 		mappingFilter.setSystemId(system.getId());
@@ -1105,7 +1104,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		
 		// Find email attribute and change strategy on WRITE_IF_NULL
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto systemMapping = systemMappingService.get(syncConfigCustom.getSystemMapping());
 		SysSystemDto system = systemService.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
 		mappingFilter.setSystemId(system.getId());
@@ -1349,7 +1348,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		SysSystemDto system = systemService.get(schemaObjectClassService.get(systemMapping.getObjectClass()).getSystem());
 		
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -1475,7 +1474,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		// Create provisioning mapping
 		SysSystemMappingDto systemMapping = new SysSystemMappingDto();
 		systemMapping.setName("default_" + System.currentTimeMillis());
-		systemMapping.setEntityType(SystemEntityType.IDENTITY);
+		systemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(objectClasses.get(0).getId());
 		systemMapping.setAccountType(AccountType.PERSONAL);
@@ -1486,7 +1485,7 @@ public class DefaultSynchronizationServiceTest extends AbstractIntegrationTest {
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.IDENTITY);
+		syncSystemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);

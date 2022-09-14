@@ -33,7 +33,7 @@ public interface ProvisioningOperation extends Auditable {
 	 * 
 	 * @return
 	 */
-	SystemEntityType getEntityType();
+	String getEntityType();
 
 	/**
 	 * IdM entity type identifier

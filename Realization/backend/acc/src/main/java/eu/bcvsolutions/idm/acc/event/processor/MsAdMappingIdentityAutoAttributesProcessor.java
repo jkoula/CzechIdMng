@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
-import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -16,7 +15,7 @@ import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.acc.connector.AdUserConnectorType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -31,6 +30,7 @@ import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
 import eu.bcvsolutions.idm.core.api.dto.IdmScriptDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmScriptFilter;
@@ -89,8 +89,8 @@ public class MsAdMappingIdentityAutoAttributesProcessor extends AbstractSystemMa
 
 
 	@Override
-	SystemEntityType getSystemEntityType() {
-		return SystemEntityType.IDENTITY;
+	String getSystemEntityType() {
+		return IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE;
 	}
 
 	@Override

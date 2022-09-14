@@ -26,7 +26,6 @@ import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationInactiveOwnerBehaviorType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
@@ -85,6 +84,7 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 
 	private static final String PRIME_VALID_CONTRACT_KEY = "prime-valid-contract";
 	private static final String IDENTITY_STATE_IDM_NAME = "state";
+	public static final String SYSTEM_ENTITY_TYPE = "IDENTITY";
 
 	@Autowired
 	private IdmIdentityService identityService;
@@ -143,7 +143,7 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmIdentityDto entity, SystemEntityType entityType,
+	protected void callProvisioningForEntity(IdmIdentityDto entity, String entityType,
 			SysSyncItemLogDto logItem) {
 		addToItemLog(logItem,
 				MessageFormat.format(
@@ -686,4 +686,8 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 		return attribute;
 	}
 	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
+	}
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -36,7 +35,7 @@ public interface SysSystemMappingService extends EventableDtoService<SysSystemMa
 	 * @param entityType
 	 * @return
 	 */
-	List<SysSystemMappingDto> findBySystem(SysSystemDto system, SystemOperationType operation, SystemEntityType entityType);
+	List<SysSystemMappingDto> findBySystem(SysSystemDto system, SystemOperationType operation, String entityType);
 	
 	/**
 	 * Find system mapping by given attributes
@@ -46,7 +45,7 @@ public interface SysSystemMappingService extends EventableDtoService<SysSystemMa
 	 * @param entityType
 	 * @return
 	 */
-	List<SysSystemMappingDto> findBySystemId(UUID systemId, SystemOperationType operation, SystemEntityType entityType);
+	List<SysSystemMappingDto> findBySystemId(UUID systemId, SystemOperationType operation, String entityType);
 	
 	/**
 	 * Find system mapping by given attributes
@@ -56,7 +55,7 @@ public interface SysSystemMappingService extends EventableDtoService<SysSystemMa
 	 * @param entityType
 	 * @return
 	 */
-	List<SysSystemMappingDto> findByObjectClass(SysSchemaObjectClassDto objectClass, SystemOperationType operation, SystemEntityType entityType);
+	List<SysSystemMappingDto> findByObjectClass(SysSchemaObjectClassDto objectClass, SystemOperationType operation, String entityType);
 
 	/**
 	 * Is enabled protection of account against delete.
@@ -100,7 +99,7 @@ public interface SysSystemMappingService extends EventableDtoService<SysSystemMa
 	 * @param entityType
 	 * @return
 	 */
-	SysSystemMappingDto findProvisioningMapping(UUID systemId, SystemEntityType entityType);
+	SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType);
 	
 	/**
 	 * Duplication of mapping attributes.

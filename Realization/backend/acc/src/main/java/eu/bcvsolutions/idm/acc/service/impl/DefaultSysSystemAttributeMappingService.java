@@ -40,7 +40,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.IdmAttachmentWithDataDto;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeControlledValueDto;
@@ -77,8 +76,10 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
@@ -150,6 +151,8 @@ public class DefaultSysSystemAttributeMappingService
 	private SysSyncConfigService syncConfigService;
 	@Autowired
 	private SysSystemGroupSystemService systemGroupSystemService;
+	@Autowired
+	private SysSystemEntityTypeManager systemEntityManager;
 
 
 	@Autowired
@@ -525,7 +528,8 @@ public class DefaultSysSystemAttributeMappingService
 			groovyScriptService.validateScript(dto.getTransformToResourceScript());
 		}
 
-		Class<? extends Identifiable> entityType = systemMappingDto.getEntityType().getExtendedAttributeOwnerType();
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(systemMappingDto.getEntityType());
+		Class<? extends Identifiable> entityType = systemEntityType.getExtendedAttributeOwnerType();
 		if (entityType != null && dto.isExtendedAttribute() && formService.isFormable(entityType)) {
 			createExtendedAttributeDefinition(dto, entityType);
 		}
@@ -772,7 +776,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, SystemEntityType entityType) {
+	public SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, String entityType) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
 		// authentication attribute is only from provisioning operation type
@@ -971,7 +975,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public List<Serializable> getControlledAttributeValues(UUID systemId, SystemEntityType entityType,
+	public List<Serializable> getControlledAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
@@ -1024,7 +1028,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, SystemEntityType entityType,
+	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
@@ -1077,7 +1081,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, SystemEntityType entityType,
+	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
 			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping) {
 		
 		// Computes values
@@ -1097,7 +1101,8 @@ public class DefaultSysSystemAttributeMappingService
 			SysSystemMappingDto mapping = DtoUtils.getEmbedded(attribute,
 					SysSystemAttributeMapping_.systemMapping.getName(), SysSystemMappingDto.class);
 	
-			Class<? extends Identifiable> entityType = mapping.getEntityType().getExtendedAttributeOwnerType();
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(mapping.getEntityType());
+			Class<? extends Identifiable> entityType = systemEntityType.getExtendedAttributeOwnerType();
 			if (entityType != null && attribute.isExtendedAttribute() && formService.isFormable(entityType)) {
 				IdmFormAttributeDto formAttribute = formService.getAttribute(entityType, attribute.getIdmPropertyName());
 				if (formAttribute != null) {

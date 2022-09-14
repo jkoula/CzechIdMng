@@ -30,7 +30,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
@@ -184,8 +183,8 @@ public class DefaultSysSystemServiceIntegrationTest extends AbstractIntegrationT
 		systemMapping.setName("default_" + System.currentTimeMillis());
 		systemMapping.setObjectClass(objectClass.getId());
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
-		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setAccountType(AccountType.PERSONAL);
+		systemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping = systemMappingService.save(systemMapping);
 		SysSystemMappingFilter entityHandlingFilter = new SysSystemMappingFilter();
 		entityHandlingFilter.setSystemId(system.getId());
@@ -348,7 +347,7 @@ public class DefaultSysSystemServiceIntegrationTest extends AbstractIntegrationT
 		// system entity
 		SysSystemEntityDto systemEntity = new SysSystemEntityDto();
 		systemEntity.setSystem(system.getId());
-		systemEntity.setEntityType(SystemEntityType.IDENTITY);
+		systemEntity.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemEntity.setUid("se_uid_" + System.currentTimeMillis());
 		systemEntity = systemEntityService.save(systemEntity);
 		
@@ -369,12 +368,12 @@ public class DefaultSysSystemServiceIntegrationTest extends AbstractIntegrationT
 		SysSystemEntityDto systemEntity = new SysSystemEntityDto();
 		systemEntity.setUid("test");
 		systemEntity.setSystem(system.getId());
-		systemEntity.setEntityType(SystemEntityType.IDENTITY);		
+		systemEntity.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);		
 		systemEntity = systemEntityService.save(systemEntity);
 		
 		SysProvisioningOperationDto provisioningOperation = new SysProvisioningOperationDto();
 		provisioningOperation.setSystem(system.getId());
-		provisioningOperation.setEntityType(SystemEntityType.IDENTITY);
+		provisioningOperation.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		provisioningOperation.setOperationType(ProvisioningEventType.CREATE);
 		provisioningOperation.setSystemEntity(systemEntity.getId());
 		provisioningOperation.setEntityIdentifier(UUID.randomUUID());

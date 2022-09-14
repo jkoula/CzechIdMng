@@ -5,13 +5,13 @@ import { connect } from 'react-redux';
 //
 import uuid from 'uuid';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
-import { SystemMappingManager, SystemManager } from '../../redux';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
+import { SystemMappingManager, SystemManager, SystemEntityTypeManager } from '../../redux';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 
 const uiKey = 'system-mappings-table';
 const manager = new SystemMappingManager();
 const systemManager = new SystemManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * System mapping list.
@@ -126,8 +126,18 @@ class SystemMappings extends Advanced.AbstractTableContent {
             sort/>
           <Advanced.Column
             property="entityType"
-            face="enum"
-            enumClass={ SystemEntityTypeEnum }
+            face="text"
+            cell={
+              ({ rowIndex, data }) => {
+                const entity = data[rowIndex];
+                if (!entity || !entity.entityType) {
+                  return null;
+                }
+                return (
+                  systemEntityTypeManager.getNiceLabelForEntityType(entity)
+                );
+              }
+            }
             header={ this.i18n('acc:entity.SystemMapping.entityType') }
             sort/>
         </Advanced.Table>

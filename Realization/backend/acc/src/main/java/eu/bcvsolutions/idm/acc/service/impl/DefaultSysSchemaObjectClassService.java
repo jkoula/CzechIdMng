@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
@@ -118,7 +117,7 @@ public class DefaultSysSchemaObjectClassService extends AbstractReadWriteDtoServ
 	}
 
 	@Override
-	public IcObjectClass findByAccount(UUID systemId, SystemEntityType entityType) {
+	public IcObjectClass findByAccount(UUID systemId, String entityType) {
 		Assert.notNull(systemId, "System ID cannot be null!");
 		Assert.notNull(entityType, "Entity type cannot be null!");
 		// Find first mapping with for entity type and system from the account.

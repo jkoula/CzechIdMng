@@ -38,7 +38,6 @@ import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
@@ -583,7 +582,7 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 		filter.setOwnership(getParameterConverter().toBoolean(parameters, "ownership"));
 		filter.setSupportChangePassword(getParameterConverter().toBoolean(parameters, "supportChangePassword"));
 		filter.setIncludeEcho(getParameterConverter().toBoolean(parameters, "includeEcho"));
-		filter.setEntityType(getParameterConverter().toEnum(parameters, "entityType", SystemEntityType.class));
+		filter.setEntityType(getParameterConverter().toString(parameters, "entityType"));
 		//
 		return filter;
 	}

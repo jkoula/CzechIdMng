@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -77,7 +76,7 @@ public class SysSystemMappingServiceValidationTest extends AbstractIntegrationTe
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto schema = createSchema(system.getId());
 		SysSystemMappingDto mapping = createMapping(schema.getId(), SystemOperationType.SYNCHRONIZATION);
-		mapping.setEntityType(SystemEntityType.CONTRACT);
+		mapping.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mapping = mappingService.save(mapping);
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(schema.getId());
 		createAttributeMapping(mapping.getId(), schemaAttribute.getId(), true, "");
@@ -89,7 +88,7 @@ public class SysSystemMappingServiceValidationTest extends AbstractIntegrationTe
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto schema = createSchema(system.getId());
 		SysSystemMappingDto mapping = createMapping(schema.getId(), SystemOperationType.SYNCHRONIZATION);
-		mapping.setEntityType(SystemEntityType.CONTRACT);
+		mapping.setEntityType(ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mapping = mappingService.save(mapping);
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(schema.getId());
 		createAttributeMapping(mapping.getId(), schemaAttribute.getId(), true, "identity");
@@ -121,8 +120,8 @@ public class SysSystemMappingServiceValidationTest extends AbstractIntegrationTe
 		mapping.setName(systemName);
 		mapping.setOperationType(type);
 		mapping.setObjectClass(objectClass);
-		mapping.setEntityType(SystemEntityType.IDENTITY);
 		mapping.setAccountType(AccountType.PERSONAL);
+		mapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mapping = mappingService.save(mapping);
 		return mapping;
 	}

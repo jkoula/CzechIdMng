@@ -1,10 +1,26 @@
 package eu.bcvsolutions.idm.acc.connector;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -27,6 +43,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.TreeSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
@@ -44,20 +61,6 @@ import eu.bcvsolutions.idm.ic.api.IcObjectClass;
 import eu.bcvsolutions.idm.ic.api.IcUidAttribute;
 import eu.bcvsolutions.idm.ic.impl.IcUidAttributeImpl;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.BeanNameAware;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * Connector type extends standard IC connector for more metadata (image, wizard, ...).
@@ -308,12 +311,11 @@ public abstract class AbstractConnectorType implements
 		Assert.notNull(schemaDto, "System schema must exists!");
 
 		String entityType = connectorTypeDto.getMetadata().get(ENTITY_TYPE);
-		SystemEntityType systemEntityType = SystemEntityType.valueOf(entityType);
-		Assert.notNull(systemEntityType, "Entity type cannot be null!");
+		Assert.hasText(entityType, "Entity type cannot be null!");
 
 		// For tree type have to be filled tree type ID too.
 		IdmTreeTypeDto treeTypeDto = null;
-		if (SystemEntityType.TREE == systemEntityType) {
+		if (TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(entityType)) {
 			String treeTypeId = connectorTypeDto.getMetadata().get(TREE_TYPE_ID);
 			Assert.notNull(treeTypeId, "Tree type ID cannot be null for TREE entity type!");
 			treeTypeDto = treeTypeService.get(UUID.fromString(treeTypeId));
@@ -337,10 +339,10 @@ public abstract class AbstractConnectorType implements
 			}
 		}
 		// For tree type have to be filled tree type ID too.
-		if (SystemEntityType.TREE == systemEntityType) {
+		if (TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(entityType)) {
 			mappingDto.setTreeType(treeTypeDto.getId());
 		}
-		mappingDto.setEntityType(systemEntityType);
+		mappingDto.setEntityType(entityType);
 		mappingDto.setOperationType(systemOperationType);
 		mappingDto.setObjectClass(schemaDto.getId());
 		mappingDto.setAccountType(AccountType.PERSONAL);
