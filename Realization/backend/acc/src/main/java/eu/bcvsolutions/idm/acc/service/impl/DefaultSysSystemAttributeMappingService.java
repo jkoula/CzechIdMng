@@ -858,7 +858,9 @@ public class DefaultSysSystemAttributeMappingService
 			}
 
 			List<IdmFormValueDto> values = formService.getValues(accountDto, formDefinitionDto, schemaAttributeDto.getName());
-			idmValue = getValuesFromEav(schemaAttributeDto, values);
+			if (!values.isEmpty()) {
+				idmValue = getValuesFromEav(schemaAttributeDto, values);
+			}
 		}
 		// Return overridden value without transformation
 		if (idmValue != null) {
