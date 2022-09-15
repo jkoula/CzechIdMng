@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 import React from 'react';
 import Helmet from 'react-helmet';
 //
-import { Basic, Advanced, Managers, Utils } from 'czechidm-core';
+import { Basic, Managers, Utils } from 'czechidm-core';
 import { Link } from 'react-router-dom';
 import SystemAttributeMappingManager from '../../redux/SystemAttributeMappingManager';
 
-const uiKey = 'script-references mapping';
+const uiKey = 'references-mapping';
 
 const scriptManager = new Managers.ScriptManager();
 const systemAttributeMappingManager = new SystemAttributeMappingManager();
@@ -33,25 +33,7 @@ class ScriptReferencesMapping extends Basic.AbstractContent {
   }
 
   getNavigationKey() {
-    return 'script-mapping-references';
-  }
-
-  useFilter(event) {
-    if (event) {
-      event.preventDefault();
-    }
-    this.refs.table.useFilterForm(this.refs.filterForm);
-  }
-
-  cancelFilter(event) {
-    if (event) {
-      event.preventDefault();
-    }
-    this.refs.table.cancelFilter(this.refs.filterForm);
-  }
-
-  showDetail(mapping) {
-    return null;
+    return 'references-mapping';
   }
 
   _getSystemMappingAttributeLink(attributeMapping) {
@@ -79,7 +61,7 @@ class ScriptReferencesMapping extends Basic.AbstractContent {
   }
 
   render() {
-    const { uiKey, _entity, _usageMapping, showLoading, className } = this.props;
+    const { _entity, _usageMapping } = this.props;
     if (!_entity || !_usageMapping) {
       return null;
     }
