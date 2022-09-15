@@ -286,7 +286,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 </Basic.Row>
               </Basic.AbstractForm>
             </Advanced.Filter>
-          }>
+          }> 
           <Advanced.Column
             header=""
             className="detail-button"
