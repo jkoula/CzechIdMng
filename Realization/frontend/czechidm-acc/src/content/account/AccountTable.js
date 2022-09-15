@@ -156,10 +156,6 @@ export class AccountTable extends Advanced.AbstractTableContent {
       systemId = detail.entity.system
     }
 
-    // if (this.refs.filterForm !== undefined) {
-    //   this.refs.filterForm.setData({  });
-    // }
-
     const forceSearchMappings = new Domain.SearchParameters()
       .setFilter('operationType', SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
       .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
@@ -239,6 +235,8 @@ export class AccountTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             header={ this.i18n('acc:entity.System.name') }
             rendered={ _.includes(columns, 'system') }
+            sort
+            sortProperty="system.name"
             cell={
               /* eslint-disable react/no-multi-comp */
               ({rowIndex, data}) => {
