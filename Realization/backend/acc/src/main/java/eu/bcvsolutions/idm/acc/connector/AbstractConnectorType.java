@@ -69,8 +69,7 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
  * @since 10.7.0
  */
 public abstract class AbstractConnectorType implements
-		ConnectorType,
-		BeanNameAware {
+		ConnectorType {
 
 	private String beanName; // spring bean name - used as id
 
@@ -101,11 +100,6 @@ public abstract class AbstractConnectorType implements
 	@Override
 	public String getId() {
 		return beanName;
-	}
-
-	@Override
-	public Map<String, String> getMetadata() {
-		return new HashMap<>();
 	}
 
 	@Override

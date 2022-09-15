@@ -9,9 +9,9 @@ import org.springframework.hateoas.core.Relation;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import eu.bcvsolutions.idm.core.api.dto.AbstractComponentDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.EmbeddedDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractWizardDto;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiModelProperty.AccessMode;
 
@@ -23,13 +23,10 @@ import io.swagger.annotations.ApiModelProperty.AccessMode;
  * @since 10.7.0
  */
 @Relation(collectionRelation = "connectorTypes")
-public class ConnectorTypeDto extends AbstractComponentDto {
+public class ConnectorTypeDto extends AbstractWizardDto {
 
-	private static final long serialVersionUID = 1L;
 	private String iconKey;
 	private String connectorName;
-	private String wizardStepName;
-	private Map<String, String> metadata;
 	@JsonProperty(value = EmbeddedDto.PROPERTY_EMBEDDED, access = Access.READ_ONLY)
 	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private Map<String, BaseDto> embedded;
@@ -39,8 +36,6 @@ public class ConnectorTypeDto extends AbstractComponentDto {
 	private boolean local = true;
 	private boolean hideParentConnector;
 	// Defines if that wizard is opened from existed system.
-	private boolean reopened = false;
-	private int order;
 	private UUID remoteServer;
 
 	public String getIconKey() {
@@ -57,25 +52,6 @@ public class ConnectorTypeDto extends AbstractComponentDto {
 
 	public void setConnectorName(String connectorName) {
 		this.connectorName = connectorName;
-	}
-
-	public Map<String, String> getMetadata() {
-		if (metadata == null) {
-			metadata = new HashMap<>();
-		}
-		return metadata;
-	}
-
-	public void setMetadata(Map<String, String> metadata) {
-		this.metadata = metadata;
-	}
-
-	public String getWizardStepName() {
-		return wizardStepName;
-	}
-
-	public void setWizardStepName(String wizardStepName) {
-		this.wizardStepName = wizardStepName;
 	}
 
 	public Map<String, BaseDto> getEmbedded() {
@@ -113,22 +89,6 @@ public class ConnectorTypeDto extends AbstractComponentDto {
 		this.hideParentConnector = hideParentConnector;
 	}
 
-	public boolean isReopened() {
-		return reopened;
-	}
-
-	public void setReopened(boolean reopened) {
-		this.reopened = reopened;
-	}
-
-	public int getOrder() {
-		return order;
-	}
-
-	public void setOrder(int order) {
-		this.order = order;
-	}
-	
 	/**
 	 * Remote server.
 	 * 
