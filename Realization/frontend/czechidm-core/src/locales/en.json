@@ -2552,8 +2552,8 @@
           }
       },
       "references": {
-        "header" : "Script usage",
-        "title" : "Script usage"
+        "header" : "Usage in scripts",
+        "title" : "Usage in scripts"
       },
       "dropzone": {
         "infoText": "Drag scripts in archive (ZIP) or single scripts (XML) here, or click to select files."

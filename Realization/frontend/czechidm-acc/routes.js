@@ -413,6 +413,17 @@ module.exports = {
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
         }
       ]
+    },
+    {
+      path: 'scripts/:entityId/',
+      component: require('czechidm-core/src/content/script/Script'),
+      childRoutes: [
+        {
+          path: 'references-mapping',
+          component: require('./src/content/script/ScriptReferencesMapping'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SCRIPT_READ'] } ]
+        }
+      ]
     }
   ]
 };

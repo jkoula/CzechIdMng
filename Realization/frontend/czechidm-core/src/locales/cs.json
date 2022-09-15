@@ -2602,8 +2602,8 @@
           }
       },
       "references": {
-        "header" : "Použití skriptu",
-        "title" : "Použití skriptu"
+        "header" : "Použití ve skriptech",
+        "title" : "Použití ve skriptech"
       },
       "dropzone": {
         "infoText": "Přetáhněte skripty v archivu (ZIP) nebo jednotlivé skripty (XML) na tuto plochu a nebo na ní klikněte pro výběr souborů."
