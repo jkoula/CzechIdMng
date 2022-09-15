@@ -356,8 +356,8 @@ module.exports = {
         order: 500,
         icon: '',
         path: '/scripts/:entityId/references-mapping',
-        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
-        items: []
+        priority: 0,
+        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SCRIPT_READ'] } ]
       }
     ]
   }

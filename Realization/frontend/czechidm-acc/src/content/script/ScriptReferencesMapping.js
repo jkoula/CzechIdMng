@@ -23,6 +23,7 @@ class ScriptReferencesMapping extends Basic.AbstractContent {
   }
 
   componentDidMount() {
+    super.componentDidMount();
     this._initComponent(this.props);
   }
 
@@ -37,6 +38,10 @@ class ScriptReferencesMapping extends Basic.AbstractContent {
   }
 
   _getSystemMappingAttributeLink(attributeMapping) {
+    if (!attributeMapping?._embedded?.systemMapping?._embedded?.objectClass?.system || !attributeMapping.id) {
+      return null;
+    }
+
     return (
       <Link to={`/system/${attributeMapping._embedded.systemMapping._embedded.objectClass.system}/attribute-mappings/${attributeMapping.id}/detail`} >
         {attributeMapping.name}
@@ -45,6 +50,10 @@ class ScriptReferencesMapping extends Basic.AbstractContent {
   }
 
   _getSystemMappingLink(attributeMapping) {
+    if (!attributeMapping?._embedded?.systemMapping?._embedded?.objectClass?.system || !attributeMapping.systemMapping) {
+      return null;
+    }
+
     return (
       <Link to={`/system/${attributeMapping._embedded.systemMapping._embedded.objectClass.system}/mappings/${attributeMapping.systemMapping}/detail`} >
         {attributeMapping._embedded.systemMapping.name}
@@ -53,6 +62,10 @@ class ScriptReferencesMapping extends Basic.AbstractContent {
   }
 
   _getSystemLink(attributeMapping) {
+    if (!attributeMapping?._embedded?.systemMapping?._embedded?.objectClass?.system) {
+      return null;
+    }
+
     return (
       <Link to={`/system/${attributeMapping._embedded.systemMapping._embedded.objectClass.system}/detail`} >
         {attributeMapping._embedded.systemMapping._embedded.objectClass._embedded.system.name}
