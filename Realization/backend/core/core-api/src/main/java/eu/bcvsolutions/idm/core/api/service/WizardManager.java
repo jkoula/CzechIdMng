@@ -22,7 +22,7 @@ public interface WizardManager<W extends AbstractWizardDto, S extends WizardServ
 	/**
 	 * Get connector type by ID.
 	 */
-	S getConnectorType(String id);
+	S getWizardType(String id);
 
 	/**
 	 * Converts connectorType to DTO version.

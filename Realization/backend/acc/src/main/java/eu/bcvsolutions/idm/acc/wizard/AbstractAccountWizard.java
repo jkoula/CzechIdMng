@@ -1,10 +1,8 @@
 package eu.bcvsolutions.idm.acc.wizard;
 
-import org.springframework.beans.factory.BeanNameAware;
-
 import eu.bcvsolutions.idm.acc.service.api.AccountWizardsService;
 
-public abstract class AbstractAccountWizard implements AccountWizardsService, BeanNameAware {
+public abstract class AbstractAccountWizard implements AccountWizardsService {
 
 	private String beanName; // spring bean name - used as id
 

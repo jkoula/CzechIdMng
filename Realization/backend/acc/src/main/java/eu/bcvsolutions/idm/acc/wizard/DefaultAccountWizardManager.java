@@ -22,22 +22,22 @@ public class DefaultAccountWizardManager implements AccountWizardManager {
 	}
 
 	@Override
-	public AccountWizardsService getConnectorType(String id) {
+	public AccountWizardsService getWizardType(String id) {
 		return null;
 	}
 
 	@Override
-	public AccountWizardDto convertTypeToDto(AccountWizardsService connectorType) {
+	public AccountWizardDto convertTypeToDto(AccountWizardsService wizard) {
 		return null;
 	}
 
 	@Override
-	public AccountWizardDto execute(AccountWizardDto connectorType) {
+	public AccountWizardDto execute(AccountWizardDto wizardDto) {
 		return null;
 	}
 
 	@Override
-	public AccountWizardDto load(AccountWizardDto connectorType) {
+	public AccountWizardDto load(AccountWizardDto wizardDto) {
 		return null;
 	}
 }

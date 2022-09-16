@@ -3,13 +3,13 @@ package eu.bcvsolutions.idm.acc.wizard;
 import org.springframework.stereotype.Component;
 
 /**
- * Wizard for personal other accounts
+ * Wizard for personal accounts
  * @author Roman Kucera
  */
-@Component(PersonalOtherAccountWizard.NAME)
-public class PersonalOtherAccountWizard extends AbstractAccountWizard {
+@Component(PersonalAccountWizard.NAME)
+public class PersonalAccountWizard extends AbstractAccountWizard {
 
-	public static final String NAME = "personal-other-account-wizard";
+	public static final String NAME = "personal-account-wizard";
 
 	@Override
 	public int getOrder() {
