@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -393,9 +395,10 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 			
 			identityRoleSubquery.select(subRootIdentityRole);
 			
+			Join<AccIdentityAccount, IdmIdentityRole> identityRole = subRootIdentityAccount.join(AccIdentityAccount_.identityRole, JoinType.LEFT);
 			identityRoleSubquery.where(
-					builder.and(subRootIdentityRole.get(IdmIdentityRole_.role).get(IdmRole_.id).in(filter.getRoleIds()),
-							builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.identityRole), subRootIdentityRole))
+					builder.and(identityRole.get(IdmIdentityRole_.role).get(IdmRole_.id).in(filter.getRoleIds()),
+							builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.identityRole), identityRole))
 			);
 			
 			identityAccountSubquery.select(subRootIdentityAccount);
@@ -422,7 +425,8 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 			predicates.add(builder.exists(identityAccountSubquery));
 		}
 		if (filter.getAccountType() != null) {
-			predicates.add(builder.equal(root.get(AccAccount_.systemMapping).get(SysSystemMapping_.accountType), filter.getAccountType()));
+			Join<AccAccount, SysSystemMapping> accountMapping = root.join(AccAccount_.systemMapping);
+			predicates.add(builder.equal(accountMapping.get(SysSystemMapping_.accountType), filter.getAccountType()));
 		}
 
 		if (filter.getSupportChangePassword() != null && filter.getSupportChangePassword()) {
