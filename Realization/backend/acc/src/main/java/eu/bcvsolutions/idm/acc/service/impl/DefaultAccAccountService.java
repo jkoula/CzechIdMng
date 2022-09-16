@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -81,7 +83,10 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractFormableService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormDefinition_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
@@ -332,6 +337,9 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 		if (filter.getSystemId() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.system).get(SysSystem_.id), filter.getSystemId()));
 		}
+		if (filter.getSystems() != null && !filter.getSystems().isEmpty()) {
+			predicates.add(root.get(AccAccount_.system).get(SysSystem_.id).in(filter.getSystems()));
+		}
 		if (filter.getSystemEntityId() != null) {
 			predicates.add(builder.equal(root.get(AccAccount_.systemEntity).get(SysSystemEntity_.id),
 					filter.getSystemEntityId()));
@@ -378,8 +386,47 @@ public class DefaultAccAccountService extends AbstractFormableService<AccAccount
 			identityAccountSubquery.where(predicate);
 			predicates.add(builder.exists(identityAccountSubquery));
 		}
+		if (filter.getRoleIds() != null && !filter.getRoleIds().isEmpty()) {
+			Subquery<AccIdentityAccount> identityAccountSubquery = query.subquery(AccIdentityAccount.class);
+			Root<AccIdentityAccount> subRootIdentityAccount = identityAccountSubquery.from(AccIdentityAccount.class);
+			
+			Subquery<IdmIdentityRole> identityRoleSubquery = query.subquery(IdmIdentityRole.class);
+			Root<IdmIdentityRole> subRootIdentityRole = identityRoleSubquery.from(IdmIdentityRole.class);
+			
+			identityRoleSubquery.select(subRootIdentityRole);
+			
+			Join<AccIdentityAccount, IdmIdentityRole> identityRole = subRootIdentityAccount.join(AccIdentityAccount_.identityRole, JoinType.LEFT);
+			identityRoleSubquery.where(
+					builder.and(identityRole.get(IdmIdentityRole_.role).get(IdmRole_.id).in(filter.getRoleIds()),
+							builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.identityRole), identityRole))
+			);
+			
+			identityAccountSubquery.select(subRootIdentityAccount);
+			identityAccountSubquery.where(
+                    builder.and(
+                    		builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.account), root), // correlation attr
+                    		builder.exists(identityRoleSubquery))
+            );			
+			predicates.add(builder.exists(identityAccountSubquery));
+		}
+		if (filter.getIdentities() != null && !filter.getIdentities().isEmpty()) {
+			Subquery<AccIdentityAccount> identityAccountSubquery = query.subquery(AccIdentityAccount.class);
+			Root<AccIdentityAccount> subRootIdentityAccount = identityAccountSubquery.from(AccIdentityAccount.class);
+			identityAccountSubquery.select(subRootIdentityAccount);
+
+			Predicate predicate = builder
+					.and(builder.equal(subRootIdentityAccount.get(AccIdentityAccount_.account), root));
+			Predicate identityPredicate = 
+					subRootIdentityAccount.get(AccIdentityAccount_.identity).get(IdmIdentity_.id).in(filter.getIdentities());
+
+			predicate = builder.and(predicate, identityPredicate);
+
+			identityAccountSubquery.where(predicate);
+			predicates.add(builder.exists(identityAccountSubquery));
+		}
 		if (filter.getAccountType() != null) {
-			predicates.add(builder.equal(root.get(AccAccount_.systemMapping).get(SysSystemMapping_.accountType), filter.getAccountType()));
+			Join<AccAccount, SysSystemMapping> accountMapping = root.join(AccAccount_.systemMapping);
+			predicates.add(builder.equal(accountMapping.get(SysSystemMapping_.accountType), filter.getAccountType()));
 		}
 
 		if (filter.getSupportChangePassword() != null && filter.getSupportChangePassword()) {

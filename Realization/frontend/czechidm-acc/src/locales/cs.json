@@ -24,6 +24,43 @@
   "content": {
     "dashboard": {
     },
+    "accounts": {
+      "header": "Účty",
+      "label": "$t(acc:content.accounts.header)",
+      "title": "$t(acc:content.accounts.header)",
+      "all": {
+        "header": "Všechny účty",
+        "label": "$t(acc:content.accounts.all.header)"
+      },
+      "personal": {
+        "header": "Osobní účty",
+        "label": "$t(acc:content.accounts.personal.header)"
+      },
+      "filter": {
+        "accounts":{
+          "identifier": {
+            "placeholder": "Identifikátor účtu"
+          },
+          "system": {
+            "placeholder": "Systém"
+          },
+          "roles": {
+            "placeholder": "Vytvořeno rolí"
+          },
+          "identity": {
+            "placeholder": "Vlastník účtu"
+          },
+          "type": {
+            "placeholder": "Typ účtu"
+          },
+          "protected": {
+            "placeholder": "Chráněn před smazáním",
+            "yes": "Ano",
+            "no": "Ne"
+          }
+        }
+      }
+    },
     "systems": {
       "header": "Napojené systémy",
       "title": "$t(acc:content.systems.header)",
@@ -1103,7 +1140,7 @@
     "SystemEntity": {
       "_type": "Entita na systému",
       "entityType": "Typ entity",
-      "uid": "Identifikátor na systému",
+      "uid": "Identifikátor účtu",
       "system": "Napojený systém",
       "wish": {
         "label": "Přání",
@@ -1827,7 +1864,7 @@
     "AccountTypeEnum": {
       "PERSONAL": "Osobní",
       "PERSONAL_OTHER": "Osobní další účet",
-      "TECHNICAL": "Systémový"
+      "TECHNICAL": "Technický"
     },
     "ReconciliationMissingAccountActionTypeEnum": {
       "CREATE_ACCOUNT": "Vytvořit účet",
