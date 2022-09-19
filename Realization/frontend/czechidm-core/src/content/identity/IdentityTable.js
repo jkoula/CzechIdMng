@@ -443,9 +443,9 @@ export class IdentityTable extends Advanced.AbstractTableContent {
             to={ ({ rowIndex, data, event }) => {
               this.showDetail(data[rowIndex], event);
             }}
-            href={ ({ rowIndex, data }) => {
-              return !skipDashboard ? `/identity/${ encodeURIComponent(data[rowIndex].username) }/dashboard` : manager.getDetailLink(data[rowIndex]);
-            }}
+            // href={ ({ rowIndex, data }) => {
+            //   return !skipDashboard ? `/identity/${ encodeURIComponent(data[rowIndex].username) }/dashboard` : manager.getDetailLink(data[rowIndex]);
+            // }}
             property="username"
             width="20%"
             sort
@@ -454,8 +454,8 @@ export class IdentityTable extends Advanced.AbstractTableContent {
           <Advanced.Column property="firstName" sort width="10%" face="text"/>
           <Advanced.Column property="externalCode" sort width="10%" face="text"/>
           <Advanced.Column property="email" width="15%" face="text" sort/>
-          <Advanced.Column property="disabled" face="bool" sort width={ 100 }/>
-          <Advanced.Column property="state" face="enum" enumClass={ IdentityStateEnum } sort width={ 100 }/>
+          <Advanced.Column property="disabled" face="bool" sort width={ 100 }/> 
+          <Advanced.Column property="state" face="enum" enumClass={ IdentityStateEnum } sort width={ 100 }/> 
           <Advanced.Column
             header={ <Basic.Icon value="component:password"/> }
             title={ this.i18n('entity.Identity.passwordExpiration.title') }

@@ -27,7 +27,6 @@ import UniformPasswordSystemManager from './UniformPasswordSystemManager';
 import RemoteServerManager from './RemoteServerManager';
 import SystemGroupManager from './SystemGroupManager';
 import SystemGroupSystemManager from './SystemGroupSystemManager';
-import EntityManager from 'czechidm-core/src/redux/data/EntityManager';
 import IdentityManager from 'czechidm-core/src/redux/data/IdentityManager';
 import SystemOwnerRoleManager from '../content/system/SystemOwnerRoleManager';
 import SystemOwnerManager from '../content/system/SystemOwnerManager';
@@ -62,7 +61,6 @@ const ManagerRoot = {
   RemoteServerManager,
   SystemGroupManager,
   SystemGroupSystemManager,
-  EntityManager,
   IdentityManager,
   SystemOwnerRoleManager,
   SystemOwnerManager,

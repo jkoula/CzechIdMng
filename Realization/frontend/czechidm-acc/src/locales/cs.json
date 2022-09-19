@@ -377,7 +377,7 @@
         "create":{
           "header": "Nový vlastník systému"
         },
-        "label": "Vlastík - identita",
+        "label": "Vlastník - identita",
         "help": "Vybraná identita se stane vlastníkem systému.",
         "title": "Vlastník"
       },

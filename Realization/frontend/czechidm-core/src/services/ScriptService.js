@@ -30,7 +30,7 @@ class ScriptService extends AbstractService {
   }
 
   supportsBulkAction() {
-    return false;
+    return true;
   }
 
   /**

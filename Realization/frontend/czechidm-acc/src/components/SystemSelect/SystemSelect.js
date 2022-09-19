@@ -11,7 +11,7 @@ export default class SystemSelect extends Advanced.EntitySelectBox {
           return null;
         }
         if (entityType && entityType !== 'System') {
-          LOGGER.warn(`IdentitySelect supports identity entity type only, given [${ entityType }] type will be ignored.`);
+          LOGGER.warn(`SystemSelect supports system entity type only, given [${ entityType }] type will be ignored.`);
         }
         return (
             <Advanced.EntitySelectBox
