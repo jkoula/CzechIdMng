@@ -334,7 +334,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             header={ this.i18n('entity.Identity._type') }
             property="identityContract"
-            width={ 175 }
+            // width={ 175 }
             cell={
               /* eslint-disable react/no-multi-comp */
               ({ rowIndex, data, property }) => (
@@ -351,7 +351,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             property="baseCode"
             header={ this.i18n('entity.Role.baseCode.label') }
             title={ this.i18n('entity.Role.baseCode.help') }
-            width={ 125 }
+            // width={ 125 }
             face="text"
             sort
             sortProperty="role.baseCode"
@@ -361,7 +361,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             property="system"
             header={ this.i18n('entity.RoleSystem.label') }
-            width={ 125 }
+            // width={ 125 }
             face="text"
             sort={false}
             rendered={ _.includes(columns, 'system') }
@@ -379,7 +379,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             property="environment"
             header={ this.i18n('entity.Role.environment.label') }
             title={ this.i18n('entity.Role.environment.help') }
-            width={ 125 }
+            // width={ 125 }
             face="text"
             sort
             sortProperty="role.environment"
@@ -398,7 +398,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             header={this.i18n('entity.IdentityRole.identityContract.title')}
             property="identityContract"
-            width={ 175 }
+            // width={ 175 }
             cell={
               /* eslint-disable react/no-multi-comp */
               ({ rowIndex, data, property }) => (
@@ -415,7 +415,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
           <Advanced.Column
             header={this.i18n('entity.IdentityRole.contractPosition.label')}
             property="contractPosition"
-            width={ 150 }
+            // width={ 150 }
             cell={
               /* eslint-disable react/no-multi-comp */
               ({ rowIndex, data, property }) => {
@@ -437,14 +437,14 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             property="validFrom"
             header={this.i18n('label.validFrom')}
             face="date"
-            width={ 100 }
+            // width={ 100 }
             sort
             rendered={ _.includes(columns, 'validFrom') }/>
           <Advanced.Column
             property="validTill"
             header={this.i18n('label.validTill')}
             face="date"
-            width={ 100 }
+            // width={ 100 }
             sort
             rendered={ _.includes(columns, 'validTill') }/>
           <Advanced.Column
@@ -465,14 +465,15 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 );
               }
             }
-            width={ 150 }
+            // width={ 150 }
             rendered={ _.includes(columns, 'directRole') }/>
 
           <Advanced.Column
             property="description"
             header={this.i18n('entity.Role.description')}
             face="text"
-            width={ 200 }
+            className='descriptionColumn'
+            // width={ 200 }
             cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.description }
             rendered={ _.includes(columns, 'description') }/>
 
@@ -480,7 +481,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             property="priority"
             header={this.i18n('entity.Role.priority')}
             face="text"
-            width={ 15 }
+            // width={ 15 }
             cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.priority }
             rendered={ _.includes(columns, 'priority') }/>
 
@@ -495,7 +496,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 <Basic.BooleanCell propertyValue={ data[rowIndex].automaticRole !== null } className="column-face-bool"/>
               )
             }
-            width={ 15 }
+            // width={ 15 }
             rendered={ _.includes(columns, 'automaticRole') }/>
           { children }
         </Advanced.Table>

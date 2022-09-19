@@ -13,7 +13,6 @@ import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
-
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const requestIdentityRoleManager = new RequestIdentityRoleManager();
 const roleRequestManager = new RoleRequestManager();
@@ -650,7 +649,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               sort/>
             <Advanced.Column
               property="systemState"
-              width={75}
+              // width={75}
               face="text"
               header={this.i18n('systemState')}
               rendered={showChangesOnly}
@@ -725,14 +724,15 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               property="description"
               header={this.i18n('entity.Role.description')}
               face="text"
-              width={ 200 }
+              // width={ 400 }
+              className='descriptionColumn'
               cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.description }
             />
               <Advanced.Column
             property="priority"
             header={this.i18n('entity.Role.priority')}
             face="text"
-            width={ 15 }
+            // width={ 15 }
             cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.priority }
             // rendered={ _.includes(columns, 'priority') }
             />
@@ -756,7 +756,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                   );
                 }
               }
-              width={ 150 }/>
+              // width={ 150 }
+              />
             <Advanced.Column
               sort
               property="automaticRole"
