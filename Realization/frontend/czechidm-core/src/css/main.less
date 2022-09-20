@@ -33,7 +33,7 @@ div.customTextAreNot.form-group {
     min-height: 64px;
     margin-right: 20px;
 }}
-
+//Wide of columns in role and description and priority
 .descriptionColumn{
     max-width: 400px;
     min-width: 300px;
@@ -42,14 +42,19 @@ div.customTextAreNot.form-group {
     max-width: fit-content;
     min-width: 100px;
   }
-  .basic-table .table > thead > tr > td{
-    text-align: center;
-  }
+
   .advanced-tree {
     max-width: fit-content;
     min-width: max-content;
   }
-  .Tree-treeNodeRow-81 {
-    max-width: 800px;
-    min-width: fit-content;
+.tree-node-row {
+    max-width: 300px;
+    .spanRole{
+        white-space:normal;
+        display:inline-block;
+     }
+    span > .entity-info{
+        color:#f50057;
+    }
   }
+ 
