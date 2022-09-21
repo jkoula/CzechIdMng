@@ -217,12 +217,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       event.preventDefault();
     }
 
-    const form = this.refs.roleConceptDetail.getForm();
-    const eavForm = this.refs.roleConceptDetail.getEavForm();
-    if (!form.isFormValid()) {
-      return;
-    }
-    if (eavForm && !eavForm.isValid()) {
+    if(!this.refs.roleConceptDetail.isValid()) {
       return;
     }
     //
@@ -231,25 +226,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     }, () => {
       const { request, putRequestToRedux} = this.props;
 
-      const entity = form.getData();
-      entity.roleRequest = request.id;
-      let eavValues = null;
-      if (eavForm) {
-        eavValues = {values: eavForm.getValues()};
-      }
 
-      // Conversions
-      if (entity.identityContract && _.isObject(entity.identityContract)) {
-        entity.identityContract = entity.identityContract.id;
-      }
-      if (entity.role && _.isArray(entity.role)) {
-        entity.roles = entity.role;
-        entity.role = null;
-      }
-      // Add EAV to entity
-      entity._eav = [eavValues];
       // Save entity
-      this.context.store.dispatch(requestIdentityRoleManager.createEntity(entity, null, (createdEntity, error) => {
+      this.refs.roleConceptDetail.save(request.id, (createdEntity, error) => {
         if (error) {
           // If error contains parameters with attributes, then is it validation error
           if (error.parameters && error.parameters.attributes) {
@@ -279,7 +258,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
             this.reload();
           });
         }
-      }));
+      });
     });
   }
 

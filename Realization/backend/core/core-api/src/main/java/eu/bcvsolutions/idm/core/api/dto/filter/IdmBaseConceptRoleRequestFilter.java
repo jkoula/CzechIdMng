@@ -26,7 +26,19 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
     private String roleEnvironment;
     private List<String> roleEnvironments;
 
-    public IdmBaseConceptRoleRequestFilter() {
+	private Set<UUID> identityRoleIds;
+
+	public void setIdentityRoleIds(Set<UUID> identityRoleIds) {
+		this.identityRoleIds = identityRoleIds;
+	}
+
+	public void setIdentityId(UUID identityId) {
+		this.identityId = identityId;
+	}
+
+	private UUID identityId;
+
+	public IdmBaseConceptRoleRequestFilter() {
 		this(new LinkedMultiValueMap<>());
 	}
 
@@ -115,4 +127,16 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 	}
 
     public abstract void setRoleAssignmentUuid(UUID identityRoleId);
+
+	public void setRoleAssignmentUuids(Set<UUID> identityRoleIds) {
+		this.identityRoleIds = identityRoleIds;
+	}
+
+	public Set<UUID> getIdentityRoleIds() {
+		return identityRoleIds;
+	}
+
+	public UUID getIdentityId() {
+		return this.identityId;
+	}
 }

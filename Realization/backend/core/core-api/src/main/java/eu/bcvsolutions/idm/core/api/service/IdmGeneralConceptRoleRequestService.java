@@ -3,19 +3,23 @@ package eu.bcvsolutions.idm.core.api.service;
 import eu.bcvsolutions.idm.core.api.domain.Loggable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -26,7 +30,7 @@ import java.util.UUID;
 public interface IdmGeneralConceptRoleRequestService<
         A extends AbstractRoleAssignmentDto,
         D extends AbstractConceptRoleRequestDto,
-        F extends IdmBaseConceptRoleRequestFilter> extends ReadWriteDtoService<D, F>, AuthorizableService<D> {
+        F extends IdmBaseConceptRoleRequestFilter> extends ReadWriteDtoService<D, F>, AuthorizableService<D>, AdaptableService<D, F, IdmRequestIdentityRoleDto> {
 
     void addToLog(Loggable logItem, String text);
 
@@ -85,4 +89,12 @@ public interface IdmGeneralConceptRoleRequestService<
     Class<D> getType();
 
     F getFilter();
+
+    IdmRequestIdentityRoleDto saveRequestRole(IdmRequestIdentityRoleDto dto, BasePermission[] permission);
+
+    IdmRequestIdentityRoleDto deleteRequestRole(IdmRequestIdentityRoleDto dto, BasePermission[] permission);
+
+    Set<String> getTransitivePermissions(D concept);
+
+    A getEmbeddedAssignment(D concept);
 }

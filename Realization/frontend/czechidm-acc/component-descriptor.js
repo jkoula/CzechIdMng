@@ -294,6 +294,15 @@ module.exports = {
       // no entityType here, because accounts for all type of entities from product will show only this tabs.
       entityType: [''],
       path: ['/account/:entityId/detail', '/account/:entityId/roles', '/account/:entityId/audit', '/account/:entityId/provisioning', '/account/:entityId/other']
+    },
+    {
+      id: 'account-select',
+      type: 'entity-select-box',
+      priority: 0,
+      localizationKey: 'entity.Account',
+      entityType: ['account'],
+      searchInFields: [],
+      manager: require('./src/redux').AccountManager
     }
   ]
 };

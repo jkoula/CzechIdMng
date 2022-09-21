@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestByIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -260,4 +261,5 @@ public interface IdmRoleRequestService extends
 	 */
 	IdmRoleRequestDto refreshSystemState(IdmRoleRequestDto request);
 
+	IdmRoleRequestDto createRequest(IdmRequestIdentityRoleDto dto);
 }

@@ -57,12 +57,20 @@ export default function BasicTabs(props) {
   // prepare rendered tabs
   let value = onSelect ? `${ activeKey }` : _mergedActiveKey;
   const _tabs = _children.map((child, index) => {
-    let eventKey = child.props.eventKey;
-    if (!eventKey && eventKey !== 0) {
+    let eventKey = child.props.value;
+    if (!eventKey) {
+      // if no value was specified, try to use eventKey
+      eventKey = child.props.eventKey
+      console.log("eventKey")
+    } else if (!eventKey && eventKey !== 0) {
+      // if no value or eventKey was specified, use index instead
       eventKey = index;
+      console.log("index")
     } else {
       eventKey = `${ eventKey }`;
+      console.log("string eventkey")
     }
+    console.log("result", eventKey)
     if (Utils.Ui.isEmpty(value)) {
       value = eventKey;
     }
@@ -70,12 +78,12 @@ export default function BasicTabs(props) {
     return (
       <Tab
         id={ `basic-tab-${ eventKey }` }
-        value={ eventKey }
+        value={ `${eventKey}` }
         aria-controls={ `basic-tabpanel-${ eventKey }` }
         disabled={ child.props.disabled }
         className={
           classnames(
-            { [classes.activeTab]: value === eventKey },
+            { [classes.activeTab]: value === `${eventKey}` },
             className
           )
         }
@@ -83,6 +91,7 @@ export default function BasicTabs(props) {
         label={ child.props.title }/>
     );
   });
+  console.log("asdasdasd", value, _tabs)
   //
   return (
     <div className="tab-horizontal" style={ style }>
@@ -97,8 +106,12 @@ export default function BasicTabs(props) {
       </AppBar>
       {
         _children.map((child, index) => {
-          let eventKey = child.props.eventKey;
-          if (!eventKey && eventKey !== 0) {
+          let eventKey = child.props.value;
+          if (!eventKey) {
+            // if no value was specified, try to use eventKey
+            eventKey = child.props.eventKey
+          } else if (!eventKey && eventKey !== 0) {
+            // if no value or eventKey was specified, use index instead
             eventKey = index;
           } else {
             eventKey = `${ eventKey }`;
@@ -107,13 +120,13 @@ export default function BasicTabs(props) {
           return (
             <div
               role="tabpanel"
-              hidden={ value !== eventKey }
+              hidden={ value !== `${eventKey}` }
               id={ `basic-tabpanel-${ eventKey }` }
               aria-labelledby={ `basic-tab-${ eventKey }` }
               className={ classes.tabContent }
               style={ child.props.style }>
               {
-                value === eventKey || !unmountOnExit
+                value === `${eventKey}` || !unmountOnExit
                 ?
                 child
                 :

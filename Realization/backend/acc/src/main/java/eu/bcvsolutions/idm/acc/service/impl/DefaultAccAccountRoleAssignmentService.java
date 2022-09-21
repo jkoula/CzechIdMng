@@ -3,7 +3,6 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
-import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment_;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
@@ -13,18 +12,16 @@ import eu.bcvsolutions.idm.acc.event.AccAccountRoleAssignmentEvent;
 import eu.bcvsolutions.idm.acc.repository.AccAccountRoleRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
-import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractRoleAssignmentService;
@@ -64,7 +61,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     }
 
     @Override
-    protected AccAccountRoleAssignmentFilter getFilter() {
+    public AccAccountRoleAssignmentFilter getFilter() {
         return new AccAccountRoleAssignmentFilter();
     }
 
@@ -132,12 +129,10 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     }
 
     @Override
-    public Collection<? extends AbstractRoleAssignmentDto> findAllByIdentity(UUID id) {
+    public Collection<AccAccountRoleAssignmentDto> findAllByIdentity(UUID id) {
         AccAccountRoleAssignmentFilter filter = new AccAccountRoleAssignmentFilter();
         filter.setIdentityId(id);
-        final List<AccAccountRoleAssignmentDto> content = find(filter, null).getContent();
-        final List<AccAccountRoleAssignmentDto> accAccountRoleAssignmentDtos = find(new AccAccountRoleAssignmentFilter(), null).getContent();
-        return content;
+        return find(filter, null).getContent();
     }
 
     @Override
@@ -147,4 +142,11 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
         event.setPriority(PriorityType.IMMEDIATE);
         return event;
     }
+
+
+    @Override
+    public <F2 extends BaseFilter> DtoAdapter<AccAccountRoleAssignmentDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
+        return null;
+    }
+
 }

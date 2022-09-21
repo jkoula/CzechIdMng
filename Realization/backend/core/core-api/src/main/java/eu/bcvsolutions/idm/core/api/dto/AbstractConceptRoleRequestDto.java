@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.api.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.Loggable;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -322,4 +323,6 @@ public abstract class AbstractConceptRoleRequestDto extends FormableDto implemen
     public abstract void setOwnerUuid(UUID id);
 
     public abstract AbstractConceptRoleRequestDto copy();
+
+    public abstract Class<? extends Identifiable> getOwnerType();
 }

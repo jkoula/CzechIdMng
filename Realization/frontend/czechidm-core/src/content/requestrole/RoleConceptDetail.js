@@ -7,10 +7,12 @@ import { connect } from 'react-redux';
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
-import { IdentityContractManager, RoleTreeNodeManager, RoleManager, DataManager, IdentityRoleManager } from '../../redux';
+import { IdentityContractManager, RoleTreeNodeManager, RoleManager, DataManager, IdentityRoleManager, RequestIdentityRoleManager } from '../../redux';
 import SearchParameters from '../../domain/SearchParameters';
 import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
+import { AccountSelect, Managers } from 'czechidm-acc'
+
 
 const identityRoleManager = new IdentityRoleManager();
 const identityContractManager = new IdentityContractManager();
@@ -20,6 +22,9 @@ let selectedRole = null;
 let selectedIdentityRole = null;
 const uiKeyIdentityRoleFormInstance = 'identity-role-form-instance';
 const uiKeyRoleAttributeFormDefinition = 'role-attribute-form-definition';
+const requestIdentityRoleManager = new RequestIdentityRoleManager();
+const requestAccountRoleManager = new Managers.RequestAccountRoleManager();
+
 
 /**
  * Detail of role concept request
@@ -31,7 +36,8 @@ export class RoleConceptDetail extends Basic.AbstractContent {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      environment: ConfigLoader.getConfig('role.table.filter.environment', [])
+      environment: ConfigLoader.getConfig('role.table.filter.environment', []),
+      selectedOwnerType: "identityContract"
     };
   }
 
@@ -63,6 +69,61 @@ export class RoleConceptDetail extends Basic.AbstractContent {
 
   getForm() {
     return this.refs.form;
+  }
+
+  isValid() {
+    const eavForm = this.getEavForm();
+    if (!this.getForm().isFormValid()) {
+      return false;
+    }
+    return !(eavForm && !eavForm.isValid());
+  }
+
+  getEntity() {
+    let entity = this.getForm().getData();
+    const eavForm = this.getEavForm();
+    let eavValues = null;
+    const {selectedOwnerType} = this.state;
+    //
+    if (eavForm) {
+      eavValues = {values: eavForm.getValues()};
+    }
+
+    // Conversions
+    if ( entity[selectedOwnerType] && _.isObject( entity[selectedOwnerType])) {
+      entity[selectedOwnerType] =  entity[selectedOwnerType].id;
+    }
+    if (entity.role && _.isArray(entity.role)) {
+      entity.roles = entity.role;
+      entity.role = null;
+    }
+    // Add EAV to entity
+    entity._eav = [eavValues];
+    //
+    return entity;
+  }
+
+  save(requestId, cb = null) {
+    const entity = this.getEntity();
+    entity.roleRequest = requestId;
+    const {selectedOwnerType} = this.state;
+    //
+    const manager = this.getManagerForType(selectedOwnerType);
+
+    this.context.store.dispatch(manager.createEntity(entity, null, cb));
+  }
+
+  getManagerForType(selectedOwnerType) {
+    switch (selectedOwnerType) {
+      case "identityContract":
+        return requestIdentityRoleManager;
+      case "account":
+        return requestAccountRoleManager;
+    }
+  }
+
+  handleTabSwitch = (newValue) => {
+    this.setState({selectedOwnerType: newValue})
   }
 
   _initComponent(props) {
@@ -116,21 +177,24 @@ export class RoleConceptDetail extends Basic.AbstractContent {
    */
   _onChangeSelectOfContract(value) {
     const entity = this.state && this.state.entity ? this.state.entity : this.props.entity;
+    console.log("_onChangeSelectOfContract entity", entity)
+    const {selectedOwnerType} = this.state;
     let validFrom = value ? value.validFrom : null;
     const now = moment().utc().valueOf();
     if (validFrom && moment(validFrom).isBefore(now)) {
       validFrom = now;
     }
     const entityFormData = _.merge({}, entity);
+    console.log("_onChangeSelectOfContract entityFormData", entityFormData)
     entityFormData.validFrom = validFrom;
-    entityFormData.identityContract = value;
+    entityFormData[selectedOwnerType] = value;
     if (this.refs.role) {
       entityFormData.role = this.refs.role.getValue();
     }
     if (this.props.entity) {
       this.setState({entity: entityFormData});
     }
-
+    console.log("_onChangeSelectOfContract entityFormData after setstate", entityFormData)
     return true;
   }
 
@@ -187,7 +251,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       validationErrors,
       showEnvironment
     } = this.props;
-    const { environment } = this.state;
+    const { environment,selectedOwnerType } = this.state;
     const entity = this.state.entity ? this.state.entity : this.props.entity;
 
     if (!entity) {
@@ -272,30 +336,68 @@ export class RoleConceptDetail extends Basic.AbstractContent {
           }
           helpBlock={ this.i18n('entity.IdentityRole.roleSystem.help')}
           label={ this.i18n('entity.IdentityRole.roleSystem.label') }/>
-        <Advanced.IdentityContractSelect
-          ref="identityContract"
-          manager={ identityContractManager }
-          forceSearchParameters={
-            new SearchParameters()
-              .setFilter('identity', identityUsername)
-              .setFilter('validNowOrInFuture', true)
-              .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
-              .setFilter('_permission_operator', 'or')
-          }
-          defaultSearchParameters={
-            new SearchParameters().clearSort()
-          }
-          pageSize={ 100 }
-          label={ this.i18n('entity.IdentityRole.identityContract.label') }
-          placeholder={ this.i18n('entity.IdentityRole.identityContract.placeholder') }
-          helpBlock={ this.i18n('entity.IdentityRole.identityContract.help') }
-          returnProperty={false}
-          readOnly={ !added || readOnly || !Utils.Entity.isNew(entity) }
-          onChange={ this._onChangeSelectOfContract.bind(this) }
-          niceLabel={ (contract) => identityContractManager.getNiceLabel(contract, false) }
-          required
-          useFirst
-          clearable={ false }/>
+
+        <Basic.Tabs onSelect={this.handleTabSwitch} activeKey={this.state.selectedOwnerType}>
+          <Basic.Tab value="identityContract" title="aaa">
+            { selectedOwnerType === "identityContract" &&
+                <Advanced.IdentityContractSelect
+                    ref="identityContract"
+                    manager={identityContractManager}
+                    forceSearchParameters={
+                      new SearchParameters()
+                          .setFilter('identity', identityUsername)
+                          .setFilter('validNowOrInFuture', true)
+                          .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
+                          .setFilter('_permission_operator', 'or')
+                    }
+                    defaultSearchParameters={
+                      new SearchParameters().clearSort()
+                    }
+                    pageSize={100}
+                    label={this.i18n('entity.IdentityRole.identityContract.label')}
+                    placeholder={this.i18n('entity.IdentityRole.identityContract.placeholder')}
+                    helpBlock={this.i18n('entity.IdentityRole.identityContract.help')}
+                    returnProperty={false}
+                    readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
+                    onChange={this._onChangeSelectOfContract.bind(this)}
+                    niceLabel={(contract) => identityContractManager.getNiceLabel(contract, false)}
+                    required
+                    useFirst
+                    clearable={false}/>
+            }
+
+          </Basic.Tab>
+          <Basic.Tab value="account" title="bbb">
+            { selectedOwnerType === "account" &&
+                <AccountSelect
+                    ref="account"
+                    forceSearchParameters={
+                      new SearchParameters()
+                          .setFilter('identityId', identityUsername)
+                          .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
+                          .setFilter('_permission_operator', 'or')
+                    }
+                    defaultSearchParameters={
+                      new SearchParameters().clearSort()
+                    }
+                    pageSize={100}
+                    label={this.i18n('entity.IdentityRole.account.label')}
+                    placeholder={this.i18n('entity.IdentityRole.acount.placeholder')}
+                    helpBlock={this.i18n('entity.IdentityRole.account.help')}
+                    returnProperty={false}
+                    readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
+                    onChange={this._onChangeSelectOfContract.bind(this)}
+                    niceLabel={(account) => requestAccountRoleManager.getNiceLabel(account, false)}
+                    required
+                    useFirst
+                    clearable={false}/>
+            }
+
+          </Basic.Tab>
+
+        </Basic.Tabs>
+
+
         <Basic.LabelWrapper
           label={ this.i18n('entity.IdentityRole.automaticRole.label') }
           helpBlock={ this.i18n('entity.IdentityRole.automaticRole.help') }

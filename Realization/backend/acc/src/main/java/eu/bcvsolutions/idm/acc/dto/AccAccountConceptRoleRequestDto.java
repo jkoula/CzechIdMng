@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.dto;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.hateoas.core.Relation;
 
@@ -69,5 +70,10 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
         conceptRoleRequest.setDirectConcept(getId());
         // save and add to concepts to be processed
         return conceptRoleRequest;
+    }
+
+    @Override
+    public Class<? extends Identifiable> getOwnerType() {
+        return AccAccountDto.class;
     }
 }

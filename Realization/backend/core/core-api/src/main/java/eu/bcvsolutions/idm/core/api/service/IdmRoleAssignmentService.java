@@ -4,9 +4,11 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
@@ -18,13 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public interface IdmRoleAssignmentService<D extends AbstractRoleAssignmentDto, F extends BaseRoleAssignmentFilter> extends EventableDtoService<D, F>,
-        AuthorizableService<D> {
+        AuthorizableService<D>, AdaptableService<D, F, IdmRequestIdentityRoleDto>{
 
     /**
      * Get form instance for given identity role
@@ -108,10 +111,10 @@ public interface IdmRoleAssignmentService<D extends AbstractRoleAssignmentDto, F
 
     Class<D> getType();
 
-    Collection<? extends AbstractRoleAssignmentDto> findAllByIdentity(UUID id);
+    Collection<D> findAllByIdentity(UUID id);
 
     void unassignAllSubRoles(UUID identityRoleId, EntityEvent<D> parentEvent);
 
     AbstractRoleAssignmentEvent<D> getEventForAssignment(D assignment, AbstractRoleAssignmentEvent.RoleAssignmentEventType update, String... flags);
-
+    F getFilter();
 }

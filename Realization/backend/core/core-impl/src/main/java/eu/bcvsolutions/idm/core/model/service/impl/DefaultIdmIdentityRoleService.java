@@ -9,14 +9,16 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,7 +33,6 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
@@ -42,15 +43,10 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
-import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
-import eu.bcvsolutions.idm.core.model.entity.IdmRole;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole_;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmIdentityRoleRepository;
@@ -254,11 +250,11 @@ public class DefaultIdmIdentityRoleService
 	 * @return
 	 */
 	private Sort getDefaultSort() {
-		return Sort.by(IdmIdentityRole_.role.getName() + "." + IdmRole_.code.getName());
+		return Sort.by(AbstractRoleAssignment_.role.getName() + "." + IdmRole_.code.getName());
 	}
 
 	@Override
-	protected IdmIdentityRoleFilter getFilter() {
+	public IdmIdentityRoleFilter getFilter() {
 		return new IdmIdentityRoleFilter();
 	}
 
@@ -267,5 +263,11 @@ public class DefaultIdmIdentityRoleService
 		@SuppressWarnings("deprecation") IdentityRoleEvent event = new IdentityRoleEvent(eventType, assignment, setupFlags(flags));
 		event.setPriority(PriorityType.IMMEDIATE);
 		return event;
+	}
+
+	@Override
+	public <F2 extends BaseFilter> DtoAdapter<IdmIdentityRoleDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
+		IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
+		return new IdentityRoleConceptCompilingAdapter(translatedFilter, /*TODO*/null, null, this);
 	}
 }

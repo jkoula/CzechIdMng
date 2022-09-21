@@ -19,7 +19,7 @@ import org.springframework.context.ApplicationContextAware;
  * @author Radek Tomiška
  *
  */
-public enum SystemEntityType implements  ApplicationContextAware
+public enum SystemEntityType
 {
 
 
@@ -36,10 +36,6 @@ public enum SystemEntityType implements  ApplicationContextAware
 	private boolean supportsProvisioning;
 	private boolean supportsSync;
 
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		//do shit
-	}
 
 	private SystemEntityType(Class<? extends AbstractDto> entityType, boolean supportsProvisioning, boolean supportsSync) {
 		this.entityType = entityType;

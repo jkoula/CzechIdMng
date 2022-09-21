@@ -278,9 +278,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         return toDtoPage(roleAssignmentRepository.findByAutomaticRole_Id(automaticRoleId, pageable));
     }
 
-
-    protected abstract F getFilter();
-
     @Transactional(readOnly = true)
     public Page<D> findExpiredRoles(LocalDate expirationDate, Pageable page) {
         Assert.notNull(expirationDate, "Expiration date is required.");

@@ -28,6 +28,7 @@ import javax.persistence.criteria.Root;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
@@ -153,10 +154,6 @@ public class DefaultIdmRoleRequestService
 	@Autowired
 	private WorkflowProcessInstanceService workflowProcessInstanceService;
 	@Autowired
-	private FormService formService;
-	@Autowired
-	private IdmRoleService roleService;
-	@Autowired
 	private WorkflowHistoricProcessInstanceService workflowHistoricProcessInstanceService;
 	@Autowired
 	private IdmIncompatibleRoleService incompatibleRoleService;
@@ -169,12 +166,8 @@ public class DefaultIdmRoleRequestService
 	@Autowired
 	private IdmRoleCompositionService roleCompositionService;
 	@Autowired
-	private ValueGeneratorManager valueGeneratorManager;
-	@Autowired
 	private IdmIdentityRoleThinService identityRoleThinService;
 	//
-	private IdmRoleRequestService roleRequestService;
-
 	@Autowired
 	public DefaultIdmRoleRequestService(IdmRoleRequestRepository repository,
 			IdmConceptRoleRequestService conceptRoleRequestService, EntityEventManager entityEventManager) {
@@ -286,7 +279,7 @@ public class DefaultIdmRoleRequestService
 			if (!(service instanceof DefaultIdmRoleRequestService)) {
 				throw new CoreException("We expects instance of DefaultIdmRoleRequestService!");
 			}
-			return ((DefaultIdmRoleRequestService) roleRequestService).startRequestNewTransactional(event);
+			return ((DefaultIdmRoleRequestService) service).startRequestNewTransactional(event);
 		} catch (Exception ex) {
 			LOG.error(ex.getLocalizedMessage(), ex);
 			IdmRoleRequestDto request = get(event.getContent().getId());
@@ -640,6 +633,14 @@ public class DefaultIdmRoleRequestService
 		RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEventType.REFRESH_SYSTEM_STATE, request);
 		this.publish(requestEvent);
 		return requestEvent.getContent();
+	}
+
+	@Override
+	public IdmRoleRequestDto createRequest(IdmRequestIdentityRoleDto dto) {
+		//TODO
+		UUID applicantUuid = conceptRoleRequestManager.getServiceForConcept(dto.getAssignmentType()).resolveApplicant();
+		createRequest()
+
 	}
 
 	@Override
@@ -1136,10 +1137,7 @@ public class DefaultIdmRoleRequestService
 
 
 	private IdmRoleRequestService getIdmRoleRequestService() {
-		if (this.roleRequestService == null) {
-			this.roleRequestService = applicationContext.getBean(IdmRoleRequestService.class);
-		}
-		return this.roleRequestService;
+		return applicationContext.getBean(IdmRoleRequestService.class);
 	}
 
 	/**

@@ -13,12 +13,14 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
-import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
@@ -36,10 +38,15 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
+import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractConceptRoleRequestService;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
+import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +58,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,17 +78,20 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     private final AccAccountService accountService;
     private final AccIdentityAccountService identityAccountService;
 
+    private final LookupService lookupService;
+
     @Autowired
     public DefaultAccAccountConceptRoleRequestService(AbstractEntityRepository<AccAccountConceptRoleRequest> repository, WorkflowProcessInstanceService workflowProcessInstanceService,
             LookupService lookupService, IdmAutomaticRoleRepository automaticRoleRepository, AccAccountRoleAssignmentService accRoleAccountService, FormService formService,
             IdmRoleCompositionService roleCompositionService, IdmRoleService roleService, AccAccountService accountService, AccIdentityAccountService identityAccountService,
-            AccAccountRoleAssignmentService roleAssignmentService) {
+            AccAccountRoleAssignmentService roleAssignmentService, LookupService lookupService1) {
         super(repository, workflowProcessInstanceService, roleCompositionService, lookupService, automaticRoleRepository, roleAssignmentService);
         this.accRoleAccountService = accRoleAccountService;
         this.formService = formService;
         this.roleService = roleService;
         this.accountService = accountService;
         this.identityAccountService = identityAccountService;
+        this.lookupService = lookupService1;
     }
 
     @Override
@@ -166,6 +177,32 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     }
 
     @Override
+    public Set<String> getTransitivePermissions(AccAccountConceptRoleRequestDto concept) {
+        Set<String> result = new HashSet<>();
+        AccAccountDto account = lookupService.lookupEmbeddedDto(concept, AccAccountConceptRoleRequest_.accAccount);
+        Set<String> accountPermissions = accountService.getPermissions(account);
+
+        if (PermissionUtils.hasPermission(accountPermissions, ContractBasePermission.CHANGEPERMISSION)) {
+            result.add(ContractBasePermission.CHANGEPERMISSION.getName());
+        } else {
+            // by related role
+            IdmRoleDto role = lookupService.lookupEmbeddedDto(concept, AbstractConceptRoleRequest_.role);
+            Set<String> rolePermissions = roleService.getPermissions(role);
+
+            if (PermissionUtils.hasPermission(rolePermissions, RoleBasePermission.CHANGEPERMISSION)) {
+                result.add(RoleBasePermission.CHANGEPERMISSION.getName());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public AccAccountRoleAssignmentDto getEmbeddedAssignment(AccAccountConceptRoleRequestDto concept) {
+        return DtoUtils.getEmbedded(concept,
+                AccAccountConceptRoleRequest_.accountRole, AccAccountRoleAssignmentDto.class, null);
+    }
+
+    @Override
     protected UUID getIdentityRoleId(AccAccountConceptRoleRequestDto concept) {
         UUID accountRoleId = null;
         AccAccountConceptRoleRequestDto accountRoleDto = DtoUtils.getEmbedded(concept, AccAccountConceptRoleRequest_.accountRole, AccAccountConceptRoleRequestDto.class, null);
@@ -228,7 +265,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             addToLog(requestEvent.getContent(), message);
             save(concept);
 
-            AccAccountRoleAssignmentEvent event = new AccAccountRoleAssignmentEvent(AccAccountRoleAssignmentEvent.RoleAssignmentEventType.DELETE, accountRole, Map.of(IdmAccountDto.SKIP_PROPAGATE,
+            AccAccountRoleAssignmentEvent event = new AccAccountRoleAssignmentEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE, accountRole, Map.of(IdmAccountDto.SKIP_PROPAGATE,
                     Boolean.TRUE));
 
             accRoleAccountService.publish(event, requestEvent);
@@ -244,6 +281,29 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             accountRoleAssignment = accRoleAccountService.get(concept.getAccountRole());
         }
         return accountRoleAssignment;
+    }
+
+    @Override
+    protected AccAccountConceptRoleRequestDto requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto) {
+        return modelMapper.map(dto, AccAccountConceptRoleRequestDto.class);
+    }
+
+    @Override
+    protected IdmRequestIdentityRoleDto conceptToRequestIdentityRole(AccAccountConceptRoleRequestDto save) {
+        return modelMapper.map(save, IdmRequestIdentityRoleDto.class);
+    }
+
+    @Override
+    protected AccAccountConceptRoleRequestDto createEmptyConceptWithRoleAssignmentData(AccAccountRoleAssignmentDto roleAssignment) {
+        AccAccountConceptRoleRequestDto conceptRoleRequest = new AccAccountConceptRoleRequestDto();
+        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccount());
+
+        return conceptRoleRequest;
+    }
+
+    @Override
+    protected AccAccountRoleAssignmentDto getRoleAssignment(UUID id) {
+        return accRoleAccountService.get(id);
     }
 
     @Override

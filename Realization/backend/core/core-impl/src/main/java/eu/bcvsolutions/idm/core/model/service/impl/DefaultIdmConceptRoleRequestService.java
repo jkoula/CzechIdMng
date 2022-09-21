@@ -1,27 +1,26 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
-import eu.bcvsolutions.idm.core.api.domain.PriorityType;
-import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
-import eu.bcvsolutions.idm.core.api.event.CoreEvent;
-import eu.bcvsolutions.idm.core.api.event.EntityEvent;
-import eu.bcvsolutions.idm.core.api.event.EventType;
-import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.service.thin.IdmIdentityRoleThinService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
@@ -35,12 +34,16 @@ import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest;
 import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
-import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmConceptRoleRequestRepository;
+import eu.bcvsolutions.idm.core.model.service.impl.adapter.DefaultRequestRoleConceptAdapter;
+import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
+import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,8 +55,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -83,14 +86,30 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
 
     private final IdmIdentityRoleService identityRoleService;
 
+    private final LookupService lookupService;
+
+    private final ModelMapper modelMapper;
+
+    //private final IdmRoleRequestService roleRequestService;
+
+    private final IdmRoleSystemService roleSystemService;
+
+    private final WorkflowProcessInstanceService workflowProcessInstanceService;
+
     @Autowired
     public DefaultIdmConceptRoleRequestService(IdmConceptRoleRequestRepository repository, WorkflowProcessInstanceService workflowProcessInstanceService, LookupService lookupService,
             IdmAutomaticRoleRepository automaticRoleRepository, IdmRoleService roleService, IdmIdentityContractService identityContractService, IdmIdentityRoleService identityRoleService,
-            IdmRoleCompositionService roleCompositionService) {
+            IdmRoleCompositionService roleCompositionService, LookupService lookupService1, ModelMapper modelMapper/*, TODO solev circular dependency IdmRoleRequestService roleRequestService*/, IdmRoleSystemService roleSystemService,
+            WorkflowProcessInstanceService workflowProcessInstanceService1) {
         super(repository, workflowProcessInstanceService, roleCompositionService, lookupService, automaticRoleRepository, identityRoleService);
         this.roleService = roleService;
         this.identityContractService = identityContractService;
         this.identityRoleService = identityRoleService;
+        this.lookupService = lookupService1;
+        this.modelMapper = modelMapper;
+        //this.roleRequestService = roleRequestService;
+        this.roleSystemService = roleSystemService;
+        this.workflowProcessInstanceService = workflowProcessInstanceService1;
         //
         Assert.notNull(workflowProcessInstanceService, "Workflow process instance service is required!");
         Assert.notNull(lookupService, "Service is required.");
@@ -226,10 +245,69 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
     }
 
     @Override
+    public IdmRequestIdentityRoleDto saveRequestRole(IdmRequestIdentityRoleDto dto, BasePermission[] permission) {
+        return conceptToRequestIdentityRole(save(requestIdentityRoleToConcept(dto), permission));
+    }
+
+    @Override
+    public Set<String> getTransitivePermissions(IdmConceptRoleRequestDto concept) {
+        Set<String> result = new HashSet<>();
+        IdmIdentityContractDto contract = lookupService.lookupEmbeddedDto(concept, IdmConceptRoleRequest_.identityContract);
+        Set<String> contractPermissions = identityContractService.getPermissions(contract);
+
+        if (PermissionUtils.hasPermission(contractPermissions, ContractBasePermission.CHANGEPERMISSION)) {
+            result.add(ContractBasePermission.CHANGEPERMISSION.getName());
+        } else {
+            // by related role
+            IdmRoleDto role = lookupService.lookupEmbeddedDto(concept, AbstractConceptRoleRequest_.role);
+            Set<String> rolePermissions = roleService.getPermissions(role);
+
+            if (PermissionUtils.hasPermission(rolePermissions, RoleBasePermission.CHANGEPERMISSION)) {
+                result.add(RoleBasePermission.CHANGEPERMISSION.getName());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public IdmIdentityRoleDto getEmbeddedAssignment(IdmConceptRoleRequestDto concept) {
+        return DtoUtils.getEmbedded(concept,
+                IdmConceptRoleRequest_.identityRole, IdmIdentityRoleDto.class,
+                (IdmIdentityRoleDto) null);
+    }
+
+    @Override
+    protected IdmConceptRoleRequestDto requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto) {
+        return modelMapper.map(dto, IdmConceptRoleRequestDto.class);
+    }
+
+    @Override
+    protected IdmRequestIdentityRoleDto conceptToRequestIdentityRole(IdmConceptRoleRequestDto save) {
+        return modelMapper.map(save, IdmRequestIdentityRoleDto.class);
+    }
+
+    @Override
+    protected IdmConceptRoleRequestDto createEmptyConceptWithRoleAssignmentData(IdmIdentityRoleDto roleAssignment) {
+        IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
+        IdmIdentityContractDto contractDto = lookupService.lookupEmbeddedDto(roleAssignment, IdmIdentityRole_.identityContract);
+        conceptRoleRequest.setOwnerUuid(roleAssignment.getIdentityContract());
+
+        conceptRoleRequest.setValidFrom(contractDto.getValidFrom());
+        conceptRoleRequest.setValidTill(contractDto.getValidTill());
+        return conceptRoleRequest;
+    }
+
+    @Override
+    protected IdmIdentityRoleDto getRoleAssignment(UUID id) {
+        return identityRoleService.get(id);
+    }
+
+    @Override
     protected IdmFormValueDto getCurrentFormValue(UUID identityRoleId, IdmFormValueDto value, IdmFormAttributeDto formAttributeDto) {
-        IdmFormValueDto identityRoleValueDto =
-                formService.getValues(new IdmIdentityRoleDto(identityRoleId), formAttributeDto).stream().filter(identityRoleValue -> identityRoleValue.getSeq() == value.getSeq()).findFirst().orElse(null);
-        return identityRoleValueDto;
+        return formService.getValues(new IdmIdentityRoleDto(identityRoleId), formAttributeDto).stream()
+                .filter(identityRoleValue -> identityRoleValue.getSeq() == value.getSeq())
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -270,8 +348,6 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         return find(filter, pa, permissions).getContent();
     }
 
-
-
     @Override
     public Collection<IdmConceptRoleRequestDto> getConceptsToRemoveDuplicates(AbstractRoleAssignmentDto tempIdentityRoleSub, List<AbstractRoleAssignmentDto> allByIdentity) {
         return null;
@@ -288,4 +364,11 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
     }
 
 
+    @Override
+    public <F2 extends BaseFilter> DtoAdapter<IdmConceptRoleRequestDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
+        // Need to translate the filter. API is too general here, but
+        IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
+        return new DefaultRequestRoleConceptAdapter<>(identityRoleService, this,
+                roleSystemService, translatedFilter, workflowProcessInstanceService, modelMapper);
+    }
 }

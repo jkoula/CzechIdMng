@@ -4,6 +4,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectInputStream.GetField;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
@@ -152,6 +153,11 @@ public class IdmConceptRoleRequestDto extends AbstractConceptRoleRequestDto {
         conceptRoleRequest.setDirectConcept(getId());
         // save and add to concepts to be processed
         return conceptRoleRequest;
+    }
+
+    @Override
+    public Class<? extends Identifiable> getOwnerType() {
+        return IdmIdentityContractDto.class;
     }
 
 }

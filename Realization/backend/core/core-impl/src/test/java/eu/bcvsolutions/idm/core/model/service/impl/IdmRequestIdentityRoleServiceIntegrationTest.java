@@ -94,7 +94,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -105,7 +105,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertNotNull(request);
@@ -145,7 +145,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setRoles(Sets.newSet(roleTwo.getId(), roleThree.getId()));
 		dto.setValidFrom(LocalDate.now().minusDays(1));
@@ -156,7 +156,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertNotNull(createdRequestIdentityRole);
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertNotNull(request);
@@ -199,9 +199,9 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for remove identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
-		dto.setIdentityRole(identityRoles.get(0).getId());
-		dto.setId(dto.getIdentityRole());
+		dto.setOwnerUuid(contract.getId());
+		dto.setRoleAssignmentUuid(identityRoles.get(0).getId());
+		dto.setId(dto.getRoleAssignmentUuid());
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService
 				.deleteRequestIdentityRole(dto);
@@ -210,7 +210,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -243,9 +243,9 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for updated identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
-		dto.setIdentityRole(identityRoles.get(0).getId());
-		dto.setId(dto.getIdentityRole());
+		dto.setOwnerUuid(contract.getId());
+		dto.setRoleAssignmentUuid(identityRoles.get(0).getId());
+		dto.setId(dto.getRoleAssignmentUuid());
 		dto.setValidFrom(LocalDate.now().minusDays(10));
 		dto.setValidTill(LocalDate.now().plusDays(10));
 
@@ -255,7 +255,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -288,7 +288,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
@@ -302,7 +302,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -340,9 +340,9 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for updated identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
-		dto.setIdentityRole(identityRoles.get(0).getId());
-		dto.setId(dto.getIdentityRole());
+		dto.setOwnerUuid(contract.getId());
+		dto.setRoleAssignmentUuid(identityRoles.get(0).getId());
+		dto.setId(dto.getRoleAssignmentUuid());
 		dto.setValidFrom(LocalDate.now().plusDays(5));
 		dto.setValidTill(LocalDate.now().minusDays(10));
 
@@ -359,7 +359,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -392,7 +392,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -403,7 +403,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -442,7 +442,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -470,7 +470,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Create request for remove identity-role
 		IdmRequestIdentityRoleDto dtoForRemove = new IdmRequestIdentityRoleDto();
 		dtoForRemove.setRoleRequest(createdRequestIdentityRole.getRoleRequest());
-		dtoForRemove.setIdentityRole(identityRole.getId());
+		dtoForRemove.setRoleAssignmentUuid(identityRole.getId());
 		dtoForRemove.setId(identityRole.getId());
 
 		// Remove existing identity-role -> new removing concept
@@ -487,8 +487,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 				.findFirst().orElse(null);
 		Assert.assertNotNull(removingConcept);
 		Assert.assertEquals(createdRequestIdentityRole.getRoleRequest(), removingConcept.getRoleRequest());
-		Assert.assertEquals(identityRole.getId(), removingConcept.getIdentityRole());
-		Assert.assertNotEquals(removingConcept.getId(), removingConcept.getIdentityRole());
+		Assert.assertEquals(identityRole.getId(), removingConcept.getRoleAssignmentUuid());
+		Assert.assertNotEquals(removingConcept.getId(), removingConcept.getRoleAssignmentUuid());
 
 	}
 	
@@ -513,7 +513,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -564,7 +564,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request identity-role
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());
@@ -637,7 +637,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request identity-role
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());
@@ -688,10 +688,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Create request for change an identity-role
 		IdmRequestIdentityRoleDto changeRequestIdentityRole = new IdmRequestIdentityRoleDto();
 		changeRequestIdentityRole.setId(identityRoles.get(0).getId());
-		changeRequestIdentityRole.setIdentityContract(contract.getId());
+		changeRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		changeRequestIdentityRole.setValidFrom(LocalDate.now());
-		changeRequestIdentityRole.setIdentityRole(identityRoles.get(0).getId());
+		changeRequestIdentityRole.setRoleAssignmentUuid(identityRoles.get(0).getId());
 		changeRequestIdentityRole.setEavs(forms);
 		changeRequestIdentityRole = requestIdentityRoleService.save(changeRequestIdentityRole);
 
@@ -736,7 +736,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request identity-role
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());
@@ -786,7 +786,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		
 		// Create request identity-role
 		createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());

@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
@@ -11,6 +12,10 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -48,6 +53,7 @@ import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRoleAttribute;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
@@ -91,6 +97,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.ADD;
+import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.UPDATE;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -208,7 +215,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
 
             UUID identityRoleId = getIdentityRoleId(concept);
 
-            if (identityRoleId != null && ConceptRoleRequestOperation.UPDATE == concept.getOperation()) {
+            if (identityRoleId != null && UPDATE == concept.getOperation()) {
 
                 // Cache for save original ID of concepts.
                 // Id will be replaced by identity-role id and have to be returned after
@@ -788,7 +795,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
         }
 
         IdmRoleDto roleDto = DtoUtils.getEmbedded(conceptRole, AbstractConceptRoleRequest_.role, IdmRoleDto.class);
-        if (roleDto != null && roleDto.getIdentityRoleAttributeDefinition() != null) {
+        if (roleDto.getIdentityRoleAttributeDefinition() != null) {
             IdmFormDefinitionDto formDefinitionDto = roleService.getFormAttributeSubdefinition(roleDto);
             formService.mergeValues(formDefinitionDto, conceptRole, roleAssignment);
         }
@@ -818,7 +825,150 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
         return roleAssignment;
     }
 
+    @Override
+    public IdmRequestIdentityRoleDto saveRequestRole(IdmRequestIdentityRoleDto dto, BasePermission[] permission) {
+        if (dto.getId() != null && dto.getId().equals(dto.getRoleAssignmentUuid())) {
+            // Given DTO is identity-role -> create UPDATE concept
+            return saveConceptyByIdentityRole(dto, permission);
+        }
+		else if(dto.getId() == null && dto.getRoleAssignmentUuid() == null) {
+            // Given DTO does not have ID neither identity-role ID -> create ADD concept
+            return saveAddConcept(dto);
+        }
+        else {
+            // Try to find role-concept
+            D roleConceptDto = this.get(dto.getId());
+            if (roleConceptDto != null) {
+                dto.setState(roleConceptDto.getState());
+                if (UPDATE == roleConceptDto.getOperation() || ADD == roleConceptDto.getOperation()) {
+                    // Given DTO is concept -> update exists UPDATE concept
+                    return this.conceptToRequestIdentityRole(this.save(requestIdentityRoleToConcept(dto), permission));
+                }
+            }
+        }
+        return null;
+    }
 
+    @Override
+    public IdmRequestIdentityRoleDto deleteRequestRole(IdmRequestIdentityRoleDto dto, BasePermission[] permission) {
+        // We don`t know if is given DTO identity-role or role-concept.
+        if (dto.getId().equals(dto.getRoleAssignmentUuid())) {
+            A identityRole = getRoleAssignment(dto.getId());
+            // OK given DTO is identity-role
+
+            UUID requestId = dto.getRoleRequest();
+            IdmRoleRequestDto request = lookupService.lookupEmbeddedDto(dto, AbstractConceptRoleRequest_.roleRequest);
+            if(requestId == null) {
+                throw new ResultCodeException(CoreResultCode.REQUEST_ITEM_CANNOT_BE_CREATED, "Trying to delete concept and not specifying role request");
+            }
+            IdmRoleRequestDto mockRequest = new IdmRoleRequestDto();
+            mockRequest.setId(requestId);
+            D concept = createConcept(identityRole, requestId, identityRole.getRole(), ConceptRoleRequestOperation.REMOVE);
+            if (request != null) {
+                // Add request to concept. Will be used on the FE (prevent loading of request).
+                concept.getEmbedded().put(AbstractConceptRoleRequest_.roleRequest.getName(), request);
+            }
+
+            return this.conceptToRequestIdentityRole(concept);
+
+        } else {
+            // Try to find role-concept
+            D roleConceptDto = get(dto.getId());
+            if (roleConceptDto != null) {
+                // OK given DTO is concept
+                delete(roleConceptDto, permission);
+                return dto;
+            }
+        }
+        return null;
+    }
+
+    private IdmRequestIdentityRoleDto saveAddConcept(IdmRequestIdentityRoleDto dto) {
+        Assert.notNull(dto.getOwnerUuid(), "Contract is required.");
+
+        Set<UUID> roles = Sets.newHashSet();
+        if (dto.getRole() != null) {
+            roles.add(dto.getRole());
+        }
+        if (dto.getRoles() != null) {
+            roles.addAll(dto.getRoles());
+        }
+
+        Assert.notEmpty(roles, "Roles cannot be empty!");
+
+
+        final UUID requestId = dto.getRoleRequest();
+        if (dto.getRoleRequest() == null) {
+            throw new ResultCodeException(CoreResultCode.REQUEST_ITEM_CANNOT_BE_CREATED, "Creating request item before the request was vreated");
+        }
+        final IdmRoleRequestDto request = lookupService.lookupEmbeddedDto(dto, AbstractConceptRoleRequest_.roleRequest);
+
+        List<D> concepts = Lists.newArrayList();
+        roles.forEach(role -> {
+            D conceptRoleRequest = requestIdentityRoleToConcept(dto);
+            conceptRoleRequest.setRoleRequest(requestId);
+            conceptRoleRequest.setOperation(ADD);
+            // Create concept with EAVs
+            conceptRoleRequest = save(conceptRoleRequest);
+            if (request != null) {
+                // Add request to concept. Will be used on the FE (prevent loading of request).
+                conceptRoleRequest.getEmbedded().put(AbstractConceptRoleRequest_.roleRequest.getName(), request);
+            }
+            concepts.add(conceptRoleRequest);
+        });
+        // Beware more then one concepts could be created, but only first will be returned!
+        return this.conceptToRequestIdentityRole(concepts.get(0));
+    }
+
+    private IdmRequestIdentityRoleDto saveConceptyByIdentityRole(IdmRequestIdentityRoleDto dto, BasePermission[] permission) {
+        A identityRole = getRoleAssignment(dto.getId());
+        Assert.notNull(identityRole, "Identity role is required.");
+
+        UUID requestId = dto.getRoleRequest();
+        if(requestId == null) {
+            throw new ResultCodeException(CoreResultCode.REQUEST_ITEM_CANNOT_BE_CREATED, "Creating request item, before request was created");
+        }
+
+        D conceptRoleRequest = createConcept(identityRole, requestId, identityRole.getRole(),UPDATE);
+        conceptRoleRequest.setValidFrom(dto.getValidFrom());
+        conceptRoleRequest.setValidTill(dto.getValidTill());
+        conceptRoleRequest.setRoleSystem(dto.getRoleSystem());
+        conceptRoleRequest.setEavs(dto.getEavs());
+        // Create concept with EAVs
+        conceptRoleRequest = save(conceptRoleRequest, permission);
+
+        return this.conceptToRequestIdentityRole(conceptRoleRequest);
+    }
+
+    /**
+     * Create new instance of concept without save
+     *
+     * @param roleAssignment
+     * @param requestId
+     * @param requestId
+     * @param operation
+     * @param roleId
+     *
+     * @return
+     */
+    private D createConcept(A roleAssignment, UUID requestId, UUID roleId, ConceptRoleRequestOperation operation) {
+        D conceptRoleRequest = createEmptyConceptWithRoleAssignmentData(roleAssignment);
+        conceptRoleRequest.setRoleRequest(requestId);
+        conceptRoleRequest.setRoleAssignmentUuid(roleAssignment.getId());
+
+        conceptRoleRequest.setRole(roleId);
+        conceptRoleRequest.setOperation(operation);
+        return conceptRoleRequest;
+    }
+
+
+    protected abstract D requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto);
+
+    protected abstract IdmRequestIdentityRoleDto conceptToRequestIdentityRole(D save);
+
+    protected abstract D createEmptyConceptWithRoleAssignmentData(A roleAssignment);
+
+    protected abstract A getRoleAssignment(UUID id);
 
     protected abstract A getRoleAssignmentFromConceptInternal(D conceptRole);
 
