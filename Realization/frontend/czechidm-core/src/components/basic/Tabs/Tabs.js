@@ -91,6 +91,7 @@ export default function BasicTabs(props) {
         label={ child.props.title }/>
     );
   });
+  console.log("asdasdasd", value, _tabs)
   //
   return (
     <div className="tab-horizontal" style={ style }>

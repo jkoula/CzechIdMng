@@ -82,7 +82,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 		LOG.debug(MessageFormat.format("Find idm-request-identity-roles by filter [{0}] ", filter));
 		Assert.notNull(filter, "Filter is required.");
 		IdmRequestIdentityRoleFilter copyFilter = modelMapper.map(filter, IdmRequestIdentityRoleFilter.class);
-		
+
 		if (pageable == null) {
 			// Page is null, so we set page to max value
 			pageable = PageRequest.of(0, Integer.MAX_VALUE);

@@ -635,6 +635,14 @@ public class DefaultIdmRoleRequestService
 	}
 
 	@Override
+	public IdmRoleRequestDto createRequest(IdmRequestIdentityRoleDto dto) {
+		//TODO
+		UUID applicantUuid = conceptRoleRequestManager.getServiceForConcept(dto.getAssignmentType()).resolveApplicant();
+		createRequest()
+
+	}
+
+	@Override
 	public void addToLog(Loggable logItem, String text) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(ZonedDateTime.now());

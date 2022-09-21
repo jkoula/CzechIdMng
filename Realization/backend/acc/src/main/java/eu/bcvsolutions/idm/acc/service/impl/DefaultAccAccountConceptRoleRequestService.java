@@ -16,7 +16,6 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.impl.adapter.AccAccountConceptRoleRequestAdapter;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
-import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
@@ -49,6 +48,8 @@ import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
+import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractConceptRoleRequestService;
@@ -353,6 +354,29 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             accountRoleAssignment = accRoleAccountService.get(concept.getAccountRole());
         }
         return accountRoleAssignment;
+    }
+
+    @Override
+    protected AccAccountConceptRoleRequestDto requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto) {
+        return modelMapper.map(dto, AccAccountConceptRoleRequestDto.class);
+    }
+
+    @Override
+    protected IdmRequestIdentityRoleDto conceptToRequestIdentityRole(AccAccountConceptRoleRequestDto save) {
+        return modelMapper.map(save, IdmRequestIdentityRoleDto.class);
+    }
+
+    @Override
+    protected AccAccountConceptRoleRequestDto createEmptyConceptWithRoleAssignmentData(AccAccountRoleAssignmentDto roleAssignment) {
+        AccAccountConceptRoleRequestDto conceptRoleRequest = new AccAccountConceptRoleRequestDto();
+        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccount());
+
+        return conceptRoleRequest;
+    }
+
+    @Override
+    protected AccAccountRoleAssignmentDto getRoleAssignment(UUID id) {
+        return accRoleAccountService.get(id);
     }
 
     @Override
