@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -183,6 +184,19 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	Object getAttributeValue(String uid, AbstractDto entity, AttributeMapping attributeHandling, MappingContext mappingContext);
+
+	/**
+	 * Find value for this mapped attribute by property name. Returned value can be
+	 * list of objects. Returns transformed value.
+	 *
+	 * @param uid
+	 * @param entity
+	 * @param attributeHandling
+	 * @param mappingContext
+	 * @param accountDto
+	 * @return
+	 */
+	Object getAttributeValue(String uid, AbstractDto entity, AttributeMapping attributeHandling, MappingContext mappingContext, AccAccountDto accountDto);
 
 	/**
 	 * Generate UID from UID attribute
