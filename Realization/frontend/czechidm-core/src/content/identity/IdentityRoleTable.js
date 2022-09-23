@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { connect } from 'react-reux';
 import uuid from 'uuid';
 import _ from 'lodash';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
-import SearchParameters from '../../domain/SearchParameters';
+import { SearchParameters } from '../../domain';
 import {
   IdentityRoleManager,
   IdentityManager,
@@ -30,7 +30,6 @@ const roleTreeNodeManager = new RoleTreeNodeManager();
 const identityContractManager = new IdentityContractManager();
 const codeListManager = new CodeListManager();
 const uiKeyIncompatibleRoles = 'identity-incompatible-roles-';
-
 const TEST_ADD_ROLE_DIRECTLY = false;
 
 /**
@@ -201,7 +200,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
         <Advanced.Table
           ref="table"
           uiKey={ this.getUiKey() }
-          columns={ _columns }
+          columns={_columns}
           manager={ this.getManager() }
           forceSearchParameters={ forceSearchParameters }
           showRefreshButton={ showRefreshButton }

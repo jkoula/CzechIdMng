@@ -54,7 +54,7 @@ class IdentityRoleDashboard extends Basic.AbstractContent {
             }
             showAddButton={ false }
             match={{params: {...(this.props.match ? this.props.match.params : []), entityId }}}
-            columns={ _.difference(IdentityRoleTable.defaultProps.columns, ['directRole', 'contractPosition']) }
+            // columns={ _.difference(IdentityRoleTable.defaultProps.columns, ['directRole', 'contractPosition']) }
             _permissions={ permissions }/>
         </Basic.Panel>
       </Basic.Div>
