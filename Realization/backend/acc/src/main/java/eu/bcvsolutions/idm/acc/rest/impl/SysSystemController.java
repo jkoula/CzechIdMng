@@ -1108,7 +1108,7 @@ public class SysSystemController extends AbstractReadWriteDtoController<SysSyste
 
 	@Override
 	@ResponseBody
-	@RequestMapping(path = "/connector-types/execute", method = RequestMethod.POST)
+	@RequestMapping(path = "/wizards/execute", method = RequestMethod.POST)
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_UPDATE + "')")
 	@ApiOperation(
 			value = "Execute specific connector type -> execute some wizard step.",
@@ -1129,7 +1129,7 @@ public class SysSystemController extends AbstractReadWriteDtoController<SysSyste
 
 	@Override
 	@ResponseBody
-	@RequestMapping(path = "/connector-types/load", method = RequestMethod.PUT)
+	@RequestMapping(path = "/wizards/load", method = RequestMethod.PUT)
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
 	@ApiOperation(
 			value = "Load data for specific connector type -> open existed system in the wizard step.",

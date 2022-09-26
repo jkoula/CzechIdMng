@@ -427,6 +427,14 @@
         "create": {
           "header": "Nový účet na koncovém systému"
         },
+        "personal-other-account-wizard": {
+          "title": "Další osobní účet",
+          "header": "Další osobní účet"
+        },
+        "personal-account-wizard": {
+          "title": "Hlavní osobní účet",
+          "header": "Hlavní osobní účet"
+        },
         "save": {
           "success": "Účet na systému byl úspěšně uložen"
         },
@@ -3471,6 +3479,54 @@
             "label": "Vyberte systém spravujicí uživatele",
             "help": ""
           }
+        }
+      }
+    },
+    "personal-other-account-wizard": {
+      "name": "Průvodce pro tvorbu dalšího osobního účtu",
+      "steps": {
+        "one": {
+          "name": "Základní nastavení účtu",
+          "help": "Udělejte základní nastavení účtů a vyberte vlastníka",
+          "system": "Systém",
+          "type": "Typ uživatele",
+          "owner": "Vlastník"
+        },
+        "two": {
+          "name": "Atributy",
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny. V případě manuální úpravy bude atribut zvýrazněn žlutě."
+        },
+        "three": {
+          "name": "Rekapitulace",
+          "help": "Zkontrolujte zadané hodnoty, s kterými bude účet vytvořen. Pokud potřebujete udělat nějakou změnu, vraťte se na odpovídají krok průvodce."
+        },
+        "four": {
+          "name": "Dokončení",
+          "help": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Nový další osobní účet byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového účtu.</h3>"
+        }
+      }
+    },
+    "personal-account-wizard": {
+      "name": "Průvodce pro tvorbu osobního účtu",
+      "steps": {
+        "one": {
+          "name": "Základní nastavení účtu",
+          "help": "Udělejte základní nastavení účtů a vyberte vlastníka",
+          "system": "Systém",
+          "type": "Typ uživatele",
+          "owner": "Vlastník"
+        },
+        "two": {
+          "name": "Atributy",
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny. V případě manuální úpravy bude atribut zvýrazněn žlutě."
+        },
+        "three": {
+          "name": "Rekapitulace",
+          "help": "Zkontrolujte zadané hodnoty, s kterými bude účet vytvořen. Pokud potřebujete udělat nějakou změnu, vraťte se na odpovídají krok průvodce."
+        },
+        "four": {
+          "name": "Dokončení",
+          "help": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Nový osobní účet byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového účtu.</h3>"
         }
       }
     }

@@ -1,4 +1,5 @@
 import { Services, Domain, Utils} from 'czechidm-core';
+import WizardService from './WizardService';
 
 /**
  * Target systems
@@ -7,7 +8,7 @@ import { Services, Domain, Utils} from 'czechidm-core';
  * @author Radek Tomiška
  * @author Peter Štrunc
  */
-class SystemService extends Services.AbstractService {
+class SystemService extends WizardService {
 
   getApiPath() {
     return '/systems';
@@ -399,56 +400,6 @@ class SystemService extends Services.AbstractService {
       });
   }
 
-  /**
-   * Loads all registered connector types.
-   */
-  getSupportedTypes() {
-    return Services.RestApiService
-      .get(`${ this.getApiPath() }/search/supported`)
-      .then(response => {
-        return response.json();
-      })
-      .then(json => {
-        if (Utils.Response.hasError(json)) {
-          throw Utils.Response.getFirstError(json);
-        }
-        return json;
-      });
-  }
-
-  /**
-   * Execute a connector type -> execute wizard step.
-   */
-  executeConnectorType(connectorType) {
-    return Services.RestApiService
-      .post(`${ this.getApiPath() }/connector-types/execute`, connectorType)
-      .then(response => {
-        return response.json();
-      })
-      .then(json => {
-        if (Utils.Response.hasError(json)) {
-          throw Utils.Response.getFirstError(json);
-        }
-        return json;
-      });
-  }
-
-  /**
-   * Load a connector type -> open existed wizard step.
-   */
-  loadConnectorType(connectorType) {
-    return Services.RestApiService
-      .put(`${ this.getApiPath() }/connector-types/load`, connectorType)
-      .then(response => {
-        return response.json();
-      })
-      .then(json => {
-        if (Utils.Response.hasError(json)) {
-          throw Utils.Response.getFirstError(json);
-        }
-        return json;
-      });
-  }
 }
 
 export default SystemService;

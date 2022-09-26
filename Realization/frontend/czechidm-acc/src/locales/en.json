@@ -427,6 +427,14 @@
         "create": {
           "header": "New account on end system"
         },
+        "personal-other-account-wizard": {
+          "title": "Other personal account",
+          "header": "Other personal account"
+        },
+        "personal-account-wizard": {
+          "title": "Main personal account",
+          "header": "Main personal account"
+        },
         "save": {
           "success": "Account in system was successfully created"
         },
@@ -3470,6 +3478,54 @@
     },
     "ldap-connector-type": {
       "name": "LDAP"
+    },
+    "personal-other-account-wizard": {
+      "name": "Wizard for creating personal other account",
+      "steps": {
+        "one": {
+          "name": "Basic setting for account",
+          "help": "Do basic configuration of account and select owner",
+          "system": "System",
+          "type": "Type of user",
+          "owner": "Owner"
+        },
+        "two": {
+          "name": "Attributes",
+          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually. Manually edited attributes will be highlighted with yellow color."
+        },
+        "three": {
+          "name": "Recapitulation",
+          "help": "Check filled values, with which the account will be created. If you need to make some chage, go back to the correct step in wizard."
+        },
+        "four": {
+          "name": "Finish",
+          "help": "<h2 style=\"margin-top: 0\">Congratulation,</h2><h3>New account was created.</h3><h3>After finish, you will be redirect to full detail.</h3>"
+        }
+      }
+    },
+    "personal-account-wizard": {
+      "name": "Wizard for creating personal account",
+      "steps": {
+        "one": {
+          "name": "Basic setting for account",
+          "help": "Do basic configuration of account and select owner",
+          "system": "System",
+          "type": "Type of user",
+          "owner": "Owner"
+        },
+        "two": {
+          "name": "Attributes",
+          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually. Manually edited attributes will be highlighted with yellow color."
+        },
+        "three": {
+          "name": "Recapitulation",
+          "help": "Check filled values, with which the account will be created. If you need to make some chage, go back to the correct step in wizard."
+        },
+        "four": {
+          "name": "Finish",
+          "help": "<h2 style=\"margin-top: 0\">Congratulation,</h2><h3>New account was created.</h3><h3>After finish, you will be redirect to full detail.</h3>"
+        }
+      }
     }
   },
   "connector-type":  {

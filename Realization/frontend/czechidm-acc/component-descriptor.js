@@ -238,6 +238,18 @@ module.exports = {
       component: require('./src/content/wizard/connectorType/AdGroupSystemWizard/AdGroupSystemWizard')
     },
     {
+      id: 'personal-account-wizard',
+      type: 'connector-type',
+      entityType: ['personal-account-wizard'],
+      component: require('./src/content/wizard/account/PersonalAccountWizard')
+    },
+    {
+      id: 'personal-other-account-wizard',
+      type: 'connector-type',
+      entityType: ['personal-other-account-wizard'],
+      component: require('./src/content/wizard/account/PersonalOtherAccountWizard')
+    },
+    {
       id: 'remote-server-icon',
       type: 'icon',
       entityType: ['server', 'servers'],

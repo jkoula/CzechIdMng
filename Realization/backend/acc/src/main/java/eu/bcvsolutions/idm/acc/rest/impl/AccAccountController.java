@@ -1,10 +1,12 @@
 package eu.bcvsolutions.idm.acc.rest.impl;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -39,10 +41,13 @@ import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccountWizardDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.acc.service.api.AccountWizardManager;
+import eu.bcvsolutions.idm.acc.service.api.AccountWizardsService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
@@ -54,6 +59,7 @@ import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
+import eu.bcvsolutions.idm.core.api.rest.WizardController;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
@@ -70,13 +76,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;;
+import io.swagger.annotations.AuthorizationScope;
 
 /**
  * Accounts on target system
  * 
  * @author Radek Tomiška
  * @author Tomáš Doischer
+ * @author Roman Kucera
  *
  */
 @RestController
@@ -88,13 +95,14 @@ import io.swagger.annotations.AuthorizationScope;;
 		description = "Account on target system",
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE,
 		consumes = MediaType.APPLICATION_JSON_VALUE)
-public class AccAccountController extends AbstractFormableDtoController<AccAccountDto, AccAccountFilter> {
+public class AccAccountController extends AbstractFormableDtoController<AccAccountDto, AccAccountFilter> implements WizardController<AccountWizardDto> {
 	
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(AccAccountController.class);
 	protected static final String TAG = "Accounts";
 	//
 	@Autowired private SysSystemEntityService systemEntityService;
 	@Autowired private IdmFormDefinitionService formDefinitionService;
+	@Autowired private AccountWizardManager accountWizardManager;
 	private final IdmFormDefinitionController formDefinitionController;
 	
 	@Autowired
@@ -612,7 +620,76 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 		//
 		return filter;
 	}
-	
+
+	/**
+	 * Returns all registered account wizards.
+	 *
+	 * @return accounts wizards
+	 */
+	@Override
+	@ResponseBody
+	@RequestMapping(method = RequestMethod.GET, value = "/search/supported")
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
+	@ApiOperation(
+			value = "Get all supported account wizards",
+			nickname = "getSupportedAccountWizards",
+			tags = {AccAccountController.TAG},
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")})
+			})
+	public Resources<AccountWizardDto> getSupportedTypes() {
+		List<AccountWizardsService> supportedTypes = accountWizardManager.getSupportedTypes();
+		List<AccountWizardDto> accountWizardDtos = supportedTypes.stream().map(accountWizardsService -> accountWizardManager.convertTypeToDto(accountWizardsService)).collect(Collectors.toList());
+
+		return new Resources<>(
+				accountWizardDtos.stream()
+						.sorted(Comparator.comparing(AccountWizardDto::getOrder))
+						.collect(Collectors.toList())
+		);
+	}
+
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/wizards/execute", method = RequestMethod.POST)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_UPDATE + "')")
+	@ApiOperation(
+			value = "Execute some wizard step.",
+			nickname = "executeWizard",
+			response = AccountWizardDto.class,
+			tags = { AccAccountController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_UPDATE, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_UPDATE, description = "")})
+			})
+	public ResponseEntity<AccountWizardDto> executeWizardType(@Valid @RequestBody AccountWizardDto wizardDto) {
+		AccountWizardDto result = accountWizardManager.execute(wizardDto);
+		return new ResponseEntity<>(result, HttpStatus.CREATED);
+	}
+
+	@Override
+	@ResponseBody
+	@RequestMapping(path = "/wizards/load", method = RequestMethod.PUT)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
+	@ApiOperation(
+			value = "Load data for specific wizards -> open existed account in the wizard step.",
+			nickname = "loadWizard",
+			response = AccountWizardDto.class,
+			tags = { AccAccountController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")})
+			})
+	public ResponseEntity<AccountWizardDto> loadWizardType(@NotNull @Valid @RequestBody AccountWizardDto wizardDto) {
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 	/**
 	 * Fills referenced entity to dto - prevent to load entity for each row
 	 * 

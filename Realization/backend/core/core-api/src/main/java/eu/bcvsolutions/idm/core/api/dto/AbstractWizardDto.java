@@ -3,6 +3,10 @@ package eu.bcvsolutions.idm.core.api.dto;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * Abstract representation of wizard dto
  * @author Roman Kucera
@@ -18,6 +22,10 @@ public class AbstractWizardDto extends AbstractComponentDto {
 	private boolean reopened = false;
 
 	private int order;
+
+	@JsonProperty(value = EmbeddedDto.PROPERTY_EMBEDDED, access = JsonProperty.Access.READ_ONLY)
+	@ApiModelProperty(accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+	private Map<String, BaseDto> embedded;
 
 	public String getWizardStepName() {
 		return wizardStepName;
@@ -52,5 +60,16 @@ public class AbstractWizardDto extends AbstractComponentDto {
 
 	public void setOrder(int order) {
 		this.order = order;
+	}
+
+	public Map<String, BaseDto> getEmbedded() {
+		if(embedded == null){
+			embedded = new HashMap<>();
+		}
+		return embedded;
+	}
+
+	public void setEmbedded(Map<String, BaseDto> embedded) {
+		this.embedded = embedded;
 	}
 }
