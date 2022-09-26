@@ -649,7 +649,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               sort/>
             <Advanced.Column
               property="systemState"
-              // width={75}
               face="text"
               header={this.i18n('systemState')}
               rendered={showChangesOnly}
@@ -724,7 +723,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               property="description"
               header={this.i18n('entity.Role.description')}
               face="text"
-              // width={ 400 }
               className='descriptionColumn'
               cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.description }
             />
@@ -732,10 +730,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
             property="priority"
             header={this.i18n('entity.Role.priority')}
             face="text"
-            // width={ 15 }
-            cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.priority }
-            // rendered={ _.includes(columns, 'priority') }
-            />
+            cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.priority }/>
             <Advanced.Column
               property="directRole"
               header={ this.i18n('entity.IdentityRole.directRole.label') }
@@ -755,9 +750,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                       face="popover" />
                   );
                 }
-              }
-              // width={ 150 }
-              />
+              }/>
             <Advanced.Column
               sort
               property="automaticRole"

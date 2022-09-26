@@ -742,12 +742,7 @@
         "result": {
           "header": "Výsledek",
           "code": "Kód"
-        },
-        "button": "Kopírovat",
-        "textCopy": "Text byl zkopírován do schránky",
-        "copyClipboard": "Zkopírovat do schránky",
-        "wrapOn": "Zapnout zalamování řádku",
-        "wrapOff": "Vypnout zalamování řádku"
+        }
       },
       "CreatableSelectBox": {
         "textCreator": "Vytvořit novou filtrovací hodnotu: [{{value}}]?",
@@ -4353,6 +4348,7 @@
     "Identity": {
       "_type": "Uživatel",
       "username": "Uživatelské jméno",
+      "externalCode": "Osobní číslo",
       "externalCode": "",
       "firstName": "Jméno",
       "lastName": "Příjmení",

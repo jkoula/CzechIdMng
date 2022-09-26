@@ -449,8 +449,7 @@ export class IdentityTable extends Advanced.AbstractTableContent {
             property="username"
             width="20%"
             sort
-            face="text"
-            />
+            face="text"/>
           <Advanced.Column property="lastName" sort face="text"/>
           <Advanced.Column property="firstName" sort width="10%" face="text"/>
           <Advanced.Column property="externalCode" sort width="10%" face="text"/>
