@@ -724,13 +724,18 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               header={this.i18n('entity.Role.description')}
               face="text"
               className='descriptionColumn'
-              cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.description }
-            />
-              <Advanced.Column
-            property="priority"
-            header={this.i18n('entity.Role.priority')}
-            face="text"
-            cell={ ({ rowIndex, data }) => data[rowIndex]._embedded.role.priority }/>
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.description 
+              }/>
+            <Advanced.Column
+              property="priority"
+              header={this.i18n('entity.Role.priority')}
+              face="text"
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.priority 
+              }/>
             <Advanced.Column
               property="directRole"
               header={ this.i18n('entity.IdentityRole.directRole.label') }

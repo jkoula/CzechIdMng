@@ -200,7 +200,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
         <Advanced.Table
           ref="table"
           uiKey={ this.getUiKey() }
-          columns={_columns}
+          columns={ _columns }
           manager={ this.getManager() }
           forceSearchParameters={ forceSearchParameters }
           showRefreshButton={ showRefreshButton }

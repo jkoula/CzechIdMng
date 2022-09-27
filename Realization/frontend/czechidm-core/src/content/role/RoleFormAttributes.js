@@ -131,7 +131,7 @@ class RoleFormAttributes extends Basic.AbstractContent {
           </div>
         </Basic.AbstractForm>
         <Basic.Div rendered={entity.identityRoleAttributeDefinition}>
-          <Basic.ContentHeader icon="fa:th-list" text={ this.i18n('content.role.formAttributes.header') } style={{marginBottom: 0 }}/>
+          <Basic.ContentHeader icon="fa:th-list" text={ this.i18n('content.role.formAttributes.header') } style={{ marginBottom: 0 }}/>
           <RoleFormAttributeTable
             uiKey="role-form-attributes-table"
             forceSearchParameters={ forceSearchParameters }
