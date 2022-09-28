@@ -400,6 +400,67 @@ module.exports = {
         path: '/scripts/:entityId/references-mapping',
         priority: 0,
         access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SCRIPT_READ'] } ]
+      },
+      {
+        id: 'account',
+        type: 'TAB',
+        labelKey: 'acc:content.accounts.label',
+        titleKey: 'acc:content.accounts.title',
+        order: 15,
+        priority: 0,
+        icon: 'fa:external-link',
+        path: '/account/:entityId',
+        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+        items: [
+          {
+            id: 'account-detail',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.label',
+            titleKey: 'acc:content.accounts.title',
+            order: 15,
+            priority: 0,
+            icon: 'fa:external-link',
+            path: '/account/:entityId/detail',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-roles',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.label',
+            titleKey: 'acc:content.accounts.title',
+            order: 15,
+            priority: 0,
+            icon: 'fa:external-link',
+            path: '/account/:entityId/roles',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-audit',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.label',
+            titleKey: 'acc:content.accounts.title',
+            order: 15,
+            priority: 0,
+            icon: 'fa:external-link',
+            path: '/account/:entityId/audit',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-provisioning',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.label',
+            titleKey: 'acc:content.accounts.title',
+            order: 15,
+            priority: 0,
+            icon: 'fa:external-link',
+            path: '/account/:entityId/provisioning',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          }
+        ]
       }
     ]
   }
