@@ -857,7 +857,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
             // OK given DTO is identity-role
 
             UUID requestId = dto.getRoleRequest();
-            IdmRoleRequestDto request = lookupService.lookupEmbeddedDto(dto, AbstractConceptRoleRequest_.roleRequest);
+            IdmRoleRequestDto request = lookupService.lookupDto(IdmRoleRequestDto.class,dto.getRoleRequest());
             if(requestId == null) {
                 throw new ResultCodeException(CoreResultCode.REQUEST_ITEM_CANNOT_BE_CREATED, "Trying to delete concept and not specifying role request");
             }
@@ -958,7 +958,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
 
         conceptRoleRequest.setRole(roleId);
         conceptRoleRequest.setOperation(operation);
-        return conceptRoleRequest;
+        return save(conceptRoleRequest);
     }
 
 

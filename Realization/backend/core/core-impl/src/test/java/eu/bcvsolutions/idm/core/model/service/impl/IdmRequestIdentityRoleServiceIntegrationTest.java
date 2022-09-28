@@ -13,11 +13,13 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleFormAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFormAttributeFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.exception.InvalidFormException;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRequestIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleFormAttributeService;
@@ -49,6 +51,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -71,6 +74,9 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 	private FormService formService;
 	@Autowired
 	private IdmRoleFormAttributeService roleFormAttributeService;
+
+	@Autowired
+	private IdmConceptRoleRequestService conceptRoleRequestService;
 
 	private final static String IP = "IP";
 	private final static String NUMBER_OF_FINGERS = "NUMBER_OF_FINGERS";
@@ -248,6 +254,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		dto.setId(dto.getRoleAssignmentUuid());
 		dto.setValidFrom(LocalDate.now().minusDays(10));
 		dto.setValidTill(LocalDate.now().plusDays(10));
+		dto.setState(RoleRequestState.IN_PROGRESS);
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
 
@@ -345,6 +352,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		dto.setId(dto.getRoleAssignmentUuid());
 		dto.setValidFrom(LocalDate.now().plusDays(5));
 		dto.setValidTill(LocalDate.now().minusDays(10));
+		dto.setState(RoleRequestState.IN_PROGRESS);
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
 		Assert.assertEquals(LocalDate.now().plusDays(5), createdRequestIdentityRole.getValidFrom());
@@ -433,6 +441,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
 		filter.setIdentityId(identity.getId());
+		final List<IdmIdentityRoleDto> allByIdentity = identityRoleService.findAllByIdentity(identity.getId());
 
 		// We expecting only one already assigned identity-role
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(filter, null)
@@ -446,6 +455,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
+		dto.setOperation(ConceptRoleRequestOperation.ADD);
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
 		Assert.assertNotNull(createdRequestIdentityRole);
@@ -454,7 +464,18 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Filter will be filtering by this request
 		filter.setRoleRequestId(createdRequestIdentityRole.getRoleRequest());
 
+
+		IdmIdentityRoleFilter irf = new IdmIdentityRoleFilter();
+
+		irf.setIdentityId(identity.getId());
+		final Page<IdmIdentityRoleDto> idmIdentityRoleDtos = identityRoleService.find(irf,null);
+
 		// We expecting two items, one assigned identity-role and one adding concept
+		IdmConceptRoleRequestFilter crf = new IdmConceptRoleRequestFilter();
+		crf.setIdentityId(identity.getId());
+		crf.setRoleRequestId(createdRequestIdentityRole.getRoleRequest());
+		crf.setIdentityRoleIsNull(true);
+		final Page<IdmConceptRoleRequestDto> idmConceptRoleRequestDtos = conceptRoleRequestService.find(crf, null);
 		requestIdentityRoles = requestIdentityRoleService.find(filter, null).getContent();
 		Assert.assertEquals(2, requestIdentityRoles.size());
 
@@ -489,7 +510,6 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(createdRequestIdentityRole.getRoleRequest(), removingConcept.getRoleRequest());
 		Assert.assertEquals(identityRole.getId(), removingConcept.getRoleAssignmentUuid());
 		Assert.assertNotEquals(removingConcept.getId(), removingConcept.getRoleAssignmentUuid());
-
 	}
 	
 	@Test

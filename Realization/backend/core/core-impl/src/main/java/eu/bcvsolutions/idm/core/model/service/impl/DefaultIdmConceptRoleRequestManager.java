@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,19 +36,15 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
 
     private final Map<Class<? extends AbstractConceptRoleRequestDto>, IdmGeneralConceptRoleRequestService> conceptServices;
     private final ModelMapper modelMapper;
-    private final List<AdaptableService<AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleDto>> adaptableServices;
-
     @Autowired
     public DefaultIdmConceptRoleRequestManager(
             List<IdmGeneralConceptRoleRequestService<?, ?, ?>> conceptServices,
-            List<AdaptableService<AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleDto>> adaptableServices,
             ModelMapper modelMapper) {
         super(modelMapper, conceptServices);
         this.conceptServices = conceptServices.stream()
                 .collect(Collectors.toMap(IdmGeneralConceptRoleRequestService::getType,
                 idmGeneralConceptRoleRequestService -> idmGeneralConceptRoleRequestService));
         this.modelMapper = modelMapper;
-        this.adaptableServices = adaptableServices;
     }
 
     @Override
@@ -113,7 +110,10 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
     }
 
     @Override
-    protected MultiSourcePagedResource<? extends BaseDto,? extends BaseFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
-        return new MultiSourcePagedResource<>(adaptableServices, modelMapper);
+    protected MultiSourcePagedResource<? extends AbstractConceptRoleRequestDto, ? extends IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
+        // TODO comment wtf
+        List<AdaptableService<AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleDto>> services = new ArrayList<>();
+        conceptServices.values().forEach(services::add);
+        return new MultiSourcePagedResource<>(services, modelMapper);
     }
 }

@@ -16,30 +16,33 @@ import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.model.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
-import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractConceptRoleRequestService;
@@ -78,19 +81,22 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     private final AccAccountService accountService;
     private final AccIdentityAccountService identityAccountService;
 
+    private final IdmIdentityService identityService;
+
     private final LookupService lookupService;
 
     @Autowired
     public DefaultAccAccountConceptRoleRequestService(AbstractEntityRepository<AccAccountConceptRoleRequest> repository, WorkflowProcessInstanceService workflowProcessInstanceService,
             LookupService lookupService, IdmAutomaticRoleRepository automaticRoleRepository, AccAccountRoleAssignmentService accRoleAccountService, FormService formService,
             IdmRoleCompositionService roleCompositionService, IdmRoleService roleService, AccAccountService accountService, AccIdentityAccountService identityAccountService,
-            AccAccountRoleAssignmentService roleAssignmentService, LookupService lookupService1) {
+            AccAccountRoleAssignmentService roleAssignmentService, IdmIdentityService identityService, LookupService lookupService1) {
         super(repository, workflowProcessInstanceService, roleCompositionService, lookupService, automaticRoleRepository, roleAssignmentService);
         this.accRoleAccountService = accRoleAccountService;
         this.formService = formService;
         this.roleService = roleService;
         this.accountService = accountService;
         this.identityAccountService = identityAccountService;
+        this.identityService = identityService;
         this.lookupService = lookupService1;
     }
 
@@ -203,6 +209,18 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     }
 
     @Override
+    public ApplicantDto resolveApplicant(IdmRequestIdentityRoleDto dto) {
+        final AccAccountDto accAccountDto = accountService.get(dto.getOwnerUuid());
+        final IdmIdentityDto idmIdentityDto = identityService.get(accAccountDto.getTargetEntityId());
+        ApplicantImplDto applicantDto = new ApplicantImplDto();
+        applicantDto.setId(idmIdentityDto.getId());
+        applicantDto.setConceptOwner(accAccountDto.getId());
+        // We do not check validity of an account here. Maybe we could use contracts of identity
+        // but at this point it is not necessary
+        return applicantDto;
+    }
+
+    @Override
     protected UUID getIdentityRoleId(AccAccountConceptRoleRequestDto concept) {
         UUID accountRoleId = null;
         AccAccountConceptRoleRequestDto accountRoleDto = DtoUtils.getEmbedded(concept, AccAccountConceptRoleRequest_.accountRole, AccAccountConceptRoleRequestDto.class, null);
@@ -307,17 +325,24 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     }
 
     @Override
-    public Collection<AccAccountConceptRoleRequestDto> getConceptsToRemoveDuplicates(AbstractRoleAssignmentDto tempIdentityRoleSub, List<AbstractRoleAssignmentDto> allByIdentity) {
-        return null;
-    }
-
-    @Override
-    public <E extends AbstractConceptRoleRequestDto> E createConceptToRemoveIdentityRole(E concept, AccAccountRoleAssignmentDto identityRoleAssignment) {
-        return null;
+    public AccAccountConceptRoleRequestDto createConceptToRemoveIdentityRole(AccAccountConceptRoleRequestDto concept, AccAccountRoleAssignmentDto identityRoleAssignment) {
+        AccAccountConceptRoleRequestDto removeConcept = new AccAccountConceptRoleRequestDto();
+        removeConcept.setAccAccount(identityRoleAssignment.getAccount());
+        removeConcept.setAccountRole(identityRoleAssignment.getId());
+        removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
+        removeConcept.setRoleRequest(concept.getRoleRequest());
+        removeConcept.addToLog(MessageFormat.format("Removed by duplicates with subrole id [{}]", identityRoleAssignment.getRoleComposition()));
+        removeConcept = save(removeConcept);
+        return removeConcept;
     }
 
     @Override
     public Class<AccAccountConceptRoleRequestDto> getType() {
         return AccAccountConceptRoleRequestDto.class;
+    }
+
+    @Override
+    public <F2 extends BaseFilter> DtoAdapter<AccAccountConceptRoleRequestDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
+        return null;
     }
 }

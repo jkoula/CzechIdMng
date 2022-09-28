@@ -24,10 +24,10 @@ public class IdmRequestIdentityRoleDto extends AbstractConceptRoleRequestDto {
 
 	private UUID ownerUuid;
 
-	private Class<? extends Identifiable> ownerType;
+	private Class<? extends Identifiable> ownerType = IdmIdentityContractDto.class;
 	private UUID roleAssignmentUuid;
 
-	private Class<? extends AbstractConceptRoleRequestDto> assignmentType;
+	private Class<? extends AbstractConceptRoleRequestDto> assignmentType = IdmConceptRoleRequestDto.class;
 
 
 	public Set<UUID> getRoles() {

@@ -43,7 +43,10 @@ import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +74,7 @@ import java.util.stream.Collectors;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssignmentDto, E extends AbstractRoleAssignment, F extends BaseRoleAssignmentFilter>
-        extends AbstractFormableService<D, E, F> implements IdmRoleAssignmentService<D, F> {
+        extends AbstractFormableService<D, E, F> implements IdmRoleAssignmentService<D, F>, ApplicationContextAware {
 
     private final IdmRoleService roleService;
     private final IdmAutomaticRoleRepository automaticRoleRepository;
@@ -82,6 +85,7 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
     private final IdmRoleAssignmentRepository<E> roleAssignmentRepository;
 
     private final FilterManager filterManager;
+    protected ApplicationContext applicationContext;
 
     protected AbstractRoleAssignmentService(IdmRoleAssignmentRepository<E> repository, EntityEventManager entityEventManager, FormService formService, IdmRoleService roleService, IdmAutomaticRoleRepository automaticRoleRepository, LookupService lookupService, FilterManager filterManager) {
         super(repository, entityEventManager, formService);
@@ -585,5 +589,8 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         return CollectionUtils.isEqualCollection(oneValues, twoValues);
     }
 
-
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

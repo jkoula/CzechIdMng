@@ -684,8 +684,7 @@ public class IdmServiceConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(IdmRoleTreeNodeService.class)
 	public IdmRoleTreeNodeService roleTreeNodeService(
-			IdmRoleRequestService roleRequestService, 
-			IdmConceptRoleRequestService conceptRoleRequestService) {
+			IdmRoleRequestService roleRequestService) {
 		return new DefaultIdmRoleTreeNodeService(roleTreeNodeRepository, treeNodeRepository, entityEventManager(), identityRoleService());
 	}
 	

@@ -10,5 +10,4 @@ import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 public interface AdaptableService<D extends BaseDto, F extends BaseFilter, R> extends ReadDtoService<D, F> {
 
     <F2 extends BaseFilter> DtoAdapter<D, R> getAdapter(F2 originalFilter);
-
 }

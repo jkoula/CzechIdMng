@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
@@ -21,6 +22,7 @@ import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -247,7 +249,7 @@ public class DefaultIdmIdentityRoleService
 	/**
 	 * Default sort by role's name
 	 * 
-	 * @return
+	 * @returnx
 	 */
 	private Sort getDefaultSort() {
 		return Sort.by(AbstractRoleAssignment_.role.getName() + "." + IdmRole_.code.getName());
@@ -268,6 +270,6 @@ public class DefaultIdmIdentityRoleService
 	@Override
 	public <F2 extends BaseFilter> DtoAdapter<IdmIdentityRoleDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
 		IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
-		return new IdentityRoleConceptCompilingAdapter(translatedFilter, /*TODO*/null, null, this);
+		return new IdentityRoleConceptCompilingAdapter(translatedFilter, /*TODO*/null, applicationContext.getBean(IdmConceptRoleRequestService.class), this);
 	}
 }

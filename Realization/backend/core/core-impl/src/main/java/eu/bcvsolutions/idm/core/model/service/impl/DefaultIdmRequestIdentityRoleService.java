@@ -89,6 +89,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	public Page<IdmRequestIdentityRoleDto> find(IdmRequestIdentityRoleFilter filter, Pageable pageable, BasePermission... permission) {
 		LOG.debug(MessageFormat.format("Find idm-request-identity-roles by filter [{0}] ", filter));
 		Assert.notNull(filter, "Filter is required.");
+		IdmRequestIdentityRoleFilter copyFilter = modelMapper.map(filter, IdmRequestIdentityRoleFilter.class);
 		
 		if (pageable == null) {
 			// Page is null, so we set page to max value
@@ -96,32 +97,24 @@ public class DefaultIdmRequestIdentityRoleService extends
 		}
 		
 		// If is true, then we want to return only concepts (not assigned roles)
-		boolean returnOnlyChanges = filter.isOnlyChanges();
-		
-		List<IdmRequestIdentityRoleDto> results = new ArrayList<>();
-		
-		long total = 0;
+		boolean returnOnlyChanges = copyFilter.isOnlyChanges();
 
-		if (filter.getRoleRequestId() != null) {
+		if (copyFilter.getRoleRequestId() != null) {
 			if (!returnOnlyChanges) {
 				// We want to load only new added roles
-				filter.setOperation(ADD);
+				copyFilter.setOperation(ADD);
 				// We don`t want load ADD concepts with filled identityRoleId (such concepts were already executed )
-				filter.setIdentityRoleIsNull(true);
+				copyFilter.setIdentityRoleIsNull(true);
 			}
-			Page<IdmRequestIdentityRoleDto> concepts = conceptRoleRequestManager.find(filter, pageable, permission);
-			results.addAll(concepts.getContent());
 		}
 
 		final List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> resources = new ArrayList<>();
 		resources.add(conceptRoleRequestManager);
-		if (shouldLoadAssignedRoles(filter, returnOnlyChanges)) {
+		if (shouldLoadAssignedRoles(copyFilter, returnOnlyChanges)) {
 			resources.add(roleAssignmentManager);
 		}
 
-		return new MultiSourcePagedResource<>(resources, modelMapper).find(filter, pageable, permission);
-
-		
+		return new MultiSourcePagedResource<>(resources, modelMapper).find(copyFilter, pageable, permission);
 
 	}
 

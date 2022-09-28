@@ -44,7 +44,6 @@ public enum SystemEntityType
 	}
 
 	public Class<? extends AbstractDto> getEntityType() {
-		
 		return entityType;
 	}
 	

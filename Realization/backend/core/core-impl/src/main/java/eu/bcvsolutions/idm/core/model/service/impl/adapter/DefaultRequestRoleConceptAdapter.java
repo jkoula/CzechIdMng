@@ -95,10 +95,10 @@ public class DefaultRequestRoleConceptAdapter<C extends AbstractConceptRoleReque
             }
         });
         // Find potential duplicated concepts (only ADD and not in terminated state)
-        List<AbstractConceptRoleRequestDto> conceptsForMarkDuplicates = data //
+       /* List<AbstractConceptRoleRequestDto> conceptsForMarkDuplicates = data //
                 .filter(concept -> ADD == concept.getOperation()) //
                 .filter(concept -> !concept.getState().isTerminatedState()) //
-                .collect(Collectors.toList()); //
+                .collect(Collectors.toList()); *///
         //TODO solve circular dependency
         //roleRequestService.markDuplicates(conceptsForMarkDuplicates, new ArrayList<>(identityRoles));
         // End mark duplicates

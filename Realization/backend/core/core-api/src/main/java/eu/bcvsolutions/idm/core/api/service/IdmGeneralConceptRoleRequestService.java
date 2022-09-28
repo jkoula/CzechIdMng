@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.api.service;
 import eu.bcvsolutions.idm.core.api.domain.Loggable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -76,9 +77,7 @@ public interface IdmGeneralConceptRoleRequestService<
     void createAssignedRole(List<D> allApprovedConcepts, D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
     void removeAssignedRole(D concept, EntityEvent<IdmRoleRequestDto> requestEvent);
 
-    Collection<D> getConceptsToRemoveDuplicates(AbstractRoleAssignmentDto tempIdentityRoleSub, List<AbstractRoleAssignmentDto> allByIdentity);
-
-    <E extends  AbstractConceptRoleRequestDto> E createConceptToRemoveIdentityRole(E concept, A identityRoleAssignment);
+    D createConceptToRemoveIdentityRole(D concept, A identityRoleAssignment);
 
     boolean cancelInvalidConcept(List<A> automaticRoles, D concept, IdmRoleRequestDto request);
 
@@ -97,4 +96,6 @@ public interface IdmGeneralConceptRoleRequestService<
     Set<String> getTransitivePermissions(D concept);
 
     A getEmbeddedAssignment(D concept);
+
+    ApplicantDto resolveApplicant(IdmRequestIdentityRoleDto dto);
 }

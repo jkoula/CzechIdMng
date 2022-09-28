@@ -4,6 +4,7 @@ import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.EmptyFilter;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
+import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -59,41 +61,45 @@ import java.util.stream.Collectors;
  *
  * Since this service combines multiple data sources, which means multiple different {@link eu.bcvsolutions.idm.core.api.dto.BaseDto}, we need a way
  * to convert them to the same data type. This is done using {@link eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter} object, which is
- * obtained by calling {@link AdaptableService#getAdapter(F2)}.
+ * obtained by calling {@link AdaptableService#getAdapter(FILTER)}.
  *
- * @param <D> {@link BaseDto} class, which internal resources use
- * @param <F> {@link BaseFilter} class, which internal resources use
- * @param <F2> {@link BaseFilter} class, which this resource uses as an input filter. This filter is then translated to F filter using {@link ModelMapper}
- * @param <R> result type
+ * @param <DTO> {@link BaseDto} class, which internal resources use
+ * @param <INNERFILTER> {@link BaseFilter} class, which internal resources use
+ * @param <FILTER> {@link BaseFilter} class, which this resource uses as an input filter. This filter is then translated to F filter using {@link ModelMapper}
+ * @param <RESULT> result type
  * @since 12.2.3
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public class MultiSourcePagedResource<D extends BaseDto, F extends BaseFilter, F2 extends BaseFilter, R> {
+public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends BaseFilter, FILTER extends BaseFilter, RESULT> {
 
-    private final Collection<AdaptableService<D, F, R>> sources;
+    private final Collection<AdaptableService<DTO, INNERFILTER, RESULT>> sources;
     private final ModelMapper modelMapper;
 
 
-    public MultiSourcePagedResource(Collection<AdaptableService<D, F, R>> sources, ModelMapper modelMapper) {
+    public MultiSourcePagedResource(Collection<AdaptableService<DTO, INNERFILTER, RESULT>> sources, ModelMapper modelMapper) {
         this.sources = sources;
         this.modelMapper = modelMapper;
     }
 
-    public Page<R> find(F2 filter, Pageable pageable, BasePermission[] permission) {
+    public Page<RESULT> find(FILTER filter, Pageable pageable, BasePermission[] permission) {
         return doPaging(
                 (service, concreteFilter, currentPageable) -> service.find(concreteFilter, currentPageable, permission),
-                (service, concreteFilter, currentPage) -> service.getAdapter(concreteFilter).transform(currentPage.stream()).collect(Collectors.toList()),
+                (service, concreteFilter, currentPage) -> {
+                    final DtoAdapter<DTO, RESULT> adapter = service.getAdapter(filter);
+                    final Stream<DTO> stream = currentPage.stream();
+                    return adapter.transform(stream).collect(Collectors.toList());
+                },
                 filter, pageable, permission);
     }
 
-    public Page<UUID> findIds(F2 filter, Pageable pageable, BasePermission[] permission) {
+    public Page<UUID> findIds(FILTER filter, Pageable pageable, BasePermission[] permission) {
         return doPaging(
                 (service, concreteFilter, currentPageable) -> service.findIds(concreteFilter, currentPageable, permission),
                 (service, concreteFilter, currentPage) -> currentPage.getContent(),
                 filter, pageable, permission);
     }
 
-    public long count(F2 filter, BasePermission[] permission) {
+    public long count(FILTER filter, BasePermission[] permission) {
         return doPaging(
                 (service, concreteFilter, currentPageable) -> new PageImpl<>(Collections.emptyList(), currentPageable, service.count(concreteFilter)),
                 (service, concreteFilter, currentPage) -> currentPage.getContent(),
@@ -101,13 +107,13 @@ public class MultiSourcePagedResource<D extends BaseDto, F extends BaseFilter, F
     }
 
     private <O, Q> Page<Q> doPaging(
-             TriFunction<AdaptableService<D, F, R>, F, Pageable, Page<O>> resultProvider,
-            TriFunction<AdaptableService<D, F, R>,F , Page<O>, Collection<Q>> resultMapper, BaseFilter filter, Pageable pageable, BasePermission[] permission) {
+             TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Pageable, Page<O>> resultProvider,
+            TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Page<O>, Collection<Q>> resultMapper, BaseFilter filter, Pageable pageable, BasePermission[] permission) {
         List<Q> result = new ArrayList<>();
         long total = 0L;
-        for (AdaptableService<D, F, R> service : sources) {
+        for (AdaptableService<DTO, INNERFILTER, RESULT> service : sources) {
             final int missingCount = Math.max(pageable.getPageSize() - result.size(), 0);
-            final F concreteFilter = modelMapper.map(filter == null ? new EmptyFilter() : filter, service.getFilterClass());
+            final INNERFILTER concreteFilter = modelMapper.map(filter == null ? new EmptyFilter() : filter, service.getFilterClass());
             //
             if (missingCount != 0) {
                 // Still need some records fetched

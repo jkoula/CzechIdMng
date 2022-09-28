@@ -6,6 +6,7 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
@@ -32,18 +33,16 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
         IdmRequestIdentityRoleFilter,
         IdmRequestIdentityRoleDto> implements IdmRoleAssignmentManager {
 
-    protected final Map<Class<IdmRequestIdentityRoleDto>, IdmRoleAssignmentService> assignmentServices;
-    private final List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> adaptableServices;
+    protected final Map<Class<? extends AbstractRoleAssignmentDto>, IdmRoleAssignmentService> assignmentServices;
 
 
     @Autowired
-    public DefaultIdmRoleAssignmentManager(List<IdmRoleAssignmentService> assignmentServices,
-            List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> adaptableServices, ModelMapper modelMapper) {
-        super(modelMapper, adaptableServices);
+    public DefaultIdmRoleAssignmentManager(List<IdmRoleAssignmentService<? extends AbstractRoleAssignmentDto, ?>> assignmentServices, ModelMapper modelMapper) {
+        super(modelMapper, assignmentServices);
 
-        this.adaptableServices = adaptableServices;
-        this.assignmentServices = assignmentServices.stream().collect(Collectors.toMap(idmRoleAssignmentService -> idmRoleAssignmentService.getType(),
-                idmRoleAssignmentService -> idmRoleAssignmentService));
+        this.assignmentServices = assignmentServices.stream().collect(
+                Collectors.toMap(idmRoleAssignmentService ->  idmRoleAssignmentService.getType(),
+                idmGeneralConceptRoleRequestService ->  idmGeneralConceptRoleRequestService));
     }
 
     @Transactional(readOnly = true)
@@ -76,6 +75,8 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
 
     @Override
     protected MultiSourcePagedResource<? extends BaseDto, ? extends BaseFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
+        List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> adaptableServices = new ArrayList<>();
+        assignmentServices.values().forEach(adaptableServices::add);
         return new MultiSourcePagedResource<>(adaptableServices, modelMapper);
     }
 
