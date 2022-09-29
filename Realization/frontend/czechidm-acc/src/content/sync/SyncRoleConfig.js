@@ -77,6 +77,12 @@ class SyncRoleConfig extends Basic.AbstractContent {
     this.setState(state);
   }
 
+  getMappingNiceLabel(mapping) {
+    if (mapping) {
+      return mapping._embedded.objectClass._embedded.system.name + ": " + mapping.name;
+    }
+  }
+
   render() {
     const {
       identityMappingSearchParameters,
@@ -144,7 +150,7 @@ class SyncRoleConfig extends Basic.AbstractContent {
               manager={systemMappingManager}
               required={!memberSystemMappingHidden}
               readOnly={memberSystemMappingHidden}
-              niceLabel={(mapping) => mapping._embedded.objectClass._embedded.system.name}
+              niceLabel={(mapping) => this.getMappingNiceLabel(mapping)}
               forceSearchParameters={identityMappingSearchParameters}
               label={this.i18n('roleConfigDetail.memberSystemMapping.label')}
               onChange={this._onChangeMemberSystem.bind(this)}
