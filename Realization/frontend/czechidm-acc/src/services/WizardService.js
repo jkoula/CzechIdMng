@@ -3,7 +3,7 @@ import { Services, Utils} from 'czechidm-core';
 /**
  * @author Roman Kučera
  */
-class WizardService extends Services.AbstractService {
+class WizardService extends Services.FormableEntityService {
     /**
      * Loads all registered wizards.
      */
