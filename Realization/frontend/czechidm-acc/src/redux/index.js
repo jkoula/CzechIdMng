@@ -27,8 +27,8 @@ import UniformPasswordSystemManager from './UniformPasswordSystemManager';
 import RemoteServerManager from './RemoteServerManager';
 import SystemGroupManager from './SystemGroupManager';
 import SystemGroupSystemManager from './SystemGroupSystemManager';
-import SystemOwnerRoleManager from '../content/system/SystemOwnerRoleManager';
-import SystemOwnerManager from '../content/system/SystemOwnerManager';
+import SystemOwnerRoleManager from './SystemOwnerRoleManager';
+import SystemOwnerManager from './SystemOwnerManager';
 
 const ManagerRoot = {
   SystemManager,
@@ -66,8 +66,3 @@ const ManagerRoot = {
 
 ManagerRoot.version = '0.0.1';
 module.exports = ManagerRoot;
-
-
-
-
-

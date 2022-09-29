@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Advanced, Basic, Managers } from "czechidm-core";
-import SystemOwnerManager from "./SystemOwnerManager";
+import SystemOwnerManager from "../../redux/SystemOwnerManager";
 import _ from "lodash";
 import { SystemManager } from "../../redux";
 import SystemSelect from "../../components/SystemSelect/SystemSelect";
@@ -48,6 +48,14 @@ class SystemOwner extends Advanced.AbstractTableContent {
     super.save(formEntity, event);
   };
 
+  afterSave(entity, error) {
+    if (!error) {
+      this.addMessage({ message: this.i18n('action.save.success', { count: 1, record: this.getManager().getNiceLabel(entity) }) });
+    }
+    //
+    super.afterSave(entity, error);
+  }
+
   render() {
     const { uiKey,_showLoading,forceSearchParameters } = this.props;
     return (
@@ -61,7 +69,7 @@ class SystemOwner extends Advanced.AbstractTableContent {
           showRowSelection={manager.canDelete()}
           actions={
             [
-              { value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false }
+              { value: 'delete', niceLabel: this.i18n('action.delete.action'),  action: this.onDelete.bind(this), disabled: false }
             ]
           }
           buttons={[

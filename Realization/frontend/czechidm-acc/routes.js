@@ -39,7 +39,7 @@ module.exports = {
         {
           path: 'owner',
           component: require('./src/content/system/SystemOwners'),
-          access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEMOWNER_READ', 'SYSTEMOWNERROLE_READ'] } ]
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEMOWNER_READ', 'SYSTEMOWNERROLE_READ'] } ]
         },
         {
           path: 'connector',

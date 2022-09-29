@@ -75,7 +75,7 @@ module.exports = {
                 order: 25,
                 path: '/system/:entityId/owner',
                 icon: 'fa:user',
-                access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEMOWNER_READ', 'SYSTEMOWNERROLE_READ'] } ]
               },
               {
                 id: 'system-entities',

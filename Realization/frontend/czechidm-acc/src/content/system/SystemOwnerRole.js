@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {Advanced, Basic, Utils} from 'czechidm-core';
-import SystemOwnerRoleManager from './SystemOwnerRoleManager';
+import SystemOwnerRoleManager from '../../redux/SystemOwnerRoleManager';
 import _ from 'lodash';
 import SystemManager from '../../redux/SystemManager';
 import SystemSelect from '../../components/SystemSelect/SystemSelect';
@@ -41,10 +41,19 @@ class SystemOwnerRole extends Advanced.AbstractTableContent {
     super.showDetail(entity, () => {
     });
   }
+
   save = (entity, event) => {
     const formEntity = this.refs.form.getData();
     super.save(formEntity, event);
   };
+
+  afterSave(entity, error) {
+    if (!error) {
+      this.addMessage({ message: this.i18n('action.save.success', { count: 1, record: this.getManager().getNiceLabel(entity) }) });
+    }
+    //
+    super.afterSave(entity, error);
+  }
 
   render() {
     const { uiKey,_showLoading, forceSearchParameters } = this.props;

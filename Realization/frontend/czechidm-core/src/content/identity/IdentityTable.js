@@ -443,9 +443,9 @@ export class IdentityTable extends Advanced.AbstractTableContent {
             to={ ({ rowIndex, data, event }) => {
               this.showDetail(data[rowIndex], event);
             }}
-            // href={ ({ rowIndex, data }) => {
-            //   return !skipDashboard ? `/identity/${ encodeURIComponent(data[rowIndex].username) }/dashboard` : manager.getDetailLink(data[rowIndex]);
-            // }}
+            href={ ({ rowIndex, data }) => {
+              return !skipDashboard ? `/identity/${ encodeURIComponent(data[rowIndex].username) }/dashboard` : manager.getDetailLink(data[rowIndex]);
+            }}
             property="username"
             width="20%"
             sort
