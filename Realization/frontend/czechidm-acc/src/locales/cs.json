@@ -995,6 +995,12 @@
       "edit": {
         "header": "Editace vazby na systém"
       }
+    },
+    "script": {
+      "references": {
+        "header" : "Použití v mapování",
+        "title" : "Použití v mapování"
+      }
     }
   },
   "entity": {

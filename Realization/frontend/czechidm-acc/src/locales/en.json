@@ -994,6 +994,12 @@
       "edit": {
         "header": "Edit link to the system"
       }
+    },
+    "script": {
+      "references": {
+        "header" : "Usage in mapping",
+        "title" : "Usage in mapping"
+      }
     }
   },
   "entity": {

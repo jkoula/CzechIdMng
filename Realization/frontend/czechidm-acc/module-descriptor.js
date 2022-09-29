@@ -380,6 +380,17 @@ module.exports = {
         path: '/role-catalogue/:entityId/accounts',
         icon: 'fa:external-link',
         access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLECATALOGUEACCOUNT_READ'] } ]
+      },
+      {
+        id: 'references-mapping',
+        parentId: 'scripts',
+        type: 'TAB',
+        labelKey: 'acc:content.script.references.title',
+        order: 500,
+        icon: '',
+        path: '/scripts/:entityId/references-mapping',
+        priority: 0,
+        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SCRIPT_READ'] } ]
       }
     ]
   }
