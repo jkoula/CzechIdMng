@@ -127,6 +127,7 @@ public class TaskSendNotificationEventListener implements ActivitiEventListener{
 					.addParameter("identity", identity.getUsername())
 					.addParameter("url", getUrlToTask(taskEntity))
 					.addParameter("subject", taskEntity.getName())
+					.addParameter("description", taskEntity.getDescription())
 				.build(), identity);
 	}
 	

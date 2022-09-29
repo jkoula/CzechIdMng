@@ -41,7 +41,7 @@ Regards BCV Solutions Ltd.
 ]]>
 	</bodyHtml>
 	<bodyText></bodyText>
-	<parameter>identity, url, subject</parameter>
+	<parameter>identity, url, subject, description</parameter>
 	<systemTemplate>true</systemTemplate>
 	<moduleId>core</moduleId>
 </template>
