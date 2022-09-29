@@ -29,7 +29,6 @@ export default class SystemAttributeMappingService extends Services.AbstractServ
   getScriptUsage(code) {
     return Services.RestApiService
     .get(`${ this.getApiPath() }/script-usage/${ encodeURIComponent(code) }`)
-    // .get(`/script-usage/${ encodeURIComponent(code) }`)
     .then(response => {
         return response.json();
     })
