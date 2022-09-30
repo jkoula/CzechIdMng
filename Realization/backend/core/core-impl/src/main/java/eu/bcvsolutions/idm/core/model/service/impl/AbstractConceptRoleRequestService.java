@@ -901,13 +901,14 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
         if (dto.getRoleRequest() == null) {
             throw new ResultCodeException(CoreResultCode.REQUEST_ITEM_CANNOT_BE_CREATED, "Creating request item before the request was vreated");
         }
-        final IdmRoleRequestDto request = lookupService.lookupEmbeddedDto(dto, AbstractConceptRoleRequest_.roleRequest);
+        final IdmRoleRequestDto request = lookupService.lookupDto(IdmRoleRequestDto.class, dto.getRoleRequest());
 
         List<D> concepts = Lists.newArrayList();
         roles.forEach(role -> {
             D conceptRoleRequest = requestIdentityRoleToConcept(dto);
             conceptRoleRequest.setRoleRequest(requestId);
             conceptRoleRequest.setOperation(ADD);
+            conceptRoleRequest.setRole(role);
             // Create concept with EAVs
             conceptRoleRequest = save(conceptRoleRequest);
             if (request != null) {

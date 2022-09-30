@@ -8,6 +8,5 @@ import java.util.stream.Stream;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public interface DtoAdapter<D extends BaseDto, R> {
-
     Stream<R> transform(Stream<D> d);
 }

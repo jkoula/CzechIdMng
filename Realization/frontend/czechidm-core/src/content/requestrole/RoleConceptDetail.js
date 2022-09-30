@@ -97,6 +97,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       entity.roles = entity.role;
       entity.role = null;
     }
+    entity.ownerUuid = entity[selectedOwnerType]
     // Add EAV to entity
     entity._eav = [eavValues];
     //

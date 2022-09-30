@@ -10,10 +10,13 @@ import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.event.AccAccountRoleAssignmentEvent;
 import eu.bcvsolutions.idm.acc.repository.AccAccountRoleRepository;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
+import eu.bcvsolutions.idm.acc.service.impl.adapter.DefaultAccountConceptRoleAdapter;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -146,7 +149,8 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
 
     @Override
     public <F2 extends BaseFilter> DtoAdapter<AccAccountRoleAssignmentDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
-        return null;
+        IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
+        return new DefaultAccountConceptRoleAdapter(translatedFilter, null, applicationContext.getBean(AccAccountConceptRoleRequestService.class), this);
     }
 
 }

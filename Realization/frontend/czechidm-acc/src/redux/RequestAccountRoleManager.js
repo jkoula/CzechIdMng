@@ -7,6 +7,13 @@ export default class RequestAccountRoleManager extends Managers.RequestIdentityR
     this.service = new RequestAccountRoleService();
   }
 
+  createEntity(entity, uiKey = null, cb = null) {
+    if (entity) {
+      entity.assignmentType = "eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto"
+    }
+    return super.createEntity(entity, uiKey, cb)
+  }
+
   getService() {
     return this.service;
   }

@@ -21,6 +21,13 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
     return 'requestIdentityRoles';
   }
 
+  createEntity(entity, uiKey = null, cb = null) {
+    if (entity) {
+      entity.assignmentType = "eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto"
+    }
+    return super.createEntity(entity, uiKey, cb)
+  }
+
   /**
    * Delete entity
    *

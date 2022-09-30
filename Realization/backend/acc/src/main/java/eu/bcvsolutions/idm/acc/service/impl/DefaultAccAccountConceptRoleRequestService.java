@@ -14,17 +14,15 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
-import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
@@ -32,6 +30,7 @@ import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -46,6 +45,7 @@ import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractConceptRoleRequestService;
+import eu.bcvsolutions.idm.core.model.service.impl.adapter.DefaultRequestRoleConceptAdapter;
 import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
@@ -60,7 +60,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -85,11 +84,16 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
 
     private final LookupService lookupService;
 
+    private final IdmRoleSystemService roleSystemService;
+
+    private final WorkflowProcessInstanceService workflowProcessInstanceService;
+
     @Autowired
     public DefaultAccAccountConceptRoleRequestService(AbstractEntityRepository<AccAccountConceptRoleRequest> repository, WorkflowProcessInstanceService workflowProcessInstanceService,
             LookupService lookupService, IdmAutomaticRoleRepository automaticRoleRepository, AccAccountRoleAssignmentService accRoleAccountService, FormService formService,
             IdmRoleCompositionService roleCompositionService, IdmRoleService roleService, AccAccountService accountService, AccIdentityAccountService identityAccountService,
-            AccAccountRoleAssignmentService roleAssignmentService, IdmIdentityService identityService, LookupService lookupService1) {
+            AccAccountRoleAssignmentService roleAssignmentService, IdmIdentityService identityService, LookupService lookupService1, IdmRoleSystemService roleSystemService,
+            WorkflowProcessInstanceService workflowProcessInstanceService1) {
         super(repository, workflowProcessInstanceService, roleCompositionService, lookupService, automaticRoleRepository, roleAssignmentService);
         this.accRoleAccountService = accRoleAccountService;
         this.formService = formService;
@@ -98,6 +102,8 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
         this.identityAccountService = identityAccountService;
         this.identityService = identityService;
         this.lookupService = lookupService1;
+        this.roleSystemService = roleSystemService;
+        this.workflowProcessInstanceService = workflowProcessInstanceService1;
     }
 
     @Override
@@ -343,6 +349,10 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
 
     @Override
     public <F2 extends BaseFilter> DtoAdapter<AccAccountConceptRoleRequestDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
-        return null;
+
+        // Need to translate the filter. API is too general here, but
+        IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
+        return new DefaultRequestRoleConceptAdapter<>(accRoleAccountService, this,
+                roleSystemService, translatedFilter, workflowProcessInstanceService, modelMapper);
     }
 }

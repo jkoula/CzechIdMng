@@ -24,8 +24,8 @@
 	<logger name="eu.bcvsolutions" level="INFO" />
 	<logger name="org.springframework" level="INFO"/>
 	<logger name="org.springframework.web" level="INFO"/>
-	<logger name="org.hibernate.SQL" level="TRACE"/>
-	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+	<logger name="org.hibernate.SQL" level="ERROR"/>
+	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="ERROR"/>
 	<logger name="AUDIT" level="ERROR"/>
     
 </configuration>
