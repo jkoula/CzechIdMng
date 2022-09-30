@@ -12,7 +12,7 @@ class SystemOwnerService extends AbstractService {
       }
     
     getNiceLabel(entity) {
-      let label = `${" - "+systemService.getNiceLabel(entity._embedded.system)}`;
+      let label = `${systemService.getNiceLabel(entity._embedded.system)}`;
       if (entity.owner) {
         label += `${" - "+identityService.getNiceLabel(entity._embedded.owner)}`;
       }

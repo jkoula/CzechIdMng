@@ -14,7 +14,7 @@ class SystemOwnerRoleService extends AbstractService {
     getNiceLabel(entity) {
         let label = `${systemService.getNiceLabel(entity._embedded.system)}`;
         if (entity.ownerRole) {
-          label += `${roleService.getNiceLabel(entity._embedded.ownerRole)}`;
+          label += `${" - "+roleService.getNiceLabel(entity._embedded.ownerRole)}`;
         }
         //
         return label;
