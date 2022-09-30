@@ -1,5 +1,6 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import _ from 'lodash';
 //
 import * as Basic from '../../components/basic';
@@ -13,6 +14,7 @@ import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
+import { ConfigurationManager } from '../../redux';
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const requestIdentityRoleManager = new RequestIdentityRoleManager();
 const roleRequestManager = new RoleRequestManager();
@@ -874,4 +876,29 @@ RequestIdentityRoleTable.defaultProps = {
   showEnvironment: true
 };
 
-export default RequestIdentityRoleTable;
+RequestIdentityRoleTable.defaultProps = {
+  columns: ConfigLoader.getConfig('RequestIdentityRoleTable.table.columns', [
+    'role',
+    'roleAttributes',
+    'environment',
+    'identityContract',
+    'contractPosition',
+    'validFrom',
+    'validTill',
+    'directRole',
+    'automaticRole',
+    'incompatibleRoles',
+    'description',
+    'priority'
+  ])
+};
+function select(state, component) {
+  return {
+    columns: component.columns || ConfigurationManager.getPublicValueAsArray(
+      state,
+      'idm.pub.app.show.RequestIdentityRoleTable.table.columns',
+      RequestIdentityRoleTable.defaultProps.columns
+    )
+  };
+}
+export default connect(select, null, null, { forwardRef: true })(RequestIdentityRoleTable);
