@@ -1863,7 +1863,9 @@
       "PROVISIONINGARCHIVE": "Provisioning - archív",
       "SYSTEMATTRIBUTEMAPPING": "Mapované atributy systému",
       "UNIFORMPASSWORD": "Systém jednotného hesla",
-      "SYSTEMGROUP": "Skupiny systémů"
+      "SYSTEMGROUP": "Skupiny systémů",
+      "SYSTEMOWNER": "Vlastník systému",
+      "SYSTEMOWNERROLE": "Vlastník systému dle role"
     }
   },
   "eav": {

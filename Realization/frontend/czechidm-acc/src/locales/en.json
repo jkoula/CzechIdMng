@@ -1859,7 +1859,9 @@
       "PROVISIONINGARCHIVE": "Provisioning - archive",
       "SYSTEMATTRIBUTEMAPPING": "Mapping atribute in system",
       "UNIFORMPASSWORD": "Uniform password system",
-      "SYSTEMGROUP": "Group of systems"
+      "SYSTEMGROUP": "Group of systems",
+      "SYSTEMOWNER": "Owner of system",
+      "SYSTEMOWNERROLE": "Owner of system by role"
     }
   },
   "eav": {
