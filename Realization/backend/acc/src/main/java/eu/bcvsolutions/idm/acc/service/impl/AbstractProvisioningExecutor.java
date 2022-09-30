@@ -26,14 +26,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -73,6 +71,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
@@ -131,6 +130,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	private final SysSystemAttributeMappingService systemAttributeMappingService;
 	protected final SysRoleSystemService roleSystemService;
 	private final IdmRoleService roleService;
+	private final SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public AbstractProvisioningExecutor(SysSystemMappingService systemMappingService,
@@ -140,7 +140,8 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			AccAccountService accountService, ProvisioningExecutor provisioningExecutor,
 			EntityEventManager entityEventManager, SysSchemaAttributeService schemaAttributeService,
 			SysSchemaObjectClassService schemaObjectClassService,
-			SysSystemAttributeMappingService systemAttributeMappingService, IdmRoleService roleService) {
+			SysSystemAttributeMappingService systemAttributeMappingService, IdmRoleService roleService,
+			SysSystemEntityTypeManager systemEntityManager) {
 
 		Assert.notNull(systemMappingService, "Service is required.");
 		Assert.notNull(attributeMappingService, "Service is required.");
@@ -156,6 +157,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		Assert.notNull(schemaObjectClassService, "Service is required.");
 		Assert.notNull(systemAttributeMappingService, "Service is required.");
 		Assert.notNull(roleService, "Service is required.");
+		Assert.notNull(systemEntityManager, "Service is required.");
 		//
 		this.systemMappingService = systemMappingService;
 		this.attributeMappingService = attributeMappingService;
@@ -171,6 +173,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		this.systemAttributeMappingService = systemAttributeMappingService;
 		this.roleSystemService = roleSystemService;
 		this.roleService = roleService;
+		this.systemEntityManager = systemEntityManager;
 	}
 
 	/**
@@ -178,12 +181,21 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 * 
 	 * @return
 	 */
-	protected SystemEntityType getEntityType() {
-		return SystemEntityType.getByClass(getService().getDtoClass());
+	protected String getEntityType() {
+		return systemEntityManager.getSystemEntityByClass(getService().getDtoClass()).getSystemEntityCode();
+	}
+	
+	/**
+	 * Returns entity type for this provisioning executor.
+	 * 
+	 * @return
+	 */
+	public String getSystemEntityType() {
+		// must be overridden in each executor
+		return null;
 	}
 
-	@Override
-	public boolean supports(SystemEntityType delimiter) {
+	public boolean supports(String delimiter) {
 		return getEntityType() == delimiter;
 	}
 
@@ -285,7 +297,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		ProvisioningOperationType operationType;
 		SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
 		SysSystemEntityDto systemEntity = getSystemEntity(account);
-		SystemEntityType entityType = SystemEntityType.getByClass(dto.getClass());
+		String entityType = systemEntityManager.getSystemEntityByClass(dto.getClass()).getSystemEntityCode();
 		String uid = account.getUid();
 		//
 		if (systemEntity == null) {
@@ -557,7 +569,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	@Override
 	public boolean accountManagement(DTO dto) {
-		SystemEntityType entityType = SystemEntityType.getByClass(dto.getClass());
+		String entityType = systemEntityManager.getSystemEntityByClass(dto.getClass()).getSystemEntityCode();
 		List<SysSystemMappingDto> systemMappings = findSystemMappingsForEntityType(dto, entityType);
 		systemMappings.forEach(mapping -> {
 			SysSchemaObjectClassDto schemaObjectClassDto = schemaObjectClassService.get(mapping.getObjectClass());
@@ -823,7 +835,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					if (attribute.isUid()) {
 						// TODO: now we set UID from SystemEntity, may be UID from
 						// AccAccount will be more correct
-						Object uidValue = getAttributeValue(uid, dto, attribute, system, mappingContext);
+						Object uidValue = getAttributeValue(uid, dto, attribute, system, mappingContext, account);
 						if (uidValue == null) {
 							throw new ProvisioningException(AccResultCode.PROVISIONING_GENERATED_UID_IS_NULL,
 									ImmutableMap.of("system", system.getName()));
@@ -837,7 +849,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), uidValue);
 					} else {
 						accountAttributes.put(ProvisioningAttributeDto.createProvisioningAttributeKey(attribute,
-								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), getAttributeValue(uid, dto, attribute, system, mappingContext));
+								schemaAttributeDto.getName(), schemaAttributeDto.getClassType()), getAttributeValue(uid, dto, attribute, system, mappingContext, account));
 					}
 				});
 
@@ -867,7 +879,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 								&& schemaAttributeParent.equals(schemaAttribute)
 								&& attributeParent.getStrategyType() == attribute.getStrategyType();
 					}).forEach(attribute -> {
-						Object value = getAttributeValue(uid, dto, attribute, system, mappingContext);
+						Object value = getAttributeValue(uid, dto, attribute, system, mappingContext, account);
 						// We don`t want null item in list (problem with
 						// provisioning in IC)
 						if (value != null) {
@@ -889,8 +901,8 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		return accountAttributes;
 	}
 
-	protected Object getAttributeValue(String uid, DTO dto, AttributeMapping attribute, SysSystemDto system, MappingContext mappingContext) {
-		return attributeMappingService.getAttributeValue(uid, dto, attribute, mappingContext);
+	protected Object getAttributeValue(String uid, DTO dto, AttributeMapping attribute, SysSystemDto system, MappingContext mappingContext, AccAccountDto accountDto) {
+		return attributeMappingService.getAttributeValue(uid, dto, attribute, mappingContext, accountDto);
 	}
 
 	@Override
@@ -943,7 +955,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	@Override
 	public IcUidAttribute authenticate(String username, GuardedString password, SysSystemDto system,
-			SystemEntityType entityType) {
+			String entityType) {
 
 		Assert.notNull(username, "Username is required.");
 		Assert.notNull(system, "System is required.");
@@ -972,7 +984,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 */
 	@Override
 	public List<AttributeMapping> resolveMappedAttributes(AccAccountDto account, DTO dto, SysSystemDto system,
-			SystemEntityType entityType) {
+			String entityType) {
 
 		// All role system attributes (overloading) for this uid and same system
 		List<SysRoleSystemAttributeDto> roleSystemAttributesAll = findOverloadingAttributes(dto, system,
@@ -990,7 +1002,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	}
 
 	private List<AttributeMapping> resolveAdditionalPasswordChangeAttributes(AccAccountDto account, DTO dto,
-			SysSystemDto system, SystemEntityType entityType) {
+			SysSystemDto system, String entityType) {
 
 		UUID mapping = account.getSystemMapping();
 		if (mapping == null) {
@@ -1024,7 +1036,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 */
 	@Override
 	public List<AttributeMapping> compileAttributes(List<? extends AttributeMapping> defaultAttributes,
-			List<SysRoleSystemAttributeDto> overloadingAttributes, SystemEntityType entityType) {
+			List<SysRoleSystemAttributeDto> overloadingAttributes, String entityType) {
 		Assert.notNull(overloadingAttributes, "List of overloading attributes cannot be null!");
 
 		List<AttributeMapping> finalAttributes = new ArrayList<>();
@@ -1182,7 +1194,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 *
 	 */
 	protected abstract List<SysRoleSystemAttributeDto> findOverloadingAttributes(DTO dto, SysSystemDto system,
-			AccAccountDto account, SystemEntityType entityType);
+			AccAccountDto account, String entityType);
 
 	/**
 	 * Find list of {@link SysSystemAttributeMapping} by provisioning type and
@@ -1203,7 +1215,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		return attributeMappingService.find(filter, null).getContent();
 	}
 
-	protected List<SysSystemMappingDto> findSystemMappingsForEntityType(DTO dto, SystemEntityType entityType) {
+	protected List<SysSystemMappingDto> findSystemMappingsForEntityType(DTO dto, String entityType) {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setEntityType(entityType);
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
@@ -1341,6 +1353,14 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		if (account != null && !account.getUid().equals(uidValue)) {
 			// UID value must be string
 			account.setUid(uidValue);
+
+			AccAccountFilter accountFilter = new AccAccountFilter();
+			accountFilter.setUid(uidValue);
+			List<UUID> content = accountService.findIds(accountFilter, null).getContent();
+			if (content.size() > 0 && !content.get(0).equals(account.getId())) {
+				throw new ResultCodeException(AccResultCode.PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS,
+						ImmutableMap.of("uid", uidValue, "account", account.getId(), "system", account.getSystem(), "mapping", account.getSystemMapping()));
+			}
 			account = accountService.save(account);
 		}
 		return account;
@@ -1497,7 +1517,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 * @param entityType type of entity
 	 * @return UUID of mapping or null if there is none provisioning mapping
 	 */
-	private UUID getMappingFromSystem(UUID system, SystemEntityType entityType) {
+	private UUID getMappingFromSystem(UUID system, String entityType) {
 		// This is fallback, if account is not found, but system has some provisioning mapping, get first one
 		List<SysSystemMappingDto> systemMappings = systemMappingService.findBySystemId(system,
 				SystemOperationType.PROVISIONING, entityType);

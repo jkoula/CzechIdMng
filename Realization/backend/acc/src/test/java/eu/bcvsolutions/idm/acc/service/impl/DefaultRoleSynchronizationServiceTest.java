@@ -30,7 +30,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -138,7 +137,7 @@ public class DefaultRoleSynchronizationServiceTest extends AbstractIntegrationTe
 		initData();
 
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
-		mappingFilter.setEntityType(SystemEntityType.ROLE);
+		mappingFilter.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		mappingFilter.setSystemId(system.getId());
 		mappingFilter.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		List<SysSystemMappingDto> mappings = systemMappingService.find(mappingFilter, null).getContent();
@@ -564,7 +563,7 @@ public class DefaultRoleSynchronizationServiceTest extends AbstractIntegrationTe
 		// Create provisioning mapping
 		SysSystemMappingDto systemMapping = new SysSystemMappingDto();
 		systemMapping.setName("default_" + System.currentTimeMillis());
-		systemMapping.setEntityType(SystemEntityType.ROLE);
+		systemMapping.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
 		systemMapping.setObjectClass(systemMappingSync.getObjectClass());
 		systemMapping.setAccountType(AccountType.PERSONAL);
@@ -588,7 +587,7 @@ public class DefaultRoleSynchronizationServiceTest extends AbstractIntegrationTe
 		// Create synchronization mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
-		syncSystemMapping.setEntityType(SystemEntityType.ROLE);
+		syncSystemMapping.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		syncSystemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);

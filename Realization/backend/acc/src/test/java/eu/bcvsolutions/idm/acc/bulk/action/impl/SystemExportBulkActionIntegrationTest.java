@@ -46,6 +46,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.RoleSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.ExportImportType;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
@@ -64,7 +65,6 @@ import eu.bcvsolutions.idm.core.api.service.ImportManager;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
 import eu.bcvsolutions.idm.core.scheduler.task.impl.ImportTaskExecutor;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
@@ -471,7 +471,7 @@ public class SystemExportBulkActionIntegrationTest extends AbstractExportBulkAct
 
 		SysSchemaObjectClassDto objectClassDto = new SysSchemaObjectClassDto();
 		objectClassDto.setId(mapping.getObjectClass());
-		helper.createMappingSystem(SystemEntityType.ROLE, objectClassDto);
+		helper.createMappingSystem(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClassDto);
 		mappings = findMappings(system);
 		Assert.assertEquals(2, mappings.size());
 
@@ -513,7 +513,7 @@ public class SystemExportBulkActionIntegrationTest extends AbstractExportBulkAct
 
 		SysSchemaObjectClassDto objectClassDto = new SysSchemaObjectClassDto();
 		objectClassDto.setId(mapping.getObjectClass());
-		helper.createMappingSystem(SystemEntityType.ROLE, objectClassDto);
+		helper.createMappingSystem(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClassDto);
 		mappings = findMappings(system);
 		Assert.assertEquals(2, mappings.size());
 

@@ -29,6 +29,8 @@ import SystemGroupService from './SystemGroupService';
 import SystemGroupSystemService from './SystemGroupSystemService';
 import SystemOwnerService from './SystemOwnerService';
 import SystemOwnerRoleService from './SystemOwnerRoleService';
+import SystemEntityTypeService from './SystemEntityTypeService';
+
 const ServiceRoot = {
   SystemService,
   RoleSystemService,
@@ -61,6 +63,7 @@ const ServiceRoot = {
   SystemGroupSystemService,
   SystemOwnerService,
   SystemOwnerRoleService
+  SystemEntityTypeService
 };
 
 ServiceRoot.version = '0.1.0';

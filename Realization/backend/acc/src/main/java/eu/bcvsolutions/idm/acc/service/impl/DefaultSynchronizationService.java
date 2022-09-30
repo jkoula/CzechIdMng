@@ -22,7 +22,6 @@ import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -45,9 +44,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncLogService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.config.cache.domain.ValueWrapper;
 import eu.bcvsolutions.idm.core.api.service.ConfigurationService;
 import eu.bcvsolutions.idm.core.api.service.IdmCacheManager;
@@ -77,7 +78,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	private final SysSyncLogService synchronizationLogService;
 	private final SysSystemEntityService systemEntityService;
 	private final AccAccountService accountService;
-	private final PluginRegistry<SynchronizationEntityExecutor, SystemEntityType> pluginExecutors;
+	private final PluginRegistry<SynchronizationEntityExecutor, SystemEntityTypeRegistrable> pluginExecutors;
 	private final SysSystemMappingService systemMappingService;
 	private final SysSchemaObjectClassService schemaObjectClassService;
 	//
@@ -89,6 +90,8 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	private IdmCacheManager idmCacheManager;
 	@Autowired
 	private LongRunningTaskManager longRunningTaskManager;
+	@Autowired
+	private SysSystemEntityTypeManager systemEntityManager;
 
 	@Autowired
 	public DefaultSynchronizationService(SysSystemAttributeMappingService attributeHandlingService,
@@ -182,7 +185,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 		UUID syncConfigId = config.getId();
 		SysSystemMappingDto mapping = systemMappingService.get(config.getSystemMapping());
 		Assert.notNull(mapping, "Mapping is required.");
-		SystemEntityType entityType = mapping.getEntityType();
+		String entityType = mapping.getEntityType();
 
 		SynchronizationEntityExecutor executor = getSyncExecutor(entityType, syncConfigId);
 		executor.setLongRunningTaskExecutor(longRunningTaskExecutor);
@@ -219,7 +222,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveMissingEntitySituation(String uid, SystemEntityType entityType,
+	public SysSyncItemLogDto resolveMissingEntitySituation(String uid, String entityType,
 			List<IcAttribute> icAttributes, UUID configId, String actionType) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -259,7 +262,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveLinkedSituation(String uid, SystemEntityType entityType,
+	public SysSyncItemLogDto resolveLinkedSituation(String uid, String entityType,
 			List<IcAttribute> icAttributes, UUID accountId, UUID configId, String actionType) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -299,7 +302,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveUnlinkedSituation(String uid, SystemEntityType entityType, UUID entityId,
+	public SysSyncItemLogDto resolveUnlinkedSituation(String uid, String entityType, UUID entityId,
 			UUID configId, String actionType, List<IcAttribute> icAttributes) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -343,7 +346,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SysSyncItemLogDto resolveMissingAccountSituation(String uid, SystemEntityType entityType, UUID accountId,
+	public SysSyncItemLogDto resolveMissingAccountSituation(String uid, String entityType, UUID accountId,
 			UUID configId, String actionType) {
 		Assert.notNull(uid, "Uid is required.");
 		Assert.notNull(entityType, "Entity type is required.");
@@ -371,7 +374,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 		return itemLog;
 	}
 
-	private SysSystemEntityDto findSystemEntity(String uid, SysSystemDto system, SystemEntityType entityType) {
+	private SysSystemEntityDto findSystemEntity(String uid, SysSystemDto system, String entityType) {
 		SysSystemEntityFilter systemEntityFilter = new SysSystemEntityFilter();
 		systemEntityFilter.setEntityType(entityType);
 		systemEntityFilter.setSystemId(system.getId());
@@ -387,7 +390,7 @@ public class DefaultSynchronizationService implements SynchronizationService {
 	}
 
 	@Override
-	public SynchronizationEntityExecutor getSyncExecutor(SystemEntityType entityType, UUID syncConfigId) {
+	public SynchronizationEntityExecutor getSyncExecutor(String entityType, UUID syncConfigId) {
 		ValueWrapper value = this.idmCacheManager.getValue(SYNC_EXECUTOR_CACHE_NAME, syncConfigId);
 		if (value == null) {
 			return getExecutor(entityType, syncConfigId);
@@ -395,8 +398,9 @@ public class DefaultSynchronizationService implements SynchronizationService {
 		return (SynchronizationEntityExecutor) value.get();
 	}
 
-	private SynchronizationEntityExecutor getExecutor(SystemEntityType entityType, UUID syncConfigId) {
-		SynchronizationEntityExecutor executor = pluginExecutors.getPluginFor(entityType);
+	private SynchronizationEntityExecutor getExecutor(String entityType, UUID syncConfigId) {
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+		SynchronizationEntityExecutor executor = pluginExecutors.getPluginFor(systemEntityType);
 		if (executor == null) {
 			throw new UnsupportedOperationException(MessageFormat
 					.format("Synchronization executor for SystemEntityType {0} is not supported!", entityType));

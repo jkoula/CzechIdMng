@@ -105,6 +105,7 @@ public class EavCodeContractByManagerFilter
 		Join<IdmFormAttribute, IdmFormDefinition> extDef = eavAttr.join(IdmFormAttribute_.formDefinition);
 		//
 		subqueryEav.where(builder.and(
+						RepositoryUtils.getValidNowOrInFuturePredicate(subRoot, builder),
 						builder.equal(subRootEav.get(IdmTreeNodeFormValue_.owner), subRoot.get(IdmIdentityContract_.workPosition)),
 						builder.equal(
 								extDef.get(IdmFormDefinition_.code), 

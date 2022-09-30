@@ -1,9 +1,8 @@
 package eu.bcvsolutions.idm.acc.dto.filter;
 
-import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import java.util.UUID;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.core.api.dto.filter.QuickFilter;
 
@@ -26,11 +25,13 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 	private Boolean passwordAttribute;
 	private Boolean disabledAttribute;
 	private SystemOperationType operationType;
-	private SystemEntityType entityType;
+	private String entityType;
 	private String name;
 	private Boolean authenticationAttribute;
 	private Boolean passwordFilter;
 	private AttributeMappingStrategyType strategyType;
+	private String transformToScript;
+	private String transformFromScript;
 
 	public Boolean getIsUid() {
 		return isUid;
@@ -120,11 +121,11 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 		this.operationType = operationType;
 	}
 
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 
@@ -158,5 +159,21 @@ public class SysSystemAttributeMappingFilter extends QuickFilter {
 
 	public void setStrategyType(AttributeMappingStrategyType strategyType) {
 		this.strategyType = strategyType;
+	}
+	
+	public String getTransformToScript() {
+		return transformToScript;
+	}
+
+	public void setTransformToScript(String scriptCode) {
+		this.transformToScript = scriptCode;
+	}
+	
+	public String getTransformFromScript() {
+		return transformFromScript;
+	}
+
+	public void setTransformFromScript(String scriptCode) {
+		this.transformFromScript = scriptCode;
 	}
 }

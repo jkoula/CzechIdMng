@@ -13,7 +13,6 @@ import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperation;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperationType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation;
 import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemEntity_;
@@ -39,7 +38,7 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 	private ProvisioningContext provisioningContext;
 	@Embedded(dtoClass = SysSystemDto.class)
 	private UUID system;
-	private SystemEntityType entityType;
+	private String entityType;
 	private UUID entityIdentifier;
 	@Embedded(dtoClass = SysSystemEntityDto.class)
 	private UUID systemEntity; // account uid, etc.
@@ -113,11 +112,11 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 	}
 
 	@Override
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 	
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 
@@ -220,7 +219,7 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 		private UUID system;
 		// Add system DTO to the embedded ... for optimization 
 		private SysSystemDto systemDto;
-		private SystemEntityType entityType;
+		private String entityType;
 		private UUID systemEntity;
 		private String systemEntityUid;
 		private UUID roleRequestId;
@@ -281,7 +280,7 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 			return this;
 		}
 		
-		public Builder setEntityType(SystemEntityType entityType) {
+		public Builder setEntityType(String entityType) {
 			this.entityType = entityType;
 			return this;
 		}

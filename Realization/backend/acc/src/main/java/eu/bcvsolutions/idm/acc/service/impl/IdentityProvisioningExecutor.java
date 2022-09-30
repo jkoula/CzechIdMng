@@ -21,7 +21,6 @@ import eu.bcvsolutions.idm.acc.domain.AssignedRoleDto;
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
@@ -41,9 +40,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
@@ -85,6 +86,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 	public final static String ASSIGNED_ROLES_FIELD = "assignedRoles";
 	public final static String ASSIGNED_ROLES_FOR_SYSTEM_FIELD = "assignedRolesForSystem";
 	public static final String IDENTITY_STATE_IDM_NAME = "state";
+	public static final String SYSTEM_ENTITY_TYPE = "IDENTITY";
 
 	private final AccIdentityAccountService identityAccountService;
 	private final IdmIdentityService identityService;
@@ -106,12 +108,12 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 			ProvisioningExecutor provisioningExecutor, EntityEventManager entityEventManager,
 			SysSchemaObjectClassService schemaObjectClassService, SysSchemaAttributeService schemaAttributeService,
 			SysSystemAttributeMappingService systemAttributeMappingService, IdmRoleService roleService,
-			IdmIdentityService identityService) {
+			IdmIdentityService identityService, SysSystemEntityTypeManager systemEntityManager) {
 
 		super(systemMappingService, attributeMappingService, connectorFacade, systemService, roleSystemService,
 				roleSystemAttributeService, systemEntityService, accountService, provisioningExecutor,
 				entityEventManager, schemaAttributeService, schemaObjectClassService, systemAttributeMappingService,
-				roleService);
+				roleService, systemEntityManager);
 		//
 		Assert.notNull(identityAccountService, "Service is required.");
 		Assert.notNull(roleSystemService, "Service is required.");
@@ -157,7 +159,8 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 	 */
 	@Override
 	protected List<SysRoleSystemAttributeDto> findOverloadingAttributes(IdmIdentityDto entity, SysSystemDto system,
-			AccAccountDto account, SystemEntityType entityType) {
+			AccAccountDto account, String entityType) {
+		
 		List<SysRoleSystemAttributeDto> roleSystemAttributesAll = new ArrayList<>();
 		UUID mapping = account.getSystemMapping();
 		if (mapping == null) {
@@ -199,7 +202,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 
 	@Override
 	protected Object getAttributeValue(String uid, IdmIdentityDto dto, AttributeMapping attribute,
-			SysSystemDto system, MappingContext mappingContext) {
+			SysSystemDto system, MappingContext mappingContext, AccAccountDto accountDto) {
 		
 		if (attribute instanceof SysRoleSystemAttributeDto) {
 			SysRoleSystemAttributeDto roleSystemAttributeDto = (SysRoleSystemAttributeDto) attribute;
@@ -305,7 +308,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 			return attributeMappingService.transformValueToResource(uid, state, attribute, dto);
 		}
 		
-		return super.getAttributeValue(uid, dto, attribute, system, mappingContext);
+		return super.getAttributeValue(uid, dto, attribute, system, mappingContext, accountDto);
 	}
 
 	public static AssignedRoleDto convertToAssignedRoleDto(IdmIdentityRoleDto identityRole) {
@@ -384,5 +387,15 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 	@Override
 	protected ReadWriteDtoService<IdmIdentityDto, ?> getService() {
 		return identityService;
+	}
+
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
+	}
+
+	@Override
+	public boolean supports(SystemEntityTypeRegistrable delimiter) {
+		return delimiter.getSystemEntityCode().equals(SYSTEM_ENTITY_TYPE) && delimiter.isSupportsProvisioning();
 	}
 }

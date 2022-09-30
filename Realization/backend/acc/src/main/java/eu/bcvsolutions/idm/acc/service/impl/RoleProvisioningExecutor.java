@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleAccountDto;
 import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
@@ -26,9 +25,11 @@ import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.RoleType;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
@@ -47,6 +48,9 @@ import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 public class RoleProvisioningExecutor extends AbstractProvisioningExecutor<IdmRoleDto> {
  
 	public static final String NAME = "roleProvisioningService";
+	
+	public static final String SYSTEM_ENTITY_TYPE = "ROLE";
+	
 	private final AccRoleAccountService roleAccountService;
 	private final IdmRoleService roleService;
 	
@@ -66,12 +70,13 @@ public class RoleProvisioningExecutor extends AbstractProvisioningExecutor<IdmRo
 			SysSchemaAttributeService schemaAttributeService,
 			SysSchemaObjectClassService schemaObjectClassService,
 			SysSystemAttributeMappingService systemAttributeMappingService,
-			IdmRoleService roleService) {
+			IdmRoleService roleService,
+			SysSystemEntityTypeManager systemEntityManager) {
 		
 		super(systemMappingService, attributeMappingService, connectorFacade, systemService, roleSystemService,
 				roleSystemAttributeService, systemEntityService, accountService,
 				provisioningExecutor, entityEventManager, schemaAttributeService, schemaObjectClassService,
-				systemAttributeMappingService, roleService);
+				systemAttributeMappingService, roleService, systemEntityManager);
 		//
 		Assert.notNull(roleAccountService, "Service is required.");
 		//
@@ -97,14 +102,15 @@ public class RoleProvisioningExecutor extends AbstractProvisioningExecutor<IdmRo
 	
 	@Override
 	protected List<SysRoleSystemAttributeDto> findOverloadingAttributes(IdmRoleDto entity, SysSystemDto system,
-			AccAccountDto account, SystemEntityType entityType) {
+			AccAccountDto account, String entityType) {
 		// Overloading attributes is not implemented for RoleNode
 		return new ArrayList<>();
 	}
 	
 	@Override
-	protected Object getAttributeValue(String uid, IdmRoleDto entity, AttributeMapping attribute, SysSystemDto system, MappingContext mappingContext) {
-		Object idmValue = super.getAttributeValue(uid, entity, attribute, system, mappingContext);
+	protected Object getAttributeValue(String uid, IdmRoleDto entity, AttributeMapping attribute, SysSystemDto system, MappingContext mappingContext,
+									   AccAccountDto accountDto) {
+		Object idmValue = super.getAttributeValue(uid, entity, attribute, system, mappingContext, accountDto);
 
 		if (attribute.isEntityAttribute()
 				&& RoleSynchronizationExecutor.ROLE_TYPE_FIELD.equals(attribute.getIdmPropertyName())) {
@@ -136,5 +142,15 @@ public class RoleProvisioningExecutor extends AbstractProvisioningExecutor<IdmRo
 	@Override
 	protected IdmRoleService getService() {
 		return roleService;
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
+	}
+	
+	@Override
+	public boolean supports(SystemEntityTypeRegistrable delimiter) {
+		return delimiter.getSystemEntityCode().equals(SYSTEM_ENTITY_TYPE) && delimiter.isSupportsProvisioning();
 	}
 }

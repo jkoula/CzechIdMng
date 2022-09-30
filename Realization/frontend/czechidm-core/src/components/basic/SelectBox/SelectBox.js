@@ -398,7 +398,6 @@ export class SelectBox extends AbstractFormComponent {
       // FIXME: show text field with filled value instead? The same as in code lists?
       return undefined;
     }
-    //
     if (!value) {
       if (multiSelect === true) {
         return [];

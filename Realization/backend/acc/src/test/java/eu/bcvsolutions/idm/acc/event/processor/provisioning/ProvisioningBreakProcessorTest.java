@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.config.domain.ProvisioningBreakConfiguration;
-import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysBlockedOperationDto;
@@ -39,6 +37,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBreakRecipientService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -497,7 +496,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		this.createAccount(system, identity);
 		//
 		provisioningService.doProvisioning(identity); // create block
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		//
 		SysProvisioningBatchDto batch = batchService.findBatch(systemEntity.getId());
 		//
@@ -522,7 +521,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		provisioningService.doProvisioning(identity); // create
 		//
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		SysProvisioningBatchDto batch = batchService.findBatch(systemEntity.getId());
 		List<SysProvisioningOperationDto> content = provisioningOperationService.findByBatchId(batch.getId(), null).getContent();
 		//
@@ -533,7 +532,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		identity.setLastName(identity.getLastName() + 2);
 		provisioningService.doProvisioning(identity); // block
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		batch = batchService.findBatch(systemEntity.getId());
 		content = provisioningOperationService.findByBatchId(batch.getId(), null)
 				.getContent();
@@ -561,7 +560,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		provisioningService.doProvisioning(identity);
 		provisioningService.doProvisioning(identity);
 		//
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		SysProvisioningBatchDto batch = batchService.findBatch(systemEntity.getId());
 		List<SysProvisioningOperationDto> content = provisioningOperationService.findByBatchId(batch.getId(), null).getContent();
 		//
@@ -580,7 +579,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		provisioningService.doProvisioning(identity);
 		provisioningService.doProvisioning(identity);
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		batch = batchService.findBatch(systemEntity.getId());
 		content = provisioningOperationService.findByBatchId(batch.getId(), null).getContent();
 		//
@@ -618,7 +617,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		identity.setLastName(identity.getLastName() + 3);
 		provisioningService.doProvisioning(identity); // block
 		//
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		SysProvisioningBatchDto batch = batchService.findBatch(systemEntity.getId());
 		//
 		assertNotNull(batch);
@@ -643,7 +642,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		//
 		provisioningService.doProvisioning(identity); // create
 		//
-		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		SysSystemEntityDto systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		SysProvisioningBatchDto batch = batchService.findBatch(systemEntity.getId());
 		List<SysProvisioningOperationDto> content = provisioningOperationService.findByBatchId(batch.getId(), null).getContent();
 		//
@@ -670,7 +669,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		provisioningService.doProvisioning(identity);
 		provisioningService.doProvisioning(identity);
 		//
-		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, SystemEntityType.IDENTITY, identity.getUsername());
+		systemEntity = systemEntityService.getBySystemAndEntityTypeAndUid(system, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, identity.getUsername());
 		batch = batchService.findBatch(systemEntity.getId());
 		//
 		assertEquals(0, provisioningOperationService.findByBatchId(batch.getId(), null).getTotalElements());
@@ -1055,7 +1054,7 @@ public class ProvisioningBreakProcessorTest extends AbstractIntegrationTest {
 		AccAccountDto account = new AccAccountDto();
 		account.setSystem(system.getId());
 		account.setUid(identity.getUsername());
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account = accountService.save(account);
 
 		AccIdentityAccountDto accountIdentity = new AccIdentityAccountDto();

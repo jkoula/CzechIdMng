@@ -29,6 +29,7 @@ import SystemGroupManager from './SystemGroupManager';
 import SystemGroupSystemManager from './SystemGroupSystemManager';
 import SystemOwnerRoleManager from './SystemOwnerRoleManager';
 import SystemOwnerManager from './SystemOwnerManager';
+import SystemEntityTypeManager from './SystemEntityTypeManager';
 
 const ManagerRoot = {
   SystemManager,
@@ -62,6 +63,7 @@ const ManagerRoot = {
   SystemGroupSystemManager,
   SystemOwnerRoleManager,
   SystemOwnerManager,
+  SystemEntityTypeManager
 };
 
 ManagerRoot.version = '0.0.1';

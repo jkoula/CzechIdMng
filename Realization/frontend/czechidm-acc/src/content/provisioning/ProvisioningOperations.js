@@ -6,14 +6,14 @@ import moment from 'moment';
 import _ from 'lodash';
 //
 import { Basic, Advanced, Managers, Utils } from 'czechidm-core';
-import { ProvisioningOperationManager, ProvisioningArchiveManager, SystemManager } from '../../redux';
+import { ProvisioningOperationManager, ProvisioningArchiveManager, SystemManager, SystemEntityTypeManager} from '../../redux';
 import ProvisioningOperationTableComponent, { ProvisioningOperationTable } from './ProvisioningOperationTable';
 import ProvisioningOperationTypeEnum from '../../domain/ProvisioningOperationTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 //
 const manager = new ProvisioningOperationManager();
 const archiveManager = new ProvisioningArchiveManager();
 const systemManager = new SystemManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * Active and archived provisioning operations
@@ -519,7 +519,7 @@ class ProvisioningOperations extends Basic.AbstractContent {
 
                   <Basic.Row>
                     <Basic.Col lg={ 4 }>
-                      <Basic.EnumLabel ref="entityType" label={ this.i18n('acc:entity.SystemEntity.entityType') } enum={ SystemEntityTypeEnum }/>
+                      <Basic.Label ref="entityType" label={ this.i18n('acc:entity.SystemEntity.entityType') } manager={ systemEntityTypeManager }/>
                     </Basic.Col>
                     <Basic.Col lg={ 8 }>
                       <Basic.LabelWrapper label={ this.i18n('acc:entity.ProvisioningOperation.entity') }>

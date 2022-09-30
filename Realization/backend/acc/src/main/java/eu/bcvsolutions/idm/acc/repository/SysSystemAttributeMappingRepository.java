@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping;
@@ -78,7 +77,7 @@ public interface SysSystemAttributeMappingRepository extends AbstractEntityRepos
 	SysSystemAttributeMapping findAuthenticationAttribute(
 			@Param("systemId") UUID systemId,
 			@Param("operationType") SystemOperationType operationType, 
-			@Param("entityType") SystemEntityType entityType);
+			@Param("entityType") String entityType);
 
 	/**
 	 * Find uid attribute
@@ -99,7 +98,7 @@ public interface SysSystemAttributeMappingRepository extends AbstractEntityRepos
 			+ "AND "
 			+ "e.systemMapping.entityType = :entityType")
 	SysSystemAttributeMapping findUidAttribute(@Param("systemId") UUID systemId,
-			@Param("operationType") SystemOperationType operationType, @Param("entityType")  SystemEntityType entityType);
+			@Param("operationType") SystemOperationType operationType, @Param("entityType")  String entityType);
 	
 	/**
 	 * Single mapped attribute in given mapping by given name

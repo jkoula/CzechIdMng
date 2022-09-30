@@ -7,7 +7,6 @@ import _ from 'lodash';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
 import { ContractSliceAccountManager, AccountManager } from '../../redux';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 
 const uiKey = 'contract-slice-accounts-table';
 const manager = new ContractSliceAccountManager();
@@ -85,7 +84,7 @@ class ContractSliceAccountsContent extends Advanced.AbstractTableContent {
     const { _showLoading, _permissions } = this.props;
     const { detail } = this.state;
     const forceSearchParameters = new Domain.SearchParameters().setFilter('sliceId', entityId);
-    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', SystemEntityTypeEnum.findKeyBySymbol(SystemEntityTypeEnum.CONTRACT));
+    const accountSearchParameters = new Domain.SearchParameters().setFilter('entityType', 'CONTRACT');
     //
     return (
       <div>

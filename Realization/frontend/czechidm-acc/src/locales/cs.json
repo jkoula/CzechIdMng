@@ -24,6 +24,43 @@
   "content": {
     "dashboard": {
     },
+    "accounts": {
+      "header": "Účty",
+      "label": "$t(acc:content.accounts.header)",
+      "title": "$t(acc:content.accounts.header)",
+      "all": {
+        "header": "Všechny účty",
+        "label": "$t(acc:content.accounts.all.header)"
+      },
+      "personal": {
+        "header": "Osobní účty",
+        "label": "$t(acc:content.accounts.personal.header)"
+      },
+      "filter": {
+        "accounts":{
+          "identifier": {
+            "placeholder": "Identifikátor účtu"
+          },
+          "system": {
+            "placeholder": "Systém"
+          },
+          "roles": {
+            "placeholder": "Vytvořeno rolí"
+          },
+          "identity": {
+            "placeholder": "Vlastník účtu"
+          },
+          "type": {
+            "placeholder": "Typ účtu"
+          },
+          "protected": {
+            "placeholder": "Chráněn před smazáním",
+            "yes": "Ano",
+            "no": "Ne"
+          }
+        }
+      }
+    },
     "systems": {
       "header": "Napojené systémy",
       "title": "$t(acc:content.systems.header)",
@@ -966,6 +1003,12 @@
       "edit": {
         "header": "Editace vazby na systém"
       }
+    },
+    "script": {
+      "references": {
+        "header" : "Použití v mapování",
+        "title" : "Použití v mapování"
+      }
     }
   },
   "entity": {
@@ -1112,7 +1155,7 @@
     "SystemEntity": {
       "_type": "Entita na systému",
       "entityType": "Typ entity",
-      "uid": "Identifikátor na systému",
+      "uid": "Identifikátor účtu",
       "system": "Napojený systém",
       "wish": {
         "label": "Přání",
@@ -1648,7 +1691,193 @@
       },
      "owner": {
       "label":"Role"
-     }
+     },
+    "SystemEntityType": {
+      "IDENTITY": {
+        "label": "Identita",
+        "attributes": {
+          "username": "Uživatelské jméno (String)",
+          "externalCode": "Personální číslo (String)",
+          "disabled": "Zakázaný (boolean)",
+          "firstName": "Jméno (String)",
+          "lastName": "Příjmení (String)",
+          "titleBefore": "Titul před (String)",
+          "titleAfter": "Titul za (String)",
+          "description": "Poznámka (String)",
+          "phone": "Telefon (String)",
+          "email": "Email (String)",
+          "state": "Stav (IdentityState)",
+          "password": "Heslo (GuardedString)",
+          "assignedRoles": "Přiřazené role uživatele",
+          "assignedRolesForSystem": "Přiřazené role uživatele (pro tento systém)",
+          "formProjection": "Typ uživatele (IdmFormProjectionDto)",
+          "helpBlock": {
+            "username": "",
+            "externalCode": "",
+            "disabled": "",
+            "firstName": "",
+            "lastName": "",
+            "titleBefore": "",
+            "titleAfter": "",
+            "description": "",
+            "phone": "",
+            "email": "",
+            "state": "Výchozí transformace je schopna odvodit (bez ohledu na malá/velká písmena) následující stavy - CREATED, VALID, NO_CONTRACT, FUTURE_CONTRACT, LEFT, DISABLED, DISABLED_MANUALLY",
+            "password": "",
+            "assignedRoles": "Vstupem transformace do systému (<strong>attributeValue</strong>) je list všech <strong>validních</strong> rolí uživatele (list AssignedRoleDto). Tento atribut je určen pouze pro <strong>provisioning</strong> a pro výchozí strategii (SET).",
+            "assignedRolesForSystem": "Vstupem transformace do systému (<strong>attributeValue</strong>) je list všech <strong>validních</strong> rolí uživatele, které přiřazují <strong>tento systém</strong> (list AssignedRoleDto). Tento atribut je určen pouze pro <strong>provisioning</strong> a pro výchozí strategii (SET).",
+            "formProjection": "<strong>Synchronizace - </strong> Pro dohledání konkrétního typu uživatele (projekce) v rámci synchronizace, můžete použít identifikátor nebo <strong>kód projekce</strong>.<br/><strong>Provisioning - </strong> Vstupem transformace do systému (<strong>attributeValue</strong>) je celý objet typu-uživatele (IdmFormProjectionDto)."
+          }
+        }
+      },
+      "ROLE": {
+        "label": "Role",
+        "attributes": {
+          "name": "Název (String)",
+          "baseCode": "Kód (String)",
+          "environment": "Prostředí (String)",
+          "roleType": "Typ role (RoleType - String)",
+          "approveRemove": "Schvalovat odebrání (Boolean)",
+          "priority": "Priorita (Integer)",
+          "description": "Popis (String)",
+          "disabled": "Zakázaný (boolean)",
+          "roleMembershipId": "Členství - Identifikátor role (String)",
+          "roleForwardAcm": "Členství - Dopředný provisioning (boolean)",
+          "roleSkipValueIfExcluded": "Členství - Vynechat hodnotu, pokud je kontrakt vyňat (boolean)",
+          "roleCatalogue": "Členství - Zařazení do katalogu rolí (List<IdmRoleCatalogueDto>)",
+          "roleMembers": "Členství - Identifikátory uživatelů/členů role (List<String>)",
+          "helpBlock": {
+            "name": "",
+            "baseCode": "",
+            "environment": "",
+            "roleType": "",
+            "approveRemove": "",
+            "priority": "",
+            "description": "",
+            "disabled": "",
+            "roleMembershipId": "Řeší členství ve skupinách. Vrací identifikátor role (DN), který bude použit v napojení role a systému. Výstupní hodnout je String, pokud bude hodnota 'null', pak dojde k odstranění vazby mezi rolí a systémem!",
+            "roleForwardAcm": "Řeší členství ve skupinách. Konkrétně spravuje parametr 'Dopředný provisioning'",
+            "roleSkipValueIfExcluded": "Řeší členství ve skupinách. Konkrétně spravuje parametr 'Vynechat hodnotu, pokud je kontrakt vyňat'",
+            "roleCatalogue": "Vrací list uzlů katalogu rolí, kam má být daná role zařazena. Pokud je potřeba řešit složitější strukturu, pak může každý uzel obsahovat (v embedded.parent) další uzel katalogu. Ukládání uzlů, je řešeno až v rámci synchornizace.",
+            "roleMembers": "Vrací list uživatelů, kteří mají mít danou roli přiřazenou. Výstupem je list identifikátorů ze systému (typicky DNka)."
+          }
+        }
+      },
+      "TREE": {
+        "label": "Strom",
+        "attributes": {
+          "code": "Kód (String)",
+          "name": "Název (String)",
+          "parent": "Rodič (String)",
+          "disabled": "Zakázaný (boolean)",
+          "helpBlock": {
+            "code": "",
+            "name": "",
+            "parent": "",
+            "disabled": ""
+          }
+        }
+      },
+      "ROLE_CATALOGUE": {
+        "label": "Katalog rolí",
+        "attributes": {
+          "code": "Kód (String)",
+          "name": "Název (String)",
+          "parent": "Rodič (String)",
+          "description": "Popis (String)",
+          "url": "URL (String)",
+          "urlTitle": "Popis URL (String)",
+          "helpBlock": {
+            "code": "",
+            "name": "",
+            "parent": "",
+            "description": "",
+            "url": "",
+            "urlTitle": ""
+          }
+        }
+      },
+      "CONTRACT": {
+        "label": "Pracovní pozice",
+        "attributes": {
+          "identity": "Vlastník (IdmIdentity - Id nebo uživ. jméno)",
+          "validFrom": "Platnost od (LocalDate)",
+          "validTill": "Platnost do (LocalDate)",
+          "workPosition": "Pracovní pozice (IdmTreeNode - Id nebo kód)",
+          "position": "Název pozice (String)",
+          "externe": "Externista (boolean)",
+          "main": "Hlavní vztah (boolean)",
+          "description": "Popis (String)",
+          "guarantees": "Vedoucí (IdmIdentity - List identifikátorů nebo uživ. jmen)",
+          "positions": "Další pozice (IdmTreeNode - List identifikátorů nebo kódů)",
+          "state": "Stav (ContractState - String)",
+          "helpBlock": {
+            "identity": "",
+            "validFrom": "",
+            "validTill": "",
+            "workPosition": "",
+            "position": "",
+            "externe": "",
+            "main": "",
+            "description": "",
+            "guarantees": "",
+            "positions": "",
+            "state": ""
+          }
+        }
+      }, 
+      "CONTRACT_SLICE": {
+        "label": "Časové řezy pozic",
+        "attributes": {
+          "identity": "Vlastník (IdmIdentity - Id nebo uživ. jméno)",
+          "validFrom": "Platnost od časového řezu (LocalDate)",
+          "contractValidFrom": "Platnost od kontraktu (LocalDate)",
+          "contratcValidTill": "Platnost do kontraktu (LocalDate)",
+          "workPosition": "Pracovní pozice (IdmTreeNode - Id nebo kód)",
+          "position": "Název pozice (String)",
+          "externe": "Externista (boolean)",
+          "main": "Hlavní vztah (boolean)",
+          "description": "Popis (String)",
+          "guarantees": "Vedoucí (IdmIdentity - List identifikátorů nebo uživ. jmen)",
+          "state": "Stav (ContractState - String)",
+          "contractCode": "Kód nadřazeného kontraktu (String - stejný pro všechny řezy)",
+          "helpBlock": {
+            "identity": "",
+            "validFrom": "",
+            "contractValidFrom": "",
+            "contractValidTill": "",
+            "workPosition": "",
+            "position": "",
+            "externe": "",
+            "main": "",
+            "description": "",
+            "guarantees": "",
+            "state": "",
+            "contractCode": ""
+          }
+        }
+      },
+      "IDENTITY_ROLE": {
+        "label": "Přiřazené role (alfa verze)",
+        "attributes": {
+          "identityContract": "Identifikátor kontraktu (IdmIdentityContract - UUID)",
+          "role": "Identifikátor role (IdmRole - UUID)",
+          "validFrom": "Platnost od (LocalDate)",
+          "validTill": "Platnost do (LocalDate)",
+          "roleComposition": "Přiřazeno business rolí (IdmRoleComposition - UUID)",
+          "contractPosition": "Další pozice na kontraktu (IdmContractPosition - UUID)",
+          "externalId": "Externí identifikátor (String)",
+          "helpBlock": {
+            "identityContract": "",
+            "role": "",
+            "validFrom": "",
+            "validTill": "",
+            "roleComposition": "",
+            "contractPosition": "",
+            "externalId": ""
+          }
+        }
+      }
     }
   },
   "enums" : {
@@ -1672,7 +1901,7 @@
     "AccountTypeEnum": {
       "PERSONAL": "Osobní",
       "PERSONAL_OTHER": "Osobní další účet",
-      "TECHNICAL": "Systémový"
+      "TECHNICAL": "Technický"
     },
     "ReconciliationMissingAccountActionTypeEnum": {
       "CREATE_ACCOUNT": "Vytvořit účet",
@@ -3653,6 +3882,10 @@
     "PROVISONING_OPERATION_RETRY_CANCEL_NOT_FOUND": {
       "title": "Operace pro provisioning byla již zpracována či zrušena",
       "message": "Byly zpracovány všechny operace pro dané entity na koncovém systému v čase, jakém byly zaznamenány do fronty."
+    },
+    "PROVISIONING_ACCOUNT_UID_ALREADY_EXISTS": {
+      "title": "Duplicitní uid pro účet!",
+      "message": "Uid [{{uid}}] již existuje. Změňte uid pro účet [{{account}}] na systému [{{system}}] v mapování [{{mapping}}]"
     },
     "SYSTEM_MAPPING_NOT_FOUND": {
       "title": "Nenalezeno systémové mapování",

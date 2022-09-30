@@ -11,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningArchiveDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmProfileDto;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
@@ -58,7 +58,7 @@ public class ProfileProvisioningProcessorIntegrationTest extends AbstractIntegra
 		Assert.assertEquals(1, content.size());
 		SysProvisioningArchiveDto sysProvisioningArchiveDto = content.get(0);
 		Assert.assertEquals(ProvisioningEventType.CREATE, sysProvisioningArchiveDto.getOperationType());
-		Assert.assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		Assert.assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		Assert.assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 		//
 		IdmProfileDto profile = getHelper().createProfile(identity);
@@ -86,7 +86,7 @@ public class ProfileProvisioningProcessorIntegrationTest extends AbstractIntegra
 		Assert.assertEquals(2, content.size());
 		sysProvisioningArchiveDto = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).orElse(null);
 		Assert.assertEquals(ProvisioningEventType.UPDATE, sysProvisioningArchiveDto.getOperationType());
-		Assert.assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		Assert.assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		Assert.assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 		//
 		attachment = new IdmAttachmentDto();
@@ -107,7 +107,7 @@ public class ProfileProvisioningProcessorIntegrationTest extends AbstractIntegra
 		Assert.assertEquals(3, content.size());
 		sysProvisioningArchiveDto = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).orElse(null);
 		Assert.assertEquals(ProvisioningEventType.UPDATE, sysProvisioningArchiveDto.getOperationType());
-		Assert.assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		Assert.assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		Assert.assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 		//
 		profile.setImage(null);
@@ -116,7 +116,7 @@ public class ProfileProvisioningProcessorIntegrationTest extends AbstractIntegra
 		Assert.assertEquals(4, content.size());
 		sysProvisioningArchiveDto = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).orElse(null);
 		Assert.assertEquals(ProvisioningEventType.UPDATE, sysProvisioningArchiveDto.getOperationType());
-		Assert.assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		Assert.assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		Assert.assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 		//
 		profile.setImage(attachment.getId());
@@ -126,7 +126,7 @@ public class ProfileProvisioningProcessorIntegrationTest extends AbstractIntegra
 		Assert.assertEquals(6, content.size());
 		sysProvisioningArchiveDto = content.stream().max(Comparator.comparing(SysProvisioningArchiveDto::getCreated)).orElse(null);
 		Assert.assertEquals(ProvisioningEventType.UPDATE, sysProvisioningArchiveDto.getOperationType());
-		Assert.assertEquals(SystemEntityType.IDENTITY, sysProvisioningArchiveDto.getEntityType());
+		Assert.assertEquals(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, sysProvisioningArchiveDto.getEntityType());
 		Assert.assertEquals(identity.getId(), sysProvisioningArchiveDto.getEntityIdentifier());
 		//
 		identityService.delete(identity);

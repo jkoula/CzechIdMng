@@ -5,7 +5,6 @@ import java.util.UUID;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -99,7 +98,7 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @param system
 	 * @return
 	 */
-	SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType);
+	SysSystemMappingDto createMapping(SysSystemDto system, String entityType);
 
 	/**
 	 * Creates default provisioning mapping for the given system
@@ -115,7 +114,7 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @param accountType
 	 * @return
 	 */
-	SysSystemMappingDto createMapping(SysSystemDto system, SystemEntityType entityType, AccountType accountType);
+	SysSystemMappingDto createMapping(SysSystemDto system, String entityType, AccountType accountType);
 
 	/**
 	 * reates default provisioning mapping for the given system, account type
@@ -152,6 +151,15 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @return
 	 */
 	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system);
+
+	/**
+	 * Assing system to given role with mapping (provisioning, identity)
+	 * @param role
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType);
 
 	/**
 	 * Find account on target system
@@ -198,11 +206,11 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * Create {@link AccAccountDto} and {@link AccIdentityAccountDto} for given
 	 * system and identity.
 	 *
-	 * @param type
+	 * @param systemEntityType
 	 * @param objectClass
 	 * @return
 	 */
-	SysSystemMappingDto createMappingSystem(SystemEntityType type, SysSchemaObjectClassDto objectClass);
+	SysSystemMappingDto createMappingSystem(String systemEntityType, SysSchemaObjectClassDto objectClass);
 
 	/**
 	 * Start synchronization by given sync config
@@ -253,4 +261,6 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @return
 	 */
 	SysSystemOwnerRoleDto createSystemOwnerRole(SysSystemDto system, IdmRoleDto owner);
+
+	void deleteSystem(UUID systemId);
 }

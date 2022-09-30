@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -74,7 +73,7 @@ public class CoreReferentialIntegrityIntegrationTest extends AbstractIntegration
 		
 		SysSystemEntityDto systemEntity = new SysSystemEntityDto();
 		systemEntity.setUid("test_uid_" + System.currentTimeMillis());
-		systemEntity.setEntityType(SystemEntityType.IDENTITY);
+		systemEntity.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemEntity.setWish(true);
 		systemEntity.setSystem(system.getId());
 		systemEntity = systemEntityService.save(systemEntity);
@@ -83,7 +82,7 @@ public class CoreReferentialIntegrityIntegrationTest extends AbstractIntegration
 		account.setSystem(system.getId());
 		account.setSystemEntity(systemEntity.getId());
 		account.setUid(systemEntity.getUid());
-		account.setEntityType(SystemEntityType.IDENTITY);
+		account.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		account = accountService.save(account);
 		
 		AccIdentityAccountDto identityAccount = new AccIdentityAccountDto();  
@@ -119,8 +118,8 @@ public class CoreReferentialIntegrityIntegrationTest extends AbstractIntegration
 		systemMapping.setName("default_" + System.currentTimeMillis());
 		systemMapping.setObjectClass(objectClass.getId());
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
-		systemMapping.setEntityType(SystemEntityType.IDENTITY);
 		systemMapping.setAccountType(AccountType.PERSONAL);
+		systemMapping.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		systemMapping = systemEntityHandlingService.save(systemMapping);
 		SysRoleSystemDto roleSystem = new SysRoleSystemDto();
 		roleSystem.setSystem(system.getId());

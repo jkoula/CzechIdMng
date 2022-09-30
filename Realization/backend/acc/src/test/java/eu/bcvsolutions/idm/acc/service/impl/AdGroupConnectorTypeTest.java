@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.connector.AdGroupConnectorType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -117,7 +116,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(memberSystemDto.getId());
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
 				.stream()
 				.findFirst()
@@ -152,7 +151,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(tableSystem.getId());
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
 				.stream()
 				.findFirst()
@@ -351,7 +350,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(memberSystemDto.getId());
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
 				.stream()
 				.findFirst()
@@ -421,7 +420,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(memberSystemDto.getId());
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
 				.stream()
 				.findFirst()
@@ -485,7 +484,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(memberSystemDto.getId());
 		mappingFilter.setOperationType(SystemOperationType.PROVISIONING);
-		mappingFilter.setEntityType(SystemEntityType.IDENTITY);
+		mappingFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingDto mappingDto = mappingService.find(mappingFilter, null).getContent()
 				.stream()
 				.findFirst()

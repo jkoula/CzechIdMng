@@ -24,7 +24,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleCatalogueAccountDto;
@@ -82,6 +81,7 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(RoleCatalogueSynchronizationExecutor.class);
 	public final static String PARENT_FIELD = "parent";
 	public final static String CODE_FIELD = "code";
+	public static final String SYSTEM_ENTITY_TYPE = "ROLE_CATALOGUE";
 
 	@Autowired
 	private IdmRoleCatalogueService catalogueService;
@@ -180,7 +180,7 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmRoleCatalogueDto entity, SystemEntityType entityType,
+	protected void callProvisioningForEntity(IdmRoleCatalogueDto entity, String entityType,
 			SysSyncItemLogDto logItem) {
 		addToItemLog(logItem,
 				MessageFormat.format(
@@ -220,7 +220,7 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 	 * @param account
 	 */
 	@Override
-	protected void doCreateEntity(SystemEntityType entityType, List<SysSystemAttributeMappingDto> mappedAttributes,
+	protected void doCreateEntity(String entityType, List<SysSystemAttributeMappingDto> mappedAttributes,
 			SysSyncItemLogDto logItem, String uid, List<IcAttribute> icAttributes, AccAccountDto account,
 			SynchronizationContext context) {
 		// We will create new Role catalogue
@@ -289,7 +289,7 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 				logItem.setDisplayName(roleCatalogue.getName());
 			}
 
-			SystemEntityType entityType = context.getEntityType();
+			String entityType = context.getEntityType();
 			if ( context.isEntityDifferent() && this.isProvisioningImplemented(entityType, logItem)) {
 				// Call provisioning for this entity
 				callProvisioningForEntity(roleCatalogue, entityType, logItem);
@@ -351,7 +351,7 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 	 * @param actionLogs
 	 */
 	@Override
-	protected void doDeleteEntity(AccAccountDto account, SystemEntityType entityType, SysSyncLogDto log,
+	protected void doDeleteEntity(AccAccountDto account, SysSyncLogDto log,
 			SysSyncItemLogDto logItem, List<SysSyncActionLogDto> actionLogs) {
 		IdmRoleCatalogueDto roleCatalogue =  this.getDtoByAccount(null, account);
 		if (roleCatalogue == null) {
@@ -459,7 +459,7 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 	private void processTreeSync(SynchronizationContext context, Map<String, IcConnectorObject> accountsMap) {
 
 		AbstractSysSyncConfigDto config = context.getConfig();
-		SystemEntityType entityType = context.getEntityType();
+		String entityType = context.getEntityType();
 		SysSystemDto system = context.getSystem();
 		List<SysSystemAttributeMappingDto> mappedAttributes = context.getMappedAttributes();
 		SysSyncLogDto log = context.getLog();
@@ -649,5 +649,10 @@ public class RoleCatalogueSynchronizationExecutor extends AbstractSynchronizatio
 		log = super.syncCorrectlyEnded(log, context);
 		log = synchronizationLogService.save(log);
 		return log;
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
 	}
 }

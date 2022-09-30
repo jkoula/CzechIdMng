@@ -9,8 +9,8 @@ import { Basic, Advanced, Utils } from 'czechidm-core';
 import SearchParameters from 'czechidm-core/src/domain/SearchParameters';
 import { DataManager, ConfigurationManager, RoleManager } from 'czechidm-core/src/redux';
 import { SystemMappingManager, SystemManager, RoleSystemManager } from '../../redux';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import { SystemInfo } from '../../components/SystemInfo/SystemInfo';
+import { SystemEntityTypeService } from '../../services/SystemEntityTypeService';
 
 const originalManager = new RoleSystemManager();
 let manager = null;
@@ -201,8 +201,18 @@ export class RoleSystemTable extends Advanced.AbstractTableContent {
             property="_embedded.systemMapping.entityType"
             header={this.i18n('acc:entity.SystemEntity.entityType')}
             rendered={_.includes(columns, 'entityType')}
-            face="enum"
-            enumClass={SystemEntityTypeEnum}
+            face="text"
+            cell={
+              ({ rowIndex, data }) => {
+                const entity = data[rowIndex];
+                if (!entity._embedded || !entity._embedded.systemMapping || entity._embedded.systemMapping.entityType) {
+                  return null;
+                }
+                return (
+                  SystemEntityTypeService.getNiceLabelForEntityType(entity._embedded.systemMapping.entityType)
+                );
+              }
+            }
             sort
             sortProperty="systemMapping.entityType" />
           <Advanced.Column

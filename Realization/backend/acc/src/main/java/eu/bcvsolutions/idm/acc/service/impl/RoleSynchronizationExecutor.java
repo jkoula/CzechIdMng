@@ -9,7 +9,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccRoleAccountDto;
@@ -120,6 +119,7 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 	public final static String ROLE_SKIP_VALUE_IF_EXCLUDED_FIELD = "roleSkipValueIfExcluded";
 	public final static String ROLE_CATALOGUE_FIELD = "roleCatalogue";
 	public final static String ROLE_MEMBERS_FIELD = "roleMembers";
+	public static final String SYSTEM_ENTITY_TYPE = "ROLE";
 	private static final String USER_UID_CACHE_KEY = "userUidCache";
 	private static final String ROLE_REQUEST_CACHE_KEY = "roleRequestCache";
 	
@@ -154,7 +154,7 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmRoleDto entity, SystemEntityType entityType, SysSyncItemLogDto logItem) {
+	protected void callProvisioningForEntity(IdmRoleDto entity, String entityType, SysSyncItemLogDto logItem) {
 		addToItemLog(logItem,
 				MessageFormat.format(
 						"Call provisioning (process RoleEventType.SAVE) for role ({0}) with username ({1}).",
@@ -718,7 +718,7 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 
 		// Need to find account using SysSystemEntityDto uid, because uid of AccAccountDto can be different.
 		SysSystemEntityFilter entityFilter = new SysSystemEntityFilter();
-		entityFilter.setEntityType(SystemEntityType.IDENTITY);
+		entityFilter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		entityFilter.setSystemId(userSystemDto.getId());
 		entityFilter.setUid(uid);
 		SysSystemEntityDto systemEntity = systemEntityService.find(entityFilter, null)
@@ -1274,5 +1274,10 @@ public class RoleSynchronizationExecutor extends AbstractSynchronizationExecutor
 	@Override
 	protected IdmRoleDto createEntityDto() {
 		return new IdmRoleDto();
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
 	}
 }

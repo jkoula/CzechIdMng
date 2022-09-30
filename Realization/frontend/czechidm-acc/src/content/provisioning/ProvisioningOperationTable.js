@@ -5,12 +5,12 @@ import _ from 'lodash';
 import { Link } from 'react-router-dom';
 //
 import { Basic, Advanced, Enums, Utils, Managers } from 'czechidm-core';
-import SystemEntityTypeEnum from '../../domain/SystemEntityTypeEnum';
 import ProvisioningOperationTypeEnum from '../../domain/ProvisioningOperationTypeEnum';
 import EmptyProvisioningTypeEnum from '../../domain/EmptyProvisioningTypeEnum';
-import { SystemManager } from '../../redux';
+import { SystemManager, SystemEntityTypeManager } from '../../redux';
 
 const systemManager = new SystemManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * Provisioning operation and archive table.
@@ -220,10 +220,10 @@ export class ProvisioningOperationTable extends Advanced.AbstractTableContent {
 
                 <Basic.Row rendered={ _.includes(columns, 'entityIdentifier') }>
                   <Basic.Col lg={ 4 }>
-                    <Advanced.Filter.EnumSelectBox
+                    <Advanced.Filter.SelectBox
                       ref="entityType"
                       placeholder={ this.i18n('acc:entity.SystemEntity.entityType') }
-                      enum={ SystemEntityTypeEnum }/>
+                      manager={ systemEntityTypeManager }/>
                   </Basic.Col>
                   <Basic.Col lg={ 8 }>
                     <Basic.Row>
@@ -356,8 +356,18 @@ export class ProvisioningOperationTable extends Advanced.AbstractTableContent {
             width={ 75 }
             header={ this.i18n('acc:entity.SystemEntity.entityType') }
             sort
-            face="enum"
-            enumClass={ SystemEntityTypeEnum }
+            face="text"
+            cell={
+              ({ rowIndex, data }) => {
+                const entity = data[rowIndex];
+                if (!entity || !entity.entityType) {
+                  return null;
+                }
+                return (
+                  systemEntityTypeManager.getNiceLabelForEntityType(entity)
+                );
+              }
+            }
             rendered={ _.includes(columns, 'entityType') } />
           <Advanced.Column
             property="entityIdentifier"

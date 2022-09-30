@@ -174,6 +174,23 @@ module.exports = {
       access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_CREATE'] } ]
     },
     {
+      path: 'accounts/',
+      component: require('./src/content/account/AccountRoutes'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+      childRoutes: [
+        {
+          path: 'accounts-all',
+          component: require('./src/content/account/Accounts'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        },
+        {
+          path: 'accounts-personal',
+          component: require('./src/content/account/AccountsPersonal'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        }
+      ]
+    },
+    {
       path: 'connector-servers/',
       component: require('./src/content/connectorserver/ConnectorServers'),
       access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['REMOTESERVER_READ'] } ]
@@ -416,6 +433,17 @@ module.exports = {
           path: 'systems',
           component: require('./src/content/systemgroup/SystemGroupSystems'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEM_GROUP_READ'] } ]
+        }
+      ]
+    },
+    {
+      path: 'scripts/:entityId/',
+      component: require('czechidm-core/src/content/script/Script'),
+      childRoutes: [
+        {
+          path: 'references-mapping',
+          component: require('./src/content/script/ScriptReferencesMapping'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SCRIPT_READ'] } ]
         }
       ]
     }

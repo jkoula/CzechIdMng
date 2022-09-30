@@ -100,7 +100,6 @@ export default class MonitoringManager extends EntityManager {
   execute(id, uiKey, cb) {
     return (dispatch) => {
       uiKey = this.resolveUiKey(uiKey, id);
-      console.log('sssssss', uiKey);
       //
       dispatch(this.dataManager.requestData(uiKey));
       this.getService().execute(id)

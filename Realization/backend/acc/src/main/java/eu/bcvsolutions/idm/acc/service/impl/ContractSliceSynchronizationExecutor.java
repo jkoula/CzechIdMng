@@ -21,7 +21,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractSliceAccountDto;
@@ -118,6 +117,7 @@ public class ContractSliceSynchronizationExecutor extends AbstractSynchronizatio
 	public final static String CONTRACT_VALID_TILL_FIELD = IdmContractSlice_.validTill.getName();
 	public final static String SYNC_CONTRACT_FIELD = "sync_contract";
 	public final static String DEFAULT_TASK = "Default";
+	public static final String SYSTEM_ENTITY_TYPE = "CONTRACT_SLICE";
 
 	@Override
 	protected SynchronizationContext validate(UUID synchronizationConfigId) {
@@ -564,7 +564,7 @@ public class ContractSliceSynchronizationExecutor extends AbstractSynchronizatio
 	 * @param logItem
 	 * @param actionLogs
 	 */
-	protected void doDeleteEntity(AccAccountDto account, SystemEntityType entityType, SysSyncLogDto log,
+	protected void doDeleteEntity(AccAccountDto account, String entityType, SysSyncLogDto log,
 			SysSyncItemLogDto logItem, List<SysSyncActionLogDto> actionLogs) {
 		IdmContractSliceDto dto =  this.getDtoByAccount(null, account);
 		if (dto == null) {
@@ -642,7 +642,7 @@ public class ContractSliceSynchronizationExecutor extends AbstractSynchronizatio
 	 * @return
 	 */
 	@Override
-	protected boolean isProvisioningImplemented(SystemEntityType entityType, SysSyncItemLogDto logItem) {
+	protected boolean isProvisioningImplemented(String entityType, SysSyncItemLogDto logItem) {
 		// Contract does not supports provisioning, but we need publish 'save' event,
 		// because identity provisioning still should be executed.
 		return true;
@@ -657,7 +657,7 @@ public class ContractSliceSynchronizationExecutor extends AbstractSynchronizatio
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmContractSliceDto entity, SystemEntityType entityType,
+	protected void callProvisioningForEntity(IdmContractSliceDto entity, String entityType,
 			SysSyncItemLogDto logItem) {
 		addToItemLog(logItem, MessageFormat.format(
 				"Call provisioning (process IdmContractSliceDto.UPDATE) for contract ({0}) with position ({1}).",
@@ -856,5 +856,10 @@ public class ContractSliceSynchronizationExecutor extends AbstractSynchronizatio
 		}).collect(Collectors.toList());
 		
 		return CollectionUtils.isEqualCollection(currentGuranteeIds, newGuranteeIds);
+	}
+
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
 	}
 }

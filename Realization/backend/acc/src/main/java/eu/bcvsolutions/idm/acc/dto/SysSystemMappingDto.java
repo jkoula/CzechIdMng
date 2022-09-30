@@ -1,14 +1,15 @@
 package eu.bcvsolutions.idm.acc.dto;
 
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
+import java.util.UUID;
+
+import org.springframework.hateoas.core.Relation;
+
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
-import java.util.UUID;
-import org.springframework.hateoas.core.Relation;
 
 /**
  * DTO for entity {@link SysSystemMapping}
@@ -23,7 +24,7 @@ public class SysSystemMappingDto extends AbstractDto {
 	private static final long serialVersionUID = -3263064824050858302L;
 
 	private String name;
-	private SystemEntityType entityType;
+	private String entityType;
 	@Embedded(dtoClass = SysSchemaObjectClassDto.class)
 	private UUID objectClass;
 	private SystemOperationType operationType;
@@ -50,11 +51,11 @@ public class SysSystemMappingDto extends AbstractDto {
 		this.name = name;
 	}
 
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 

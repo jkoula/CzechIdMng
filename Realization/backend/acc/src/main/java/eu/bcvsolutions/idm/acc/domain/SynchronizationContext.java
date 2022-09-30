@@ -65,7 +65,7 @@ public class SynchronizationContext implements Serializable {
 	private IcSyncDeltaTypeEnum type;
 	private AbstractSysSyncConfigDto config;
 	private SysSystemDto system;
-	private SystemEntityType entityType;
+	private String entityType;
 	private List<SysSystemAttributeMappingDto> mappedAttributes;
 	private AccAccountDto account;
 	private SysSyncLogDto log;
@@ -139,11 +139,11 @@ public class SynchronizationContext implements Serializable {
 		return this;
 	}
 
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 
-	public SynchronizationContext addEntityType(SystemEntityType entityType) {
+	public SynchronizationContext addEntityType(String entityType) {
 		this.entityType = entityType;
 		return this;
 	}

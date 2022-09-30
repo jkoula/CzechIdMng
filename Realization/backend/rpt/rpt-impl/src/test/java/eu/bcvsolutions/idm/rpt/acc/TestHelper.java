@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.rpt.acc;
 
 import java.util.UUID;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -167,11 +166,11 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * Create {@link AccAccountDto} and {@link AccIdentityAccountDto} for given
 	 * system and identity.
 	 *
-	 * @param type
+	 * @param systemEntityType
 	 * @param objectClass
 	 * @return
 	 */
-	SysSystemMappingDto createMappingSystem(SystemEntityType type, SysSchemaObjectClassDto objectClass);
+	SysSystemMappingDto createMappingSystem(String systemEntityType, SysSchemaObjectClassDto objectClass);
 
 	/**
 	 * Start synchronization by given sync config

@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import eu.bcvsolutions.idm.core.api.config.swagger.SwaggerConfig;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
+import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,9 +55,13 @@ public class SysSystemAttributeMappingController extends AbstractReadWriteDtoCon
 
 	protected static final String TAG = "System mapping - atributes";
 	
+	private SysSystemAttributeMappingService service;
+	
 	@Autowired
 	public SysSystemAttributeMappingController(SysSystemAttributeMappingService service) {
 		super(service);
+		
+		this.service = service;
 	}
 
 	@Override
@@ -177,5 +183,24 @@ public class SysSystemAttributeMappingController extends AbstractReadWriteDtoCon
 			@ApiParam(value = "Attribute mapping's uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId) {
 		return super.delete(backendId);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "script-usage/{backendId}")
+	@PreAuthorize("hasAuthority('" + CoreGroupPermission.SCRIPT_READ + "')")
+	@ApiOperation(
+			value = "Script usage in mapping", 
+			nickname = "getScriptUsage", 
+			tags = { SysSystemAttributeMappingController.TAG }, 
+			authorizations = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.SCRIPT_READ, description = "") }),
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+						@AuthorizationScope(scope = CoreGroupPermission.SCRIPT_READ, description = "") })
+				})
+	public Resources<?> getScriptUsageInMapping(
+			@ApiParam(value = "Script's uuid identifier or code.", required = true)
+			@PathVariable @NotNull String backendId) {
+		return toResources(service.getScriptUsage(backendId), SysSystemAttributeMappingDto.class);
 	}
 }

@@ -13,7 +13,6 @@ import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.acc.DefaultAccTestHelper;
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
@@ -23,6 +22,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.service.impl.TreeSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.domain.RecursionType;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
@@ -106,7 +106,7 @@ public class TreeTypeDeleteBulkActionIntegrationTest extends AbstractBulkActionT
 		//
 		Assert.assertEquals(5, identityRoleService.findAllByIdentity(identity.getId()).size()); // 3 manual, 2 automatic
 		//
-		getHelper().createMapping(system, SystemEntityType.TREE);
+		getHelper().createMapping(system, TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		SysSystemMappingFilter filter = new SysSystemMappingFilter();
 		filter.setSystemId(system.getId());
 		SysSystemMappingDto mapping = systemMappingService.find(filter, null).getContent().get(0);

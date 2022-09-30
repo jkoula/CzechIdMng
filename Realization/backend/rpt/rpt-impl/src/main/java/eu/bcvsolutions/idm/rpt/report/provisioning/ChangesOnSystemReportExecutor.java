@@ -37,7 +37,6 @@ import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningOperation;
 import eu.bcvsolutions.idm.acc.domain.SysValueChangeType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeDifferenceDto;
@@ -60,6 +59,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
@@ -157,7 +157,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		boolean skipUnchangedMultivalue = getSkipUnchangedValues(report);		
 		AccAccountFilter filterAccount = new AccAccountFilter();
 		filterAccount.setSystemId(systemDto.getId());
-		filterAccount.setEntityType(SystemEntityType.IDENTITY);
+		filterAccount.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 
 		File temp = getAttachmentManager().createTempFile();
 		try (FileOutputStream outputStream = new FileOutputStream(temp)) {

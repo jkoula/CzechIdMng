@@ -1,9 +1,17 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.stereotype.Component;
+
 import com.google.common.collect.Sets;
+
 import eu.bcvsolutions.idm.acc.connector.AdGroupConnectorType;
 import eu.bcvsolutions.idm.acc.connector.AdUserConnectorType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
@@ -20,12 +28,6 @@ import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.stereotype.Component;
 
 /**
  * Processor for automatic creation of role mapped attributes (for sync) by common schema attributes for MS AD connector (MS Group AD+WinRM connector).
@@ -53,8 +55,8 @@ public class MsAdSyncMappingRoleAutoAttributesProcessor extends MsAdMappingIdent
 	}
 
 	@Override
-	SystemEntityType getSystemEntityType() {
-		return SystemEntityType.ROLE;
+	String getSystemEntityType() {
+		return RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE;
 	}
 
 	@Override

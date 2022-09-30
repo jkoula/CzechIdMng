@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
@@ -42,11 +41,11 @@ public class SysSystemEntityFilter extends DataFilter {
 		set(PARAMETER_SYSTEM_ID, systemId);
 	}
 
-	public SystemEntityType getEntityType() {
-		return getParameterConverter().toEnum(getData(), PARAMETER_ENTITY_TYPE, SystemEntityType.class);
+	public String getEntityType() {
+		return getParameterConverter().toString(getData(), PARAMETER_ENTITY_TYPE);
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		set(PARAMETER_ENTITY_TYPE, entityType);
 	}
 

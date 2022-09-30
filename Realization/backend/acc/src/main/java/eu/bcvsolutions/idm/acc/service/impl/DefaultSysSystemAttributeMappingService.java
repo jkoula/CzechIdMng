@@ -26,6 +26,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.plugin.core.OrderAwarePluginRegistry;
 import org.springframework.plugin.core.PluginRegistry;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -40,9 +41,9 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.IdmAttachmentWithDataDto;
 import eu.bcvsolutions.idm.acc.domain.MappingContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysAttributeControlledValueDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
@@ -55,6 +56,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysAttributeControlledValueFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute;
@@ -77,8 +79,10 @@ import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
@@ -97,6 +101,7 @@ import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
@@ -150,6 +155,8 @@ public class DefaultSysSystemAttributeMappingService
 	private SysSyncConfigService syncConfigService;
 	@Autowired
 	private SysSystemGroupSystemService systemGroupSystemService;
+	@Autowired
+	private SysSystemEntityTypeManager systemEntityManager;
 
 
 	@Autowired
@@ -356,6 +363,14 @@ public class DefaultSysSystemAttributeMappingService
 		if (filter.getId() != null) {
 			predicates.add(builder.equal(root.get(SysSystemAttributeMapping_.id), filter.getId()));
 		}
+		
+		if (!StringUtils.isEmpty(filter.getTransformToScript())) {
+			predicates.add(builder.like(root.get(SysSystemAttributeMapping_.transformToResourceScript), "%" + filter.getTransformToScript() + "%"));
+		}
+		
+		if (!StringUtils.isEmpty(filter.getTransformFromScript())) {
+			predicates.add(builder.like(root.get(SysSystemAttributeMapping_.transformFromResourceScript), "%" + filter.getTransformFromScript() + "%"));
+		}
 
 		return predicates;
 	}
@@ -525,7 +540,8 @@ public class DefaultSysSystemAttributeMappingService
 			groovyScriptService.validateScript(dto.getTransformToResourceScript());
 		}
 
-		Class<? extends Identifiable> entityType = systemMappingDto.getEntityType().getExtendedAttributeOwnerType();
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(systemMappingDto.getEntityType());
+		Class<? extends Identifiable> entityType = systemEntityType.getExtendedAttributeOwnerType();
 		if (entityType != null && dto.isExtendedAttribute() && formService.isFormable(entityType)) {
 			createExtendedAttributeDefinition(dto, entityType);
 		}
@@ -772,7 +788,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, SystemEntityType entityType) {
+	public SysSystemAttributeMappingDto getAuthenticationAttribute(UUID systemId, String entityType) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
 		// authentication attribute is only from provisioning operation type
@@ -828,6 +844,11 @@ public class DefaultSysSystemAttributeMappingService
 	 */
 	@Override
 	public Object getAttributeValue(String uid, AbstractDto entity, AttributeMapping attributeHandling, MappingContext mappingContext) {
+		return getAttributeValue(uid, entity, attributeHandling, mappingContext, null);
+	}
+
+	@Override
+	public Object getAttributeValue(String uid, AbstractDto entity, AttributeMapping attributeHandling, MappingContext mappingContext, AccAccountDto accountDto) {
 		Object idmValue = null;
 		//
 		if (attributeHandling.isPasswordAttribute()) {
@@ -837,40 +858,26 @@ public class DefaultSysSystemAttributeMappingService
 		}
 		//
 		SysSchemaAttributeDto schemaAttributeDto = getSchemaAttribute(attributeHandling);
+		// Get value from account EAV = overriding value
+		if (accountDto != null && accountDto.getFormDefinition() != null) {
+			IdmFormDefinitionDto formDefinitionDto = DtoUtils.getEmbedded(accountDto, AccAccount_.formDefinition, IdmFormDefinitionDto.class, null);
+			if (formDefinitionDto == null) {
+				formDefinitionDto = formDefinitionService.get(accountDto.getFormDefinition());
+			}
+
+			List<IdmFormValueDto> values = formService.getValues(accountDto, formDefinitionDto, schemaAttributeDto.getName());
+			if (!values.isEmpty()) {
+				idmValue = getValuesFromEav(schemaAttributeDto, values);
+			}
+		}
+		// Return overridden value without transformation
+		if (idmValue != null) {
+			return idmValue;
+		}
 		//
 		if (attributeHandling.isExtendedAttribute() && entity != null && formService.isFormable(entity.getClass())) {
 			List<IdmFormValueDto> formValues = formService.getValues(entity, attributeHandling.getIdmPropertyName());
-			if (formValues.isEmpty()) {
-				if (schemaAttributeDto.getClassType().equals(Boolean.class.getCanonicalName())) {
-					// convert empty value to false for booleans
-					idmValue = Boolean.FALSE;
-				} else {
-					idmValue = null;
-				}
-			} else if (schemaAttributeDto.isMultivalued()) {
-				// Multiple value extended attribute
-				List<Object> values = new ArrayList<>();
-				formValues.stream().forEachOrdered(formValue -> {
-					values.add(this.resolveFormValue(formValue));
-				});
-				idmValue = values;
-			} else {
-				// Single value extended attribute
-				IdmFormValueDto formValue = formValues.get(0);
-				if (formValue.isConfidential()) {
-					Object confidentialValue = formService.getConfidentialPersistentValue(formValue);
-					// If is confidential value String and schema attribute is GuardedString type,
-					// then convert to GuardedString will be did.
-					if (confidentialValue instanceof String
-							&& schemaAttributeDto.getClassType().equals(GuardedString.class.getName())) {
-						idmValue = new GuardedString((String) confidentialValue);
-					} else {
-						idmValue = confidentialValue;
-					}
-				} else {
-					idmValue = this.resolveFormValue(formValue);
-				}
-			}
+			idmValue = getValuesFromEav(schemaAttributeDto, formValues);
 		}
 		// Find value from entity
 		else if (attributeHandling.isEntityAttribute()) {
@@ -884,7 +891,7 @@ public class DefaultSysSystemAttributeMappingService
 					// We will search value directly in entity by property name
 					idmValue = EntityUtils.getEntityValue(entity, attributeHandling.getIdmPropertyName());
 				} catch (IntrospectionException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | ProvisioningException ex) {
+						 | InvocationTargetException | ProvisioningException ex) {
 					throw new ProvisioningException(AccResultCode.PROVISIONING_IDM_FIELD_NOT_FOUND,
 							ImmutableMap.of("property", attributeHandling.getIdmPropertyName(), "entityType",
 									entity.getClass(), "schemaAtribute",
@@ -892,12 +899,44 @@ public class DefaultSysSystemAttributeMappingService
 							ex);
 				}
 			}
-		} else {
-			// If Attribute value is not in entity nor in extended attribute, then idmValue
-			// is null.
-			// It means attribute is static ... we will call transformation to resource.
 		}
 		return this.transformValueToResource(uid, idmValue, attributeHandling, entity, mappingContext);
+	}
+
+	private Object getValuesFromEav(SysSchemaAttributeDto schemaAttributeDto, List<IdmFormValueDto> formValues) {
+		Object idmValue;
+		if (formValues.isEmpty()) {
+			if (schemaAttributeDto.getClassType().equals(Boolean.class.getCanonicalName())) {
+				// convert empty value to false for booleans
+				idmValue = Boolean.FALSE;
+			} else {
+				idmValue = null;
+			}
+		} else if (schemaAttributeDto.isMultivalued()) {
+			// Multiple value extended attribute
+			List<Object> values = new ArrayList<>();
+			formValues.stream().forEachOrdered(formValue -> {
+				values.add(this.resolveFormValue(formValue));
+			});
+			idmValue = values;
+		} else {
+			// Single value extended attribute
+			IdmFormValueDto formValue = formValues.get(0);
+			if (formValue.isConfidential()) {
+				Object confidentialValue = formService.getConfidentialPersistentValue(formValue);
+				// If is confidential value String and schema attribute is GuardedString type,
+				// then convert to GuardedString will be did.
+				if (confidentialValue instanceof String
+						&& schemaAttributeDto.getClassType().equals(GuardedString.class.getName())) {
+					idmValue = new GuardedString((String) confidentialValue);
+				} else {
+					idmValue = confidentialValue;
+				}
+			} else {
+				idmValue = this.resolveFormValue(formValue);
+			}
+		}
+		return idmValue;
 	}
 
 	@Override
@@ -971,7 +1010,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public List<Serializable> getControlledAttributeValues(UUID systemId, SystemEntityType entityType,
+	public List<Serializable> getControlledAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
@@ -1024,7 +1063,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, SystemEntityType entityType,
+	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
 			String schemaAttributeName) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
@@ -1077,7 +1116,7 @@ public class DefaultSysSystemAttributeMappingService
 	}
 
 	@Override
-	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, SystemEntityType entityType,
+	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
 			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping) {
 		
 		// Computes values
@@ -1097,7 +1136,8 @@ public class DefaultSysSystemAttributeMappingService
 			SysSystemMappingDto mapping = DtoUtils.getEmbedded(attribute,
 					SysSystemAttributeMapping_.systemMapping.getName(), SysSystemMappingDto.class);
 	
-			Class<? extends Identifiable> entityType = mapping.getEntityType().getExtendedAttributeOwnerType();
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(mapping.getEntityType());
+			Class<? extends Identifiable> entityType = systemEntityType.getExtendedAttributeOwnerType();
 			if (entityType != null && attribute.isExtendedAttribute() && formService.isFormable(entityType)) {
 				IdmFormAttributeDto formAttribute = formService.getAttribute(entityType, attribute.getIdmPropertyName());
 				if (formAttribute != null) {
@@ -1318,6 +1358,33 @@ public class DefaultSysSystemAttributeMappingService
 			}
 		}
 		result.put(SysSystemAttributeMappingService.MAPPING_SCRIPT_FAIL_SCRIPT_PATH_KEY, sb.toString());
+		return result;
+	}
+	
+	@Override
+	public List<SysSystemAttributeMappingDto> getScriptTransformToUsage(String scriptCode) {
+		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
+		attributeFilter.setTransformToScript(scriptCode);
+		//
+		return this.find(attributeFilter, null).getContent();
+	}
+
+	@Override
+	public List<SysSystemAttributeMappingDto> getScriptTransformFromUsage(String scriptCode) {
+		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
+		attributeFilter.setTransformFromScript(scriptCode);
+		//
+		return this.find(attributeFilter, null).getContent();
+	}
+
+	@Override
+	public List<SysSystemAttributeMappingDto> getScriptUsage(String scriptCode) {
+		List<SysSystemAttributeMappingDto> result = new ArrayList<>();
+		List<SysSystemAttributeMappingDto> inTransformationFrom = getScriptTransformFromUsage(scriptCode);
+		result.addAll(inTransformationFrom);
+		List<SysSystemAttributeMappingDto> inTransformationTo = getScriptTransformToUsage(scriptCode);
+		result.addAll(inTransformationTo);
+		
 		return result;
 	}
 }

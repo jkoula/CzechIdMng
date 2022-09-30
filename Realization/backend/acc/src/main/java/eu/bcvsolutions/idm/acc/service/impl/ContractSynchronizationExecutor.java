@@ -23,7 +23,6 @@ import eu.bcvsolutions.idm.acc.domain.AttributeMapping;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractAccountDto;
@@ -130,6 +129,7 @@ public class ContractSynchronizationExecutor extends AbstractSynchronizationExec
 	public final static String CONTRACT_POSITIONS_FIELD = "positions";
 	public final static String SYNC_CONTRACT_FIELD = "sync_contract";
 	public final static String DEFAULT_TASK = "Default";
+	public static final String SYSTEM_ENTITY_TYPE = "CONTRACT";
 
 	@Override
 	protected SynchronizationContext validate(UUID synchronizationConfigId) {
@@ -190,7 +190,7 @@ public class ContractSynchronizationExecutor extends AbstractSynchronizationExec
 	 * @param logItem
 	 */
 	@Override
-	protected void callProvisioningForEntity(IdmIdentityContractDto entity, SystemEntityType entityType,
+	protected void callProvisioningForEntity(IdmIdentityContractDto entity, String entityType,
 			SysSyncItemLogDto logItem) {
 		addToItemLog(logItem, MessageFormat.format(
 				"Call provisioning (process IdentityContractEvent.UPDATE) for contract ({0}) with position ({1}).",
@@ -395,7 +395,7 @@ public class ContractSynchronizationExecutor extends AbstractSynchronizationExec
 	 * @return
 	 */
 	@Override
-	protected boolean isProvisioningImplemented(SystemEntityType entityType, SysSyncItemLogDto logItem) {
+	protected boolean isProvisioningImplemented(String entityType, SysSyncItemLogDto logItem) {
 		// Contract does not supports provisioning, but we need publish 'save' event,
 		// because identity provisioning still should be executed.
 		return true;
@@ -914,5 +914,10 @@ public class ContractSynchronizationExecutor extends AbstractSynchronizationExec
 			return defaultTask;
 		}
 		return tasks.get(0);
+	}
+	
+	@Override
+	public String getSystemEntityType() {
+		return SYSTEM_ENTITY_TYPE;
 	}
 }

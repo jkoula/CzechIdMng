@@ -6,8 +6,6 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
@@ -24,7 +22,6 @@ import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
@@ -58,10 +55,9 @@ public class AccAccount extends AbstractEntity implements FormableEntity, Extern
 	@Column(name = "uid", length = DefaultFieldLengths.UID, nullable = false)
 	private String uid;
 	
-	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type")
-	private SystemEntityType entityType;
-
+	private String entityType;
+	
 	@Audited
 	@NotNull
 	@ManyToOne(optional = false)
@@ -154,11 +150,11 @@ public class AccAccount extends AbstractEntity implements FormableEntity, Extern
 		return uid;
 	}
 	
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 	
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 	public SysSystemMapping getSystemMapping() {

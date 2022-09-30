@@ -52,10 +52,12 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
 import eu.bcvsolutions.idm.acc.service.api.UniformPasswordManager;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.IdmPasswordPolicyType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
@@ -107,6 +109,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 	@Autowired private SysProvisioningAttributeService provisioningAttributeService;
 	@Autowired private UniformPasswordManager uniformPasswordManager;
 	@Autowired private ConnectorManager connectorManager;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
+
 	@Autowired
 	private AccAccountService accountService;
 	@Autowired
@@ -225,6 +229,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				.getFullAccountObject(provisioningOperation);
 		if (fullAccountObject != null) {
 			connectorObject.getAttributes().clear();
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(provisioningOperation.getEntityType());
 
 			SysSystemMappingDto mapping = getMapping(provisioningOperation);
 			SysSchemaObjectClassDto schemaObjectClassDto = schemaObjectClassService.get(mapping.getObjectClass());
@@ -245,7 +250,7 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 					if (uniformPasswordManager.isSystemInUniformPasswordAgenda(provisioningOperation.getSystem())) {
 						generatedPassword = uniformPasswordManager.generateUniformPassword(
 								provisioningOperation.getEntityIdentifier(),
-								provisioningOperation.getEntityType().getEntityType(),
+								systemEntityType.getEntityType(),
 								provisioningOperation.getTransactionId());
 					}
 				}
@@ -794,7 +799,8 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 
 		AbstractDto abstractDto = null;
 		if (entityIdentifier != null) {
-			BaseDto dto = lookupService.lookupDto(provisioningOperation.getEntityType().getEntityType(), entityIdentifier);
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(provisioningOperation.getEntityType());
+			BaseDto dto = lookupService.lookupDto(systemEntityType.getEntityType(), entityIdentifier);
 			if (dto instanceof AbstractDto) {
 				abstractDto = (AbstractDto) dto;
 			} else {

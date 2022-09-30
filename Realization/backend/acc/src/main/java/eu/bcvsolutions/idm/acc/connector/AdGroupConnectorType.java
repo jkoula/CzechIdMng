@@ -1,14 +1,33 @@
 package eu.bcvsolutions.idm.acc.connector;
 
+import java.io.Serializable;
+import java.net.UnknownHostException;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.naming.AuthenticationException;
+import javax.naming.CommunicationException;
+
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.ReconciliationMissingAccountActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationLinkedActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationMissingEntityActionType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationUnlinkedActionType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
@@ -30,6 +49,7 @@ import eu.bcvsolutions.idm.acc.event.processor.MsAdSyncMappingRoleAutoAttributes
 import eu.bcvsolutions.idm.acc.service.api.ConnectorType;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.RoleSynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
@@ -42,22 +62,6 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
-import java.io.Serializable;
-import java.net.UnknownHostException;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.naming.AuthenticationException;
-import javax.naming.CommunicationException;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 /**
  * AD wizard for groups.
@@ -402,7 +406,7 @@ public class AdGroupConnectorType extends AdUserConnectorType {
 			SysSystemMappingDto mappingDto = new SysSystemMappingDto();
 			mappingDto.setObjectClass(schemaDto.getId());
 			mappingDto.setOperationType(SystemOperationType.SYNCHRONIZATION);
-			mappingDto.setEntityType(SystemEntityType.ROLE);
+			mappingDto.setEntityType(RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 			mappingDto.setName("AD role sync mapping.");
 			mappingDto.setAccountType(AccountType.PERSONAL);
 			mappingDto = getSystemMappingService().publish(

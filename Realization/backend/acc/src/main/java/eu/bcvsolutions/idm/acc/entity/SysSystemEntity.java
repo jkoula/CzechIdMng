@@ -3,8 +3,6 @@ package eu.bcvsolutions.idm.acc.entity;
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
@@ -16,7 +14,6 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 
@@ -45,9 +42,8 @@ public class SysSystemEntity extends AbstractEntity {
 	
 	@Audited
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type", nullable = false)
-	private SystemEntityType entityType;
+	private String entityType;
 	
 	@Audited
 	@NotNull
@@ -63,7 +59,7 @@ public class SysSystemEntity extends AbstractEntity {
 	public SysSystemEntity() {
 	}
 	
-	public SysSystemEntity(String uid, SystemEntityType entityType) {
+	public SysSystemEntity(String uid, String entityType) {
 		this.uid = uid;
 		this.entityType = entityType;
 	}
@@ -76,11 +72,11 @@ public class SysSystemEntity extends AbstractEntity {
 		return uid;
 	}
 
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 

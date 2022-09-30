@@ -17,7 +17,6 @@ import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.InitApplicationData;
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.SysProvisioningOperationDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysProvisioningOperationFilter;
@@ -25,6 +24,7 @@ import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation;
 import eu.bcvsolutions.idm.acc.rest.impl.SysProvisioningOperationController;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningOperationService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
+import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -79,7 +79,7 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(identity.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		assertFalse(operations.isEmpty());
 		assertTrue(operations.size() > 1);
@@ -125,7 +125,7 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(identity.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		assertFalse(operations.isEmpty());
 		assertTrue(operations.size() > 1);
@@ -170,7 +170,7 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(identity.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		assertFalse(operations.isEmpty());
 		assertTrue(operations.size() > 1);
@@ -219,7 +219,7 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(identity.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		assertFalse(operations.isEmpty());
 		assertTrue(operations.size() > 1);
@@ -269,7 +269,7 @@ public class ProvisioningOperationRetryBulkActionTest extends AbstractBulkAction
 
 		SysProvisioningOperationFilter filter = new SysProvisioningOperationFilter();
 		filter.setEntityIdentifier(identity.getId());
-		filter.setEntityType(SystemEntityType.IDENTITY);
+		filter.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		List<SysProvisioningOperationDto> operations = provisioningOperationService.find(filter, null).getContent();
 		assertFalse(operations.isEmpty());
 		assertTrue(operations.size() > 1);

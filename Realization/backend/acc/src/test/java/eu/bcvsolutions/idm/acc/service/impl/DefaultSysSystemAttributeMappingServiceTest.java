@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -81,12 +80,11 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 
 	@Test
 	public void moreAttributesOnSchemaAttributeSyncTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.SET;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		// For synchronization is enabled more mapped attributes for one schema
 		// attribute
 		systemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
@@ -109,12 +107,11 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 
 	@Test(expected = ResultCodeException.class)
 	public void moreAttributesOnSchemaAttributeProvTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.SET;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		// For provisioning is NOT enabled more mapped attributes for one schema
 		// attribute
 		systemMapping.setOperationType(SystemOperationType.PROVISIONING);
@@ -134,12 +131,11 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 
 	@Test(expected = ResultCodeException.class)
 	public void moreAttributesOnSchemaAttChangeMappingTypeTest() {
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.SET;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		// For synchronization is enabled more mapped attributes for one schema
 		// attribute
 		systemMapping.setOperationType(SystemOperationType.SYNCHRONIZATION);
@@ -169,12 +165,11 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 	@Test
 	public void textFilterTest() {
 		IdmBasePermission permission = IdmBasePermission.ADMIN;
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.MERGE;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(objectClass);
 
 		SysSystemAttributeMappingDto attributeMapping1 = createAttributeMappingSystem(systemMapping, strategyType,
@@ -199,12 +194,11 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 	@Test
 	public void schemaAttributeIdFilterTest() {
 		IdmBasePermission permission = IdmBasePermission.ADMIN;
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.MERGE;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(objectClass);
 		SysSchemaAttributeDto schemaAttribute2 = createSchemaAttribute(objectClass);
@@ -226,13 +220,12 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 	@Test
 	public void systemMappingIdFilterTest() {
 		IdmBasePermission permission = IdmBasePermission.ADMIN;
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.MERGE;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping1 = testHelper.createMappingSystem(entityType, objectClass);
-		SysSystemMappingDto systemMapping2 = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping1 = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
+		SysSystemMappingDto systemMapping2 = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(objectClass);
 
 		SysSystemAttributeMappingDto attributeMapping1 = createAttributeMappingSystem(systemMapping1, strategyType,
@@ -252,7 +245,6 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 	@Test
 	public void systemIdFilterTest() {
 		IdmBasePermission permission = IdmBasePermission.ADMIN;
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.MERGE;
 
 		SysSystemDto system1 = createSystem();
@@ -260,8 +252,8 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 		SysSchemaObjectClassDto objectClass1 = createObjectClass(system1);
 		SysSchemaObjectClassDto objectClass2 = createObjectClass(system2);
 
-		SysSystemMappingDto systemMapping1 = testHelper.createMappingSystem(entityType, objectClass1);
-		SysSystemMappingDto systemMapping2 = testHelper.createMappingSystem(entityType, objectClass2);
+		SysSystemMappingDto systemMapping1 = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass1);
+		SysSystemMappingDto systemMapping2 = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass2);
 		SysSchemaAttributeDto schemaAttribute1 = createSchemaAttribute(objectClass1);
 		SysSchemaAttributeDto schemaAttribute2 = createSchemaAttribute(objectClass2);
 
@@ -283,12 +275,11 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 	@Test
 	public void idmPropertyNameFilterTest() {
 		IdmBasePermission permission = IdmBasePermission.ADMIN;
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.MERGE;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(objectClass);
 
 		SysSystemAttributeMappingDto attributeMapping1 = createAttributeMappingSystem(systemMapping, strategyType,
@@ -312,13 +303,12 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 	@Test
 	public void isUidFitlerTest() {
 		IdmBasePermission permission = IdmBasePermission.ADMIN;
-		SystemEntityType entityType = SystemEntityType.IDENTITY;
 		AttributeMappingStrategyType strategyType = AttributeMappingStrategyType.MERGE;
 
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objectClass = createObjectClass(system);
-		SysSystemMappingDto systemMapping1 = testHelper.createMappingSystem(entityType, objectClass);
-		SysSystemMappingDto systemMapping2 = testHelper.createMappingSystem(entityType, objectClass);
+		SysSystemMappingDto systemMapping1 = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
+		SysSystemMappingDto systemMapping2 = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objectClass);
 		SysSchemaAttributeDto schemaAttribute = createSchemaAttribute(objectClass);
 
 		SysSystemAttributeMappingDto attributeMapping1 = createAttributeMappingSystem(systemMapping1,
@@ -387,7 +377,7 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objClass = createObjectClass(system);
 		SysSchemaAttributeDto schemaAttr = createSchemaAttribute(objClass);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(SystemEntityType.IDENTITY, objClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objClass);
 		SysSystemAttributeMappingDto attrMapping = createAttributeMappingSystem(systemMapping,
 				AttributeMappingStrategyType.CREATE, schemaAttr.getId());
 		
@@ -419,7 +409,7 @@ public class DefaultSysSystemAttributeMappingServiceTest extends AbstractIntegra
 		SysSystemDto system = createSystem();
 		SysSchemaObjectClassDto objClass = createObjectClass(system);
 		SysSchemaAttributeDto schemaAttr = createSchemaAttribute(objClass);
-		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(SystemEntityType.IDENTITY, objClass);
+		SysSystemMappingDto systemMapping = testHelper.createMappingSystem(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, objClass);
 		SysSystemAttributeMappingDto attrMapping = createAttributeMappingSystem(systemMapping,
 				AttributeMappingStrategyType.CREATE, schemaAttr.getId());
 		

@@ -1,7 +1,14 @@
 package eu.bcvsolutions.idm.acc.event.processor;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -19,12 +26,6 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcAttributeInfo;
 import eu.bcvsolutions.idm.ic.api.IcObjectClassInfo;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Abstract processor for automatic creation of a mapped attributes by common schema attributes.
@@ -157,7 +158,7 @@ public abstract class AbstractSystemMappingAutoAttributesProcessor extends CoreE
 		return schemaAttributeService.find(schemaAttributeFilter, null).getContent();
 	}
 
-	abstract SystemEntityType getSystemEntityType();
+	abstract String getSystemEntityType();
 
 	/**
 	 * Attributes will be generated only for defined operation type. By default (null) for all (provisioning and sync).

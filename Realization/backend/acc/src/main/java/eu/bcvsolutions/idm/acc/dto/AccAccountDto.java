@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.google.common.annotations.Beta;
 
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
@@ -48,7 +47,7 @@ public class AccAccountDto extends FormableDto implements ExternalIdentifiable {
 	private boolean inProtection;
 	private ZonedDateTime endOfProtection;
 	private String realUid;
-	private SystemEntityType entityType;
+	private String entityType;
 	@Beta
 	private UUID targetEntityId;
 	@Beta
@@ -125,11 +124,11 @@ public class AccAccountDto extends FormableDto implements ExternalIdentifiable {
 		this.realUid = realUid;
 	}
 	
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 	
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 

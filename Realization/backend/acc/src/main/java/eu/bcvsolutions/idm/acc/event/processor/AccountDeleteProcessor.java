@@ -17,7 +17,6 @@ import org.springframework.util.Assert;
 import com.google.common.collect.ImmutableMap;
 
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccContractSliceAccountDto;
@@ -42,6 +41,8 @@ import eu.bcvsolutions.idm.acc.service.api.AccRoleAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccRoleCatalogueAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccTreeAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemEntityTypeManager;
+import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -71,6 +72,7 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 	private final ProvisioningService provisioningService;
 	@Autowired
 	private AccContractSliceAccountService contractAccountSliceService;
+	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
 	private static final Logger LOG = LoggerFactory.getLogger(AccountDeleteProcessor.class);
 
@@ -186,8 +188,9 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 			accountService.deleteInternal(refreshAccount);
 		}
 		if (deleteTargetAccount && account.getEntityType() != null) {
-			SystemEntityType entityType = account.getEntityType();
-			if (!entityType.isSupportsProvisioning()) {
+			String entityType = account.getEntityType();
+			SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(entityType);
+			if (!systemEntityType.isSupportsProvisioning()) {
 				LOG.warn(MessageFormat.format("Provisioning is not supported for [{1}] now [{0}]!", account.getUid(),
 						entityType));
 				return new DefaultEventResult<>(event, this);

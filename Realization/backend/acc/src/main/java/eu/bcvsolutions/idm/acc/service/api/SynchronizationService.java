@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationContext;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
 import eu.bcvsolutions.idm.acc.dto.SysSyncItemLogDto;
 import eu.bcvsolutions.idm.acc.entity.SysSyncConfig;
@@ -93,7 +92,7 @@ public interface SynchronizationService {
 	 *            Action for this situation.
 	 * @return
 	 */
-	SysSyncItemLogDto resolveMissingEntitySituation(String uid, SystemEntityType entityType,
+	SysSyncItemLogDto resolveMissingEntitySituation(String uid, String entityType,
 			List<IcAttribute> icAttributes, UUID configId, String actionType);
 
 	/**
@@ -112,7 +111,7 @@ public interface SynchronizationService {
 	 *            Action for this situation.
 	 * @return
 	 */
-	SysSyncItemLogDto resolveLinkedSituation(String uid, SystemEntityType entityType, List<IcAttribute> icAttributes,
+	SysSyncItemLogDto resolveLinkedSituation(String uid, String entityType, List<IcAttribute> icAttributes,
 			UUID accountId, UUID configId, String actionType);
 
 	/**
@@ -131,7 +130,7 @@ public interface SynchronizationService {
 	 *            Action for this situation.
 	 * @return
 	 */
-	SysSyncItemLogDto resolveUnlinkedSituation(String uid, SystemEntityType entityType, UUID entityId, UUID configId,
+	SysSyncItemLogDto resolveUnlinkedSituation(String uid, String entityType, UUID entityId, UUID configId,
 			String actionType, List<IcAttribute> icAttributes);
 
 	/**
@@ -151,7 +150,7 @@ public interface SynchronizationService {
 	 *            Action for this situation.
 	 * @return
 	 */
-	SysSyncItemLogDto resolveMissingAccountSituation(String uid, SystemEntityType entityType, UUID accountId,
+	SysSyncItemLogDto resolveMissingAccountSituation(String uid, String entityType, UUID accountId,
 			UUID configId, String actionType);
 
 	/**
@@ -162,6 +161,6 @@ public interface SynchronizationService {
 	 * 
 	 * @return
 	 */
-	SynchronizationEntityExecutor getSyncExecutor(SystemEntityType entityType, UUID syncConfigId);
+	SynchronizationEntityExecutor getSyncExecutor(String entityType, UUID syncConfigId);
 
 }

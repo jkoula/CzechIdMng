@@ -10,17 +10,16 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
-import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.bcvsolutions.idm.acc.domain.AccountType;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
@@ -54,9 +53,8 @@ public class SysSystemMapping extends AbstractEntity {
 	private String name;
 	@Audited
 	@NotNull
-	@Enumerated(EnumType.STRING)
 	@Column(name = "entity_type", nullable = false)
-	private SystemEntityType entityType;
+	private String entityType;
 	@Audited
 	@NotNull
 	@ManyToOne(optional = false)
@@ -120,11 +118,11 @@ public class SysSystemMapping extends AbstractEntity {
 		return name;
 	}
 
-	public SystemEntityType getEntityType() {
+	public String getEntityType() {
 		return entityType;
 	}
 
-	public void setEntityType(SystemEntityType entityType) {
+	public void setEntityType(String entityType) {
 		this.entityType = entityType;
 	}
 
