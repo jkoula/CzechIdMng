@@ -1,6 +1,6 @@
 import AbstractService from "czechidm-core/src/services/AbstractService";
 import IdentityService from "czechidm-core/src/services/IdentityService";
-import SystemService from "../../services/SystemService";
+import SystemService from "./SystemService";
 
 const systemService = new SystemService()
 const identityService = new IdentityService()
