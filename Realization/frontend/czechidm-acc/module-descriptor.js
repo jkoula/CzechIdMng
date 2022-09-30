@@ -69,6 +69,15 @@ module.exports = {
                 access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['SYSTEM_READ', 'ACCOUNT_READ'] } ]
               },
               {
+                id: 'system-owner',
+                type: 'TAB',
+                labelKey: 'acc:content.system.owner.title',
+                order: 25,
+                path: '/system/:entityId/owner',
+                icon: 'fa:user',
+                access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEMOWNER_READ', 'SYSTEMOWNERROLE_READ'] } ]
+              },
+              {
                 id: 'system-entities',
                 type: 'TAB',
                 labelKey: 'acc:content.system.entities.title',

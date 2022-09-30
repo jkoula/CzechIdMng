@@ -410,6 +410,14 @@
         "header": "Item log details",
         "title": "Item log details"
       },
+      "owner": {
+        "create":{
+          "header": "New system owner"
+        },
+        "label": "Owner-identity",
+        "help": "Selected identity will be the system owner.",
+        "title": "Owner"
+      },
       "accounts": {
         "header": "Accounts in system <small>managed in IdM</small>",
         "title": "Accounts",
@@ -1660,6 +1668,28 @@
       "systemGroup": "Group",
       "mergeAttribute": "Attribute for controlling groups"
     },
+    "SystemOwner": {
+      "header":"System owner- defined by identity",
+      "owner": {
+        "label": "Owner",
+        "help":"Selected identity will be the owner system."
+      },
+      "system":{
+        "label":"System"
+      }
+    },
+    "SystemOwnerRole":{
+      "header":"System owner - defined by role",
+      "ownerRole":{
+        "label":"Role",
+        "help": "Identities with the selected role assigned will be the system owner."
+      },
+      "system":{
+        "label":"System"
+      },
+      "owner": {
+        "label":"Role"
+     },
     "SystemEntityType": {
       "IDENTITY": {
         "label": "Identity",
@@ -2058,7 +2088,9 @@
       "PROVISIONINGARCHIVE": "Provisioning - archive",
       "SYSTEMATTRIBUTEMAPPING": "Mapping atribute in system",
       "UNIFORMPASSWORD": "Uniform password system",
-      "SYSTEMGROUP": "Group of systems"
+      "SYSTEMGROUP": "Group of systems",
+      "SYSTEMOWNER": "Owner of system",
+      "SYSTEMOWNERROLE": "Owner of system by role"
     }
   },
   "eav": {

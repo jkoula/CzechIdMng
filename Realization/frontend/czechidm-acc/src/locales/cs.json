@@ -410,6 +410,14 @@
         "header": "Detail logu položky",
         "title": "Detail logu položky"
       },
+      "owner": {
+        "create":{
+          "header": "Nový vlastník systému"
+        },
+        "label": "Vlastník - identita",
+        "help": "Vybraná identita se stane vlastníkem systému.",
+        "title": "Vlastník"
+      },
       "accounts": {
         "header": "Účty na koncovém systému <small>uložené v IdM</small>",
         "title": "Účty na systému",
@@ -1071,6 +1079,7 @@
         "notVirtual": "Bez virtuálních",
         "all": "Všechny systémy"
       }
+      
     },
     "ConnectorServer": {
       "name": "Jméno",
@@ -1661,6 +1670,28 @@
       "systemGroup": "Skupina",
       "mergeAttribute": "Atribut kontrolující skupiny"
     },
+    "SystemOwner": {
+      "header":"Vlastník systému - přímý výběr uživatele",
+      "owner": {
+        "label": "Vlastník",
+        "help":"Vybraná identita se stane vlastníkem systému."
+      },
+      "system":{
+        "label":"Systém"
+      }
+    },
+    "SystemOwnerRole":{
+      "header":"Vlastník systému - určený rolí",
+      "ownerRole":{
+        "label":"Role",
+        "help": "Identity mající vybranou roli se stanou vlastníkem systému."
+      },
+      "system":{
+        "label":"Systém"
+      },
+     "owner": {
+      "label":"Role"
+     },
     "SystemEntityType": {
       "IDENTITY": {
         "label": "Identita",
@@ -2061,7 +2092,9 @@
       "PROVISIONINGARCHIVE": "Provisioning - archív",
       "SYSTEMATTRIBUTEMAPPING": "Mapované atributy systému",
       "UNIFORMPASSWORD": "Systém jednotného hesla",
-      "SYSTEMGROUP": "Skupiny systémů"
+      "SYSTEMGROUP": "Skupiny systémů",
+      "SYSTEMOWNER": "Vlastník systému",
+      "SYSTEMOWNERROLE": "Vlastník systému dle role"
     }
   },
   "eav": {

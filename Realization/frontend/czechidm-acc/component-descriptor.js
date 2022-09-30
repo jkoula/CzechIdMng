@@ -97,6 +97,15 @@ module.exports = {
       manager: require('./src/redux').SystemManager
     },
     {
+      id: 'system-select-box',
+      type: 'entity-select-box',
+      priority: 0,
+      localizationKey: 'entity.System',
+      entityType: ['system'],
+      searchInFields: ['code'],
+      manager: require('./src/redux').SystemManager
+    },
+    {
       id: 'target-system-icon',
       type: 'icon',
       entityType: ['system', 'systems'],

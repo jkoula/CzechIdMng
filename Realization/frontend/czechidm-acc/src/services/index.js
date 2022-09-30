@@ -27,6 +27,8 @@ import UniformPasswordSystemService from './UniformPasswordSystemService';
 import RemoteServerService from './RemoteServerService';
 import SystemGroupService from './SystemGroupService';
 import SystemGroupSystemService from './SystemGroupSystemService';
+import SystemOwnerService from './SystemOwnerService';
+import SystemOwnerRoleService from './SystemOwnerRoleService';
 import SystemEntityTypeService from './SystemEntityTypeService';
 
 const ServiceRoot = {
@@ -59,6 +61,8 @@ const ServiceRoot = {
   RemoteServerService,
   SystemGroupService,
   SystemGroupSystemService,
+  SystemOwnerService,
+  SystemOwnerRoleService
   SystemEntityTypeService
 };
 

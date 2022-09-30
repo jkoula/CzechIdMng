@@ -454,8 +454,8 @@ export class IdentityTable extends Advanced.AbstractTableContent {
           <Advanced.Column property="firstName" sort width="10%" face="text"/>
           <Advanced.Column property="externalCode" sort width="10%" face="text"/>
           <Advanced.Column property="email" width="15%" face="text" sort/>
-          <Advanced.Column property="disabled" face="bool" sort width={ 100 }/>
-          <Advanced.Column property="state" face="enum" enumClass={ IdentityStateEnum } sort width={ 100 }/>
+          <Advanced.Column property="disabled" face="bool" sort width={ 100 }/> 
+          <Advanced.Column property="state" face="enum" enumClass={ IdentityStateEnum } sort width={ 100 }/> 
           <Advanced.Column
             header={ <Basic.Icon value="component:password"/> }
             title={ this.i18n('entity.Identity.passwordExpiration.title') }

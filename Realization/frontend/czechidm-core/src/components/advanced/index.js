@@ -157,7 +157,7 @@ const Components = {
   Panel: {
     Header: PanelHeader
   },
-  AbstractUniversalSearchType
+  AbstractUniversalSearchType,
 };
 
 Components.version = '12.0.0';

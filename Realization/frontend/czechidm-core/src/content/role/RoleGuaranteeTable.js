@@ -165,7 +165,7 @@ export class RoleGuaranteeTable extends Advanced.AbstractTableContent {
                 ref="form"
                 data={detail.entity}
                 showLoading={ _showLoading }
-                readOnly={ !manager.canSave(detail.entity, _permissions) }>
+                readOnly={ !manager.canSave(detail.entity, _permissions)}>
                 <Advanced.RoleSelect
                   ref="role"
                   manager={ roleManager }
