@@ -715,7 +715,6 @@
         "copyClipboard": "Copy to clipboard",
         "wrapOn": "Turn on line wrapping",
         "wrapOff": "Turn off line wrapping"
-        }
       },
       "CreatableSelectBox": {
         "textCreator": "Create a new filtering option: [{{value}}]?",
