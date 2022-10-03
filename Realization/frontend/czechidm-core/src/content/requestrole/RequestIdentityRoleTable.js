@@ -481,7 +481,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       request,
       identityId,
       showRowSelection,
-      showEnvironment,
+      showEnvironment
     } = this.props;
     const {
       showChangesOnly,
@@ -548,6 +548,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
           </Basic.Toolbar>
           <Advanced.Table
             ref="table"
+            columns={this.props.columns}
             uiKey="request-identity-role-table"
             hover={ false }
             manager={ requestIdentityRoleManager }
@@ -670,11 +671,13 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               header={ this.i18n('entity.Role.environment.label') }
               sort/>
             <Advanced.Column
+             property="roleAttributes"
               header={this.i18n('content.task.IdentityRoleConceptTable.identityRoleAttributes.header')}
               cell={
                 ({rowIndex, data}) => this.renderConceptAttributesCell({ rowIndex, data })
               }/>
             <Advanced.Column
+            property="contractPosition"
               header={ this.i18n('entity.IdentityRole.identityContract.title') }
               cell={
                 ({rowIndex, data}) => {
@@ -699,6 +702,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               }/>
             <Advanced.Column
               header={ this.i18n('entity.RoleRequest.candicateUsers') }
+              property="candicateUsers"
               cell={
                 ({rowIndex, data}) => {
                   const candidates = data[rowIndex].candidates;
@@ -769,6 +773,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                   className="column-face-bool"/>
               }/>
             <Advanced.Column
+              property="action"
               header={ this.i18n('label.action') }
               className="action"
               cell={ this.renderConceptActionsCell.bind(this) }/>
@@ -878,21 +883,24 @@ RequestIdentityRoleTable.defaultProps = {
 
 RequestIdentityRoleTable.defaultProps = {
   columns: ConfigLoader.getConfig('RequestIdentityRoleTable.table.columns', [
-    'role',
+    'role.name',
+    '_embedded.role.baseCode',
+    'systemState',
+    '_embedded.role.environment',
     'roleAttributes',
-    'environment',
-    'identityContract',
     'contractPosition',
     'validFrom',
     'validTill',
+    'description',
+    'priority',
     'directRole',
     'automaticRole',
-    'incompatibleRoles',
-    'description',
-    'priority'
+    'candicateUsers',
+    'action'
   ])
 };
 function select(state, component) {
+  console.log(component, "COMPONENTpppp");
   return {
     columns: component.columns || ConfigurationManager.getPublicValueAsArray(
       state,
