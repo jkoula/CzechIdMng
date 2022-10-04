@@ -671,13 +671,13 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               header={ this.i18n('entity.Role.environment.label') }
               sort/>
             <Advanced.Column
-             property="roleAttributes"
+              property="roleAttributes"
               header={this.i18n('content.task.IdentityRoleConceptTable.identityRoleAttributes.header')}
               cell={
                 ({rowIndex, data}) => this.renderConceptAttributesCell({ rowIndex, data })
               }/>
             <Advanced.Column
-            property="contractPosition"
+              property="contractPosition"
               header={ this.i18n('entity.IdentityRole.identityContract.title') }
               cell={
                 ({rowIndex, data}) => {
