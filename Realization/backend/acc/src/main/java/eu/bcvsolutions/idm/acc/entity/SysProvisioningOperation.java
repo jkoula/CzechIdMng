@@ -39,7 +39,8 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 		@Index(name = "idx_sys_p_o_sys_entity", columnList = "system_entity_id"),
 		@Index(name = "idx_sys_p_o_entity_identifier", columnList = "entity_identifier"),
 		@Index(name = "idx_sys_pro_oper_batch_id", columnList = "provisioning_batch_id"),
-		@Index(name = "idx_sys_p_o_role_request_id", columnList = "role_request_id")
+		@Index(name = "idx_sys_p_o_role_request_id", columnList = "role_request_id"),
+		@Index(name = "idx_sys_p_o_role_account_id", columnList = "account_id")
 		})
 public class SysProvisioningOperation extends AbstractEntity {
 
@@ -88,7 +89,12 @@ public class SysProvisioningOperation extends AbstractEntity {
 	// ID of request, without DB relation on the request -> Request can be null or doesn't have to exist! 
 	@Column(name = "role_request_id")
     private UUID roleRequestId;
-	
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	private AccAccount account;
+
+
 	public SysProvisioningOperation() {
 	}
 	
@@ -200,5 +206,17 @@ public class SysProvisioningOperation extends AbstractEntity {
 
 	public void setRoleRequestId(UUID roleRequestId) {
 		this.roleRequestId = roleRequestId;
+	}
+
+	/**
+	 * Account
+	 * @return
+	 */
+	public AccAccount getAccount() {
+		return account;
+	}
+
+	public void setAccount(AccAccount account) {
+		this.account = account;
 	}
 }

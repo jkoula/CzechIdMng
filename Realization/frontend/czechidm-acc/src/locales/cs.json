@@ -59,6 +59,21 @@
             "no": "Ne"
           }
         }
+      },
+      "detail": {
+        "header": "Detail účtu: {{name}}",
+        "title": "Atributy",
+        "tabs": {
+          "account": "Detail účtu",
+          "roles": "Role",
+          "audit": "Audit",
+          "provisioning": "Provisioning"
+        },
+        "discard": {
+          "header": "Hodnoty nejsou uloženy",
+          "text": "Všechny změny budou ztraceny",
+          "help": "Hodnoty nebudou propsány do systému, všechny změny budou ztraceny"
+        }
       }
     },
     "systems": {

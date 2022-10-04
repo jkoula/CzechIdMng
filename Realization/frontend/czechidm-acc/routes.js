@@ -202,17 +202,17 @@ module.exports = {
         },
         {
           path: 'roles',
-          component: require('./src/content/account/AccountDetail'),
+          component: require('./src/content/account/AccountRoles'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
         },
         {
           path: 'audit',
-          component: require('./src/content/account/AccountDetail'),
+          component: require('./src/content/account/AccountAudit'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
         },
         {
           path: 'provisioning',
-          component: require('./src/content/account/AccountDetail'),
+          component: require('./src/content/account/AccountProvisioning'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
         }
       ]

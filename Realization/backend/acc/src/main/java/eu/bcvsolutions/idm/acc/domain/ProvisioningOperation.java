@@ -29,6 +29,13 @@ public interface ProvisioningOperation extends Auditable {
 	UUID getSystem();
 
 	/**
+	 * Account
+	 *
+	 * @return
+	 */
+	UUID getAccount();
+
+	/**
 	 * IdM entity type
 	 * 
 	 * @return

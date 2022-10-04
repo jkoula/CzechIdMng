@@ -16,7 +16,7 @@ const manager = new AccountManager();
 class AccountDetailRoutes extends Basic.AbstractContent {
 
   getContentKey() {
-    return 'acc:content.remote-servers';
+    return 'acc:content.accounts.detail';
   }
 
   componentDidMount() {
@@ -40,11 +40,7 @@ class AccountDetailRoutes extends Basic.AbstractContent {
     return (
       <Basic.Div>
         {
-          this._getIsNew()
-          ?
-          <Helmet title={ this.i18n('create.title') } />
-          :
-          <Helmet title={ this.i18n('edit.title') } />
+          <Helmet title={ this.i18n('header') } />
         }
         {
           (this._getIsNew() || !entity)
@@ -52,9 +48,9 @@ class AccountDetailRoutes extends Basic.AbstractContent {
           <Advanced.DetailHeader
             entity={ entity }
             showLoading={ showLoading }
-            icon="component:server"
+            icon="fa:external-link"
             back="/accounts/accounts-all">
-            { this.i18n('edit.header', { record: manager.getNiceLabel(entity), escape: false }) }
+            { this.i18n('header', { name: manager.getNiceLabel(entity), escape: false }) }
           </Advanced.DetailHeader>
         }
         {

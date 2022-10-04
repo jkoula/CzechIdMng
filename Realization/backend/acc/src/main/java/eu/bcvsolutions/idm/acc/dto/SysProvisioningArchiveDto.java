@@ -39,6 +39,8 @@ public class SysProvisioningArchiveDto extends AbstractDto implements Provisioni
 	private OperationResult result;
 	// ID of request, without DB relation on the request -> Request can be null or doesn't have to exist!
     private UUID roleRequestId;
+	@Embedded(dtoClass = AccAccountDto.class)
+	private UUID account;
 
 	public ProvisioningEventType getOperationType() {
 		return operationType;
@@ -105,7 +107,13 @@ public class SysProvisioningArchiveDto extends AbstractDto implements Provisioni
 		this.roleRequestId = roleRequestId;
 	}
 
+	public UUID getAccount() {
+		return account;
+	}
 
+	public void setAccount(UUID account) {
+		this.account = account;
+	}
 
 	/**
 	 * New {@link SysProvisioningArchiveDto} builder.
@@ -121,7 +129,7 @@ public class SysProvisioningArchiveDto extends AbstractDto implements Provisioni
 		private UUID entityIdentifier;
 		private String systemEntityUid;
 		private OperationResult result;
-		
+		private UUID account;
 		public Builder() {
 		}
 		
@@ -132,6 +140,7 @@ public class SysProvisioningArchiveDto extends AbstractDto implements Provisioni
 			this.entityType = provisioningOperation.getEntityType();
 			this.entityIdentifier = provisioningOperation.getEntityIdentifier();
 			this.result = provisioningOperation.getResult();
+			this.account = provisioningOperation.getAccount();
 		}
 		
 		public Builder setOperationType(ProvisioningEventType operationType) {
@@ -142,6 +151,13 @@ public class SysProvisioningArchiveDto extends AbstractDto implements Provisioni
 		public Builder setSystem(SysSystemDto system) {
 			if (system != null) {
 				this.system = system.getId();				
+			}
+			return this;
+		}
+
+		public Builder setAccount(AccAccountDto account) {
+			if (account != null) {
+				this.account = account.getId();
 			}
 			return this;
 		}
@@ -185,6 +201,7 @@ public class SysProvisioningArchiveDto extends AbstractDto implements Provisioni
 			provisioningArchive.setEntityIdentifier(entityIdentifier);
 			provisioningArchive.setProvisioningContext(provisioningContext);
 			provisioningArchive.setResult(result);
+			provisioningArchive.setAccount(account);
 			return provisioningArchive;
 		}
 	}

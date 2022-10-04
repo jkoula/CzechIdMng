@@ -331,7 +331,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 			return null;
 		}
 		SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class);
-		return doProvisioning(systemEntity, dto, dto.getId(), operationType, finalAttributes, isDryRun, systemMappingDto);
+		return doProvisioning(systemEntity, dto, dto.getId(), operationType, finalAttributes, isDryRun, systemMappingDto, account);
 	}
 
 	@Override
@@ -344,7 +344,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		}
 		//
 		if (systemEntity != null) {
-			doProvisioning(systemEntity, null, entityId, ProvisioningOperationType.DELETE, null, systemMappingDto);
+			doProvisioning(systemEntity, null, entityId, ProvisioningOperationType.DELETE, null, systemMappingDto, account);
 		}
 	}
 
@@ -465,7 +465,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 					account, dto, system, systemEntity.getEntityType());
 			if (!additionalPasswordChangeAttributes.isEmpty()) {
 				additionalProvisioningOperation = prepareProvisioning(systemEntity, dto, dto.getId(),
-						ProvisioningOperationType.UPDATE, additionalPasswordChangeAttributes, systemMappingDto);
+						ProvisioningOperationType.UPDATE, additionalPasswordChangeAttributes, systemMappingDto, account);
 			}
 			//
 			// add another password
@@ -698,7 +698,7 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	private SysProvisioningOperationDto prepareProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
 															ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes,
-															SysSystemMappingDto systemMappingDto) {
+															SysSystemMappingDto systemMappingDto, AccAccountDto accountDto) {
 		Assert.notNull(systemEntity, "System entity is required.");
 		Assert.notNull(systemEntity.getUid(), "System entity uid is required.");
 		Assert.notNull(systemEntity.getEntityType(), "System entity type is required.");
@@ -747,7 +747,8 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 				.setSystemEntity(systemEntity) //
 				.setEntityIdentifier(entityId) //
 				.setRoleRequestId(roleRequestId)
-				.setProvisioningContext(new ProvisioningContext(accountAttributes, connectorObject));
+				.setProvisioningContext(new ProvisioningContext(accountAttributes, connectorObject))
+				.setAccount(accountDto.getId());
 		//
 		return operationBuilder.build();
 	}
@@ -782,9 +783,10 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	 * @param attributes
 	 */
 	private void doProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
-								ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, SysSystemMappingDto systemMappingDto) {
+								ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, SysSystemMappingDto systemMappingDto,
+								AccAccountDto accountDto) {
 		SysProvisioningOperationDto provisioningOperation = prepareProvisioning(systemEntity, dto, entityId,
-				operationType, attributes, systemMappingDto);
+				operationType, attributes, systemMappingDto, accountDto);
 		//
 		if (provisioningOperation != null) {
 			provisioningExecutor.execute(provisioningOperation);
@@ -793,9 +795,9 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 
 	private SysProvisioningOperationDto doProvisioning(SysSystemEntityDto systemEntity, DTO dto, UUID entityId,
 													   ProvisioningOperationType operationType, List<? extends AttributeMapping> attributes, boolean isDryRun,
-													   SysSystemMappingDto systemMappingDto) {
+													   SysSystemMappingDto systemMappingDto, AccAccountDto accountDto) {
 		SysProvisioningOperationDto provisioningOperation = prepareProvisioning(systemEntity, dto, entityId,
-				operationType, attributes, systemMappingDto);
+				operationType, attributes, systemMappingDto, accountDto);
 		//
 		if (provisioningOperation != null) {
 			provisioningOperation.setDryRun(isDryRun);

@@ -38,6 +38,8 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 	private ProvisioningContext provisioningContext;
 	@Embedded(dtoClass = SysSystemDto.class)
 	private UUID system;
+	@Embedded(dtoClass = AccAccountDto.class)
+	private UUID account;
 	private String entityType;
 	private UUID entityIdentifier;
 	@Embedded(dtoClass = SysSystemEntityDto.class)
@@ -106,9 +108,18 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 	public UUID getSystem() {
 		return system;
 	}
-	
+
 	public void setSystem(UUID system) {
 		this.system = system;
+	}
+
+	@Override
+	public UUID getAccount() {
+		return account;
+	}
+
+	public void setAccount(UUID account) {
+		this.account = account;
 	}
 
 	@Override
@@ -219,6 +230,7 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 		private UUID system;
 		// Add system DTO to the embedded ... for optimization 
 		private SysSystemDto systemDto;
+		private UUID account;
 		private String entityType;
 		private UUID systemEntity;
 		private String systemEntityUid;
@@ -289,6 +301,11 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 			this.system = system;
 			return this;
 		}
+
+		public Builder setAccount(UUID account) {
+			this.account = account;
+			return this;
+		}
 		
 		public Builder setSystemEntity(UUID systemEntity) {
 			this.systemEntity = systemEntity;
@@ -319,6 +336,7 @@ public class SysProvisioningOperationDto extends AbstractDto implements Provisio
 			provisioningOperation.setEntityIdentifier(entityIdentifier);
 			provisioningOperation.setProvisioningContext(provisioningContext);
 			provisioningOperation.setRoleRequestId(roleRequestId);
+			provisioningOperation.setAccount(account);
 		 
 			return provisioningOperation;
 		}

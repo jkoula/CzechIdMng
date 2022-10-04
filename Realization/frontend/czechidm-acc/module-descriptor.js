@@ -415,8 +415,8 @@ module.exports = {
           {
             id: 'account-detail',
             type: 'TAB',
-            labelKey: 'acc:content.accounts.label',
-            titleKey: 'acc:content.accounts.title',
+            labelKey: 'acc:content.accounts.detail.tabs.account',
+            titleKey: 'acc:content.accounts.detail.tabs.account',
             order: 15,
             priority: 0,
             icon: 'fa:external-link',
@@ -427,11 +427,11 @@ module.exports = {
           {
             id: 'account-roles',
             type: 'TAB',
-            labelKey: 'acc:content.accounts.label',
-            titleKey: 'acc:content.accounts.title',
+            labelKey: 'acc:content.accounts.detail.tabs.roles',
+            titleKey: 'acc:content.accounts.detail.tabs.roles',
             order: 15,
             priority: 0,
-            icon: 'fa:external-link',
+            icon: 'fa:key',
             path: '/account/:entityId/roles',
             access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
             items: []
@@ -439,11 +439,11 @@ module.exports = {
           {
             id: 'account-audit',
             type: 'TAB',
-            labelKey: 'acc:content.accounts.label',
-            titleKey: 'acc:content.accounts.title',
+            labelKey: 'acc:content.accounts.detail.tabs.audit',
+            titleKey: 'acc:content.accounts.detail.tabs.audit',
             order: 15,
             priority: 0,
-            icon: 'fa:external-link',
+            icon: 'fa:history',
             path: '/account/:entityId/audit',
             access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
             items: []
@@ -451,11 +451,11 @@ module.exports = {
           {
             id: 'account-provisioning',
             type: 'TAB',
-            labelKey: 'acc:content.accounts.label',
-            titleKey: 'acc:content.accounts.title',
+            labelKey: 'acc:content.accounts.detail.tabs.provisioning',
+            titleKey: 'acc:content.accounts.detail.tabs.provisioning',
             order: 15,
             priority: 0,
-            icon: 'fa:external-link',
+            icon: 'fa:circle-o',
             path: '/account/:entityId/provisioning',
             access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
             items: []

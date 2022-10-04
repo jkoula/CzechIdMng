@@ -26,6 +26,7 @@ public class SysProvisioningOperationFilter
 	public static final String PARAMETER_FROM = "from"; // created from
 	public static final String PARAMETER_TILL = "till"; // created till
 	public static final String PARAMETER_SYSTEM_ID = "systemId";
+	public static final String PARAMETER_ACCOUNT_ID = "accountId";
 	public static final String PARAMETER_OPERATION_TYPE = "operationType";
 	public static final String PARAMETER_ENTITY_TYPE = "entityType";
 	public static final String PARAMETER_RESULT_STATE = "resultState";
@@ -75,7 +76,15 @@ public class SysProvisioningOperationFilter
 	public void setSystemId(UUID systemId) {
 		set(PARAMETER_SYSTEM_ID, systemId);
 	}
-	
+
+	public UUID getAccountId() {
+		return getParameterConverter().toUuid(getData(), PARAMETER_ACCOUNT_ID);
+	}
+
+	public void setAccountId(UUID accountId) {
+		set(PARAMETER_ACCOUNT_ID, accountId);
+	}
+
 	public ProvisioningEventType getOperationType() {
 		return getParameterConverter().toEnum(getData(), PARAMETER_OPERATION_TYPE, ProvisioningEventType.class);
 	}

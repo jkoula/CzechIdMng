@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
+import Badge from '@material-ui/core/Badge';
+import InputLabel from '@material-ui/core/InputLabel';
 //
 import { Basic, Utils, Managers } from 'czechidm-core';
 import AccountManager from '../../redux/AccountManager';
@@ -29,110 +31,17 @@ class AccountDetail extends Basic.AbstractContent {
   }
 
   getContentKey() {
-    return 'acc:content.accounts';
+    return 'acc:content.accounts.detail';
   }
 
   componentDidMount() {
     super.componentDidMount();
     //
     const { entityId } = this.props.match.params;
-    const { isNew, entity } = this.props;
     //
-    if (isNew) {
-      this.context.store.dispatch(manager.receiveEntity(entityId, entity || {}, null, () => {
-        // this.refs.host.focus();
-      }));
-    } else {
-      this.getLogger().debug(`[FormDetail] loading entity detail [id:${entityId}]`);
-      this.context.store.dispatch(manager.fetchEntity(entityId, null, () => {
-        // this.refs.host.focus();
-      }));
-      // load values from eav
-      if (entity) {
-        manager.getService()
-          .getFormValues(entityId, entity.formDefinition)
-          .then(eavValues => {
-            // transform values from connector object to array, merge with eavs
-            manager.getService()
-              .getConnectorObject(entityId)
-              .then(json => {
-                var key = 0;
-                const values = [];
-                if (json) {
-                  json.attributes.forEach(item => {
-                    eavValues.values.forEach(eavValue => {
-                      let value;
-                      if (item.values) {
-                        // TODO solve multivalue
-                        value = item.values[0];
-                      }
-
-                      let overridenValue;
-                      if (eavValue._embedded.formAttribute.code === item.name) {
-                        overridenValue = eavValue.value;
-                      }
-
-                      const valuetoInsert = {
-                        key: key,
-                        name: item.name,
-                        value: value,
-                        overridenValue: overridenValue
-                      }
-                      values[key] = valuetoInsert;
-                      key++;
-                    });
-                  });
-                }
-
-                this.setState({
-                  values: values,
-                  originalValues: [...values]
-                });
-              })
-              .catch(error => {
-                this.addError(error);
-              });
-          })
-          .catch(error => {
-            manager.getService()
-              .getConnectorObject(entityId)
-              .then(json => {
-                var key = 0;
-                const values = [];
-                if (json) {
-                  json.attributes.forEach(item => {
-                    let value;
-                    if (item.values) {
-                      // TODO solve multivalue
-                      value = item.values[0];
-                    }
-
-                    let overridenValue;
-
-                    const valuetoInsert = {
-                      key: key,
-                      name: item.name,
-                      value: value,
-                      overridenValue: overridenValue
-                    }
-                    values[key] = valuetoInsert;
-                    key++;
-                  });
-                }
-
-                this.setState({
-                  values: values,
-                  originalValues: [...values]
-                });
-              })
-              .catch(error => {
-                this.addError(error);
-              });
-          });
-
-      }
-    }
-    this.selectNavigationItems(['sys-systems-main-menu', 'accounts']);
+    this.getLogger().debug(`[FormDetail] loading entity detail [id:${entityId}]`);
+    this.refresh();
+    this.selectNavigationItems(['sys-systems-main-menu', 'accounts', 'account-detail']);
   }
 
   getNavigationKey() {
@@ -237,7 +146,8 @@ class AccountDetail extends Basic.AbstractContent {
     values[key] = {
       key: key,
       name: values[key].name,
-      value: event.target.value
+      value: event.target.value,
+      overridenValue: values[key].overridenValue,
     };
 
     this.setState({
@@ -248,16 +158,132 @@ class AccountDetail extends Basic.AbstractContent {
   }
 
   discard() {
-    this.context.history.goBack();
+    const { showEdit } = this.state
+
+    this.refs['confirm-discard'].show(
+      this.i18n('discard.text'),
+      this.i18n('discard.header')
+    ).then(() => {
+      this.setState({
+        showEdit: !showEdit,
+        changed: false
+      });
+    }, () => {
+      // nothing
+    });
+
+
+  }
+
+  refresh() {
+    const { entityId } = this.props.match.params;
+
+    this.setState({
+      _showLoading: true
+    }, () => {
+      this.context.store.dispatch(manager.fetchEntity(entityId, null, (entity) => {
+        manager.getService()
+          .getFormValues(entityId, entity.formDefinition)
+          .then(eavValues => {
+            // transform values from connector object to array, merge with eavs
+            manager.getService()
+              .getConnectorObject(entityId)
+              .then(json => {
+                var key = 0;
+                const values = [];
+                if (json) {
+                  json.attributes.forEach(item => {
+                    eavValues.values.forEach(eavValue => {
+                      let value;
+                      if (item.values) {
+                        // TODO solve multivalue
+                        value = item.values[0];
+                      }
+  
+                      let overridenValue;
+                      if (eavValue._embedded.formAttribute.code === item.name) {
+                        overridenValue = eavValue.value;
+                      }
+  
+                      const valuetoInsert = {
+                        key: key,
+                        name: item.name,
+                        value: value,
+                        overridenValue: overridenValue
+                      }
+                      values[key] = valuetoInsert;
+                      key++;
+                    });
+                  });
+                }
+  
+                this.setState({
+                  values: values,
+                  originalValues: [...values],
+                  _showLoading: false
+                });
+              })
+              .catch(error => {
+                this.addError(error);
+              });
+          })
+          .catch(error => {
+            manager.getService()
+              .getConnectorObject(entityId)
+              .then(json => {
+                var key = 0;
+                const values = [];
+                if (json) {
+                  json.attributes.forEach(item => {
+                    let value;
+                    if (item.values) {
+                      // TODO solve multivalue
+                      value = item.values[0];
+                    }
+  
+                    let overridenValue;
+  
+                    const valuetoInsert = {
+                      key: key,
+                      name: item.name,
+                      value: value,
+                      overridenValue: overridenValue
+                    }
+                    values[key] = valuetoInsert;
+                    key++;
+                  });
+                }
+  
+                this.setState({
+                  values: values,
+                  originalValues: [...values],
+                  _showLoading: false
+                });
+              })
+              .catch(error => {
+                this.addError(error);
+              });
+          });
+      }));
+    });
   }
 
   render() {
-    const { uiKey, entity, showLoading, _permissions } = this.props;
-    const { values, showEdit, changed } = this.state;
+    const { entity } = this.props;
+    const { values, showEdit, changed, _showLoading } = this.state;
 
     //
     return (
       <form onSubmit={this.save.bind(this)}>
+        <Basic.Confirm ref="confirm-discard" level="danger">
+          <Basic.Div style={{ marginTop: 20 }}>
+            <Basic.AbstractForm ref="discard-form" uiKey="confirm-discard" >
+              <Basic.Alert
+                level="info"
+                text={this.i18n('discard.help')} />
+            </Basic.AbstractForm>
+          </Basic.Div>
+        </Basic.Confirm>
         <Basic.Panel
           className={
             classnames({
@@ -288,7 +314,8 @@ class AccountDetail extends Basic.AbstractContent {
                     key="add_button"
                     className="btn-xs"
                     icon="fa:sync"
-                    rendered={!showEdit}>
+                    rendered={!showEdit}
+                    onClick={this.refresh.bind(this)}>
                     {'refresh'}
                   </Basic.Button>
                   <Basic.Button
@@ -341,17 +368,27 @@ class AccountDetail extends Basic.AbstractContent {
               </Grid>
             </Grid>
           </Basic.Div>
-          <Basic.PanelHeader text={Utils.Entity.isNew(entity) ? this.i18n('create.header') : this.i18n('detail.title')} />
-          <Basic.PanelBody style={{ paddingTop: 10, paddingBottom: 20 }}>
+          <Basic.PanelHeader text={this.i18n('title')} />
+          <Basic.PanelBody style={{ paddingTop: 30 }} showLoading={_showLoading}>
             <Grid container spacing={1}>
               <Grid container item xs={12} spacing={3}>
                 {
                   values.map(item => (
                     <Grid item xs={4}>
-                      <p className='account-detail-label'>{item.name}</p>
+                      <InputLabel style={{ fontSize: 'small', paddingBottom: 10 }}>
+                        {item.name}
+                      </InputLabel>
                       {showEdit
-                        ? <TextField onChange={(e) => this.valueChange(e, item.key)} id="outlined-basic" variant="outlined" defaultValue={(item.overridenValue ? item.overridenValue : item.value)} size="small" style={{ marginTop: -10 }} />
-                        : <p className={item.overridenValue ? 'account-detail-overriden' : ''}>{item.overridenValue ? item.overridenValue : item.value}</p>
+                        ?
+                        <div>
+                          <TextField onChange={(e) => this.valueChange(e, item.key)} id="outlined-basic" defaultValue={(item.overridenValue ? item.overridenValue : item.value)} size="small" style={{ marginTop: -10 }} />
+                          <Basic.Icon style={{ marginLeft: 5 }} level='warning' value='fa:unlink' rendered={item.overridenValue ? true : false} />
+                        </div>
+                        :
+                        <div>
+                          <p style={{ fontSize: 16, marginTop: -8, marginRight: 10, display: 'inline-block' }}>{item.overridenValue ? item.overridenValue : item.value}</p>
+                          <Basic.Icon style={{ marginLeft: 5 }} level='warning' value='fa:unlink' rendered={item.overridenValue ? true : false} />
+                        </div>
                       }
                     </Grid>
                   ))
