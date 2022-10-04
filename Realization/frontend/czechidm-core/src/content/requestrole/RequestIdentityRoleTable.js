@@ -900,7 +900,6 @@ RequestIdentityRoleTable.defaultProps = {
   ])
 };
 function select(state, component) {
-  console.log(component, "COMPONENTpppp");
   return {
     columns: component.columns || ConfigurationManager.getPublicValueAsArray(
       state,
