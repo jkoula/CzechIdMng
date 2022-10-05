@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.service.impl.adapter;
 
 import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
@@ -38,7 +39,10 @@ public class DefaultAccountConceptRoleAdapter extends AbstractRoleAssignmentConc
     @Override
     protected IdmRequestIdentityRoleDto roleAssignmentToReqIdentityRole(AccAccountRoleAssignmentDto roleAssignment) {
         IdmRequestIdentityRoleDto result = new IdmRequestIdentityRoleDto();
-        result.setOwnerUuid(roleAssignment.getAccount());
+        result.setOwnerUuid(roleAssignment.getAccAccount());
+        result.setAssignmentType(AccAccountConceptRoleRequestDto.class);
+        result.setOwnerType(AccAccountDto.class);
+        result.getEmbedded().putAll(roleAssignment.getEmbedded());
         return result;
     }
 

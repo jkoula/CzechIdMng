@@ -22,8 +22,8 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
   }
 
   createEntity(entity, uiKey = null, cb = null) {
-    if (entity) {
-      entity.assignmentType = "eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto"
+    if (entity && !entity.assignmentType) {
+      entity.assignmentType = RequestIdentityRoleManager.ENTITY_TYPE
     }
     return super.createEntity(entity, uiKey, cb)
   }
@@ -139,3 +139,4 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
      };
    }
 }
+RequestIdentityRoleManager.ENTITY_TYPE = "eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto";

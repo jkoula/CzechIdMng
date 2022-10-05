@@ -1,14 +1,9 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRequestIdentityRoleService;
@@ -18,7 +13,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
-import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.rest.AbstractBaseDtoService;
@@ -27,7 +21,6 @@ import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,12 +30,9 @@ import org.springframework.util.Assert;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.ADD;
-import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.UPDATE;
 
 /**
  * Default implementation of service for search and processing changes in assigned identity roles
@@ -113,13 +103,13 @@ public class DefaultIdmRequestIdentityRoleService extends
 		if (shouldLoadAssignedRoles(copyFilter, returnOnlyChanges)) {
 			resources.add(roleAssignmentManager);
 		}
-
+		copyFilter.setAddPermissions(true);
 		return new MultiSourcePagedResource<>(resources, modelMapper).find(copyFilter, pageable, permission);
 
 	}
 
 	private static boolean shouldLoadAssignedRoles(IdmRequestIdentityRoleFilter filter, boolean returnOnlyChanges) {
-		return !returnOnlyChanges && filter.getIdentityId() != null;
+		return !returnOnlyChanges && filter.getIdentity() != null;
 	}
 
 	@Override

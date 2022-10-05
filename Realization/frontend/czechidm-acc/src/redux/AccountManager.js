@@ -2,6 +2,7 @@ import Immutable from 'immutable';
 
 import { Managers } from 'czechidm-core';
 import { AccountService } from '../services';
+import RequestAccountRoleManager from "./RequestAccountRoleManager";
 
 const service = new AccountService();
 
@@ -57,4 +58,5 @@ export default class AccountManager extends Managers.FormableEntityManager {
     }
 }
 
+AccountManager.ENTITY_TYPE = "eu.bcvsolutions.idm.acc.dto.AccAccountDto";
 AccountManager.UI_KEY_SUPPORTED_TYPES = 'account-wizards';

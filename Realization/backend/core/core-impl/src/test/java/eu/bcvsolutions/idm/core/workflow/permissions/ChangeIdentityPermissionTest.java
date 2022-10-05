@@ -1486,7 +1486,7 @@ public class ChangeIdentityPermissionTest extends AbstractCoreWorkflowIntegratio
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
 		IdmRequestIdentityRoleDto requestIdentityRoleDto = requestIdentityRoles.get(0);
@@ -1505,7 +1505,7 @@ public class ChangeIdentityPermissionTest extends AbstractCoreWorkflowIntegratio
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
 		requestIdentityRoleDto = requestIdentityRoles.get(0);
@@ -1555,7 +1555,7 @@ public class ChangeIdentityPermissionTest extends AbstractCoreWorkflowIntegratio
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
 		IdmRequestIdentityRoleDto requestIdentityRoleDto = requestIdentityRoles.get(0);
@@ -1580,7 +1580,7 @@ public class ChangeIdentityPermissionTest extends AbstractCoreWorkflowIntegratio
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
 		requestIdentityRoleDto = requestIdentityRoles.get(0);
@@ -1624,7 +1624,7 @@ public class ChangeIdentityPermissionTest extends AbstractCoreWorkflowIntegratio
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
 		requestIdentityRoleDto = requestIdentityRoles.get(0);
@@ -1687,7 +1687,7 @@ public class ChangeIdentityPermissionTest extends AbstractCoreWorkflowIntegratio
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentityId(applicant.getId());
+		requestIdentityRoleFilter.setIdentity(applicant.getId());
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		Assert.assertEquals(2, requestIdentityRoles.size());
 		Assert.assertTrue(requestIdentityRoles.stream().anyMatch(rir -> rir.getRole().equals(roleOne.getId())

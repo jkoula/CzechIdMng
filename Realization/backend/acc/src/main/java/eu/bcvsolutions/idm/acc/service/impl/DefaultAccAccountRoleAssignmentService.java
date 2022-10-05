@@ -75,7 +75,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
 
     @Override
     public List<AccAccountRoleAssignmentDto> findByAccountId(UUID id) {
-        return toDtos(accAccountRoleRepository.findByAccount_Id(id), false);
+        return toDtos(accAccountRoleRepository.findByAccAccount_Id(id), false);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
             text = text.toLowerCase();
             predicates.add(
                     builder.like(
-                            builder.lower(root.get(AccAccountRoleAssignment_.account).get(AccAccount_.uid)),
+                            builder.lower(root.get(AccAccountRoleAssignment_.accAccount).get(AccAccount_.uid)),
                             "%" + text + "%")
             );
         }
@@ -116,7 +116,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
             identityAccountSubquery.select(identityAccountRoot);
             identityAccountSubquery.where(
                     builder.and(
-                            builder.equal(identityAccountRoot.get(AccIdentityAccount_.account), root.get(AccAccountRoleAssignment_.account)),
+                            builder.equal(identityAccountRoot.get(AccIdentityAccount_.account), root.get(AccAccountRoleAssignment_.accAccount)),
                             builder.equal(identityAccountRoot.get(AccIdentityAccount_.identity).get(AbstractEntity_.id), identityId)
                     )
             );

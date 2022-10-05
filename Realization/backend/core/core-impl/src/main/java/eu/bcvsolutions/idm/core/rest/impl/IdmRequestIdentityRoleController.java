@@ -185,7 +185,7 @@ public class IdmRequestIdentityRoleController
 	@Override
 	protected IdmRequestIdentityRoleFilter toFilter(MultiValueMap<String, Object> parameters) {
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter(parameters);
-		filter.setIdentityId(getParameterConverter().toUuid(parameters, "identityId"));
+		filter.setIdentity(getParameterConverter().toUuid(parameters, "identityId"));
 		filter.setIdentityContractId(getParameterConverter().toUuid(parameters, "identityContractId"));
 		filter.setRoleId(getParameterConverter().toUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID));
 		filter.setRoleText(getParameterConverter().toString(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_TEXT));

@@ -566,7 +566,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Override
 	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to) {
 		AccAccountRoleAssignmentDto roleAssignmentDto = new AccAccountRoleAssignmentDto();
-		roleAssignmentDto.setAccount(accAccountDto.getId());
+		roleAssignmentDto.setAccAccount(accAccountDto.getId());
 		roleAssignmentDto.setRole(role.getId());
 		roleAssignmentDto.setValidFrom(from);
 		roleAssignmentDto.setValidTill(to);

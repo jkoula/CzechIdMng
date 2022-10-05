@@ -1,8 +1,6 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
-import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -40,7 +38,6 @@ import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmConceptRoleRequestRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.adapter.DefaultRequestRoleConceptAdapter;
-import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
@@ -58,7 +55,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,7 +200,7 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
             predicates.add(builder.equal(root.get(IdmConceptRoleRequest_.identityContract).get(IdmIdentityContract_.id), filter.getIdentityContractId()));
         }
 
-        if (filter.getIdentityId() != null) {
+        if (filter.getIdentity() != null) {
             Subquery<IdmIdentityContract> contractSub = query.subquery(IdmIdentityContract.class);
             final Root<IdmIdentityContract> contractRoot = contractSub.from(IdmIdentityContract.class);
             contractSub.select(contractRoot);
@@ -212,7 +208,7 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
             contractSub.where(
                     builder.and(
                         //builder.equal(root.get(IdmConceptRoleRequest_.identityContract), contractSub),
-                        builder.equal(contractRoot.get(IdmIdentityContract_.identity).get(AbstractEntity_.id), filter.getIdentityId())
+                        builder.equal(contractRoot.get(IdmIdentityContract_.identity).get(AbstractEntity_.id), filter.getIdentity())
             ));
             predicates.add(builder.and(
                     builder.exists(contractSub),

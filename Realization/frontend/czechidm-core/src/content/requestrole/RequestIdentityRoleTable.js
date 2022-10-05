@@ -1,5 +1,5 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 //
@@ -14,11 +14,14 @@ import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
+import ComponentService from "../../services/ComponentService";
+
 import { ConfigurationManager } from '../../redux';
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const requestIdentityRoleManager = new RequestIdentityRoleManager();
 const roleRequestManager = new RoleRequestManager();
 const identityContractManager = new IdentityContractManager();
+const componentService = new ComponentService();
 
 /**
  * Table for keep identity role concepts.
@@ -409,7 +412,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
             readOnly
               || !manualRole
               || !value.role
-              || !value.identityContract
+              || !value.ownerUuid
               || !this._canChangePermissions(value)
           }
           role="group"
@@ -461,6 +464,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       identityId,
       showRowSelection,
       showEnvironment,
+      requestId,
       columns
     } = this.props;
     const {
@@ -474,6 +478,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     let forceSearchParameters = new SearchParameters();
     if (request) {
       forceSearchParameters = forceSearchParameters.setFilter('roleRequestId', request.id);
+    }
+    if (requestId) {
+      forceSearchParameters = forceSearchParameters.setFilter('roleRequestId', requestId);
     }
     if (identityId) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
@@ -629,9 +636,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               rendered={showEnvironment}
               face="text"
               header={ this.i18n('entity.Role.baseCode.label') }
-              cell={ 
-                ({ rowIndex, data }) => 
-                  data[rowIndex]._embedded.role.baseCode 
+              cell={
+                ({ rowIndex, data }) =>
+                  data[rowIndex]._embedded.role.baseCode
               }
               sort/>
             <Advanced.Column
@@ -653,9 +660,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               sortProperty="role.environment"
               face="text"
               header={ this.i18n('entity.Role.environment.label') }
-              cell={ 
-                ({ rowIndex, data }) => 
-                  data[rowIndex]._embedded.role.environment 
+              cell={
+                ({ rowIndex, data }) =>
+                  data[rowIndex]._embedded.role.environment
               }
               sort/>
             <Advanced.Column
@@ -669,8 +676,10 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               header={ this.i18n('entity.IdentityRole.identityContract.title') }
               cell={
                 ({rowIndex, data}) => {
-                  const contract = data[rowIndex]._embedded.identityContract;
-                  if (!contract) {
+                  const manager = componentService.getManagerForConceptByOwnerType(data[rowIndex].ownerType)
+
+                  const owner = manager.getEmbeddedOwner(data[rowIndex]);
+                  if (!owner) {
                     return (
                       <Basic.Label
                         level="default"
@@ -678,10 +687,13 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                         title={ this.i18n('content.audit.revision.deleted') }/>
                     );
                   }
+                  //
+                  const componentInfo = componentService.getConcepComponentByOwnerType(data[rowIndex].ownerType)
+                  console.log("oooo", componentInfo, data[rowIndex])
                   return (
-                    <Advanced.IdentityContractInfo
-                      entityIdentifier={ contract.id }
-                      entity={ contract }
+                    <componentInfo.ownerInfoComponent
+                      entityIdentifier={ owner.id }
+                      entity={ owner }
                       showIdentity={ false }
                       showIcon
                       face="popover" />
@@ -718,17 +730,17 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               header={this.i18n('entity.Role.description')}
               face="text"
               className='descriptionColumn'
-              cell={ 
-                ({ rowIndex, data }) => 
-                  data[rowIndex]._embedded.role.description 
+              cell={
+                ({ rowIndex, data }) =>
+                  data[rowIndex]._embedded.role.description
               }/>
             <Advanced.Column
               property="priority"
               header={this.i18n('entity.Role.priority')}
               face="text"
-              cell={ 
-                ({ rowIndex, data }) => 
-                  data[rowIndex]._embedded.role.priority 
+              cell={
+                ({ rowIndex, data }) =>
+                  data[rowIndex]._embedded.role.priority
               }/>
             <Advanced.Column
               property="directRole"

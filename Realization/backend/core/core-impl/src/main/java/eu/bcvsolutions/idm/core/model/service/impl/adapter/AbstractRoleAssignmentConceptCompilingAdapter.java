@@ -60,7 +60,7 @@ public abstract class AbstractRoleAssignmentConceptCompilingAdapter<D extends Ab
         IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
 
         identityRoleFilter.setIdentityContractId(filter.getIdentityContractId());
-        identityRoleFilter.setIdentityId(filter.getIdentityId());
+        identityRoleFilter.setIdentityId(filter.getIdentity());
         identityRoleFilter.setRoleId(filter.getRoleId());
         identityRoleFilter.setRoleText(filter.getRoleText());
         identityRoleFilter.setRoleEnvironments(filter.getRoleEnvironments());
@@ -87,6 +87,7 @@ public abstract class AbstractRoleAssignmentConceptCompilingAdapter<D extends Ab
         F conceptFilter = conceptService.getFilter();
         conceptFilter.setRoleAssignmentUuids(identityRoleIds);
         conceptFilter.setRoleRequestId(filter.getRoleRequestId());
+        conceptFilter.setAddPermissions(true);
 
         List<C> conceptsForThisPage = conceptService.find(conceptFilter, null, permission).getContent();
         conceptsForThisPage.stream() //
@@ -152,6 +153,7 @@ public abstract class AbstractRoleAssignmentConceptCompilingAdapter<D extends Ab
             request.getEmbedded().put(IdmIdentityRole_.identityContract.getName(),
                     identityRole.getEmbedded().get(IdmIdentityRole_.identityContract.getName()));
             request.setPermissions(identityRole.getPermissions());
+
 
             if (filter.isIncludeEav()) {
                 IdmFormInstanceDto formInstanceDto  = getFormInstance(identityRole);

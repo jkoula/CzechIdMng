@@ -1002,6 +1002,17 @@ module.exports = {
       type: 'universal-search-type',
       entityType: ['role-universal-search-type'],
       component: require('./src/content/unisearch/RoleUniversalSearchType').default
+    },
+    {
+      id: 'identity-role-manager',
+      type: 'role-concept-manager',
+      priority: 0,
+      entityType: [require('./src/redux').ConceptRoleRequestManager.ENTITY_TYPE],
+      manager: require('./src/redux').ConceptRoleRequestManager,
+      ownerType: require('./src/redux').IdentityContractManager.ENTITY_TYPE,
+      ownerManager: require('./src/redux').IdentityContractManager,
+      ownerSelectComponent: require('./src/components/advanced/IdentityContractSelect/IdentityContractSelect').default,
+      ownerInfoComponent: require('./src/components/advanced/IdentityContractInfo/IdentityContractInfo').default
     }
   ]
 };

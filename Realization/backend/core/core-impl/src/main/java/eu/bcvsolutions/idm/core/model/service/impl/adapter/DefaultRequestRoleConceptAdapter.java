@@ -12,30 +12,24 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleSystemFilter;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadDtoService;
 import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
-import eu.bcvsolutions.idm.core.model.service.impl.DefaultIdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
 import org.springframework.util.Assert;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.ADD;
@@ -81,7 +75,7 @@ public class DefaultRequestRoleConceptAdapter<C extends AbstractConceptRoleReque
         if (data == null) {
             return Stream.<IdmRequestIdentityRoleDto>builder().build();
         }
-        final UUID identityId = originalFilter.getIdentityId();
+        final UUID identityId = originalFilter.getIdentity();
         LOG.debug(MessageFormat.format("Start searching duplicates for identity [{1}].", identityId));
         Assert.notNull(identityId, "Identity identifier is required.");
 
@@ -117,6 +111,7 @@ public class DefaultRequestRoleConceptAdapter<C extends AbstractConceptRoleReque
     @SuppressWarnings("unchecked")
     private IdmRequestIdentityRoleDto conceptToRequestIdentityRole(C concept) {
         IdmRequestIdentityRoleDto result = modelMapper.map(concept, IdmRequestIdentityRoleDto.class);
+        result.setAssignmentType(conceptRoleRequestService.getType());
         // load permission from related contract or role (OR)
         if (originalFilter != null // from find method only
                 && ADD == concept.getOperation() // newly requested role only

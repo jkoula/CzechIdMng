@@ -10,9 +10,7 @@ import org.springframework.util.MultiValueMap;
  * @author Vít Švanda
  */
 public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
-	
-    private UUID identityId;
-    private boolean includeEav = false;
+	private boolean includeEav = false;
     private boolean onlyChanges = false;
     private boolean includeCandidates = false;
     private boolean includeCrossDomainsSystemsCount = false;
@@ -24,14 +22,6 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
     public IdmRequestIdentityRoleFilter(MultiValueMap<String, Object> data) {
     	super(data);
     }
-
-	public UUID getIdentityId() {
-		return identityId;
-	}
-
-	public void setIdentityId(UUID identityId) {
-		this.identityId = identityId;
-	}
 
 	public boolean isIncludeEav() {
 		return includeEav;

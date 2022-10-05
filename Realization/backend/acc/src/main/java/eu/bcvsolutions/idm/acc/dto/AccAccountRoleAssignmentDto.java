@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.dto;
 
+import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import org.springframework.hateoas.core.Relation;
 
@@ -12,7 +13,8 @@ import java.util.UUID;
 public class AccAccountRoleAssignmentDto extends AbstractRoleAssignmentDto {
 
     private static final long serialVersionUID = 1L;
-    private UUID account;
+    @Embedded(dtoClass = AccAccountDto.class)
+    private UUID accAccount;
 
     public AccAccountRoleAssignmentDto(UUID identityRoleId) {
         super(identityRoleId);
@@ -21,16 +23,16 @@ public class AccAccountRoleAssignmentDto extends AbstractRoleAssignmentDto {
     public AccAccountRoleAssignmentDto() {
     }
 
-    public UUID getAccount() {
-        return account;
+    public UUID getAccAccount() {
+        return accAccount;
     }
 
-    public void setAccount(UUID account) {
-        this.account = account;
+    public void setAccAccount(UUID account) {
+        this.accAccount = account;
     }
 
     @Override
     public UUID getEntity() {
-        return getAccount();
+        return getAccAccount();
     }
 }

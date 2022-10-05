@@ -2,11 +2,12 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
 import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
@@ -14,16 +15,27 @@ import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import org.apache.commons.collections.MultiMap;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.spi.ConditionalConverter;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,15 +48,18 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
 
     private final Map<Class<? extends AbstractConceptRoleRequestDto>, IdmGeneralConceptRoleRequestService> conceptServices;
     private final ModelMapper modelMapper;
+
+    private final FilterManager filterManager;
     @Autowired
     public DefaultIdmConceptRoleRequestManager(
             List<IdmGeneralConceptRoleRequestService<?, ?, ?>> conceptServices,
-            ModelMapper modelMapper) {
+            ModelMapper modelMapper, FilterManager filterManager) {
         super(modelMapper, conceptServices);
         this.conceptServices = conceptServices.stream()
                 .collect(Collectors.toMap(IdmGeneralConceptRoleRequestService::getType,
                 idmGeneralConceptRoleRequestService -> idmGeneralConceptRoleRequestService));
         this.modelMapper = modelMapper;
+        this.filterManager = filterManager;
     }
 
     @Override
@@ -114,6 +129,9 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
         // TODO comment wtf
         List<AdaptableService<AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleDto>> services = new ArrayList<>();
         conceptServices.values().forEach(services::add);
+
+
+
         return new MultiSourcePagedResource<>(services, modelMapper);
     }
 }

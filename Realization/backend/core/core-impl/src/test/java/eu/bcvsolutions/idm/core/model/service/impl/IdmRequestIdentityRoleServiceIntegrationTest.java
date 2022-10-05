@@ -440,7 +440,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmRoleDto role = this.getHelper().createRole();
 
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
-		filter.setIdentityId(identity.getId());
+		filter.setIdentity(identity.getId());
 		final List<IdmIdentityRoleDto> allByIdentity = identityRoleService.findAllByIdentity(identity.getId());
 
 		// We expecting only one already assigned identity-role
@@ -472,7 +472,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// We expecting two items, one assigned identity-role and one adding concept
 		IdmConceptRoleRequestFilter crf = new IdmConceptRoleRequestFilter();
-		crf.setIdentityId(identity.getId());
+		crf.setIdentity(identity.getId());
 		crf.setRoleRequestId(createdRequestIdentityRole.getRoleRequest());
 		crf.setIdentityRoleIsNull(true);
 		final Page<IdmConceptRoleRequestDto> idmConceptRoleRequestDtos = conceptRoleRequestService.find(crf, null);
@@ -522,7 +522,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmRoleDto role = this.getHelper().createRole();
 
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
-		filter.setIdentityId(identity.getId());
+		filter.setIdentity(identity.getId());
 		filter.setRoleText(assignedRole.getCode());
 
 		// We expecting only one already assigned identity-role
@@ -608,7 +608,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertNotNull(request);
 
 		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
-		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setIdentity(identity.getId());
 		filterRequestIdentityRole.setRoleRequestId(request.getId());
 		// Include EAV attributes
 		filterRequestIdentityRole.setIncludeEav(true);
@@ -682,7 +682,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		getHelper().executeRequest(request, false, true);
 
 		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
-		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setIdentity(identity.getId());
 		filterRequestIdentityRole.setRoleRequestId(request.getId());
 		// Include EAV attributes
 		filterRequestIdentityRole.setIncludeEav(true);
@@ -781,7 +781,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		getHelper().executeRequest(request, false, true);
 
 		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
-		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setIdentity(identity.getId());
 		filterRequestIdentityRole.setRoleRequestId(request.getId());
 		// Include EAV attributes
 		filterRequestIdentityRole.setIncludeEav(true);

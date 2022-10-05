@@ -1088,7 +1088,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeEav(true);
 		requestIdentityRoleFilter.setOnlyChanges(true);
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		requestIdentityRoleFilter.setRoleRequestId(roleRequestDtoOne.getId());
 
 		List<IdmRequestIdentityRoleDto> requestIdentityRoleDtos = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
@@ -1144,7 +1144,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeEav(true);
 		requestIdentityRoleFilter.setOnlyChanges(true);
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		requestIdentityRoleFilter.setRoleRequestId(roleRequestDtoTwo.getId());
 
 		requestIdentityRoleDtos = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
@@ -1158,7 +1158,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		// Check again requestOne!
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeEav(true);
-		requestIdentityRoleFilter.setIdentityId(identity.getId());
+		requestIdentityRoleFilter.setIdentity(identity.getId());
 		requestIdentityRoleFilter.setOnlyChanges(true);
 		requestIdentityRoleFilter.setRoleRequestId(roleRequestDtoOne.getId());
 

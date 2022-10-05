@@ -1,3 +1,4 @@
+const RequestAccountRoleManager = require("./src/redux/RequestAccountRoleManager");
 module.exports = {
   id: 'acc',
   name: 'Account managment',
@@ -36,6 +37,13 @@ module.exports = {
       entityType: ['schema', 'SysSchemaObjectClass', 'SysSchemaObjectClassDto'],
       component: require('./src/components/SchemaInfo/SchemaInfo').default,
       manager: require('./src/redux').SchemaObjectClassManager
+    },
+    {
+      id: 'account-info',
+      type: 'entity-info',
+      entityType: ['account', 'AccountDto'],
+      component: require('./src/components/AccountInfo/AccountInfo').default,
+      manager: require('./src/redux').AccountManager
     },
     {
       id: 'attribute-mapping-info',
@@ -303,6 +311,17 @@ module.exports = {
       entityType: ['account'],
       searchInFields: [],
       manager: require('./src/redux').AccountManager
+    },
+    {
+      id: 'account-role-manager',
+      type: 'role-concept-manager',
+      priority: 0,
+      entityType: [require('./src/redux').RequestAccountRoleManager.ENTITY_TYPE],
+      manager: require('./src/redux').RequestAccountRoleManager,
+      ownerType: require('./src/redux').AccountManager.ENTITY_TYPE,
+      ownerManager: require('./src/redux').AccountManager,
+      ownerSelectComponent: require('./src/components/AccountSelect/AccountSelect').default,
+      ownerInfoComponent: require('./src/components/AccountInfo/AccountInfo').default
     }
   ]
 };

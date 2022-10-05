@@ -38,7 +38,7 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
     @NotNull
     @ManyToOne(optional = false)
     @JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private AccAccount account;
+    private AccAccount accAccount;
 
     public String getExternalId() {
         return externalId;
@@ -48,22 +48,22 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
         this.externalId = externalId;
     }
 
-    public AccAccount getAccount() {
-        return account;
+    public AccAccount getAccAccount() {
+        return accAccount;
     }
 
-    public void setAccount(AccAccount account) {
-        this.account = account;
+    public void setAccAccount(AccAccount account) {
+        this.accAccount = account;
     }
 
     @Override
     public String getOwnerId() {
-        return getAccount().getId().toString();
+        return getAccAccount().getId().toString();
     }
 
     @Override
     public String getOwnerCode() {
-        return getAccount().getUid();
+        return getAccAccount().getUid();
     }
 
     @Override

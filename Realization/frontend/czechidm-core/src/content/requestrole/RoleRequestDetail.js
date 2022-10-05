@@ -316,15 +316,18 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       _incompatibleRolesLoading,
       canExecute,
       showEnvironment,
-      _showDescription
+      _showDescription,
+      entityId
     } = this.props;
     const {errorOccurred} = this.state;
+    const _entityId = entityId || this.props.match.params.entityId;
     //
     const isNew = this._getIsNew();
     let request = isNew ? this.state.request : _request;
     if (!request) {
       request = this.state.request;
     }
+    console.log("eeeee render req", isNew, request, _permissions)
     const requestForForm = _.merge({}, request);
     // Form is rendered if data are changed, but we don't want rerenderd the form if only some
     // concept was changed (prevent lost other changes in form ... filled description for example).
@@ -494,6 +497,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
               </Basic.ContentHeader>
               <RequestIdentityRoleTable
                 ref="conceptTable"
+                requestId={_entityId}
                 request={request}
                 showEnvironment={showEnvironment}
                 incompatibleRoles={ _incompatibleRoles }

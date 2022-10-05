@@ -2,20 +2,37 @@ package eu.bcvsolutions.idm.core.model.service.util;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.EmptyFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.spi.ConditionalConverter;
+import org.modelmapper.spi.MappingContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -146,6 +163,7 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
             if (modelMapper == null) {
                 throw new IllegalArgumentException("No model mapper specified. This needs it to translate filters.");
             }
+
             return new MultiSourcePagedResource<>(adaptableServices, modelMapper);
         }
 

@@ -66,7 +66,7 @@ public class SysAccountRoleAssignmentControllerRestTest extends AbstractRoleAssi
     @Override
     protected AccAccountRoleAssignmentDto prepareDto() {
         AccAccountRoleAssignmentDto dto = new AccAccountRoleAssignmentDto();
-        dto.setAccount(accHelper.createIdentityAccount(accHelper.createTestResourceSystem(true), getHelper().createIdentity()).getAccount());
+        dto.setAccAccount(accHelper.createIdentityAccount(accHelper.createTestResourceSystem(true), getHelper().createIdentity()).getAccount());
         dto.setRole(getHelper().createRole().getId());
         dto.setValidFrom(LocalDate.now());
         dto.setValidTill(LocalDate.now().plusDays(1));
@@ -119,13 +119,13 @@ public class SysAccountRoleAssignmentControllerRestTest extends AbstractRoleAssi
     @Override
     protected AccAccountRoleAssignmentDto getEmptyRoleAssignment(UUID id) {
         AccAccountRoleAssignmentDto dto = new AccAccountRoleAssignmentDto();
-        dto.setAccount(id);
+        dto.setAccAccount(id);
         return dto;
     }
 
     @Override
     protected String getOwnerCode(AccAccountRoleAssignmentDto roleAssignment) {
-        final AccAccountDto accAccountDto = accountService.get(roleAssignment.getAccount());
+        final AccAccountDto accAccountDto = accountService.get(roleAssignment.getAccAccount());
         return accAccountDto.getUid();
     }
 

@@ -51,31 +51,35 @@ export default class ComponentService {
    * @return {object}            component
    */
   getComponentByEntityType(type, entityType) {
-    if (!type || !entityType) {
+    return this.getComponentByAttributeValue(type, entityType, "entityType");
+  }
+
+  getComponentByAttributeValue(type, attributeValue, attributeName) {
+    if (!type || !attributeValue || ! attributeName) {
       LOGGER.warn('[ComponentService] Compontent type and antity type is required');
       return null;
     }
     //
     const components = this.getComponentDefinitions(type)
-      .filter(component => {
-        if (!component.entityType) {
-          return false;
-        }
-        // multiple types
-        if (_.isArray(component.entityType)) {
-          for (const entityTypeItem of component.entityType) {
-            if (entityTypeItem.toLowerCase() === entityType.toLowerCase()) {
-              return true;
-            }
+        .filter(component => {
+          if (!component[attributeName]) {
+            return false;
           }
-          return false;
-        }
-        // single value
-        return component.entityType.toLowerCase() === entityType.toLowerCase();
-      })
-      .sort((one, two) => {
-        return (one.priority || 0) < (two.priority || 0);
-      });
+          // multiple types
+          if (_.isArray(component[attributeName])) {
+            for (const entityTypeItem of component[attributeName]) {
+              if (entityTypeItem.toLowerCase() === attributeValue.toLowerCase()) {
+                return true;
+              }
+            }
+            return false;
+          }
+          // single value
+          return component[attributeName].toLowerCase() === attributeValue.toLowerCase();
+        })
+        .sort((one, two) => {
+          return (one.priority || 0) < (two.priority || 0);
+        });
     //
     if (!components || components.size === 0) {
       return null;
@@ -165,6 +169,30 @@ export default class ComponentService {
     return this.getComponentByEntityType(ComponentService.UNIVERSAL_SEARCH_TYPE, entityType);
   }
 
+  getComponentForConceptType(conceptType) {
+    if (!conceptType) {
+      return null
+    }
+    return this.getComponentByEntityType(ComponentService.ROLE_CONCEPT_MANAGER, conceptType);
+  }
+
+  getRoleAssignmentComponents() {
+    return this.getComponentDefinitions(ComponentService.ROLE_CONCEPT_MANAGER)
+        .sort((one, two) => {
+          return (one.priority || 0) < (two.priority || 0);
+        });
+  }
+
+  getManagerForConceptByOwnerType(selectedOwnerType) {
+    const component = this.getComponentByAttributeValue(ComponentService.ROLE_CONCEPT_MANAGER, selectedOwnerType, "ownerType");
+    const ManagerType = component.manager;
+    return new ManagerType();
+  }
+
+  getConcepComponentByOwnerType(selectedOwnerType) {
+    return this.getComponentByAttributeValue(ComponentService.ROLE_CONCEPT_MANAGER, selectedOwnerType, "ownerType");
+  }
+
 }
 // reserved component types
 ComponentService.ENTITY_INFO_COMPONENT_TYPE = 'entity-info';
@@ -179,3 +207,4 @@ ComponentService.CONNECTOR_TYPE = 'connector-type';
 ComponentService.MODAL_COMPONENT_TYPE = 'modal';
 ComponentService.MONITORING_RESULT_BUTTON_COMPONENT_TYPE = 'monitoring-result-button';
 ComponentService.UNIVERSAL_SEARCH_TYPE = 'universal-search-type';
+ComponentService.ROLE_CONCEPT_MANAGER = 'role-concept-manager';
