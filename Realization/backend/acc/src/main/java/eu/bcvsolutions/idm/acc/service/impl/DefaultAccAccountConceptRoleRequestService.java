@@ -358,7 +358,10 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
 
     @Override
     protected AccAccountConceptRoleRequestDto requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto) {
-        return modelMapper.map(dto, AccAccountConceptRoleRequestDto.class);
+        final AccAccountConceptRoleRequestDto map = modelMapper.map(dto, AccAccountConceptRoleRequestDto.class);
+        map.setAccAccount(dto.getOwnerUuid());
+        map.setAccountRole(dto.getRoleAssignmentUuid());
+        return map;
     }
 
     @Override
@@ -369,7 +372,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     protected AccAccountConceptRoleRequestDto createEmptyConceptWithRoleAssignmentData(AccAccountRoleAssignmentDto roleAssignment) {
         AccAccountConceptRoleRequestDto conceptRoleRequest = new AccAccountConceptRoleRequestDto();
-        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccount());
+        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccAccount());
 
         return conceptRoleRequest;
     }
