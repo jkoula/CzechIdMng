@@ -666,7 +666,10 @@ public class DefaultFormService implements FormService {
 				// we using filled value only and set her into previous value => value id is preserved 
 				// the same value should not be updated
 				// confidential value is always updated - only new values are sent from client
-				if (newValue.isConfidential() || !previousValue.isEquals(newValue)) {
+
+				if (newValue.getValue() == null) {
+					formValueService.delete(previousValue, permission);
+				} else if (newValue.isConfidential() || !previousValue.isEquals(newValue)) {
 					UUID previousUuidValue = previousValue.getUuidValue();
 					// set value for the previous value
 					previousValue.setValues(newValue);

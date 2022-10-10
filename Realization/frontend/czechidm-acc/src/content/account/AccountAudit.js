@@ -46,7 +46,7 @@ class AccountAudit extends Basic.AbstractContent {
     //
     return (
       <div>
-        <Helmet title={ this.i18n('title') } />
+        <Helmet title={ this.i18n('tabs.audit') } />
         <EntityAuditTable
           uiKey={ `account-audit-table-${ entity.id }` }
           forceSearchParameters={ forceSearchParameters }/>

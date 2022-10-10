@@ -73,6 +73,17 @@
           "header": "Hodnoty nejsou uloženy",
           "text": "Všechny změny budou ztraceny",
           "help": "Hodnoty nebudou propsány do systému, všechny změny budou ztraceny"
+        },
+        "save": {
+          "header": "Uložit hodnoty",
+          "text": "Nové hodnoty budou uloženy",
+          "help": "Hodnoty budou propsány do koncového systému",
+          "success": "Účet {{record}} byl úspěšně uložen",
+          "no-change": "Nebyly provedeny žádné změny, není co uložit"
+        },
+        "override": {
+          "header": "Smazání ručně spravované hodnoty",
+          "text": "Ručně spravovaná hodnota bude nahrazena automatickým výpočtem pro daný atribut (mapování, transformační skript). Po akceptaci bude na detailu zobrazena automatická hodnota. Formuláře je nutné následně ještě uložit."
         }
       }
     },
