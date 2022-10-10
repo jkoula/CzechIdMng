@@ -328,7 +328,6 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     if (!request) {
       request = this.state.request;
     }
-    console.log("eeeee render req", isNew, request, _permissions)
     const requestForForm = _.merge({}, request);
     // Form is rendered if data are changed, but we don't want rerenderd the form if only some
     // concept was changed (prevent lost other changes in form ... filled description for example).
