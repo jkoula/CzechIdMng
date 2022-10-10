@@ -340,14 +340,14 @@ export class RoleConceptDetail extends Basic.AbstractContent {
           helpBlock={ this.i18n('entity.IdentityRole.roleSystem.help')}
           label={ this.i18n('entity.IdentityRole.roleSystem.label') }/>
 
-        <Basic.Tabs onSelect={this.handleTabSwitch} activeKey={this.state.selectedOwnerType}>
-
+        <Basic.Tabs  onSelect={this.handleTabSwitch} activeKey={selectedOwnerType}>
             {
                 components.map(component => {
                         const ManagerType = component.ownerManager;
                         const managerInstance = new ManagerType();
 
-                        return <Basic.Tab value={component.ownerType} title={component.ownerType}>
+                        return <Basic.Tab value={component.ownerType}
+                                          title={this.i18n(component.locale+'._type')}>
                             {
                                 component.ownerType === selectedOwnerType ? <component.ownerSelectComponent
                                     ref={component.ownerType}
@@ -379,38 +379,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
                     }
                 )
             }
-
-
-
-          {/*
-          <Basic.Tab value="account" title="bbb">
-            { selectedOwnerType === "account" &&
-                <AccountSelect
-                    ref="account"
-                    forceSearchParameters={
-                      new SearchParameters()
-                          .setFilter('identityId', identityUsername)
-                          .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
-                          .setFilter('_permission_operator', 'or')
-                    }
-                    defaultSearchParameters={
-                      new SearchParameters().clearSort()
-                    }
-                    pageSize={100}
-                    label={this.i18n('entity.IdentityRole.account.label')}
-                    placeholder={this.i18n('entity.IdentityRole.acount.placeholder')}
-                    helpBlock={this.i18n('entity.IdentityRole.account.help')}
-                    returnProperty={false}
-                    readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
-                    onChange={this._onChangeSelectOfContract.bind(this)}
-                    niceLabel={(account) => requestAccountRoleManager.getNiceLabel(account, false)}
-                    required
-                    useFirst
-                    clearable={false}/>
-            }
-
-          </Basic.Tab>*/}
-
         </Basic.Tabs>
 
 

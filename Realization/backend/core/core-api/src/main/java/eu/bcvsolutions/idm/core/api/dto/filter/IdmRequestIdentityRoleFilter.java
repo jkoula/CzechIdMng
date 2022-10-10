@@ -14,7 +14,8 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
     private boolean onlyChanges = false;
     private boolean includeCandidates = false;
     private boolean includeCrossDomainsSystemsCount = false;
-    
+
+	public static final String ONLY_ASSIGNMENTS_PARAMETER = "onlyAssignments";
     public IdmRequestIdentityRoleFilter() {
 		super();
 	}
@@ -22,6 +23,14 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
     public IdmRequestIdentityRoleFilter(MultiValueMap<String, Object> data) {
     	super(data);
     }
+
+	public boolean isOnlyAssignments() {
+		return getParameterConverter().toBoolean(getData(), ONLY_ASSIGNMENTS_PARAMETER, false);
+	}
+
+	public void setOnlyAssignments(boolean onlyAssignments) {
+		set(ONLY_ASSIGNMENTS_PARAMETER, onlyAssignments);
+	}
 
 	public boolean isIncludeEav() {
 		return includeEav;

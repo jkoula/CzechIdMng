@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.config.domain;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.utils.ReflectionUtils;
 import org.modelmapper.spi.ConditionalConverter;
@@ -19,13 +20,13 @@ import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.instantiateUsin
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public class DataFilterConverter implements ConditionalConverter<DataFilter, DataFilter> {
+public class DataFilterConverter implements ConditionalConverter<BaseFilter, BaseFilter> {
 
     @Override
-    public DataFilter convert(MappingContext<DataFilter, DataFilter> mappingContext) {
-        final DataFilter source = mappingContext.getSource();
-        final Class<DataFilter> destinationType = mappingContext.getDestinationType();
-        final DataFilter destination = instantiateUsingNoArgConstructor(destinationType, new DataFilter(source.getDtoClass()));
+    public BaseFilter convert(MappingContext<BaseFilter, BaseFilter> mappingContext) {
+        final BaseFilter source = mappingContext.getSource();
+        final Class<BaseFilter> destinationType = mappingContext.getDestinationType();
+        final BaseFilter destination = instantiateUsingNoArgConstructor(destinationType, null);
 
         final Collection<Field> alldestSuperFields = getAllDeclaredFieldsSuperClassAndInterface(destinationType);
 
@@ -65,7 +66,6 @@ public class DataFilterConverter implements ConditionalConverter<DataFilter, Dat
                 throw new RuntimeException(e);
             }
         });
-
 
         return destination;
     }

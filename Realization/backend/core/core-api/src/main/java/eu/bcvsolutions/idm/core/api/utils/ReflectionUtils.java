@@ -90,7 +90,7 @@ public class ReflectionUtils {
                 .collect(Collectors.toSet());
     }
 
-    public static Collection<Method> getAllGetterMethods(Class<DataFilter> clazz) {
+    public static Collection<Method> getAllGetterMethods(Class<?> clazz) {
         return getAllDeclaredMethodsSuperClassAndInterface(clazz).stream()
                 .filter(method -> method.getName().startsWith("get"))
                 .collect(Collectors.toSet());

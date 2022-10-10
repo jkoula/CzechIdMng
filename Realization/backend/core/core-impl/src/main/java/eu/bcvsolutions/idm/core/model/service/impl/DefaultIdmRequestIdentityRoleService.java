@@ -99,7 +99,10 @@ public class DefaultIdmRequestIdentityRoleService extends
 		}
 
 		final List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> resources = new ArrayList<>();
-		resources.add(conceptRoleRequestManager);
+
+		if (!filter.isOnlyAssignments()) {
+			resources.add(conceptRoleRequestManager);
+		}
 		if (shouldLoadAssignedRoles(copyFilter, returnOnlyChanges)) {
 			resources.add(roleAssignmentManager);
 		}
@@ -117,7 +120,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	public IdmRequestIdentityRoleDto save(IdmRequestIdentityRoleDto dto, BasePermission... permission) {
 		LOG.debug(MessageFormat.format("Save idm-request-identity-role [{0}] ", dto));
 		Assert.notNull(dto, "DTO is required.");
-		if (dto.getRoleRequest() == null) {
+		if (dto.getRoleRequest() == null || roleRequestService.get(dto.getRoleRequest()) == null) {
 			final IdmRoleRequestDto request = roleRequestService.createRequest(dto);
 			dto.setRoleRequest(request.getId());
 			dto.getEmbedded().put(AbstractConceptRoleRequest_.ROLE_REQUEST, request);

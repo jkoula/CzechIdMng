@@ -19,6 +19,7 @@ public abstract class AbstractConceptRoleRequestDto extends FormableDto implemen
 
     public static final String WF_PROCESS_FIELD = "wfProcessId";
     public static final String DUPLICATES = "duplicates";
+    @Embedded(dtoClass = IdmRoleRequestDto.class)
     protected UUID roleRequest;
     @Embedded(dtoClass = IdmRoleDto.class)
     protected UUID role;

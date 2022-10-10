@@ -45,6 +45,7 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
     uiKey = this.resolveUiKey(uiKey, entity.id);
     return (dispatch) => {
       dispatch(this.requestEntity(entity.id, uiKey));
+      console.log("daaaaata manager", entity)
       this.getService().delete(entity)
       .then((json) => {
         if (cb) {

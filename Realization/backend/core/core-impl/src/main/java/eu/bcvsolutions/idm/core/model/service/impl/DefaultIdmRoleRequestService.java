@@ -688,12 +688,13 @@ public class DefaultIdmRoleRequestService
 		final IdmGeneralConceptRoleRequestService<AbstractRoleAssignmentDto, ? extends AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter> serviceForConcept =
 				conceptRoleRequestManager.getServiceForConcept(dto.getAssignmentType());
 		ApplicantDto applicant = serviceForConcept.resolveApplicant(dto);
-		return createRequest(applicant.getId(), dto.getRoleAssignmentUuid(), applicant.getValidFrom(), applicant.getValidTill());
+		return createRequest(dto.getRoleRequest(), applicant.getId(), dto.getRoleAssignmentUuid(), applicant.getValidFrom(), applicant.getValidTill());
 	}
 
-	protected IdmRoleRequestDto createRequest(UUID applicant, UUID assignmentOwner, LocalDate validFrom, LocalDate validTill, IdmRoleDto... roles) {
+	protected IdmRoleRequestDto createRequest(UUID id, UUID applicant, UUID assignmentOwner, LocalDate validFrom, LocalDate validTill, IdmRoleDto... roles) {
 		Assert.notNull(applicant, "Applicant must be filled for create role request!");
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
+		roleRequest.setId(id);
 		roleRequest.setApplicant(applicant);
 		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 		roleRequest.setExecuteImmediately(true);

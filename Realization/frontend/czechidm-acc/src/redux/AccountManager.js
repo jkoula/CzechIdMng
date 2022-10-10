@@ -25,6 +25,7 @@ export default class AccountManager extends Managers.FormableEntityManager {
     return 'accounts';
   }
 
+
     /**
    * Loads all registered account wizards
    *

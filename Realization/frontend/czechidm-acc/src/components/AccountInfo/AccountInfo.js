@@ -36,7 +36,7 @@ export class AccountInfo extends Advanced.AbstractEntityInfo {
   getLink() {
     const entity = this.getEntity();
     const systemId = entity.system;
-    return `/system/${encodeURIComponent(systemId)}/object-classes/${encodeURIComponent(entity.id)}/detail`;
+    return `/system/${encodeURIComponent(systemId)}/accounts/${encodeURIComponent(entity.id)}/detail`;
   }
 
   /**

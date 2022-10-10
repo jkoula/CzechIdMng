@@ -122,6 +122,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
         this.context.store.dispatch(roleRequestManager.updateEntity(formEntity, `${uiKey}-detail`, this.afterSaveAndStartRequest.bind(this)));
       } else {
         // => save only
+        console.log("eeeeee Update: ", formEntity)
         this.context.store.dispatch(roleRequestManager.updateEntity(formEntity, `${uiKey}-detail`, (createdEntity, error) => {
           this.afterSave(createdEntity, error, true);
         }));
@@ -327,7 +328,6 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     if (!request) {
       request = this.state.request;
     }
-    console.log("eeeee render req", isNew, request, _permissions)
     const requestForForm = _.merge({}, request);
     // Form is rendered if data are changed, but we don't want rerenderd the form if only some
     // concept was changed (prevent lost other changes in form ... filled description for example).

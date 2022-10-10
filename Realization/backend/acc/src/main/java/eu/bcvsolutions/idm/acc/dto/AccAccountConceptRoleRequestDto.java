@@ -44,7 +44,7 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
 
     @Override
     public void setRoleAssignmentUuid(UUID id) {
-        setAccAccount(id);
+        setAccountRole(id);
     }
 
     @Override

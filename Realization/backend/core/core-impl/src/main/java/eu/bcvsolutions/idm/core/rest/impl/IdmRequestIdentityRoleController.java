@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -185,7 +186,7 @@ public class IdmRequestIdentityRoleController
 	@Override
 	protected IdmRequestIdentityRoleFilter toFilter(MultiValueMap<String, Object> parameters) {
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter(parameters);
-		filter.setIdentity(getParameterConverter().toUuid(parameters, "identityId"));
+		filter.setIdentity(getParameterConverter().toEntityUuid(parameters, "identityId", IdmIdentityDto.class));
 		filter.setIdentityContractId(getParameterConverter().toUuid(parameters, "identityContractId"));
 		filter.setRoleId(getParameterConverter().toUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID));
 		filter.setRoleText(getParameterConverter().toString(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_TEXT));
@@ -195,7 +196,6 @@ public class IdmRequestIdentityRoleController
 		filter.setOnlyChanges(getParameterConverter().toBoolean(parameters, "onlyChanges", false));
 		filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));
 		filter.setIncludeCrossDomainsSystemsCount(getParameterConverter().toBoolean(parameters, "includeCrossDomainsSystemsCount", false));
-		
 		return filter;
 	}
 }

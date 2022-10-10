@@ -1,11 +1,15 @@
 package eu.bcvsolutions.idm.core.api.dto.filter;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Filter for concept role request.
@@ -14,11 +18,10 @@ import java.util.UUID;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public class IdmConceptRoleRequestFilter extends IdmBaseConceptRoleRequestFilter {
-    private UUID identityRoleId;
-    private UUID identityContractId;
-    private Set<UUID> identityRoleIds;
 
-    private boolean identityRoleIsNull = false;
+    public static final String IDENTITY_ROLE_ID_PARAMETER = "identityRoleId";
+    public static final String IDENTITY_CONTRACT_ID_PARAMETER = "identityContractId";
+    public static final String IDENTITY_IDENTITY_ROLE_IS_NULL_PARAMETER = "identityRoleIsNull";
 
     public IdmConceptRoleRequestFilter() {
 		this(new LinkedMultiValueMap<>());
@@ -34,35 +37,29 @@ public class IdmConceptRoleRequestFilter extends IdmBaseConceptRoleRequestFilter
     }
 
     public UUID getIdentityRoleId() {
-        return identityRoleId;
+        return getParameterConverter().toUuid(getData(), IDENTITY_ROLE_ID_PARAMETER);
     }
 
     public void setIdentityRoleId(UUID identityRoleId) {
-        this.identityRoleId = identityRoleId;
+        set(IDENTITY_ROLE_ID_PARAMETER, identityRoleId);
     }
 
     public UUID getIdentityContractId() {
-        return identityContractId;
+        return getParameterConverter().toUuid(getData(), IDENTITY_CONTRACT_ID_PARAMETER);
     }
 
     public void setIdentityContractId(UUID identityContractId) {
-        this.identityContractId = identityContractId;
+        set(IDENTITY_CONTRACT_ID_PARAMETER, identityContractId);
     }
     
-    public Set<UUID> getIdentityRoleIds() {
-		return identityRoleIds;
-	}
 
-	public void setIdentityRoleIds(Set<UUID> identityRoleIds) {
-		this.identityRoleIds = identityRoleIds;
-	}
 
 	public boolean isIdentityRoleIsNull() {
-		return identityRoleIsNull;
+        return getParameterConverter().toBoolean(getData(), IDENTITY_IDENTITY_ROLE_IS_NULL_PARAMETER, false);
 	}
 
 	public void setIdentityRoleIsNull(boolean identityRoleIsNull) {
-		this.identityRoleIsNull = identityRoleIsNull;
+		set(IDENTITY_IDENTITY_ROLE_IS_NULL_PARAMETER, identityRoleIsNull);
 	}
 
 }

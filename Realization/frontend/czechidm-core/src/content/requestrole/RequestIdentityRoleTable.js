@@ -227,11 +227,11 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     this.setState({
       showLoading: true
     }, () => {
-      const { request, putRequestToRedux} = this.props;
+      const { request, requestId, putRequestToRedux} = this.props;
 
 
       // Save entity
-      this.refs.roleConceptDetail.save(request.id, (createdEntity, error) => {
+      this.refs.roleConceptDetail.save(requestId, (createdEntity, error) => {
         if (error) {
           // If error contains parameters with attributes, then is it validation error
           if (error.parameters && error.parameters.attributes) {
@@ -381,7 +381,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
    * Generate cell with actions (buttons)
    */
   renderConceptActionsCell({rowIndex, data}) {
-    const { readOnly } = this.props;
+    const { readOnly, requestId } = this.props;
     const { showLoadingActions } = this.state;
 
     const actions = [];
@@ -389,10 +389,12 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     const manualRole = !value.automaticRole && !value.directRole;
     const operation = value.operation;
     //
+    const item = {...data[rowIndex], roleRequest: requestId}
+
     actions.push(
       <Basic.Button
         level="danger"
-        onClick={ this._internalDelete.bind(this, data[rowIndex]) }
+        onClick={ this._internalDelete.bind(this, item) }
         className="btn-xs"
         disabled={ readOnly || !manualRole || !this._canChangePermissions(value) }
         showLoading={ showLoadingActions }
@@ -402,11 +404,12 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
         icon="trash"/>
     );
     if (operation !== 'REMOVE') {
+
       actions.push(
         <Basic.Button
           level="warning"
           showLoading={ showLoadingActions }
-          onClick={ this._showDetail.bind(this, data[rowIndex], true, false) }
+          onClick={ this._showDetail.bind(this, item, true, false) }
           className="btn-xs"
           disabled={
             readOnly
@@ -839,6 +842,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               entity={detail.entity}
               isEdit={detail.edit}
               multiAdd={detail.add}
+              requestId={requestId}
               validationErrors={ validationErrors }/>
           </Basic.Modal.Body>
           <Basic.Modal.Footer>

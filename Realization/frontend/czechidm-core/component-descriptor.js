@@ -1012,7 +1012,8 @@ module.exports = {
       ownerType: require('./src/redux').IdentityContractManager.ENTITY_TYPE,
       ownerManager: require('./src/redux').IdentityContractManager,
       ownerSelectComponent: require('./src/components/advanced/IdentityContractSelect/IdentityContractSelect').default,
-      ownerInfoComponent: require('./src/components/advanced/IdentityContractInfo/IdentityContractInfo').default
+      ownerInfoComponent: require('./src/components/advanced/IdentityContractInfo/IdentityContractInfo').default,
+      locale: "core:entity.IdentityContract"
     }
   ]
 };

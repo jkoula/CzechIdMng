@@ -3,12 +3,16 @@ package eu.bcvsolutions.idm.core.api.dto.filter;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Filter for concept role request.
@@ -17,18 +21,37 @@ import java.util.UUID;
  */
 public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 
-    private UUID roleRequestId;
+	public static final String IDENTITY_ROLE_IDS_PARAMETER = "identityRoleIds";
+	public static final String ROLE_REQUEST_ID_PARAMETER = "roleRequestId";
+	public static final String ROLE_REQ_STATE_PARAMETER = "identityRoleIds";
+	public static final String AUTOMATIC_ROLE_PARAMETER = "identityRoleIds";
+	public static final String DIRECT_ROLE_PARAMETER = "directRole";
+	public static final String CONCEPT_ROLE_OPERATION_PARAMETER = "identityRoleIds";
+	public static final String ENVIRONMENT_PARAMETER = "identityRoleIds";
+
+
     private RoleRequestState state;
     private UUID roleId;
     private String roleText;
     private UUID automaticRole;
-    private ConceptRoleRequestOperation operation;
+
+	private UUID directRole;
+
+	private ConceptRoleRequestOperation operation;
     private String roleEnvironment;
     private List<String> roleEnvironments;
 
-	private Set<UUID> identityRoleIds;
-
 	private UUID identityId;
+
+	public UUID getDirectRole() {
+		return directRole;
+		//return getParameterConverter().toUuid(getData(), DIRECT_ROLE_PARAMETER);
+	}
+
+	public void setDirectRole(UUID directRole) {
+		this.directRole = directRole;
+		//set(DIRECT_ROLE_PARAMETER, directRole);
+	}
 
 	public UUID getIdentityId() {
 		return identityId;
@@ -36,10 +59,6 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 
 	public void setIdentityId(UUID identityId) {
 		this.identityId = identityId;
-	}
-
-	public void setIdentityRoleIds(Set<UUID> identityRoleIds) {
-		this.identityRoleIds = identityRoleIds;
 	}
 
 	public void setIdentity(UUID identity) {
@@ -60,11 +79,11 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 	}
 
 	public UUID getRoleRequestId() {
-        return roleRequestId;
+        return getParameterConverter().toUuid(getData(), ROLE_REQUEST_ID_PARAMETER);
     }
 
     public void setRoleRequestId(UUID roleRequestId) {
-        this.roleRequestId = roleRequestId;
+        set(ROLE_REQUEST_ID_PARAMETER, roleRequestId);
     }
 
     public RoleRequestState getState() {
@@ -137,15 +156,31 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 
     public abstract void setRoleAssignmentUuid(UUID identityRoleId);
 
-	public void setRoleAssignmentUuids(Set<UUID> identityRoleIds) {
-		this.identityRoleIds = identityRoleIds;
+	public Set<UUID> getIdentityRoleIds() {
+		if (!getData().containsKey(IDENTITY_ROLE_IDS_PARAMETER)) {
+			return null;
+		}
+		final List<Object> objects = getData().get(IDENTITY_ROLE_IDS_PARAMETER);
+
+
+		return objects.stream().map(DtoUtils::toUuid).collect(Collectors.toSet());
 	}
 
-	public Set<UUID> getIdentityRoleIds() {
-		return identityRoleIds;
+	public void setIdentityRoleIds(Set<UUID> identityRoleIds) {
+		if (identityRoleIds != null) {
+			put(IDENTITY_ROLE_IDS_PARAMETER, new ArrayList(identityRoleIds));
+		}
 	}
 
 	public UUID getIdentity() {
 		return getIdentityId();
+	}
+
+	public void setRoleAssignmentUuids(Set<UUID> identityRoleIds) {
+		setIdentityRoleIds(identityRoleIds);
+	}
+
+	public boolean isDirectRole() {
+		return getDirectRole() != null;
 	}
 }

@@ -122,7 +122,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             predicates.add(root.get(AccAccountConceptRoleRequest_.accountRole).get(AbstractEntity_.id).in(ids));
         }
 
-        if (filter.isAccountRoleIsNull()) {
+        if (filter.isAccountRoleIsNull() && ids != null && ids.isEmpty()) {
             predicates.add(builder.isNull(root.get(AccAccountConceptRoleRequest_.accountRole)));
         }
         //

@@ -43,11 +43,11 @@ public class AccAccountConceptRoleRequestFilter extends IdmBaseConceptRoleReques
     }
 
     public Set<UUID> getAccountRoleUuids() {
-        return accountRoleUuids;
+        return getIdentityRoleIds();
     }
 
     public void setAccountRoleUuids(Set<UUID> accountRoleUuids) {
-        this.accountRoleUuids = accountRoleUuids;
+        setIdentityRoleIds(accountRoleUuids);
     }
 
     public boolean isAccountRoleIsNull() {
