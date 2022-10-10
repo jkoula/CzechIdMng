@@ -504,6 +504,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     //
     const showLoading = this.props.showLoading || this.state.showLoading;
     const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);
+    // const name = "role.name";
     //
     return (
       <Basic.Div>
@@ -615,7 +616,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               className="detail-button"
               cell={ this.renderDetailCell.bind(this) }/>
             <Advanced.Column
-              property="role.name"
+              // property="role.name"
+              property="name"
               title={ this.i18n('entity.Role.name') }
               sort
               header={ this.i18n('entity.IdentityRole.role') }
@@ -644,11 +646,16 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                 }
               }/>
             <Advanced.Column
-              property="_embedded.role.baseCode"
+              // property="_embedded.role.baseCode"
+              property="baseCode"
               sortProperty="role.baseCode"
               rendered={showEnvironment}
               face="text"
               header={ this.i18n('entity.Role.baseCode.label') }
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.baseCode 
+              }
               sort/>
             <Advanced.Column
               property="systemState"
@@ -664,11 +671,15 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                 }
               }/>
             <Advanced.Column
-              property="_embedded.role.environment"
+              property="environment"
               rendered={showEnvironment}
               sortProperty="role.environment"
               face="text"
               header={ this.i18n('entity.Role.environment.label') }
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.environment 
+              }
               sort/>
             <Advanced.Column
               property="roleAttributes"
@@ -883,10 +894,10 @@ RequestIdentityRoleTable.defaultProps = {
 
 RequestIdentityRoleTable.defaultProps = {
   columns: ConfigLoader.getConfig('RequestIdentityRoleTable.table.columns', [
-    'role.name',
-    '_embedded.role.baseCode',
+    'name',
+    'baseCode',
     'systemState',
-    '_embedded.role.environment',
+    'environment',
     'roleAttributes',
     'contractPosition',
     'validFrom',
@@ -903,7 +914,7 @@ function select(state, component) {
   return {
     columns: component.columns || ConfigurationManager.getPublicValueAsArray(
       state,
-      'idm.pub.app.show.RequestIdentityRoleTable.table.columns',
+      'idm.pub.app.show.role.request.table.columns',
       RequestIdentityRoleTable.defaultProps.columns
     )
   };
