@@ -968,7 +968,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 					&& l.getType().equals(IdentityLinkType.OWNER)));
 		});
 	}
-	
+
 	@Test
 	public void testSwitchUserAuditVariables() {
 		IdmIdentityDto adminOriginal = getHelper().createIdentity();
@@ -1006,7 +1006,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 			Assert.assertEquals(adminOriginal.getId().toString(), workflowProcessInstanceDto.getProcessVariables().get(WorkflowProcessInstanceService.ORIGINAL_IMPLEMENTER_IDENTIFIER));
 		} finally {
 			logout();
-		}		
+		}
 		//
 		try {
 			getHelper().login(adminOriginal);
@@ -1046,7 +1046,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 		Assert.assertEquals(adminHelpdesk.getId(), assignedRole.getCreatorId());
 		Assert.assertEquals(adminOriginal.getId(), assignedRole.getOriginalCreatorId());
 	}
-	
+
 	@Test
 	public void testSwitchUserAuditVariablesModify() {
 		IdmIdentityDto adminOriginal = getHelper().createIdentity();
@@ -1091,7 +1091,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 			Assert.assertEquals(adminOriginal.getId().toString(), workflowProcessInstanceDto.getProcessVariables().get(WorkflowProcessInstanceService.ORIGINAL_IMPLEMENTER_IDENTIFIER));
 		} finally {
 			logout();
-		}		
+		}
 		//
 		try {
 			getHelper().login(adminOriginal);
@@ -1131,7 +1131,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 		Assert.assertEquals(adminHelpdesk.getId(), assignedRole.getModifierId());
 		Assert.assertEquals(adminOriginal.getId(), assignedRole.getOriginalModifierId());
 	}
-	
+
 	@Test
 	public void testSwitchUserDeleteProcess() {
 		IdmIdentityDto adminOriginal = getHelper().createIdentity();
@@ -1164,7 +1164,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 			Assert.assertEquals(adminOriginal.getId().toString(), workflowProcessInstanceDto.getProcessVariables().get(WorkflowProcessInstanceService.ORIGINAL_IMPLEMENTER_IDENTIFIER));
 		} finally {
 			logout();
-		}		
+		}
 		//
 		try {
 			getHelper().login(adminOriginal);
@@ -1349,7 +1349,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 		taskFilter.setCreatedAfter(from);
 		return workflowHistoricProcessInstanceService.find(taskFilter, null).getContent();
 	}
-	
+
 	/**
 	 * Return count of historic processes for current logged user
 	 *
@@ -1469,6 +1469,17 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 		} else {
 			throw new UnsupportedOperationException(String.format("This owner type is not supported! Owner: [{}]", owner));
 		}
+	}
+
+	@Override
+	public AbstractRoleAssignmentDto createRoleAssignment(UUID roleId, UUID ownerId, LocalDate validFrom,
+			LocalDate validTill) {
+		IdmIdentityRoleDto identityRole = new IdmIdentityRoleDto();
+		identityRole.setIdentityContract(ownerId);
+		identityRole.setRole(roleId);
+		identityRole.setValidFrom(validFrom);
+		identityRole.setValidTill(validTill);
+		return identityRoleService.save(identityRole);
 	}
 
 	@Override
