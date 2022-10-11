@@ -7,6 +7,7 @@ import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
@@ -20,8 +21,10 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto;
 import eu.bcvsolutions.idm.acc.entity.SysSystem;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 
 /**
@@ -249,7 +252,7 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	void cleaner();
 
 	/**
-	 * create system owner by identity
+	 * Create system owner by identity
 	 * @param system
 	 * @param owner
 	 * @return
@@ -257,16 +260,163 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	SysSystemOwnerDto createSystemOwner(SysSystemDto system, IdmIdentityDto owner);
 
 	/**
-	 * create system owner by role
+	 * Create system owner by role
 	 * @param system
 	 * @param owner
 	 * @return
 	 */
 	SysSystemOwnerRoleDto createSystemOwnerRole(SysSystemDto system, IdmRoleDto owner);
 
+	/**
+	 * Create direct (without role request) account role assignment.
+	 *
+	 * @param accountId
+	 * @param roleId
+	 * @return
+	 */
+    AccAccountRoleAssignmentDto createAccountRoleAssignment(UUID accountId, UUID roleId);
+
 	void deleteSystem(UUID systemId);
 
     AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA);
 
-    AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to);
+    /**
+     * Create direct (without role request) account role assignment with validity.
+     *
+     * @param accountId
+     * @param roleId
+     * @param from
+     * @param to
+     * @return
+     */
+    AccAccountRoleAssignmentDto createAccountRoleAssignment(UUID accountId, UUID roleId, LocalDate from, LocalDate to);
+
+    /**
+     * Directly (without role request) remove assigned account role.
+     *
+     * @param roleAssignment
+     */
+    void removeAccountRoleAssignment(AccAccountRoleAssignmentDto roleAssignment);
+
+    /**
+     * Creates an account. It will create a corresponding system with mapping and roles
+     * and an identity with a contract.
+     *
+     * @return
+     */
+    AccAccountDto createAccount();
+
+    /**
+     * Assignes a role to an account via a role request.
+     *
+     * @param accAccountDto
+     * @param waitTillRequestExecuted - will wait for 150 ms up to 5 times till the role request is executed
+     * @param roleIds
+     */
+    void assignRoleToAccountViaRequest(AccAccountDto accAccountDto, boolean waitTillRequestExecuted, UUID... roleIds);
+
+    /**
+     * Assignes a role to an account via a role request.
+     *
+     * @param accAccountDto
+     * @param validFrom
+     * @param validTill
+     * @param waitTillRequestExecuted - will wait for 150 ms up to 5 times till the role request is executed
+     * @param roleIds
+     */
+    void assignRoleToAccountViaRequest(AccAccountDto accAccountDto, LocalDate validFrom, LocalDate validTill, boolean waitTillRequestExecuted, UUID... roleIds);
+
+    /**
+     * Updates an assigned role via a role request.
+     *
+     * @param accAccountDto
+     * @param validFrom
+     * @param validTill
+     * @param waitTillRequestExecuted - will wait for 150 ms up to 5 times till the role request is executed
+     * @param roleAssignment
+     */
+    void updateAssignedAccountRoleViaRequest(AccAccountDto accAccountDto, LocalDate validFrom, LocalDate validTill, boolean waitTillRequestExecuted, AccAccountRoleAssignmentDto roleAssignment);
+
+    /**
+     * Updates an assigned role via a role request.
+     *
+     * @param accAccountDto
+     * @param validFrom
+     * @param validTill
+     * @param waitTillRequestExecuted - will wait for 150 ms up to 5 times till the role request is executed
+     * @param roleId
+     */
+    void updateAssignedAccountRoleViaRequest(AccAccountDto accAccountDto, LocalDate validFrom, LocalDate validTill, boolean waitTillRequestExecuted, UUID roleId);
+
+    /**
+     * Removes an assigned account role.
+     *
+     * @param accAccountDto
+     * @param waitTillRequestExecuted - will wait for 150 ms up to 5 times till the role request is executed
+     * @param roleIds
+     */
+    void removeRoleFromAccountViaRequest(AccAccountDto accAccountDto, boolean waitTillRequestExecuted, UUID... roleIds);
+
+    /**
+     * Returns the id of the identity which is the owner of the account.
+     *
+     * @param accountId
+     * @return identityId
+     */
+    UUID getAccountOwner(UUID accountId);
+
+    /**
+     * Creates a concept role request for an account.
+     *
+     * @param requestId
+     * @param roleId
+     * @param accountId
+     * @param roleAssignmentId
+     * @param operationType
+     * @param validFrom
+     * @param validTill
+     * @return
+     */
+    AccAccountConceptRoleRequestDto createAccountConceptRoleRequest(UUID requestId, UUID roleId, UUID accountId,
+			UUID roleAssignmentId, ConceptRoleRequestOperation operationType, LocalDate validFrom, LocalDate validTill);
+
+    /**
+     * Creates a concept role request for an account.
+     *
+     * @param requestId
+     * @param roleId
+     * @param accountId
+     * @param roleAssignmentId
+     * @param operationType
+     * @return
+     */
+    AccAccountConceptRoleRequestDto createAccountConceptRoleRequest(UUID requestId, UUID roleId, UUID accountId,
+			UUID roleAssignmentId, ConceptRoleRequestOperation operationType);
+
+    /**
+     * Creates a concept role request for an account with ADD type.
+     *
+     * @param requestId
+     * @param roleId
+     * @param accountId
+     * @return
+     */
+    AccAccountConceptRoleRequestDto createAccountConceptRoleRequest(UUID requestId, UUID roleId, UUID accountId);
+
+    /**
+     * Creates a role request for identity.
+     *
+     * @param identityId
+     * @param executeImmediately
+     * @return
+     */
+    IdmRoleRequestDto createRoleRequest(UUID identityId, boolean executeImmediately);
+
+    /**
+     * Creates a role request for identity which will be executed immediately.
+     *
+     * @param identityId
+     * @return
+     */
+    IdmRoleRequestDto createRoleRequest(UUID identityId);
 }

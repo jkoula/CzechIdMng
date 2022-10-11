@@ -1,5 +1,20 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
@@ -30,19 +45,6 @@ import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractRoleAssignmentService;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -122,6 +124,11 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
                     )
             );
             predicates.add(builder.exists(identityAccountSubquery));
+        }
+        
+        final UUID accountId = filter.getAccountId();
+        if (accountId != null) {
+        	predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.accAccount).get(AbstractEntity_.id), accountId));
         }
 
         UUID directRoleId = filter.getDirectRoleId();

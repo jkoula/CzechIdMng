@@ -11,8 +11,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
-import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
-import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
@@ -30,7 +28,9 @@ import eu.bcvsolutions.idm.acc.domain.OperationResultType;
 import eu.bcvsolutions.idm.acc.domain.SynchronizationActionType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AbstractSysSyncConfigDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysConnectorKeyDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
@@ -45,6 +45,9 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccUniformPasswordFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncActionLogFilter;
@@ -52,8 +55,11 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncItemLogFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment_;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.scheduler.task.impl.SynchronizationSchedulableTaskExecutor;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccUniformPasswordService;
@@ -74,12 +80,18 @@ import eu.bcvsolutions.idm.acc.service.impl.DefaultSysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleTreeNodeFilter;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
@@ -121,6 +133,8 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Autowired private SysSystemOwnerService systemOwnerService;
 	@Autowired private SysSystemOwnerRoleService systemOwnerRoleService;
 	@Autowired private AccAccountRoleAssignmentService accAccountRoleAssignmentService;
+	@Autowired private IdmRoleRequestService roleRequestService;
+	@Autowired private AccAccountConceptRoleRequestService accountConceptRoleRequestService;
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -559,18 +573,153 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	}
 
 	@Override
-	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA) {
-		return createAccountRoleAssignment(accAccountDto, roleA, null, null);
+	public AccAccountRoleAssignmentDto createAccountRoleAssignment(UUID accountId, UUID roleId) {
+		return createAccountRoleAssignment(accountId, roleId, null, null);
 	}
 
 	@Override
-	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to) {
+	public AccAccountRoleAssignmentDto createAccountRoleAssignment(UUID accountId, UUID roleId, LocalDate from, LocalDate to) {
 		AccAccountRoleAssignmentDto roleAssignmentDto = new AccAccountRoleAssignmentDto();
-		roleAssignmentDto.setAccAccount(accAccountDto.getId());
-		roleAssignmentDto.setRole(role.getId());
+		roleAssignmentDto.setAccAccount(accountId);
+		roleAssignmentDto.setRole(roleId);
 		roleAssignmentDto.setValidFrom(from);
 		roleAssignmentDto.setValidTill(to);
 		return accAccountRoleAssignmentService.save(roleAssignmentDto);
 	}
 
+	@Override
+	public void removeAccountRoleAssignment(AccAccountRoleAssignmentDto roleAssignment) {
+		accAccountRoleAssignmentService.delete(roleAssignment);
+	}
+
+	@Override
+	public AccAccountDto createAccount() {
+		IdmIdentityDto identity = this.createIdentity();
+		//
+		SysSystemDto system = this.createSystem("test_resource");
+		this.createMapping(system);
+		IdmRoleDto roleOne = this.createRole();
+		this.createRoleSystem(roleOne, system);
+		//
+		this.createIdentityRole(identity, roleOne);
+		//
+		AccAccountFilter accountFilter = new AccAccountFilter();
+		accountFilter.setUid(identity.getUsername());
+		AccAccountDto account = accountService.find(accountFilter, null).stream().findFirst().orElse(null);
+		return account;
+	}
+
+	@Override
+	public void assignRoleToAccountViaRequest(AccAccountDto accAccountDto, boolean waitTillRequestExecuted, UUID... roleIds) {
+		this.assignRoleToAccountViaRequest(accAccountDto, null, null, waitTillRequestExecuted, roleIds);
+	}
+
+	@Override
+	public void assignRoleToAccountViaRequest(AccAccountDto accAccountDto, LocalDate validFrom, LocalDate validTill, boolean waitTillRequestExecuted, UUID... roleIds) {
+		IdmRoleRequestDto roleRequest = createRoleRequest(getAccountOwner(accAccountDto.getId()));
+		final UUID roleRequestId = roleRequest.getId();
+		for (UUID roleId : roleIds) {
+			createAccountConceptRoleRequest(roleRequestId, roleId, accAccountDto.getId(), null, ConceptRoleRequestOperation.ADD, validFrom, validTill);
+		}
+		IdmRoleRequestDto processedRoleRequest = this.executeRequest(roleRequest, false, true);
+
+		if (waitTillRequestExecuted) {
+			this.waitForResult(res -> {
+				return roleRequestService.get(processedRoleRequest.getId()).getState() != RoleRequestState.EXECUTED;
+			}, 150, 5);
+		}
+	}
+
+	@Override
+	public void updateAssignedAccountRoleViaRequest(AccAccountDto accAccountDto, LocalDate validFrom, LocalDate validTill, boolean waitTillRequestExecuted, AccAccountRoleAssignmentDto roleAssignment) {
+		IdmRoleRequestDto roleRequest = createRoleRequest(getAccountOwner(accAccountDto.getId()));
+		final UUID roleRequestId = roleRequest.getId();
+		createAccountConceptRoleRequest(roleRequestId, roleAssignment.getRole(), accAccountDto.getId(), roleAssignment.getId(), ConceptRoleRequestOperation.UPDATE, validFrom, validTill);
+		IdmRoleRequestDto processedRoleRequest = this.executeRequest(roleRequest, false, true);
+
+		if (waitTillRequestExecuted) {
+			this.waitForResult(res -> {
+				return roleRequestService.get(processedRoleRequest.getId()).getState() != RoleRequestState.EXECUTED;
+			}, 150, 5);
+		}
+	}
+
+	@Override
+	public void updateAssignedAccountRoleViaRequest(AccAccountDto accAccountDto, LocalDate validFrom, LocalDate validTill, boolean waitTillRequestExecuted, UUID roleId) {
+		AccAccountRoleAssignmentFilter accountRoleFilter = new AccAccountRoleAssignmentFilter();
+		accountRoleFilter.setAccountId(accAccountDto.getId());
+		accountRoleFilter.setRoleId(roleId);
+		List<AccAccountRoleAssignmentDto> accountRoles = accAccountRoleAssignmentService.find(accountRoleFilter, null).getContent();
+		accountRoles.forEach(aR -> this.updateAssignedAccountRoleViaRequest(accAccountDto, validFrom, validTill, waitTillRequestExecuted, aR));
+	}
+
+	@Override
+	public void removeRoleFromAccountViaRequest(AccAccountDto accAccountDto, boolean waitTillRequestExecuted, UUID... roleIds) {
+		IdmRoleRequestDto roleRequest = createRoleRequest(getAccountOwner(accAccountDto.getId()));
+		final UUID roleRequestId = roleRequest.getId();
+		for (UUID roleId : roleIds) {
+			AccAccountRoleAssignmentFilter accountRoleFilter = new AccAccountRoleAssignmentFilter();
+			accountRoleFilter.setAccountId(accAccountDto.getId());
+			accountRoleFilter.setRoleId(roleId);
+			List<AccAccountRoleAssignmentDto> roleAssignments = accAccountRoleAssignmentService.find(accountRoleFilter, null).getContent();
+			roleAssignments.forEach(rA ->
+				createAccountConceptRoleRequest(roleRequestId, roleId, accAccountDto.getId(), rA.getId(), ConceptRoleRequestOperation.REMOVE)
+			);
+		}
+		IdmRoleRequestDto processedRoleRequest = this.executeRequest(roleRequest, false, true);
+
+		if (waitTillRequestExecuted) {
+			this.waitForResult(res -> {
+				return roleRequestService.get(processedRoleRequest.getId()).getState() != RoleRequestState.EXECUTED;
+			}, 150, 5);
+		}
+	}
+
+	@Override
+	public UUID getAccountOwner(UUID accountId) {
+		AccIdentityAccountFilter iaFilter = new AccIdentityAccountFilter();
+		iaFilter.setAccountId(accountId);
+		return identityAccountService.find(iaFilter, null).stream().findFirst().orElseThrow().getIdentity();
+	}
+
+	@Override
+	public AccAccountConceptRoleRequestDto createAccountConceptRoleRequest(UUID requestId, UUID roleId,
+			UUID accountId, UUID roleAssignmentId, ConceptRoleRequestOperation operationType, LocalDate validFrom,
+			LocalDate validTill) {
+		AccAccountConceptRoleRequestDto concept = new AccAccountConceptRoleRequestDto();
+		concept.setAccAccount(accountId);
+		concept.setRole(roleId);
+		concept.setOperation(operationType);
+		concept.setRoleAssignmentUuid(roleAssignmentId);
+		concept.setValidFrom(validFrom);
+		concept.setValidTill(validTill);
+		concept.setRoleRequest(requestId);
+		return accountConceptRoleRequestService.save(concept);
+	}
+
+	@Override
+	public AccAccountConceptRoleRequestDto createAccountConceptRoleRequest(UUID requestId, UUID roleId,
+			UUID accountId, UUID roleAssignmentId, ConceptRoleRequestOperation operationType) {
+		return this.createAccountConceptRoleRequest(requestId, roleId, accountId, roleAssignmentId, operationType, null, null);
+	}
+
+	@Override
+	public AccAccountConceptRoleRequestDto createAccountConceptRoleRequest(UUID requestId, UUID roleId,
+			UUID accountId) {
+		return this.createAccountConceptRoleRequest(requestId, roleId, accountId, null, ConceptRoleRequestOperation.ADD, null, null);
+	}
+
+	@Override
+	public IdmRoleRequestDto createRoleRequest(UUID identityId, boolean executeImmediately) {
+		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
+		roleRequest.setApplicant(identityId);
+		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
+		roleRequest.setExecuteImmediately(executeImmediately);
+		return roleRequestService.save(roleRequest);
+	}
+
+	@Override
+	public IdmRoleRequestDto createRoleRequest(UUID identityId) {
+		return this.createRoleRequest(identityId, true);
+	}
 }
