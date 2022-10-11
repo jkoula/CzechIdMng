@@ -504,7 +504,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     //
     const showLoading = this.props.showLoading || this.state.showLoading;
     const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);
-    // const name = "role.name";
     //
     return (
       <Basic.Div>
@@ -616,7 +615,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               className="detail-button"
               cell={ this.renderDetailCell.bind(this) }/>
             <Advanced.Column
-              // property="role.name"
               property="name"
               title={ this.i18n('entity.Role.name') }
               sort
@@ -646,7 +644,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                 }
               }/>
             <Advanced.Column
-              // property="_embedded.role.baseCode"
               property="baseCode"
               sortProperty="role.baseCode"
               rendered={showEnvironment}
