@@ -14,7 +14,7 @@ export default class AccountService extends WizardService {
     if (!entity) {
       return '';
     }
-    return `${AccountTypeEnum.getNiceLabel(entity?._embedded?.systemMapping?.accountType)}:${entity._embedded.system.name}:${entity.uid}`;
+    return `${AccountTypeEnum.getNiceLabel(entity?._embedded?.systemMapping?.accountType)}:${entity?._embedded?.system.name}:${entity?.uid}`;
   }
 
   getApiPath() {

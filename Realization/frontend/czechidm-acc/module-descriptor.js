@@ -459,6 +459,18 @@ module.exports = {
             path: '/account/:entityId/provisioning',
             access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
             items: []
+          },
+          {
+            id: 'account-other',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.detail.tabs.other',
+            titleKey: 'acc:content.accounts.detail.tabs.other',
+            order: 15,
+            priority: 0,
+            icon: 'fa:cog',
+            path: '/account/:entityId/other',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
           }
         ]
       }

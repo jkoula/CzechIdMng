@@ -214,6 +214,11 @@ module.exports = {
           path: 'provisioning',
           component: require('./src/content/account/AccountProvisioning'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        },
+        {
+          path: 'other',
+          component: require('./src/content/account/AccountOther'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
         }
       ]
     },

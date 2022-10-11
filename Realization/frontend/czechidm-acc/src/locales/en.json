@@ -67,7 +67,8 @@
           "account": "Account detail",
           "roles": "Roles",
           "audit": "Audit",
-          "provisioning": "Provisioning"
+          "provisioning": "Provisioning",
+          "other": "Other settings"
         },
         "discard": {
           "header": "Values are not saved",

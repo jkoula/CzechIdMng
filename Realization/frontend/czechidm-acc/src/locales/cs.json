@@ -67,7 +67,8 @@
           "account": "Detail účtu",
           "roles": "Role",
           "audit": "Audit",
-          "provisioning": "Provisioning"
+          "provisioning": "Provisioning",
+          "other": "Další nastavení"
         },
         "discard": {
           "header": "Hodnoty nejsou uloženy",
