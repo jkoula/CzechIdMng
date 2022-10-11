@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.core.model.entity;
 
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
-import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import org.hibernate.envers.Audited;
@@ -41,11 +40,6 @@ public class AbstractRoleAssignment extends AbstractEntity implements FormableEn
 
     @Audited
     @ManyToOne
-    @JoinColumn(name = "direct_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    protected IdmIdentityRole directRole;
-
-    @Audited
-    @ManyToOne
     @JoinColumn(name = "role_composition_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     protected IdmRoleComposition roleComposition;
 
@@ -75,14 +69,6 @@ public class AbstractRoleAssignment extends AbstractEntity implements FormableEn
 
     public void setRoleSystem(UUID roleSystem) {
         this.roleSystem = roleSystem;
-    }
-
-    public IdmIdentityRole getDirectRole() {
-        return directRole;
-    }
-
-    public void setDirectRole(IdmIdentityRole directRole) {
-        this.directRole = directRole;
     }
 
     public IdmRoleComposition getRoleComposition() {

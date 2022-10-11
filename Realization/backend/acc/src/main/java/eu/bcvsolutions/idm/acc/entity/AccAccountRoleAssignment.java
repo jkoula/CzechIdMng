@@ -6,6 +6,7 @@ import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
 
     private static final long serialVersionUID = 1L;
 
+
     @Audited
     @Size(max = DefaultFieldLengths.NAME)
     @Column(name = "external_id", length = DefaultFieldLengths.NAME)
@@ -39,6 +41,11 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
     @ManyToOne(optional = false)
     @JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private AccAccount accAccount;
+
+    @Audited
+    @ManyToOne
+    @JoinColumn(name = "direct_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    protected AccAccountRoleAssignment directRole;
 
     public String getExternalId() {
         return externalId;
@@ -69,5 +76,13 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
     @Override
     public String getOwnerType() {
         return AccAccount.class.getName();
+    }
+
+    public AccAccountRoleAssignment getDirectRole() {
+        return directRole;
+    }
+
+    public void setDirectRole(AccAccountRoleAssignment directRole) {
+        this.directRole = directRole;
     }
 }

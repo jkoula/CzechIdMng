@@ -26,6 +26,7 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 	public static final String ROLE_REQ_STATE_PARAMETER = "identityRoleIds";
 	public static final String AUTOMATIC_ROLE_PARAMETER = "identityRoleIds";
 	public static final String DIRECT_ROLE_PARAMETER = "directRole";
+	public static final String DIRECT_ROLE_ID_PARAMETER = "directRoleId";
 	public static final String CONCEPT_ROLE_OPERATION_PARAMETER = "identityRoleIds";
 	public static final String ENVIRONMENT_PARAMETER = "identityRoleIds";
 
@@ -35,22 +36,26 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
     private String roleText;
     private UUID automaticRole;
 
-	private UUID directRole;
-
 	private ConceptRoleRequestOperation operation;
     private String roleEnvironment;
     private List<String> roleEnvironments;
 
 	private UUID identityId;
 
-	public UUID getDirectRole() {
-		return directRole;
-		//return getParameterConverter().toUuid(getData(), DIRECT_ROLE_PARAMETER);
+	public UUID getDirectRoleId() {
+		return getParameterConverter().toUuid(getData(), DIRECT_ROLE_ID_PARAMETER);
 	}
 
-	public void setDirectRole(UUID directRole) {
-		this.directRole = directRole;
-		//set(DIRECT_ROLE_PARAMETER, directRole);
+	public void setDirectRoleId(UUID directRole) {
+		set(DIRECT_ROLE_ID_PARAMETER, directRole);
+	}
+
+	public Boolean isDirectRole() {
+		return getParameterConverter().toBoolean(getData(), DIRECT_ROLE_PARAMETER);
+	}
+
+	public void setDirectRole(Boolean directRole) {
+		set(DIRECT_ROLE_PARAMETER, directRole);
 	}
 
 	public UUID getIdentityId() {
@@ -178,9 +183,5 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 
 	public void setRoleAssignmentUuids(Set<UUID> identityRoleIds) {
 		setIdentityRoleIds(identityRoleIds);
-	}
-
-	public boolean isDirectRole() {
-		return getDirectRole() != null;
 	}
 }

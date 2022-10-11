@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.model.entity;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import javax.persistence.*;
@@ -8,7 +7,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.envers.Audited;
-import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.domain.AuditSearchable;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -38,8 +36,12 @@ import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 public class IdmIdentityRole extends AbstractRoleAssignment implements ValidableEntity, AuditSearchable, ExternalIdentifiable, FormableEntity {
 
 	private static final long serialVersionUID = 9208706652291035265L;
-	
-	@Audited
+    @Audited
+    @ManyToOne
+    @JoinColumn(name = "direct_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    protected IdmIdentityRole directRole;
+
+    @Audited
 	@Size(max = DefaultFieldLengths.NAME)
 	@Column(name = "external_id", length = DefaultFieldLengths.NAME)
 	private String externalId;
@@ -133,4 +135,12 @@ public class IdmIdentityRole extends AbstractRoleAssignment implements Validable
 	public void setContractPosition(IdmContractPosition contractPosition) {
 		this.contractPosition = contractPosition;
 	}
+
+    public IdmIdentityRole getDirectRole() {
+        return directRole;
+    }
+
+    public void setDirectRole(IdmIdentityRole directRole) {
+        this.directRole = directRole;
+    }
 }

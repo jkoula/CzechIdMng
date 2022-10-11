@@ -32,6 +32,9 @@ public class IdmIdentityRoleDto extends AbstractRoleAssignmentDto {
 	@Embedded(dtoClass = IdmContractPositionDto.class)
 	protected UUID contractPosition;
 
+	@Embedded(dtoClass = IdmIdentityRoleDto.class)
+	protected UUID directRole; // direct identity role
+
 	@Deprecated
 	@SuppressWarnings("unused")
     private boolean automaticRole; // this attribute can't be removed (serializable backward compatibility)
@@ -74,6 +77,7 @@ public class IdmIdentityRoleDto extends AbstractRoleAssignmentDto {
 		//
 	    identityContract = (UUID) readFields.get("identityContract", null);
 	    contractPosition = (UUID) readFields.get("contractPosition", null);
+		directRole = (UUID) readFields.get("directRole", null);
     }
 
 	@Override
@@ -87,5 +91,13 @@ public class IdmIdentityRoleDto extends AbstractRoleAssignmentDto {
 
 	public void setContractPosition(UUID contractPosition) {
 		this.contractPosition = contractPosition;
+	}
+
+	public UUID getDirectRole() {
+		return directRole;
+	}
+
+	public void setDirectRole(UUID directRole) {
+		this.directRole = directRole;
 	}
 }

@@ -163,6 +163,11 @@ public class DefaultIdmIdentityRoleService
 					contractPositionId)
 					);
 		}
+
+		UUID directRoleId = filter.getDirectRoleId();
+		if (directRoleId != null) {
+			predicates.add(builder.equal(root.get(IdmIdentityRole_.directRole).get(AbstractEntity_.id), directRoleId));
+		}
 		return predicates;
 	}
 	

@@ -26,8 +26,6 @@ public abstract class AbstractRoleAssignmentDto extends FormableDto implements V
     protected LocalDate validTill;
     @Embedded(dtoClass = AbstractIdmAutomaticRoleDto.class)
     protected UUID roleTreeNode; // this attribute can't be renamed (backward compatibility) - AutomaticRole reference
-    @Embedded(dtoClass = IdmIdentityRoleDto.class)
-    protected UUID directRole; // direct identity role
     @Embedded(dtoClass = IdmRoleCompositionDto.class)
     protected UUID roleComposition; // direct role
     // Relation on sys-system form ACC. We need to working with that also in the core module (cross-domains).
@@ -83,14 +81,6 @@ public abstract class AbstractRoleAssignmentDto extends FormableDto implements V
 		return externalId;
 	}
 
-    public UUID getDirectRole() {
-		return directRole;
-	}
-
-    public void setDirectRole(UUID directRole) {
-		this.directRole = directRole;
-	}
-
     public UUID getRoleComposition() {
 		return roleComposition;
 	}
@@ -115,10 +105,13 @@ public abstract class AbstractRoleAssignmentDto extends FormableDto implements V
         validFrom = DtoUtils.toLocalDate(readFields.get("validFrom", null));
         validTill = DtoUtils.toLocalDate(readFields.get("validTill", null));
         roleTreeNode = (UUID) readFields.get("roleTreeNode", null);
-        directRole = (UUID) readFields.get("directRole", null);
         roleComposition = (UUID) readFields.get("roleComposition", null);
         roleSystem = (UUID) readFields.get("roleSystem", null);
     }
 
     public abstract UUID getEntity();
+
+    public abstract void setDirectRole(UUID directRole);
+
+    public abstract UUID getDirectRole();
 }

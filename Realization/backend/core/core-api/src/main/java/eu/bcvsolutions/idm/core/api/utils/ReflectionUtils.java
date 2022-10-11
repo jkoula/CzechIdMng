@@ -13,12 +13,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public class ReflectionUtils {
+
+    public static final String GETTER_REGEX_PATTERN = "^(is|get)([A-Z].*)";
+    public static final Pattern GETTER_COMPILED_PATTERN = Pattern.compile(GETTER_REGEX_PATTERN);
 
     public static Set<Method> getAllDeclaredMethodsSuperClassAndInterface(Class<?> clazz) {
         Set<Method> result = new HashSet<>(List.of(clazz.getDeclaredMethods()));
@@ -43,12 +48,9 @@ public class ReflectionUtils {
         return setter.getName().substring(3).toLowerCase();
     }
 
-    public static String getLowercaseFieldNameFromGetter(Method setter) {
-        if (!setter.getName().startsWith("get")) {
-            // not a setter
-            return null;
-        }
-        return setter.getName().substring(3).toLowerCase();
+    public static String getLowercaseFieldNameFromGetter(Method getter) {
+        Matcher matcher = GETTER_COMPILED_PATTERN.matcher(getter.getName());
+        return matcher.find() ? matcher.group(2).toLowerCase() : null;
     }
 
     public static Collection<Field> getAllDeclaredFieldsSuperClassAndInterface(Class<?> clazz) {
@@ -92,7 +94,7 @@ public class ReflectionUtils {
 
     public static Collection<Method> getAllGetterMethods(Class<?> clazz) {
         return getAllDeclaredMethodsSuperClassAndInterface(clazz).stream()
-                .filter(method -> method.getName().startsWith("get"))
+                .filter(method -> method.getName().matches(GETTER_REGEX_PATTERN))
                 .collect(Collectors.toSet());
     }
 

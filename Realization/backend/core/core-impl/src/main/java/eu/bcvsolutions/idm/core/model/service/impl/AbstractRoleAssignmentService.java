@@ -160,10 +160,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
                     automaticRoleId)
             );
         }
-        UUID directRoleId = filter.getDirectRoleId();
-        if (directRoleId != null) {
-            predicates.add(builder.equal(root.get(AbstractRoleAssignment_.directRole).get(AbstractEntity_.id), directRoleId));
-        }
         //
         UUID roleCompositionId = filter.getRoleCompositionId();
         if (roleCompositionId != null) {
@@ -174,9 +170,9 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         Boolean directRole = filter.getDirectRole();
         if (directRole != null) {
             if (directRole) {
-                predicates.add(builder.isNull(root.get(AbstractRoleAssignment_.directRole)));
+                predicates.add(builder.isNull(root.get("directRole")));
             } else {
-                predicates.add(builder.isNotNull(root.get(AbstractRoleAssignment_.directRole)));
+                predicates.add(builder.isNotNull(root.get("directRole")));
             }
         }
         // Role-system

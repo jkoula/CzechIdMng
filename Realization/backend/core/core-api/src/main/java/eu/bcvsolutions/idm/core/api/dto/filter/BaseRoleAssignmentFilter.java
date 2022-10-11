@@ -109,6 +109,10 @@ public abstract class BaseRoleAssignmentFilter extends DataFilter {
         set(PARAMETER_DIRECT_ROLE, directRole);
     }
 
+    public Boolean isDirectRole() {
+        return getParameterConverter().toBoolean(getData(), PARAMETER_DIRECT_ROLE);
+    }
+
     public UUID getDirectRoleId() {
         return getParameterConverter().toUuid(getData(), PARAMETER_DIRECT_ROLE_ID);
     }

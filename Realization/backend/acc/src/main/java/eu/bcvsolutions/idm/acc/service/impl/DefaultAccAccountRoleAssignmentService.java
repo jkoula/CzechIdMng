@@ -25,6 +25,7 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractRoleAssignmentService;
@@ -122,6 +123,12 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
             );
             predicates.add(builder.exists(identityAccountSubquery));
         }
+
+        UUID directRoleId = filter.getDirectRoleId();
+        if (directRoleId != null) {
+            predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.directRole).get(AbstractEntity_.id), directRoleId));
+        }
+
         //
         return predicates;
     }
