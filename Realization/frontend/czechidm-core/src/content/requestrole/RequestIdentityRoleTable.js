@@ -481,7 +481,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       request,
       identityId,
       showRowSelection,
-      showEnvironment
+      showEnvironment,
+      columns
     } = this.props;
     const {
       showChangesOnly,
@@ -548,7 +549,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
           </Basic.Toolbar>
           <Advanced.Table
             ref="table"
-            columns={this.props.columns}
+            columns={ this.props.columns }
             uiKey="request-identity-role-table"
             hover={ false }
             manager={ requestIdentityRoleManager }
@@ -883,13 +884,6 @@ RequestIdentityRoleTable.propTypes = {
 };
 
 RequestIdentityRoleTable.defaultProps = {
-  showLoading: false,
-  showRowSelection: true,
-  readOnly: false,
-  showEnvironment: true
-};
-
-RequestIdentityRoleTable.defaultProps = {
   columns: ConfigLoader.getConfig('RequestIdentityRoleTable.table.columns', [
     'name',
     'baseCode',
@@ -905,8 +899,13 @@ RequestIdentityRoleTable.defaultProps = {
     'automaticRole',
     'candicateUsers',
     'action'
-  ])
+  ]),
+  showLoading: false,
+  showRowSelection: true,
+  readOnly: false,
+  showEnvironment: true
 };
+
 function select(state, component) {
   return {
     columns: component.columns || ConfigurationManager.getPublicValueAsArray(
