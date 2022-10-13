@@ -38,4 +38,31 @@ export default class SystemAttributeMappingService extends Services.AbstractServ
         }
         return json;
     });}
+
+  /**
+ * Returns value for attribute and account
+ *
+ * @param  {string} schema attr name
+ * @param  {string} account id
+ * @return {promise}
+ */
+  getAttributeValue(schemaAttrName, accountId) {
+    return Services.RestApiService
+      .get(`${this.getApiPath()}/${encodeURIComponent(schemaAttrName)}/value/${encodeURIComponent(accountId)}`)
+      .then(response => {
+        if (response.status === 403) {
+          throw new Error(403);
+        }
+        if (response.status === 404) {
+          throw new Error(404);
+        }
+        return response.json();
+      })
+      .then(json => {
+        if (Utils.Response.hasError(json)) {
+          throw Utils.Response.getFirstError(json);
+        }
+        return json;
+      });
+  }
 }

@@ -8,11 +8,13 @@ import TextField from '@material-ui/core/TextField';
 import Chip from '@material-ui/core/Chip';
 
 //
-import { Basic, Utils, Managers } from 'czechidm-core';
+import { Basic, Utils, Managers, Domain } from 'czechidm-core';
 import AccountManager from '../../redux/AccountManager';
+import SystemAttributeMappingManager from '../../redux/SystemAttributeMappingManager';
 //
 const manager = new AccountManager();
 const formDefinitionManager = new Managers.FormDefinitionManager();
+const systemAttributeMappingManager = new SystemAttributeMappingManager();
 
 /**
 * Account detail
@@ -65,7 +67,11 @@ class AccountDetail extends Basic.AbstractContent {
     originalValues.forEach(orginalValue => {
       if (values[orginalValue.key].reset || (values[orginalValue.key].overridenValue !== orginalValue.overridenValue && values[orginalValue.key].overridenValue !== orginalValue.value &&
         values[orginalValue.key].overridenValue !== undefined)) {
-        rows.push({ name: orginalValue.name, original: orginalValue.value, new: values[orginalValue.key].overridenValue, multiValue: orginalValue.multiValue, reset: values[orginalValue.key].reset })
+        if (values[orginalValue.key].reset) {
+          rows.push({ name: orginalValue.name, original: orginalValue.value, new: values[orginalValue.key].value, multiValue: orginalValue.multiValue, reset: values[orginalValue.key].reset })
+        } else {
+          rows.push({ name: orginalValue.name, original: orginalValue.value, new: values[orginalValue.key].overridenValue, multiValue: orginalValue.multiValue, reset: values[orginalValue.key].reset })
+        }
       }
     });
 
@@ -94,7 +100,6 @@ class AccountDetail extends Basic.AbstractContent {
               }),
             );
             values.forEach(value => {
-              // TODO maybe check overriden to
               if (originalValues[value.key].value !== value.value || value.reset) {
                 const attribute = attributesMap.get(value.name);
                 switch (attribute.persistentType) {
@@ -110,13 +115,66 @@ class AccountDetail extends Basic.AbstractContent {
                   case "BOOLEAN":
                     formValues.push({
                       formAttribute: attribute.id,
-                      booleanValue: value.value,
+                      booleanValue: value.reset ? null : value.value,
                       _embedded: {
                         formAttribute: attribute
                       }
                     });
                     break;
-                  // TODO add more attributes, multivalue to
+                  case "TEXT":
+                    formValues.push({
+                      formAttribute: attribute.id,
+                      stringValue: value.reset ? null : value.value,
+                      _embedded: {
+                        formAttribute: attribute
+                      }
+                    });
+                    break;
+                  case "CHAR":
+                    formValues.push({
+                      formAttribute: attribute.id,
+                      stringValue: value.reset ? null : value.value,
+                      _embedded: {
+                        formAttribute: attribute
+                      }
+                    });
+                    break;
+                  case "LONG":
+                    formValues.push({
+                      formAttribute: attribute.id,
+                      longValue: value.reset ? null : value.value,
+                      _embedded: {
+                        formAttribute: attribute
+                      }
+                    });
+                    break;
+                  case "DOUBLE":
+                    formValues.push({
+                      formAttribute: attribute.id,
+                      doubleValue: value.reset ? null : value.value,
+                      _embedded: {
+                        formAttribute: attribute
+                      }
+                    });
+                    break;
+                  case "INT":
+                    formValues.push({
+                      formAttribute: attribute.id,
+                      longValue: value.reset ? null : value.value,
+                      _embedded: {
+                        formAttribute: attribute
+                      }
+                    });
+                    break;
+                  case "BYTEARRAY":
+                    formValues.push({
+                      formAttribute: attribute.id,
+                      byteValue: value.reset ? null : value.value,
+                      _embedded: {
+                        formAttribute: attribute
+                      }
+                    });
+                    break;
                 }
               }
             });
@@ -170,7 +228,7 @@ class AccountDetail extends Basic.AbstractContent {
   valueChange(event, key) {
     const { values, originalValues } = this.state;
 
-    // validate input
+    // TODO validate input ?
 
     const newValue = event.target.value;
 
@@ -189,6 +247,7 @@ class AccountDetail extends Basic.AbstractContent {
       value: newValue,
       overridenValue: overridenValue,
       multiValue: values[key].multiValue,
+      isRole: values[key].isRole,
       reset: false
     };
 
@@ -233,99 +292,135 @@ class AccountDetail extends Basic.AbstractContent {
       _showLoading: true
     }, () => {
       this.context.store.dispatch(manager.fetchEntity(entityId, null, (entity) => {
-        manager.getService()
-          .getFormValues(entityId, entity.formDefinition)
-          .then(eavValues => {
-            // transform values from connector object to array, merge with eavs
+        // get attributes for mapping
+        const searchParameters = new Domain.SearchParameters()
+          .setName(Domain.SearchParameters.NAME_QUICK)
+          .setFilter('systemMappingId', entity.systemMapping)
+          .setSort('name', true)
+          .setSize(Domain.SearchParameters.MAX_SIZE);
+        systemAttributeMappingManager.getService().search(searchParameters)
+          .then(json => {
+            // put them into map, name is key and value is strategy
+            const mappingAttributes = new Map();
+
+            json._embedded.systemAttributeMappings.forEach(attributeMapping => {
+              const key = attributeMapping._embedded.schemaAttribute.name;
+              const value = attributeMapping.strategyType;
+              mappingAttributes.set(key, value);
+            })
+
+            // get eav values
             manager.getService()
-              .getConnectorObject(entityId)
-              .then(json => {
-                var key = 0;
-                const values = [];
-                if (json) {
-                  json.attributes.forEach(item => {
-                    let value;
-                    if (item.values) {
-                      if (!item.multiValue) {
-                        value = item.values[0];
-                      } else {
-                        let multiValue = '';
-                        item.values.forEach(entryValue => {
-                          multiValue = multiValue.concat(entryValue + "\n");
+              .getFormValues(entityId, entity.formDefinition)
+              .then(eavValues => {
+                // get account from system via connector
+                manager.getService()
+                  .getConnectorObject(entityId)
+                  .then(json => {
+                    var key = 0;
+                    const values = [];
+                    if (json) {
+                      // for each attribute check if attribute is overiden or not
+                      json.attributes.forEach(item => {
+                        let value;
+                        if (item.values) {
+                          if (!item.multiValue) {
+                            value = item.values[0];
+                          } else {
+                            let multiValue = '';
+                            item.values.forEach(entryValue => {
+                              multiValue = multiValue.concat(entryValue + "\n");
+                            });
+                            value = multiValue.trim();
+                          }
+                        }
+
+                        let overridenValue;
+                        eavValues.values.forEach(eavValue => {
+                          if (eavValue._embedded.formAttribute.code === item.name) {
+                            overridenValue = eavValue.value;
+                          }
                         });
-                        value = multiValue.trim();
-                      }
+
+                        const valuetoInsert = {
+                          key: key,
+                          name: item.name,
+                          value: value,
+                          overridenValue: overridenValue,
+                          multiValue: item.multiValue,
+                          isRole: mappingAttributes.get(item.name) === "MERGE" || mappingAttributes.get(item.name) === "AUTHORITATIVE_MERGE" ? true : false,
+                          reset: false
+                        }
+                        values[key] = valuetoInsert;
+                        key++;
+                      });
                     }
 
-                    let overridenValue;
-                    eavValues.values.forEach(eavValue => {
-                      if (eavValue._embedded.formAttribute.code === item.name) {
-                        overridenValue = eavValue.value;
-                      }
+                    this.setState({
+                      values: values,
+                      originalValues: [...values],
+                      _showLoading: false
                     });
-
-                    const valuetoInsert = {
-                      key: key,
-                      name: item.name,
-                      value: value,
-                      overridenValue: overridenValue,
-                      multiValue: item.multiValue,
-                      reset: false
-                    }
-                    values[key] = valuetoInsert;
-                    key++;
+                  })
+                  .catch(error => {
+                    this.addError(error);
                   });
-                }
-
-                this.setState({
-                  values: values,
-                  originalValues: [...values],
-                  _showLoading: false
-                });
               })
               .catch(error => {
-                this.addError(error);
+                // If account has no overriden attributes in goes here
+                // Get account from system
+                manager.getService()
+                  .getConnectorObject(entityId)
+                  .then(json => {
+                    var key = 0;
+                    const values = [];
+                    if (json) {
+                      json.attributes.forEach(item => {
+                        let value;
+                        if (item.values) {
+                          if (!item.multiValue) {
+                            value = item.values[0];
+                          } else {
+                            let multiValue = '';
+                            item.values.forEach(entryValue => {
+                              multiValue = multiValue.concat(entryValue + "\n");
+                            });
+                            value = multiValue.trim();
+                          }
+                        }
+
+                        let overridenValue;
+
+                        const valuetoInsert = {
+                          key: key,
+                          name: item.name,
+                          value: value,
+                          overridenValue: overridenValue,
+                          multiValue: item.multiValue,
+                          isRole: mappingAttributes.get(item.name) === "MERGE" || mappingAttributes.get(item.name) === "AUTHORITATIVE_MERGE" ? true : false,
+                          reset: false
+                        }
+                        values[key] = valuetoInsert;
+                        key++;
+                      });
+                    }
+
+                    this.setState({
+                      values: values,
+                      originalValues: [...values],
+                      _showLoading: false
+                    });
+                  })
+                  .catch(error => {
+                    this.addError(error);
+                  });
               });
           })
           .catch(error => {
-            manager.getService()
-              .getConnectorObject(entityId)
-              .then(json => {
-                var key = 0;
-                const values = [];
-                if (json) {
-                  json.attributes.forEach(item => {
-                    let value;
-                    if (item.values) {
-                      // TODO solve multivalue
-                      value = item.values[0];
-                    }
-
-                    let overridenValue;
-
-                    const valuetoInsert = {
-                      key: key,
-                      name: item.name,
-                      value: value,
-                      overridenValue: overridenValue,
-                      multiValue: item.multiValue,
-                      reset: false
-                    }
-                    values[key] = valuetoInsert;
-                    key++;
-                  });
-                }
-
-                this.setState({
-                  values: values,
-                  originalValues: [...values],
-                  _showLoading: false
-                });
-              })
-              .catch(error => {
-                this.addError(error);
-              });
+            this.addError(error);
           });
+
+
       }));
     });
   }
@@ -350,27 +445,35 @@ class AccountDetail extends Basic.AbstractContent {
   }
 
   stopOverride(event, key) {
-    const { values, originalValues } = this.state;
+    const { entity } = this.props;
+    const { values } = this.state;
 
     this.refs['confirm-stop-override'].show(
       this.i18n('override.text'),
       this.i18n('override.header')
     ).then(() => {
-      values[key] = {
-        key: key,
-        name: values[key].name,
-        value: originalValues[key].value,
-        overridenValue: undefined,
-        multiValue: values[key].multiValue,
-        reset: true
-      };
+      systemAttributeMappingManager.getService().getAttributeValue(values[key].name, entity.id)
+        .then(json => {
+          values[key] = {
+            key: key,
+            name: values[key].name,
+            value: json.content,
+            overridenValue: undefined,
+            multiValue: values[key].multiValue,
+            isRole: values[key].isRole,
+            reset: true
+          };
 
-      this.setState({
-        values: values,
-        changed: true
-      }, () => {
-        this.forceUpdate();
-      });
+          this.setState({
+            values: values,
+            changed: true
+          }, () => {
+            this.forceUpdate();
+          });
+        })
+        .catch(error => {
+          this.addError(error);
+        });
     }, () => {
       // nothing
     });
@@ -413,7 +516,6 @@ class AccountDetail extends Basic.AbstractContent {
         <Helmet title={this.i18n('tabs.account')} />
         <Basic.Confirm ref="confirm-stop-override" level="info" />
         <Basic.Modal show={showModal} onHide={this.closeModal.bind(this)} >
-          <Basic.Modal.Header text={'Zadna zmena'} closeButton />
           <Basic.Modal.Body>
             <Basic.Alert
               level="info"
@@ -443,7 +545,7 @@ class AccountDetail extends Basic.AbstractContent {
                 rowClass={'warning'}>
                 <Basic.Column
                   property="name"
-                  header={'Attribute'}
+                  header={this.i18n('save.attribute')}
                   cell={({ rowIndex, data }) => {
                     const row = data[rowIndex];
                     return row.name;
@@ -451,7 +553,7 @@ class AccountDetail extends Basic.AbstractContent {
                 />
                 <Basic.Column
                   property="original"
-                  header={'Value on system'}
+                  header={this.i18n('save.value-on-system')}
                   cell={({ rowIndex, data }) => {
                     const row = data[rowIndex];
 
@@ -475,7 +577,7 @@ class AccountDetail extends Basic.AbstractContent {
                 />
                 <Basic.Column
                   property="new"
-                  header={'New value'}
+                  header={this.i18n('save.new-value')}
                   cell={({ rowIndex, data }) => {
                     const row = data[rowIndex];
 
@@ -534,8 +636,8 @@ class AccountDetail extends Basic.AbstractContent {
                     icon={showEdit ? "fa:th-list" : "fa:pencil"}
                     disabled={showEdit && changed}>
                     {showEdit
-                      ? 'view'
-                      : 'edit'
+                      ? this.i18n('control.view')
+                      : this.i18n('control.edit')
                     }
                   </Basic.Button>
                 </Grid>
@@ -547,7 +649,7 @@ class AccountDetail extends Basic.AbstractContent {
                     icon="fa:sync"
                     rendered={!showEdit}
                     onClick={this.refresh.bind(this)}>
-                    {'refresh'}
+                    {this.i18n('control.refresh')}
                   </Basic.Button>
                   <Basic.Button
                     level="link"
@@ -557,7 +659,7 @@ class AccountDetail extends Basic.AbstractContent {
                     onClick={this.save.bind(this)}
                     rendered={showEdit}
                     disabled={!changed}>
-                    {'save'}
+                    {this.i18n('control.save')}
                   </Basic.Button>
                 </Grid>
                 <Grid item xs={1}>
@@ -569,14 +671,20 @@ class AccountDetail extends Basic.AbstractContent {
                     onClick={this.discard.bind(this)}
                     rendered={showEdit}
                     disabled={!changed}>
-                    {'discard'}
+                    {this.i18n('control.discard')}
                   </Basic.Button>
                 </Grid>
                 <Grid item xs={2}>
-                  <TextField id="outlined-basic" label="Attribute name" variant="outlined" size="small" autoComplete='off' onChange={this.filterNameChanged.bind(this)} value={attrName ? attrName : ''} />
+                  <TextField id="outlined-basic" label={this.i18n('control.attr-name')}
+                    variant="outlined" size="small"
+                    autoComplete='off' onChange={this.filterNameChanged.bind(this)}
+                    value={attrName ? attrName : ''} />
                 </Grid>
                 <Grid item xs={2}>
-                  <TextField id="outlined-basic" label="Attribute value" variant="outlined" size="small" autoComplete='off' onChange={this.filterValueChanged.bind(this)} value={attrValue ? attrValue : ''} />
+                  <TextField id="outlined-basic" label={this.i18n('control.attr-value')}
+                    variant="outlined" size="small"
+                    autoComplete='off' onChange={this.filterValueChanged.bind(this)}
+                    value={attrValue ? attrValue : ''} />
                 </Grid>
                 <Grid item xs={1}>
                   <Basic.Button
@@ -585,7 +693,7 @@ class AccountDetail extends Basic.AbstractContent {
                     className="btn-xs"
                     style={{ minWidth: 150 }}
                     onClick={this.cancel.bind(this)}>
-                    {'cancel filter'}
+                    {this.i18n('control.cancel-filter')}
                   </Basic.Button>
                 </Grid>
               </Grid>
@@ -605,17 +713,28 @@ class AccountDetail extends Basic.AbstractContent {
                             ?
                             <Basic.Div>
                               <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
-                              <TextField onBlur={this.focusLost.bind(this)} onChange={(e) => this.valueChange(e, item.key)} maxRows={4} autoComplete='off' multiline id="outlined-basic" value={(item.overridenValue != undefined ? item.overridenValue : item.value)} size="small" style={{ marginTop: -10 }} />
+                              <TextField disabled={item.isRole} onBlur={this.focusLost.bind(this)}
+                                onChange={(e) => this.valueChange(e, item.key)} maxRows={4}
+                                autoComplete='off' multiline id="outlined-basic"
+                                value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
+                                size="small" style={{ marginTop: -10 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
-                                <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label='Spravováno ručně' />
+                                <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label={this.i18n('control.manually')} />
+                              </Basic.Div>
+                              <Basic.Div rendered={item.isRole} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
+                                <Chip color="secondary" size="small" label={this.i18n('control.managed-by-roles')} />
                               </Basic.Div>
                             </Basic.Div>
                             :
                             <Basic.Div>
                               <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
-                              <TextField onBlur={this.focusLost.bind(this)} onChange={(e) => this.valueChange(e, item.key)} id="outlined-basic" autoComplete='off' value={(item.overridenValue != undefined ? item.overridenValue : item.value)} size="small" style={{ marginTop: -10 }} />
+                              <TextField onBlur={this.focusLost.bind(this)}
+                                onChange={(e) => this.valueChange(e, item.key)} id="outlined-basic"
+                                autoComplete='off'
+                                value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
+                                size="small" style={{ marginTop: -10 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
-                                <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label='Spravováno ručně' />
+                                <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label={this.i18n('control.manually')} />
                               </Basic.Div>
                             </Basic.Div>
                           }
@@ -626,17 +745,21 @@ class AccountDetail extends Basic.AbstractContent {
                             ?
                             <Basic.Div>
                               <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
-                              <TextField disabled maxRows={4} multiline id="outlined-basic" value={(item.overridenValue != undefined ? item.overridenValue : item.value)} size="small" style={{ marginTop: -10 }} />
+                              <TextField disabled maxRows={4} multiline id="outlined-basic"
+                                value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
+                                size="small" style={{ marginTop: -10 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
-                                <Chip color="secondary" size="small" label='Spravováno ručně' />
+                                <Chip color="secondary" size="small" label={this.i18n('control.manually')} />
                               </Basic.Div>
                             </Basic.Div>
                             :
                             <Basic.Div>
                               <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
-                              <TextField disabled id="outlined-basic" value={(item.overridenValue != undefined ? item.overridenValue : (item.value ? item.value : ''))} size="small" style={{ marginTop: -10 }} />
+                              <TextField disabled id="outlined-basic"
+                                value={(item.overridenValue != undefined ? item.overridenValue : (item.value ? item.value : ''))}
+                                size="small" style={{ marginTop: -10 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
-                                <Chip color="secondary" size="small" label='Spravováno ručně' />
+                                <Chip color="secondary" size="small" label={this.i18n('control.manually')} />
                               </Basic.Div>
                             </Basic.Div>
                           }

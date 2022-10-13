@@ -46,7 +46,6 @@ class AccountProvisioning extends Advanced.AbstractTableContent {
       .setFilter('entityType', entity.targetEntityType)
       .setFilter('systemId', entity.system)
       .setFilter('accountId', entity.id);
-      // .setFilter('systemEntity', entity.systemEntity);
     let columns = ProvisioningOperationTable.defaultProps.columns;
     columns = _.difference(columns, ['entityType', 'entityIdentifier']);
     //

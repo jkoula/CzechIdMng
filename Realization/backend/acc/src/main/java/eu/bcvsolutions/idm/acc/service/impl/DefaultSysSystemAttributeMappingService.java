@@ -24,9 +24,10 @@ import javax.persistence.criteria.Subquery;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.plugin.core.OrderAwarePluginRegistry;
 import org.springframework.plugin.core.PluginRegistry;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -51,6 +52,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysAttributeControlledValueFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
@@ -72,6 +74,7 @@ import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.repository.SysRoleSystemAttributeRepository;
 import eu.bcvsolutions.idm.acc.repository.SysSyncConfigRepository;
 import eu.bcvsolutions.idm.acc.repository.SysSystemAttributeMappingRepository;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.FormPropertyManager;
 import eu.bcvsolutions.idm.acc.service.api.SysAttributeControlledValueService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
@@ -96,6 +99,7 @@ import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.GroovyScriptService;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
@@ -157,6 +161,10 @@ public class DefaultSysSystemAttributeMappingService
 	private SysSystemGroupSystemService systemGroupSystemService;
 	@Autowired
 	private SysSystemEntityTypeManager systemEntityManager;
+	@Autowired
+	private AccAccountService accountService;
+	@Autowired
+	private LookupService lookupService;
 
 
 	@Autowired
@@ -363,11 +371,11 @@ public class DefaultSysSystemAttributeMappingService
 		if (filter.getId() != null) {
 			predicates.add(builder.equal(root.get(SysSystemAttributeMapping_.id), filter.getId()));
 		}
-		
+
 		if (!StringUtils.isEmpty(filter.getTransformToScript())) {
 			predicates.add(builder.like(root.get(SysSystemAttributeMapping_.transformToResourceScript), "%" + filter.getTransformToScript() + "%"));
 		}
-		
+
 		if (!StringUtils.isEmpty(filter.getTransformFromScript())) {
 			predicates.add(builder.like(root.get(SysSystemAttributeMapping_.transformFromResourceScript), "%" + filter.getTransformFromScript() + "%"));
 		}
@@ -1360,7 +1368,7 @@ public class DefaultSysSystemAttributeMappingService
 		result.put(SysSystemAttributeMappingService.MAPPING_SCRIPT_FAIL_SCRIPT_PATH_KEY, sb.toString());
 		return result;
 	}
-	
+
 	@Override
 	public List<SysSystemAttributeMappingDto> getScriptTransformToUsage(String scriptCode) {
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
@@ -1384,7 +1392,39 @@ public class DefaultSysSystemAttributeMappingService
 		result.addAll(inTransformationFrom);
 		List<SysSystemAttributeMappingDto> inTransformationTo = getScriptTransformToUsage(scriptCode);
 		result.addAll(inTransformationTo);
-		
+
 		return result;
 	}
+
+	@Override
+	public Object getTransformedValueForAttributeAndAccount(String accountId, String schemaAttrName) {
+		AccAccountDto accountDto = accountService.get(accountId);
+
+		SysSystemAttributeMappingFilter attributeMappingFilter = new SysSystemAttributeMappingFilter();
+		attributeMappingFilter.setSchemaAttributeName(schemaAttrName);
+		attributeMappingFilter.setSystemMappingId(accountDto.getSystemMapping());
+		attributeMappingFilter.setSystemId(accountDto.getSystem());
+		List<SysSystemAttributeMappingDto> systemAttributeMappingDtos = this.find(attributeMappingFilter, null).getContent();
+
+		if (systemAttributeMappingDtos.size() != 1) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		SysSystemAttributeMappingDto systemAttributeMappingDto = systemAttributeMappingDtos.get(0);
+
+		SystemEntityTypeRegistrable systemEntityType = systemEntityManager.getSystemEntityByCode(accountDto.getTargetEntityType());
+		AbstractDto entity = lookupService.lookupDto(systemEntityType.getEntityType(), accountDto.getTargetEntityId());
+
+		SysSystemMappingDto systemMappingDto = DtoUtils.getEmbedded(accountDto, AccAccount_.systemMapping, SysSystemMappingDto.class);
+		SysSystemEntityDto systemEntityDto = DtoUtils.getEmbedded(accountDto, AccAccount_.systemEntity, SysSystemEntityDto.class);
+		SysSystemDto systemDto = DtoUtils.getEmbedded(accountDto, AccAccount_.system, SysSystemDto.class);
+		MappingContext mappingContext = systemMappingService.getMappingContext(systemMappingDto, systemEntityDto, entity, systemDto);
+
+		Object transformValueToResource = this.getAttributeValue(accountDto.getUid(), entity, systemAttributeMappingDto, mappingContext);
+		if (transformValueToResource == null) {
+			transformValueToResource = "";
+		}
+		return transformValueToResource;
+	}
+
 }
