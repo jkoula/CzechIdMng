@@ -425,7 +425,9 @@
           "header": "Detail účtu na koncovém systému"
         },
         "create": {
-          "header": "Nový účet na koncovém systému"
+          "header": "Nový účet na koncovém systému",
+          "or": "nebo",
+          "default": "Použít výchozí formulář"
         },
         "personal-other-account-wizard": {
           "title": "Další osobní účet",

@@ -425,7 +425,9 @@
           "header": "Account details in system"
         },
         "create": {
-          "header": "New account on end system"
+          "header": "New account on end system",
+          "or": "or",
+          "default": "Use default form"
         },
         "personal-other-account-wizard": {
           "title": "Other personal account",

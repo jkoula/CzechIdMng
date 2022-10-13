@@ -36,7 +36,8 @@ export class AccountTable extends Advanced.AbstractTableContent {
       ...this.state,
       systemEntity: null,
       attributeNameFilter: null,
-      showWizard: false
+      showWizard: false,
+      defaultForm: false
     };
     this.context.store.dispatch(manager.fetchSupportedTypes());
   }
@@ -82,6 +83,13 @@ export class AccountTable extends Advanced.AbstractTableContent {
     delete this.state.connectorObject;
   }
 
+  closeDefaultForm() {
+    this.setState({
+      defaultForm: false,
+      systemId: undefined
+    });
+  }
+
   save(entity, event) {
     const formEntity = this.refs.form.getData();
     //
@@ -92,12 +100,19 @@ export class AccountTable extends Advanced.AbstractTableContent {
     if (!error) {
       this.addMessage({ message: this.i18n('save.success', { name: entity.uid }) });
     }
+    this.closeDefaultForm();
     super.afterSave(entity, error);
   }
 
   onChangeSystemEntity(systemEntity) {
     this.setState({
       systemEntity
+    });
+  }
+
+  systemChanged(system) {
+    this.setState({
+      systemId: system.id
     });
   }
 
@@ -164,16 +179,8 @@ export class AccountTable extends Advanced.AbstractTableContent {
       renderSystem,
       supportedTypes
     } = this.props;
-    const { detail, systemEntity, connectorObject, showWizard, accountWizard } = this.state;
+    const { detail, systemEntity, connectorObject, showWizard, accountWizard, defaultForm, systemId } = this.state;
     //
-    let systemId = null;
-    if (forceSearchParameters.getFilters().has('systemId')) {
-      systemId = forceSearchParameters.getFilters().get('systemId');
-    } 
-    if (systemId == null && detail && detail.entity) {
-      systemId = detail.entity.system
-    }
-
     const forceSearchMappings = new Domain.SearchParameters()
       .setFilter('operationType', SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
       .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
@@ -335,6 +342,24 @@ export class AccountTable extends Advanced.AbstractTableContent {
                   ))
                 }
               </Basic.Div>
+              <Basic.Div style={{ margin: '0 75px' }} >
+              <Basic.TextDivider text={ this.i18n('create.or') }/>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 10 }}>
+                <Basic.Button
+                  level="link"
+                  onClick={ (event) => {
+                    if (event) {
+                      event.preventDefault();
+                    }
+                    this.setState({
+                      defaultForm: true
+                    });
+                    this.closeDetail();
+                  }}>
+                  { this.i18n('create.default') }
+                </Basic.Button>
+              </div>
+            </Basic.Div>
           </Basic.Modal.Body>
           <Basic.Modal.Footer>
             <Basic.Button
@@ -358,6 +383,102 @@ export class AccountTable extends Advanced.AbstractTableContent {
             </Basic.Div>
           </IdmContext.Provider>
         }
+
+        <Basic.Modal
+          bsSize="large"
+          show={defaultForm}
+          onHide={this.closeDefaultForm.bind(this)}
+          backdrop="static"
+          keyboard={!_showLoading}>
+          <Basic.Modal.Header
+            closeButton={!_showLoading}
+            text={this.i18n('create.header')}
+            rendered={Utils.Entity.isNew(detail.entity)} />
+          <Basic.Modal.Header
+            closeButton={!_showLoading}
+            text={this.i18n('edit.header', { name: detail.entity.name })}
+            rendered={!Utils.Entity.isNew(detail.entity)} />
+          <Basic.Modal.Body>
+            <form onSubmit={this.save.bind(this, {})}>
+              <Basic.AbstractForm
+                ref="form"
+                showLoading={_showLoading}
+                readOnly={!manager.canSave(detail.entity, _permissions)}>
+                <Basic.SelectBox
+                  ref="system"
+                  manager={systemManager}
+                  label={this.i18n('acc:entity.Account.system')}
+                  forceSearchParameters={new Domain.SearchParameters(Domain.SearchParameters.NAME_AUTOCOMPLETE)}
+                  required
+                  onChange={this.systemChanged.bind(this)} />
+                <Basic.TextField
+                  ref="uid"
+                  label={this.i18n('acc:entity.Account.uid')}
+                  required
+                  max={1000} />
+                {
+                  !Managers.SecurityManager.hasAuthority('SYSTEMENTITY_READ')
+                  ||
+                  <Basic.SelectBox
+                    ref="systemEntity"
+                    manager={systemEntityManager}
+                    label={this.i18n('acc:entity.Account.systemEntity')}
+                    forceSearchParameters={forceSystemEntitySearchParameters}
+                    onChange={this.onChangeSystemEntity.bind(this)} />
+                }
+                <Basic.SelectBox
+                  ref="entityType"
+                  label={this.i18n('acc:entity.SystemEntity.entityType')}
+                  multiSelect={false}
+                  manager={systemEntityTypeManager}
+                  hidden={systemEntity} />
+                <Basic.SelectBox
+                  ref="systemMapping"
+                  manager={systemMappingManager}
+                  forceSearchParameters={forceSearchMappings}
+                  label={this.i18n('acc:entity.RoleSystem.systemMapping')}
+                  placeholder={this.i18n('acc:content.role.roleSystemDetail.systemMapping.systemPlaceholder')}
+                  required />
+                <Basic.Checkbox
+                  ref="inProtection"
+                  label={this.i18n('acc:entity.Account.inProtection')}
+                  readOnly />
+                <Basic.DateTimePicker
+                  mode="datetime"
+                  ref="endOfProtection"
+                  label={this.i18n('acc:entity.Account.endOfProtection')}
+                  readOnly={!detail.entity.inProtection} />
+              </Basic.AbstractForm>
+              {/* onEnter action - is needed because footer submit button is outside form */}
+              <input type="submit" className="hidden" />
+            </form>
+            <Basic.Div rendered={Managers.SecurityManager.hasAuthority('SYSTEM_READ')}>
+              <Basic.ContentHeader text={this.i18n('acc:entity.SystemEntity.attributes')} rendered={!Utils.Entity.isNew(detail.entity)} />
+              <AttributeTable
+                connectorObject={connectorObject}
+                rendered={!Utils.Entity.isNew(detail.entity)}
+              />
+            </Basic.Div>
+          </Basic.Modal.Body>
+          <Basic.Modal.Footer>
+            <Basic.Button
+              level="link"
+              onClick={this.closeDefaultForm.bind(this)}
+              showLoading={_showLoading}>
+              {this.i18n('button.close')}
+            </Basic.Button>
+            <Basic.Button
+              type="submit"
+              level="success"
+              rendered={manager.canSave(detail.entity, _permissions)}
+              showLoading={_showLoading}
+              showLoadingIcon
+              showLoadingText={this.i18n('button.saving')}
+              onClick={this.save.bind(this, {})}>
+              {this.i18n('button.save')}
+            </Basic.Button>
+          </Basic.Modal.Footer>
+        </Basic.Modal>
 
       </Basic.Div>
     );
