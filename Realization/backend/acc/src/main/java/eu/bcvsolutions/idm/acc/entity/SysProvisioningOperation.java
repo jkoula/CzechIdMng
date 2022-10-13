@@ -90,7 +90,8 @@ public class SysProvisioningOperation extends AbstractEntity {
 	@Column(name = "role_request_id")
     private UUID roleRequestId;
 
-	@ManyToOne(optional = false)
+	@ManyToOne
+	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private AccAccount account;
 
