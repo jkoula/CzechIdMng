@@ -246,27 +246,54 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
           const valuesToSave = new Map();
 
           this.refs.wizard.refs.attributes.getValues().forEach(value => {
-            filledValues.set(value.formAttribute, value);
+            if (filledValues.has(value.formAttribute)) {
+              const values = filledValues.get(value.formAttribute);
+              values.push(value);
+              filledValues.set(value.formAttribute, values);
+            } else {
+              const values = [value];
+              filledValues.set(value.formAttribute, values);
+            }
           })
 
           wizardContext.connectorType.values.forEach(value => {
-            defaultValues.set(value.formAttribute, value);
+            if (defaultValues.has(value.formAttribute)) {
+              const values = defaultValues.get(value.formAttribute);
+              values.push(value);
+              defaultValues.set(value.formAttribute, values);
+            } else {
+              const values = [value];
+              defaultValues.set(value.formAttribute, values);
+            }
           })
 
           filledValues.forEach((value, key) => {
             if (defaultValues.has(key)) {
-              if (defaultValues.get(key).value !== value.value) {
-                valuesToSave.set(value.formAttribute, value);
+              // compare each value
+              if (defaultValues.get(key).length === value.length) {
+                for (let index = 0; index < value.length; index++) {
+                  if (defaultValues.get(key)[index].value !== value[index].value) {
+                    valuesToSave.set(value[index].formAttribute, value);
+                  }
+                }
+              } else {
+                // arrays have diffrent size, something changed
+                valuesToSave.set(value[0].formAttribute, value);
               }
             } else {
-              valuesToSave.set(value.formAttribute, value);
+              valuesToSave.set(value[0].formAttribute, value);
             }
           });
 
-          wizardContext.connectorType.values = filledValues;
+          wizardContext.connectorType.values = this.refs.wizard.refs.attributes.getValues();
+
+          let valuesToSaveArray = [];
+          valuesToSave.forEach(value => {
+            valuesToSaveArray = valuesToSaveArray.concat(value);
+          });
 
           this.setState({
-            valuesToSave: Array.from(valuesToSave.values())
+            valuesToSave: valuesToSaveArray
           });
         }
         wizardContext.connectorType.wizardStepName = "accountAttributes";
