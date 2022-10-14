@@ -3493,7 +3493,7 @@
         },
         "two": {
           "name": "Attributes",
-          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually. Manually edited attributes will be highlighted with yellow color."
+          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually."
         },
         "three": {
           "name": "Recapitulation",
@@ -3517,7 +3517,7 @@
         },
         "two": {
           "name": "Attributes",
-          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually. Manually edited attributes will be highlighted with yellow color."
+          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually."
         },
         "three": {
           "name": "Recapitulation",

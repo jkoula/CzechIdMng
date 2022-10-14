@@ -58,6 +58,7 @@ public class DefaultAccountWizardManager implements AccountWizardManager {
 		accountWizardDto.setMetadata(wizard.getMetadata());
 		accountWizardDto.setOrder(wizard.getOrder());
 		accountWizardDto.setFormDefinition(wizard.getFormDefinitionDto());
+		accountWizardDto.setValues(wizard.getValues());
 
 		return accountWizardDto;
 	}

@@ -28,7 +28,9 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
     if (wizardContext && connectorType) {
       wizardContext.connectorType = connectorType;
     }
-    this.state = {};
+    this.state = {
+      expanded: 'panel1'
+    };
   }
 
   getWizardId() {
@@ -181,7 +183,7 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
     const wizardContext = this.context.wizardContext;
     let formInstance;
     if (wizardContext && wizardContext.connectorType && wizardContext.connectorType.formDefinition) {
-      formInstance = new Domain.FormInstance(wizardContext.connectorType.formDefinition, null);
+      formInstance = new Domain.FormInstance(wizardContext.connectorType.formDefinition, wizardContext.connectorType.values);
     }
     const { connectorType } = this.props;
     return {
@@ -203,7 +205,7 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                 >
                   <Typography>Basic attributes</Typography>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails style={{display: 'inherit'}}>
                   <Typography>
                     {formInstance
                       ? <Advanced.EavForm
@@ -227,20 +229,6 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                   </Typography>
                 </AccordionDetails>
               </Accordion>
-              <Accordion expanded={expanded === 'panel3'} onChange={this.handleChange.bind(this, 'panel3')}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel2bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography>Other attributes</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                    asdadf
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
             </Basic.AbstractForm>
           </Basic.Div>
         );
@@ -252,7 +240,34 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
 
         const wizardContext = this.context.wizardContext;
         if (this?.refs?.wizard?.refs?.attributes) {
-          wizardContext.connectorType.values = this.refs.wizard.refs.attributes.getValues();
+          // compare filled values with default ones. We want to save to EAV only values which were filled by user (exclude default ones)
+          const filledValues = new Map();
+          const defaultValues = new Map();
+          const valuesToSave = new Map();
+
+          this.refs.wizard.refs.attributes.getValues().forEach(value => {
+            filledValues.set(value.formAttribute, value);
+          })
+
+          wizardContext.connectorType.values.forEach(value => {
+            defaultValues.set(value.formAttribute, value);
+          })
+
+          filledValues.forEach((value, key) => {
+            if (defaultValues.has(key)) {
+              if (defaultValues.get(key).value !== value.value) {
+                valuesToSave.set(value.formAttribute, value);
+              }
+            } else {
+              valuesToSave.set(value.formAttribute, value);
+            }
+          });
+
+          wizardContext.connectorType.values = filledValues;
+
+          this.setState({
+            valuesToSave: Array.from(valuesToSave.values())
+          });
         }
         wizardContext.connectorType.wizardStepName = "accountAttributes";
         cb();
@@ -323,28 +338,17 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                 </Typography>
               </AccordionDetails>
             </Accordion>
-            <Accordion expanded={expanded === 'panel3'} onChange={this.handleChange.bind(this, 'panel3')}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2bh-content"
-                id="panel2bh-header"
-              >
-                <Typography>Other attributes</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
-                  asdadf
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
           </div>
         );
       },
       // Good method for execute a step on the backend (if is defined).
       // For example set connector info after new system is created.
       getExecuteConnectorType: (cb) => {
+        const { valuesToSave } = this.state;
         const wizardContext = this.context.wizardContext;
         wizardContext.connectorType.wizardStepName = "accountRecapitulation";
+        // put only the values which were overriden by user
+        wizardContext.connectorType.values = valuesToSave;
         this.setState({
           showLoading: true
         }, () => {

@@ -3496,7 +3496,7 @@
         },
         "two": {
           "name": "Atributy",
-          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny. V případě manuální úpravy bude atribut zvýrazněn žlutě."
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny"
         },
         "three": {
           "name": "Rekapitulace",
@@ -3520,7 +3520,7 @@
         },
         "two": {
           "name": "Atributy",
-          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny. V případě manuální úpravy bude atribut zvýrazněn žlutě."
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny."
         },
         "three": {
           "name": "Rekapitulace",
