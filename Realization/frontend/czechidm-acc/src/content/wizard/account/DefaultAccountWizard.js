@@ -203,7 +203,7 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                   aria-controls="panel1bh-content"
                   id="panel1bh-header"
                 >
-                  <Typography>Basic attributes</Typography>
+                  <Typography>{this.i18n(`${connectorType.module}:wizard.${connectorType.name}.steps.two.basic-attr`)}</Typography>
                 </AccordionSummary>
                 <AccordionDetails style={{display: 'inherit'}}>
                   <Typography>
@@ -221,11 +221,10 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                   aria-controls="panel2bh-content"
                   id="panel2bh-header"
                 >
-                  <Typography>Permissions</Typography>
+                  <Typography>{this.i18n(`${connectorType.module}:wizard.${connectorType.name}.steps.two.permission`)}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography>
-                    asdadf
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -337,7 +336,7 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                 aria-controls="panel1bh-content"
                 id="panel1bh-header"
               >
-                <Typography>Basic attributes</Typography>
+                <Typography>{this.i18n(`${connectorType.module}:wizard.${connectorType.name}.steps.three.basic-attr`)}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography>
@@ -357,11 +356,10 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                 aria-controls="panel2bh-content"
                 id="panel2bh-header"
               >
-                <Typography>Permissions</Typography>
+                <Typography>{this.i18n(`${connectorType.module}:wizard.${connectorType.name}.steps.three.permission`)}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Typography>
-                  asdadf
                 </Typography>
               </AccordionDetails>
             </Accordion>
