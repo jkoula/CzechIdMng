@@ -1689,9 +1689,10 @@
       "system":{
         "label":"Systém"
       },
-     "owner": {
-      "label":"Role"
-     },
+      "owner": {
+        "label":"Role"
+      }
+    },
     "SystemEntityType": {
       "IDENTITY": {
         "label": "Identita",
