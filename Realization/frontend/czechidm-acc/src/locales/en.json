@@ -1689,7 +1689,8 @@
       },
       "owner": {
         "label":"Role"
-     },
+      }
+    },
     "SystemEntityType": {
       "IDENTITY": {
         "label": "Identity",
