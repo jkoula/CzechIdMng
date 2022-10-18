@@ -62,7 +62,7 @@ const ServiceRoot = {
   SystemGroupService,
   SystemGroupSystemService,
   SystemOwnerService,
-  SystemOwnerRoleService
+  SystemOwnerRoleService,
   SystemEntityTypeService
 };
 
