@@ -3521,11 +3521,15 @@
         },
         "two": {
           "name": "Attributes",
-          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually."
+          "help": "Fill attributes for account. Values could be filled with suggested values. If it's allowed, you can change them manually.",
+          "basic-attr": "Basic attributes",
+          "permission": "Roles - permissions"
         },
         "three": {
           "name": "Recapitulation",
-          "help": "Check filled values, with which the account will be created. If you need to make some chage, go back to the correct step in wizard."
+          "help": "Check filled values, with which the account will be created. If you need to make some chage, go back to the correct step in wizard.",
+          "basic-attr": "Basic attributes",
+          "permission": "Roles - permissions"
         },
         "four": {
           "name": "Finish",

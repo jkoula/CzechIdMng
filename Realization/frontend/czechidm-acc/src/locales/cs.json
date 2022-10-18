@@ -3496,11 +3496,15 @@
         },
         "two": {
           "name": "Atributy",
-          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny"
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny",
+          "basic-attr": "Základní atributy",
+          "permission": "Role - oprávnění"
         },
         "three": {
           "name": "Rekapitulace",
-          "help": "Zkontrolujte zadané hodnoty, s kterými bude účet vytvořen. Pokud potřebujete udělat nějakou změnu, vraťte se na odpovídají krok průvodce."
+          "help": "Zkontrolujte zadané hodnoty, s kterými bude účet vytvořen. Pokud potřebujete udělat nějakou změnu, vraťte se na odpovídají krok průvodce.",
+          "basic-attr": "Základní atributy",
+          "permission": "Role - oprávnění"
         },
         "four": {
           "name": "Dokončení",

@@ -373,11 +373,12 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
         const wizardContext = this.context.wizardContext;
         wizardContext.connectorType.wizardStepName = "accountRecapitulation";
         // put only the values which were overriden by user
-        wizardContext.connectorType.values = valuesToSave;
+        const connectorTypeToSend = _.cloneDeep(wizardContext.connectorType);
+        connectorTypeToSend.values = valuesToSave;
         this.setState({
           showLoading: true
         }, () => {
-          accountManager.getService().executeConnectorType(wizardContext.connectorType)
+          accountManager.getService().executeConnectorType(connectorTypeToSend)
             .then((json) => {
               wizardContext.connectorType = json;
               this.setState({
