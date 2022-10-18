@@ -1,5 +1,6 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import _ from 'lodash';
 //
 import * as Basic from '../../components/basic';
@@ -13,7 +14,7 @@ import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
-
+import { ConfigurationManager } from '../../redux';
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const requestIdentityRoleManager = new RequestIdentityRoleManager();
 const roleRequestManager = new RoleRequestManager();
@@ -481,6 +482,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       identityId,
       showRowSelection,
       showEnvironment,
+      columns
     } = this.props;
     const {
       showChangesOnly,
@@ -547,6 +549,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
           </Basic.Toolbar>
           <Advanced.Table
             ref="table"
+            columns={ this.props.columns }
             uiKey="request-identity-role-table"
             hover={ false }
             manager={ requestIdentityRoleManager }
@@ -613,7 +616,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               className="detail-button"
               cell={ this.renderDetailCell.bind(this) }/>
             <Advanced.Column
-              property="role.name"
+              property="name"
               title={ this.i18n('entity.Role.name') }
               sort
               header={ this.i18n('entity.IdentityRole.role') }
@@ -642,15 +645,18 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                 }
               }/>
             <Advanced.Column
-              property="_embedded.role.baseCode"
+              property="baseCode"
               sortProperty="role.baseCode"
               rendered={showEnvironment}
               face="text"
               header={ this.i18n('entity.Role.baseCode.label') }
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.baseCode 
+              }
               sort/>
             <Advanced.Column
               property="systemState"
-              width={75}
               face="text"
               header={this.i18n('systemState')}
               rendered={showChangesOnly}
@@ -663,18 +669,24 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                 }
               }/>
             <Advanced.Column
-              property="_embedded.role.environment"
+              property="environment"
               rendered={showEnvironment}
               sortProperty="role.environment"
               face="text"
               header={ this.i18n('entity.Role.environment.label') }
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.environment 
+              }
               sort/>
             <Advanced.Column
+              property="roleAttributes"
               header={this.i18n('content.task.IdentityRoleConceptTable.identityRoleAttributes.header')}
               cell={
                 ({rowIndex, data}) => this.renderConceptAttributesCell({ rowIndex, data })
               }/>
             <Advanced.Column
+              property="contractPosition"
               header={ this.i18n('entity.IdentityRole.identityContract.title') }
               cell={
                 ({rowIndex, data}) => {
@@ -699,6 +711,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               }/>
             <Advanced.Column
               header={ this.i18n('entity.RoleRequest.candicateUsers') }
+              property="candicateUsers"
               cell={
                 ({rowIndex, data}) => {
                   const candidates = data[rowIndex].candidates;
@@ -722,6 +735,23 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               face="date"
               header={this.i18n('entity.ConceptRoleRequest.validTill')}/>
             <Advanced.Column
+              property="description"
+              header={this.i18n('entity.Role.description')}
+              face="text"
+              className='descriptionColumn'
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.description 
+              }/>
+            <Advanced.Column
+              property="priority"
+              header={this.i18n('entity.Role.priority')}
+              face="text"
+              cell={ 
+                ({ rowIndex, data }) => 
+                  data[rowIndex]._embedded.role.priority 
+              }/>
+            <Advanced.Column
               property="directRole"
               header={ this.i18n('entity.IdentityRole.directRole.label') }
               cell={
@@ -740,8 +770,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                       face="popover" />
                   );
                 }
-              }
-              width={ 150 }/>
+              }/>
             <Advanced.Column
               sort
               property="automaticRole"
@@ -753,6 +782,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                   className="column-face-bool"/>
               }/>
             <Advanced.Column
+              property="action"
               header={ this.i18n('label.action') }
               className="action"
               cell={ this.renderConceptActionsCell.bind(this) }/>
@@ -854,10 +884,35 @@ RequestIdentityRoleTable.propTypes = {
 };
 
 RequestIdentityRoleTable.defaultProps = {
+  columns: ConfigLoader.getConfig('RequestIdentityRoleTable.table.columns', [
+    'name',
+    'baseCode',
+    'systemState',
+    'environment',
+    'roleAttributes',
+    'contractPosition',
+    'validFrom',
+    'validTill',
+    'description',
+    'priority',
+    'directRole',
+    'automaticRole',
+    'candicateUsers',
+    'action'
+  ]),
   showLoading: false,
   showRowSelection: true,
   readOnly: false,
   showEnvironment: true
 };
 
-export default RequestIdentityRoleTable;
+function select(state, component) {
+  return {
+    columns: component.columns || ConfigurationManager.getPublicValueAsArray(
+      state,
+      'idm.pub.app.show.role.request.table.columns',
+      RequestIdentityRoleTable.defaultProps.columns
+    )
+  };
+}
+export default connect(select, null, null, { forwardRef: true })(RequestIdentityRoleTable);
