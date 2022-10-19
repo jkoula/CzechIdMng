@@ -40,7 +40,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 		@Index(name = "idx_sys_p_o_entity_identifier", columnList = "entity_identifier"),
 		@Index(name = "idx_sys_pro_oper_batch_id", columnList = "provisioning_batch_id"),
 		@Index(name = "idx_sys_p_o_role_request_id", columnList = "role_request_id"),
-		@Index(name = "idx_sys_p_o_role_account_id", columnList = "account_id")
+		@Index(name = "idx_sys_p_o_account_id", columnList = "account_id")
 		})
 public class SysProvisioningOperation extends AbstractEntity {
 
