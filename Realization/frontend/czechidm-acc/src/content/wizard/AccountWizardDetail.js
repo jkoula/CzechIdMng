@@ -46,5 +46,5 @@ export default class AccountWizardDetail extends Basic.AbstractContextComponent 
 }
 
 AccountWizardDetail.defaultProps = {
-  reopened: false // Defines if the wizard use for create new system or for reopen existed.
+  reopened: false // Defines if the wizard use for create new account or for reopen existed.
 };

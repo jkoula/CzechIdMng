@@ -3489,7 +3489,7 @@
       "steps": {
         "one": {
           "name": "Základní nastavení účtu",
-          "help": "Udělejte základní nastavení účtů a vyberte vlastníka",
+          "help": "Proveďte základní nastavení účtů a vyberte vlastníka",
           "system": "Systém",
           "type": "Typ uživatele",
           "owner": "Vlastník"
@@ -3517,7 +3517,7 @@
       "steps": {
         "one": {
           "name": "Základní nastavení účtu",
-          "help": "Udělejte základní nastavení účtů a vyberte vlastníka",
+          "help": "Proveďte základní nastavení účtů a vyberte vlastníka",
           "system": "Systém",
           "type": "Typ uživatele",
           "owner": "Vlastník"

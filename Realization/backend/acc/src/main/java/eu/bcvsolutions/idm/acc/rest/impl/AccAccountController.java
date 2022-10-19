@@ -687,6 +687,7 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "")})
 			})
 	public ResponseEntity<AccountWizardDto> loadWizardType(@NotNull @Valid @RequestBody AccountWizardDto wizardDto) {
+		// Returning error, because loading wizard is not supported, we are using wizard only for new accounts
 		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
