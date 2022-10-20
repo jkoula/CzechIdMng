@@ -288,6 +288,13 @@ public abstract class AbstractLongRunningTaskExecutor<V> implements
 			}
 
 			return end(result, null);
+		} catch (AcceptedException ae) {
+			OperationResult resultAccepted = new OperationResult.Builder(OperationState.CREATED).build();
+			IdmLongRunningTaskDto task = longRunningTaskService.get(longRunningTaskId);
+			task.setRunning(false);
+			task.setResult(resultAccepted);
+			longRunningTaskService.save(task);
+			return null;
 		} catch (Exception ex) {
 			return end(null, ex);
 		}
