@@ -723,7 +723,7 @@ class AccountDetail extends Basic.AbstractContent {
                                 onChange={(e) => this.valueChange(e, item.key)} maxRows={4}
                                 autoComplete='off' multiline id="outlined-basic"
                                 value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
-                                size="small" style={{ marginTop: -10 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label={this.i18n('control.manually')} />
                               </Basic.Div>
@@ -738,7 +738,7 @@ class AccountDetail extends Basic.AbstractContent {
                                 onChange={(e) => this.valueChange(e, item.key)} id="outlined-basic"
                                 autoComplete='off'
                                 value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
-                                size="small" style={{ marginTop: -10 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label={this.i18n('control.manually')} />
                               </Basic.Div>
@@ -753,7 +753,7 @@ class AccountDetail extends Basic.AbstractContent {
                               <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
                               <TextField disabled maxRows={4} multiline id="outlined-basic"
                                 value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
-                                size="small" style={{ marginTop: -10 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" label={this.i18n('control.manually')} />
                               </Basic.Div>
@@ -763,7 +763,7 @@ class AccountDetail extends Basic.AbstractContent {
                               <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
                               <TextField disabled id="outlined-basic"
                                 value={(item.overridenValue != undefined ? item.overridenValue : (item.value ? item.value : ''))}
-                                size="small" style={{ marginTop: -10 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" label={this.i18n('control.manually')} />
                               </Basic.Div>
