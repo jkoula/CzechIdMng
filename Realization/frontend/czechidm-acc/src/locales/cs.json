@@ -4141,6 +4141,10 @@
     "WIZARD_MSSQL_CONNECTOR_LIB_MISSING": {
       "title": "Připojení k MS-SQL serveru se nezdařilo (chybí knihovna)!",
       "message": "Pro použití Windows authentizace, musí být nainstalována specifická knihovna: [{{text}}]."
+    },
+    "WIZARD_ACCOUNT_NO_LOGIN_ROLE": {
+      "title": "Účet nelze vytvořit",
+      "message": "Nepodařilo se najít login roli pro daný systém a typ účtu. Prosím zkontrolujte nastavení systému a login roli."
     }
   },
   "processor": {

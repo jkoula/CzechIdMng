@@ -4138,6 +4138,10 @@
     "WIZARD_MSSQL_CONNECTOR_LIB_MISSING": {
       "title": "Connection to MS-SQL server failed (missing library)!",
       "message": "To use Windows authentication, the specific library must be installed: [{{text}}]."
+    },
+    "WIZARD_ACCOUNT_NO_LOGIN_ROLE": {
+      "title": "Account can't be created",
+      "message": "No login role found for this specific system and user type. Please check system configuration and login role."
     }
   },
   "processor": {

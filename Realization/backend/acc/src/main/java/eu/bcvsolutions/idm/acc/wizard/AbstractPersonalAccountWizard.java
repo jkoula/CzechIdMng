@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccountWizardDto;
@@ -21,6 +22,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
@@ -85,6 +87,15 @@ public abstract class AbstractPersonalAccountWizard extends AbstractAccountWizar
 		Map<String, String> metadata = wizardDto.getMetadata();
 		String systemMappingId = metadata.getOrDefault("systemMapping", null);
 
+		// Login role
+		SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
+		roleSystemFilter.setSystemMappingId(UUID.fromString(systemMappingId));
+		roleSystemFilter.setCreateAccountByDefault(true);
+		List<SysRoleSystemDto> roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
+		if (roleSystemDtos.isEmpty()) {
+			throw new ResultCodeException(AccResultCode.WIZARD_ACCOUNT_NO_LOGIN_ROLE);
+		}
+
 		AccAccountDto accountDto = prepareAccount(wizardDto, systemMappingId);
 
 		// get owner, it's identity
@@ -100,15 +111,6 @@ public abstract class AbstractPersonalAccountWizard extends AbstractAccountWizar
 		// Do provisioning for acc and owner
 		provisioningService.doProvisioning(accountDto, ownerDto);
 
-		// Login role
-		SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
-		roleSystemFilter.setSystemMappingId(UUID.fromString(systemMappingId));
-		roleSystemFilter.setCreateAccountByDefault(true);
-		List<SysRoleSystemDto> roleSystemDtos = roleSystemService.find(roleSystemFilter, null).getContent();
-		if (roleSystemDtos.isEmpty()) {
-			LOG.info("No login role found");
-			return;
-		}
 		SysRoleSystemDto roleSystemDto = roleSystemDtos.get(0);
 
 		// assign role
