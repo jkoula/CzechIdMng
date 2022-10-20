@@ -55,6 +55,88 @@ class AccountDetail extends Basic.AbstractContent {
     return 'account-detail';
   }
 
+  resolveEavAttributes(formValues, attributesMap, value) {
+    const { originalValues } = this.state;
+    
+    if (originalValues[value.key].value !== value.value || value.reset) {
+      const attribute = attributesMap.get(value.name);
+      switch (attribute.persistentType) {
+        case "SHORTTEXT":
+          formValues.push({
+            formAttribute: attribute.id,
+            shortTextValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "BOOLEAN":
+          formValues.push({
+            formAttribute: attribute.id,
+            booleanValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "TEXT":
+          formValues.push({
+            formAttribute: attribute.id,
+            stringValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "CHAR":
+          formValues.push({
+            formAttribute: attribute.id,
+            stringValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "LONG":
+          formValues.push({
+            formAttribute: attribute.id,
+            longValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "DOUBLE":
+          formValues.push({
+            formAttribute: attribute.id,
+            doubleValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "INT":
+          formValues.push({
+            formAttribute: attribute.id,
+            longValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+        case "BYTEARRAY":
+          formValues.push({
+            formAttribute: attribute.id,
+            byteValue: value.reset ? null : value.value,
+            _embedded: {
+              formAttribute: attribute
+            }
+          });
+          break;
+      }
+    }
+  }
+
   save(event) {
     const { uiKey, entity } = this.props;
     const { values, originalValues } = this.state;
@@ -100,83 +182,7 @@ class AccountDetail extends Basic.AbstractContent {
               }),
             );
             values.forEach(value => {
-              if (originalValues[value.key].value !== value.value || value.reset) {
-                const attribute = attributesMap.get(value.name);
-                switch (attribute.persistentType) {
-                  case "SHORTTEXT":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      shortTextValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "BOOLEAN":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      booleanValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "TEXT":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      stringValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "CHAR":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      stringValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "LONG":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      longValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "DOUBLE":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      doubleValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "INT":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      longValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                  case "BYTEARRAY":
-                    formValues.push({
-                      formAttribute: attribute.id,
-                      byteValue: value.reset ? null : value.value,
-                      _embedded: {
-                        formAttribute: attribute
-                      }
-                    });
-                    break;
-                }
-              }
+              this.resolveEavAttributes(formValues, attributesMap, value);
             });
             entity._eav = [{
               formDefinition: result,
