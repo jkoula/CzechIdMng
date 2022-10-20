@@ -23,11 +23,11 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
  * 
  * @author Roman Kucera
  */
-@Component("accAccountProvisioningProcessor")
+@Component("accAccountProvisioningProcessorAfterEavSave")
 @Description("Do provisioning after eav is saved")
-public class AccountProvisioningProcessor extends CoreEventProcessor<IdmFormInstanceDto> {
+public class AccountProvisioningProcessorAfterEavSave extends CoreEventProcessor<IdmFormInstanceDto> {
 
-	private static final String PROCESSOR_NAME = "account-provisioning-processor";
+	private static final String PROCESSOR_NAME = "account-provisioning-processor-after-eav-save";
 
 	@Autowired
 	private AccAccountService accountService;
@@ -35,13 +35,14 @@ public class AccountProvisioningProcessor extends CoreEventProcessor<IdmFormInst
 	private ProvisioningService provisioningService;
 
 	@Autowired
-	public AccountProvisioningProcessor() {
+	public AccountProvisioningProcessorAfterEavSave() {
 		super(CoreEventType.UPDATE);
 	}
 
 	@Override
 	public boolean conditional(EntityEvent<IdmFormInstanceDto> event) {
-		return super.conditional(event) && event.getContent().getOwnerType().getCanonicalName().equals(AccAccount.class.getCanonicalName());
+		return super.conditional(event) && event.getContent().getOwnerType().getCanonicalName().equals(AccAccount.class.getCanonicalName()) &&
+				((AccAccount)event.getContent().getOwner()).getSystemEntity() != null;
 	}
 
 	@Override

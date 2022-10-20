@@ -1019,12 +1019,12 @@ public class DefaultSysSystemAttributeMappingService
 
 	@Override
 	public List<Serializable> getControlledAttributeValues(UUID systemId, String entityType,
-			String schemaAttributeName) {
+			String schemaAttributeName, UUID mappingId) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
 		Assert.notNull(schemaAttributeName, "Schema attribute name is mandatory for get controlled values!");
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(systemId, entityType);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(systemId, entityType, mappingId);
 		Assert.notNull(mapping, "System provisioning mapping is mandatory for search controlled attribute values!");
 		List<Serializable> results = Lists.newArrayList();
 
@@ -1072,12 +1072,12 @@ public class DefaultSysSystemAttributeMappingService
 
 	@Override
 	public List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
-			String schemaAttributeName) {
+																			String schemaAttributeName, UUID mappingId) {
 		Assert.notNull(systemId, "System ID is mandatory for get controlled values!");
 		Assert.notNull(entityType, "Entity type is mandatory for get controlled values!");
 		Assert.notNull(schemaAttributeName, "Schema attribute name is mandatory for get controlled values!");
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(systemId, entityType);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(systemId, entityType, mappingId);
 		Assert.notNull(mapping, "System provisioning mapping is mandatory for search controlled attribute values!");
 
 		List<SysSystemAttributeMappingDto> attributes = this.getAttributeMapping(schemaAttributeName, mapping,
@@ -1101,7 +1101,7 @@ public class DefaultSysSystemAttributeMappingService
 
 		if (attributeMapping.isEvictControlledValuesCache()) {
 			List<Serializable> controlledAttributeValues = recalculateAttributeControlledValues(systemId, entityType,
-					schemaAttributeName, attributeMapping);
+					schemaAttributeName, attributeMapping, mappingId);
 			cachedControlledValues = controlledAttributeValues;
 		}
 
@@ -1125,11 +1125,11 @@ public class DefaultSysSystemAttributeMappingService
 
 	@Override
 	public synchronized List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
-			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping) {
+			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping, UUID mappingId) {
 		
 		// Computes values
 		List<Serializable> controlledAttributeValues = this.getControlledAttributeValues(systemId, entityType,
-				schemaAttributeName);
+				schemaAttributeName, mappingId);
 		// Save results
 		attributeControlledValueService.setControlledValues(attributeMapping, controlledAttributeValues);
 		return controlledAttributeValues;

@@ -95,7 +95,7 @@ public class MappingContextTest extends AbstractIntegrationTest {
 	public void testMappingContext() {
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		Assert.assertNotNull(system);
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 
 		// Create the description attribute (print context as string).
@@ -124,7 +124,7 @@ public class MappingContextTest extends AbstractIntegrationTest {
 	public void testMappingContextContract() {
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		Assert.assertNotNull(system);
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 
 		// Create the description attribute (print context as string).
@@ -160,7 +160,7 @@ public class MappingContextTest extends AbstractIntegrationTest {
 	public void testMappingContextIdentityRoles() {
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		Assert.assertNotNull(system);
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 
 		// Create the description attribute (print context as string).
@@ -203,7 +203,7 @@ public class MappingContextTest extends AbstractIntegrationTest {
 	public void testMappingContextIdentityRolesForSystem() {
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		Assert.assertNotNull(system);
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 
 		// Create the description attribute (print context as string).
@@ -246,7 +246,7 @@ public class MappingContextTest extends AbstractIntegrationTest {
 	public void testMappingContextConnectorObject() {
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		Assert.assertNotNull(system);
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 
 		// Create the description attribute (print context as string).
@@ -295,7 +295,7 @@ public class MappingContextTest extends AbstractIntegrationTest {
 		SysSystemDto system = helper.createTestResourceSystem(true);
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 		mapping.setMappingContextScript("return \"WrongType\";");
 		mapping = systemMappingService.save(mapping);

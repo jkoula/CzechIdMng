@@ -133,7 +133,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(1, controlledAttributeValues.size());
@@ -156,7 +156,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -260,7 +260,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		SysRoleSystemAttributeDto roleAttributeTwo = new SysRoleSystemAttributeDto();
 		roleAttributeTwo.setName(RIGHTS_ATTRIBUTE);
@@ -271,7 +271,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -299,7 +299,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -356,7 +356,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		SysRoleSystemAttributeDto roleAttributeTwo = new SysRoleSystemAttributeDto();
 		roleAttributeTwo.setName(RIGHTS_ATTRIBUTE);
@@ -367,7 +367,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -394,7 +394,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(1, controlledAttributeValues.size());
@@ -418,7 +418,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -427,7 +427,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 
 		// Recalculation
 		attributeMappingService.getCachedControlledAndHistoricAttributeValues(system.getId(), mapping.getEntityType(),
-				RIGHTS_ATTRIBUTE);
+				RIGHTS_ATTRIBUTE, mapping.getId());
 
 		// Search historic controlled values for that attribute
 		historicControlledValues = attributeControlledValueService //
@@ -482,7 +482,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		SysRoleSystemAttributeDto roleAttributeTwo = new SysRoleSystemAttributeDto();
 		roleAttributeTwo.setName(RIGHTS_ATTRIBUTE);
@@ -493,7 +493,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -520,7 +520,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(1, controlledAttributeValues.size());
@@ -544,7 +544,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -553,7 +553,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 
 		// Manual recalculation (needed for deleting redundant historic value)
 		attributeMappingService.recalculateAttributeControlledValues(system.getId(), mapping.getEntityType(),
-				RIGHTS_ATTRIBUTE, rightsAttribute);
+				RIGHTS_ATTRIBUTE, rightsAttribute, mapping.getId());
 
 		// Search historic controlled values for that attribute
 		historicControlledValues = attributeControlledValueService //
@@ -603,7 +603,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		SysRoleSystemAttributeDto roleAttributeTwo = new SysRoleSystemAttributeDto();
 		roleAttributeTwo.setName(RIGHTS_ATTRIBUTE);
@@ -614,7 +614,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -637,12 +637,12 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 
 		// Manual recalculation
 		attributeMappingService.recalculateAttributeControlledValues(system.getId(), mapping.getEntityType(),
-				RIGHTS_ATTRIBUTE, rightsAttribute);
+				RIGHTS_ATTRIBUTE, rightsAttribute, mapping.getId());
 		// Check cached controlled and historic values (results are controlled and
 		// historic values in one lists)
 		List<Serializable> cachedControlledAndHistoricAttributeValues = attributeMappingService
 				.getCachedControlledAndHistoricAttributeValues(system.getId(), mapping.getEntityType(),
-						RIGHTS_ATTRIBUTE);
+						RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(cachedControlledAndHistoricAttributeValues);
 		assertEquals(2, cachedControlledAndHistoricAttributeValues.size());
 		assertTrue(cachedControlledAndHistoricAttributeValues.contains(ONE_VALUE));
@@ -655,7 +655,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -673,12 +673,12 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 
 		// Manual recalculation (needed for deleting redundant historic value)
 		attributeMappingService.recalculateAttributeControlledValues(system.getId(), mapping.getEntityType(),
-				RIGHTS_ATTRIBUTE, rightsAttribute);
+				RIGHTS_ATTRIBUTE, rightsAttribute, mapping.getId());
 		// Check cached controlled and historic values (results are controlled and
 		// historic values in one lists)
 		cachedControlledAndHistoricAttributeValues = attributeMappingService
 				.getCachedControlledAndHistoricAttributeValues(system.getId(), mapping.getEntityType(),
-						RIGHTS_ATTRIBUTE);
+						RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(cachedControlledAndHistoricAttributeValues);
 		assertEquals(3, cachedControlledAndHistoricAttributeValues.size());
 		assertTrue(cachedControlledAndHistoricAttributeValues.contains(ONE_VALUE));
@@ -690,7 +690,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 
 		cachedControlledAndHistoricAttributeValues = attributeMappingService
 				.getCachedControlledAndHistoricAttributeValues(system.getId(), mapping.getEntityType(),
-						RIGHTS_ATTRIBUTE);
+						RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(cachedControlledAndHistoricAttributeValues);
 		assertEquals(2, cachedControlledAndHistoricAttributeValues.size());
 		assertTrue(cachedControlledAndHistoricAttributeValues.contains(ONE_VALUE));
@@ -743,7 +743,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 		
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -751,7 +751,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		assertTrue(controlledAttributeValues.contains(TWO_VALUE));
 
 		attributeMappingService.recalculateAttributeControlledValues(system.getId(), mapping.getEntityType(),
-				RIGHTS_ATTRIBUTE, rightsAttribute);
+				RIGHTS_ATTRIBUTE, rightsAttribute, mapping.getId());
 
 		SysAttributeControlledValueFilter attributeHistoricalValueFilter = new SysAttributeControlledValueFilter();
 		attributeHistoricalValueFilter.setHistoricValue(Boolean.TRUE);
@@ -768,7 +768,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleSystemService.delete(roleSystemOne);
 		
 		controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(1, controlledAttributeValues.size());
@@ -788,7 +788,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleSystemService.delete(roleSystemTwo);
 		
 		controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(0, controlledAttributeValues.size());
@@ -838,14 +838,14 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttribute = roleSystemAttributeService.save(roleAttribute);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(controlledAttributeValues);
 		assertEquals(0, controlledAttributeValues.size());
 
 		roleSystemAttributeService.delete(roleAttribute);
 		
 		controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(controlledAttributeValues);
 		assertEquals(0, controlledAttributeValues.size());
 	}
@@ -885,7 +885,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttribute = roleSystemAttributeService.save(roleAttribute);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(controlledAttributeValues);
 		assertEquals(1, controlledAttributeValues.size());
 		assertEquals(controlledValue, controlledAttributeValues.get(0));
@@ -904,7 +904,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		assertEquals(controlledValue, hitoricalValues.get(0).getValue());
 
 		controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 		assertNotNull(controlledAttributeValues);
 		assertEquals(0, controlledAttributeValues.size());
 		
@@ -953,7 +953,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		SysRoleSystemAttributeDto roleAttributeTwo = new SysRoleSystemAttributeDto();
 		roleAttributeTwo.setName(RIGHTS_ATTRIBUTE);
@@ -966,7 +966,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());
@@ -1246,7 +1246,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeOne = roleSystemAttributeService.saveInternal(roleAttributeOne);
 
 		List<Serializable> controlledAttributeValues = attributeMappingService
-				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				.getControlledAttributeValues(system.getId(), mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		SysRoleSystemAttributeDto roleAttributeTwo = new SysRoleSystemAttributeDto();
 		roleAttributeTwo.setName(RIGHTS_ATTRIBUTE);
@@ -1259,7 +1259,7 @@ public class ProvisioningMergeTest extends AbstractIntegrationTest {
 		roleAttributeTwo = roleSystemAttributeService.saveInternal(roleAttributeTwo);
 
 		controlledAttributeValues = attributeMappingService.getControlledAttributeValues(system.getId(),
-				mapping.getEntityType(), RIGHTS_ATTRIBUTE);
+				mapping.getEntityType(), RIGHTS_ATTRIBUTE, mapping.getId());
 
 		assertNotNull(controlledAttributeValues);
 		assertEquals(2, controlledAttributeValues.size());

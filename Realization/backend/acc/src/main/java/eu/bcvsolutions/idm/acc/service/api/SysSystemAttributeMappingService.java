@@ -257,20 +257,21 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	List<Serializable> getControlledAttributeValues(UUID system, String entityType,
-			String schemaAttributeName);
+			String schemaAttributeName, UUID mappingId);
 
 	/**
 	 * Get currently controlled and historic values for given attribute. If is
 	 * attribute sets as evicted, then are current values recalculated (calls
 	 * getControlledAttributeValues).
-	 * 
+	 *
 	 * @param systemId
 	 * @param entityType
 	 * @param schemaAttributeName
+	 * @param account
 	 * @return
 	 */
 	List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
-			String schemaAttributeName);
+																	 String schemaAttributeName, UUID account);
 
 	/**
 	 * Recalculation of controlled values for given attribute. First calls
@@ -283,7 +284,7 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
-			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping);
+			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping, UUID mappingId);
 
 	/**
 	 * Return all mapped attributes as password for given system id and mapping.

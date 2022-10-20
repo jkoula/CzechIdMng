@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
@@ -106,8 +105,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
@@ -154,8 +152,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
@@ -201,8 +198,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 
@@ -246,8 +242,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 
@@ -292,8 +287,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
@@ -330,8 +324,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
@@ -368,8 +361,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
@@ -406,8 +398,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 
@@ -461,8 +452,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 
@@ -517,8 +507,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 
@@ -579,8 +568,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(),
-				IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
 		Assert.assertNotNull(mapping);
 		mapping = systemMappingService.save(mapping);
 
@@ -658,6 +646,11 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME);
 		Assert.assertNotNull(system);
 
+		return system;
+
+	}
+
+	private SysSystemMappingDto createMapping(SysSystemDto system) {
 		// generate schema for system
 		List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
 
@@ -669,8 +662,7 @@ public class PerformanceAccountManagementTest extends AbstractIntegrationTest {
 		syncSystemMapping.setObjectClass(objectClasses.get(0).getId());
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 		createIdentityMapping(system, syncMapping);
-		return system;
-
+		return syncMapping;
 	}
 
 	private void createIdentityMapping(SysSystemDto system, final SysSystemMappingDto entityHandlingResult) {

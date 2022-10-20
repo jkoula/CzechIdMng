@@ -422,9 +422,14 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
-	public SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType) {
+	public SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType, UUID mappingId) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
+
+		if (mappingId != null) {
+			return this.get(mappingId);
+		}
+
 		SysSystemMappingFilter mappingFilter = new SysSystemMappingFilter();
 		mappingFilter.setSystemId(systemId);
 		mappingFilter.setEntityType(entityType);

@@ -57,7 +57,7 @@ public class SystemAttributeMappingStrategyRecalculationTaskExecutorTest extends
 
 		assertNotNull(system);
 
-		SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 
 		assertNotNull(provisioningMapping);
 

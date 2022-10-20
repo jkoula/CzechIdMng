@@ -133,7 +133,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initData();
 		Assert.assertNotNull(system);
 		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 		mapping.setCanBeAccountCreatedScript("return entity.getPriority() == 1000;");
 		mapping = systemMappingService.save(mapping);
@@ -171,7 +171,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initData();
 		Assert.assertNotNull(system);
 		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 		mapping.setCanBeAccountCreatedScript("return Boolean.FALSE;");
 		mapping = systemMappingService.save(mapping);
@@ -200,7 +200,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
 		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 		mapping.setCanBeAccountCreatedScript("return Boolean.FALSE;");
 		mapping = systemMappingService.save(mapping);
@@ -870,7 +870,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = initData();
 		Assert.assertNotNull(system);
 
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		Assert.assertNotNull(mapping);
 		mapping.setMappingContextScript("context.put(\"test\", \"testOne\");");
 		mapping = systemMappingService.save(mapping);
@@ -975,7 +975,7 @@ public class AccountManagementTest extends AbstractIntegrationTest {
 				SysSystemAttributeMappingDto attributeHandlingName = new SysSystemAttributeMappingDto();
 				attributeHandlingName.setIdmPropertyName("description");
 				attributeHandlingName.setName(schemaAttr.getName());
-				attributeHandlingName.setEntityAttribute(true);;
+				attributeHandlingName.setEntityAttribute(true);
 				attributeHandlingName.setSchemaAttribute(schemaAttr.getId());
 				attributeHandlingName.setSystemMapping(entityHandlingResult.getId());
 				schemaAttributeMappingService.save(attributeHandlingName);
