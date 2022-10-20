@@ -217,7 +217,7 @@ module.exports = {
         },
         {
           path: 'other',
-          component: require('./src/content/account/AccountOther'),
+          component: require('./src/content/account/AccountOtherSetting'),
           access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
         }
       ]

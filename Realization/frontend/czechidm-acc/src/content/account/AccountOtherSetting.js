@@ -20,7 +20,7 @@ const systemEntityTypeManager = new SystemEntityTypeManager();
 *
 * @author Roman Kucera
 */
-class AccountOther extends Basic.AbstractContent {
+class AccountOtherSetting extends Basic.AbstractContent {
 
   constructor(props, context) {
     super(props, context);
@@ -53,11 +53,11 @@ class AccountOther extends Basic.AbstractContent {
     });
 
     this.getLogger().debug(`[FormDetail] loading entity detail [id:${entityId}]`);
-    this.selectNavigationItems(['sys-systems-main-menu', 'accounts', 'account-other']);
+    this.selectNavigationItems(['sys-systems-main-menu', 'accounts', 'account-other-setting']);
   }
 
   getNavigationKey() {
-    return 'account-other';
+    return 'account-other-setting';
   }
 
   save(event) {
@@ -209,12 +209,12 @@ class AccountOther extends Basic.AbstractContent {
   }
 }
 
-AccountOther.propTypes = {
+AccountOtherSetting.propTypes = {
   uiKey: PropTypes.string,
   isNew: PropTypes.bool,
   _permissions: PropTypes.arrayOf(PropTypes.string)
 };
-AccountOther.defaultProps = {
+AccountOtherSetting.defaultProps = {
   isNew: false,
   _permissions: null
 };
@@ -229,4 +229,4 @@ function select(state, component) {
   };
 }
 
-export default connect(select)(AccountOther);
+export default connect(select)(AccountOtherSetting);

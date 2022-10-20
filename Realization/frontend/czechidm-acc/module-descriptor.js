@@ -461,7 +461,7 @@ module.exports = {
             items: []
           },
           {
-            id: 'account-other',
+            id: 'account-other-setting',
             type: 'TAB',
             labelKey: 'acc:content.accounts.detail.tabs.other',
             titleKey: 'acc:content.accounts.detail.tabs.other',
