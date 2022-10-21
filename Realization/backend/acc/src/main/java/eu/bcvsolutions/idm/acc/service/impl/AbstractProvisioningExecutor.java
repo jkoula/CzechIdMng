@@ -49,6 +49,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.EntityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
@@ -94,6 +95,10 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.eav.entity.IdmFormValue_;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
 import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
@@ -131,6 +136,9 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 	protected final SysRoleSystemService roleSystemService;
 	private final IdmRoleService roleService;
 	private final SysSystemEntityTypeManager systemEntityManager;
+
+	@Autowired
+	private FormService formService;
 
 	@Autowired
 	public AbstractProvisioningExecutor(SysSystemMappingService systemMappingService,
@@ -1000,7 +1008,35 @@ public abstract class AbstractProvisioningExecutor<DTO extends AbstractDto> impl
 		List<? extends AttributeMapping> defaultAttributes = findAttributeMappings(systemMappingDto);
 
 		// Final list of attributes use for provisioning
-		return compileAttributes(defaultAttributes, roleSystemAttributesAll, entityType);
+		List<AttributeMapping> attributeMappings = compileAttributes(defaultAttributes, roleSystemAttributesAll, entityType);
+
+		// add attribute which is overloaded via EAV of account
+		if (account.getFormDefinition() != null && systemMappingDto != null) {
+			SysSystemMappingDto finalSystemMappingDto = systemMappingDto;
+			List<IdmFormValueDto> values = formService.getValues(account, account.getFormDefinition());
+
+			values.forEach(idmFormValueDto -> {
+
+				IdmFormAttributeDto formAttributeDto = DtoUtils.getEmbedded(idmFormValueDto, IdmFormValue_.formAttribute, IdmFormAttributeDto.class);
+
+				SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
+				schemaAttributeFilter.setName(formAttributeDto.getCode());
+				schemaAttributeFilter.setSystemId(account.getSystem());
+				schemaAttributeFilter.setObjectClassId(finalSystemMappingDto.getObjectClass());
+				List<SysSchemaAttributeDto> schemaAttributeDtos = schemaAttributeService.find(schemaAttributeFilter, null).getContent();
+
+				if (schemaAttributeDtos.size() == 1) {
+					SysSystemAttributeMappingDto firstname = new SysSystemAttributeMappingDto();
+					firstname.setStrategyType(AttributeMappingStrategyType.SET);
+					firstname.setName(formAttributeDto.getCode());
+					firstname.setSchemaAttribute(schemaAttributeDtos.get(0).getId());
+					firstname.setSystemMapping(finalSystemMappingDto.getId());
+					attributeMappings.add(firstname);
+				}
+			});
+		}
+
+		return attributeMappings;
 	}
 
 	private List<AttributeMapping> resolveAdditionalPasswordChangeAttributes(AccAccountDto account, DTO dto,

@@ -47,7 +47,7 @@ class AccountOtherSetting extends Basic.AbstractContent {
         this.setState({
           entity: entity,
           _showLoading: false,
-          accountType: AccountTypeEnum.getNiceLabel(entity._embedded.systemMapping.accountType)
+          accountType: AccountTypeEnum.getNiceLabel(entity?._embedded?.systemMapping?.accountType)
         });
       }));
     });

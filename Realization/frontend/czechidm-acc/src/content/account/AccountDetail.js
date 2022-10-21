@@ -516,6 +516,9 @@ class AccountDetail extends Basic.AbstractContent {
         return false;
       });
     }
+
+    const disableEditButton = entity ? entity.systemMapping === null : false;
+
     //
     return (
       <form onSubmit={this.save.bind(this)}>
@@ -640,7 +643,7 @@ class AccountDetail extends Basic.AbstractContent {
                     className="btn-xs"
                     onClick={this.edit.bind(this)}
                     icon={showEdit ? "fa:th-list" : "fa:pencil"}
-                    disabled={showEdit && changed}>
+                    disabled={(showEdit && changed) || disableEditButton}>
                     {showEdit
                       ? this.i18n('control.view')
                       : this.i18n('control.edit')
