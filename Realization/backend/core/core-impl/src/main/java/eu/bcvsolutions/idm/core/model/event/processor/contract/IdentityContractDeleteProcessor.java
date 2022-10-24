@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.model.event.processor.ConceptCancellingProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -57,31 +59,31 @@ import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventTyp
 @Component(IdentityContractDeleteProcessor.PROCESSOR_NAME)
 @Description("Deletes identity contract.")
 public class IdentityContractDeleteProcessor
-		extends CoreEventProcessor<IdmIdentityContractDto> 
-		implements IdentityContractProcessor {
+		extends ConceptCancellingProcessor<IdmIdentityContractDto, IdmConceptRoleRequestDto, IdmConceptRoleRequestFilter, IdmIdentityRoleDto>
+		implements IdentityContractProcessor  {
 
 	public static final String PROCESSOR_NAME = "identity-contract-delete-processor";
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(IdentityContractDeleteProcessor.class);
 	//
 	@Autowired private IdmIdentityContractService service;
-	@Autowired private IdmIdentityRoleService identityRoleService;
-	@Autowired private IdmConceptRoleRequestService conceptRequestService;
-	@Autowired private IdmRoleRequestService roleRequestService;
 	@Autowired private IdmContractGuaranteeService contractGuaranteeService;
 	@Autowired private IdmContractPositionService contractPositionService;
 	@Autowired private IdmContractSliceService contractSliceService;
 	@Autowired private IdmDelegationDefinitionService delegationDefinitionService;
 	@Autowired private EntityStateManager entityStateManager;
 	
-	public IdentityContractDeleteProcessor() {
-		super(IdentityContractEventType.DELETE);
+	public IdentityContractDeleteProcessor(IdmConceptRoleRequestService conceptRequestService, IdmRoleRequestService roleRequestService, IdmIdentityRoleService identityRoleService) {
+
+		super(conceptRequestService, identityRoleService, roleRequestService, IdentityContractEventType.DELETE);
 	}
 	
 	@Override
 	public String getName() {
 		return PROCESSOR_NAME;
 	}
-	
+
+
+
 	@Override
 	public EventResult<IdmIdentityContractDto> process(EntityEvent<IdmIdentityContractDto> event) {
 		IdmIdentityContractDto contract = event.getContent();
@@ -96,7 +98,7 @@ public class IdentityContractDeleteProcessor
 			// This contract is controlled by some slice -> cannot be deleted.
 			// Cannot be enforced => contract cannot be deleted at all.
 			throw new ResultCodeException(
-					CoreResultCode.CONTRACT_IS_CONTROLLED_CANNOT_BE_DELETED, 
+					CoreResultCode.CONTRACT_IS_CONTROLLED_CANNOT_BE_DELETED,
 					ImmutableMap.of("contractId", contractId)
 			);
 		}
@@ -105,26 +107,20 @@ public class IdentityContractDeleteProcessor
 		removeRelatedConcepts(contractId);
 		//
 		// delete referenced roles
-		removeRelatedAssignedRoles(event, contract, contractId, forceDelete);
+		removeRelatedAssignedRoles(event, contract.getIdentity(), contractId, forceDelete);
 		// delete contract guarantees
 		IdmContractGuaranteeFilter filter = new IdmContractGuaranteeFilter();
 		filter.setIdentityContractId(contractId);
-		contractGuaranteeService.find(filter, null).forEach(guarantee -> {
-			contractGuaranteeService.delete(guarantee);
-		});
+		contractGuaranteeService.find(filter, null).forEach(guarantee -> contractGuaranteeService.delete(guarantee));
 		// delete contract positions
 		IdmContractPositionFilter positionFilter = new IdmContractPositionFilter();
 		positionFilter.setIdentityContractId(contractId);
-		contractPositionService.find(positionFilter, null).forEach(position -> {
-			contractPositionService.delete(position);
-		});
+		contractPositionService.find(positionFilter, null).forEach(position -> contractPositionService.delete(position));
 		//
 		// delete all contract's delegations 
 		IdmDelegationDefinitionFilter delegationFilter = new IdmDelegationDefinitionFilter();
 		delegationFilter.setDelegatorContractId(contractId);
-		delegationDefinitionService.find(delegationFilter,  null).forEach(delegation -> {
-			delegationDefinitionService.delete(delegation);
-		});
+		delegationDefinitionService.find(delegationFilter,  null).forEach(delegation -> delegationDefinitionService.delete(delegation));
 		
 		// delete identity contract
 		if (forceDelete) {
@@ -147,56 +143,5 @@ public class IdentityContractDeleteProcessor
 			service.deleteInternal(contract);
 		}
 		return new DefaultEventResult<>(event, this);
-	}
-
-	private void removeRelatedAssignedRoles(EntityEvent<IdmIdentityContractDto> event, IdmIdentityContractDto contract, UUID contractId, boolean forceDelete) {
-		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
-		identityRoleService.findAllByContract(contractId).forEach(identityRole -> {
-			// Sub roles are removed different way (processor on direct identity role),
-			// but automatic roles has to be removed in the same request.
-			if (identityRole.getDirectRole() == null) {
-				IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
-				conceptRoleRequest.setIdentityRole(identityRole.getId());
-				conceptRoleRequest.setRole(identityRole.getRole());
-				conceptRoleRequest.setOperation(ConceptRoleRequestOperation.REMOVE);
-				conceptRoleRequest.setIdentityContract(contractId); // ignore not found
-				//
-				concepts.add(conceptRoleRequest);
-			}
-		});
-		if (forceDelete) { // ~ async with force
-			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(contract.getIdentity());
-			roleRequest.setConceptRoles(concepts);
-			//
-			RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
-			requestEvent.setPriority(PriorityType.HIGH);
-			//
-			roleRequestService.startConcepts(requestEvent, event);
-		} else {
-			// ~ sync
-			roleRequestService.executeConceptsImmediate(contract.getIdentity(), concepts);
-		}
-	}
-
-	private void removeRelatedConcepts(UUID contractId) {
-		IdmConceptRoleRequestFilter conceptRequestFilter = new IdmConceptRoleRequestFilter();
-		conceptRequestFilter.setIdentityContractId(contractId);
-		conceptRequestService.find(conceptRequestFilter, null).getContent().forEach(concept -> {
-			String message = null;
-			if (concept.getState().isTerminatedState()) {
-				message = MessageFormat.format(
-						"IdentityContract [{0}] (requested in concept [{1}]) was deleted (not from this role request)!", contractId, concept.getId());
-			} else {
-				message = MessageFormat.format(
-						"Request change in concept [{0}], was not executed, because requested IdentityContract [{1}] was deleted (not from this role request)!",
-						concept.getId(), contractId);
-				// Cancel concept and WF
-				concept = conceptRequestService.cancel(concept);
-			}
-			IdmRoleRequestDto request = roleRequestService.get(concept.getRoleRequest());
-			roleRequestService.addToLog(request, message);
-			conceptRequestService.addToLog(concept, message);
-		});
 	}
 }

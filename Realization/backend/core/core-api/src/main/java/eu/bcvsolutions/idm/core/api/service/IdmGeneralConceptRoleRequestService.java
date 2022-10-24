@@ -79,6 +79,8 @@ public interface IdmGeneralConceptRoleRequestService<
 
     D createConceptToRemoveIdentityRole(D concept, A identityRoleAssignment);
 
+    D createEmptyConcept();
+
     boolean cancelInvalidConcept(List<A> automaticRoles, D concept, IdmRoleRequestDto request);
 
     A createAssignmentFromConcept(D concept);
@@ -97,5 +99,9 @@ public interface IdmGeneralConceptRoleRequestService<
 
     A getEmbeddedAssignment(D concept);
 
+    A fetchAssignment(D concept);
+
     ApplicantDto resolveApplicant(IdmRequestIdentityRoleDto dto);
+
+    List<UUID> resolveManagerContractsForApproval(D conceptRole);
 }

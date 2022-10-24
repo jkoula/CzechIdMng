@@ -485,8 +485,12 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
                     if (conceptFormInstance.getFormDefinition() == null) {
                         conceptFormInstance.setFormDefinition(formDefinitionDto);
                     }
-                } else {
+                } else if (dto.getId() != null){
                     conceptFormInstance = formService.getFormInstance(dto, formDefinitionDto);
+                } else {
+                    conceptFormInstance = new IdmFormInstanceDto();
+                    conceptFormInstance.setFormDefinition(formDefinitionDto);
+                    //conceptFormInstance.setOwnerType();
                 }
 
                 if (!checkChanges) { // Return only EAV values, without compare changes

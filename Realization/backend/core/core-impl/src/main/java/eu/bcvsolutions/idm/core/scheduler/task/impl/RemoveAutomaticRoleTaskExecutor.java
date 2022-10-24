@@ -285,7 +285,7 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 				//
 				// Find all concepts and remove relation on automatic role
 				IdmConceptRoleRequestFilter conceptRequestFilter = new IdmConceptRoleRequestFilter();
-				conceptRequestFilter.setAutomaticRole(getAutomaticRoleId());
+				conceptRequestFilter.setAutomaticRoleId(getAutomaticRoleId());
 				//
 				List<IdmConceptRoleRequestDto> concepts = conceptRequestService.find(conceptRequestFilter, null).getContent();
 

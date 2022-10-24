@@ -25,20 +25,17 @@ import java.util.Map;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public class AbstractRoleAssignmentSaveProcessor<A extends AbstractRoleAssignmentDto> extends CoreEventProcessor<A> {
+public abstract class AbstractRoleAssignmentSaveProcessor<A extends AbstractRoleAssignmentDto> extends CoreEventProcessor<A> {
 
     private final IdmRoleAssignmentService<A, ? extends BaseRoleAssignmentFilter> service;
 
-    private final IdmIdentityRoleValidRequestService validRequestService;
 
 
-    public AbstractRoleAssignmentSaveProcessor(IdmRoleAssignmentService<A, ? extends BaseRoleAssignmentFilter> service, IdmIdentityRoleValidRequestService validRequestService,
+    public AbstractRoleAssignmentSaveProcessor(IdmRoleAssignmentService<A, ? extends BaseRoleAssignmentFilter> service,
             AbstractRoleAssignmentEvent.RoleAssignmentEventType... eventTypes) {
         super(eventTypes);
         Assert.notNull(service, "Service is required.");
-        Assert.notNull(validRequestService, "Service is required.");
         this.service = service;
-        this.validRequestService = validRequestService;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class AbstractRoleAssignmentSaveProcessor<A extends AbstractRoleAssignmen
         // if identityRole isn't valid save request into validRequests
         if (!EntityUtils.isValid(roleAssignment)) {
             // create new IdmIdentityRoleValidRequest
-            validRequestService.createByIdentityRoleId(roleAssignment.getId());
+            createRoleValidReqForInvalidRole(roleAssignment);
         }
         //
         return new DefaultEventResult<>(event, this);
@@ -71,6 +68,8 @@ public class AbstractRoleAssignmentSaveProcessor<A extends AbstractRoleAssignmen
             ); //
         }
     }
+
+    protected abstract void createRoleValidReqForInvalidRole(A roleAssignment);
 
 
 }

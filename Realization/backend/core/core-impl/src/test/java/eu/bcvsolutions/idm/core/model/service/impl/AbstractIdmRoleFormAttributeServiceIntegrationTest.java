@@ -43,6 +43,7 @@ import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleFormAttribute_;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Basic role form attribute service test
@@ -270,6 +271,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 	
 	@SuppressWarnings("unchecked")
 	@Test
+	@Transactional
 	public void testDeleteRoleAttributeValueViaRoleRequest() {
 		// Create role with attribute (include the sub-definition)
 		IdmRoleDto role = createRoleWithAttributes();

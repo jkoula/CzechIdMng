@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
@@ -22,6 +27,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.workflow.permissions.AbstractChangeIdentityPermissionTest;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Test change permissions for account (account roles).
@@ -29,6 +35,7 @@ import eu.bcvsolutions.idm.core.workflow.permissions.AbstractChangeIdentityPermi
  * @author Tomáš Doischer
  *
  */
+@Transactional
 public class ChangeAccountPermissionTest extends AbstractChangeIdentityPermissionTest {
 
 	@Autowired
@@ -37,7 +44,18 @@ public class ChangeAccountPermissionTest extends AbstractChangeIdentityPermissio
 	private AccAccountRoleAssignmentService roleAssignmentService;
 	@Autowired
 	private TestHelper helper;
-	
+
+	@Autowired
+	IdmIdentityService identityService;
+
+	@Autowired
+	AccAccountService accountService;
+
+	@Override
+	protected void deleteOwner(AbstractDto owner) {
+		accountService.deleteById(owner.getId());
+	}
+
 	@Override
 	public AbstractConceptRoleRequestDto createConceptRoleRequest(IdmRoleRequestDto request, IdmRoleDto role, UUID assigneeId,
 			UUID roleAssignmentId, ConceptRoleRequestOperation operationType, LocalDate validFrom, List<IdmFormInstanceDto> eavs) {
@@ -56,8 +74,8 @@ public class ChangeAccountPermissionTest extends AbstractChangeIdentityPermissio
 	}
 
 	@Override
-	public AbstractDto createOwner() {
-		return helper.createAccount();
+	public AbstractDto createOwner(GuardedString password) {
+		return helper.createAccount(password);
 	}
 
 	@Override
@@ -86,4 +104,5 @@ public class ChangeAccountPermissionTest extends AbstractChangeIdentityPermissio
 			LocalDate validTill) {
 		return helper.createAccountRoleAssignment(ownerId, roleId, validFrom, validTill);
 	}
+
 }

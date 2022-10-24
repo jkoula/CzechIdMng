@@ -832,9 +832,8 @@ public class DefaultIdmRoleRequestService
 	@Override
 	public Set<ResolvedIncompatibleRoleDto> getIncompatibleRoles(IdmRoleRequestDto request, IdmBasePermission... permissions) {
 		// Currently assigned roles
-		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
-		identityRoleFilter.setIdentityId(request.getApplicant());
-		List<IdmIdentityRoleDto> identityRoles = identityRoleService.find(identityRoleFilter, null, permissions).getContent();
+
+		List<AbstractRoleAssignmentDto> identityRoles = roleAssignmentManager.getAllByIdentity(request.getApplicant(), permissions).getContent();
 		// Roles from concepts
 		List<AbstractConceptRoleRequestDto> concepts = conceptRoleRequestManager.findAllByRoleRequest(request.getId(), null, permissions);
 		Set<UUID> removedRoleAssignments = new HashSet<>();

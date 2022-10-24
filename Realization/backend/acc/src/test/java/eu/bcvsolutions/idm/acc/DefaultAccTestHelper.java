@@ -11,6 +11,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
@@ -594,7 +596,11 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 
 	@Override
 	public AccAccountDto createAccount() {
-		IdmIdentityDto identity = this.createIdentity();
+		return createAccount(null);
+	}
+	@Override
+	public AccAccountDto createAccount(GuardedString password){
+		IdmIdentityDto identity = this.createIdentity(password);
 		//
 		SysSystemDto system = this.createSystem("test_resource");
 		this.createMapping(system);
@@ -721,5 +727,14 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Override
 	public IdmRoleRequestDto createRoleRequest(UUID identityId) {
 		return this.createRoleRequest(identityId, true);
+	}
+
+	@Override
+	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA) {
+		return createAccountRoleAssignment(accAccountDto.getId(), roleA.getId());
+	}
+
+	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to) {
+		return createAccountRoleAssignment(accAccountDto.getId(), role.getId(), from, to);
 	}
 }

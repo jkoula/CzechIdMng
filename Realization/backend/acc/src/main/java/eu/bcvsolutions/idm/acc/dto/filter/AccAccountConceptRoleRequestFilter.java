@@ -34,6 +34,16 @@ public class AccAccountConceptRoleRequestFilter extends IdmBaseConceptRoleReques
         setAccountRole(identityRoleId);
     }
 
+    @Override
+    public void setOwnerUuid(UUID ownerUuid) {
+        setAccountuuid(ownerUuid);
+    }
+
+    @Override
+    public UUID getOwnerUuid() {
+        return getAccountuuid();
+    }
+
     public UUID getAccountuuid() {
         return accountuuid;
     }

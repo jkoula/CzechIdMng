@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -117,4 +118,6 @@ public interface IdmRoleAssignmentService<D extends AbstractRoleAssignmentDto, F
 
     AbstractRoleAssignmentEvent<D> getEventForAssignment(D assignment, AbstractRoleAssignmentEvent.RoleAssignmentEventType update, String... flags);
     F getFilter();
+
+    List<D> findAllByOwnerId(UUID ownerUuid);
 }

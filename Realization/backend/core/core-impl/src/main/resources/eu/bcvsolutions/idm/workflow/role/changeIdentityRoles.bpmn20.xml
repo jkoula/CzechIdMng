@@ -66,18 +66,13 @@ Configuration properties:
     <sequenceFlow id="flow21" sourceRef="scripttask1" targetRef="startAddSubWorkflow"></sequenceFlow>
     <scriptTask id="scripttask1" name="Loading concepts for add new permissions" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import java.time.LocalDate;
-          import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
           import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation
 
 //Get request ID from event
 def requestId = entityEvent.content.id;
 
 //Search concept for operation change
-IdmConceptRoleRequestFilter conceptFilter = new IdmConceptRoleRequestFilter();
-conceptFilter.setRoleRequestId(requestId);
-conceptFilter.setOperation(ConceptRoleRequestOperation.ADD);
-
-def addedConceptRoles = conceptRoleRequestService.find(conceptFilter, null).getContent();
+def addedConceptRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequestOperation.ADD);
 
 execution.setVariable("addedConceptRoles", addedConceptRoles);</script>
     </scriptTask>
@@ -85,18 +80,13 @@ execution.setVariable("addedConceptRoles", addedConceptRoles);</script>
     <sequenceFlow id="flow23" sourceRef="startevent1" targetRef="servicetaskCreateProcessName"></sequenceFlow>
     <scriptTask id="scripttask2" name="Loading concepts for change permissions" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import java.time.LocalDate;
-          import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
           import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation
 
 //Get request ID from event
 def requestId = entityEvent.content.id;
 
 //Search concept for operation change
-IdmConceptRoleRequestFilter conceptFilter = new IdmConceptRoleRequestFilter();
-conceptFilter.setRoleRequestId(requestId);
-conceptFilter.setOperation(ConceptRoleRequestOperation.UPDATE);
-
-def changedConceptRoles = conceptRoleRequestService.find(conceptFilter, null).getContent();
+def changedConceptRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequestOperation.UPDATE);
 
 execution.setVariable("changedConceptRoles", changedConceptRoles);</script>
     </scriptTask>
@@ -137,18 +127,13 @@ execution.setVariable("changedConceptRoles", changedConceptRoles);</script>
     </callActivity>
     <scriptTask id="scripttask3" name="Loading concepts for remove assigned permissions" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import java.time.LocalDate;
-          import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
           import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation
 
 //Get request ID from event
 def requestId = entityEvent.content.id;
 
 //Search concept for operation change
-IdmConceptRoleRequestFilter conceptFilter = new IdmConceptRoleRequestFilter();
-conceptFilter.setRoleRequestId(requestId);
-conceptFilter.setOperation(ConceptRoleRequestOperation.REMOVE);
-
-def removedConceptRoles = conceptRoleRequestService.find(conceptFilter, null).getContent();
+def removedConceptRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequestOperation.REMOVE);
 
 execution.setVariable("removedConceptRoles", removedConceptRoles);</script>
     </scriptTask>
@@ -173,17 +158,13 @@ roleRequestService.save(requestDto);</script>
     <sequenceFlow id="flow36" sourceRef="scripttask4" targetRef="servicetaskRealization"></sequenceFlow>
     <sequenceFlow id="flow37" sourceRef="parallelgateway2" targetRef="scripttask14"></sequenceFlow>
     <scriptTask id="sid-02963C54-77A0-4E79-8EBD-4FBA5CCD4501" name="Set request and concepts to disapproved" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter
-          import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+      <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 
  //Request was disapproved, now we set DISAPPROVE state to all concepts and request
-
- IdmConceptRoleRequestFilter filter = new IdmConceptRoleRequestFilter();
- filter.setRoleRequestId(entityEvent.content.id);
-
- for (concept in conceptRoleRequestService.find(filter, null).getContent()) {
+ for (concept in conceptManager.findAllByRoleRequest(entityEvent.content.id, null)) {
 	concept.setState(RoleRequestState.DISAPPROVED);
-	conceptRoleRequestService.save(concept);
+
+     conceptManager.getServiceForConcept(concept).save(concept);
  }
 
 // Set and save state DISAPPROVED to request
@@ -394,18 +375,13 @@ if(!skip){
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision.equals("disapprove")}]]></conditionExpression>
     </sequenceFlow>
     <scriptTask id="scripttask6" name="Set request and concepts to canceled by applicant" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter
-          import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+      <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 
  //Request was disapproved, now we set CANCELED state to all concepts and request
-
- IdmConceptRoleRequestFilter filter = new IdmConceptRoleRequestFilter();
- filter.setRoleRequestId(entityEvent.content.id);
-
- for (concept in conceptRoleRequestService.find(filter, null).getContent()) {
+ for (concept in conceptManager.findAllByRoleRequest(entityEvent.content.id, null)) {
 	concept.setState(RoleRequestState.CANCELED);
-        conceptRoleRequestService.addToLog(concept, "Canceled by applicant");
-	conceptRoleRequestService.save(concept);
+     conceptManager.getServiceForConcept(concept).addToLog(concept, "Canceled by applicant");
+     conceptManager.getServiceForConcept(concept).save(concept);
  }
 
 // Set and save state CANCELED to request
@@ -479,7 +455,6 @@ if(!skip){
       <script>import eu.bcvsolutions.idm.core.notification.api.dto.IdmMessageDto;
 import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
 import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import java.time.format.DateTimeFormatter;
 
@@ -491,18 +466,10 @@ DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd. MM. yyyy HH:mm")
 def from = dateFormat.format(entityEvent.content.created);
 
 // gather all information about roles for send notification
-IdmConceptRoleRequestFilter conceptFilter = new IdmConceptRoleRequestFilter();
-conceptFilter.setRoleRequestId(requestId);
 
-
-conceptFilter.setOperation(ConceptRoleRequestOperation.ADD);
-def addedRoles = conceptRoleRequestService.find(conceptFilter, null).getContent();
-
-conceptFilter.setOperation(ConceptRoleRequestOperation.UPDATE);
-def changedRoles = conceptRoleRequestService.find(conceptFilter, null).getContent();
-
-conceptFilter.setOperation(ConceptRoleRequestOperation.REMOVE);
-def removedRoles = conceptRoleRequestService.find(conceptFilter, null).getContent();
+def addedRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequestOperation.ADD);
+def changedRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequestOperation.UPDATE);
+      def removedRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequestOperation.REMOVE);
 
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
 def sendNotificationToImplementer = configurationService.getBooleanValue("idm.sec.core.wf.notification.implementer.enabled", false);

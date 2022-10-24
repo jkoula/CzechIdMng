@@ -1025,6 +1025,12 @@ public class DefaultTestHelper implements TestHelper {
 	}
 
 	@Override
+	public IdmRoleDto createRoleIfNotExists(String roleCode) {
+		final IdmRoleDto byCode = roleService.getByCode(roleCode);
+		return byCode == null ? createRole(roleCode) : byCode;
+	}
+
+	@Override
 	public IdmFormAttributeDto createEavAttribute(String code, Class<? extends Identifiable> clazz,
 			PersistentType type) {
 		IdmFormAttributeDto eavAttribute = new IdmFormAttributeDto();

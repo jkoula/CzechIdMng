@@ -266,6 +266,11 @@ public class DefaultIdmIdentityRoleService
 	}
 
 	@Override
+	public List<IdmIdentityRoleDto> findAllByOwnerId(UUID ownerUuid) {
+		return findAllByContract(ownerUuid);
+	}
+
+	@Override
 	public AbstractRoleAssignmentEvent<IdmIdentityRoleDto> getEventForAssignment(IdmIdentityRoleDto assignment, AbstractRoleAssignmentEvent.RoleAssignmentEventType eventType, String... flags) {
 		@SuppressWarnings("deprecation") IdentityRoleEvent event = new IdentityRoleEvent(eventType, assignment, setupFlags(flags));
 		event.setPriority(PriorityType.IMMEDIATE);

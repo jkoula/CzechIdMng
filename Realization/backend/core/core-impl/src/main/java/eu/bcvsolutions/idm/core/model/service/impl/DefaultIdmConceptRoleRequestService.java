@@ -55,6 +55,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -207,12 +208,12 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
 
             contractSub.where(
                     builder.and(
-                        //builder.equal(root.get(IdmConceptRoleRequest_.identityContract), contractSub),
-                        builder.equal(contractRoot.get(IdmIdentityContract_.identity).get(AbstractEntity_.id), filter.getIdentity())
+                            builder.equal(root.get(IdmConceptRoleRequest_.identityContract), contractRoot),
+                            builder.equal(contractRoot.get(IdmIdentityContract_.identity).get(AbstractEntity_.id), filter.getIdentity())
             ));
             predicates.add(builder.and(
-                    builder.exists(contractSub),
-                    builder.equal(root.get(IdmConceptRoleRequest_.identityContract), contractSub)
+                    builder.exists(contractSub)
+                    //builder.equal(root.get(IdmConceptRoleRequest_.identityContract), contractSub)
                     ));
         }
 
@@ -289,6 +290,11 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
     }
 
     @Override
+    public IdmIdentityRoleDto fetchAssignment(IdmConceptRoleRequestDto concept) {
+        return identityRoleService.get(concept.getIdentityRole());
+    }
+
+    @Override
     public ApplicantDto resolveApplicant(IdmRequestIdentityRoleDto dto) {
         final IdmIdentityContractDto contractDto = identityContractService.get(dto.getOwnerUuid());
         ApplicantImplDto result = new ApplicantImplDto();
@@ -297,6 +303,11 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         result.setValidFrom(contractDto.getValidFrom());
         result.setValidTill(contractDto.getValidTill());
         return result;
+    }
+
+    @Override
+    public List<UUID> resolveManagerContractsForApproval(IdmConceptRoleRequestDto conceptRole) {
+        return Collections.singletonList(conceptRole.getIdentityContract());
     }
 
     @Override
@@ -389,10 +400,17 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         removeConcept.setIdentityContract(identityRoleAssignment.getIdentityContract());
         removeConcept.setIdentityRole(identityRoleAssignment.getId());
         removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
-        removeConcept.setRoleRequest(concept.getRoleRequest());
+        if (concept != null) {
+            removeConcept.setRoleRequest(concept.getRoleRequest());
+        }
         removeConcept.addToLog(MessageFormat.format("Removed by duplicates with subrole id [{}]", identityRoleAssignment.getRoleComposition()));
         removeConcept = save(removeConcept);
         return removeConcept;
+    }
+
+    @Override
+    public IdmConceptRoleRequestDto createEmptyConcept() {
+        return new IdmConceptRoleRequestDto();
     }
 
     @Override

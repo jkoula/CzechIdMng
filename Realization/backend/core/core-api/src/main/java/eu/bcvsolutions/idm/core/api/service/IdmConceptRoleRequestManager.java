@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.api.service;
 
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
@@ -32,4 +33,7 @@ public interface IdmConceptRoleRequestManager extends AdaptableService<IdmReques
 
     Page<IdmRequestIdentityRoleDto> find(IdmRequestIdentityRoleFilter filter, Pageable pageable, BasePermission[] permission);
 
+    List<AbstractConceptRoleRequestDto> getAllByRoleId(UUID roleId);
+
+    List<AbstractConceptRoleRequestDto> getAllByRoleRequest(UUID requestId, ConceptRoleRequestOperation operation);
 }

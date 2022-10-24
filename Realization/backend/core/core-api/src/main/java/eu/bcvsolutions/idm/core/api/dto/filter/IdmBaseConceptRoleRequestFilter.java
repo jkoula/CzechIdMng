@@ -24,7 +24,8 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 	public static final String IDENTITY_ROLE_IDS_PARAMETER = "identityRoleIds";
 	public static final String ROLE_REQUEST_ID_PARAMETER = "roleRequestId";
 	public static final String ROLE_REQ_STATE_PARAMETER = "identityRoleIds";
-	public static final String AUTOMATIC_ROLE_PARAMETER = "identityRoleIds";
+	public static final String AUTOMATIC_ROLE_PARAMETER = "automaticRole";
+	public static final String AUTOMATIC_ROLE_ID_PARAMETER = "automaticRoleId";
 	public static final String DIRECT_ROLE_PARAMETER = "directRole";
 	public static final String DIRECT_ROLE_ID_PARAMETER = "directRoleId";
 	public static final String CONCEPT_ROLE_OPERATION_PARAMETER = "identityRoleIds";
@@ -107,12 +108,20 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
         this.roleId = roleId;
     }
 
-    public UUID getAutomaticRole() {
-		return automaticRole;
+    public Boolean getAutomaticRole() {
+		return getParameterConverter().toBoolean(getData(), AUTOMATIC_ROLE_PARAMETER);
 	}
 
-	public void setAutomaticRole(UUID automaticRole) {
-		this.automaticRole = automaticRole;
+	public void setAutomaticRole(Boolean automaticRole) {
+		set(AUTOMATIC_ROLE_PARAMETER, automaticRole);
+	}
+
+	public UUID getAutomaticRoleId() {
+		return getParameterConverter().toUuid(getData(), AUTOMATIC_ROLE_ID_PARAMETER);
+	}
+
+	public void setAutomaticRoleId(UUID automaticRoleId) {
+		set(AUTOMATIC_ROLE_ID_PARAMETER, automaticRoleId);
 	}
 
 	public ConceptRoleRequestOperation getOperation() {
@@ -184,4 +193,7 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
 	public void setRoleAssignmentUuids(Set<UUID> identityRoleIds) {
 		setIdentityRoleIds(identityRoleIds);
 	}
+
+	public abstract void setOwnerUuid(UUID contractId);
+	public abstract UUID getOwnerUuid();
 }

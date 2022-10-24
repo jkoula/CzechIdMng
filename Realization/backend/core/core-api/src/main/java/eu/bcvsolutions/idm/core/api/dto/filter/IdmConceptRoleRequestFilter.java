@@ -36,6 +36,16 @@ public class IdmConceptRoleRequestFilter extends IdmBaseConceptRoleRequestFilter
         setIdentityRoleId(identityRoleId);
     }
 
+    @Override
+    public void setOwnerUuid(UUID contractId) {
+        setIdentityContractId(contractId);
+    }
+
+    @Override
+    public UUID getOwnerUuid() {
+        return getIdentityContractId();
+    }
+
     public UUID getIdentityRoleId() {
         return getParameterConverter().toUuid(getData(), IDENTITY_ROLE_ID_PARAMETER);
     }

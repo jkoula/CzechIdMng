@@ -22,9 +22,11 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto;
 import eu.bcvsolutions.idm.acc.entity.SysSystem;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.ic.service.api.IcConnectorFacade;
 
 /**
@@ -306,6 +308,8 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
      */
     AccAccountDto createAccount();
 
+	AbstractDto createAccount(GuardedString password);
+
     /**
      * Assignes a role to an account via a role request.
      *
@@ -419,4 +423,9 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
      * @return
      */
     IdmRoleRequestDto createRoleRequest(UUID identityId);
+
+	AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA);
+
+	AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to);
+
 }

@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,88 +53,6 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 	private IdmIdentityRoleService identityRoleService;
 	@Autowired
 	private IdmConceptRoleRequestService conceptRoleRequestService;
-	
-	
-	
-	@Override
-	@Transactional
-	public void testGetHistoricTaskByUserInvolvedInProcess() {
-		super.testGetHistoricTaskByUserInvolvedInProcess();
-	}
-
-	@Override
-	@Transactional
-	public void testSwitchUserAuditVariables() {
-		super.testSwitchUserAuditVariables();
-	}
-
-	@Override
-	@Transactional
-	public void testSwitchUserAuditVariablesModify() {
-		super.testSwitchUserAuditVariablesModify();
-	}
-	
-	
-
-	@Override
-	@Transactional
-	public void testTaskCount() {
-		super.testTaskCount();
-	}
-
-	@Override
-	@Transactional
-	public void testCompleteTaskByStarter() {
-		super.testCompleteTaskByStarter();
-	}
-
-	@Override
-	@Transactional
-	public void testCompleteTaskByAnotherUser() {
-		super.testCompleteTaskByAnotherUser();
-	}
-
-	@Override
-	@Transactional
-	public void testCompleteTaskByPreviosApprover() {
-		super.testCompleteTaskByPreviosApprover();
-	}
-
-	@Override
-	@Transactional
-	public void testGetTaskByAnotherUser() {
-		super.testGetTaskByAnotherUser();
-	}
-
-	@Override
-	@Transactional
-	public void testFindCandidatesWithoutSubprocess() {
-		super.testFindCandidatesWithoutSubprocess();
-	}
-
-	@Override
-	@Transactional
-	public void testFindCandidatesWithSubprocess() {
-		super.testFindCandidatesWithSubprocess();
-	}
-
-	@Override
-	@Transactional
-	public void testAccessIsAddedForOwnerAndImplementerToSubprocesses() {
-		super.testAccessIsAddedForOwnerAndImplementerToSubprocesses();
-	}
-
-	@Override
-	@Transactional
-	public void testSwitchUserDeleteProcess() {
-		super.testSwitchUserDeleteProcess();
-	}
-
-	@Override
-	@Transactional
-	public void testGetTaskByUserInvolvedInProcess() {
-		super.testGetTaskByUserInvolvedInProcess();
-	}
 
 	@Test
 	public void addSuperAdminRoleTest() {
@@ -631,6 +550,11 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 	}
 
 	@Override
+	protected void deleteOwner(AbstractDto owner) {
+		identityContractService.deleteById(owner.getId());
+	}
+
+	@Override
 	public AbstractConceptRoleRequestDto createConceptRoleRequest(IdmRoleRequestDto request, IdmRoleDto role,
 			UUID assigneeId, UUID roleAssignmentId, ConceptRoleRequestOperation operationType, LocalDate validFrom,
 			List<IdmFormInstanceDto> eavs) {
@@ -658,8 +582,8 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 	}
 
 	@Override
-	public AbstractDto createOwner() {
-		IdmIdentityDto identity = getHelper().createIdentity();
+	public AbstractDto createOwner(GuardedString password) {
+		IdmIdentityDto identity = getHelper().createIdentity(password);
 		IdmIdentityContractDto contract = getHelper().createContract(identity);
 		return contract;
 	}

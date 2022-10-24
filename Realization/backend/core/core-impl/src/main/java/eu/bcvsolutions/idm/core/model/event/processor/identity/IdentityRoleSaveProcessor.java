@@ -42,16 +42,24 @@ public class IdentityRoleSaveProcessor
 
 	public static final String PROCESSOR_NAME = "identity-role-save-processor";
 
+	private final IdmIdentityRoleValidRequestService validRequestService;
+
 	@Autowired
 	public IdentityRoleSaveProcessor(
 			IdmIdentityRoleService service,
 			IdmIdentityRoleValidRequestService validRequestService) {
-		super(service, validRequestService, AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE, AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE);
+		super(service, AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE, AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE);
+		this.validRequestService = validRequestService;
 	}
 	
 	@Override
 	public String getName() {
 		return PROCESSOR_NAME;
+	}
+
+	@Override
+	protected void createRoleValidReqForInvalidRole(IdmIdentityRoleDto roleAssignment) {
+		validRequestService.createByIdentityRoleId(roleAssignment.getId());
 	}
 
 }

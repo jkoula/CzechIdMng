@@ -72,6 +72,11 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     }
 
     @Override
+    public List<AccAccountRoleAssignmentDto> findAllByOwnerId(UUID ownerUuid) {
+        return findByAccountId(ownerUuid);
+    }
+
+    @Override
     protected LocalDate getDateForValidTill(AccAccountRoleAssignmentDto one) {
         return one.getValidTill();
     }

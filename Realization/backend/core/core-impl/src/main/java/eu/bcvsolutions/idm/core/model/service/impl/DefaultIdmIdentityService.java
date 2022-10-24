@@ -292,7 +292,7 @@ public class DefaultIdmIdentityService
                     		)
             );			
 			predicates.add(builder.exists(subquery));
-		}		
+		}
 		//
 		return predicates;
 	}

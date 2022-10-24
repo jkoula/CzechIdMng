@@ -14,6 +14,7 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -22,11 +23,13 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
@@ -60,11 +63,14 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.text.MessageFormat;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -88,12 +94,14 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
 
     private final WorkflowProcessInstanceService workflowProcessInstanceService;
 
+    private final IdmIdentityContractService contractService;
+
     @Autowired
     public DefaultAccAccountConceptRoleRequestService(AbstractEntityRepository<AccAccountConceptRoleRequest> repository, WorkflowProcessInstanceService workflowProcessInstanceService,
             LookupService lookupService, IdmAutomaticRoleRepository automaticRoleRepository, AccAccountRoleAssignmentService accRoleAccountService, FormService formService,
             IdmRoleCompositionService roleCompositionService, IdmRoleService roleService, AccAccountService accountService, AccIdentityAccountService identityAccountService,
             AccAccountRoleAssignmentService roleAssignmentService, IdmIdentityService identityService, LookupService lookupService1, IdmRoleSystemService roleSystemService,
-            WorkflowProcessInstanceService workflowProcessInstanceService1) {
+            WorkflowProcessInstanceService workflowProcessInstanceService1, IdmIdentityContractService contractService) {
         super(repository, workflowProcessInstanceService, roleCompositionService, lookupService, automaticRoleRepository, roleAssignmentService);
         this.accRoleAccountService = accRoleAccountService;
         this.formService = formService;
@@ -104,6 +112,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
         this.lookupService = lookupService1;
         this.roleSystemService = roleSystemService;
         this.workflowProcessInstanceService = workflowProcessInstanceService1;
+        this.contractService = contractService;
     }
 
     @Override
@@ -215,6 +224,11 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     }
 
     @Override
+    public AccAccountRoleAssignmentDto fetchAssignment(AccAccountConceptRoleRequestDto concept) {
+        return accRoleAccountService.get(concept.getAccountRole());
+    }
+
+    @Override
     public ApplicantDto resolveApplicant(IdmRequestIdentityRoleDto dto) {
         final AccAccountDto accAccountDto = accountService.get(dto.getOwnerUuid());
         final IdmIdentityDto idmIdentityDto = identityService.get(accAccountDto.getTargetEntityId());
@@ -224,6 +238,19 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
         // We do not check validity of an account here. Maybe we could use contracts of identity
         // but at this point it is not necessary
         return applicantDto;
+    }
+
+    @Override
+    public List<UUID> resolveManagerContractsForApproval(AccAccountConceptRoleRequestDto conceptRole) {
+        final LocalDate now = LocalDate.now();
+
+        AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
+        filter.setAccountId(conceptRole.getAccAccount());
+
+        return identityAccountService.find(filter, null).stream()
+                .flatMap(accIdentityAccountDto -> contractService.findAllValidForDate(accIdentityAccountDto.getIdentity(), now, null).stream())
+                .map(AbstractDto::getId)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -339,10 +366,17 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
         removeConcept.setAccAccount(identityRoleAssignment.getAccAccount());
         removeConcept.setAccountRole(identityRoleAssignment.getId());
         removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
-        removeConcept.setRoleRequest(concept.getRoleRequest());
+        if (concept != null) {
+            removeConcept.setRoleRequest(concept.getRoleRequest());
+        }
         removeConcept.addToLog(MessageFormat.format("Removed by duplicates with subrole id [{}]", identityRoleAssignment.getRoleComposition()));
         removeConcept = save(removeConcept);
         return removeConcept;
+    }
+
+    @Override
+    public AccAccountConceptRoleRequestDto createEmptyConcept() {
+        return new AccAccountConceptRoleRequestDto();
     }
 
     @Override

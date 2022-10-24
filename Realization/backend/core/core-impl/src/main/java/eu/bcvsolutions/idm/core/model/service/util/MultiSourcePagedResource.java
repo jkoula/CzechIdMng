@@ -17,6 +17,7 @@ import org.modelmapper.spi.ConditionalConverter;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.LinkedMultiValueMap;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -127,15 +129,15 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
              TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Pageable, Page<O>> resultProvider,
             TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Page<O>, Collection<Q>> resultMapper, BaseFilter filter, Pageable pageable, BasePermission[] permission) {
         List<Q> result = new ArrayList<>();
+        final Pageable nullSafePageable = Optional.ofNullable(pageable).orElse(PageRequest.of(0, Integer.MAX_VALUE));
         long total = 0L;
         for (AdaptableService<DTO, INNERFILTER, RESULT> service : sources) {
-            final int missingCount = Math.max(pageable.getPageSize() - result.size(), 0);
+            final int missingCount = nullSafePageable.isPaged() ? Math.max(nullSafePageable.getPageSize() - result.size(), 0) : Integer.MAX_VALUE;
             final INNERFILTER concreteFilter = modelMapper.map(filter == null ? new EmptyFilter() : filter, service.getFilterClass());
             //
             if (missingCount != 0) {
                 // Still need some records fetched
-                final long offset = Math.max(0, (long) pageable.getPageNumber() * pageable.getPageSize() - total);
-                final Pageable currentPageable = OffsetPageable.of(offset, 0, missingCount, pageable.getSort());
+                final Pageable currentPageable = getCurrentPageable(nullSafePageable, total, missingCount);
                 //
                 final Page<O> currentPage = resultProvider.apply(service, concreteFilter, currentPageable);
                 result.addAll(resultMapper.apply(service, concreteFilter, currentPage));
@@ -146,7 +148,16 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
                 total+= count;
             }
         }
-        return new PageImpl<>(result, pageable, total);
+        return new PageImpl<>(result, nullSafePageable, total);
+    }
+
+    private Pageable getCurrentPageable(Pageable originalPageable, long total, int missingCount) {
+        if (originalPageable.isUnpaged()) {
+            return Pageable.unpaged();
+        }
+
+        final long offset = Math.max(0, (long) originalPageable.getPageNumber() * originalPageable.getPageSize() - total);
+        return OffsetPageable.of(offset, 0, missingCount, originalPageable.getSort());
     }
 
     @FunctionalInterface

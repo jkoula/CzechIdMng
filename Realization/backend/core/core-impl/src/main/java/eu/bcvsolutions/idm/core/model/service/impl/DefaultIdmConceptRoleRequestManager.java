@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
@@ -19,9 +20,11 @@ import org.apache.commons.collections.MultiMap;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.internal.util.Assert;
 import org.modelmapper.spi.ConditionalConverter;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -43,7 +46,7 @@ import java.util.stream.Stream;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-@Service
+@Service("conceptManager")
 public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMultiService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> implements IdmConceptRoleRequestManager {
 
     private final Map<Class<? extends AbstractConceptRoleRequestDto>, IdmGeneralConceptRoleRequestService> conceptServices;
@@ -99,6 +102,29 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
     }
 
     @Override
+    public List<AbstractConceptRoleRequestDto> getAllByRoleId(UUID roleId) {
+        return conceptServices.values().stream().flatMap(idmGeneralConceptRoleRequestService -> {
+            final IdmBaseConceptRoleRequestFilter filter = idmGeneralConceptRoleRequestService.getFilter();
+            filter.setRoleId(roleId);
+            final Stream<? extends AbstractConceptRoleRequestDto> concepts = idmGeneralConceptRoleRequestService.find(filter, null).stream();
+            return concepts;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AbstractConceptRoleRequestDto> getAllByRoleRequest(UUID requestId, ConceptRoleRequestOperation operation) {
+        Assert.notNull(requestId, "No request id provided");
+        final List<AbstractConceptRoleRequestDto> collect = conceptServices.values().stream().flatMap(idmGeneralConceptRoleRequestService -> {
+            final IdmBaseConceptRoleRequestFilter filter = idmGeneralConceptRoleRequestService.getFilter();
+            filter.setRoleRequestId(requestId);
+            filter.setOperation(operation);
+            final Stream<? extends AbstractConceptRoleRequestDto> concepts = idmGeneralConceptRoleRequestService.find(filter, null).stream();
+            return concepts;
+        }).collect(Collectors.toList());
+        return collect;
+    }
+
+    @Override
     public Class<IdmRequestIdentityRoleFilter> getFilterClass() {
         return IdmRequestIdentityRoleFilter.class;
     }
@@ -129,9 +155,6 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
         // TODO comment wtf
         List<AdaptableService<AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleDto>> services = new ArrayList<>();
         conceptServices.values().forEach(services::add);
-
-
-
         return new MultiSourcePagedResource<>(services, modelMapper);
     }
 }

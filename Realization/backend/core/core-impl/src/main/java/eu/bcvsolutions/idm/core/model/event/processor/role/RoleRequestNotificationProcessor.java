@@ -140,9 +140,9 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 
 		IdmIdentityDto applicantIdentity = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant.getName(),
 				IdmIdentityDto.class);
-		IdmIdentityDto implementerIdentity = identityService.get(request.getCreatorId());
+		IdmIdentityDto implementerIdentity = request.getCreatorId() == null ? null : identityService.get(request.getCreatorId());
 
-		if (implementerIdentity.equals(applicantIdentity)) {
+		if (applicantIdentity.equals(implementerIdentity)) {
 			// Send notification only to implementer if
 			// implementer and applicant is same identity
 			if (sendNotificationToImplementer || sendNotificationToApplicant) {
@@ -156,7 +156,7 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 						applicantIdentity, applicantIdentity);
 			}
 			// Send notification to implementer
-			if (sendNotificationToImplementer) {
+			if (sendNotificationToImplementer && implementerIdentity != null) {
 				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
 						removedRoles, applicantIdentity, implementerIdentity);
 			}

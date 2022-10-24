@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
@@ -22,9 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.AbstractCoreWorkflowIntegrationTest;
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
@@ -69,6 +68,7 @@ import eu.bcvsolutions.idm.core.workflow.service.WorkflowHistoricProcessInstance
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowHistoricTaskInstanceService;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowTaskInstanceService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Test change permissions for identity.
@@ -94,6 +94,8 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 	public static final String APPROVE_INCOMPATIBLE_ENABLE = "idm.sec.core.wf.approval.incompatibility.enabled";
 	public static final String APPROVE_INCOMPATIBLE_ROLE = "idm.sec.core.wf.approval.incompatibility.role";
 	public static final String INCOMPATIBILITY_ROLE_TEST = "IncompatibilityRoleTest";
+
+	public static final GuardedString TEST_APPLICANT_PWD = new GuardedString(UUID.randomUUID().toString());
 	//
 	@Autowired
 	public WorkflowTaskInstanceService workflowTaskInstanceService;
@@ -141,6 +143,16 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().setConfigurationValue(APPROVE_BY_MANAGER_ENABLE, false);
 		getHelper().setConfigurationValue(APPROVE_BY_HELPDESK_ENABLE, false);
 		getHelper().setConfigurationValue(APPROVE_BY_USERMANAGER_ENABLE, false);
+		getHelper().setConfigurationValue(APPROVE_INCOMPATIBLE_ENABLE, false);
+		//
+		configurationService.deleteValue(APPROVE_BY_HELPDESK_ROLE);
+		configurationService.deleteValue(APPROVE_BY_SECURITY_ROLE);
+		configurationService.deleteValue(APPROVE_INCOMPATIBLE_ROLE);
+		//
+		configurationService.deleteValue(APPROVE_ROLE_BY_MANAGER_KEY);
+		configurationService.deleteValue(APPROVE_ROLE_BY_SECURITY_KEY);
+		configurationService.deleteValue(APPROVE_ROLE_BY_GUARANTEE_KEY);
+		configurationService.deleteValue(APPROVE_REMOVE_ROLE_BY_MANAGER_KEY);
 		//
 		super.logout();
 	}
@@ -158,10 +170,10 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		// Set incompatibility role test
 		configurationService.setValue(APPROVE_INCOMPATIBLE_ROLE, INCOMPATIBILITY_ROLE_TEST);
 		// Create test role for load candidates on approval incompatibility (TEST_USER_1)
-		IdmRoleDto role = getHelper().createRole(INCOMPATIBILITY_ROLE_TEST);
+		IdmRoleDto role = getHelper().createRoleIfNotExists(INCOMPATIBILITY_ROLE_TEST);
 		getHelper().createIdentityRole(identityService.getByUsername(InitTestDataProcessor.TEST_USER_1), role);
 
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 
 		// Create definition of incompatible roles
@@ -240,7 +252,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmRoleDto role = getHelper().createRole(INCOMPATIBILITY_ROLE_TEST);
 		getHelper().createIdentityRole(identityService.getByUsername(InitTestDataProcessor.TEST_USER_1), role);
 
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 
 		// Create definition of incompatible roles
@@ -284,7 +296,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		configurationService.setValue(APPROVE_BY_USERMANAGER_ENABLE, "false");
 		//
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto guarantee = getHelper().createIdentity();
 
@@ -373,7 +385,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmIdentityDto noAdmin = getHelper().createIdentity();
 		//
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		//
@@ -423,7 +435,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		configurationService.setValue(APPROVE_BY_USERMANAGER_ENABLE, "false");
 
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = getHelper().createIdentity();
@@ -476,7 +488,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		configurationService.setValue(APPROVE_BY_USERMANAGER_ENABLE, "false");
 		//
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto guarantee = getHelper().createIdentity();
@@ -528,7 +540,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		loginAsNoAdmin(helpdeskIdentity.getUsername());
 		try {
 			completeTasksFromUsers(guarantee.getUsername(), "approve");
-			fail("This user: " + helpdeskIdentity.getUsername() + " can't approve task.");
+			fail("This user: " + helpdeskIdentity.getUsername() + " should not be able to approve task.");
 		} catch (ResultCodeException ex) {
 			assertTrue(CoreResultCode.FORBIDDEN.name().equals(ex.getError().getError().getStatusEnum()));
 		} catch (Exception e) {
@@ -566,7 +578,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		configurationService.setValue(APPROVE_BY_USERMANAGER_ENABLE, "false");
 		//
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto anotherUser = getHelper().createIdentity();
@@ -649,7 +661,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().waitForResult(null, 1, 1);
 
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -722,7 +734,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().waitForResult(null, 1, 1);
 
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -795,7 +807,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		// We are logged as admin. By default is all approve tasks assigned to Admin.
 		// All this tasks will be skipped.
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -847,7 +859,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 
 		configurationService.setValue(APPROVE_BY_SECURITY_ENABLE, "false");
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -901,7 +913,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		assertNotNull(workflowProcessInstanceService.get(conceptWf));
 
 		// Wf process for concept cannot be cancelled (because main process would be frozen ). Process will be disapproved.
-		identityContractService.deleteById(owner.getId());
+		deleteOwner(owner);
 
 		// Concept has to be in the Cancel state and WF must be ended
 		concept = (AbstractConceptRoleRequestDto) getConceptRoleService().get(concept.getId());
@@ -913,6 +925,8 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		assertEquals(RoleRequestState.EXECUTED, request.getState());
 	}
 
+	protected abstract void deleteOwner(AbstractDto owner);
+
 	@Test
 	public void cancelSubprocessOnRoleDeleteTest() {
 		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
@@ -920,7 +934,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 
 		configurationService.setValue(APPROVE_BY_SECURITY_ENABLE, "false");
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -929,12 +943,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 
 		// Guarantee
 		int priority = 500;
-		IdmRoleDto adminRole = roleConfiguration.getAdminRole();
+		IdmRoleDto adminRole = getHelper().createRole();
 		adminRole.setPriority(priority);
 		getHelper().createRoleGuarantee(adminRole, test2);
 		adminRole = roleService.save(adminRole);
 		configurationService.setValue(IdmRoleService.WF_BY_ROLE_PRIORITY_PREFIX + priority,
-				APPROVE_ROLE_BY_MANAGER_KEY);
+				APPROVE_ROLE_BY_GUARANTEE_KEY);
 
 		IdmRoleRequestDto request = createRoleRequest(applicantId);
 
@@ -1001,7 +1015,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		configurationService.setValue(APPROVE_BY_HELPDESK_ENABLE, "true");
 		//
 		loginAsAdmin();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		//
@@ -1072,7 +1086,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().createIdentityRole(helpdeskIdentity, helpdeskRole);
 		configurationService.setValue(APPROVE_BY_HELPDESK_ROLE, helpdeskRole.getCode());
 
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto guarantee = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
 
@@ -1083,7 +1097,8 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().createRoleGuarantee(adminRole, guarantee);
 		adminRole = roleService.save(adminRole);
 		configurationService.setValue(IdmRoleService.WF_BY_ROLE_PRIORITY_PREFIX + priority,
-				APPROVE_ROLE_BY_MANAGER_KEY);
+				APPROVE_ROLE_BY_GUARANTEE_KEY);
+				//APPROVE_ROLE_BY_MANAGER_KEY);
 
 		IdmRoleRequestDto request = createRoleRequest(applicantId);
 
@@ -1205,7 +1220,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmRoleDto roleTwo = roleService.save(role);
 		//
 		IdmIdentityDto implementer = getHelper().createIdentity();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto guaranteeOne = getHelper().createIdentity();
@@ -1241,7 +1256,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().login(implementer);
 		List<WorkflowProcessInstanceDto> processes = workflowProcessInstanceService.find(new WorkflowFilterDto(), null, IdmBasePermission.READ).getContent();
 		Assert.assertEquals(3, processes.size());
-		getHelper().login(applicant);
+		getHelper().login(applicant.getUsername(), TEST_APPLICANT_PWD);
 		Assert.assertEquals(3, workflowProcessInstanceService.find(new WorkflowFilterDto(), null, IdmBasePermission.READ).getTotalElements());
 		getHelper().login(guaranteeOne);
 		Assert.assertEquals(1, workflowProcessInstanceService.find(new WorkflowFilterDto(), null, IdmBasePermission.READ).getTotalElements());
@@ -1264,7 +1279,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmIdentityDto adminOriginal = getHelper().createIdentity();
 		IdmIdentityDto adminSwitched = getHelper().createIdentity();
 		IdmIdentityDto adminHelpdesk = getHelper().createIdentity();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmRoleDto adminRole = roleConfiguration.getAdminRole();
 		getHelper().createIdentityRole(adminOriginal, adminRole);
@@ -1342,7 +1357,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmIdentityDto adminOriginal = getHelper().createIdentity();
 		IdmIdentityDto adminSwitched = getHelper().createIdentity();
 		IdmIdentityDto adminHelpdesk = getHelper().createIdentity();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmRoleDto adminRole = roleConfiguration.getAdminRole();
 		getHelper().createIdentityRole(adminOriginal, adminRole);
@@ -1401,9 +1416,8 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 			Assert.assertEquals(applicantId.toString(), tasks.get(0).getApplicant());
 			checkAndCompleteOneTask(taskFilter, applicantId, "approve");
 			getHelper().waitForResult(res -> {
-				return workflowTaskInstanceService.count(taskFilter) != 0;
+				return workflowTaskInstanceService.find(taskFilter, null).getTotalElements() != 0;
 			}, 1000, 30);
-//			workflowTaskInstanceService.completeTask(tasks.get(0).getId(), "approve");
 			//
 			// check original identity is filled in task variables
 			WorkflowHistoricTaskInstanceDto workflowHistoricTaskInstanceDto = workflowHistoricTaskInstanceService.get(tasks.get(0).getId());
@@ -1431,7 +1445,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmIdentityDto adminOriginal = getHelper().createIdentity();
 		IdmIdentityDto adminSwitched = getHelper().createIdentity();
 		IdmIdentityDto adminHelpdesk = getHelper().createIdentity();
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmRoleDto adminRole = roleConfiguration.getAdminRole();
 		getHelper().createIdentityRole(adminOriginal, adminRole);
@@ -1481,7 +1495,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().waitForResult(null, 1, 1);
 
 		loginAsAdmin(InitTestDataProcessor.TEST_USER_2);
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -1561,7 +1575,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		getHelper().waitForResult(null, 1, 1);
 
 		loginAsAdmin(InitTestDataProcessor.TEST_USER_2);
-		AbstractDto owner = createOwner();
+		AbstractDto owner = createOwner(TEST_APPLICANT_PWD);
 		UUID applicantId = getApplicant(owner);
 		IdmIdentityDto applicant = identityService.get(applicantId);
 		IdmIdentityDto test2 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
@@ -1685,6 +1699,8 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		taskFilter.setCandidateOrAssigned(approverUser);
 		List<WorkflowTaskInstanceDto> tasks = workflowTaskInstanceService.find(taskFilter, null).getContent();
 		//
+		Assert.assertFalse("No tasks to complete.",tasks.isEmpty());
+		//
 		for (WorkflowTaskInstanceDto task : tasks) {
 			workflowTaskInstanceService.completeTask(task.getId(), decision);
 		}
@@ -1703,7 +1719,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 	
 	public abstract IdmRoleAssignmentService getRoleAssignmentService();
 	
-	public abstract AbstractDto createOwner();
+	public abstract AbstractDto createOwner(final GuardedString password);
 	
 	public abstract UUID getApplicant(AbstractDto owner);
 	
@@ -1716,6 +1732,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		roleRequest.setApplicant(applicantId);
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(false);
+		roleRequest.setCreatorId(applicantId);
 		return roleRequestService.save(roleRequest);
 	}
 }

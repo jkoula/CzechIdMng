@@ -194,7 +194,7 @@ public class DefaultIdmPasswordService
 			return false;
 		}
 		// isn't possible compare null password
-		if (passwordToCheck.asString() == null) {
+		if (passwordToCheck == null || passwordToCheck.asString() == null) {
 			return false;
 		}
 		return BCrypt.checkpw(passwordToCheck.asString(), password.getPassword());
