@@ -144,7 +144,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleSystemInCrossDomainGroup() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -194,7 +194,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleSystemInDisabledCrossDomainGroup() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -250,7 +250,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleInCrossDomainGroupCannotCreateAccount() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -338,7 +338,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testUpdateAccountInCrossDomain() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -445,7 +445,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 	
 	@Test
 	public void testUpdateAccountInCrossDomainOnTwoSystems() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		// System one
 		SysSystemDto systemDto = initSystem(connectorType);
 		
@@ -612,7 +612,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 	
 	@Test
 	public void testUpdateAccountInCrossDomainOnOneSystem() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		// System one
 		SysSystemDto systemDto = initSystem(connectorType);
 		
@@ -811,7 +811,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testGetConnectorObjectWithCrossDomainValues() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -891,7 +891,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testConnectorConfigurationLoginInformations() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -980,7 +980,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testDisableDefaultAccountCreation() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1051,7 +1051,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testDisableDefaultAccountCreationForAutomaticRole() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1140,7 +1140,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleInCrossDomainGroupCannotCreateAccountForAutomaticRole() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1248,7 +1248,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testDisableDefaultAccountCreationForBusinessRole() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1332,7 +1332,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleInCrossDomainGroupCannotCreateAccountForBusinessRole() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1435,7 +1435,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleInCrossDomainGroupProvisioningForBusinessRole() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1559,7 +1559,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleInCrossDomainGroupProvisioningForAutomaticRole() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();
@@ -1692,7 +1692,7 @@ public class CrossDomainAdUserConnectorTypeTest extends AbstractIntegrationTest 
 
 	@Test
 	public void testRoleInCrossDomainGroupProvisioning() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockCrossDomainAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockCrossDomainAdUserConnectorType.NAME);
 		SysSystemDto systemDto = initSystem(connectorType);
 
 		SysSystemAttributeMappingFilter filter = new SysSystemAttributeMappingFilter();

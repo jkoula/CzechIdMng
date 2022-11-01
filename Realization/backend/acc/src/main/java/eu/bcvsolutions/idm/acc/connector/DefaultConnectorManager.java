@@ -80,7 +80,7 @@ public class DefaultConnectorManager implements ConnectorManager {
 	}
 
 	@Override
-	public ConnectorType getConnectorType(String id) {
+	public ConnectorType getWizardType(String id) {
 		return this.getSupportedTypes().stream()
 				.filter(type -> type.getId().equals(id))
 				.findFirst()
@@ -123,7 +123,7 @@ public class DefaultConnectorManager implements ConnectorManager {
 		Assert.notNull(connectorType, "Connector type cannot be null!");
 		Assert.notNull(connectorType.getId(), "Connector type ID cannot be null!");
 
-		ConnectorType connectorTypeDef = this.getConnectorType(connectorType.getId());
+		ConnectorType connectorTypeDef = this.getWizardType(connectorType.getId());
 		Assert.notNull(connectorTypeDef, "Connector type definition was not found!");
 
 		if (!connectorType.isReopened()) {
@@ -139,7 +139,7 @@ public class DefaultConnectorManager implements ConnectorManager {
 		Assert.notNull(connectorType, "Connector type cannot be null!");
 		Assert.notNull(connectorType.getId(), "Connector type ID cannot be null!");
 
-		ConnectorType connectorTypeDef = this.getConnectorType(connectorType.getId());
+		ConnectorType connectorTypeDef = this.getWizardType(connectorType.getId());
 		Assert.notNull(connectorTypeDef, "Connector type definition was not found!");
 
 		return connectorTypeDef.load(connectorType);

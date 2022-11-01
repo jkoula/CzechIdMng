@@ -189,6 +189,8 @@ public enum AccResultCode implements ResultCode {
 	WIZARD_AD_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND, "The group [%s] wasn't found!"),
 	WIZARD_AD_CONNECTOR_DN_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Entry with DN [%s] already exists!"),
 	WIZARD_AD_CREATED_TEST_USER_DN(HttpStatus.CREATED, "Test user with DN [%s] created."),
+	// Account wizard
+	WIZARD_ACCOUNT_NO_LOGIN_ROLE(HttpStatus.BAD_REQUEST, "No login role found"),
 	//
 	WIZARD_AD_GROUP_WRONG_MEMBER_CONNECTOR_TYPE(HttpStatus.BAD_REQUEST, "Member system have to use AD connector, but using [%s]!"),
 	//

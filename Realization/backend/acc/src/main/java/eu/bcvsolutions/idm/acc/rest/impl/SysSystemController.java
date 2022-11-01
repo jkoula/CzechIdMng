@@ -74,6 +74,7 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
+import eu.bcvsolutions.idm.core.api.rest.WizardController;
 import eu.bcvsolutions.idm.core.api.service.ConfidentialStorage;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
@@ -116,7 +117,7 @@ import io.swagger.annotations.AuthorizationScope;;
 		description = "Operations with target systems",
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE,
 		consumes = MediaType.APPLICATION_JSON_VALUE)
-public class SysSystemController extends AbstractReadWriteDtoController<SysSystemDto, SysSystemFilter> {
+public class SysSystemController extends AbstractReadWriteDtoController<SysSystemDto, SysSystemFilter> implements WizardController<ConnectorTypeDto> {
 
 	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(SysSystemController.class);
 	
@@ -991,6 +992,7 @@ public class SysSystemController extends AbstractReadWriteDtoController<SysSyste
 	 *
 	 * @return connector types
 	 */
+	@Override
 	@ResponseBody
 	@RequestMapping(method = RequestMethod.GET, value = "/search/supported")
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
@@ -1104,8 +1106,9 @@ public class SysSystemController extends AbstractReadWriteDtoController<SysSyste
 		);
 	}
 
+	@Override
 	@ResponseBody
-	@RequestMapping(path = "/connector-types/execute", method = RequestMethod.POST)
+	@RequestMapping(path = "/wizards/execute", method = RequestMethod.POST)
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_UPDATE + "')")
 	@ApiOperation(
 			value = "Execute specific connector type -> execute some wizard step.",
@@ -1118,14 +1121,15 @@ public class SysSystemController extends AbstractReadWriteDtoController<SysSyste
 					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
 							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_UPDATE, description = "")})
 			})
-	public ResponseEntity<ConnectorTypeDto> executeConnectorType(@Valid @RequestBody ConnectorTypeDto connectorType) {
-		ConnectorTypeDto result = connectorManager.execute(connectorType);
+	public ResponseEntity<ConnectorTypeDto> executeWizardType(@Valid @RequestBody ConnectorTypeDto wizardDto) {
+		ConnectorTypeDto result = connectorManager.execute(wizardDto);
 
 		return new ResponseEntity<ConnectorTypeDto>(result, HttpStatus.CREATED);
 	}
 
+	@Override
 	@ResponseBody
-	@RequestMapping(path = "/connector-types/load", method = RequestMethod.PUT)
+	@RequestMapping(path = "/wizards/load", method = RequestMethod.PUT)
 	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
 	@ApiOperation(
 			value = "Load data for specific connector type -> open existed system in the wizard step.",
@@ -1138,31 +1142,31 @@ public class SysSystemController extends AbstractReadWriteDtoController<SysSyste
 					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
 							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")})
 			})
-	public ResponseEntity<ConnectorTypeDto> loadConnectorType(@NotNull @Valid @RequestBody ConnectorTypeDto connectorTypeDto) {
-		if (!connectorTypeDto.isReopened()) {
+	public ResponseEntity<ConnectorTypeDto> loadWizardType(@NotNull @Valid @RequestBody ConnectorTypeDto wizardDto) {
+		if (!wizardDto.isReopened()) {
 			// Load default values for new system.
-			ConnectorTypeDto result = connectorManager.load(connectorTypeDto);
+			ConnectorTypeDto result = connectorManager.load(wizardDto);
 			return new ResponseEntity<ConnectorTypeDto>(result, HttpStatus.OK);
 		}
 		// Load data for already existed system.
-		String systemId = connectorTypeDto.getMetadata().get(AbstractConnectorType.SYSTEM_DTO_KEY);
+		String systemId = wizardDto.getMetadata().get(AbstractConnectorType.SYSTEM_DTO_KEY);
 		Assert.notNull(systemId, "System ID have to be present in the connector type metadata.");
 		SysSystemDto systemDto = getDto(systemId);
 		if (systemDto != null) {
 			// If connector type is not given (ID is null), then try to find it by connector name.
 			// If connector name is null, then default connector type will be used.
-			if (Strings.isBlank(connectorTypeDto.getId())) {
+			if (Strings.isBlank(wizardDto.getId())) {
 				ConnectorType connectorType = connectorManager.findConnectorTypeBySystem(
 						systemDto
 				);
 				ConnectorTypeDto newConnectorTypeDto = connectorManager.convertTypeToDto(connectorType);
-				newConnectorTypeDto.setReopened(connectorTypeDto.isReopened());
-				newConnectorTypeDto.setMetadata(connectorTypeDto.getMetadata());
-				connectorTypeDto = newConnectorTypeDto;
+				newConnectorTypeDto.setReopened(wizardDto.isReopened());
+				newConnectorTypeDto.setMetadata(wizardDto.getMetadata());
+				wizardDto = newConnectorTypeDto;
 			}
-			connectorTypeDto.getEmbedded().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto);
+			wizardDto.getEmbedded().put(AbstractConnectorType.SYSTEM_DTO_KEY, systemDto);
 			
-			ConnectorTypeDto result = connectorManager.load(connectorTypeDto);
+			ConnectorTypeDto result = connectorManager.load(wizardDto);
 
 			return new ResponseEntity<ConnectorTypeDto>(result, HttpStatus.OK);
 		}

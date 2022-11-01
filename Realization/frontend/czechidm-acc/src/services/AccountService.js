@@ -1,5 +1,6 @@
 import { Services, Domain, Utils } from 'czechidm-core';
 import AccountTypeEnum from '../domain/AccountTypeEnum';
+import WizardService from './WizardService';
 
 /**
  * Accounts on target system
@@ -7,7 +8,7 @@ import AccountTypeEnum from '../domain/AccountTypeEnum';
  * @author Vít Švanda
  * @author Radek Tomiška
  */
-export default class AccountService extends Services.AbstractService {
+export default class AccountService extends WizardService {
 
   getNiceLabel(entity) {
     if (!entity) {

@@ -373,7 +373,7 @@ export default class Wizard extends AbstractContextComponent {
           { this.i18n('button.close') }
         </Button>
         <Button
-          disabled={isFirst}
+          disabled={(isFirst || isLast)}
           style={{marginRight: 5}}
           showLoading={_showLoading}
           onClick={this.onClickPrevious.bind(this)}>

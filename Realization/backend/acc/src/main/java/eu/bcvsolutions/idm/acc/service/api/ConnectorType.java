@@ -4,14 +4,12 @@ import eu.bcvsolutions.idm.acc.dto.ConnectorTypeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemGroupSystemDto;
-import eu.bcvsolutions.idm.core.api.utils.EntityUtils;
+import eu.bcvsolutions.idm.core.api.service.WizardService;
 import eu.bcvsolutions.idm.ic.api.IcAttribute;
 import eu.bcvsolutions.idm.ic.api.IcConnectorConfiguration;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
 import eu.bcvsolutions.idm.ic.api.IcObjectClass;
 import java.util.List;
-import java.util.Map;
-import org.springframework.core.Ordered;
 
 /**
  * Connector type extends standard IC connector for more metadata (image, wizard, ...).
@@ -19,9 +17,8 @@ import org.springframework.core.Ordered;
  * @author Vít Švanda
  * @since 10.7.0
  */
-public interface ConnectorType extends Ordered {
+public interface ConnectorType extends WizardService<ConnectorTypeDto> {
 
-	String STEP_FINISH = "finish";
 	String CREATES_ROLE_WITH_SYSTEM = "createRoleWithSystem";
 	// For hide the dialog for create new role-system on summary step.
 	String SKIP_CREATES_ROLE_WITH_SYSTEM = "skipCreateRoleWithSystem";
@@ -39,13 +36,6 @@ public interface ConnectorType extends Ordered {
 	String ALERT_MORE_MAPPINGS = "alertMoreMappings";
 
 	/**
-	 * Bean name / unique identifier (spring bean name).
-	 *
-	 * @return
-	 */
-	String getId();
-
-	/**
 	 * Defines for which connector could be used.
 	 *
 	 * @return
@@ -60,57 +50,11 @@ public interface ConnectorType extends Ordered {
 	default String getIconKey() {return "default-connector";}
 
 	/**
-	 * Returns module
-	 *
-	 * @return
-	 */
-	default String getModule() {
-		return EntityUtils.getModule(this.getClass());
-	}
-
-	/**
 	 * Defines if original IC connector should be hidden in the UI.
 	 *
 	 * @return
 	 */
 	default boolean hideParentConnector() {return true;}
-
-
-	/**
-	 * Order of connectors.
-	 *
-	 * @return
-	 */
-	@Override
-	int getOrder();
-
-	/**
-	 * If false, then connector type will be not visible to a user.
-	 *
-	 * @return
-	 */
-	boolean supports();
-
-
-	/**
-	 * Specific data for a connector type (attributes).
-	 */
-	Map<String, String> getMetadata();
-
-	/**
-	 * Execute connector type -> execute some wizard step.
-	 *
-	 */
-	default ConnectorTypeDto execute(ConnectorTypeDto connectorType) {
-		return connectorType;
-	}
-
-	/**
-	 * Load data for specific wizard/step (for open existing system in the wizard).
-	 */
-	default ConnectorTypeDto load(ConnectorTypeDto connectorType) {
-		return connectorType;
-	}
 
 	/**
 	 * Returns true if this connector type should be use for open given system.

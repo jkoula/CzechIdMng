@@ -3,10 +3,12 @@ import React from 'react';
 import _ from 'lodash';
 import {SystemManager} from '../../../redux';
 import AbstractWizardStep from '../AbstractWizardStep';
+import SystemEntityTypeManager from '../../../redux/SystemEntityTypeManager';
 
 const systemManager = new SystemManager();
 const roleManager = new Managers.RoleManager();
 const treeTypeManager = new Managers.TreeTypeManager();
+const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * Wizard for create a universal system.

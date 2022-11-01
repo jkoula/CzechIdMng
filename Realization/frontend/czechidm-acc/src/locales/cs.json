@@ -425,7 +425,17 @@
           "header": "Detail účtu na koncovém systému"
         },
         "create": {
-          "header": "Nový účet na koncovém systému"
+          "header": "Nový účet na koncovém systému",
+          "or": "nebo",
+          "default": "Použít výchozí formulář"
+        },
+        "personal-other-account-wizard": {
+          "title": "Další osobní účet",
+          "header": "Další osobní účet"
+        },
+        "personal-account-wizard": {
+          "title": "Hlavní osobní účet",
+          "header": "Hlavní osobní účet"
         },
         "save": {
           "success": "Účet na systému byl úspěšně uložen"
@@ -3473,6 +3483,62 @@
           }
         }
       }
+    },
+    "personal-other-account-wizard": {
+      "name": "Průvodce pro tvorbu dalšího osobního účtu",
+      "steps": {
+        "one": {
+          "name": "Základní nastavení účtu",
+          "help": "Proveďte základní nastavení účtů a vyberte vlastníka",
+          "system": "Systém",
+          "type": "Typ uživatele",
+          "owner": "Vlastník"
+        },
+        "two": {
+          "name": "Atributy",
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny",
+          "basic-attr": "Základní atributy",
+          "permission": "Role - oprávnění"
+        },
+        "three": {
+          "name": "Rekapitulace",
+          "help": "Zkontrolujte zadané hodnoty, s kterými bude účet vytvořen. Pokud potřebujete udělat nějakou změnu, vraťte se na odpovídají krok průvodce.",
+          "basic-attr": "Základní atributy",
+          "permission": "Role - oprávnění"
+        },
+        "four": {
+          "name": "Dokončení",
+          "help": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Nový další osobní účet byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového účtu.</h3>"
+        }
+      }
+    },
+    "personal-account-wizard": {
+      "name": "Průvodce pro tvorbu osobního účtu",
+      "steps": {
+        "one": {
+          "name": "Základní nastavení účtu",
+          "help": "Proveďte základní nastavení účtů a vyberte vlastníka",
+          "system": "Systém",
+          "type": "Typ uživatele",
+          "owner": "Vlastník"
+        },
+        "two": {
+          "name": "Atributy",
+          "help": "Vyplňte atributy účtu. Hodnoty mohou být předvyplněny navrhovanými hodnotami. Pokud je to dovoleno, hodnoty mohou být ručně upraveny.",
+          "basic-attr": "Základní atributy",
+          "permission": "Role - oprávnění"
+        },
+        "three": {
+          "name": "Rekapitulace",
+          "help": "Zkontrolujte zadané hodnoty, s kterými bude účet vytvořen. Pokud potřebujete udělat nějakou změnu, vraťte se na odpovídají krok průvodce.",
+          "basic-attr": "Základní atributy",
+          "permission": "Role - oprávnění"
+        },
+        "four": {
+          "name": "Dokončení",
+          "help": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Nový osobní účet byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového účtu.</h3>"
+        }
+      }
     }
   },
   "connector-type":  {
@@ -4075,6 +4141,10 @@
     "WIZARD_MSSQL_CONNECTOR_LIB_MISSING": {
       "title": "Připojení k MS-SQL serveru se nezdařilo (chybí knihovna)!",
       "message": "Pro použití Windows authentizace, musí být nainstalována specifická knihovna: [{{text}}]."
+    },
+    "WIZARD_ACCOUNT_NO_LOGIN_ROLE": {
+      "title": "Účet nelze vytvořit",
+      "message": "Nepodařilo se najít login roli pro daný systém a typ účtu. Prosím zkontrolujte nastavení systému a login roli."
     }
   },
   "processor": {

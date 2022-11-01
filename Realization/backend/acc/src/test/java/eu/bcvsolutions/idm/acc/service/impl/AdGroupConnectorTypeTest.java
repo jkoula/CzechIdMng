@@ -102,7 +102,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testStepOne() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		// Clean
@@ -123,7 +123,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 				.orElse(null);
 		assertNotNull(mappingDto);
 
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		connectorTypeDto.setReopened(false);
 		connectorManager.load(connectorTypeDto);
@@ -158,7 +158,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 				.orElse(null);
 		assertNotNull(mappingDto);
 
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		connectorTypeDto.setReopened(false);
 		connectorManager.load(connectorTypeDto);
@@ -179,7 +179,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testCreateUser() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -201,7 +201,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testDeleteUser() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -227,7 +227,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testAssignUserToGroup() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -254,7 +254,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testStepFour() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -295,7 +295,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testOfDefaultSync() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -340,7 +340,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testOfFullSync() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -410,7 +410,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 	
 	@Test
 	public void testReuseNewCatalog() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -474,7 +474,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 	
 	@Test
 	public void testCreateNewCatalog() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -541,7 +541,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testReopenSystem() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -571,7 +571,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 		//  Execute step four. 
 		connectorManager.execute(connectorTypeDto);
 
-		connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		connectorTypeDto.setReopened(true);
 		connectorTypeDto.getEmbedded().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto);
@@ -597,7 +597,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 
 	@Test
 	public void testReopenSystemWithoutOptionsAttributes() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
@@ -610,7 +610,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 			formService.saveAttribute(userSearchContainerAttribute);
 		}
 
-		connectorType = connectorManager.getConnectorType(MockAdGroupConnectorType.NAME);
+		connectorType = connectorManager.getWizardType(MockAdGroupConnectorType.NAME);
 		connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		connectorTypeDto.setReopened(true);
 		connectorTypeDto.getEmbedded().put(MockAdGroupConnectorType.SYSTEM_DTO_KEY, systemDto);
@@ -700,7 +700,7 @@ public class AdGroupConnectorTypeTest extends AbstractIntegrationTest {
 	}
 
 	private SysSystemDto createMemberSystem() {
-		ConnectorType connectorType = connectorManager.getConnectorType(MockAdUserConnectorType.NAME);
+		ConnectorType connectorType = connectorManager.getWizardType(MockAdUserConnectorType.NAME);
 		ConnectorTypeDto connectorTypeDto = connectorManager.convertTypeToDto(connectorType);
 		SysSystemDto systemDto = createSystem(this.getHelper().createName(), connectorTypeDto);
 		connectorTypeDto.getMetadata().put(MockAdUserConnectorType.SYSTEM_DTO_KEY, systemDto.getId().toString());
