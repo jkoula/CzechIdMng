@@ -10,7 +10,7 @@ const service = new AccountService();
  *
  * @author Radek Tomiška
  */
-export default class AccountManager extends Managers.EntityManager {
+export default class AccountManager extends Managers.FormableEntityManager {
 
   getService() {
     return service;

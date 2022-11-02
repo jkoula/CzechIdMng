@@ -99,8 +99,8 @@ public class ForwardAccountManagementTest extends AbstractIntegrationTest {
 	public void forwardAcmDisabledTest() {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
-		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
+
 		Assert.assertNotNull(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
 		
@@ -141,8 +141,8 @@ public class ForwardAccountManagementTest extends AbstractIntegrationTest {
 	public void forwardAcmEnabledTest() {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
-		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
+
 		Assert.assertNotNull(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
 		
@@ -183,8 +183,8 @@ public class ForwardAccountManagementTest extends AbstractIntegrationTest {
 	public void identityRoleIsValidInPastTest() {
 		SysSystemDto system = initIdentityData();
 		Assert.assertNotNull(system);
-		
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = createMapping(system);
+
 		Assert.assertNotNull(mapping);
 		IdmIdentityDto identity = helper.createIdentity();
 		
@@ -238,9 +238,12 @@ public class ForwardAccountManagementTest extends AbstractIntegrationTest {
 		SysSystemDto system = helper.createSystem(TestResource.TABLE_NAME);
 		Assert.assertNotNull(system);
 
+		return system;
+	}
+
+	private SysSystemMappingDto createMapping(SysSystemDto system) {
 		// generate schema for system
 		List<SysSchemaObjectClassDto> objectClasses = systemService.generateSchema(system);
-
 		// Create mapping
 		SysSystemMappingDto syncSystemMapping = new SysSystemMappingDto();
 		syncSystemMapping.setName("default_" + System.currentTimeMillis());
@@ -250,10 +253,9 @@ public class ForwardAccountManagementTest extends AbstractIntegrationTest {
 		syncSystemMapping.setAccountType(AccountType.PERSONAL);
 		final SysSystemMappingDto syncMapping = systemMappingService.save(syncSystemMapping);
 		createIdentityMapping(system, syncMapping);
-		return system;
-
+		return syncMapping;
 	}
-	
+
 	private void createIdentityMapping(SysSystemDto system, final SysSystemMappingDto entityHandlingResult) {
 		SysSchemaAttributeFilter schemaAttributeFilter = new SysSchemaAttributeFilter();
 		schemaAttributeFilter.setSystemId(system.getId());

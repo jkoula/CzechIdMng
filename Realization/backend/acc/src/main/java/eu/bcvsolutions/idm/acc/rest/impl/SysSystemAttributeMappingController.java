@@ -5,7 +5,9 @@ import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,12 +36,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;;
+import io.swagger.annotations.AuthorizationScope;
 
 /**
  * Schema attribute handling rest
  * 
  * @author svandav
+ * @author Roman Kucera
  *
  */
 @RestController
@@ -54,14 +57,13 @@ import io.swagger.annotations.AuthorizationScope;;
 public class SysSystemAttributeMappingController extends AbstractReadWriteDtoController<SysSystemAttributeMappingDto, SysSystemAttributeMappingFilter> {
 
 	protected static final String TAG = "System mapping - atributes";
-	
-	private SysSystemAttributeMappingService service;
-	
+
+	private final SysSystemAttributeMappingService systemAttributeMappingService;
+
 	@Autowired
 	public SysSystemAttributeMappingController(SysSystemAttributeMappingService service) {
 		super(service);
-		
-		this.service = service;
+		systemAttributeMappingService = service;
 	}
 
 	@Override
@@ -184,23 +186,48 @@ public class SysSystemAttributeMappingController extends AbstractReadWriteDtoCon
 			@PathVariable @NotNull String backendId) {
 		return super.delete(backendId);
 	}
-	
+
 	@ResponseBody
 	@GetMapping(value = "script-usage/{backendId}")
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.SCRIPT_READ + "')")
 	@ApiOperation(
-			value = "Script usage in mapping", 
-			nickname = "getScriptUsage", 
-			tags = { SysSystemAttributeMappingController.TAG }, 
-			authorizations = { 
-				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
+			value = "Script usage in mapping",
+			nickname = "getScriptUsage",
+			tags = { SysSystemAttributeMappingController.TAG },
+			authorizations = {
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
 						@AuthorizationScope(scope = CoreGroupPermission.SCRIPT_READ, description = "") }),
-				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = { 
+				@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
 						@AuthorizationScope(scope = CoreGroupPermission.SCRIPT_READ, description = "") })
 				})
 	public Resources<?> getScriptUsageInMapping(
 			@ApiParam(value = "Script's uuid identifier or code.", required = true)
 			@PathVariable @NotNull String backendId) {
-		return toResources(service.getScriptUsage(backendId), SysSystemAttributeMappingDto.class);
+		return toResources(systemAttributeMappingService.getScriptUsage(backendId), SysSystemAttributeMappingDto.class);
+	}
+
+	@ResponseBody
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.SYSTEM_READ + "')")
+	@RequestMapping(value = "/{schemaAttrName}/value/{accountId}", method = RequestMethod.GET)
+	@ApiOperation(
+			value = "System attribute mapping value",
+			nickname = "getSystemAttributeMappingValue",
+			response = Object.class,
+			tags = { SysSystemAttributeMappingController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")}),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.SYSTEM_READ, description = "")})
+			})
+	public ResponseEntity<?> get(
+			@ApiParam(value = "Schema attribute name", required = true)
+			@PathVariable @NotNull String schemaAttrName,
+			@ApiParam(value = "Account's uuid identifier.", required = true)
+			@PathVariable @NotNull String accountId) {
+
+		Object transformedValueForAttributeAndAccount = systemAttributeMappingService.getTransformedValueForAttributeAndAccount(accountId, schemaAttrName);
+		Resource<Object> resourceSupport = new Resource<>(transformedValueForAttributeAndAccount);
+		return new ResponseEntity<>(resourceSupport, HttpStatus.OK);
 	}
 }

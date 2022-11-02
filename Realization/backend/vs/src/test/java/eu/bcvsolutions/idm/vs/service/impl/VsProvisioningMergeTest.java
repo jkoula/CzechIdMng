@@ -101,7 +101,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 
 		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
 		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(roleTwo, system);
-		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 		attributeFilter.setSystemMappingId(mapping.getId());
@@ -164,7 +164,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 
 		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
 		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(roleTwo, system);
-		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 		attributeFilter.setSystemMappingId(mapping.getId());
@@ -235,7 +235,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 
 		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
 		SysRoleSystemDto roleSystemTwo = helper.createRoleSystem(roleTwo, system);
-		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 		
 		SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 		attributeFilter.setSystemMappingId(mapping.getId());
@@ -366,7 +366,7 @@ public class VsProvisioningMergeTest extends AbstractIntegrationTest {
 			IdmRoleDto role = helper.createRole();
 			String mergeValue = role.getCode();
 			SysRoleSystemDto roleSystem = helper.createRoleSystem(role, system);
-			SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+			SysSystemMappingDto mapping = mappingService.findProvisioningMapping(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, null);
 			
 			SysSystemAttributeMappingFilter attributeFilter = new SysSystemAttributeMappingFilter();
 			attributeFilter.setSystemMappingId(mapping.getId());

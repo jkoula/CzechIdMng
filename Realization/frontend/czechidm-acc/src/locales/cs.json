@@ -59,6 +59,48 @@
             "no": "Ne"
           }
         }
+      },
+      "detail": {
+        "header": "Detail účtu: {{name}}",
+        "title": "Atributy",
+        "tabs": {
+          "account": "Detail účtu",
+          "roles": "Role",
+          "audit": "Audit",
+          "provisioning": "Provisioning",
+          "other": "Další nastavení"
+        },
+        "discard": {
+          "header": "Hodnoty nejsou uloženy",
+          "text": "Všechny změny budou ztraceny",
+          "help": "Hodnoty nebudou propsány do systému, všechny změny budou ztraceny"
+        },
+        "save": {
+          "header": "Uložit hodnoty",
+          "text": "Nové hodnoty budou uloženy",
+          "help": "Hodnoty budou propsány do koncového systému",
+          "success": "Účet {{record}} byl úspěšně uložen",
+          "no-change": "Nebyly provedeny žádné změny, není co uložit",
+          "attribute": "Atribut",
+          "value-on-system": "Hodnota na systému",
+          "new-value": "Nová hodnota"
+        },
+        "override": {
+          "header": "Smazání ručně spravované hodnoty",
+          "text": "Ručně spravovaná hodnota bude nahrazena automatickým výpočtem pro daný atribut (mapování, transformační skript). Po akceptaci bude na detailu zobrazena automatická hodnota. Formuláře je nutné následně ještě uložit."
+        },
+        "control": {
+          "edit": "Editovat",
+          "view": "Náhled",
+          "refresh": "Obnovit",
+          "save": "Uložit",
+          "discard": "Zrušit",
+          "attr-name": "Název atributu",
+          "attr-value": "Hodnota atributu",
+          "cancel-filter": "Zrušit filtr",
+          "manually": "Spravováno ručně",
+          "managed-by-roles": "Hodnoty jsou spravovány rolemi"
+        }
       }
     },
     "systems": {

@@ -400,6 +400,79 @@ module.exports = {
         path: '/scripts/:entityId/references-mapping',
         priority: 0,
         access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SCRIPT_READ'] } ]
+      },
+      {
+        id: 'account',
+        type: 'TAB',
+        labelKey: 'acc:content.accounts.label',
+        titleKey: 'acc:content.accounts.title',
+        order: 15,
+        priority: 0,
+        icon: 'fa:external-link',
+        path: '/account/:entityId',
+        access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+        items: [
+          {
+            id: 'account-detail',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.detail.tabs.account',
+            titleKey: 'acc:content.accounts.detail.tabs.account',
+            order: 15,
+            priority: 0,
+            icon: 'fa:external-link',
+            path: '/account/:entityId/detail',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-roles',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.detail.tabs.roles',
+            titleKey: 'acc:content.accounts.detail.tabs.roles',
+            order: 15,
+            priority: 0,
+            icon: 'fa:key',
+            path: '/account/:entityId/roles',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-audit',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.detail.tabs.audit',
+            titleKey: 'acc:content.accounts.detail.tabs.audit',
+            order: 15,
+            priority: 0,
+            icon: 'fa:history',
+            path: '/account/:entityId/audit',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-provisioning',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.detail.tabs.provisioning',
+            titleKey: 'acc:content.accounts.detail.tabs.provisioning',
+            order: 15,
+            priority: 0,
+            icon: 'fa:circle-o',
+            path: '/account/:entityId/provisioning',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          },
+          {
+            id: 'account-other-setting',
+            type: 'TAB',
+            labelKey: 'acc:content.accounts.detail.tabs.other',
+            titleKey: 'acc:content.accounts.detail.tabs.other',
+            order: 15,
+            priority: 0,
+            icon: 'fa:cog',
+            path: '/account/:entityId/other',
+            access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+            items: []
+          }
+        ]
       }
     ]
   }

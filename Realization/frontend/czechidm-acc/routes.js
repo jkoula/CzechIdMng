@@ -191,6 +191,38 @@ module.exports = {
       ]
     },
     {
+      path: 'account/:entityId',
+      component: require('./src/content/account/AccountDetailRoutes'),
+      access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ],
+      childRoutes: [
+        {
+          path: 'detail',
+          component: require('./src/content/account/AccountDetail'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        },
+        {
+          path: 'roles',
+          component: require('./src/content/account/AccountRoles'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        },
+        {
+          path: 'audit',
+          component: require('./src/content/account/AccountAudit'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        },
+        {
+          path: 'provisioning',
+          component: require('./src/content/account/AccountProvisioning'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        },
+        {
+          path: 'other',
+          component: require('./src/content/account/AccountOtherSetting'),
+          access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ACCOUNT_READ'] } ]
+        }
+      ]
+    },
+    {
       path: 'connector-servers/',
       component: require('./src/content/connectorserver/ConnectorServers'),
       access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['REMOTESERVER_READ'] } ]

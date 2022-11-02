@@ -198,7 +198,7 @@ public class DefaultSysRoleSystemAttributeServiceTest extends AbstractIntegratio
 		attributeMapping = systemAttributeMappingService.get(attributeMapping.getId());
 		Assert.assertTrue(attributeMapping.isEvictControlledValuesCache());
 		// Manual recalculation of the attribute
-		systemAttributeMappingService.recalculateAttributeControlledValues(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, attributeName, attributeMapping);
+		systemAttributeMappingService.recalculateAttributeControlledValues(system.getId(), IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE, attributeName, attributeMapping, systemMapping.getId());
 		// Attribute must be recalculated now
 		attributeMapping = systemAttributeMappingService.get(attributeMapping.getId());
 		Assert.assertFalse(attributeMapping.isEvictControlledValuesCache());

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 //
 import { Services, Domain, Utils } from 'czechidm-core';
-import { SystemEntityTypeService } from '../services/SystemEntityTypeService';
+import SystemEntityTypeService from './SystemEntityTypeService';
 
 /**
  * Active provisioning operations in the queue.
@@ -10,11 +10,16 @@ import { SystemEntityTypeService } from '../services/SystemEntityTypeService';
  */
 export default class ProvisioningOperationService extends Services.AbstractService {
 
+  constructor() {
+    super();
+    this.systemEntityTypeService = new SystemEntityTypeService();
+  }
+
   getNiceLabel(entity) {
     if (!entity) {
       return '';
     }
-    return `${(entity._embedded && entity._embedded.system) ? entity._embedded.system.name : entity.system}:${SystemEntityTypeService.getNiceLabelForEntityType(entity)}:${entity.systemEntityUid}`;
+    return `${(entity._embedded && entity._embedded.system) ? entity._embedded.system.name : entity.system}:${this.systemEntityTypeService.getNiceLabelForEntityType(entity)}:${entity.systemEntityUid}`;
   }
 
   getApiPath() {

@@ -78,6 +78,10 @@ export class AccountTable extends Advanced.AbstractTableContent {
     });
   }
 
+  showFullDetail(entity) {
+    this.context.history.push(`/account/${ encodeURIComponent(entity.id) }/detail`);
+  }
+
   closeDetail() {
     super.closeDetail();
     delete this.state.connectorObject;
@@ -245,14 +249,14 @@ export class AccountTable extends Advanced.AbstractTableContent {
                 return (
                   <Advanced.DetailButton
                     title={this.i18n('button.detail')}
-                    onClick={this.showDetail.bind(this, data[rowIndex])}/>
+                    onClick={this.showFullDetail.bind(this, data[rowIndex])}/>
                 );
               }
             }/>
           <Advanced.ColumnLink
             to={
               ({ rowIndex, data }) => {
-                this.showDetail(data[rowIndex]);
+                this.showFullDetail(data[rowIndex]);
               }
             }
             property="uid"

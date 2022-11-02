@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.MultiValueMap;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -26,10 +27,12 @@ import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
+import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExecutor;
@@ -49,6 +52,7 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 	public static final String PARAMETER_SYSTEM_UUID = "system-uuid";
 	public static final String PARAMETER_ENTITY_TYPE = "entity-type";
 	public static final String PARAMETER_ONLY_EVICTED = "only-evicted";
+	public static final String PARAMETER_MAPPING_UUID = "mapping-uuid";
 
 	@Autowired
 	private SysSystemMappingService systemMappingService;
@@ -58,7 +62,8 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 	private UUID systemId;
 	private boolean onlyEvicted;
 	private String entityType;
-	
+	private UUID mappingId;
+
 	@Override
 	public String getName() {
 		return TASK_NAME;
@@ -68,7 +73,9 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 	public void init(Map<String, Object> properties) {
 		super.init(properties);
 
-		systemId = getParameterConverter().toUuid(properties, PARAMETER_SYSTEM_UUID);
+		MultiValueMap<String, UUID> params = getParameterConverter().toSystemMappingAttribute(properties, CoreResultCode.LONG_RUNNING_TASK_WRONG_CONFIGURATION);
+		systemId = params.getFirst(ParameterConverter.PARAMETER_SYSTEM);
+		mappingId = params.getFirst(ParameterConverter.PARAMETER_SYSTEM_MAPPING);
 		onlyEvicted = getParameterConverter().toBoolean(properties, PARAMETER_ONLY_EVICTED);
 		entityType = getParameterConverter().toString(properties, PARAMETER_ENTITY_TYPE);
 	}
@@ -83,7 +90,7 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 	@Override
 	public Boolean process() {
 		this.counter = 0L;
-		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(systemId, entityType);
+		SysSystemMappingDto mapping = systemMappingService.findProvisioningMapping(systemId, entityType, mappingId);
 		Assert.notNull(mapping, "Provisioning mapping is mandatory!");
 
 		// Loading all attributes for recalculation (on given system)
@@ -110,7 +117,7 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 						SysSystemAttributeMapping_.schemaAttribute, SysSchemaAttributeDto.class);
 				// Recalculate controlled values
 				systemAttributeMappingService.recalculateAttributeControlledValues(systemId, entityType,
-						schemaAttributeDto.getName(), attribute);
+						schemaAttributeDto.getName(), attribute, mappingId);
 				// Success
 				this.logItemProcessed(attribute, new OperationResult.Builder(OperationState.EXECUTED).build());
 			} catch (Exception ex) {
@@ -131,15 +138,12 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 		properties.put(PARAMETER_SYSTEM_UUID, systemId);
 		properties.put(PARAMETER_ONLY_EVICTED, onlyEvicted);
 		properties.put(PARAMETER_ENTITY_TYPE, entityType);
+		properties.put(PARAMETER_MAPPING_UUID, mappingId);
 		return properties;
 	}
 
 	@Override
 	public List<IdmFormAttributeDto> getFormAttributes() {
-		IdmFormAttributeDto systemAttribute = new IdmFormAttributeDto(PARAMETER_SYSTEM_UUID, PARAMETER_SYSTEM_UUID,
-				PersistentType.UUID);
-		systemAttribute.setRequired(true);
-		systemAttribute.setFaceType(AccFaceType.SYSTEM_SELECT);
 		IdmFormAttributeDto evictedAttribute = new IdmFormAttributeDto(PARAMETER_ONLY_EVICTED, PARAMETER_ONLY_EVICTED,
 				PersistentType.BOOLEAN);
 		evictedAttribute.setDefaultValue(String.valueOf(Boolean.TRUE));
@@ -148,8 +152,12 @@ public class AttributeControlledValuesRecalculationTaskExecutor extends Abstract
 				PersistentType.SHORTTEXT);
 		entityTypeAttribute.setDefaultValue(String.valueOf(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE));
 		entityTypeAttribute.setRequired(true);
+		IdmFormAttributeDto mappingAttribute = new IdmFormAttributeDto(ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES, ParameterConverter.PARAMETER_MAPPING_ATTRIBUTES,
+				PersistentType.TEXT);
+		mappingAttribute.setRequired(true);
+		mappingAttribute.setFaceType(AccFaceType.SYSTEM_MAPPING_ATTRIBUTE_FILTERED_SELECT);
 		//
-		return Lists.newArrayList(systemAttribute, entityTypeAttribute, evictedAttribute);
+		return Lists.newArrayList(mappingAttribute, entityTypeAttribute, evictedAttribute);
 	}
 
 	@Override

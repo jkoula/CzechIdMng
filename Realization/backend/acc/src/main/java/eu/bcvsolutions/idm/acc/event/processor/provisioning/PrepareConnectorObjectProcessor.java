@@ -39,6 +39,7 @@ import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
+import eu.bcvsolutions.idm.acc.entity.SysProvisioningOperation_;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
@@ -591,11 +592,13 @@ public class PrepareConnectorObjectProcessor extends AbstractEntityEventProcesso
 				idmValues.add(idmValue);
 			}
 		}
-		
+
+		AccAccountDto account = DtoUtils.getEmbedded(provisioningOperation, SysProvisioningOperation_.account, AccAccountDto.class);
+
 		// Load definition of all controlled values in IdM for that attribute
 		List<Serializable> controlledValues = attributeMappingService.getCachedControlledAndHistoricAttributeValues(
 				provisioningOperation.getSystem(), provisioningOperation.getEntityType(),
-				provisioningAttribute.getSchemaAttributeName());
+				provisioningAttribute.getSchemaAttributeName(), account.getSystemMapping());
 		List<Serializable> controlledValuesFlat = Lists.newArrayList();
 		
 		// Controlled value can be Collection, we need to create flat list for all values

@@ -257,20 +257,21 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	List<Serializable> getControlledAttributeValues(UUID system, String entityType,
-			String schemaAttributeName);
+			String schemaAttributeName, UUID mappingId);
 
 	/**
 	 * Get currently controlled and historic values for given attribute. If is
 	 * attribute sets as evicted, then are current values recalculated (calls
 	 * getControlledAttributeValues).
-	 * 
+	 *
 	 * @param systemId
 	 * @param entityType
 	 * @param schemaAttributeName
+	 * @param account
 	 * @return
 	 */
 	List<Serializable> getCachedControlledAndHistoricAttributeValues(UUID systemId, String entityType,
-			String schemaAttributeName);
+																	 String schemaAttributeName, UUID account);
 
 	/**
 	 * Recalculation of controlled values for given attribute. First calls
@@ -283,7 +284,7 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	List<Serializable> recalculateAttributeControlledValues(UUID systemId, String entityType,
-			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping);
+			String schemaAttributeName, SysSystemAttributeMappingDto attributeMapping, UUID mappingId);
 
 	/**
 	 * Return all mapped attributes as password for given system id and mapping.
@@ -293,29 +294,37 @@ public interface SysSystemAttributeMappingService
 	 * @return
 	 */
 	List<SysSystemAttributeMappingDto> getAllPasswordAttributes(UUID systemId, UUID systemMappingId);
-	
+
 	/**
 	 * Returns a list of attributes in which a script is used in transformation to.
-	 * 
+	 *
 	 * @param scriptCode
 	 * @return
 	 */
 	List<SysSystemAttributeMappingDto> getScriptTransformToUsage(String scriptCode);
-	
+
 	/**
 	 * Returns a list of attributes in which a script is used in transformation from.
-	 * 
+	 *
 	 * @param scriptCode
 	 * @return
 	 */
 	List<SysSystemAttributeMappingDto> getScriptTransformFromUsage(String scriptCode);
-	
+
 	/**
 	 * Returns a list of attributes in which a script is used in transformation.
 	 * Both in transformation to and from.
-	 * 
+	 *
 	 * @param scriptCode
 	 * @return
 	 */
 	List<SysSystemAttributeMappingDto> getScriptUsage(String scriptCode);
+
+	/**
+	 * Get value for account and attribute
+	 * @param accountId
+	 * @param schemaAttrName
+	 * @return
+	 */
+	Object getTransformedValueForAttributeAndAccount(String accountId, String schemaAttrName);
 }

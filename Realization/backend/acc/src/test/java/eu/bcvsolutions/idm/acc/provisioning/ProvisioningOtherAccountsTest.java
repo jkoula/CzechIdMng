@@ -319,13 +319,13 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		provisioningOperationFilter.setSystemId(system.getId());
 		provisioningOperationFilter.setOperationType(ProvisioningEventType.UPDATE);
 		List<SysProvisioningArchiveDto> provisioningArchiveDtos = provisioningArchiveService.find(provisioningOperationFilter, null).getContent();
-		assertEquals(1, provisioningArchiveDtos.size());
+		assertEquals(3, provisioningArchiveDtos.size());
 
 		TestResource resource = helper.findResource(accountFound.getUid());
 		assertNotNull(resource);
 
 		// check values in provisioning archive
-		Map<ProvisioningAttributeDto, Object> accountObject = provisioningArchiveDtos.get(0).getProvisioningContext().getAccountObject();
+		Map<ProvisioningAttributeDto, Object> accountObject = provisioningArchiveDtos.get(2).getProvisioningContext().getAccountObject();
 		assertNotNull(accountObject);
 		IdmIdentityDto finalIdentityDto = identityDto;
 		accountObject.forEach((provisioningAttributeDto, o) -> {
@@ -372,13 +372,13 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		provisioningService.doProvisioning(identityDto);
 
 		provisioningArchiveDtos = provisioningArchiveService.find(provisioningOperationFilter, null).getContent();
-		assertEquals(2, provisioningArchiveDtos.size());
+		assertEquals(5, provisioningArchiveDtos.size());
 
 		TestResource resource1 = helper.findResource(accountFound.getUid());
 		assertNotNull(resource1);
 
 		// check values in provisioning archive
-		accountObject = provisioningArchiveDtos.get(1).getProvisioningContext().getAccountObject();
+		accountObject = provisioningArchiveDtos.get(4).getProvisioningContext().getAccountObject();
 		assertNotNull(accountObject);
 		accountObject.forEach((provisioningAttributeDto, o) -> {
 			if (ATTRIBUTE_MAPPING_EMAIL.equals(provisioningAttributeDto.getSchemaAttributeName())) {

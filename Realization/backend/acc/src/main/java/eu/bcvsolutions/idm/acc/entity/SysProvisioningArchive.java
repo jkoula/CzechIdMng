@@ -15,6 +15,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
@@ -35,7 +38,8 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 		@Index(name = "idx_sys_p_o_arch_entity_type", columnList = "entity_type"),
 		@Index(name = "idx_sys_p_o_arch_entity_identifier", columnList = "entity_identifier"),
 		@Index(name = "idx_sys_p_o_arch_uid", columnList = "system_entity_uid"),
-		@Index(name = "idx_sys_p_a_role_request_id", columnList = "role_request_id")
+		@Index(name = "idx_sys_p_a_role_request_id", columnList = "role_request_id"),
+		@Index(name = "idx_sys_p_o_arch_account", columnList = "account_id")
 		})
 public class SysProvisioningArchive extends AbstractEntity {
 
@@ -71,7 +75,12 @@ public class SysProvisioningArchive extends AbstractEntity {
 	// ID of request, without DB relation on the request -> Request can be null or doesn't have to exist! 
 	@Column(name = "role_request_id")
     private UUID roleRequestId;
-	
+
+	@ManyToOne
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+	private AccAccount account;
+
 	/**
 	 * Provisioning operation type
 	 * 
@@ -174,6 +183,17 @@ public class SysProvisioningArchive extends AbstractEntity {
 
 	public void setRoleRequestId(UUID roleRequestId) {
 		this.roleRequestId = roleRequestId;
-	}	
+	}
 
+	/**
+	 * Account
+	 * @return
+	 */
+	public AccAccount getAccount() {
+		return account;
+	}
+
+	public void setAccount(AccAccount account) {
+		this.account = account;
+	}
 }

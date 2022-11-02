@@ -59,6 +59,48 @@
             "no": "No"
           }
         }
+      },
+      "detail": {
+        "header": "Account detail: {{name}}",
+        "title": "Attributes",
+        "tabs": {
+          "account": "Account detail",
+          "roles": "Roles",
+          "audit": "Audit",
+          "provisioning": "Provisioning",
+          "other": "Other settings"
+        },
+        "discard": {
+          "header": "Values are not saved",
+          "text": "All changes will be lost",
+          "help": "Values will not be send to system, all changes will be lost"
+        },
+        "save": {
+          "header": "Save values",
+          "text": "New values will be saved",
+          "help": "Values will be send to system",
+          "success": "Account {{record}} was saved successfuly",
+          "no-change": "No changes, there is nothing to save",
+          "attribute": "Attribute",
+          "value-on-system": "Value on system",
+          "new-value": "New value"
+        },
+        "override": {
+          "header": "Delete manually managed value",
+          "text": "Manually managed value will be replaced with automatic calculation for attribute (mapping, transformation script). After accepting there will be automatic value on account detail. Form must be saved."
+        },
+        "control": {
+          "edit": "Edit",
+          "view": "View",
+          "refresh": "Refresh",
+          "save": "Save",
+          "discard": "Discard",
+          "attr-name": "Attribute name",
+          "attr-value": "Attribute value",
+          "cancel-filter": "Cancel filtr",
+          "manually": "Managed manually",
+          "managed-by-roles": "Values are managed by roles"
+        }
       }
     },
     "systems": {

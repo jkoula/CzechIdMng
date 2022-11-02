@@ -41,6 +41,7 @@ import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.EntityAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SynchronizationEntityExecutor;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.config.domain.PrivateIdentityConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
@@ -104,6 +105,8 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 	private PrivateIdentityConfiguration identityConfiguration;
 	@Autowired
 	private IdmFormProjectionService formProjectionService;
+	@Autowired
+	private SysSystemMappingService systemMappingService;
 
 	@Override
 	protected SynchronizationContext validate(UUID synchronizationConfigId) {
@@ -115,9 +118,11 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 			throw new ResultCodeException(AccResultCode.SYNCHRONIZATION_INACTIVE_OWNER_BEHAVIOR_MUST_BE_SET);
 		}
 		if (SynchronizationInactiveOwnerBehaviorType.LINK_PROTECTED == inactiveOwnerBehavior) {
+
+			SysSystemMappingDto syncMapping = systemMappingService.get(config.getSystemMapping());
 			SysSystemMappingDto provisioningMapping = systemMappingService.findProvisioningMapping(
 					context.getSystem().getId(),
-					context.getEntityType());
+					context.getEntityType(), syncMapping.getConnectedSystemMappingId());
 
 			if (provisioningMapping == null) {
 				throw new ResultCodeException(AccResultCode.SYNCHRONIZATION_PROVISIONING_MUST_EXIST,
@@ -671,7 +676,6 @@ public class IdentitySynchronizationExecutor extends AbstractSynchronizationExec
 	 * Provides default transformation of the state attribute from resource system to {@link IdentityState} enum
 	 * 
 	 * @param attribute
-	 * @param icAttributes
 	 * @return
 	 */
 	private Object defaultStateTransformation(Object attribute) {
