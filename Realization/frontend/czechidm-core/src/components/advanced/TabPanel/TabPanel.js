@@ -72,7 +72,16 @@ export default function TabPanel(props) {
   const classes = useStyles();
   //
   let activeItemId = null;
+
+  const childrenPaths = [];
+  children?.props?.children.forEach(item => {
+    childrenPaths.push(item.props.path);
+  });
+
   const navigationItems = [...getNavigationItems(navigation, parentId, null, userContext, match.params).map(item => {
+    if(!childrenPaths.includes(item.path)) {
+      return null;
+    }
     // resolve label
     const labelParams = resolveNavigationParameters(userContext, match.params);
     labelParams.defaultValue = item.label;

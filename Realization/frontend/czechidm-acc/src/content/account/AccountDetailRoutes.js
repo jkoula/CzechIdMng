@@ -2,11 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { Basic, Advanced, Utils } from 'czechidm-core';
+import { Switch } from "react-router-dom";
+import { Basic, Advanced, Utils, ComponentService } from 'czechidm-core';
 import AccountManager from '../../redux/AccountManager';
 import AccountDetail from './AccountDetail';
 
 const manager = new AccountManager();
+const componentService = new ComponentService();
 
 /**
  * Account detail
@@ -37,6 +39,31 @@ class AccountDetailRoutes extends Basic.AbstractContent {
 
   render() {
     const { entity, showLoading } = this.props;
+    const routes = this.getRoutes();
+
+    const components = componentService.getComponentDefinitions("account-type");
+    let filteredRoutes;
+    
+    for (const component of components) { 
+      const entityType = component[1].entityType[0];
+      const path = component[1].path;
+      if (entity) {
+        if (entity.entityType === entityType) {
+          filteredRoutes = routes;
+          break;
+        } else {
+          const tabs = [];
+          routes.props.children.forEach(item => {
+            if (path.includes(item.props.path)) {
+              tabs.push(item);
+            }
+          });
+          filteredRoutes = <Switch>{tabs}</Switch>
+        }
+      }
+    }
+
+
     return (
       <Basic.Div>
         {
@@ -59,7 +86,7 @@ class AccountDetailRoutes extends Basic.AbstractContent {
           <AccountDetail isNew match={ this.props.match } />
           :
           <Advanced.TabPanel position="left" parentId="account" match={ this.props.match }>
-            { this.getRoutes() }
+            { filteredRoutes }
           </Advanced.TabPanel>
         }
 
