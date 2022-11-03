@@ -3,11 +3,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { Switch } from "react-router-dom";
-import { Basic, Advanced, Utils } from 'czechidm-core';
+import { Basic, Advanced, Utils, ComponentService } from 'czechidm-core';
 import AccountManager from '../../redux/AccountManager';
 import AccountDetail from './AccountDetail';
 
 const manager = new AccountManager();
+const componentService = new ComponentService();
 
 /**
  * Account detail
@@ -39,20 +40,30 @@ class AccountDetailRoutes extends Basic.AbstractContent {
   render() {
     const { entity, showLoading } = this.props;
     const routes = this.getRoutes();
+
+    const components = componentService.getComponentDefinitions("account-type");
     let filteredRoutes;
-    if (entity) {
-      if (entity.entityType === "TECHNICAL_ACCOUNT") {
-        filteredRoutes = routes;
-      } else {
-        const tabs = [];
-        routes.props.children.forEach(item => {
-          if (item.props.path !== "/account/:entityId/tech") {
-            tabs.push(item);
-          }
-        });
-        filteredRoutes = <Switch>{tabs}</Switch>
+    
+    for (const component of components) { 
+      const entityType = component[1].entityType[0];
+      const path = component[1].path;
+      if (entity) {
+        if (entity.entityType === entityType) {
+          filteredRoutes = routes;
+          break;
+        } else {
+          const tabs = [];
+          routes.props.children.forEach(item => {
+            if (path.includes(item.props.path)) {
+              tabs.push(item);
+            }
+          });
+          filteredRoutes = <Switch>{tabs}</Switch>
+        }
       }
     }
+
+
     return (
       <Basic.Div>
         {

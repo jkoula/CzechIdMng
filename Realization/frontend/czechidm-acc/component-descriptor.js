@@ -288,5 +288,12 @@ module.exports = {
       entityType: ['system-universal-search-type'],
       component: require('./src/components/SystemUniversalSearchType/SystemUniversalSearchType').default
     },
+    {
+      id: "account-type-personal",
+      type: "account-type",
+      // no entityType here, because accounts for all type of entities from product will show only this tabs.
+      entityType: [''],
+      path: ['/account/:entityId/detail', '/account/:entityId/roles', '/account/:entityId/audit', '/account/:entityId/provisioning', '/account/:entityId/other']
+    }
   ]
 };
