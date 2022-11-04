@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.PermissionContext;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
@@ -77,7 +78,7 @@ public class RoleRequestByIdentityEvaluator extends AbstractTransitiveEvaluator<
 	public Set<String> getPermissions(IdmRoleRequest entity, AuthorizationPolicy policy) {
 		Set<String> permissions = super.getPermissions(entity, policy);
 		// Add permissions, when CHANGEPERMISSION or CANBEREQUESTED is available on at least one contract of selected identity.
-		IdmIdentity applicant = entity.getApplicant();
+		ApplicantDto applicant = entity.getApplicant();
 		if (applicant != null) {
 			IdmIdentityContractFilter filter = new IdmIdentityContractFilter();
 			filter.setEvaluatePermissionOperator(PermissionContext.OPERATOR_OR);

@@ -185,18 +185,18 @@ public class DefaultIdmRoleRequestService
 		// applicant
 		if (filter.getApplicantId() != null) {
 			predicates.add(
-					builder.equal(root.get(IdmRoleRequest_.applicant).get(AbstractEntity_.id), filter.getApplicantId()));
+					builder.equal(root.get(IdmRoleRequest_.applicant), filter.getApplicantId()));
 		}
 		// duplicatedToRequestId
 		if (filter.getDuplicatedToRequestId() != null) {
 			predicates.add(builder.equal(root.get(IdmRoleRequest_.duplicatedToRequest).get(AbstractEntity_.id),
 					filter.getDuplicatedToRequestId()));
 		}
-		//
-		if (StringUtils.isNotEmpty(filter.getApplicant())) {
-			predicates.add(builder.equal(root.get(IdmRoleRequest_.applicant).get(IdmIdentity_.username),
-					filter.getApplicant()));
-		}
+		// TODO solve how to search by applicant because there is chance he has no username
+//		if (StringUtils.isNotEmpty(filter.getApplicant())) {
+//			predicates.add(builder.equal(root.get(IdmRoleRequest_.applicant).get(IdmIdentity_.username),
+//					filter.getApplicant()));
+//		}
 		UUID creatorId = filter.getCreatorId();
 		if (creatorId != null) {
 			predicates.add(builder.equal(root.get(AbstractEntity_.creatorId), creatorId));
@@ -212,7 +212,7 @@ public class DefaultIdmRoleRequestService
 		//
 		List<UUID> applicants = filter.getApplicants();
 		if (!applicants.isEmpty()) {
-			predicates.add(root.get(IdmRoleRequest_.applicant).get(IdmIdentity_.id).in(applicants));
+			predicates.add(root.get(IdmRoleRequest_.applicant).in(applicants));
 		}
 		//
 		List<OperationState> resultStates = filter.getSystemStates();

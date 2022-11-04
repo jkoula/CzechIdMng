@@ -24,6 +24,6 @@ public interface IdmRoleRequestRepository extends AbstractEntityRepository<IdmRo
 	 * @param state
 	 * @return
 	 */
-	List<IdmRoleRequest> findAllByApplicant_IdAndState(@Param("applicantId") UUID applicantId, @Param("state") RoleRequestState state);
+	List<IdmRoleRequest> findAllByApplicantAndState(@Param("applicantId") UUID applicantId, @Param("state") RoleRequestState state);
 
 }

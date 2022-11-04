@@ -26,7 +26,6 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
     private static final long serialVersionUID = 1L;
     public static final String WF_PROCESS_FIELD = "wfProcessId";
 
-    @Embedded(dtoClass = IdmIdentityDto.class)
     private UUID applicant;
     private RoleRequestState state;
     private RoleRequestedByType requestedByType;
