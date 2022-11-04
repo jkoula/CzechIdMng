@@ -70,7 +70,7 @@ public class AccAccountRoleRoleCompositionTest extends AbstractIntegrationTest {
 		helper.createRoleComposition(role, roleSubTwo);
 		//
 		AccAccountDto account = helper.createAccount();
-		AccAccountRoleAssignmentDto roleAssignment = helper.createAccountRoleAssignment(account.getId(), role.getId());
+		helper.assignRoleToAccountViaRequest(account, true, role.getId());
 		//
 		List<AccAccountRoleAssignmentDto> accountRoles = accountRoleService.findByAccountId(account.getId());
 		Assert.assertEquals(3, accountRoles.size());
@@ -78,7 +78,7 @@ public class AccAccountRoleRoleCompositionTest extends AbstractIntegrationTest {
 		Assert.assertTrue(accountRoles.stream().anyMatch(aR -> aR.getRole().equals(roleSubOne.getId())));
 		Assert.assertTrue(accountRoles.stream().anyMatch(aR -> aR.getRole().equals(roleSubTwo.getId())));
 		//
-		helper.removeAccountRoleAssignment(roleAssignment);
+		helper.removeRoleFromAccountViaRequest(account, true, role.getId());
 		accountRoles = accountRoleService.findByAccountId(account.getId());
 		Assert.assertEquals(0, accountRoles.size());
 	}

@@ -68,6 +68,7 @@ public class AccountRoleAssignmentValidityTest extends AbstractIntegrationTest {
 		//
 		AccAccountRoleAssignmentFilter accountRoleFilter = new AccAccountRoleAssignmentFilter();
 		accountRoleFilter.setValid(Boolean.TRUE);
+		accountRoleFilter.setAccountId(account.getId());
 		List<AccAccountRoleAssignmentDto> accountRoles = accountRoleService.find(accountRoleFilter, null).getContent();
 		Assert.assertEquals(1, accountRoles.size());
 		//

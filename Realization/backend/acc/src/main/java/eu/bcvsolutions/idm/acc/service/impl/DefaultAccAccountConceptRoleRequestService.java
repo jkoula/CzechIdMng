@@ -17,6 +17,7 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
@@ -371,6 +372,15 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
         }
         removeConcept.addToLog(MessageFormat.format("Removed by duplicates with subrole id [{}]", identityRoleAssignment.getRoleComposition()));
         removeConcept = save(removeConcept);
+        return removeConcept;
+    }
+
+    @Override
+    public AccAccountConceptRoleRequestDto createConceptToRemoveIdentityRole(AccAccountRoleAssignmentDto roleAssignment) {
+        AccAccountConceptRoleRequestDto removeConcept = createEmptyConcept();
+        removeConcept.setAccAccount(roleAssignment.getAccAccount());
+        removeConcept.setAccountRole(roleAssignment.getId());
+        removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
         return removeConcept;
     }
 

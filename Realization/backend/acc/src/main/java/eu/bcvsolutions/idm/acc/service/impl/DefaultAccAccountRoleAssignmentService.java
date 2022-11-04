@@ -11,8 +11,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
+import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
@@ -40,7 +48,6 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractRoleAssignmentService;
@@ -54,11 +61,14 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
 
     private final AccAccountRoleRepository accAccountRoleRepository;
 
+    private final AccIdentityAccountService identityAccountService;
+
     @Autowired
     public DefaultAccAccountRoleAssignmentService(AccAccountRoleRepository repository, EntityEventManager entityEventManager, FormService formService, IdmRoleService roleService,
-            IdmAutomaticRoleRepository automaticRoleRepository, LookupService lookupService, FilterManager filterManager) {
+            IdmAutomaticRoleRepository automaticRoleRepository, LookupService lookupService, FilterManager filterManager, AccIdentityAccountService identityAccountService) {
         super(repository, entityEventManager, formService, roleService, automaticRoleRepository, lookupService, filterManager);
         this.accAccountRoleRepository = repository;
+        this.identityAccountService = identityAccountService;
     }
 
     @Override
@@ -74,6 +84,15 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     @Override
     public List<AccAccountRoleAssignmentDto> findAllByOwnerId(UUID ownerUuid) {
         return findByAccountId(ownerUuid);
+    }
+
+    @Override
+    public IdmIdentityDto getRelatedIdentity(AccAccountRoleAssignmentDto roleAssignment) {
+        AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
+        filter.setAccountId(roleAssignment.getAccAccount());
+        return identityAccountService.find(filter, null).stream()
+                .map(accIdentityAccountDto -> DtoUtils.getEmbedded(accIdentityAccountDto, AccIdentityAccount_.identity,
+                IdmIdentityDto.class)).findFirst().orElse(null);
     }
 
     @Override

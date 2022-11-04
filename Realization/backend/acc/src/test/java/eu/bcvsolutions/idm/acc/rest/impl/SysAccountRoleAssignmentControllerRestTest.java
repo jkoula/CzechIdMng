@@ -8,6 +8,7 @@ import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
@@ -56,6 +57,9 @@ public class SysAccountRoleAssignmentControllerRestTest extends AbstractRoleAssi
 
     @Autowired
     LookupService lookupService;
+
+    @Autowired
+    AccAccountRoleAssignmentService accountRoleAssignmentService;
 
 
     @Override
@@ -136,7 +140,13 @@ public class SysAccountRoleAssignmentControllerRestTest extends AbstractRoleAssi
 
     @Override
     protected AccAccountRoleAssignmentDto createRoleAssignment(UUID owner, IdmRoleDto roleOne) {
-        return accHelper.createAccountRoleAssignment(accountService.get(owner), roleOne);
+        accHelper.assignRoleToAccountViaRequest(accountService.get(owner), true, roleOne.getId());
+
+        AccAccountRoleAssignmentFilter filter = new AccAccountRoleAssignmentFilter();
+        filter.setAccountId(owner);
+        filter.setRoleId(roleOne.getId());
+
+        return accountRoleAssignmentService.find(filter, null, null).getContent().get(0);
     }
 
     @Override

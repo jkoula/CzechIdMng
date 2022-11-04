@@ -36,11 +36,13 @@ import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.ExportManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
@@ -90,7 +92,7 @@ public class DefaultSysRoleSystemService
 	@Autowired private IdmRoleCompositionService roleCompositionService;
 	@Autowired private LookupService lookupService;
 	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
-	@Autowired private IdmIdentityRoleService identityRoleService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 
 	@Autowired
 	public DefaultSysRoleSystemService(SysRoleSystemRepository repository) {
@@ -106,9 +108,9 @@ public class DefaultSysRoleSystemService
 		SysRoleSystem roleSystemEntity = this.getEntity(roleSystem.getId());
 
 		// Identity-role check.
-		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 		identityRoleFilter.setRoleSystemId(roleSystemEntity.getId());
-		long count = identityRoleService.count(identityRoleFilter);
+		long count = roleAssignmentManager.count(identityRoleFilter);
 		if (count > 0) {
 			IdmRoleDto roleDto = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.role, IdmRoleDto.class, null);
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE,

@@ -70,7 +70,6 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityStateFilter;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 
 /**

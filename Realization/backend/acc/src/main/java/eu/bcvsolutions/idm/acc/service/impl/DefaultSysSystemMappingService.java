@@ -14,6 +14,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -110,10 +114,8 @@ public class DefaultSysSystemMappingService
 	private SysSchemaAttributeService attributeService;
 	@Lazy
 	@Autowired
-	private IdmIdentityRoleService identityRoleService;
-	@Lazy
-	@Autowired
-	private IdmIdentityContractService identityContractService;
+	private IdmRoleAssignmentManager roleAssignmentManager;
+
 	@Lazy
 	@Autowired
 	private IdmTreeTypeService treeTypeService;
@@ -125,6 +127,10 @@ public class DefaultSysSystemMappingService
 	private SysSystemEntityService systemEntityService;
 	@Autowired
 	private SysSystemEntityTypeManager systemEntityManager;
+
+	@Lazy
+	@Autowired
+	private IdmIdentityContractService identityContractService;
 
 	@Autowired
 	public DefaultSysSystemMappingService(
@@ -473,19 +479,18 @@ public class DefaultSysSystemMappingService
 		}
 
 		if ((mapping.isAddContextIdentityRoles() || mapping.isAddContextIdentityRolesForSystem()) &&  dto instanceof IdmIdentityDto) {
-			IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+			IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 			identityRoleFilter.setIdentityId(dto.getId());
-			List<IdmIdentityRoleDto> identityRoles = identityRoleService
+			List<AbstractRoleAssignmentDto> identityRoles = roleAssignmentManager
 					.find(identityRoleFilter,
-							PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmIdentityRole_.created.getName())))
-					.getContent();
+							PageRequest.of(0, Integer.MAX_VALUE, Sort.by(AbstractEntity_.created.getName())), (a,b) -> {});
 			if (mapping.isAddContextIdentityRoles()) {
 				// Set all identity-roles to the context.
 				mappingContext.setIdentityRoles(identityRoles);
 			}
 			if (mapping.isAddContextIdentityRolesForSystem()) {
 				Assert.notNull(system.getId(), "System identifier is required.");
-				List<IdmIdentityRoleDto> identityRolesForSystem = Lists.newArrayList();
+				List<AbstractRoleAssignmentDto> identityRolesForSystem = Lists.newArrayList();
 				AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 				identityAccountFilter.setIdentityId(dto.getId());
 				identityAccountFilter.setSystemId(system.getId());
