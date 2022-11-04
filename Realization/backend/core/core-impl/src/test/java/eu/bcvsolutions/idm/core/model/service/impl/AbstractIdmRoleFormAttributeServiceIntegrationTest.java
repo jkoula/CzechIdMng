@@ -83,7 +83,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 
 	}
 
-	@Test
+	@Test(expected = ResultCodeException.class)
 	public void testChangeOfSuperdefinitionNotAllowed() {
 		// Create role with attribute (include the sub-definition)
 		IdmRoleDto role = createRoleWithAttributes();
@@ -172,7 +172,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		
 		AbstractDto owner = createOwner();
 		UUID applicantId = getApplicant(owner);
-		createRoleAssignment(owner.getId(), role.getId(), null, null);
+		createRoleAssignment(role.getId(), owner.getId(), null, null);
 		
 		List<AbstractRoleAssignmentDto> roleAssignments = findRoleAssignmentsForOwner(owner);
 		assertEquals(1, roleAssignments.size());
@@ -227,7 +227,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		IdmRoleRequestDto request = createRoleRequest(applicantId);
 		// Create change role-concept
 		AbstractConceptRoleRequestDto conceptRoleRequest = createConceptRoleRequest(request, role, owner.getId(), 
-				null, ConceptRoleRequestOperation.UPDATE, LocalDate.now());
+				null, ConceptRoleRequestOperation.ADD, LocalDate.now());
 		conceptRoleRequest.getEavs().clear();
 		
 		// Create role attribute value in concept

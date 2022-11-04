@@ -1206,6 +1206,7 @@ public class DefaultIdmRoleRequestService
 					// Duplication found, create request
 					if (duplicated != null && identityRoleAssignment.getId().equals(duplicated.getId())) {
 						AbstractConceptRoleRequestDto removeConcept = conceptRoleRequestManager.getServiceForConcept(concept).createConceptToRemoveIdentityRole(concept, identityRoleAssignment);
+						removeConcept.addToLog(MessageFormat.format("Removed by duplicates with subrole id [{}]", identityRoleAssignment.getRoleComposition()));
 						conceptsToRemove.add(removeConcept);
 					}
 				}

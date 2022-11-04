@@ -223,9 +223,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		// Find all identity roles for applicant
 		List<AbstractRoleAssignmentDto> assignedRoles = findRoleAssignmentsForOwner(owner);
 		boolean exists = assignedRoles.stream()
-			.filter(identityRole -> incompatibleRoleTwo.getId().equals(identityRole.getRole()))
-			.findFirst()
-			.isPresent();
+			.anyMatch(identityRole -> incompatibleRoleTwo.getId().equals(identityRole.getRole()));
 		// Incompatible role two must be assigned for applicant
 		assertTrue(exists);
 
@@ -463,7 +461,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 			completeTasksFromUsers(helpdeskIdentity.getUsername(), "approve");
 			fail("This user: " + applicant.getUsername() + " can't approve task.");
 		} catch (ResultCodeException ex) {
-			assertTrue(CoreResultCode.FORBIDDEN.name().equals(ex.getError().getError().getStatusEnum()));
+			assertEquals(CoreResultCode.FORBIDDEN.name(), ex.getError().getError().getStatusEnum());
 		} catch (Exception e) {
 			fail("Some problem: " + e.getLocalizedMessage());
 		}
@@ -473,7 +471,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 			completeTasksFromUsers(helpdeskIdentity.getUsername(), "approve");
 			fail("This user: " + test2.getUsername() + " can't approve task.");
 		} catch (ResultCodeException ex) {
-			assertTrue(CoreResultCode.FORBIDDEN.name().equals(ex.getError().getError().getStatusEnum()));
+			assertEquals(CoreResultCode.FORBIDDEN.name(), ex.getError().getError().getStatusEnum());
 		} catch (Exception e) {
 			fail("Some problem: " + e.getLocalizedMessage());
 		}
@@ -523,7 +521,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 			completeTasksFromUsers(helpdeskIdentity.getUsername(), "approve");
 			fail("This user: " + applicant.getUsername() + " can't approve task.");
 		} catch (ResultCodeException ex) {
-			assertTrue(CoreResultCode.FORBIDDEN.name().equals(ex.getError().getError().getStatusEnum()));
+			assertEquals(CoreResultCode.FORBIDDEN.name(), ex.getError().getError().getStatusEnum());
 		} catch (Exception e) {
 			fail("Some problem: " + e.getLocalizedMessage());
 		}
@@ -542,7 +540,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 			completeTasksFromUsers(guarantee.getUsername(), "approve");
 			fail("This user: " + helpdeskIdentity.getUsername() + " should not be able to approve task.");
 		} catch (ResultCodeException ex) {
-			assertTrue(CoreResultCode.FORBIDDEN.name().equals(ex.getError().getError().getStatusEnum()));
+			assertEquals(CoreResultCode.FORBIDDEN.name(), ex.getError().getError().getStatusEnum());
 		} catch (Exception e) {
 			fail("Some problem: " + e.getLocalizedMessage());
 		}
@@ -552,7 +550,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 			completeTasksFromUsers(guarantee.getUsername(), "approve");
 			fail("This user: " + applicant.getUsername() + " can't approve task.");
 		} catch (ResultCodeException ex) {
-			assertTrue(CoreResultCode.FORBIDDEN.name().equals(ex.getError().getError().getStatusEnum()));
+			assertEquals(CoreResultCode.FORBIDDEN.name(), ex.getError().getError().getStatusEnum());
 		} catch (Exception e) {
 			fail("Some problem: " + e.getLocalizedMessage());
 		}

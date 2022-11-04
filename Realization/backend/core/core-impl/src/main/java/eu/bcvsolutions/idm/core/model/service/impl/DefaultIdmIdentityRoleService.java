@@ -11,6 +11,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
@@ -22,7 +23,6 @@ import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -268,6 +268,14 @@ public class DefaultIdmIdentityRoleService
 	@Override
 	public List<IdmIdentityRoleDto> findAllByOwnerId(UUID ownerUuid) {
 		return findAllByContract(ownerUuid);
+	}
+
+	@Override
+	public IdmIdentityDto getRelatedIdentity(IdmIdentityRoleDto roleAssignment) {
+		IdmIdentityContractDto contract = DtoUtils.getEmbedded(roleAssignment, IdmIdentityRole_.identityContract,
+				IdmIdentityContractDto.class);
+		//
+		return lookupService.lookupEmbeddedDto(contract, IdmIdentityContract_.identity);
 	}
 
 	@Override

@@ -403,8 +403,16 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         if (concept != null) {
             removeConcept.setRoleRequest(concept.getRoleRequest());
         }
-        removeConcept.addToLog(MessageFormat.format("Removed by duplicates with subrole id [{}]", identityRoleAssignment.getRoleComposition()));
         removeConcept = save(removeConcept);
+        return removeConcept;
+    }
+
+    @Override
+    public IdmConceptRoleRequestDto createConceptToRemoveIdentityRole(IdmIdentityRoleDto roleAssignment) {
+        IdmConceptRoleRequestDto removeConcept = createEmptyConcept();
+        removeConcept.setIdentityContract(roleAssignment.getIdentityContract());
+        removeConcept.setIdentityRole(roleAssignment.getId());
+        removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
         return removeConcept;
     }
 

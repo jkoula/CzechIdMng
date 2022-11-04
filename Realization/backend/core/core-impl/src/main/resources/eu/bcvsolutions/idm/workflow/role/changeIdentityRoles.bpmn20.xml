@@ -480,6 +480,7 @@ def applicantIdentity = identityService.get(applicantIdentifier);
 def implementerIdentity = identityService.get(implementerIdentifier);
 
 def url = getUrl(entityEvent.content);
+      println("aaapp0 $implementerIdentity $applicantIdentity")
 
 //send notification
 if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
@@ -571,7 +572,7 @@ def managerDescription = execution.getVariable("managerDescription");
 if (managerDescription == null || managerDescription.isEmpty()) {
 	managerDescription = "";
 }
-
+println("aaapp1 $implementerIdentity $applicantIdentity")
 //send notification
 if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
   if(sendNotificationToImplementer || sendNotificationToApplicant){
@@ -649,6 +650,7 @@ def managerDescription = execution.getVariable("managerDescription");
 if (managerDescription == null || managerDescription.isEmpty()) {
 	managerDescription = "";
 }
+      println("aaapp2 $implementerIdentity $applicantIdentity")
 
 //send notification
 if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
@@ -726,6 +728,7 @@ def managerDescription = execution.getVariable("managerDescription");
 if (managerDescription == null || managerDescription.isEmpty()) {
 	managerDescription = "";
 }
+      println("aaapp3 $implementerIdentity $applicantIdentity")
 
 //send notification
 if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
@@ -803,6 +806,7 @@ def managerDescription = execution.getVariable("managerDescription");
 if (managerDescription == null || managerDescription.isEmpty()) {
 	managerDescription = "";
 }
+      println("aaapp4 $implementerIdentity $applicantIdentity")
 
 //send notification
 if (implementerIdentity.getId().equals(applicantIdentity.getId())) {

@@ -180,10 +180,17 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
             //
             predicates.add(builder.exists(subquery));
         }
-        if (filter.getAutomaticRole() != null) {
+        if (filter.getAutomaticRoleId() != null) {
             predicates.add(builder.equal(root.get(AbstractConceptRoleRequest_.automaticRole).get(AbstractEntity_.id),
-                    filter.getAutomaticRole()));
+                    filter.getAutomaticRoleId()));
         }
+        if (filter.getAutomaticRole() != null) {
+            predicates.add(Boolean.TRUE.equals(filter.getAutomaticRole()) ?
+                        builder.isNotNull(root.get(AbstractConceptRoleRequest_.automaticRole)) :
+                            builder.isNull(root.get(AbstractConceptRoleRequest_.automaticRole))
+                    );
+        }
+
         if (filter.getOperation() != null) {
             predicates.add(builder.equal(root.get(AbstractConceptRoleRequest_.operation), filter.getOperation()));
         }

@@ -69,7 +69,7 @@ public abstract class ConceptCancellingProcessor<O extends BaseDto,
             // Sub roles are removed different way (processor on direct identity role),
             // but automatic roles has to be removed in the same request.
             if (identityRole.getDirectRole() == null) {
-                final C conceptToRemoveIdentityRole = conceptRequestService.createConceptToRemoveIdentityRole(null, identityRole);
+                final C conceptToRemoveIdentityRole = conceptRequestService.createConceptToRemoveIdentityRole(identityRole);
                 //
                 concepts.add(conceptToRemoveIdentityRole);
             }
