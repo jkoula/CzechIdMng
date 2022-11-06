@@ -115,6 +115,9 @@ public class DefaultSysRoleSystemAttributeService extends
 	private List<SysRoleAssignmentJPAPlugin> roleAssignmentJPAPlugins;
 
 	@Autowired
+	private List<SysRoleAssignmentJPAPlugin> roleAssignmentJPAPlugins;
+
+	@Autowired
 	public DefaultSysRoleSystemAttributeService(SysRoleSystemAttributeRepository repository) {
 		super(repository);
 	}
