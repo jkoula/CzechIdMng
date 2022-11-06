@@ -1,5 +1,9 @@
 package eu.bcvsolutions.idm.acc.config;
 
+import eu.bcvsolutions.idm.acc.entity.AccAccountConceptRoleRequest;
+import eu.bcvsolutions.idm.acc.entity.AccAccountConceptRoleRequestFormValue;
+import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
+import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignmentFormValue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +26,30 @@ public class AccFormableConfiguration {
             /**
              * Account form values supports authorization policies.
              */
+            @Override
+            public AuthorizableType getAuthorizableType() {
+                return new AuthorizableType(CoreGroupPermission.FORMVALUE, getEntityClass());
+            }
+        };
+    }
+
+    @Bean
+    public AbstractFormValueService<AccAccountConceptRoleRequest, AccAccountConceptRoleRequestFormValue> conceptFormValueService(
+            AbstractFormValueRepository<AccAccountConceptRoleRequest, AccAccountConceptRoleRequestFormValue> repository) {
+
+        return new AbstractFormValueService<>(repository) {
+            @Override
+            public AuthorizableType getAuthorizableType() {
+                return new AuthorizableType(CoreGroupPermission.FORMVALUE, getEntityClass());
+            }
+        };
+    }
+
+    @Bean
+    public AbstractFormValueService<AccAccountRoleAssignment, AccAccountRoleAssignmentFormValue> accountRoleAssignmentFormValueService(
+            AbstractFormValueRepository<AccAccountRoleAssignment, AccAccountRoleAssignmentFormValue> repository) {
+
+        return new AbstractFormValueService<>(repository) {
             @Override
             public AuthorizableType getAuthorizableType() {
                 return new AuthorizableType(CoreGroupPermission.FORMVALUE, getEntityClass());

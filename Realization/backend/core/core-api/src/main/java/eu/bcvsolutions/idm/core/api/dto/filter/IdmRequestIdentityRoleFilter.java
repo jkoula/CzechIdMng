@@ -16,6 +16,7 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
     private boolean includeCrossDomainsSystemsCount = false;
 
 	public static final String ONLY_ASSIGNMENTS_PARAMETER = "onlyAssignments";
+	public static final String VALID_PARAMETER = "isValid";
 	public static final String ROLE_SYSTEM_ID = "roleSystemId";
     public IdmRequestIdentityRoleFilter() {
 		super();
@@ -73,4 +74,11 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
 		return getParameterConverter().toUuid(getData(), ROLE_SYSTEM_ID);
 	}
 
+	public void setValid(Boolean val) {
+		set(VALID_PARAMETER, val);
+	}
+
+	public Boolean isValid() {
+		return getParameterConverter().toBoolean(getData(), VALID_PARAMETER);
+	}
 }

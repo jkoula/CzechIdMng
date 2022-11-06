@@ -257,7 +257,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     protected UUID getIdentityRoleId(AccAccountConceptRoleRequestDto concept) {
         UUID accountRoleId = null;
-        AccAccountConceptRoleRequestDto accountRoleDto = DtoUtils.getEmbedded(concept, AccAccountConceptRoleRequest_.accountRole, AccAccountConceptRoleRequestDto.class, null);
+        AccAccountRoleAssignmentDto accountRoleDto = DtoUtils.getEmbedded(concept, AccAccountConceptRoleRequest_.accountRole, AccAccountRoleAssignmentDto.class, null);
         if (accountRoleDto == null) {
             accountRoleId = concept.getAccountRole();
         } else {

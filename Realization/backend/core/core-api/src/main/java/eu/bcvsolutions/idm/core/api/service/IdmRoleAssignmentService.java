@@ -16,6 +16,7 @@ import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;

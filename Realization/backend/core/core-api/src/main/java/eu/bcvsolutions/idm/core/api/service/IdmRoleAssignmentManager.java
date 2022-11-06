@@ -9,6 +9,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.persistence.criteria.Predicate;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -25,4 +26,5 @@ public interface IdmRoleAssignmentManager extends AdaptableService<IdmRequestIde
 
     List<AbstractRoleAssignmentDto> find(IdmRequestIdentityRoleFilter identityRoleFilter, Pageable pageable,
             BiConsumer<AbstractRoleAssignmentDto, IdmRoleAssignmentService<AbstractRoleAssignmentDto, BaseRoleAssignmentFilter>> consumer);
+
 }

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,13 +78,14 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
     public List<AbstractRoleAssignmentDto> find(IdmRequestIdentityRoleFilter identityRoleFilter, Pageable pageable,
             BiConsumer<AbstractRoleAssignmentDto, IdmRoleAssignmentService<AbstractRoleAssignmentDto, BaseRoleAssignmentFilter>> consumer) {
         return assignmentServices.values().stream().flatMap(service -> {
-            final Page<AbstractRoleAssignmentDto> page = service.find(identityRoleFilter, pageable);
+            final BaseRoleAssignmentFilter filter = service.getFilter();
+            modelMapper.map(identityRoleFilter, filter);
+            final Page<AbstractRoleAssignmentDto> page = service.find(filter, pageable);
             //
             page.forEach(o -> consumer.accept(o, service));
             return page.stream();
         }).collect(Collectors.toList());
     }
-
 
     @Override
     public IdmRequestIdentityRoleDto checkAccess(IdmRequestIdentityRoleDto dto, BasePermission... permission) {

@@ -1241,6 +1241,8 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
 		requestIdentityRoleFilter.setIdentity(applicant.getId());
+		requestIdentityRoleFilter.setOnlyChanges(true);
+
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		Assert.assertEquals(2, requestIdentityRoles.size());
 		Assert.assertTrue(requestIdentityRoles.stream().anyMatch(rir -> rir.getRole().equals(roleOne.getId())

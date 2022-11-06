@@ -258,7 +258,7 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
             if (formDefinition != null) {
                 IdmFormDefinitionDto formDefinitionDto = roleService.getFormAttributeSubdefinition(role);
                 // thin dto can be given -> owner is normal dto
-                return this.getFormService().getFormInstance(new IdmIdentityRoleDto(dto.getId()), formDefinitionDto);
+                return this.getFormService().getFormInstance(dto, formDefinitionDto);
             }
         }
         return null;

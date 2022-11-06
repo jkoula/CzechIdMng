@@ -4,12 +4,15 @@ import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -113,6 +116,9 @@ public class DefaultSysRoleSystemAttributeService extends
 	private SysAttributeControlledValueService attributeControlledValueService;
 	@Autowired
 	private SysSystemEntityTypeManager systemEntityManager;
+
+	@Autowired
+	private List<SysRoleAssignmentJPAPlugin> roleAssignmentJPAPlugins;
 
 	@Autowired
 	public DefaultSysRoleSystemAttributeService(SysRoleSystemAttributeRepository repository) {
@@ -389,93 +395,13 @@ public class DefaultSysRoleSystemAttributeService extends
 					.add(builder.equal(root.get(SysRoleSystemAttribute_.systemAttributeMapping).get(AbstractEntity_.id),
 							filter.getSystemAttributeMappingId()));
 		}
-		
-		// Search overridden attributes for this account (searching via
-		// identity-accounts -> identity-roles -> role-systems ->
-		// role-system-attributes)
-		if (filter.getIdentityId() != null && filter.getAccountId() != null) {
-			Subquery<AccIdentityAccount> subquery = query.subquery(AccIdentityAccount.class);
-			Root<AccIdentityAccount> subRoot = subquery.from(AccIdentityAccount.class);
-			subquery.select(subRoot);
 
-			// Correlation attribute predicate
-			Predicate correlationPredicate = builder.equal(
-					subRoot.get(AccIdentityAccount_.identityRole).get(IdmIdentityRole_.role),
-					root.get(SysRoleSystemAttribute_.roleSystem).get(SysRoleSystem_.role)); // Correlation attribute
-			// Identity predicate
-			Predicate identityPredicate = builder.equal(subRoot.get(AccIdentityAccount_.identityRole)
-					.get(IdmIdentityRole_.identityContract).get(IdmIdentityContract_.identity).get(AbstractEntity_.id),
-					filter.getIdentityId());
-			// Account predicate
-			Predicate accountPredicate = builder.equal(subRoot.get(AccIdentityAccount_.account).get(AbstractEntity_.id),
-					filter.getAccountId());
-			
-			subquery.where(builder.and(correlationPredicate, identityPredicate, accountPredicate));
+		List<Predicate> overridenAttributePredicates = roleAssignmentJPAPlugins.stream()
+				.flatMap(sysRoleAssignmentJPAPlugin -> sysRoleAssignmentJPAPlugin.getOverridenAttributesPredicates(root, query, builder, filter).stream())
+				.collect(Collectors.toList());
 
-			predicates.add(builder.exists(subquery));
-		}
-		
-		// Find override for identity (via identity-role)
-		if (filter.getIdentityId() != null  && filter.getAccountId() == null) {
-			Subquery<IdmIdentityRole> subquery = query.subquery(IdmIdentityRole.class);
-			Root<IdmIdentityRole> subRoot = subquery.from(IdmIdentityRole.class);
-			subquery.select(subRoot);
-
-			// Correlation attribute predicate
-			Predicate correlationPredicate = builder.equal(
-					subRoot.get(IdmIdentityRole_.role),
-					root.get(SysRoleSystemAttribute_.roleSystem).get(SysRoleSystem_.role)); // Correlation attribute
-			// Identity predicate
-			Predicate identityPredicate = builder.equal(subRoot.get(IdmIdentityRole_.identityContract)
-							.get(IdmIdentityContract_.identity).get(AbstractEntity_.id),
-					filter.getIdentityId());
-
-				subquery.where(builder.and(correlationPredicate, identityPredicate));
-
-			predicates.add(builder.exists(subquery));
-		}
-		
-		// Find override attributes for identity (via identity-role and role-system).
-		// We want to find all override attribute for identity, where relation between identity-role
-		// and role-system is null or if relation is not null, then return override attributes where same role-systems are used.
-		if (filter.getRoleSystemRelationForIdentityId() != null) {
-			
-			// Query via role:
-			Subquery<IdmIdentityRole> subquery = query.subquery(IdmIdentityRole.class);
-			Root<IdmIdentityRole> subRoot = subquery.from(IdmIdentityRole.class);
-			subquery.select(subRoot);
-
-			// Correlation attribute predicate
-			Predicate correlationPredicate = builder.equal(
-					subRoot.get(IdmIdentityRole_.role),
-					root.get(SysRoleSystemAttribute_.roleSystem).get(SysRoleSystem_.role)); // Correlation attribute
-			// Identity predicate
-			Predicate identityPredicate = builder.equal(subRoot.get(IdmIdentityRole_.identityContract)
-							.get(IdmIdentityContract_.identity).get(AbstractEntity_.id),
-					filter.getRoleSystemRelationForIdentityId());
-			// Identity-role predicate
-			Predicate identityRolePredicate = builder.isNull(subRoot.get(IdmIdentityRole_.roleSystem));
-
-			subquery.where(builder.and(correlationPredicate, identityPredicate, identityRolePredicate));
-			
-			// Query via role-system:
-			Subquery<IdmIdentityRole> subqueryViaRoleSystem = query.subquery(IdmIdentityRole.class);
-			Root<IdmIdentityRole> subRootViaRoleSystem  = subqueryViaRoleSystem.from(IdmIdentityRole.class);
-			subqueryViaRoleSystem.select(subRootViaRoleSystem );
-
-			// Correlation attribute predicate
-			Predicate correlationPredicateViaRoleSystem = builder.equal(
-					subRootViaRoleSystem .get(IdmIdentityRole_.roleSystem),
-					root.get(SysRoleSystemAttribute_.roleSystem)); // Correlation attribute
-			// Identity predicate
-			Predicate identityPredicateViaRoleSystem  = builder.equal(subRootViaRoleSystem.get(IdmIdentityRole_.identityContract)
-							.get(IdmIdentityContract_.identity).get(AbstractEntity_.id),
-					filter.getRoleSystemRelationForIdentityId());
-
-			subqueryViaRoleSystem.where(builder.and(correlationPredicateViaRoleSystem, identityPredicateViaRoleSystem));
-
-			// Query by role or by role-system
-			predicates.add(builder.or(builder.exists(subquery), builder.exists(subqueryViaRoleSystem)));
+		if (!overridenAttributePredicates.isEmpty()) {
+			predicates.add(builder.or(overridenAttributePredicates.toArray(new Predicate[0])));
 		}
 
 		// Get role-system-attributes with cross domains groups (using same merge attribute) or attributes where default account creation is disabled.
