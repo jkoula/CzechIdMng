@@ -379,7 +379,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	
 	@Override
 	public SysSystemMappingDto getDefaultMapping(UUID systemId) {
-		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(systemId, SystemOperationType.PROVISIONING, SystemEntityType.IDENTITY);
+		List<SysSystemMappingDto> mappings = systemMappingService.findBySystemId(systemId, SystemOperationType.PROVISIONING, IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
 		if(mappings.isEmpty()) {
 			throw new CoreException(String.format("Default mapping for system[%s] not found", systemId));
 		}

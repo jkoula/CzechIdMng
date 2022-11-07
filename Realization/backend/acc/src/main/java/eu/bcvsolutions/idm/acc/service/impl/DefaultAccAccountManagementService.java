@@ -4,6 +4,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
@@ -62,7 +63,6 @@ import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
@@ -94,7 +94,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	private final SysSystemMappingService systemMappingService;
 	private final SysSchemaObjectClassService schemaObjectClassService;
 	@Autowired
-	private IdmIdentityRoleService identityRoleService;
+	private IdmRoleAssignmentManager roleAssignmentManager;
 	@Autowired
 	private EntityStateManager entityStateManager;
 	@Autowired
@@ -135,7 +135,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
 		filter.setIdentityId(identity.getId());
 		List<AccIdentityAccountDto> allIdentityAccountList = identityAccountService.find(filter, null).getContent();
-		List<IdmIdentityRoleDto> identityRoles = identityRoleService.findAllByIdentity(identity.getId());
+		List<AbstractRoleAssignmentDto> identityRoles = roleAssignmentManager.findAllByIdentity(identity.getId());
 		
 		if (CollectionUtils.isEmpty(identityRoles) && CollectionUtils.isEmpty(allIdentityAccountList)) {
 			// No roles and accounts ... we don't have anything to do
@@ -190,7 +190,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	
 	
 	@Override
-	public List<UUID> resolveNewIdentityRoles(IdmIdentityDto identity, IdmIdentityRoleDto... identityRoles) {
+	public List<UUID> resolveNewIdentityRoles(IdmIdentityDto identity, AbstractRoleAssignmentDto... identityRoles) {
 		Assert.notNull(identity, "Identity is required.");
 
 		if (identityRoles == null || identityRoles.length == 0) {
@@ -198,7 +198,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			return null;
 		}
 
-		List<IdmIdentityRoleDto> identityRolesList = Lists.newArrayList(identityRoles);
+		List<AbstractRoleAssignmentDto> identityRolesList = Lists.newArrayList(identityRoles);
 		List<AccIdentityAccountDto> identityAccountsToCreate = Lists.newArrayList();
 
 		// For this account should be executed provisioning
@@ -217,17 +217,17 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	}
 	
 	@Override
-	public  List<UUID>  resolveUpdatedIdentityRoles(IdmIdentityDto identity, IdmIdentityRoleDto... identityRoles) {
+	public  List<UUID>  resolveUpdatedIdentityRoles(IdmIdentityDto identity, AbstractRoleAssignmentDto... identityRoles) {
 		Assert.notNull(identity, "Identity is required.");
 
 		if (identityRoles == null || identityRoles.length == 0) {
 			// No identity-roles ... we don't have anything to do
 			return null;
 		}
-		List<IdmIdentityRoleDto> identityRolesList = Lists.newArrayList(identityRoles);
+		List<AbstractRoleAssignmentDto> identityRolesList = Lists.newArrayList(identityRoles);
 		// Find identity-accounts for changed identity-roles (using IN predicate)
 		List<UUID> identityRoleIds = identityRolesList.stream() //
-				.map(IdmIdentityRoleDto::getId) //
+				.map(AbstractRoleAssignmentDto::getId) //
 				.collect(Collectors.toList()); //
 		AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
 		filter.setIdentityId(identity.getId());
@@ -342,7 +342,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 
 	@Override
 	@Transactional
-	public List<UUID> deleteIdentityAccount(IdmIdentityRoleDto entity) {
+	public List<UUID> deleteIdentityAccount(AbstractRoleAssignmentDto entity) {
 		AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
 		filter.setIdentityRoleId(entity.getId());
 		List<UUID> accountIds = Lists.newArrayList();
@@ -357,9 +357,9 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	
 	@Override
 	@Transactional
-	public void deleteIdentityAccount(EntityEvent<IdmIdentityRoleDto> event) {
+	public void deleteIdentityAccount(EntityEvent<AbstractRoleAssignmentDto> event) {
 		Assert.notNull(event, "Event is required.");
-		IdmIdentityRoleDto identityRole = event.getContent();
+		AbstractRoleAssignmentDto identityRole = event.getContent();
 		Assert.notNull(identityRole, "Identity role is required.");
 		Assert.notNull(identityRole, "Identity role identifier is required.");
 		//
@@ -447,7 +447,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	 * @param identityAccountsToDelete
 	 */
 	private void resolveIdentityAccountForDelete(List<AccIdentityAccountDto> identityAccountList,
-			List<IdmIdentityRoleDto> identityRoles, List<AccIdentityAccountDto> identityAccountsToDelete) {
+			List<AbstractRoleAssignmentDto> identityRoles, List<AccIdentityAccountDto> identityAccountsToDelete) {
 
 		// Search IdentityAccounts to delete
 		identityRoles.stream().filter(identityRole -> !identityRole.isValid())
@@ -496,7 +496,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	 */
 	private void resolveIdentityAccountForCreate(IdmIdentityDto identity,
 												 List<AccIdentityAccountDto> identityAccountList,
-												 List<IdmIdentityRoleDto> identityRoles,
+												 List<AbstractRoleAssignmentDto> identityRoles,
 												 List<AccIdentityAccountDto> identityAccountsToCreate,
 												 List<AccIdentityAccountDto> identityAccountsToDelete,
 												 boolean onlyCreateNew,
@@ -529,7 +529,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 												 List<AccIdentityAccountDto> identityAccountsToDelete,
 												 boolean onlyCreateNew,
 												 SysRoleSystemDto roleSystem,
-												 IdmIdentityRoleDto identityRole)  {
+			AbstractRoleAssignmentDto identityRole)  {
 		String uid = generateUID(identity, roleSystem);
 		// Check on change of UID is not executed if all given identity-roles are new
 		if (!onlyCreateNew) {
@@ -776,7 +776,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			accountUid = accountDto.getUid();
 			accountMappingId = accountDto.getSystemMapping() != null ? accountDto.getSystemMapping().toString() : "";
 
-			IdmIdentityRoleDto idmIdentityRoleDto = identityRoleService.get(identityAccount.getIdentityRole());
+			IdmRequestIdentityRoleDto idmIdentityRoleDto = roleAssignmentManager.get(identityAccount.getIdentityRole());
 			SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
 			roleSystemFilter.setRoleId(idmIdentityRoleDto.getRole());
 			roleSystemFilter.setSystemId(accountDto.getSystem());

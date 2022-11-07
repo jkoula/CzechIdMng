@@ -424,8 +424,6 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
      */
     IdmRoleRequestDto createRoleRequest(UUID identityId);
 
-	AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA);
-
 	AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to);
 
 }
