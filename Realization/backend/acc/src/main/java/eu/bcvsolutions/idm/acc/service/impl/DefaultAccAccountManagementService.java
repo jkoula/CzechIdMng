@@ -788,7 +788,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			roleSystemFilter.setSystemMappingId(accountDto.getSystemMapping());
 			accountWithSameMapping = roleSystemService.count(roleSystemFilter);
 		}
-		if (accountWithSameMapping > 0) {
+		if (accountWithSameMapping == 0) {
 			if (count == 0) {
 				AccIdentityAccountDto identityAccountDto = identityAccountService.save(identityAccount);
 				accounts.add(identityAccountDto.getAccount());

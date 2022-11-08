@@ -3,7 +3,6 @@ package eu.bcvsolutions.idm.acc.service.impl;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
-import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -18,8 +17,6 @@ import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.entity.SysSystem_;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
@@ -35,13 +32,11 @@ import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
 import eu.bcvsolutions.idm.core.api.service.ExportManager;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
@@ -363,20 +358,6 @@ public class DefaultSysRoleSystemService
 
 			predicates.add(builder.exists(subquery));
 		}
-		
-		// Return role-system where is uses given attribute mapping
-		if (filter.getAttributeMappingId() != null) {
-			Subquery<SysRoleSystemAttribute> subquery = query.subquery(SysRoleSystemAttribute.class);
-			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
-			subquery.select(subRoot);
-
-			subquery.where(builder.and( //
-					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
-					builder.equal(subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping).get(AbstractEntity_.id),
-							filter.getAttributeMappingId())));
-
-			predicates.add(builder.exists(subquery));
-		}
 
 		// Get role-systems with cross domains groups for given role (using same merge attribute).
 		if (filter.getIsInCrossDomainGroupRoleId() != null) {
@@ -385,21 +366,11 @@ public class DefaultSysRoleSystemService
 			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
 			subquery.select(subRoot);
 
-			Subquery<SysSystemGroupSystem> subquerySystemGroup = query.subquery(SysSystemGroupSystem.class);
-			Root<SysSystemGroupSystem> subRootSystemGroup = subquerySystemGroup.from(SysSystemGroupSystem.class);
-			subquerySystemGroup.select(subRootSystemGroup);
+			final Subquery<SysSystemGroupSystem> subqueryForSystemGroup = DefaultSysRoleSystemAttributeService.getSubqueryForSystemGroup(subRoot, query, builder);
 
-			subquerySystemGroup.where(builder.and(
-							builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.mergeAttribute),
-									subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping))), // Correlation attribute
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.disabled),
-							Boolean.FALSE),
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.type),
-							SystemGroupType.CROSS_DOMAIN));
-							
 			subquery.where(builder.and( //
 					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
-					builder.exists(subquerySystemGroup),
+					builder.exists(subqueryForSystemGroup),
 					builder.equal(root.get(SysRoleSystem_.role).get(AbstractEntity_.id),
 							filter.getIsInCrossDomainGroupRoleId())));
 

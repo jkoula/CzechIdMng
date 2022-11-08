@@ -4,9 +4,7 @@ import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
-import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
@@ -45,8 +43,6 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaObjectClassFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
-import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount;
-import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
@@ -76,8 +72,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.RequestManager;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 
 /**
@@ -406,25 +400,29 @@ public class DefaultSysRoleSystemAttributeService extends
 
 		// Get role-system-attributes with cross domains groups (using same merge attribute) or attributes where default account creation is disabled.
 		if (Boolean.TRUE.equals(filter.getInCrossDomainGroupOrIsNoLogin())) {
-			Subquery<SysSystemGroupSystem> subquerySystemGroup = query.subquery(SysSystemGroupSystem.class);
-			Root<SysSystemGroupSystem> subRootSystemGroup = subquerySystemGroup.from(SysSystemGroupSystem.class);
-			subquerySystemGroup.select(subRootSystemGroup);
-
-			subquerySystemGroup.where(builder.and(
-							builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.mergeAttribute),
-									root.get(SysRoleSystemAttribute_.systemAttributeMapping))), // Correlation attribute
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.disabled),
-							Boolean.FALSE),
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.type),
-							SystemGroupType.CROSS_DOMAIN));
 
 			predicates.add(builder.or(
 					builder.equal(root.get(SysRoleSystemAttribute_.roleSystem).get(SysRoleSystem_.createAccountByDefault), Boolean.FALSE),
-					builder.exists(subquerySystemGroup))
-			);
+					builder.exists(getSubqueryForSystemGroup(root, query, builder))
+			));
 		}
 		
 		return predicates;
+	}
+
+	public static Subquery<SysSystemGroupSystem> getSubqueryForSystemGroup(Root<SysRoleSystemAttribute> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+		Subquery<SysSystemGroupSystem> subquerySystemGroup = query.subquery(SysSystemGroupSystem.class);
+		Root<SysSystemGroupSystem> subRootSystemGroup = subquerySystemGroup.from(SysSystemGroupSystem.class);
+		subquerySystemGroup.select(subRootSystemGroup);
+
+		subquerySystemGroup.where(builder.and(
+						builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.mergeAttribute),
+								root.get(SysRoleSystemAttribute_.systemAttributeMapping))), // Correlation attribute
+				builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.disabled),
+						Boolean.FALSE),
+				builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.type),
+						SystemGroupType.CROSS_DOMAIN));
+		return subquerySystemGroup;
 	}
 
 	/**
