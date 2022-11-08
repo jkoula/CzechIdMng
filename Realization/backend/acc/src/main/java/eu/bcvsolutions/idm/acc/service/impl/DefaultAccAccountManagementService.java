@@ -5,6 +5,7 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
@@ -776,9 +777,13 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			accountUid = accountDto.getUid();
 			accountMappingId = accountDto.getSystemMapping() != null ? accountDto.getSystemMapping().toString() : "";
 
-			IdmRequestIdentityRoleDto idmIdentityRoleDto = roleAssignmentManager.get(identityAccount.getIdentityRole());
+			IdmRequestIdentityRoleFilter rif = new IdmRequestIdentityRoleFilter();
+			rif.setRoleAssignmentUuid(identityAccount.getIdentityRole());
+
+			final List<AbstractRoleAssignmentDto> assignments = roleAssignmentManager.find(rif, null, (s, a) -> {});
+			AbstractRoleAssignmentDto roleAssignmentDto = assignments.stream().findFirst().orElseThrow();
 			SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
-			roleSystemFilter.setRoleId(idmIdentityRoleDto.getRole());
+			roleSystemFilter.setRoleId(roleAssignmentDto.getRole());
 			roleSystemFilter.setSystemId(accountDto.getSystem());
 			roleSystemFilter.setSystemMappingId(accountDto.getSystemMapping());
 			accountWithSameMapping = roleSystemService.count(roleSystemFilter);
