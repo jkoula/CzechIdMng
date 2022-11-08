@@ -72,7 +72,7 @@ module.exports = {
                 id: 'system-owner',
                 type: 'TAB',
                 labelKey: 'acc:content.system.owner.title',
-                order: 25,
+                order: 75,
                 path: '/system/:entityId/owner',
                 icon: 'fa:user',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['SYSTEMOWNER_READ', 'SYSTEMOWNERROLE_READ'] } ]

@@ -10,6 +10,8 @@ export default class systemOwners extends Basic.AbstractContent {
 
       componentDidMount() {
         super.componentDidMount();
+        // 
+        this.selectNavigationItems(['system-owner']);
       }
     
       getContentKey() {
