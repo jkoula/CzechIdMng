@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.plugin.core.PluginRegistry;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.google.common.collect.ImmutableMap;
@@ -109,6 +110,7 @@ public class DefaultReportManager implements ReportManager {
 	/**
 	 * Publish event only.
 	 */
+	@Transactional
 	@Override
 	public RptReportDto generate(RptReportDto report) {
 		Assert.notNull(report, "Report is required!");
