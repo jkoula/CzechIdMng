@@ -139,11 +139,15 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 				.filter(concept -> ConceptRoleRequestOperation.REMOVE == concept.getOperation()) //
 				.collect(Collectors.toSet()); //
 
-		IdmIdentityDto applicantIdentity = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant.getName(),
-				IdmIdentityDto.class);
+		IdmIdentityDto applicantIdentity = null;
+		if (IdmIdentityDto.class.getCanonicalName().equals(request.getApplicant().getApplicantType())) {
+			applicantIdentity = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant.getName(),
+					IdmIdentityDto.class);
+		}
+
 		IdmIdentityDto implementerIdentity = request.getCreatorId() == null ? null : identityService.get(request.getCreatorId());
 
-		if (applicantIdentity.equals(implementerIdentity)) {
+		if (applicantIdentity != null && applicantIdentity.equals(implementerIdentity)) {
 			// Send notification only to implementer if
 			// implementer and applicant is same identity
 			if (sendNotificationToImplementer || sendNotificationToApplicant) {
@@ -152,7 +156,7 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 			}
 		} else {
 			// Send notification to applicant
-			if (sendNotificationToApplicant) {
+			if (sendNotificationToApplicant && applicantIdentity != null) {
 				send(CoreModule.TOPIC_REQUEST_REALIZED_APPLICANT, request, from, addedRoles, changedRoles, removedRoles,
 						applicantIdentity, applicantIdentity);
 			}

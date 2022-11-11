@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import javax.sql.DataSource;
 
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -718,7 +719,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Override
 	public IdmRoleRequestDto createRoleRequest(UUID identityId, boolean executeImmediately) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(identityId);
+		roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(executeImmediately);
 		return roleRequestService.save(roleRequest);

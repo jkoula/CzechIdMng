@@ -15,6 +15,7 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -187,7 +188,7 @@ public class IdentityContractEndProcessor extends AbstractWorkflowEventProcessor
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 				roleRequest.setState(RoleRequestState.CONCEPT);
 				roleRequest.setExecuteImmediately(true); // without approval
-				roleRequest.setApplicant(contract.getIdentity());
+				roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 				roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 				roleRequest = roleRequestService.save(roleRequest);
 				//

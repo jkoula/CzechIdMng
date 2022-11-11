@@ -13,6 +13,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -262,4 +263,10 @@ public interface IdmRoleRequestService extends
 	IdmRoleRequestDto refreshSystemState(IdmRoleRequestDto request);
 
 	IdmRoleRequestDto createRequest(IdmRequestIdentityRoleDto dto);
+
+	IdmIdentityDto getApplicantAsIdentity(IdmRoleRequestDto request);
+
+	List<IdmIdentityDto> getGuarantorsForApplicant(IdmRoleRequestDto request);
+
+	ApplicantService getApplicantService(String applicantType);
 }

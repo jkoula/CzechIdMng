@@ -257,7 +257,7 @@ if(configResult &amp;&amp; configResult.equals("false")){
 
 if(!skip){
   //Find all managers for applicant
-  managers = identityService.findAllManagers(applicantIdentifier, null, true);
+  managers = roleRequestService.getGuarantorsForApplicant(entityEvent.content);
   if(managers.isEmpty()){
     managers.add(identityService.getByUsername("admin"));
   }
@@ -474,8 +474,7 @@ def changedRoles = conceptManager.getAllByRoleRequest(requestId, ConceptRoleRequ
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
 def sendNotificationToImplementer = configurationService.getBooleanValue("idm.sec.core.wf.notification.implementer.enabled", false);
 
-def applicantIdentifier = execution.getVariable("applicantIdentifier");
-def applicantIdentity = identityService.get(applicantIdentifier);
+def applicantIdentity = roleRequestService.getApplicantAsIdentity(entityEvent.content);
 
 def implementerIdentity = identityService.get(implementerIdentifier);
 
@@ -483,7 +482,7 @@ def url = getUrl(entityEvent.content);
       println("aaapp0 $implementerIdentity $applicantIdentity")
 
 //send notification
-if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
+if (applicantIdentity != null &amp;&amp; implementerIdentity.getId().equals(applicantIdentity.getId())) {
   if(sendNotificationToImplementer || sendNotificationToApplicant){
     notificationManager.send(
      CoreModuleDescriptor.TOPIC_CHANGE_IDENTITY_ROLES_IMPLEMENTER,
@@ -500,7 +499,7 @@ if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
     );
   }
 } else {
-if(sendNotificationToApplicant){
+if(sendNotificationToApplicant &amp;&amp; applicantIdentity != null){
   notificationManager.send(
    CoreModuleDescriptor.TOPIC_CHANGE_IDENTITY_ROLES,
             new IdmMessageDto.Builder()
@@ -544,79 +543,81 @@ def getUrl(request){
     <sequenceFlow id="flow46" sourceRef="scripttask8" targetRef="endevent1"></sequenceFlow>
     <scriptTask id="scripttask9" name="Send notification with result (Disapproved)" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import eu.bcvsolutions.idm.core.notification.api.dto.IdmMessageDto;
-import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
-import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
-import java.time.format.DateTimeFormatter;
+          import eu.bcvsolutions.idm.core.CoreModuleDescriptor;
+          import eu.bcvsolutions.idm.core.notification.api.domain.NotificationLevel;
+          import java.time.format.DateTimeFormatter;
 
-// get request ID from event
-def requestId = entityEvent.content.id;
+          // get request ID from event
+          def requestId = entityEvent.content.id;
 
-// get url of application
-def url = configurationService.getFrontendUrl("/workflow/history/processes/" + execution.getVariable("processInstanceId"));
+          // get url of application
+          def url = configurationService.getFrontendUrl("/workflow/history/processes/" +
+          execution.getVariable("processInstanceId"));
 
-//to whom notification will be send
-def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
-def sendNotificationToImplementer = configurationService.getBooleanValue("idm.sec.core.wf.notification.implementer.enabled", false);
+          //to whom notification will be send
+          def sendNotificationToApplicant =
+          configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
+          def sendNotificationToImplementer =
+          configurationService.getBooleanValue("idm.sec.core.wf.notification.implementer.enabled", false);
 
-def applicantUsername = execution.getVariable("applicantUsername");
-def applicantIdentity = identityService.getByUsername(applicantUsername);
+          def applicantIdentity = roleRequestService.getApplicantAsIdentity(entityEvent.content);
 
-def implementerIdentity = identityService.get(implementerIdentifier);
+          def implementerIdentity = identityService.get(implementerIdentifier);
 
-// transform date
-DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd. MM. yyyy HH:mm");
-def from = dateFormat.format(entityEvent.content.created);
+          // transform date
+          DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd. MM. yyyy HH:mm");
+          def from = dateFormat.format(entityEvent.content.created);
 
-def managerDescription = execution.getVariable("managerDescription");
+          def managerDescription = execution.getVariable("managerDescription");
 
-if (managerDescription == null || managerDescription.isEmpty()) {
-	managerDescription = "";
-}
-println("aaapp1 $implementerIdentity $applicantIdentity")
-//send notification
-if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
-  if(sendNotificationToImplementer || sendNotificationToApplicant){
-		notificationManager.send(
-			CoreModuleDescriptor.TOPIC_DISAPPROVE_IDENTITY_ROLES_IMPLEMENTER,
-			new IdmMessageDto.Builder()
-				.setLevel(NotificationLevel.SUCCESS)
-				.addParameter("managerDescription", managerDescription)
-				.addParameter("url", url)
-				.addParameter("from", from)
-				.addParameter("applicantIdentity", applicantIdentity)
-			.build(),
-			applicantIdentity
-		);
-  }
-} else {
-if(sendNotificationToApplicant){
-	notificationManager.send(
-		CoreModuleDescriptor.TOPIC_DISAPPROVE_IDENTITY_ROLES,
-		new IdmMessageDto.Builder()
-			.setLevel(NotificationLevel.SUCCESS)
-			.addParameter("managerDescription", managerDescription)
-			.addParameter("url", url)
-			.addParameter("from", from)
-			.addParameter("implementerIdentity", implementerIdentity)
-		.build(),
-		applicantIdentity
-	);
-}
-  if(sendNotificationToImplementer){
-		notificationManager.send(
-			CoreModuleDescriptor.TOPIC_DISAPPROVE_IDENTITY_ROLES_IMPLEMENTER,
-			new IdmMessageDto.Builder()
-				.setLevel(NotificationLevel.SUCCESS)
-				.addParameter("managerDescription", managerDescription)
-				.addParameter("url", url)
-				.addParameter("from", from)
-				.addParameter("applicantIdentity", applicantIdentity)
-			.build(),
-			implementerIdentity
-		);
-  }
-}
-</script>
+          if (managerDescription == null || managerDescription.isEmpty()) {
+          managerDescription = "";
+          }
+          println("aaapp1 $implementerIdentity $applicantIdentity")
+          //send notification
+          if (applicantIdentity != null &amp;&amp; implementerIdentity.getId().equals(applicantIdentity.getId())) {
+            if(sendNotificationToImplementer || sendNotificationToApplicant){
+              notificationManager.send(
+              CoreModuleDescriptor.TOPIC_DISAPPROVE_IDENTITY_ROLES_IMPLEMENTER,
+              new IdmMessageDto.Builder()
+              .setLevel(NotificationLevel.SUCCESS)
+              .addParameter("managerDescription", managerDescription)
+              .addParameter("url", url)
+              .addParameter("from", from)
+              .addParameter("applicantIdentity", applicantIdentity)
+              .build(),
+              applicantIdentity
+              );
+            }
+          } else {
+            if(sendNotificationToApplicant &amp;&amp; applicantIdentity != null){
+              notificationManager.send(
+              CoreModuleDescriptor.TOPIC_DISAPPROVE_IDENTITY_ROLES,
+              new IdmMessageDto.Builder()
+              .setLevel(NotificationLevel.SUCCESS)
+              .addParameter("managerDescription", managerDescription)
+              .addParameter("url", url)
+              .addParameter("from", from)
+              .addParameter("implementerIdentity", implementerIdentity)
+              .build(),
+              applicantIdentity
+              );
+          }
+          if(sendNotificationToImplementer){
+              notificationManager.send(
+              CoreModuleDescriptor.TOPIC_DISAPPROVE_IDENTITY_ROLES_IMPLEMENTER,
+              new IdmMessageDto.Builder()
+              .setLevel(NotificationLevel.SUCCESS)
+              .addParameter("managerDescription", managerDescription)
+              .addParameter("url", url)
+              .addParameter("from", from)
+              .addParameter("applicantIdentity", applicantIdentity)
+              .build(),
+              implementerIdentity
+              );
+          }
+          }
+      </script>
     </scriptTask>
     <endEvent id="endByManager" name="End"></endEvent>
     <sequenceFlow id="flow48" sourceRef="scripttask9" targetRef="endByManager"></sequenceFlow>
@@ -793,8 +794,7 @@ def url = configurationService.getFrontendUrl("/workflow/history/processes/" + e
 def sendNotificationToApplicant = configurationService.getBooleanValue("idm.sec.core.wf.notification.applicant.enabled", true);
 def sendNotificationToImplementer = configurationService.getBooleanValue("idm.sec.core.wf.notification.implementer.enabled", false);
 
-def applicantUsername = execution.getVariable("applicantUsername");
-def applicantIdentity = identityService.getByUsername(applicantUsername);
+def applicantIdentity = roleRequestService.getApplicantAsIdentity(entityEvent.content);
 
 def implementerIdentity = identityService.get(implementerIdentifier);
 
@@ -809,7 +809,7 @@ if (managerDescription == null || managerDescription.isEmpty()) {
       println("aaapp4 $implementerIdentity $applicantIdentity")
 
 //send notification
-if (implementerIdentity.getId().equals(applicantIdentity.getId())) {
+if (applicantIdentity != null &amp;&amp; implementerIdentity.getId().equals(applicantIdentity.getId())) {
   if(sendNotificationToImplementer || sendNotificationToApplicant){
 		notificationManager.send(
 			CoreModuleDescriptor.TOPIC_RETURN_REQUEST_IDENTITY_ROLES_IMPLEMENTER,

@@ -26,7 +26,7 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
     private static final long serialVersionUID = 1L;
     public static final String WF_PROCESS_FIELD = "wfProcessId";
 
-    private UUID applicant;
+    private ApplicantImplDto applicant;
     private RoleRequestState state;
     private RoleRequestedByType requestedByType;
     //In embedded map, is under wfProcessId key actual task - WorkflowProcessInstanceDto.class
@@ -66,11 +66,11 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
         this.originalRequest = originalRequest;
     }
 
-    public UUID getApplicant() {
+    public ApplicantImplDto getApplicant() {
         return applicant;
     }
 
-    public void setApplicant(UUID applicant) {
+    public void setApplicant(ApplicantImplDto applicant) {
         this.applicant = applicant;
     }
 

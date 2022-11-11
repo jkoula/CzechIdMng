@@ -16,6 +16,7 @@ import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -54,7 +55,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutorIntegrationTest extends Abstr
 		roleRequest.setExecuteImmediately(true); // without approval
 		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 		IdmIdentityDto applicant = getHelper().createIdentity((GuardedString) null);
-		roleRequest.setApplicant(applicant.getId());
+		roleRequest.setApplicant(new ApplicantImplDto(applicant.getId(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.save(roleRequest);
 		IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
 		IdmIdentityContractDto contract = getHelper().getPrimeContract(applicant);

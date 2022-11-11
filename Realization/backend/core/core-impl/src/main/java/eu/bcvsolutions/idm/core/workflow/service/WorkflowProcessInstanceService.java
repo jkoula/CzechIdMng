@@ -58,12 +58,11 @@ public interface WorkflowProcessInstanceService extends ReadWriteDtoService<Work
 	 * 
 	 * @param definitionKey
 	 * @param objectType - Mostly type of applicant 
-	 * @param applicant  - User readable applicant name
 	 * @param objectIdentifier - Mostly identifier of applicant
 	 * @param variables
 	 * @return
 	 */
-	ProcessInstance startProcess(String definitionKey, String objectType, String applicant, String objectIdentifier,
+	ProcessInstance startProcess(String definitionKey, String objectType, String objectIdentifier,
 			Map<String, Object> variables);
 
 	/**

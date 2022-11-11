@@ -28,7 +28,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest;
@@ -305,6 +305,7 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         result.setId(contractDto.getIdentity());
         result.setValidFrom(contractDto.getValidFrom());
         result.setValidTill(contractDto.getValidTill());
+        result.setApplicantType(dto.getOwnerType().getCanonicalName());
         return result;
     }
 

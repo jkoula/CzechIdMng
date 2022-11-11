@@ -22,13 +22,12 @@ import org.hibernate.envers.Audited;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
-import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
-import eu.bcvsolutions.idm.core.model.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 
 /**
  * Request for roles
@@ -49,6 +48,9 @@ public class IdmRoleRequest extends AbstractEntity {
 	@NotNull
 	@JsonDeserialize(as = UUID.class)
 	private UUID applicant;
+
+	@Column(name = "applicant_type")
+	private String applicantType;
 
 	@Audited
 	@NotNull
@@ -96,11 +98,20 @@ public class IdmRoleRequest extends AbstractEntity {
 	public ApplicantDto getApplicant() {
 		ApplicantImplDto applicantImplDto = new ApplicantImplDto();
 		applicantImplDto.setId(applicant);
+		applicantImplDto.setApplicantType(applicantType);
 		return applicantImplDto;
 	}
 
 	public void setApplicant(UUID applicant) {
 		this.applicant = applicant;
+	}
+
+	public String getApplicantType() {
+		return applicantType;
+	}
+
+	public void setApplicantType(String applicantType) {
+		this.applicantType = applicantType;
 	}
 
 	public RoleRequestState getState() {

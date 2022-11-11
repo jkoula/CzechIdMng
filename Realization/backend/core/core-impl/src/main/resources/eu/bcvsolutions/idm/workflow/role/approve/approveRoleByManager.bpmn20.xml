@@ -119,11 +119,16 @@ conceptManager.getServiceForConcept(conceptDto).save(conceptDto);</script>
     </scriptTask>
     <sequenceFlow id="flow40" sourceRef="scripttask8" targetRef="exclusivegateway2"></sequenceFlow>
     <scriptTask id="scripttask9" name="Find all managers (for applicant) and resolve if we can skip next task" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>boolean skip = false;
+      <script>
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+
+boolean skip = false;
 def candidates = null;
 
 //Find all managers
-candidates = identityService.findAllManagers(applicantIdentifier, null, true);
+def requestDto = DtoUtils.getEmbedded(conceptRole, "roleRequest", IdmRoleRequestDto.class);
+candidates = roleRequestService.getGuarantorsForApplicant(requestDto);
       println("aaaaaaa $candidates")
 
 // If is list of candidates empty, then will be added ADMIN user as default approver
@@ -155,11 +160,15 @@ if(!skip){
     </scriptTask>
     <sequenceFlow id="flow41" sourceRef="scripttask9" targetRef="approveAssignByManager"></sequenceFlow>
     <scriptTask id="scripttask10" name="Find all managers (for applicant) and resolve if we can skip next task" scriptFormat="groovy" activiti:autoStoreVariables="false">
-      <script>boolean skip = false;
+      <script>
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+boolean skip = false;
 def candidates = null;
 
 //Find all managers
-candidates = identityService.findAllManagers(applicantIdentifier, null, true);
+def requestDto = DtoUtils.getEmbedded(conceptRole, "roleRequest", IdmRoleRequestDto.class);
+candidates = roleRequestService.getGuarantorsForApplicant(requestDto);
 
 // If is list of candidates empty, then will be added ADMIN user as default approver
 if(candidates.isEmpty()){

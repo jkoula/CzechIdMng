@@ -86,18 +86,4 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
         this.directRole = directRole;
     }
 
-    @Override
-    public String getOwnerId() {
-        return getAccount().getId().toString();
-    }
-
-    @Override
-    public String getOwnerCode() {
-        return getAccount().getUid();
-    }
-
-    @Override
-    public String getOwnerType() {
-        return AccAccount.class.getName();
-    }
 }

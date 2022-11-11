@@ -34,6 +34,7 @@ import eu.bcvsolutions.idm.core.api.domain.ContractState;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -51,6 +52,7 @@ import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmPasswordService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.utils.ExceptionUtils;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
@@ -75,6 +77,7 @@ import eu.bcvsolutions.idm.core.model.event.PasswordChangeEvent.PasswordChangeEv
 import eu.bcvsolutions.idm.core.model.event.processor.identity.IdentityPasswordProcessor;
 import eu.bcvsolutions.idm.core.model.repository.IdmIdentityRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 
 /**
@@ -98,6 +101,7 @@ public class DefaultIdmIdentityService
 	@Autowired private RoleConfiguration roleConfiguration;
 	@Autowired private IdmIdentityContractService identityContractService;
 	@Autowired private IdmPasswordService passwordService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 	
 	@Autowired
 	public DefaultIdmIdentityService(
@@ -713,5 +717,10 @@ public class DefaultIdmIdentityService
 			}
 		};
 		return criteria;
+	}
+
+	@Override
+	public List<AbstractRoleAssignmentDto> getAllRolesForApplicant(UUID applicant, IdmBasePermission[] permissions) {
+		return roleAssignmentManager.getAllByIdentity(applicant, permissions).getContent();
 	}
 }

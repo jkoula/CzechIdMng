@@ -24,6 +24,7 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.domain.TransactionContextHolder;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityEventDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -122,7 +123,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			// remove one role and add other
 			IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(identity.getId());
+			roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setExecuteImmediately(true);
 			IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);
@@ -301,7 +302,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 		// remove one role and add other
 		IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
 		final IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(identity.getId());
+		roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(true);
 		final IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);
@@ -391,7 +392,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			// remove one role and add other
 			IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
 			final IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(identity.getId());
+			roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setExecuteImmediately(true);
 			final IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);

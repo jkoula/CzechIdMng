@@ -161,16 +161,18 @@ def from = dateFormat.format(entityEvent.content.created);
 // get url
 def url = getUrl(entityEvent.content);
 
-notificationManager.send(
-     CoreModuleDescriptor.TOPIC_APPROVE_ROLE_DEFINITION_CHANGE,
-              new IdmMessageDto.Builder()
-       .setLevel(NotificationLevel.INFO)
-       .addParameter("roleName", roleName)
-       .addParameter("from", from)
-       .addParameter("url", url)
-     .build(),
-     applicantDto
-    );
+if(applicantDto != null) {
+      notificationManager.send(
+          CoreModuleDescriptor.TOPIC_APPROVE_ROLE_DEFINITION_CHANGE,
+          new IdmMessageDto.Builder()
+          .setLevel(NotificationLevel.INFO)
+          .addParameter("roleName", roleName)
+          .addParameter("from", from)
+          .addParameter("url", url)
+          .build(),
+          applicantDto
+          );
+}
 
 def getUrl(request){
 	if (request == null) {
@@ -197,16 +199,19 @@ def from = dateFormat.format(entityEvent.content.created);
 // get url
 def url = getUrl(entityEvent.content);
 
-notificationManager.send(
-     CoreModuleDescriptor.TOPIC_DISAPPROVE_ROLE_DEFINITION_CHANGE,
-              new IdmMessageDto.Builder()
-       .setLevel(NotificationLevel.INFO)
-       .addParameter("roleName", roleName)
-       .addParameter("from", from)
-       .addParameter("url", url)
-     .build(),
-     applicantDto
-    );
+if(applicantDto != null) {
+     notificationManager.send(
+          CoreModuleDescriptor.TOPIC_DISAPPROVE_ROLE_DEFINITION_CHANGE,
+          new IdmMessageDto.Builder()
+          .setLevel(NotificationLevel.INFO)
+          .addParameter("roleName", roleName)
+          .addParameter("from", from)
+          .addParameter("url", url)
+          .build(),
+          applicantDto
+          );
+}
+
       </script>
     </scriptTask>
     <sequenceFlow id="flow61" sourceRef="scripttask13" targetRef="scripttask17"></sequenceFlow>

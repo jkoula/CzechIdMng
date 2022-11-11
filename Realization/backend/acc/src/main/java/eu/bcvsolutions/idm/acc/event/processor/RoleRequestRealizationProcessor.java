@@ -76,6 +76,11 @@ public class RoleRequestRealizationProcessor extends CoreEventProcessor<IdmRoleR
 	}
 
 	@Override
+	public boolean conditional(EntityEvent<IdmRoleRequestDto> event) {
+		return super.conditional(event) && IdmIdentityDto.class.getCanonicalName().equals(event.getContent().getApplicant().getApplicantType());
+	}
+
+	@Override
 	public EventResult<IdmRoleRequestDto> process(EntityEvent<IdmRoleRequestDto> event) {
 		IdmRoleRequestDto request = event.getContent();
 		IdmIdentityDto identity = identityService.get(request.getApplicant());

@@ -14,9 +14,11 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
@@ -136,7 +138,7 @@ public class ProcessAllAutomaticRoleByAttributeTaskExecutor extends AbstractSche
 
     		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
     		roleRequest.setConceptRoles(concepts);
-    		roleRequest.setApplicant(contract.getIdentity());
+    		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
     		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 
 			canContinue = updateState();
@@ -173,7 +175,7 @@ public class ProcessAllAutomaticRoleByAttributeTaskExecutor extends AbstractSche
     			
     			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
     			roleRequest.setConceptRoles(concepts);
-    			roleRequest.setApplicant(identityId);
+    			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
     			roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 
     			canContinue = updateState();

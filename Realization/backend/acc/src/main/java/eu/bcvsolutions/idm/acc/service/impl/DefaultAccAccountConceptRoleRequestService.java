@@ -10,8 +10,8 @@ import eu.bcvsolutions.idm.acc.entity.AccAccountConceptRoleRequest_;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.event.AccAccountRoleAssignmentEvent;
-import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.impl.adapter.AccAccountConceptRoleRequestAdapter;
@@ -19,6 +19,7 @@ import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -45,11 +46,8 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
-import eu.bcvsolutions.idm.core.model.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.model.entity.AbstractConceptRoleRequest_;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
-import eu.bcvsolutions.idm.core.model.entity.IdmConceptRoleRequest_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.AbstractConceptRoleRequestService;
@@ -257,6 +255,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
         ApplicantImplDto applicantDto = new ApplicantImplDto();
         applicantDto.setId(idmIdentityDto.getId());
         applicantDto.setConceptOwner(accAccountDto.getId());
+        applicantDto.setApplicantType(dto.getOwnerType().getCanonicalName());
         // We do not check validity of an account here. Maybe we could use contracts of identity
         // but at this point it is not necessary
         return applicantDto;
@@ -266,11 +265,10 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     public List<UUID> resolveManagerContractsForApproval(AccAccountConceptRoleRequestDto conceptRole) {
         final LocalDate now = LocalDate.now();
 
-        AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
-        filter.setAccountId(conceptRole.getAccAccount());
+        IdmRoleRequestDto roleRequest = DtoUtils.getEmbedded(conceptRole, "roleRequest", IdmRoleRequestDto.class);
+        List<IdmIdentityDto> guarantorsForApplicant = requestService.getGuarantorsForApplicant(roleRequest);
 
-        return identityAccountService.find(filter, null).stream()
-                .flatMap(accIdentityAccountDto -> contractService.findAllValidForDate(accIdentityAccountDto.getIdentity(), now, null).stream())
+        return guarantorsForApplicant.stream().flatMap(identityDto -> contractService.findAllValidForDate(identityDto.getId(), now, null).stream())
                 .map(AbstractDto::getId)
                 .collect(Collectors.toList());
     }
@@ -354,32 +352,6 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             accountRoleAssignment = accRoleAccountService.get(concept.getAccountRole());
         }
         return accountRoleAssignment;
-    }
-
-    @Override
-    protected AccAccountConceptRoleRequestDto requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto) {
-        final AccAccountConceptRoleRequestDto map = modelMapper.map(dto, AccAccountConceptRoleRequestDto.class);
-        map.setAccAccount(dto.getOwnerUuid());
-        map.setAccountRole(dto.getRoleAssignmentUuid());
-        return map;
-    }
-
-    @Override
-    protected IdmRequestIdentityRoleDto conceptToRequestIdentityRole(AccAccountConceptRoleRequestDto save) {
-        return modelMapper.map(save, IdmRequestIdentityRoleDto.class);
-    }
-
-    @Override
-    protected AccAccountConceptRoleRequestDto createEmptyConceptWithRoleAssignmentData(AccAccountRoleAssignmentDto roleAssignment) {
-        AccAccountConceptRoleRequestDto conceptRoleRequest = new AccAccountConceptRoleRequestDto();
-        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccAccount());
-
-        return conceptRoleRequest;
-    }
-
-    @Override
-    protected AccAccountRoleAssignmentDto getRoleAssignment(UUID id) {
-        return accRoleAccountService.get(id);
     }
 
     @Override

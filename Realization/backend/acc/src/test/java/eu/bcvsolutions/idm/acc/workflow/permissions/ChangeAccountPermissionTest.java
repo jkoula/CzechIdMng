@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.PasswordChangeDto;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
@@ -79,9 +81,9 @@ public class ChangeAccountPermissionTest extends AbstractChangeIdentityPermissio
 	}
 
 	@Override
-	public UUID getApplicant(AbstractDto owner) {
+	public ApplicantDto getApplicant(AbstractDto owner) {
 		if (owner instanceof AccAccountDto) {
-			return helper.getAccountOwner(owner.getId());
+			return new ApplicantImplDto(helper.getAccountOwner(owner.getId()), IdmIdentityDto.class.getCanonicalName());
 		} else {
 			throw new UnsupportedOperationException(String.format("This owner type is not supported! Owner: [{}]", owner));
 		}

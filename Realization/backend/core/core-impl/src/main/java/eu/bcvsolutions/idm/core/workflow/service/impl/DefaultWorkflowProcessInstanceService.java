@@ -82,16 +82,11 @@ public class DefaultWorkflowProcessInstanceService
 
 	@Override
 	@Transactional
-	public ProcessInstance startProcess(String definitionKey, String objectType, String applicant,
-			String objectIdentifier, Map<String, Object> variables) {
+	public ProcessInstance startProcess(String definitionKey, String objectType, String objectIdentifier, Map<String, Object> variables) {
 		Assert.hasText(definitionKey, "Definition key cannot be null!");
 		UUID implementerId = securityService.getCurrentId();
 		UUID originalImplementerId = securityService.getOriginalId();
  
-		IdmIdentityDto applicantIdentity = null;
-		if (applicant != null) {
-			applicantIdentity = identityService.getByUsername(applicant);
-		}
 		ProcessInstanceBuilder builder = runtimeService.createProcessInstanceBuilder()
 				.processDefinitionKey(definitionKey)//
 				.variable(WorkflowProcessInstanceService.OBJECT_TYPE, objectType)
@@ -99,9 +94,8 @@ public class DefaultWorkflowProcessInstanceService
 				.variable(WorkflowProcessInstanceService.OBJECT_IDENTIFIER, objectIdentifier)
 				.variable(WorkflowProcessInstanceService.IMPLEMENTER_IDENTIFIER, implementerId == null ? null : implementerId.toString())
 				.variable(WorkflowProcessInstanceService.ORIGINAL_IMPLEMENTER_IDENTIFIER, originalImplementerId == null ? null : originalImplementerId.toString())
-				.variable(WorkflowProcessInstanceService.APPLICANT_USERNAME, applicant)
-				.variable(WorkflowProcessInstanceService.APPLICANT_IDENTIFIER,
-						applicantIdentity != null ? applicantIdentity.getId() : null);
+				.variable(WorkflowProcessInstanceService.APPLICANT_USERNAME, objectIdentifier)
+				.variable(WorkflowProcessInstanceService.APPLICANT_IDENTIFIER, UUID.fromString(objectIdentifier));
 		if (variables != null) {
 			for (Entry<String, Object> entry : variables.entrySet()) {
 				builder.variable(entry.getKey(), entry.getValue());
@@ -111,10 +105,8 @@ public class DefaultWorkflowProcessInstanceService
 		ProcessInstance instance = builder.start();
 		if (!instance.isEnded()) {
 			// must explicit check null, else throw org.activiti.engine.ActivitiIllegalArgumentException: userId and groupId cannot both be null
-			if (applicantIdentity != null) {
-				// Set applicant as owner of process.
-				runtimeService.addUserIdentityLink(instance.getId(), applicantIdentity.getId().toString(), IdentityLinkType.OWNER);
-			}
+			// Set applicant as owner of process.
+			runtimeService.addUserIdentityLink(instance.getId(), objectIdentifier, IdentityLinkType.OWNER);
 			if (implementerId != null) {
 				// Set current logged user (implementer) as starter of process.
 				runtimeService.addUserIdentityLink(instance.getId(), implementerId.toString(), IdentityLinkType.STARTER);

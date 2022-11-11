@@ -23,6 +23,8 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleFormAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -179,7 +181,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		AbstractRoleAssignmentDto roleAssignment = roleAssignments.get(0);
 		
 		// Create request
-		IdmRoleRequestDto request = createRoleRequest(applicantId);
+		IdmRoleRequestDto request = createRoleRequest(applicantId, owner.getClass().getCanonicalName());
 		// Create change role-concept
 		AbstractConceptRoleRequestDto conceptRoleRequest = createConceptRoleRequest(request, role, owner.getId(), 
 				roleAssignment.getId(), ConceptRoleRequestOperation.UPDATE, LocalDate.now());
@@ -224,7 +226,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		assertEquals(0, roleAssignments.size());
 		
 		// Create request
-		IdmRoleRequestDto request = createRoleRequest(applicantId);
+		IdmRoleRequestDto request = createRoleRequest(applicantId, owner.getClass().getCanonicalName());
 		// Create change role-concept
 		AbstractConceptRoleRequestDto conceptRoleRequest = createConceptRoleRequest(request, role, owner.getId(), 
 				null, ConceptRoleRequestOperation.ADD, LocalDate.now());
@@ -301,7 +303,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		assertEquals(0, roleAssignments.size());
 
 		// Create request
-		IdmRoleRequestDto request = createRoleRequest(applicantId);
+		IdmRoleRequestDto request = createRoleRequest(applicantId, owner.getClass().getCanonicalName());
 		// Create change role-concept
 		AbstractConceptRoleRequestDto conceptRoleRequest = createConceptRoleRequest(request, role, owner.getId(), 
 				null, ConceptRoleRequestOperation.ADD, LocalDate.now());
@@ -347,7 +349,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		Assert.assertEquals(BigDecimal.TEN.longValue(), ((BigDecimal) value).longValue());
 		
 		// Create request for delete attribute value
-		IdmRoleRequestDto requestUpdate = createRoleRequest(applicantId);
+		IdmRoleRequestDto requestUpdate = createRoleRequest(applicantId, owner.getClass().getCanonicalName());
 		// Create change role-concept
 		AbstractConceptRoleRequestDto updateConceptRoleRequest = createConceptRoleRequest(requestUpdate, role, owner.getId(), 
 				roleAssignment.getId(), ConceptRoleRequestOperation.UPDATE, LocalDate.now());
@@ -430,7 +432,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 		assertEquals(0, roleAssignments.size());
 		
 		// Create request
-		IdmRoleRequestDto request = createRoleRequest(applicantId);
+		IdmRoleRequestDto request = createRoleRequest(applicantId, owner.getClass().getCanonicalName());
 		// Create change role-concept
 		AbstractConceptRoleRequestDto conceptRoleRequest = createConceptRoleRequest(request, role, owner.getId(), 
 				null, ConceptRoleRequestOperation.ADD, LocalDate.now());
@@ -809,9 +811,9 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 	
 	public abstract AbstractRoleAssignmentDto createRoleAssignment(UUID roleId, UUID ownerId, LocalDate validFrom, LocalDate validTill);
 	
-	public IdmRoleRequestDto createRoleRequest(UUID applicantId) {
+	public IdmRoleRequestDto createRoleRequest(UUID applicantId, String applicantType) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(applicantId);
+		roleRequest.setApplicant(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(true);
 		return roleRequestService.save(roleRequest);

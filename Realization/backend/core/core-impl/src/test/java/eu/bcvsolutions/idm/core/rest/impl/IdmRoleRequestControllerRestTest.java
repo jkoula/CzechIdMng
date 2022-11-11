@@ -23,6 +23,7 @@ import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -73,7 +74,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 	protected IdmRoleRequestDto prepareDto() {
 		IdmIdentityDto applicant = getHelper().createIdentity((GuardedString) null);
 		IdmRoleRequestDto dto = new IdmRoleRequestDto();
-		dto.setApplicant(applicant.getId());
+		dto.setApplicant(new ApplicantImplDto(applicant.getId(), IdmIdentityDto.class.getCanonicalName()));
 		dto.setState(RoleRequestState.CONCEPT);
 		dto.setRequestedByType(RoleRequestedByType.MANUALLY);
 		//
@@ -223,12 +224,12 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		IdmRoleRequestDto roleRequesttwo = createDto();
 		//
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
-		filter.set("applicantId", roleRequestOne.getApplicant().toString());
+		filter.set("applicantId", roleRequestOne.getApplicant().getId().toString());
 		List<IdmRoleRequestDto> requests = find(filter);
 		Assert.assertEquals(1, requests.size());
 		Assert.assertEquals(roleRequestOne.getId(), requests.get(0).getId());
 		//
-		filter.set("applicantId", roleRequesttwo.getApplicant().toString());
+		filter.set("applicantId", roleRequesttwo.getApplicant().getId().toString());
 		requests = find(filter);
 		Assert.assertEquals(1, requests.size());
 		Assert.assertEquals(roleRequesttwo.getId(), requests.get(0).getId());
@@ -271,7 +272,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
 		filter.set("createdFrom", requestTwo.getCreated().truncatedTo(ChronoUnit.MILLIS).toString());
 		filter.set("createdTill", ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS).plus(1, ChronoUnit.MILLIS).toString());
-		filter.put("applicants", Lists.newArrayList(requestOne.getApplicant().toString(), requestTwo.getApplicant().toString()));
+		filter.put("applicants", Lists.newArrayList(requestOne.getApplicant().getId().toString(), requestTwo.getApplicant().getId().toString()));
 
 		List<IdmRoleRequestDto> results = find(filter);
 		Assert.assertEquals(1, results.size());
@@ -284,14 +285,14 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		IdmIdentityDto applicantTwo = getHelper().createIdentity((GuardedString) null);
 
 		IdmRoleRequestDto request = this.createDto();
-		request.setApplicant(applicantOne.getId());
+		request.setApplicant(new ApplicantImplDto(applicantOne.getId(), IdmIdentityDto.class.getCanonicalName()));
 		IdmRoleRequestDto requestOne = createDto(request);
 		request = this.createDto();
-		request.setApplicant(applicantTwo.getId());
+		request.setApplicant(new ApplicantImplDto(applicantTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
 		IdmRoleRequestDto requestTwo = createDto(request);
 
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
-		filter.put("applicants", Lists.newArrayList(requestOne.getApplicant().toString(), requestTwo.getApplicant().toString()));
+		filter.put("applicants", Lists.newArrayList(requestOne.getApplicant().getId().toString(), requestTwo.getApplicant().getId().toString()));
 
 		List<IdmRoleRequestDto> results = find(filter);
 		
@@ -299,7 +300,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		Assert.assertTrue(results.stream().anyMatch(r -> r.getId().equals(requestOne.getId())));
 		Assert.assertTrue(results.stream().anyMatch(r -> r.getId().equals(requestTwo.getId())));
 
-		filter.put("applicants", Lists.newArrayList(requestOne.getApplicant().toString()));
+		filter.put("applicants", Lists.newArrayList(requestOne.getApplicant().getId().toString()));
 		results = find(filter);
 		Assert.assertEquals(requestOne.getId(), results.get(0).getId());
 	}

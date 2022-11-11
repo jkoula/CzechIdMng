@@ -84,7 +84,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountDto accAccountDto = accountService.get(identityAccount.getAccount());
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(identity.getId());
+		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED); // can not be saved (after
@@ -133,7 +133,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(accAccountDto, roleA);
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(identity.getId());
+		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -177,7 +177,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(accAccountDto, roleA);
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(identity.getId());
+		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);

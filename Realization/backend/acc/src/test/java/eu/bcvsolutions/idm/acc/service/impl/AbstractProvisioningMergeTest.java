@@ -51,6 +51,7 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -216,7 +217,7 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 
 		// create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(applicantId);
+		request.setApplicant(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED);

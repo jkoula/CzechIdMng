@@ -39,6 +39,7 @@ import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
@@ -512,7 +513,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setConceptRoles(Lists.newArrayList(conceptRoleRequest));
-			roleRequest.setApplicant(contract.getIdentity());
+			roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 			RoleRequestEvent roleRequestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
 			roleRequest = roleRequestService.startConcepts(roleRequestEvent, null);
 			//
@@ -593,7 +594,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setConceptRoles(Lists.newArrayList(conceptRoleRequest));
-			roleRequest.setApplicant(contract.getIdentity());
+			roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 			RoleRequestEvent roleRequestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
 			roleRequest = roleRequestService.startConcepts(roleRequestEvent, null);
 			//
@@ -654,7 +655,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 				//
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
     			roleRequest.setConceptRoles(Lists.newArrayList(conceptRoleRequest));
-    			roleRequest.setApplicant(identity.getId());
+				roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
     			roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 				// log successfully removed identity role
 				ResultModel resultModel = new DefaultResultModel(

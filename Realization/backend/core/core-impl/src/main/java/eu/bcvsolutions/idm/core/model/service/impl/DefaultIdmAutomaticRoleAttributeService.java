@@ -24,6 +24,8 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -260,7 +262,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 		// Execute concepts
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(identityId);
+		roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 	}
 	
@@ -1121,7 +1123,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 		//
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(contract.getIdentity());
+		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 	}
 	

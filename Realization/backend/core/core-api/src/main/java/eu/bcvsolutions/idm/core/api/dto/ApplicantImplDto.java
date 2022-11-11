@@ -1,5 +1,6 @@
-package eu.bcvsolutions.idm.core.model.dto;
+package eu.bcvsolutions.idm.core.api.dto;
 
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 
 import java.time.LocalDate;
@@ -15,6 +16,15 @@ public class ApplicantImplDto implements ApplicantDto {
     private UUID conceptOwner;
     private LocalDate validFrom;
     private LocalDate validTill;
+    private String applicantType;
+
+    public ApplicantImplDto() {
+    }
+
+    public ApplicantImplDto(UUID id, String applicantType) {
+        this.id = id;
+        this.applicantType = applicantType;
+    }
 
     @Override
     public UUID getId() {
@@ -40,6 +50,15 @@ public class ApplicantImplDto implements ApplicantDto {
     @Override
     public UUID getConceptOwner() {
         return conceptOwner;
+    }
+
+    public void setApplicantType(String applicantType) {
+        this.applicantType = applicantType;
+    }
+
+    @Override
+    public String getApplicantType() {
+        return applicantType;
     }
 
     public void setConceptOwner(UUID conceptOwner) {

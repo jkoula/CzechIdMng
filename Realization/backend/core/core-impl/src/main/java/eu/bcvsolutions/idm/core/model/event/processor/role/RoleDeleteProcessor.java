@@ -12,6 +12,7 @@ import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
@@ -173,7 +174,7 @@ public class RoleDeleteProcessor
 						conceptRoleRequestManager.getServiceForConcept(identityRole.getAssignmentType());
 				ApplicantDto applicantId = serviceForConcept.resolveApplicant(identityRole);
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-				roleRequest.setApplicant(applicantId.getId());
+				roleRequest.setApplicant(new ApplicantImplDto(applicantId.getId(), identityRole.getOwnerType().getCanonicalName()));
 				//
 				AbstractConceptRoleRequestDto conceptRoleRequest = serviceForConcept.createEmptyConcept();
 				conceptRoleRequest.setRoleAssignmentUuid(identityRole.getId());

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAuthorizationPolicyDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -210,7 +211,7 @@ public class RoleRequestByWfEvaluatorIntegrationTest extends AbstractEvaluatorIn
 
 	private IdmRoleRequestDto createRoleRequest(IdmIdentityDto test1) {
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(test1.getId());
+		request.setApplicant(new ApplicantImplDto(test1.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(false);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		return request;

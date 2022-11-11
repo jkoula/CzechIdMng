@@ -122,7 +122,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		// cast here is probably ok
 		IdmConceptRoleRequestDto concept = (IdmConceptRoleRequestDto) request.getConceptRoles().get(0);
@@ -173,7 +173,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(3, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		request.getConceptRoles().forEach(concept -> {
 			Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
@@ -224,7 +224,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
 		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
@@ -270,7 +270,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
 		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
@@ -317,7 +317,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
 		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
@@ -375,7 +375,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
 		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
@@ -419,7 +419,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		// Delete adding concept
 		requestIdentityRoleService.deleteRequestIdentityRole(createdRequestIdentityRole);

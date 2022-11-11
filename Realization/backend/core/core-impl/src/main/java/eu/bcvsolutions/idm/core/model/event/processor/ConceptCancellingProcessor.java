@@ -4,9 +4,11 @@ import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
@@ -76,7 +78,7 @@ public abstract class ConceptCancellingProcessor<O extends BaseDto,
         });
         if (forceDelete) { // ~ async with force
             IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-            roleRequest.setApplicant(applicant);
+            roleRequest.setApplicant(new ApplicantImplDto(applicant, IdmIdentityDto.class.getCanonicalName()));
             roleRequest.setConceptRoles(concepts);
             //
             RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEvent.RoleRequestEventType.EXCECUTE, roleRequest);

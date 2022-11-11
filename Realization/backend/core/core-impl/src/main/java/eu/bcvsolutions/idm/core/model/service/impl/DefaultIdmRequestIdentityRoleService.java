@@ -156,28 +156,5 @@ public class DefaultIdmRequestIdentityRoleService extends
 	public void delete(IdmRequestIdentityRoleDto dto, BasePermission... permission) {
 		throw new UnsupportedOperationException();
 	}
-	
-
-	
-	/**
-	 * Creates new manual request for given identity
-	 * 
-	 * @param identityId
-	 * @return
-	 */
-	private IdmRoleRequestDto createRequest(UUID identityId) {
-		Assert.notNull(identityId, "Identity id must be filled for create role request!");
-		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(identityId);
-		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
-		roleRequest.setExecuteImmediately(false);
-		roleRequest = roleRequestService.save(roleRequest);
-		LOG.debug(MessageFormat.format("New manual role-request [{1}] was created.", roleRequest));
-		
-		return roleRequest;
-	}
-
-
-
 
 }

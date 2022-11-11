@@ -14,5 +14,5 @@ public interface ApplicantDto extends ValidableEntity, Identifiable {
 
     public UUID getConceptOwner();
 
-
+    public String getApplicantType();
 }

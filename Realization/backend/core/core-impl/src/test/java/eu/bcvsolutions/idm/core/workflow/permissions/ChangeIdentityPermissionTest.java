@@ -3,14 +3,27 @@ package eu.bcvsolutions.idm.core.workflow.permissions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
+import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
+
+import org.activiti.engine.task.IdentityLink;
+import org.activiti.engine.task.IdentityLinkType;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,8 +49,14 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.model.event.processor.module.InitTestDataProcessor;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
+import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowFilterDto;
+import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowHistoricProcessInstanceDto;
+import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowHistoricTaskInstanceDto;
+import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowProcessInstanceDto;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowTaskInstanceDto;
+import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 
 /**
  * Test change permissions for identity.
@@ -1338,30 +1357,6 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 		assertTrue(task instanceof WorkflowHistoricTaskInstanceDto);
 	}
 
-	/**
-	 * Return {@link WorkflowHistoricProcessInstanceDto} for current logged user
-	 *
-	 * @return
-	 */
-	private List<WorkflowHistoricProcessInstanceDto> getHistoricProcess(ZonedDateTime from) {
-		WorkflowFilterDto taskFilter = new WorkflowFilterDto();
-		taskFilter.setCandidateOrAssigned(securityService.getCurrentId().toString());
-		taskFilter.setCreatedAfter(from);
-		return workflowHistoricProcessInstanceService.find(taskFilter, null).getContent();
-	}
-
-	/**
-	 * Return count of historic processes for current logged user
-	 *
-	 * @return
-	 */
-	private long getHistoricProcessCount(ZonedDateTime from) {
-		WorkflowFilterDto taskFilter = new WorkflowFilterDto();
-		taskFilter.setCandidateOrAssigned(securityService.getCurrentId().toString());
-		taskFilter.setCreatedAfter(from);
-		return workflowHistoricProcessInstanceService.count(taskFilter);
-	}
-
 	private IdmConceptRoleRequestDto createRoleConcept(IdmRoleDto adminRole, IdmIdentityContractDto contract,
 			IdmRoleRequestDto request) {
 		IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
@@ -1385,7 +1380,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 
 	private IdmRoleRequestDto createRoleRequest(IdmIdentityDto test1) {
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(test1.getId());
+		request.setApplicant(new ApplicantImplDto(test1.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(false);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		return request;
@@ -1450,9 +1445,9 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 	}
 
 	@Override
-	public UUID getApplicant(AbstractDto owner) {
+	public ApplicantDto getApplicant(AbstractDto owner) {
 		if (owner instanceof IdmIdentityContractDto) {
-			return ((IdmIdentityContractDto) owner).getIdentity();
+			return new ApplicantImplDto(((IdmIdentityContractDto) owner).getIdentity(), IdmIdentityDto.class.getCanonicalName());
 		} else {
 			throw new UnsupportedOperationException(String.format("This owner type is not supported! Owner: [{}]", owner));
 		}
@@ -1482,14 +1477,4 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 		return identityRoleService.save(identityRole);
 	}
 
-	@Override
-	public AbstractRoleAssignmentDto createRoleAssignment(UUID roleId, UUID ownerId, LocalDate validFrom,
-			LocalDate validTill) {
-		IdmIdentityRoleDto identityRole = new IdmIdentityRoleDto();
-		identityRole.setIdentityContract(ownerId);
-		identityRole.setRole(roleId);
-		identityRole.setValidFrom(validFrom);
-		identityRole.setValidTill(validTill);
-		return identityRoleService.save(identityRole);
-	}
 }

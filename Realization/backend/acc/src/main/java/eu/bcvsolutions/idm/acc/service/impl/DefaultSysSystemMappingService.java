@@ -132,10 +132,6 @@ public class DefaultSysSystemMappingService
 	@Autowired
 	private IdmIdentityContractService identityContractService;
 
-	@Lazy
-	@Autowired
-	private IdmIdentityContractService identityContractService;
-
 	@Autowired
 	public DefaultSysSystemMappingService(
 			SysSystemMappingRepository repository, 

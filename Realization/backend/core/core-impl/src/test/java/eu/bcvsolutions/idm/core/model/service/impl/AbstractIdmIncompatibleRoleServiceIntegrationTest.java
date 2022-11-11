@@ -20,6 +20,7 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIncompatibleRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -284,7 +285,7 @@ public abstract class AbstractIdmIncompatibleRoleServiceIntegrationTest extends 
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setState(RoleRequestState.CONCEPT);
 		roleRequest.setExecuteImmediately(true); // without approval
-		roleRequest.setApplicant(applicantId);
+		roleRequest.setApplicant(new ApplicantImplDto(applicantId, owner.getClass().getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest = getHelper().getService(IdmRoleRequestService.class).save(roleRequest);
 		//
@@ -380,7 +381,7 @@ public abstract class AbstractIdmIncompatibleRoleServiceIntegrationTest extends 
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setState(RoleRequestState.CONCEPT);
 		roleRequest.setExecuteImmediately(true); // without approval
-		roleRequest.setApplicant(applicantId);
+		roleRequest.setApplicant(new ApplicantImplDto(applicantId, owner.getClass().getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest = getHelper().getService(IdmRoleRequestService.class).save(roleRequest);
 		//
