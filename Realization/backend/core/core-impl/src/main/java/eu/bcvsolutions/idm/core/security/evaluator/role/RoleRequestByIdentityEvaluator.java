@@ -17,6 +17,7 @@ import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.PermissionContext;
+import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleRequest;
@@ -68,7 +69,7 @@ public class RoleRequestByIdentityEvaluator extends AbstractTransitiveEvaluator<
 		subquery.select(subRoot);		
 		subquery.where(builder.and(
 				authorizationManager.getPredicate(subRoot, query, builder, permission),
-				builder.equal(root.get(IdmRoleRequest_.applicant), subRoot) // correlation attribute
+				builder.equal(root.get(IdmRoleRequest_.applicant), subRoot.get(AbstractEntity_.id)) // correlation attribute
 				));
 		//
 		return builder.exists(subquery);
