@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
-import eu.bcvsolutions.idm.core.config.domain.DataFilterConverter;
+import eu.bcvsolutions.idm.core.config.domain.BaseFilterConverter;
 import eu.bcvsolutions.idm.core.config.domain.DataFilterToBaseFilterConverter;
 import org.modelmapper.Condition;
 import org.modelmapper.Converter;
@@ -75,8 +75,8 @@ public class ModelMapperConfig {
 		// skipping converter if source value is null. More here https://redmine.czechidm.com/issues/2271. 
 		modeler.getConfiguration().getConverters().add(new UuidToEntityConditionalConverter(applicationContext));
 		// Converting DataFilter
-		modeler.getConfiguration().getConverters().add(new DataFilterConverter());
-		//modeler.getConfiguration().getConverters().add(new DataFilterToBaseFilterConverter());
+		modeler.getConfiguration().getConverters().add(new DataFilterToBaseFilterConverter());
+		modeler.getConfiguration().getConverters().add(new BaseFilterConverter());
 
 		// This converter must be set for only one purpose... workaround fixed
 		// error in ModelMapper.

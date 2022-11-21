@@ -4,6 +4,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
@@ -33,7 +34,7 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
         final List<MockDto> inputData = Stream.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()).map(MockDto::new).collect(Collectors.toList());
         TestListResource resource = new TestListResource(inputData);
 
-        MultiSourcePagedResource<MockDto, BaseFilter,BaseFilter, MockDto> multiresource = new MultiSourcePagedResource<>(List.of(resource), new ModelMapper());
+        MultiSourcePagedResource<MockDto, DataFilter,DataFilter, MockDto> multiresource = new MultiSourcePagedResource<>(List.of(resource), new ModelMapper());
 
         Pageable pageable = PageRequest.of(0, 2);
         final Page<MockDto> mockDtos = multiresource.find(null, pageable, null);
@@ -66,7 +67,7 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
         final List<MockDto> inputData3 = Stream.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()).map(MockDto::new).collect(Collectors.toList());
         TestListResource resource3 = new TestListResource(inputData3);
 
-        MultiSourcePagedResource<MockDto, BaseFilter, BaseFilter, MockDto> multiresource = new MultiSourcePagedResource<>(List.of(resource1, resource2, resource3), new ModelMapper());
+        MultiSourcePagedResource<MockDto, DataFilter, DataFilter, MockDto> multiresource = new MultiSourcePagedResource<>(List.of(resource1, resource2, resource3), new ModelMapper());
 
         Pageable pageable = PageRequest.of(0, 2);
         final Page<MockDto> mockDtos = multiresource.find(null, pageable, null);
@@ -118,7 +119,7 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
 
 
 
-    private class TestListResource implements AdaptableService<MockDto, BaseFilter, MockDto> {
+    private class TestListResource implements AdaptableService<MockDto, DataFilter, MockDto> {
 
         private final List<MockDto> data;
 
@@ -140,8 +141,8 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
         }
 
         @Override
-        public Class<BaseFilter> getFilterClass() {
-            return BaseFilter.class;
+        public Class<DataFilter> getFilterClass() {
+            return DataFilter.class;
         }
 
         @Override
@@ -155,7 +156,7 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
         }
 
         @Override
-        public MockDto get(Serializable id, BaseFilter context, BasePermission... permission) {
+        public MockDto get(Serializable id, DataFilter context, BasePermission... permission) {
             return data.stream().filter(mockDto -> mockDto.getId().equals(id)).findFirst().orElse(null);
         }
 
@@ -165,7 +166,7 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
         }
 
         @Override
-        public Page<MockDto> find(BaseFilter filter, Pageable pageable, BasePermission... permission) {
+        public Page<MockDto> find(DataFilter filter, Pageable pageable, BasePermission... permission) {
             return new PageImpl<>(data.subList(
                     Math.toIntExact(Math.min(pageable.getOffset(), data.size())),
                     Math.min(
@@ -180,12 +181,12 @@ public class MultiSourcePagedResourceTest extends AbstractUnitTest {
         }
 
         @Override
-        public Page<UUID> findIds(BaseFilter filter, Pageable pageable, BasePermission... permission) {
+        public Page<UUID> findIds(DataFilter filter, Pageable pageable, BasePermission... permission) {
             return new PageImpl<>(find(pageable, permission).stream().map(AbstractDto::getId).collect(Collectors.toList()),pageable, data.size());
         }
 
         @Override
-        public long count(BaseFilter filter, BasePermission... permission) {
+        public long count(DataFilter filter, BasePermission... permission) {
             return data.size();
         }
 

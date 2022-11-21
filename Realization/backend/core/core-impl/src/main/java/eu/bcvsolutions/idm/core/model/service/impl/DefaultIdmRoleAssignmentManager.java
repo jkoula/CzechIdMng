@@ -47,16 +47,16 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
         super(modelMapper, assignmentServices);
 
         this.assignmentServices = assignmentServices.stream().collect(
-                Collectors.toMap(idmRoleAssignmentService ->  idmRoleAssignmentService.getType(),
+                Collectors.toMap(IdmRoleAssignmentService::getType,
                 idmGeneralConceptRoleRequestService ->  idmGeneralConceptRoleRequestService));
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<AbstractRoleAssignmentDto> findAllByIdentity(UUID id) {
-        final List<AbstractRoleAssignmentDto> result = new ArrayList<>();
-        assignmentServices.values().forEach(idmRoleAssignmentService -> result.addAll(idmRoleAssignmentService.findAllByIdentity(id)));
-        return result;
+    public List<AbstractRoleAssignmentDto> findAllByIdentity(UUID identityUuid) {
+        return assignmentServices.values().stream()
+                .flatMap(idmRoleAssignmentService -> (Stream<AbstractRoleAssignmentDto>) idmRoleAssignmentService.findAllByIdentity(identityUuid).stream())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
     }
 
     @Override
-    protected MultiSourcePagedResource<? extends BaseDto, ? extends BaseFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
+    public MultiSourcePagedResource<IdmRequestIdentityRoleDto,IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
         List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> adaptableServices = new ArrayList<>();
         assignmentServices.values().forEach(adaptableServices::add);
         return new MultiSourcePagedResource<>(adaptableServices, modelMapper);

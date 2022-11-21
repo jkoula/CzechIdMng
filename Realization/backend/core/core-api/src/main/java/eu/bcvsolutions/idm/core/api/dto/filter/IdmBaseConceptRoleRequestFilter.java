@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  *
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter {
+public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter implements OwnerTypeFilter {
 
 	public static final String IDENTITY_ROLE_IDS_PARAMETER = "identityRoleIds";
 	public static final String ROLE_REQUEST_ID_PARAMETER = "roleRequestId";

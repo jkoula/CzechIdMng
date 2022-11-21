@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.CoreModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -146,18 +147,18 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 			// Send notification only to implementer if
 			// implementer and applicant is same identity
 			if (sendNotificationToImplementer || sendNotificationToApplicant) {
-				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
+				send(CoreModule.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
 						removedRoles, applicantIdentity, implementerIdentity);
 			}
 		} else {
 			// Send notification to applicant
 			if (sendNotificationToApplicant) {
-				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_APPLICANT, request, from, addedRoles, changedRoles, removedRoles,
+				send(CoreModule.TOPIC_REQUEST_REALIZED_APPLICANT, request, from, addedRoles, changedRoles, removedRoles,
 						applicantIdentity, applicantIdentity);
 			}
 			// Send notification to implementer
 			if (sendNotificationToImplementer && implementerIdentity != null) {
-				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
+				send(CoreModule.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
 						removedRoles, applicantIdentity, implementerIdentity);
 			}
 		}

@@ -19,7 +19,8 @@ import java.util.UUID;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public interface IdmConceptRoleRequestManager extends AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> {
+public interface IdmConceptRoleRequestManager extends AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>
+       , MultiResourceProvider<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> {
 
 
     <C extends AbstractConceptRoleRequestDto> void save(C concept);

@@ -17,7 +17,8 @@ import java.util.function.BiConsumer;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public interface IdmRoleAssignmentManager extends AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> {
+public interface IdmRoleAssignmentManager extends AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>,
+        MultiResourceProvider<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>{
 
     List<AbstractRoleAssignmentDto> findAllByIdentity(UUID id);
     <A extends AbstractRoleAssignmentDto> IdmRoleAssignmentService<A, ? extends BaseRoleAssignmentFilter> getServiceForAssignment(A identityRole);

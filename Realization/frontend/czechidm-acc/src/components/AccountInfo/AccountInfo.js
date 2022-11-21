@@ -45,7 +45,7 @@ export class AccountInfo extends Advanced.AbstractEntityInfo {
    * @param  {object} entity
    */
   getEntityIcon() {
-    return 'fa:object-group';
+    return 'fa:id-badge';
   }
 
   /**

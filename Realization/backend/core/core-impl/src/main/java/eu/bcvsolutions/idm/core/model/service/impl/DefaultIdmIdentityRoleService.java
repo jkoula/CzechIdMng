@@ -291,4 +291,9 @@ public class DefaultIdmIdentityRoleService
 		IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
 		return new IdentityRoleConceptCompilingAdapter(translatedFilter, /*TODO*/null, applicationContext.getBean(IdmConceptRoleRequestService.class), this);
 	}
+
+	@Override
+	public Class<?> getOwnerType() {
+		return IdmIdentityContractDto.class;
+	}
 }

@@ -26,7 +26,7 @@ import java.util.UUID;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public interface IdmRoleAssignmentService<D extends AbstractRoleAssignmentDto, F extends BaseRoleAssignmentFilter> extends EventableDtoService<D, F>,
-        AuthorizableService<D>, AdaptableService<D, F, IdmRequestIdentityRoleDto>, ReadDtoService<D, F>{
+        AuthorizableService<D>, AdaptableService<D, F, IdmRequestIdentityRoleDto>, ReadDtoService<D, F>, OwnerTypeResolvableService {
 
     /**
      * Get form instance for given identity role

@@ -16,6 +16,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
@@ -38,6 +39,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmConceptRoleRequestRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.adapter.DefaultRequestRoleConceptAdapter;
+import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
@@ -45,6 +47,7 @@ import eu.bcvsolutions.idm.core.security.api.utils.PermissionUtils;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -92,7 +95,7 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
 
     private final ModelMapper modelMapper;
 
-    //private final IdmRoleRequestService roleRequestService;
+    private final IdmRoleRequestService roleRequestService;
 
     private final IdmRoleSystemService roleSystemService;
 
@@ -101,7 +104,7 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
     @Autowired
     public DefaultIdmConceptRoleRequestService(IdmConceptRoleRequestRepository repository, WorkflowProcessInstanceService workflowProcessInstanceService, LookupService lookupService,
             IdmAutomaticRoleRepository automaticRoleRepository, IdmRoleService roleService, IdmIdentityContractService identityContractService, IdmIdentityRoleService identityRoleService,
-            IdmRoleCompositionService roleCompositionService, LookupService lookupService1, ModelMapper modelMapper/*, TODO solev circular dependency IdmRoleRequestService roleRequestService*/, IdmRoleSystemService roleSystemService,
+            IdmRoleCompositionService roleCompositionService, LookupService lookupService1, ModelMapper modelMapper, @Lazy IdmRoleRequestService roleRequestService, IdmRoleSystemService roleSystemService,
             WorkflowProcessInstanceService workflowProcessInstanceService1) {
         super(repository, workflowProcessInstanceService, roleCompositionService, lookupService, automaticRoleRepository, identityRoleService);
         this.roleService = roleService;
@@ -109,7 +112,7 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         this.identityRoleService = identityRoleService;
         this.lookupService = lookupService1;
         this.modelMapper = modelMapper;
-        //this.roleRequestService = roleRequestService;
+        this.roleRequestService = roleRequestService;
         this.roleSystemService = roleSystemService;
         this.workflowProcessInstanceService = workflowProcessInstanceService1;
         //
@@ -431,7 +434,11 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
     public <F2 extends BaseFilter> DtoAdapter<IdmConceptRoleRequestDto, IdmRequestIdentityRoleDto> getAdapter(F2 originalFilter) {
         // Need to translate the filter. API is too general here, but
         IdmRequestIdentityRoleFilter translatedFilter = modelMapper.map(originalFilter, IdmRequestIdentityRoleFilter.class);
-        return new DefaultRequestRoleConceptAdapter<>(identityRoleService, this,
-                roleSystemService, translatedFilter, workflowProcessInstanceService, modelMapper);
+        return new DefaultRequestRoleConceptAdapter<>(identityRoleService, this, roleRequestService, roleSystemService, translatedFilter, workflowProcessInstanceService, modelMapper);
+    }
+
+    @Override
+    public Class<?> getOwnerType() {
+        return IdmIdentityContractDto.class;
     }
 }

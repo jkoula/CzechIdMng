@@ -5,7 +5,6 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
@@ -16,29 +15,16 @@ import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
 import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
-import org.apache.commons.collections.MultiMap;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.internal.util.Assert;
-import org.modelmapper.spi.ConditionalConverter;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -146,15 +132,17 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
     }
 
     @Override
+    public MultiSourcePagedResource<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
+        // TODO comment wtf
+        List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> services = new ArrayList<>();
+        conceptServices.values().forEach(services::add);
+        return new MultiSourcePagedResource<>(services, modelMapper);
+    }
+
+    @Override
     public boolean supports(Class<?> delimiter) {
         return false;
     }
 
-    @Override
-    protected MultiSourcePagedResource<? extends AbstractConceptRoleRequestDto, ? extends IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
-        // TODO comment wtf
-        List<AdaptableService<AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter, IdmRequestIdentityRoleDto>> services = new ArrayList<>();
-        conceptServices.values().forEach(services::add);
-        return new MultiSourcePagedResource<>(services, modelMapper);
-    }
+
 }

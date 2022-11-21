@@ -100,19 +100,30 @@ public class ReflectionUtils {
 
     public static void invokeSetter(Object destination, String key, Object value) {
         final Optional<Method> setter = getAllSetterMethods(destination.getClass()).stream()
-                .filter(method -> key.equals(getLowercaseFieldNameFromSetter(method)))
+                .filter(method -> key.toLowerCase().equals(getLowercaseFieldNameFromSetter(method)))
                 .findFirst();
 
         setter.ifPresent(method -> {
             try {
                 method.invoke(destination, value);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
 
+    public static Object invokeGetter(Object o, String key) {
+        final Optional<Method> getter = getAllGetterMethods(o.getClass()).stream()
+                .filter(method -> key.toLowerCase().equals(getLowercaseFieldNameFromGetter(method)))
+                .findFirst();
+
+        return getter.map(method -> {
+            try {
+                return method.invoke(o);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }).orElse(null);
+    }
 }

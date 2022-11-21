@@ -31,7 +31,8 @@ import java.util.UUID;
 public interface IdmGeneralConceptRoleRequestService<
         A extends AbstractRoleAssignmentDto,
         D extends AbstractConceptRoleRequestDto,
-        F extends IdmBaseConceptRoleRequestFilter> extends ReadWriteDtoService<D, F>, AuthorizableService<D>, AdaptableService<D, F, IdmRequestIdentityRoleDto> {
+        F extends IdmBaseConceptRoleRequestFilter> extends
+        ReadWriteDtoService<D, F>, AuthorizableService<D>, AdaptableService<D, F, IdmRequestIdentityRoleDto>, OwnerTypeResolvableService {
 
     void addToLog(Loggable logItem, String text);
 

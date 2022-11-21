@@ -37,7 +37,7 @@ public class DataFilterToBaseFilterConverter implements ConditionalConverter<Dat
 
     @Override
     public MatchResult match(Class<?> src, Class<?> dest) {
-        return DataFilter.class.isAssignableFrom(src) && !DataFilter.class.isAssignableFrom(dest) && BaseFilter.class.isAssignableFrom(dest) ? MatchResult.FULL : MatchResult.NONE;
+        return DataFilter.class.isAssignableFrom(src) && BaseFilter.class.isAssignableFrom(dest) ? MatchResult.FULL : MatchResult.NONE;
     }
 
 }

@@ -311,6 +311,16 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     }
   }
 
+  getOwnerTypeOptions() {
+    const roleAssignmentComponents = componentService.getRoleAssignmentComponents();
+    return [...roleAssignmentComponents].map(([key,value]) => {
+      return {
+        value: value.ownerType,
+        niceLabel: this.i18n(value.locale + '.ownerType')
+      }
+    });
+  }
+
   /**
    * We cannot show delete action for automatic and business roles
    */
@@ -494,6 +504,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     //
     const showLoading = this.props.showLoading || this.state.showLoading;
     const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);
+    const ownerTypeOptions = this.getOwnerTypeOptions();
     //
     return (
       <Basic.Div>
@@ -586,6 +597,13 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                         manager={ identityContractManager }
                         forceSearchParameters={ contractForceSearchparameters }
                         niceLabel={ (entity) => identityContractManager.getNiceLabel(entity, false) }/>
+                    </Basic.Col>
+                    <Basic.Col lg={ showEnvironment ? 3 : 6 }>
+                      <Advanced.Filter.EnumSelectBox
+                          ref="ownerType"
+                          placeholder={ "TODO" }
+                          niceLabel={ "TODO"}
+                          options={ ownerTypeOptions }/>
                     </Basic.Col>
                     <Basic.Col lg={ 3 } className="text-right">
                       <Basic.Button onClick={ this.cancelFilter.bind(this) } style={{ marginRight: 5 }}>
@@ -866,6 +884,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       </Basic.Div>
     );
   }
+
+
 }
 
 RequestIdentityRoleTable.propTypes = {

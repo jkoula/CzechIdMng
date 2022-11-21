@@ -153,6 +153,13 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
     protected List<Predicate> toPredicates(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, F filter) {
         List<Predicate> predicates = super.toPredicates(root, query, builder, filter);
         //
+        if (filter.getOwnerType() != null && !filter.getOwnerType().isAssignableFrom(getOwnerType())) {
+            // If supported owner type by this service does not match owner type specified in filter, we want to return
+            // empty result set.
+            predicates.add(builder.disjunction());
+            return predicates;
+        }
+        //
         if (filter.getRoleRequestId() != null) {
             predicates.add(builder.equal(root.get(AbstractConceptRoleRequest_.roleRequest).get(AbstractEntity_.id),
                     filter.getRoleRequestId()));

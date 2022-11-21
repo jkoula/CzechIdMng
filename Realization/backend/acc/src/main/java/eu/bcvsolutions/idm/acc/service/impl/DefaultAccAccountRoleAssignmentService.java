@@ -119,6 +119,9 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
             );
         }
 
+        if (filter.getAccountId() != null) {
+            predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.accAccount).get(AbstractEntity_.id), filter.getAccountId()));
+        }
 
         Boolean valid = filter.getValid();
         if (valid != null) {
@@ -191,4 +194,8 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
         return new DefaultAccountConceptRoleAdapter(translatedFilter, null, applicationContext.getBean(AccAccountConceptRoleRequestService.class), this);
     }
 
+    @Override
+    public Class<?> getOwnerType() {
+        return AccAccountDto.class;
+    }
 }

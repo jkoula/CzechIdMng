@@ -97,7 +97,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     if ( entity[selectedOwnerType] && _.isObject( entity[selectedOwnerType])) {
       entity[selectedOwnerType] =  entity[selectedOwnerType].id;
     }
-    console.log("QQQQ entity save ", entity)
     if (entity.role && _.isArray(entity.role)) {
       entity.roles = entity.role;
       entity.role = null;

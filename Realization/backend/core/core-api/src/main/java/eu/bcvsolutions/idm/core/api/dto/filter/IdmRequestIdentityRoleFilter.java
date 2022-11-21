@@ -18,6 +18,7 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
 	public static final String ONLY_ASSIGNMENTS_PARAMETER = "onlyAssignments";
 	public static final String VALID_PARAMETER = "isValid";
 	public static final String ROLE_SYSTEM_ID = "roleSystemId";
+
     public IdmRequestIdentityRoleFilter() {
 		super();
 	}
@@ -81,4 +82,5 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
 	public Boolean isValid() {
 		return getParameterConverter().toBoolean(getData(), VALID_PARAMETER);
 	}
+
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public abstract class BaseRoleAssignmentFilter extends DataFilter {
+public abstract class BaseRoleAssignmentFilter extends DataFilter implements OwnerTypeFilter {
     public static final String PARAMETER_DIRECT_ROLE = "directRole"; //if its direct role (true) or not (false - depends on some filled direct role)
     public static final String PARAMETER_DIRECT_ROLE_ID = "directRoleId";
     public static final String PARAMETER_ROLE_COMPOSITION_ID = "roleCompositionId";

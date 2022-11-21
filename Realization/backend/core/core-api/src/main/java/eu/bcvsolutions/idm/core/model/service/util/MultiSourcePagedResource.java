@@ -1,40 +1,25 @@
 package eu.bcvsolutions.idm.core.model.service.util;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.EmptyFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
+import eu.bcvsolutions.idm.core.api.utils.ReflectionUtils;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
-import org.modelmapper.spi.ConditionalConverter;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -83,17 +68,16 @@ import java.util.stream.Stream;
  * obtained by calling {@link AdaptableService#getAdapter(FILTER)}.
  *
  * @param <DTO> {@link BaseDto} class, which internal resources use
- * @param <INNERFILTER> {@link BaseFilter} class, which internal resources use
- * @param <FILTER> {@link BaseFilter} class, which this resource uses as an input filter. This filter is then translated to F filter using {@link ModelMapper}
+ * @param <INNERFILTER> {@link DataFilter} class, which internal resources use
+ * @param <FILTER> {@link DataFilter} class, which this resource uses as an input filter. This filter is then translated to F filter using {@link ModelMapper}
  * @param <RESULT> result type
  * @since 12.2.3
  * @author Peter Štrunc <github.com/peter-strunc>
  */
-public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends BaseFilter, FILTER extends BaseFilter, RESULT> {
+public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends DataFilter, FILTER extends DataFilter, RESULT> {
 
     private final Collection<AdaptableService<DTO, INNERFILTER, RESULT>> sources;
     private final ModelMapper modelMapper;
-
 
     public MultiSourcePagedResource(Collection<AdaptableService<DTO, INNERFILTER, RESULT>> sources, ModelMapper modelMapper) {
         this.sources = sources;
@@ -106,7 +90,7 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
                 (service, concreteFilter, currentPage) -> {
                     final DtoAdapter<DTO, RESULT> adapter = service.getAdapter(filter);
                     final Stream<DTO> stream = currentPage.stream();
-                    return adapter.transform(stream).collect(Collectors.toList());
+                    return currentPage.isEmpty() ? Collections.emptyList() : adapter.transform(stream).collect(Collectors.toList());
                 },
                 filter, pageable, permission);
     }
@@ -127,13 +111,13 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
 
     private <O, Q> Page<Q> doPaging(
              TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Pageable, Page<O>> resultProvider,
-            TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Page<O>, Collection<Q>> resultMapper, BaseFilter filter, Pageable pageable, BasePermission[] permission) {
+            TriFunction<AdaptableService<DTO, INNERFILTER, RESULT>, INNERFILTER, Page<O>, Collection<Q>> resultMapper, DataFilter filter, Pageable pageable, BasePermission[] permission) {
         List<Q> result = new ArrayList<>();
         final Pageable nullSafePageable = Optional.ofNullable(pageable).orElse(PageRequest.of(0, Integer.MAX_VALUE));
         long total = 0L;
         for (AdaptableService<DTO, INNERFILTER, RESULT> service : sources) {
             final int missingCount = nullSafePageable.isPaged() ? Math.max(nullSafePageable.getPageSize() - result.size(), 0) : Integer.MAX_VALUE;
-            final INNERFILTER concreteFilter = modelMapper.map(filter == null ? new EmptyFilter() : filter, service.getFilterClass());
+            final INNERFILTER concreteFilter = translateFilter(filter, service.getFilterClass());
             //
             if (missingCount != 0) {
                 // Still need some records fetched
@@ -151,6 +135,18 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
         return new PageImpl<>(result, nullSafePageable, total);
     }
 
+    private INNERFILTER translateFilter(DataFilter filter, Class<INNERFILTER> filterClass) {
+        final INNERFILTER innerfilter = ReflectionUtils.instantiateUsingNoArgConstructor(filterClass, null);
+
+        final MultiValueMap<String, Object> data = filter.getData();
+        data.forEach((key, value) -> ReflectionUtils.invokeSetter(innerfilter, key, toSingleValue(value)));
+        return innerfilter;
+    }
+
+    private Object toSingleValue(List<Object> value) {
+        return value.stream().findFirst().orElse(null);
+    }
+
     private Pageable getCurrentPageable(Pageable originalPageable, long total, int missingCount) {
         if (originalPageable.isUnpaged()) {
             return Pageable.unpaged();
@@ -165,7 +161,7 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
         R apply(T var1, U var2, V var3);
     }
 
-    public static class Builder<D extends BaseDto, F extends BaseFilter, F2 extends BaseFilter, R> {
+    public static class Builder<D extends BaseDto, F extends DataFilter, F2 extends DataFilter, R> {
 
         private ModelMapper modelMapper;
         private final List<AdaptableService<D, F, R>> adaptableServices = new ArrayList<>();
@@ -178,12 +174,18 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends B
             return new MultiSourcePagedResource<>(adaptableServices, modelMapper);
         }
 
-        public void setModelMapper(ModelMapper modelMapper) {
+        public Builder<D, F, F2, R> setModelMapper(ModelMapper modelMapper) {
             this.modelMapper = modelMapper;
+            return this;
         }
 
-        public void addAdaptableServices(List<AdaptableService<D, F, R>> adaptableServices) {
+        public Builder<D, F, F2, R> addAdaptableServices(Collection<AdaptableService<D, F, R>> adaptableServices) {
             this.adaptableServices.addAll(adaptableServices);
+            return this;
+        }
+
+        public Builder<D, F, F2, R> addResource(MultiSourcePagedResource<D, F, F2, R> resource) {
+            return addAdaptableServices(resource.sources);
         }
     }
 

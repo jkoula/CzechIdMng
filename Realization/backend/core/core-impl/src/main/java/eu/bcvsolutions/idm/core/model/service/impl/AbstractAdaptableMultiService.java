@@ -4,11 +4,12 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.entity.BaseEntity;
+import eu.bcvsolutions.idm.core.api.service.MultiResourceProvider;
 import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment;
-import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,9 +28,9 @@ import java.util.stream.Stream;
  */
 public abstract class AbstractAdaptableMultiService<
         D extends AbstractDto, // Destination class of inner services
-        F extends BaseFilter, // Supported filter
+        F extends DataFilter, // Supported filter
         R // Destination class of this service
-        > implements AdaptableService<D, F, R> {
+        > implements AdaptableService<D, F, R>, MultiResourceProvider<D,F,R> {
 
     protected final ModelMapper modelMapper;
 
@@ -72,8 +73,6 @@ public abstract class AbstractAdaptableMultiService<
     public Page<D> find(F filter, Pageable pageable, BasePermission[] permission) {
         return getMultiResource().find(filter, pageable, permission);
     }
-
-    protected abstract  MultiSourcePagedResource<? extends BaseDto,? extends BaseFilter, F, D> getMultiResource();
 
     @Override
     public Page<UUID> findIds(F filter, Pageable pageable, BasePermission... permission) {

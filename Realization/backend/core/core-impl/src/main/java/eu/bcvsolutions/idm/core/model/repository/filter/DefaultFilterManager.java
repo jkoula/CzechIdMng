@@ -124,8 +124,7 @@ public class DefaultFilterManager implements FilterManager {
 					continue;
 				}
 				// check property is processed by service
-				if (!getRegisteredServiceFilters().containsKey(key) // by service definition
-						&& !getRegisteredFilters(entityClass, filter.getClass()).containsKey(key)) { // by filter instance
+				if (isFilterSupported(filter, entityClass, key)) { // by filter instance
 					FilterNotSupportedException ex = new FilterNotSupportedException(key);
 					//
 					if (configurationService.getBooleanValue(
@@ -149,6 +148,11 @@ public class DefaultFilterManager implements FilterManager {
 		}
 		//
 		return predicates;
+	}
+
+	public boolean isFilterSupported(DataFilter filter, Class<? extends BaseEntity> entityClass, FilterKey key) {
+		return !getRegisteredServiceFilters().containsKey(key) // by service definition
+				&& !getRegisteredFilters(entityClass, filter.getClass()).containsKey(key);
 	}
 
 	/**

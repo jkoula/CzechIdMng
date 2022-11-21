@@ -61,8 +61,7 @@ const ManagerRoot = {
   UniformPasswordSystemManager,
   RemoteServerManager,
   SystemGroupManager,
-  SystemGroupSystemManager,
-  RequestAccountRoleManager
+  RequestAccountRoleManager,
   SystemGroupSystemManager,
   SystemOwnerRoleManager,
   SystemOwnerManager,

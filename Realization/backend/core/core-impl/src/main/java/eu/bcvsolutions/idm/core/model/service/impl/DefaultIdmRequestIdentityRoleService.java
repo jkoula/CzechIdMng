@@ -2,8 +2,10 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRequestIdentityRoleService;
@@ -97,22 +99,23 @@ public class DefaultIdmRequestIdentityRoleService extends
 				copyFilter.setIdentityRoleIsNull(true);
 			}
 		}
+		copyFilter.setAddPermissions(true);
 
-		final List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> resources = new ArrayList<>();
+		final MultiSourcePagedResource.Builder<IdmRequestIdentityRoleDto,IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> builder = new MultiSourcePagedResource.Builder<>();
 
 		if (!filter.isOnlyAssignments()) {
-			resources.add(conceptRoleRequestManager);
+			builder.addResource(conceptRoleRequestManager.getMultiResource());
 		}
 		if (shouldLoadAssignedRoles(copyFilter, returnOnlyChanges)) {
-			resources.add(roleAssignmentManager);
+			builder.addResource(roleAssignmentManager.getMultiResource());
 		}
-		copyFilter.setAddPermissions(true);
-		return new MultiSourcePagedResource<>(resources, modelMapper).find(copyFilter, pageable, permission);
+		builder.setModelMapper(modelMapper);
 
+		return builder.build().find(copyFilter, pageable, permission);
 	}
 
 	private static boolean shouldLoadAssignedRoles(IdmRequestIdentityRoleFilter filter, boolean returnOnlyChanges) {
-		return !returnOnlyChanges && filter.getIdentity() != null;
+		return !returnOnlyChanges && (filter.getIdentity() != null || filter.isOnlyAssignments());
 	}
 
 	@Override
