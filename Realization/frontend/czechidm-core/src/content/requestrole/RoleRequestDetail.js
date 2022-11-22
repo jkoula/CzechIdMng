@@ -68,7 +68,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       this.setState({
         showLoading: false,
         request: {
-          applicant: props.location.query.applicantId,
+          applicant: {id: props.location.query.applicantId},
           state: RoleRequestStateEnum.findKeyBySymbol(RoleRequestStateEnum.CONCEPT),
           requestedByType: 'MANUALLY'
         }
@@ -107,6 +107,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       return;
     }
     const formEntity = this.refs.form.getData();
+    // TODO prepare applicant DTO
     this.setState({showLoading: true}, () => {
       delete formEntity.conceptRoles;
 
@@ -167,7 +168,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
    * If new request was created, then redirect will be made.
    */
   afterRequestSave(requestId) {
-    if (!this.refs.form.isFormValid()) {
+    if (this.refs.form == null || !this.refs.form.isFormValid()) {
       return;
     }
     const formEntity = this.refs.form.getData();
@@ -273,6 +274,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   }
 
   _getApplicantAndImplementer(request) {
+    // TODO get ID from applicant dto
     return (
       <div>
         <Basic.LabelWrapper
@@ -281,7 +283,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
           ref="applicant"
           label={this.i18n('entity.RoleRequest.applicant')}>
           <Advanced.IdentityInfo
-            entityIdentifier={ request && request.applicant }
+            entityIdentifier={ request && request.applicant.id }
             showLoading={!request}/>
         </Basic.LabelWrapper>
 
@@ -303,7 +305,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     const { _request, location} = props;
     const applicantFromUrl = location && location.query ? location.query.applicantId : null;
 
-    return _request ? _request.applicant : applicantFromUrl;
+    return _request ? _request.applicant.id : applicantFromUrl;
   }
 
   render() {
@@ -590,7 +592,7 @@ function select(state, component) {
   const entityId = component.entityId ? component.entityId : component.match.params.entityId;
   const entity = roleRequestManager.getEntity(state, entityId);
   const applicantFromUrl = component.location && component.location.query ? component.location.query.applicantId : null;
-  const identityId = entity ? entity.applicant : applicantFromUrl;
+  const identityId = entity ? entity.applicant.id : applicantFromUrl;
   if (entity && entity._embedded && entity._embedded.wfProcessId) {
     entity.currentActivity = entity._embedded.wfProcessId.name;
     entity.candicateUsers = entity._embedded.wfProcessId.candicateUsers;

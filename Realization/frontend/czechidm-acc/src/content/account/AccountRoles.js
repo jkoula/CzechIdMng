@@ -5,6 +5,7 @@ import classnames from 'classnames';
 //
 import { Basic, Utils } from 'czechidm-core';
 import AccountManager from '../../redux/AccountManager';
+import AccountRolesContent from './AccountRolesContent';
 //
 const manager = new AccountManager();
 
@@ -78,19 +79,10 @@ class AccountRoles extends Basic.AbstractContent {
 
     //
     return (
-      <form onSubmit={this.save.bind(this)}>
-        <Basic.Panel
-          className={
-            classnames({
-              last: !Utils.Entity.isNew(entity),
-              'no-border': !Utils.Entity.isNew(entity)
-            })
-          }>
-          <Basic.PanelHeader text={this.i18n('tabs.roles')} />
-          <Basic.PanelBody style={{ paddingTop: 30}}>
-          </Basic.PanelBody>
-        </Basic.Panel>
-      </form>
+      <AccountRolesContent
+        identity={entity.id}
+        match={this.props.match}
+      />
     );
   }
 }

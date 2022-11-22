@@ -487,7 +487,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       validationErrors
     } = this.state;
 
-    const identityUsername = request && request.applicant;
+    const identityUsername = request && request.applicant.id;
     let forceSearchParameters = new SearchParameters();
     if (request) {
       forceSearchParameters = forceSearchParameters.setFilter('roleRequestId', request.id);
