@@ -24,6 +24,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.getLowercaseFieldNameFromGetter;
+import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.invokeGetter;
+import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.invokeSetter;
+
 /**
  *
  * This class joins multiple services into a single one and offers basic paging functionality across all of these resources.
@@ -138,8 +142,19 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends D
     private INNERFILTER translateFilter(DataFilter filter, Class<INNERFILTER> filterClass) {
         final INNERFILTER innerfilter = ReflectionUtils.instantiateUsingNoArgConstructor(filterClass, null);
 
+        // Set values using data map
         final MultiValueMap<String, Object> data = filter.getData();
-        data.forEach((key, value) -> ReflectionUtils.invokeSetter(innerfilter, key, toSingleValue(value)));
+        data.forEach((key, value) -> invokeSetter(innerfilter, key, toSingleValue(value)));
+
+        // Set values using getters
+        // This is a fallback for filters which combine DataFilter with internal fields
+        ReflectionUtils.getAllGetterMethods(filter.getClass()).stream()
+                .forEach(getter -> {
+                    final String getterKey = getLowercaseFieldNameFromGetter(getter);
+                    final Object valueToSet = invokeGetter(filter, getterKey);
+                    invokeSetter(innerfilter, getterKey, valueToSet);
+                });
+
         return innerfilter;
     }
 
