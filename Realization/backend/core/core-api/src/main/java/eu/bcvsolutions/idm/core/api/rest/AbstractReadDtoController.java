@@ -74,6 +74,8 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	@Autowired private ObjectMapper objectMapper;
 	@Autowired private LookupService lookupService;
 	@Autowired private BulkActionManager bulkActionManager;
+
+	@Autowired(required = false) private List<PluggableFilterTranslator<F>> translators;
 	//
 	private FilterConverter filterConverter;
 	private final ReadDtoService<DTO, F> service;
@@ -420,12 +422,30 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	 * Transforms request parameters to:
 	 * - {@link BaseFilter} using object mapper
 	 * - {@link DataFilter} using reflection with constructor(parameters).
-	 * 
+	 *
+	 * @deprecated It is no longer advised to override this method. To supply logic for translating filters, please provide
+	 * 				bean of type {@link PluggableFilterTranslator}
 	 * @param parameters
 	 * @return
 	 */
-	protected F toFilter(MultiValueMap<String, Object> parameters) {	
-		return getParameterConverter().toFilter(parameters, getService().getFilterClass());
+	@Deprecated
+	protected F toFilter(MultiValueMap<String, Object> parameters) {
+		return paramsToFilter(parameters);
+	}
+
+	protected final F paramsToFilter(MultiValueMap<String, Object> parameters) {
+		F filter = getParameterConverter().toFilter(parameters, getService().getFilterClass());
+		for (PluggableFilterTranslator<F> translator : getPluggableTranslators()) {
+			filter = translator.transform(filter, parameters);
+		}
+		return filter;
+	}
+
+	protected final List<PluggableFilterTranslator<F>> getPluggableTranslators() {
+		if (this.translators == null) {
+			return Collections.emptyList();
+		}
+		return translators;
 	}
 	
 	/**
