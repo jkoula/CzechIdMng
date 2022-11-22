@@ -18,7 +18,7 @@ import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
 public class AccFormableConfiguration {
 
 	@Bean
-    public AbstractFormValueService<AccAccount, AccAccountFormValue> certificateFormValueService(
+    public AbstractFormValueService<AccAccount, AccAccountFormValue> accountFormValueService(
             AbstractFormValueRepository<AccAccount, AccAccountFormValue> repository) {
 
         return new AbstractFormValueService<AccAccount, AccAccountFormValue>(repository) {
