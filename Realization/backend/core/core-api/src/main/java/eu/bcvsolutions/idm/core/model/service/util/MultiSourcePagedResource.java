@@ -141,14 +141,16 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends D
 
     private INNERFILTER translateFilter(DataFilter filter, Class<INNERFILTER> filterClass) {
         final INNERFILTER innerfilter = ReflectionUtils.instantiateUsingNoArgConstructor(filterClass, null);
-
+        if (filter == null) {
+            return innerfilter;
+        }
         // Set values using data map
         final MultiValueMap<String, Object> data = filter.getData();
         data.forEach((key, value) -> invokeSetter(innerfilter, key, toSingleValue(value)));
 
         // Set values using getters
         // This is a fallback for filters which combine DataFilter with internal fields
-        ReflectionUtils.getAllGetterMethods(filter.getClass()).stream()
+        ReflectionUtils.getAllGetterMethods(filter.getClass())
                 .forEach(getter -> {
                     final String getterKey = getLowercaseFieldNameFromGetter(getter);
                     final Object valueToSet = invokeGetter(filter, getterKey);
