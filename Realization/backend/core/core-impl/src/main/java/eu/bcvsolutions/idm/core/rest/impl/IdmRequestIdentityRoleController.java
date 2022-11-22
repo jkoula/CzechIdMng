@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.FormableFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.OwnerTypeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -198,7 +199,9 @@ public class IdmRequestIdentityRoleController
 		filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));
 		filter.setIncludeCrossDomainsSystemsCount(getParameterConverter().toBoolean(parameters, "includeCrossDomainsSystemsCount", false));
 		filter.setOwnerType(getParameterConverter().toClass(parameters, OwnerTypeFilter.OWNER_TYPE));
-		filter.setRoleRequestId(getParameterConverter().toUuid(parameters, "accountId"));
+		filter.set("accountId", getParameterConverter().toUuid(parameters, "accountId"));
+		filter.setDirectRole(getParameterConverter().toBoolean(parameters, "directRole", false));
+		filter.setAddEavMetadata(getParameterConverter().toBoolean(parameters, FormableFilter.PARAMETER_ADD_EAV_METADATA, false));
 		return filter;
 	}
 }

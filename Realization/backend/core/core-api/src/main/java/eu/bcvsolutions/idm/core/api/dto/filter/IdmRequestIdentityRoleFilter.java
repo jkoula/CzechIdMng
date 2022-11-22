@@ -9,7 +9,7 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Vít Švanda
  */
-public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
+public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter implements FormableFilter{
 	private boolean includeEav = false;
     private boolean onlyChanges = false;
     private boolean includeCandidates = false;
