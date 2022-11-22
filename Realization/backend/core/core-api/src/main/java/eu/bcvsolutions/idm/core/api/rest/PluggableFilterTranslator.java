@@ -3,6 +3,8 @@ package eu.bcvsolutions.idm.core.api.rest;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import org.springframework.util.MultiValueMap;
 
+import java.util.Optional;
+
 /**
  * Providing a bean of this type allows clients to provide their custom implementation of filter translation.
  * This interface is a replacement for now obsolete overriding of {@link AbstractReadDtoController#toFilter(MultiValueMap)}
@@ -18,6 +20,6 @@ import org.springframework.util.MultiValueMap;
  */
 public interface PluggableFilterTranslator<F extends BaseFilter> {
 
-    public F transform(F filter, MultiValueMap<String, Object> parameters);
+    public F transform(Optional<F> filter, MultiValueMap<String, Object> parameters);
 
 }

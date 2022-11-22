@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import eu.bcvsolutions.idm.core.api.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -434,9 +436,13 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	}
 
 	protected final F paramsToFilter(MultiValueMap<String, Object> parameters) {
-		F filter = getParameterConverter().toFilter(parameters, getService().getFilterClass());
-		for (PluggableFilterTranslator<F> translator : getPluggableTranslators()) {
-			filter = translator.transform(filter, parameters);
+		final List<PluggableFilterTranslator<F>> pluggableTranslators = getPluggableTranslators();
+		if (pluggableTranslators.isEmpty()) {
+			return getParameterConverter().toFilter(parameters, getService().getFilterClass());
+		}
+		F filter = null;
+		for (PluggableFilterTranslator<F> translator : pluggableTranslators) {
+			filter = translator.transform(Optional.ofNullable(filter), parameters);
 		}
 		return filter;
 	}

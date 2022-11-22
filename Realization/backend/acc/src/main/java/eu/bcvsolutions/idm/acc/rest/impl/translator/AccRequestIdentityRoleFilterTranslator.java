@@ -28,8 +28,13 @@ public class AccRequestIdentityRoleFilterTranslator extends AbstractPluggableFil
     }
 
     @Override
-    public IdmRequestIdentityRoleFilter transform(IdmRequestIdentityRoleFilter filter, MultiValueMap<String, Object> parameters) {
+    public IdmRequestIdentityRoleFilter transformInternal(IdmRequestIdentityRoleFilter filter, MultiValueMap<String, Object> parameters) {
         filter.set(PARAMETER_ACCOUNT_ID, getParameterConverter().toUuid(parameters, PARAMETER_ACCOUNT_ID));
         return filter;
+    }
+
+    @Override
+    protected IdmRequestIdentityRoleFilter getEmptyFilter() {
+        return new IdmRequestIdentityRoleFilter();
     }
 }

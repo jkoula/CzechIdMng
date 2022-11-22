@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
+import org.springframework.util.MultiValueMap;
+
+import java.util.Optional;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -25,4 +28,13 @@ public abstract class AbstractPluggableFilterTranslator<F extends BaseFilter> im
         }
         return parameterConverter;
     }
+
+    @Override
+    public final F transform(Optional<F> filter, MultiValueMap<String, Object> parameters) {
+        return transformInternal(filter.orElse(getEmptyFilter()), parameters);
+    }
+
+    protected abstract F transformInternal(F filter, MultiValueMap<String, Object> parameters);
+
+    protected abstract F getEmptyFilter();
 }

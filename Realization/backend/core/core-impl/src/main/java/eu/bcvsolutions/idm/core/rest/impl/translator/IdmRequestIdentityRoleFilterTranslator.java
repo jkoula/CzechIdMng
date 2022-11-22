@@ -25,7 +25,7 @@ public class IdmRequestIdentityRoleFilterTranslator extends AbstractPluggableFil
     }
 
     @Override
-    public IdmRequestIdentityRoleFilter transform(IdmRequestIdentityRoleFilter filter, MultiValueMap<String, Object> parameters) {
+    public IdmRequestIdentityRoleFilter transformInternal(IdmRequestIdentityRoleFilter filter, MultiValueMap<String, Object> parameters) {
         filter.setIdentity(getParameterConverter().toEntityUuid(parameters, "identityId", IdmIdentityDto.class));
         filter.setIdentityContractId(getParameterConverter().toUuid(parameters, "identityContractId"));
         filter.setRoleId(getParameterConverter().toUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID));
@@ -37,9 +37,13 @@ public class IdmRequestIdentityRoleFilterTranslator extends AbstractPluggableFil
         filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));
         filter.setIncludeCrossDomainsSystemsCount(getParameterConverter().toBoolean(parameters, "includeCrossDomainsSystemsCount", false));
         filter.setOwnerType(getParameterConverter().toClass(parameters, OwnerTypeFilter.OWNER_TYPE));
-        filter.set("accountId", getParameterConverter().toUuid(parameters, "accountId"));
         filter.setDirectRole(getParameterConverter().toBoolean(parameters, "directRole", false));
         filter.setAddEavMetadata(getParameterConverter().toBoolean(parameters, FormableFilter.PARAMETER_ADD_EAV_METADATA, false));
         return filter;
+    }
+
+    @Override
+    protected IdmRequestIdentityRoleFilter getEmptyFilter() {
+        return new IdmRequestIdentityRoleFilter();
     }
 }
