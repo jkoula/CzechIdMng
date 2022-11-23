@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.service.impl.adapter;
 
+import com.mchange.util.AssertException;
 import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
@@ -15,6 +16,7 @@ import org.springframework.util.Assert;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -38,9 +40,15 @@ public class AccAccountConceptRoleRequestAdapter extends DefaultRequestRoleConce
     @Override
     protected Collection<AccAccountRoleAssignmentDto> getAssignments() {
         final UUID accountId = originalFilter.getParameterConverter().toUuid(originalFilter.getData(), AccAccountRoleAssignmentFilter.PARAMETER_ACCOUNT_ID);
-        LOG.debug(MessageFormat.format("Start searching duplicates for identity [{1}].", accountId));
-        Assert.notNull(accountId, "Account identifier is required.");
+        final UUID identityId = originalFilter.getIdentityId();
+        if (Objects.nonNull(accountId)) {
+            LOG.debug(MessageFormat.format("Start searching duplicates for account [{1}].", accountId));
+            return roleAssignmentService.findAllByOwnerId(accountId);
 
-        return roleAssignmentService.findAllByOwnerId(accountId);
+        } else if (Objects.nonNull(identityId)) {
+            LOG.debug(MessageFormat.format("Start searching duplicates for identity [{1}].", identityId));
+            return roleAssignmentService.findAllByIdentity(identityId);
+        }
+        throw new AssertException("Account identifier or Identity identifier is required.");
     }
 }
