@@ -169,6 +169,15 @@ public class DefaultIdmIdentityRoleService
 		if (directRoleId != null) {
 			predicates.add(builder.equal(root.get(IdmIdentityRole_.directRole).get(AbstractEntity_.id), directRoleId));
 		}
+		// is direct role
+		Boolean directRole = filter.getDirectRole();
+		if (directRole != null) {
+			if (directRole) {
+				predicates.add(builder.isNull(root.get(IdmIdentityRole_.directRole)));
+			} else {
+				predicates.add(builder.isNotNull(root.get("directRole")));
+			}
+		}
 		return predicates;
 	}
 	

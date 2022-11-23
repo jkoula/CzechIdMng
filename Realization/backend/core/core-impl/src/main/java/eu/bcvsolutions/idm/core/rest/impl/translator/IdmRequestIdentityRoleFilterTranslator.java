@@ -37,8 +37,9 @@ public class IdmRequestIdentityRoleFilterTranslator extends AbstractPluggableFil
         filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));
         filter.setIncludeCrossDomainsSystemsCount(getParameterConverter().toBoolean(parameters, "includeCrossDomainsSystemsCount", false));
         filter.setOwnerType(getParameterConverter().toClass(parameters, OwnerTypeFilter.OWNER_TYPE));
-        filter.setDirectRole(getParameterConverter().toBoolean(parameters, "directRole", false));
-        filter.setAddEavMetadata(getParameterConverter().toBoolean(parameters, FormableFilter.PARAMETER_ADD_EAV_METADATA, false));
+        filter.setDirectRole(getParameterConverter().toBoolean(parameters, "directRole"));
+        filter.setAddEavMetadata(getParameterConverter().toBoolean(parameters, FormableFilter.PARAMETER_ADD_EAV_METADATA));
+        filter.setOnlyAssignments(getParameterConverter().toBoolean(parameters, IdmRequestIdentityRoleFilter.ONLY_ASSIGNMENTS_PARAMETER));
         return filter;
     }
 

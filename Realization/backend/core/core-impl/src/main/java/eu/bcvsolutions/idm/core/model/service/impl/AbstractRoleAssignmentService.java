@@ -31,6 +31,7 @@ import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRoleAttribute;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole_;
@@ -173,15 +174,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
             predicates.add(builder.equal(root.get(AbstractRoleAssignment_.roleComposition).get(AbstractEntity_.id), roleCompositionId));
         }
         //
-        // is direct role
-        Boolean directRole = filter.getDirectRole();
-        if (directRole != null) {
-            if (directRole) {
-                predicates.add(builder.isNull(root.get("directRole")));
-            } else {
-                predicates.add(builder.isNotNull(root.get("directRole")));
-            }
-        }
         // Role-system
         UUID roleSystemId = filter.getRoleSystemId();
         if (roleSystemId != null) {

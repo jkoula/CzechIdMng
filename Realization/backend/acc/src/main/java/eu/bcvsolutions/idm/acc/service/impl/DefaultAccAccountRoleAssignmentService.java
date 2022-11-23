@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -161,6 +162,15 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
         UUID directRoleId = filter.getDirectRoleId();
         if (directRoleId != null) {
             predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.directRole).get(AbstractEntity_.id), directRoleId));
+        }
+        // is direct role
+        Boolean directRole = filter.getDirectRole();
+        if (directRole != null) {
+            if (directRole) {
+                predicates.add(builder.isNull(root.get(AccAccountRoleAssignment_.directRole)));
+            } else {
+                predicates.add(builder.isNotNull(root.get("directRole")));
+            }
         }
 
         //

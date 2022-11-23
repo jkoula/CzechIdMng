@@ -7,6 +7,8 @@ import eu.bcvsolutions.idm.acc.dto.filter.AccAccountConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccountConceptRoleRequest;
 import eu.bcvsolutions.idm.acc.entity.AccAccountConceptRoleRequest_;
+import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount;
+import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.event.AccAccountRoleAssignmentEvent;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
@@ -63,11 +65,13 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -136,6 +140,19 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
 
         if (filter.isAccountRoleIsNull() && ids != null && ids.isEmpty()) {
             predicates.add(builder.isNull(root.get(AccAccountConceptRoleRequest_.accountRole)));
+        }
+        //
+        if (Objects.nonNull(filter.getIdentity())) {
+            Subquery<AccIdentityAccount> identityAccountSubquery = query.subquery(AccIdentityAccount.class);
+            final Root<AccIdentityAccount> identityAccountRoot = identityAccountSubquery.from(AccIdentityAccount.class);
+            identityAccountSubquery.select(identityAccountRoot);
+
+            identityAccountSubquery.where(
+                    builder.and(
+                            builder.equal(root.get(AccAccountConceptRoleRequest_.accAccount), identityAccountRoot.get(AccIdentityAccount_.account)),
+                            builder.equal(identityAccountRoot.get(AccIdentityAccount_.identity).get(AbstractEntity_.id), filter.getIdentity())
+                    ));
+            predicates.add(builder.exists(identityAccountSubquery));
         }
         //
         return predicates;

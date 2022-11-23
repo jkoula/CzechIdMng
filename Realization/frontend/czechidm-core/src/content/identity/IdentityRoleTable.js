@@ -198,6 +198,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     if (forceSearchParameters && hasIdentityForceFilter) {
       contractForceSearchparameters = new SearchParameters().setFilter('identity', forceSearchParameters.getFilters().get('identityId'));
     }
+    forceSearchParameters.setFilter('onlyAssignments', 'true');
     const _columns = this.getColumns();
     //
     return (

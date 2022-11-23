@@ -44,7 +44,6 @@ public class AccAccountConceptRoleRequestAdapter extends DefaultRequestRoleConce
         if (Objects.nonNull(accountId)) {
             LOG.debug(MessageFormat.format("Start searching duplicates for account [{1}].", accountId));
             return roleAssignmentService.findAllByOwnerId(accountId);
-
         } else if (Objects.nonNull(identityId)) {
             LOG.debug(MessageFormat.format("Start searching duplicates for identity [{1}].", identityId));
             return roleAssignmentService.findAllByIdentity(identityId);

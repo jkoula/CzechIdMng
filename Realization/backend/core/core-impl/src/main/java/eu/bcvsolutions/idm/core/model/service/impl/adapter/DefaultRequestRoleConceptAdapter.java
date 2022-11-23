@@ -75,10 +75,6 @@ public class DefaultRequestRoleConceptAdapter<C extends AbstractConceptRoleReque
 
     @Override
     public Stream<IdmRequestIdentityRoleDto> transform(Stream<C> data) {
-        if (data == null) {
-            return Stream.<IdmRequestIdentityRoleDto>builder().build();
-        }
-        //
         final Collection<A> roleAssignments = getAssignments();
         // Add to all identity roles form instance. For identity role can exist only
         // one form instance.
