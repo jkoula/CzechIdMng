@@ -293,7 +293,8 @@ class AccountRolesContent extends Basic.AbstractContent {
               key="direct_roles"
               uiKey={ `${uiKey}-${entityId}` }
               forceSearchParameters={new Domain.SearchParameters()
-                  .setFilter('identityId', entityId)
+                  .setFilter('accountId', entityId)
+                  .setFilter('ownerType', 'eu.bcvsolutions.idm.acc.dto.AccAccountDto')
                   .setFilter('directRole', true)
                   .setFilter('addEavMetadata', true)
                   .setFilter('onlyAssignments', true)}
