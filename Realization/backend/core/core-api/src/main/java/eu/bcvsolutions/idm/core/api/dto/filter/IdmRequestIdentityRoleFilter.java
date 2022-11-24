@@ -10,10 +10,10 @@ import org.springframework.util.MultiValueMap;
  * @author Vít Švanda
  */
 public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter implements FormableFilter{
-	private boolean includeEav = false;
-    private boolean onlyChanges = false;
-    private boolean includeCandidates = false;
-    private boolean includeCrossDomainsSystemsCount = false;
+	private Boolean includeEav = false;
+    private Boolean onlyChanges = false;
+    private Boolean includeCandidates = false;
+    private Boolean includeCrossDomainsSystemsCount = false;
 
 	public static final String ONLY_ASSIGNMENTS_PARAMETER = "onlyAssignments";
 	public static final String VALID_PARAMETER = "isValid";
@@ -27,43 +27,43 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter im
     	super(data);
     }
 
-	public boolean isOnlyAssignments() {
+	public Boolean isOnlyAssignments() {
 		return getParameterConverter().toBoolean(getData(), ONLY_ASSIGNMENTS_PARAMETER, false);
 	}
 
-	public void setOnlyAssignments(boolean onlyAssignments) {
+	public void setOnlyAssignments(Boolean onlyAssignments) {
 		set(ONLY_ASSIGNMENTS_PARAMETER, onlyAssignments);
 	}
 
-	public boolean isIncludeEav() {
+	public Boolean isIncludeEav() {
 		return includeEav;
 	}
 
-	public void setIncludeEav(boolean includeEav) {
+	public void setIncludeEav(Boolean includeEav) {
 		this.includeEav = includeEav;
 	}
 
-	public boolean isOnlyChanges() {
+	public Boolean isOnlyChanges() {
 		return onlyChanges;
 	}
 
-	public void setOnlyChanges(boolean onlyChanges) {
+	public void setOnlyChanges(Boolean onlyChanges) {
 		this.onlyChanges = onlyChanges;
 	}
 
-	public boolean isIncludeCandidates() {
+	public Boolean isIncludeCandidates() {
 		return includeCandidates;
 	}
 
-	public void setIncludeCandidates(boolean includeCandidates) {
+	public void setIncludeCandidates(Boolean includeCandidates) {
 		this.includeCandidates = includeCandidates;
 	}
 
-	public boolean isIncludeCrossDomainsSystemsCount() {
+	public Boolean isIncludeCrossDomainsSystemsCount() {
 		return includeCrossDomainsSystemsCount;
 	}
 
-	public void setIncludeCrossDomainsSystemsCount(boolean includeCrossDomainsSystemsCount) {
+	public void setIncludeCrossDomainsSystemsCount(Boolean includeCrossDomainsSystemsCount) {
 		this.includeCrossDomainsSystemsCount = includeCrossDomainsSystemsCount;
 	}
 
