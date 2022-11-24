@@ -1,22 +1,7 @@
 package eu.bcvsolutions.idm.acc.bulk.action.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.google.common.collect.ImmutableSet;
-
 import eu.bcvsolutions.idm.acc.TestHelper;
-import eu.bcvsolutions.idm.acc.domain.SystemOperationType;
 import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
@@ -28,6 +13,16 @@ import eu.bcvsolutions.idm.core.api.bulk.action.dto.IdmBulkActionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.test.api.AbstractBulkActionTest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
 
 /**
  * Integration tests for {@link SystemMappingDuplicateBulkAction}
@@ -122,9 +117,8 @@ public class SystemMappingDuplicateBulkActionTest extends AbstractBulkActionTest
 		// Expected name matches
 		assertTrue(clonedMapping.getName().equals(MessageFormat.format("{0}{1}", "Copy-of-", origMapping.getName())));
 
-		// Test that all cloned mappings are turned to synchronization type -> same
-		// provisioning types are not allowed
-		assertTrue(SystemOperationType.SYNCHRONIZATION.equals(clonedMapping.getOperationType()));
+		// Check that the same operation type is used
+		assertTrue(origMapping.getOperationType().equals(clonedMapping.getOperationType()));
 
 		// UUID of both mappings has to be different
 		assertNotEquals(origMapping.getId(), clonedMapping.getId());
