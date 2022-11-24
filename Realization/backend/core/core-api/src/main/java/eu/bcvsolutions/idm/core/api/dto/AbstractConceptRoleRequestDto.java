@@ -17,6 +17,8 @@ import java.util.UUID;
  */
 public abstract class AbstractConceptRoleRequestDto extends FormableDto implements Loggable {
 
+    private static final long serialVersionUID = 2552559375838158151L;
+
     public static final String WF_PROCESS_FIELD = "wfProcessId";
     public static final String DUPLICATES = "duplicates";
     @Embedded(dtoClass = IdmRoleRequestDto.class)
