@@ -15,12 +15,12 @@ import AccountTypeEnum from '../../domain/AccountTypeEnum';
 
 const uiKey = 'system-mappings';
 const uiKeyAttributes = 'system-attribute-mappings';
+const SYSTEM_MAPPING_VALIDATION = 'SYSTEM_MAPPING_VALIDATION';
 const systemAttributeMappingManager = new SystemAttributeMappingManager();
 const systemManager = new SystemManager();
 const treeTypeManager = new Managers.TreeTypeManager();
 const systemMappingManager = new SystemMappingManager();
 const schemaObjectClassManager = new SchemaObjectClassManager();
-const SYSTEM_MAPPING_VALIDATION = 'SYSTEM_MAPPING_VALIDATION';
 const scriptManager = new Managers.ScriptManager();
 const systemEntityTypeManager = new SystemEntityTypeManager();
 
@@ -431,7 +431,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
     const { _entityType, activeKey, validationError, _operationType} = this.state;
     const isNew = this._getIsNew();
     const mapping = isNew ? this.state.mapping : _mapping;
-
+    
     let isSelectedTree = false;
     if (_entityType !== undefined) {
       if (_entityType === 'TREE') {
@@ -469,7 +469,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
     .setFilter('operationType', operationTypeToFilter === SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING) ? 
     SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.SYNCHRONIZATION) : SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
     .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
-
+    
     return (
       <div>
         <Helmet title={this.i18n('title')}/>
@@ -525,11 +525,9 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     clearable={false}/>
                   <Basic.SelectBox
                     ref="entityType"
-                    multiSelect={ false }
                     manager={ systemEntityTypeManager }
                     onChange={this._onChangeEntityType.bind(this)}
                     label={this.i18n('acc:entity.SystemMapping.entityType')}
-                    readOnly={!Utils.Entity.isNew(mapping)}
                     required
                     clearable={false}/>
                   <Basic.SelectBox
