@@ -40,6 +40,7 @@ public class IdmRequestIdentityRoleFilterTranslator extends AbstractPluggableFil
         filter.setDirectRole(getParameterConverter().toBoolean(parameters, "directRole"));
         filter.setAddEavMetadata(getParameterConverter().toBoolean(parameters, FormableFilter.PARAMETER_ADD_EAV_METADATA));
         filter.setOnlyAssignments(getParameterConverter().toBoolean(parameters, IdmRequestIdentityRoleFilter.ONLY_ASSIGNMENTS_PARAMETER));
+        filter.setLoadAssignments(getParameterConverter().toBoolean(parameters, IdmRequestIdentityRoleFilter.LOAD_ASSIGNMENTS_PARAMETER));
         return filter;
     }
 

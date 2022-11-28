@@ -30,12 +30,12 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter impleme
 	public static final String DIRECT_ROLE_ID_PARAMETER = "directRoleId";
 	public static final String CONCEPT_ROLE_OPERATION_PARAMETER = "identityRoleIds";
 	public static final String ENVIRONMENT_PARAMETER = "identityRoleIds";
+	public static final String LOAD_ASSIGNMENTS_PARAMETER = "loadAssignments";
 
 
     private RoleRequestState state;
     private UUID roleId;
     private String roleText;
-    private UUID automaticRole;
 
 	private ConceptRoleRequestOperation operation;
     private String roleEnvironment;
@@ -194,6 +194,15 @@ public abstract class IdmBaseConceptRoleRequestFilter extends DataFilter impleme
 		setIdentityRoleIds(identityRoleIds);
 	}
 
+	public Boolean isLoadRoleAssignments() {
+		return getParameterConverter().toBoolean(getData(), LOAD_ASSIGNMENTS_PARAMETER, false);
+	}
+
+	public void setLoadAssignments(Boolean loadAssignments) {
+		set(LOAD_ASSIGNMENTS_PARAMETER, loadAssignments);
+	}
+
 	public abstract void setOwnerUuid(UUID contractId);
 	public abstract UUID getOwnerUuid();
+
 }

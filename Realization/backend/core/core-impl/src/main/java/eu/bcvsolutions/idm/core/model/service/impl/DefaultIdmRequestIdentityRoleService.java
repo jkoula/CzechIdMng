@@ -115,7 +115,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 	}
 
 	private static boolean shouldLoadAssignedRoles(IdmRequestIdentityRoleFilter filter, boolean returnOnlyChanges) {
-		return !returnOnlyChanges && (filter.getIdentity() != null || filter.isOnlyAssignments());
+		return filter.isLoadRoleAssignments() || (!returnOnlyChanges && (filter.getIdentity() != null || filter.isOnlyAssignments()));
 	}
 
 	@Override
