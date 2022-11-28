@@ -94,8 +94,7 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends D
                 (service, concreteFilter, currentPage) -> {
                     final DtoAdapter<DTO, RESULT> adapter = service.getAdapter(filter);
                     final Stream<DTO> stream = currentPage.stream();
-                    return adapter.transform(stream).collect(Collectors.toList());
-                },
+                    return currentPage.isEmpty() ? Collections.emptyList() : adapter.transform(stream).collect(Collectors.toList());                },
                 filter, pageable, permission);
     }
 
