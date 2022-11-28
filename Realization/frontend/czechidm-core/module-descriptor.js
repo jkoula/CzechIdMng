@@ -702,7 +702,7 @@ module.exports = {
             icon: 'component:request-roles',
             iconColor: '#eb9316',
             order: 20,
-            path: 'requests/:requestId/roles',
+            path: '/requests/:requestId/roles',
             access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLE_READ', 'AUTOMATICROLEATTRIBUTE_READ', 'ROLETREENODE_READ'] } ],
             items: [
               {
@@ -710,7 +710,7 @@ module.exports = {
                 type: 'TAB',
                 labelKey: 'content.roles.tabs.basic',
                 order: 100,
-                path: 'requests/:requestId/role/:entityId/detail',
+                path: '/requests/:requestId/role/:entityId/detail',
                 icon: 'component:basic-info'
               },
               {
@@ -719,7 +719,7 @@ module.exports = {
                 icon: 'component:business-roles',
                 labelKey: 'content.role.compositions.title',
                 order: 120,
-                path: 'requests/:requestId/role/:entityId/compositions',
+                path: '/requests/:requestId/role/:entityId/compositions',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLECOMPOSITION_READ'] } ]
               },
               {
@@ -729,7 +729,7 @@ module.exports = {
                 titleKey: 'content.role.incompatible-roles.title',
                 order: 125,
                 icon: 'fa:times-circle',
-                path: 'requests/:requestId/role/:entityId/incompatible-roles',
+                path: '/requests/:requestId/role/:entityId/incompatible-roles',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['INCOMPATIBLEROLE_READ'] } ]
               },
               {
@@ -738,7 +738,7 @@ module.exports = {
                 labelKey: 'content.role.guarantees.title',
                 icon: 'component:identities',
                 order: 130,
-                path: 'requests/:requestId/role/:entityId/guarantees',
+                path: '/requests/:requestId/role/:entityId/guarantees',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLEGUARANTEE_READ', 'ROLEGUARANTEEROLE_READ'] } ]
               },
               {
@@ -747,7 +747,7 @@ module.exports = {
                 labelKey: 'content.role.formAttributes.title',
                 icon: 'fa:th-list',
                 order: 115,
-                path: 'requests/:requestId/role/:entityId/form-attributes',
+                path: '/requests/:requestId/role/:entityId/form-attributes',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLEFORMATTRIBUTE_READ'] } ]
               },
               {
@@ -756,7 +756,7 @@ module.exports = {
                 labelKey: 'content.role.catalogues.title',
                 icon: 'component:role-catalogue',
                 order: 140,
-                path: 'requests/:requestId/role/:entityId/catalogues',
+                path: '/requests/:requestId/role/:entityId/catalogues',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLECATALOGUEROLE_READ'] } ]
               },
               {
@@ -765,7 +765,7 @@ module.exports = {
                 labelKey: 'content.role.eav.title',
                 order: 110,
                 priority: 0,
-                path: 'requests/:requestId/role/:entityId/eav',
+                path: '/requests/:requestId/role/:entityId/eav',
                 access: [ { type: 'HAS_ALL_AUTHORITIES', authorities: ['ROLE_READ', 'FORMDEFINITION_AUTOCOMPLETE'] } ]
               },
               {
@@ -775,7 +775,7 @@ module.exports = {
                 titleKey: 'content.role.authorization-policies.title',
                 order: 200,
                 icon: 'fa:shield-alt',
-                path: 'requests/:requestId/role/:entityId/authorization-policies',
+                path: '/requests/:requestId/role/:entityId/authorization-policies',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['AUTHORIZATIONPOLICY_READ'] } ]
               },
               {
@@ -784,7 +784,7 @@ module.exports = {
                 labelKey: 'content.role.tree-nodes.label',
                 titleKey: 'content.role.tree-nodes.title',
                 order: 400,
-                path: 'requests/:requestId/role/:entityId/automatic-roles/trees',
+                path: '/requests/:requestId/role/:entityId/automatic-roles/trees',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['ROLETREENODE_READ'] } ]
               }
             ]
@@ -1602,7 +1602,7 @@ module.exports = {
                 icon: 'component:form-projections',
                 order: 45,
                 type: 'TAB',
-                path: 'forms/form-projections',
+                path: '/forms/form-projections',
                 access: [ { type: 'HAS_ANY_AUTHORITY', authorities: ['FORMPROJECTION_READ'] } ],
                 items: [
                   {
