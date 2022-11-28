@@ -478,7 +478,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       showRowSelection,
       showEnvironment,
       requestId,
-      columns
+      columns,
+      isAccount,
+      accountId
     } = this.props;
     const {
       showChangesOnly,
@@ -495,8 +497,12 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (requestId) {
       forceSearchParameters = forceSearchParameters.setFilter('roleRequestId', requestId);
     }
-    if (identityId) {
+    if (identityId && !isAccount) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
+    }
+    if (isAccount && accountId) {
+      forceSearchParameters = forceSearchParameters.setFilter('accountId', accountId);
+      forceSearchParameters = forceSearchParameters.setFilter('ownerType', 'eu.bcvsolutions.idm.acc.dto.AccAccountDto');
     }
     forceSearchParameters = forceSearchParameters.setFilter('onlyChanges', showChangesOnly);
     forceSearchParameters = forceSearchParameters.setFilter('includeCandidates', true);
@@ -861,7 +867,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               isEdit={detail.edit}
               multiAdd={detail.add}
               requestId={requestId}
-              validationErrors={ validationErrors }/>
+              validationErrors={ validationErrors }
+              isAccount={isAccount}
+              accountId={accountId}/>
           </Basic.Modal.Body>
           <Basic.Modal.Footer>
             <Basic.Button
@@ -895,7 +903,9 @@ RequestIdentityRoleTable.propTypes = {
   request: PropTypes.object,
   readOnly: PropTypes.bool,
   showEnvironment: PropTypes.bool,
-  putRequestToRedux: PropTypes.func
+  putRequestToRedux: PropTypes.func,
+  isAccount: PropTypes.bool,
+  accountId: PropTypes.string
 };
 
 RequestIdentityRoleTable.defaultProps = {
@@ -918,7 +928,8 @@ RequestIdentityRoleTable.defaultProps = {
   showLoading: false,
   showRowSelection: true,
   readOnly: false,
-  showEnvironment: true
+  showEnvironment: true,
+  isAccount: false
 };
 
 function select(state, component) {

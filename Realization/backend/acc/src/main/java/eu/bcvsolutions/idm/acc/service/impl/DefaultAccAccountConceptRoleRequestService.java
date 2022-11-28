@@ -20,6 +20,7 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
@@ -32,6 +33,7 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
+import eu.bcvsolutions.idm.core.api.service.ApplicantService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
@@ -251,13 +253,18 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     public ApplicantDto resolveApplicant(IdmRequestIdentityRoleDto dto) {
         final AccAccountDto accAccountDto = accountService.get(dto.getOwnerUuid());
-        final IdmIdentityDto idmIdentityDto = identityService.get(accAccountDto.getTargetEntityId());
+
         ApplicantImplDto applicantDto = new ApplicantImplDto();
-        applicantDto.setId(idmIdentityDto.getId());
+        applicantDto.setId(accAccountDto.getTargetEntityId());
         applicantDto.setConceptOwner(accAccountDto.getId());
-        applicantDto.setApplicantType(dto.getOwnerType().getCanonicalName());
-        // We do not check validity of an account here. Maybe we could use contracts of identity
-        // but at this point it is not necessary
+
+        ApplicantService applicantService = requestService.getApplicantServiceByAccountType(accAccountDto.getTargetEntityType());
+        if (applicantService != null) {
+            BaseDto applicant = applicantService.get(accAccountDto.getTargetEntityId());
+            applicantDto.setApplicantType(applicant.getClass().getCanonicalName());
+            // We do not check validity of an account here. Maybe we could use contracts of identity
+            // but at this point it is not necessary
+        }
         return applicantDto;
     }
 

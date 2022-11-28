@@ -632,6 +632,17 @@ public class DefaultIdmRoleRequestService
 	}
 
 	@Override
+	public ApplicantService getApplicantServiceByAccountType(String accountType) {
+		return applicationContext
+				.getBeansOfType(ApplicantService.class)
+				.values()
+				.stream()
+				.filter(abstractEventableDtoService -> accountType.equals(abstractEventableDtoService.getAccountType()))
+				.findFirst()
+				.orElse(null);
+	}
+
+	@Override
 	public IdmRoleRequest toEntity(IdmRoleRequestDto dto, IdmRoleRequest entity) {
 		if (dto == null) {
 			return null;

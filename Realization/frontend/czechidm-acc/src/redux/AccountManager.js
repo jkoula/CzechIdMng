@@ -13,6 +13,13 @@ const service = new AccountService();
  */
 export default class AccountManager extends Managers.FormableEntityManager {
 
+  constructor() {
+    super();
+    this.dataManager = new Managers.DataManager();
+    this.incompatibleRoleManager = new Managers.IncompatibleRoleManager();
+  }
+
+
   getService() {
     return service;
   }
@@ -23,6 +30,26 @@ export default class AccountManager extends Managers.FormableEntityManager {
 
   getCollectionType() {
     return 'accounts';
+  }
+
+  /**
+   * Load account incompatible roles (by assigned roles) from BE
+   *
+   * @param  {string} id
+   * @param  {string} uiKey
+   * @return {array[object]}
+   */
+   fetchIncompatibleRoles(id, uiKey) {
+    return (dispatch) => {
+      dispatch(this.dataManager.requestData(uiKey));
+      this.getService().getIncompatibleRoles(id)
+        .then(json => {
+          dispatch(this.dataManager.receiveData(uiKey, json._embedded[this.incompatibleRoleManager.getCollectionType()]));
+        })
+        .catch(error => {
+          dispatch(this.receiveError(null, uiKey, error));
+        });
+    };
   }
 
 

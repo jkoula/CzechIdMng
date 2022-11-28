@@ -41,7 +41,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     this.state = {
       entity: updatedEntity,
       environment: ConfigLoader.getConfig('role.table.filter.environment', []),
-      selectedOwnerType: props.entity ? props.entity.ownerType :IdentityContractManager.ENTITY_TYPE
+      selectedOwnerType: props.isAccount ? "eu.bcvsolutions.idm.acc.dto.AccAccountDto" : props.entity ? props.entity.ownerType :IdentityContractManager.ENTITY_TYPE
     };
   }
 
@@ -248,7 +248,9 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       isEdit,
       multiAdd,
       validationErrors,
-      showEnvironment
+      showEnvironment,
+      isAccount,
+      accountId
     } = this.props;
     const { environment,selectedOwnerType } = this.state;
     const entity = this.state.entity ? this.state.entity : this.props.entity;
@@ -345,19 +347,24 @@ export class RoleConceptDetail extends Basic.AbstractContent {
                         const ManagerType = component.ownerManager;
                         const managerInstance = new ManagerType();
 
+                        let forceParams = new SearchParameters()
+                        .setFilter('id', accountId)
+                        .setFilter('validNowOrInFuture', true)
+                        .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
+                        .setFilter('_permission_operator', 'or')
+
+                        if(!isAccount) {
+                          forceParams = forceParams.setFilter('identity', identityUsername);
+                        }
+
                         return <Basic.Tab value={component.ownerType}
-                                          title={this.i18n(component.locale+'._type')}>
+                                          title={this.i18n(component.locale+'._type')}
+                                          rendered={isAccount ? component.ownerType === selectedOwnerType : true}>
                             {
                                 component.ownerType === selectedOwnerType ? <component.ownerSelectComponent
                                     ref={component.ownerType}
                                     manager={managerInstance}
-                                    forceSearchParameters={
-                                        new SearchParameters()
-                                            .setFilter('identity', identityUsername)
-                                            .setFilter('validNowOrInFuture', true)
-                                            .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
-                                            .setFilter('_permission_operator', 'or')
-                                    }
+                                    forceSearchParameters={forceParams}
                                     defaultSearchParameters={
                                         new SearchParameters().clearSort()
                                     }
@@ -372,6 +379,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
                                     required
                                     useFirst
                                     clearable={false}
+                                    disabled={isAccount}
                                 /> : <span/>
                             }
                         </Basic.Tab>
@@ -427,14 +435,17 @@ RoleConceptDetail.propTypes = {
   entity: PropTypes.object,
   identityUsername: PropTypes.string,
   readOnly: PropTypes.bool,
-  showEnvironment: PropTypes.bool
+  showEnvironment: PropTypes.bool,
+  isAccount: PropTypes.bool,
+  accountId: PropTypes.string
 };
 
 RoleConceptDetail.defaultProps = {
   multiAdd: false,
   showLoading: false,
   readOnly: true,
-  showEnvironment: true
+  showEnvironment: true,
+  isAccount: false
 };
 
 function select(state) {

@@ -28,4 +28,8 @@ public interface ApplicantService<DTO extends BaseDto, F extends BaseFilter> ext
 	default List<? extends AbstractRoleAssignmentDto> getAllRolesForApplicant(UUID applicant, IdmBasePermission[] permissions) {
 		return new ArrayList<>();
 	}
+
+	default String getAccountType() {
+		return null;
+	};
 }

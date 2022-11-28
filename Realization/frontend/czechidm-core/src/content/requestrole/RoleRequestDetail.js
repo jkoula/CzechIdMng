@@ -320,7 +320,9 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       canExecute,
       showEnvironment,
       _showDescription,
-      entityId
+      entityId,
+      isAccount,
+      accountId
     } = this.props;
     const {errorOccurred} = this.state;
     const _entityId = entityId || this.props.match.params.entityId;
@@ -506,6 +508,8 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                 readOnly={!isEditable || !roleRequestManager.canSave(request, _permissions) || !canExecute || showLoading}
                 identityId={this._getIdentityId(this.props)}
                 putRequestToRedux={this.putRequestToRedux.bind(this)}
+                isAccount={isAccount}
+                accountId={accountId}
               />
               <Basic.AbstractForm
                 readOnly
@@ -578,11 +582,14 @@ RoleRequestDetail.propTypes = {
   editableInStates: PropTypes.arrayOf(PropTypes.string),
   showRequestDetail: PropTypes.bool,
   canExecute: PropTypes.bool,
+  isAccount: PropTypes.bool,
+  accountId: PropTypes.string
 };
 RoleRequestDetail.defaultProps = {
   editableInStates: ['CONCEPT', 'EXCEPTION', 'DUPLICATED'],
   showRequestDetail: true,
-  canExecute: true
+  canExecute: true,
+  isAccount: false
 };
 
 function select(state, component) {
@@ -592,6 +599,8 @@ function select(state, component) {
   const entityId = component.entityId ? component.entityId : component.match.params.entityId;
   const entity = roleRequestManager.getEntity(state, entityId);
   const applicantFromUrl = component.location && component.location.query ? component.location.query.applicantId : null;
+  const isAccountFromURL = component.location && component.location.query ? component.location.query.isAccount : null;
+  const accountIdFromURL = component.location && component.location.query ? component.location.query.accountId : null;
   const identityId = entity ? entity.applicant.id : applicantFromUrl;
   if (entity && entity._embedded && entity._embedded.wfProcessId) {
     entity.currentActivity = entity._embedded.wfProcessId.name;
@@ -606,6 +615,8 @@ function select(state, component) {
     _incompatibleRoles: entity ? DataManager.getData(state, `${ uiKeyIncompatibleRoles }${entity.id}`) : null,
     _incompatibleRolesLoading: entity ? DataManager.isShowLoading(state, `${ uiKeyIncompatibleRoles }${entity.id}`) : false,
     _showDescription: ConfigurationManager.getPublicValueAsBoolean(state, 'idm.pub.app.show.roleRequest.description', true),
+    isAccount: (isAccountFromURL === 'true'),
+    accountId: accountIdFromURL
   };
 }
 

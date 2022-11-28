@@ -269,4 +269,6 @@ public interface IdmRoleRequestService extends
 	List<IdmIdentityDto> getGuarantorsForApplicant(IdmRoleRequestDto request);
 
 	ApplicantService getApplicantService(String applicantType);
+
+	ApplicantService getApplicantServiceByAccountType(String accountType);
 }

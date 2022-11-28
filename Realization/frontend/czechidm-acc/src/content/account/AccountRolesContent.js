@@ -9,6 +9,7 @@ import { Basic, Advanced, Utils, Domain, Managers } from 'czechidm-core';
 import RoleRequestTable from 'czechidm-core/src/content/requestrole/RoleRequestTable';
 import IdentityRoleTableComponent, { IdentityRoleTable } from 'czechidm-core/src/content/identity/IdentityRoleTable';
 import IdentitiesInfo from 'czechidm-core/src/content/identity/IdentitiesInfo';
+import AccountManager from '../../redux/AccountManager';
 
 const uiKey = 'account-roles';
 const identityRoleManager = new Managers.IdentityRoleManager();
@@ -18,6 +19,7 @@ const roleRequestManager = new Managers.RoleRequestManager();
 const workflowTaskInstanceManager = new Managers.WorkflowTaskInstanceManager();
 const codeListManager = new Managers.CodeListManager();
 const uiKeyIncompatibleRoles = 'identity-incompatible-roles-';
+const accountManager = new AccountManager();
 
 /**
  * Assigned account roles
@@ -51,7 +53,7 @@ class AccountRolesContent extends Basic.AbstractContent {
     super.componentDidMount();
     //
     const { entityId } = this.props.match.params;
-    this.context.store.dispatch(identityManager.fetchIncompatibleRoles(entityId, `${uiKeyIncompatibleRoles}${entityId}`));
+    this.context.store.dispatch(accountManager.fetchIncompatibleRoles(entityId, `${uiKeyIncompatibleRoles}${entityId}`));
     this.context.store.dispatch(codeListManager.fetchCodeListIfNeeded('environment'));
     // Allow chcek of unresolved requests
     this.canSendLongPollingRequest = true;
@@ -75,11 +77,11 @@ class AccountRolesContent extends Basic.AbstractContent {
   }
 
   _initComponent(props) {
-    const { entityId } = props.match.params;
+    const { entity } = this.props;
     if (!this.state.longPollingInprogress && this._isLongPollingEnabled()) {
       // Long-polling request can be send.
       this.setState({longPollingInprogress: true}, () => {
-        this._sendLongPollingRequest(entityId);
+        this._sendLongPollingRequest(entity.targetEntityId);
       });
     }
   }
@@ -201,11 +203,10 @@ class AccountRolesContent extends Basic.AbstractContent {
   }
 
   _changePermissions() {
+    const { entity } = this.props;
     const { entityId } = this.props.match.params;
-    const identity = this.props.identity || identityManager.getEntity(this.context.store.getState(), entityId);
-    //
     const uuidId = uuid.v1();
-    this.context.history.push(`/role-requests/${ uuidId }/new?new=1&applicantId=${ identity.id }`);
+    this.context.history.push(`/role-requests/${ uuidId }/new?new=1&applicantId=${ entity.targetEntityId }&isAccount=true&accountId=${ entityId }`);
   }
 
   _refreshAll(props = null) {
@@ -262,14 +263,14 @@ class AccountRolesContent extends Basic.AbstractContent {
 
   render() {
     const { entityId } = this.props.match.params;
-    const { _permissions, _requestUi, embedded, _columns } = this.props;
+    const { _permissions, _requestUi, embedded, _columns, entity } = this.props;
     const { activeKey } = this.state;
     //
     let force = new Domain.SearchParameters();
-    force = force.setFilter('identity', entityId);
+    force = force.setFilter('identity', entity.targetEntityId);
     force = force.setFilter('category', 'eu.bcvsolutions.role.approve');
     let roleRequestsForceSearch = new Domain.SearchParameters();
-    roleRequestsForceSearch = roleRequestsForceSearch.setFilter('applicant', entityId);
+    roleRequestsForceSearch = roleRequestsForceSearch.setFilter('applicant', entity.targetEntityId);
     roleRequestsForceSearch = roleRequestsForceSearch.setFilter('executed', 'false');
     //
     return (
@@ -316,7 +317,8 @@ class AccountRolesContent extends Basic.AbstractContent {
               key="sub_roles"
               uiKey={ `${uiKey}-sub-${entityId}` }
               forceSearchParameters={ new Domain.SearchParameters()
-                  .setFilter('identityId', entityId)
+                  .setFilter('accountId', entityId)
+                  .setFilter('ownerType', 'eu.bcvsolutions.idm.acc.dto.AccAccountDto')
                   .setFilter('directRole', false)
                   .setFilter('addEavMetadata', true)
                   .setFilter('onlyAssignments', true)}
@@ -435,7 +437,8 @@ AccountRolesContent.propTypes = {
   _permissions: PropTypes.oneOfType([
     PropTypes.bool,
     PropTypes.arrayOf(PropTypes.string)
-  ])
+  ]),
+  entity: PropTypes.object
 };
 AccountRolesContent.defaultProps = {
   _showLoading: true,
@@ -450,9 +453,10 @@ function select(state, component) {
   }
   const entityId = component.match.params.entityId;
   const requestUi = Utils.Ui.getUiState(state, 'table-applicant-requests');
-  const longPollingEnabled = Managers.ConfigurationManager.getPublicValueAsBoolean(state, 'idm.pub.app.long-polling.enabled', true);
+  // const longPollingEnabled = Managers.ConfigurationManager.getPublicValueAsBoolean(state, 'idm.pub.app.long-polling.enabled', true);
 
   return {
+    entity: accountManager.getEntity(state, entityId),
     identity: component.identity || identityManager.getEntity(state, entityId),
     _showLoading: identityRoleManager.isShowLoading(state, `${ uiKey }-${ entityId }`),
     _addRoleProcessIds: addRoleProcessIds,
@@ -460,7 +464,8 @@ function select(state, component) {
     _permissions: identityManager.getPermissions(state, null, entityId),
     _searchParameters: Utils.Ui.getSearchParameters(state, `${ uiKey }-${ entityId }`),
     _requestUi: requestUi,
-    _longPollingEnabled: longPollingEnabled,
+    // Long pooling is disabled on this agenda, because it caused issue from the side of accounts
+    _longPollingEnabled: false,
     _columns: Managers.ConfigurationManager.getPublicValueAsArray(
       state,
       'idm.pub.app.show.identityRole.table.columns',

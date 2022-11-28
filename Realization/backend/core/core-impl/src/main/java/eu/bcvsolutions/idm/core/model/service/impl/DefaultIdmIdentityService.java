@@ -723,4 +723,9 @@ public class DefaultIdmIdentityService
 	public List<AbstractRoleAssignmentDto> getAllRolesForApplicant(UUID applicant, IdmBasePermission[] permissions) {
 		return roleAssignmentManager.getAllByIdentity(applicant, permissions).getContent();
 	}
+
+	@Override
+	public String getAccountType() {
+		return "IDENTITY";
+	}
 }
