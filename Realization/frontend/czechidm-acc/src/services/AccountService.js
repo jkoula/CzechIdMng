@@ -75,7 +75,7 @@ export default class AccountService extends WizardService {
    * @param token {string}
    * @return {Promise}
    */
-      getIncompatibleRoles(accountId, token = null) {
+    getIncompatibleRoles(accountId, token = null) {
       return Services.RestApiService
         .get(`${ this.getApiPath() }/${ encodeURIComponent(accountId) }/incompatible-roles`, token)
         .then(response => {

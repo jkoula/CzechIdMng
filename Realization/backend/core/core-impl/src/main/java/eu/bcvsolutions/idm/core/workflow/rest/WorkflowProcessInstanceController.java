@@ -1,7 +1,5 @@
 package eu.bcvsolutions.idm.core.workflow.rest;
 
-import java.util.UUID;
-
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -104,7 +101,7 @@ public class WorkflowProcessInstanceController extends AbstractReadWriteDtoContr
 		WorkflowFilterDto filter = super.toFilter(parameters);
 		String applicant = getParameterConverter().toString(parameters, "identity");
 		if (applicant != null) {
-				filter.getEqualsVariables().put(WorkflowProcessInstanceService.APPLICANT_IDENTIFIER, UUID.fromString(applicant));
+				filter.getEqualsVariables().put(WorkflowProcessInstanceService.APPLICANT_IDENTIFIER, applicant);
 		}
 		
 		return filter;

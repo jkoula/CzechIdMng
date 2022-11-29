@@ -499,10 +499,15 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     }
     if (identityId && !isAccount) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
+      forceSearchParameters = forceSearchParameters.setFilter('accountId', null);
+      forceSearchParameters = forceSearchParameters.setFilter('ownerType', null);
+      forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', null);
     }
     if (isAccount && accountId) {
+      forceSearchParameters = forceSearchParameters.setFilter('identityId', null);
       forceSearchParameters = forceSearchParameters.setFilter('accountId', accountId);
       forceSearchParameters = forceSearchParameters.setFilter('ownerType', 'eu.bcvsolutions.idm.acc.dto.AccAccountDto');
+      forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', true);
     }
     forceSearchParameters = forceSearchParameters.setFilter('onlyChanges', showChangesOnly);
     forceSearchParameters = forceSearchParameters.setFilter('includeCandidates', true);
@@ -602,7 +607,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                         placeholder={ this.i18n('entity.IdentityRole.identityContract.title') }
                         manager={ identityContractManager }
                         forceSearchParameters={ contractForceSearchparameters }
-                        niceLabel={ (entity) => identityContractManager.getNiceLabel(entity, false) }/>
+                        niceLabel={ (entity) => identityContractManager.getNiceLabel(entity, false) }
+                        rendered={!isAccount}/>
                     </Basic.Col>
                     <Basic.Col lg={ showEnvironment ? 3 : 6 }>
                       <Advanced.Filter.EnumSelectBox

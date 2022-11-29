@@ -71,18 +71,27 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
           applicant: {id: props.location.query.applicantId},
           state: RoleRequestStateEnum.findKeyBySymbol(RoleRequestStateEnum.CONCEPT),
           requestedByType: 'MANUALLY'
-        }
+        },
+        isAccount: props.location.query.isAccount,
+        accountId: props.location.query.accountId
       });
     } else {
       this.context.store.dispatch(roleRequestManager.fetchEntity(_entityId, null, (entity, error) => {
+        const {isAccount, accountId} = this.props.location.state;
         if (error) {
           this.setState({
-            errorOccurred: true
+            errorOccurred: true,
+            isAccount: isAccount,
+            accountId: accountId
           }, () => {
             this.addError(error);
           });
         } else {
           this.context.store.dispatch(roleRequestManager.fetchIncompatibleRoles(_entityId, `${ uiKeyIncompatibleRoles }${ _entityId }`));
+          this.setState({
+            isAccount: isAccount,
+            accountId: accountId
+          });
         }
       }));
     }
@@ -168,6 +177,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
    * If new request was created, then redirect will be made.
    */
   afterRequestSave(requestId) {
+    const {isAccount, accountId} = this.state;
     if (this.refs.form == null || !this.refs.form.isFormValid()) {
       return;
     }
@@ -181,11 +191,17 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
         request.description = formEntity.description;
         // => save only
         this.context.store.dispatch(roleRequestManager.updateEntity(request, `${uiKey}-detail`, () => {
-          this.context.history.replace(`/role-requests/${requestId}/detail`);
+          this.context.history.replace({
+            pathname: `/role-requests/${requestId}/detail`,
+            state: { isAccount: isAccount, accountId: accountId }
+           });
         }));
       }));
     } else if (this._getIsNew()) {
-      this.context.history.replace(`/role-requests/${requestId}/detail`);
+      this.context.history.replace({
+        pathname: `/role-requests/${requestId}/detail`,
+        state: { isAccount: isAccount, accountId: accountId }
+       });
     }
   }
 
@@ -320,11 +336,9 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       canExecute,
       showEnvironment,
       _showDescription,
-      entityId,
-      isAccount,
-      accountId
+      entityId
     } = this.props;
-    const {errorOccurred} = this.state;
+    const {errorOccurred, isAccount, accountId} = this.state;
     const _entityId = entityId || this.props.match.params.entityId;
     //
     const isNew = this._getIsNew();
