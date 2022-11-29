@@ -338,8 +338,14 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       _showDescription,
       entityId
     } = this.props;
-    const {errorOccurred, isAccount, accountId} = this.state;
+    const {errorOccurred} = this.state;
+    let {isAccount, accountId} = this.state;
     const _entityId = entityId || this.props.match.params.entityId;
+    //
+    if(!isAccount && !accountId) {
+      isAccount = this.props?.location?.state?.isAccount;
+      accountId = this.props?.location?.state?.accountId;
+    }
     //
     const isNew = this._getIsNew();
     let request = isNew ? this.state.request : _request;
@@ -520,7 +526,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                 showEnvironment={showEnvironment}
                 incompatibleRoles={ _incompatibleRoles }
                 readOnly={!isEditable || !roleRequestManager.canSave(request, _permissions) || !canExecute || showLoading}
-                identityId={this._getIdentityId(this.props)}
+                identityId={isAccount ? null : this._getIdentityId(this.props)}
                 putRequestToRedux={this.putRequestToRedux.bind(this)}
                 isAccount={isAccount}
                 accountId={accountId}
