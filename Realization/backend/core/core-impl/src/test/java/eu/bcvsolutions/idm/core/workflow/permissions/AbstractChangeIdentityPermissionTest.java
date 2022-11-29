@@ -14,9 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
-import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
-import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
@@ -36,6 +33,8 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIncompatibleRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
@@ -57,6 +56,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.event.processor.module.InitTestDataProcessor;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.security.api.service.LoginService;
@@ -1126,7 +1126,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		if (isIdentity) {
+			requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		} else {
+			requestIdentityRoleFilter.set("accountId", owner.getId());
+			requestIdentityRoleFilter.setOwnerType(owner.getClass());
+		}
 		requestIdentityRoleFilter.setRoleId(role.getId()); // TODO temporary
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
@@ -1146,7 +1151,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		if (isIdentity) {
+			requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		} else {
+			requestIdentityRoleFilter.set("accountId", owner.getId());
+			requestIdentityRoleFilter.setOwnerType(owner.getClass());
+		}
 		requestIdentityRoleFilter.setRoleId(role.getId()); // TODO temporary
 		requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
@@ -1178,6 +1188,11 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		ApplicantDto applicantId = getApplicant(owner);
 		IdmIdentityDto guarantee = identityService.getByUsername(InitTestDataProcessor.TEST_USER_2);
 
+		boolean isIdentity = false;
+		if (IdmIdentityDto.class.getCanonicalName().equals(applicantId.getApplicantType())) {
+			isIdentity = true;
+		}
+
 		// Guarantee
 		int priority = 500;
 		IdmRoleDto adminRole = roleConfiguration.getAdminRole();
@@ -1196,7 +1211,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		if (isIdentity) {
+			requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		} else {
+			requestIdentityRoleFilter.set("accountId", owner.getId());
+			requestIdentityRoleFilter.setOwnerType(owner.getClass());
+		}
 		requestIdentityRoleFilter.setRoleId(adminRole.getId()); // TODO temporary
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
@@ -1222,7 +1242,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		if (isIdentity) {
+			requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		} else {
+			requestIdentityRoleFilter.set("accountId", owner.getId());
+			requestIdentityRoleFilter.setOwnerType(owner.getClass());
+		}
 		requestIdentityRoleFilter.setRoleId(adminRole.getId()); // TODO temporary
 		requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
@@ -1267,7 +1292,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		if (isIdentity) {
+			requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		} else {
+			requestIdentityRoleFilter.set("accountId", owner.getId());
+			requestIdentityRoleFilter.setOwnerType(owner.getClass());
+		}
 		requestIdentityRoleFilter.setRoleId(adminRole.getId()); // TODO temporary
 		requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
 		assertEquals(1, requestIdentityRoles.size());
@@ -1342,7 +1372,12 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 		IdmRequestIdentityRoleFilter requestIdentityRoleFilter = new IdmRequestIdentityRoleFilter();
 		requestIdentityRoleFilter.setIncludeCandidates(true);
 		requestIdentityRoleFilter.setRoleRequestId(request.getId());
-		requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		if (isIdentity) {
+			requestIdentityRoleFilter.setIdentity(applicantId.getId());
+		} else {
+			requestIdentityRoleFilter.set("accountId", owner.getId());
+			requestIdentityRoleFilter.setOwnerType(owner.getClass());
+		}
 		requestIdentityRoleFilter.setOnlyChanges(true);
 
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(requestIdentityRoleFilter, null).getContent();
