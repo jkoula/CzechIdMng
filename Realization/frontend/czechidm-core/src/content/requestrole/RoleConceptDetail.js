@@ -292,7 +292,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
         _formInstance = instance;
       });
     }
-
+    
     return (
       <Basic.AbstractForm
         ref="form"

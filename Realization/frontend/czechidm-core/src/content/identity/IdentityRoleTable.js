@@ -26,6 +26,7 @@ import {IdentityRoleTableFilter} from "./IdentityRoleTableFilter";
 import OwnerCell from "../requestrole/OwnerCell";
 import {AssignmentOwnerSelector} from "../requestrole/AssignmentOwnerSelector";
 
+
 //const manager = new IdentityRoleManager(); // default manager
 const manager =  new RequestIdentityRoleManager();
 const identityManager = new IdentityManager();
