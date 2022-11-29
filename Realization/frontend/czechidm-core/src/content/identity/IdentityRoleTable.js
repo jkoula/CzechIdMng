@@ -9,7 +9,6 @@ import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
 import { SearchParameters } from '../../domain';
 import {
-  IdentityRoleManager,
   IdentityManager,
   RoleTreeNodeManager,
   RoleManager,
@@ -23,6 +22,7 @@ import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import ComponentService from "../../services/ComponentService";
+import {IdentityRoleTableFilter} from "./IdentityRoleTableFilter";
 
 //const manager = new IdentityRoleManager(); // default manager
 const manager =  new RequestIdentityRoleManager();
@@ -247,50 +247,12 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             }
           }
           filter={
-            <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
-              <Basic.AbstractForm ref="filterForm">
-                <Basic.Row className="last">
-                  <Basic.Col lg={ showEnvironment ? 3 : 5 }>
-                    <Advanced.Filter.TextField
-                      ref="roleText"
-                      placeholder={ this.i18n('filter.role.placeholder') }
-                      header={ this.i18n('filter.role.placeholder') }
-                      hidden={ hasRoleForceFilter }
-                      help={ Advanced.Filter.getTextHelp() }/>
-                    <Advanced.Filter.SelectBox
-                      ref="identityId"
-                      manager={ identityManager }
-                      label={ null }
-                      placeholder={ this.i18n('filter.identity.placeholder') }
-                      header={ this.i18n('filter.identity.placeholder') }
-                      hidden={ hasIdentityForceFilter }/>
-                  </Basic.Col>
-                  <Basic.Col lg={ 3 } rendered={ showEnvironment }>
-                    <Advanced.CodeListSelect
-                      ref="roleEnvironment"
-                      code="environment"
-                      label={ null }
-                      placeholder={ this.i18n('entity.Role.environment.label') }
-                      items={ environmentItems || [] }
-                      hidden={ hasRoleForceFilter }
-                      multiSelect/>
-                  </Basic.Col>
-                  <Basic.Col lg={ showEnvironment ? 3 : 4 }>
-                    <Basic.Div rendered={ contractForceSearchparameters !== null }>
-                      <Advanced.Filter.SelectBox
-                        ref="identityContractId"
-                        placeholder={ this.i18n('entity.IdentityRole.identityContract.title') }
-                        manager={ identityContractManager }
-                        forceSearchParameters={ contractForceSearchparameters }
-                        niceLabel={ (entity) => identityContractManager.getNiceLabel(entity, false) }/>
-                    </Basic.Div>
-                  </Basic.Col>
-                  <Basic.Col lg={ 3 } className="text-right">
-                    <Advanced.Filter.FilterButtons cancelFilter={ this.cancelFilter.bind(this) }/>
-                  </Basic.Col>
-                </Basic.Row>
-              </Basic.AbstractForm>
-            </Advanced.Filter>
+            <IdentityRoleTableFilter
+                useFilter showEnvironment hasRoleForceFilter hasIdentityForceFilter environmentItems
+            contractForceSearchparameters cancelFilter
+            >
+
+            </IdentityRoleTableFilter>
           }>
           <Advanced.Column
             header=""
