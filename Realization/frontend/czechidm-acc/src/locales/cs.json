@@ -1417,6 +1417,12 @@
           "false": "ne"
         },
         "validateDate": "Datum provedení validace"
+      },
+      "select": {
+        "label": "Účet na systému",
+        "help": "Účet na systému",
+        "title": "Účet na systému",
+        "placeholder": "Účet na systému"
       }
     },
     "IdentityAccount": {

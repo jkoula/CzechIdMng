@@ -81,14 +81,14 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.useFilterForm(this.refs.filterForm);
+    this.refs.table.useFilterForm(this.refs.filterForm.getFilterForm());
   }
 
   cancelFilter(event) {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.cancelFilter(this.refs.filterForm);
+    this.refs.table.cancelFilter(this.refs.filterForm.getFilterForm());
   }
 
   /**
@@ -194,9 +194,9 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     // contract force search parameters - contract filter is shown only if identity is given
     const hasIdentityForceFilter = forceSearchParameters.getFilters().has('identityId');
     const hasRoleForceFilter = forceSearchParameters.getFilters().has('roleId');
-    let contractForceSearchparameters = null;
+    let contractForceSearchParameters = null;
     if (forceSearchParameters && hasIdentityForceFilter) {
-      contractForceSearchparameters = new SearchParameters().setFilter('identity', forceSearchParameters.getFilters().get('identityId'));
+      contractForceSearchParameters = new SearchParameters().setFilter('identity', forceSearchParameters.getFilters().get('identityId'));
     }
     forceSearchParameters.setFilter('onlyAssignments', 'true');
     const _columns = this.getColumns();
@@ -247,13 +247,16 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             }
           }
           filter={
-            <IdentityRoleTableFilter
-                useFilter showEnvironment hasRoleForceFilter hasIdentityForceFilter environmentItems
-            contractForceSearchparameters cancelFilter
-            >
-
-            </IdentityRoleTableFilter>
-          }>
+            <IdentityRoleTableFilter ref="filterForm"
+                                     showEnvironment={showEnvironment}
+                                     hasRoleForceFilter={hasRoleForceFilter}
+                                     hasIdentityForceFilter={hasIdentityForceFilter}
+                                     environmentItems={environmentItems}
+                                     contractForceSearchParameters={contractForceSearchParameters}
+                                     useFilter={this.useFilter.bind(this)}
+                                     cancelFilter={this.cancelFilter.bind(this)}
+            />
+         }>
           <Advanced.Column
             header=""
             className="detail-button"

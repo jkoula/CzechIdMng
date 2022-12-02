@@ -3260,6 +3260,9 @@
           },
           "identity": {
             "placeholder": "$t(entity.Identity._type)"
+          },
+          "ownerSelect": {
+            "placeholder": "Assigned to"
           }
         },
         "changePermissions": "Request to change roles",
@@ -4963,6 +4966,12 @@
         "label": "Main position",
         "help": "Main / prime work position.",
         "title": "Main position"
+      },
+      "select": {
+        "label": "Contract position",
+        "help": "Contract position",
+        "title": "Contract position",
+        "placeholder": "Select contract position"
       },
       "state": {
         "label": "State",

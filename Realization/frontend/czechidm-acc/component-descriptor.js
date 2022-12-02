@@ -322,7 +322,8 @@ module.exports = {
       ownerManager: require('./src/redux').AccountManager,
       ownerSelectComponent: require('./src/components/AccountSelect/AccountSelect').default,
       ownerInfoComponent: require('./src/components/AccountInfo/AccountInfo').default,
-      locale: "acc:entity.Account"
+      locale: "acc:entity.Account.select",
+      filterCode: "accountId"
     }
   ]
 };

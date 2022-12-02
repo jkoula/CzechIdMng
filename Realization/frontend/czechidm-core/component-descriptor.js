@@ -1013,7 +1013,8 @@ module.exports = {
       ownerManager: require('./src/redux').IdentityContractManager,
       ownerSelectComponent: require('./src/components/advanced/IdentityContractSelect/IdentityContractSelect').default,
       ownerInfoComponent: require('./src/components/advanced/IdentityContractInfo/IdentityContractInfo').default,
-      locale: "core:entity.IdentityContract"
+      locale: "core:entity.IdentityContract.select",
+      filterCode: "identityContractId"
     }
   ]
 };

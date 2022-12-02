@@ -25,6 +25,7 @@ export default class FilterButtons extends Basic.AbstractContextComponent {
 
   _useFilter(event) {
     const { useFilter } = this.props;
+    console.log("wwww",useFilter)
     //
     if (useFilter) {
       if (event) {

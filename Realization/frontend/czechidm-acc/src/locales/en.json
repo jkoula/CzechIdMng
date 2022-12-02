@@ -1415,7 +1415,13 @@
         "false": "no"
       },
       "validateDate": "Validation date"
-    }
+    },
+     "select": {
+       "label": "Account",
+       "help": "Account",
+       "title": "Account",
+       "placeholder": "Select account"
+     }
   },
     "IdentityAccount": {
       "_type": "Identity account in system",

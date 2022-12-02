@@ -17,6 +17,7 @@ import IdentitiesInfo from '../identity/IdentitiesInfo';
 import ComponentService from "../../services/ComponentService";
 
 import { ConfigurationManager } from '../../redux';
+import {IdentityRoleTableFilter} from "../identity/IdentityRoleTableFilter";
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const requestIdentityRoleManager = new RequestIdentityRoleManager();
 const roleRequestManager = new RoleRequestManager();
@@ -89,14 +90,14 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.useFilterForm(this.refs.filterForm);
+    this.refs.table.useFilterForm(this.refs.filterForm.getFilterForm());
   }
 
   cancelFilter(event) {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.cancelFilter(this.refs.filterForm);
+    this.refs.table.cancelFilter(this.refs.filterForm.getFilterForm());
   }
 
   /**
@@ -500,7 +501,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (identityId && !isAccount) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
       forceSearchParameters = forceSearchParameters.setFilter('accountId', null);
-      forceSearchParameters = forceSearchParameters.setFilter('ownerType', null);
+      //forceSearchParameters = forceSearchParameters.setFilter('ownerType', null);
       forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', null);
     }
     if (isAccount && accountId) {
@@ -514,7 +515,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     forceSearchParameters = forceSearchParameters.setFilter('includeCrossDomainsSystemsCount', true);
     //
     const showLoading = this.props.showLoading || this.state.showLoading;
-    const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);
+    const contractForceSearchParameters = new SearchParameters().setFilter('identity', identityUsername);
     const ownerTypeOptions = this.getOwnerTypeOptions();
     //
     return (
@@ -577,7 +578,16 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
             rowClass={this._getRowClass}
             forceSearchParameters={forceSearchParameters}
             filter={
-              <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
+              <IdentityRoleTableFilter ref="filterForm"
+                                       showEnvironment={showEnvironment}
+                                       hasRoleForceFilter={false}
+                                       hasIdentityForceFilter={true}
+                                       contractForceSearchParameters={contractForceSearchParameters}
+                                       useFilter={this.useFilter.bind(this)}
+                                       cancelFilter={this.cancelFilter.bind(this)}
+              />
+
+              /*<Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
                 <Basic.AbstractForm ref="filterForm">
                   <Basic.Row className="last">
                     <Basic.Col lg={ 3 }>
@@ -606,7 +616,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                         ref="identityContractId"
                         placeholder={ this.i18n('entity.IdentityRole.identityContract.title') }
                         manager={ identityContractManager }
-                        forceSearchParameters={ contractForceSearchparameters }
+                        forceSearchParameters={ contractForceSearchParameters }
                         niceLabel={ (entity) => identityContractManager.getNiceLabel(entity, false) }
                         rendered={!isAccount}/>
                     </Basic.Col>
@@ -627,7 +637,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                     </Basic.Col>
                   </Basic.Row>
                 </Basic.AbstractForm>
-              </Advanced.Filter>
+              </Advanced.Filter>*/
             }
             _searchParameters={ this.getSearchParameters() }>
             <Advanced.Column

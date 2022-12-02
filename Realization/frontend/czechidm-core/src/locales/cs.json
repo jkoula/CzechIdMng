@@ -3313,6 +3313,9 @@
           },
           "identity": {
             "placeholder": "$t(entity.Identity._type)"
+          },
+          "ownerSelect": {
+            "placeholder": "Přiděleno na"
           }
         },
         "changePermissions": "Žádost o změnu rolí",
@@ -5017,6 +5020,12 @@
         "label": "Hlavní pozice",
         "help": "Hlavní / primární pracovní pozice. Bude použita například pro zobrazení pozice uživatele.",
         "title": "Hlavní pozice"
+      },
+      "select": {
+        "label": "Pracovní pozice",
+        "help": "Pracovní pozice",
+        "title": "Pracovní pozice",
+        "placeholder": "Vyberte pracovní pozici"
       },
       "state": {
         "label": "Stav",
