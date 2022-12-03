@@ -4910,6 +4910,9 @@
     "IdentityRole": {
       "_type": "Přiřazená role",
       "role" : "Název role",
+      "owner": {
+        "title": "Přiřazeno na"
+      },
       "identityContract": {
         "label": "PPV",
         "title": "Pracovně právní vztah",

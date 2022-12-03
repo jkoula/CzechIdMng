@@ -23,6 +23,7 @@ import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import ComponentService from "../../services/ComponentService";
 import {IdentityRoleTableFilter} from "./IdentityRoleTableFilter";
+import OwnerCell from "../requestrole/OwnerCell";
 
 //const manager = new IdentityRoleManager(); // default manager
 const manager =  new RequestIdentityRoleManager();
@@ -307,7 +308,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             cell={
               /* eslint-disable react/no-multi-comp */
               ({ rowIndex, data, property }) => (
-                <Advanced.EntityInfo
+                  <Advanced.EntityInfo
                   entityType="identity"
                   entityIdentifier={ data[rowIndex]._embedded[property].identity }
                   entity={ data[rowIndex]._embedded[property]._embedded.identity }
@@ -362,35 +363,11 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             cell={ ({rowIndex, data}) => this._attributesCell({ rowIndex, data }) }
             rendered={ _.includes(columns, 'roleAttributes') }/>
           <Advanced.Column
-            header={this.i18n('entity.IdentityRole.identityContract.title')}
-            property="identityContract"
-            cell={
-              /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data }) => {
-                const manager = componentService.getManagerForConceptByOwnerType(data[rowIndex].ownerType)
-
-                const owner = manager.getEmbeddedOwner(data[rowIndex]);
-                if (!owner) {
-                  return (
-                      <Basic.Label
-                          level="default"
-                          value={this.i18n('label.removed')}
-                          title={this.i18n('content.audit.revision.deleted')}/>
-                  );
-                }
-                //
-                const componentInfo = componentService.getConcepComponentByOwnerType(data[rowIndex].ownerType)
-                return (
-                    <componentInfo.ownerInfoComponent
-                        entityIdentifier={owner.id}
-                        entity={owner}
-                        showIdentity={false}
-                        showIcon
-                        face="popover"/>
-                );
-              }
-            }
-            rendered={ _.includes(columns, 'identityContract') }/>
+            header={this.i18n('entity.IdentityRole.owner.title')}
+            property="owner"
+            cell={ ({rowIndex, data}) => <OwnerCell entity={ data[rowIndex]}/> }
+            rendered={ _.includes(columns, 'owner') }
+              />
           <Advanced.Column
             header={this.i18n('entity.IdentityRole.contractPosition.label')}
             property="contractPosition"
@@ -410,7 +387,8 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 );
               }
             }
-            rendered={ _.includes(columns, 'contractPosition') }/>
+            rendered={ _.includes(columns, 'contractPosition') }
+          />
           <Advanced.Column
             property="validFrom"
             header={this.i18n('label.validFrom')}
@@ -651,7 +629,7 @@ IdentityRoleTable.defaultProps = {
     'role',
     'roleAttributes',
     'environment',
-    'identityContract',
+    'owner',
     'contractPosition',
     'validFrom',
     'validTill',

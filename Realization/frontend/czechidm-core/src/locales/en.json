@@ -4857,6 +4857,9 @@
     "IdentityRole": {
       "_type": "Assigned role",
       "role" : "Role",
+      "owner": {
+        "title": "Assigned to"
+      },
       "identityContract": {
         "label": "Contracted position",
         "title": "Contracted position",
