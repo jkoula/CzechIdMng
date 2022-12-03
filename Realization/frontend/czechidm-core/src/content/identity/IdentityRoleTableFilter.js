@@ -82,7 +82,7 @@ export class IdentityRoleTableFilter extends AbstractContextComponent {
 
     render() {
         const {useFilter, showEnvironment, hasRoleForceFilter, hasIdentityForceFilter,
-            contractForceSearchParameters, cancelFilter} = this.props
+            contractForceSearchParameters, cancelFilter, environmentItems} = this.props
         const {selectedOwnerType} = this.state;
         //
         const ownerTypeOptions = this.getOwnerTypeOptions();
