@@ -46,9 +46,13 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     const updatedEntity = {...props.entity};
     updatedEntity[props.entity.ownerType] = props.entity.ownerUuid
 
+    const ownerType = props.isAccount ?
+        "eu.bcvsolutions.idm.acc.dto.AccAccountDto" : props.entity && props.entity.ownerType ?
+            props.entity.ownerType :IdentityContractManager.ENTITY_TYPE;
     this.state = {
       entity: updatedEntity,
       environment: ConfigLoader.getConfig('role.table.filter.environment', []),
+      selectedOwnerType: ownerType
     };
   }
 
@@ -252,6 +256,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     } = this.props;
     const { environment } = this.state;
     const entity = this.state.entity ? this.state.entity : this.props.entity;
+    console.log("uuu", this.state);
 
     if (!entity) {
       return null;
@@ -382,7 +387,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       </Basic.AbstractForm>
     );
   }
-
 }
 
 RoleConceptDetail.propTypes = {
