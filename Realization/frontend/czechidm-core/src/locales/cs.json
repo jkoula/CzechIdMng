@@ -3315,7 +3315,7 @@
             "placeholder": "$t(entity.Identity._type)"
           },
           "ownerSelect": {
-            "placeholder": "Přiděleno na"
+            "placeholder": "Přiřazeno na"
           }
         },
         "changePermissions": "Žádost o změnu rolí",

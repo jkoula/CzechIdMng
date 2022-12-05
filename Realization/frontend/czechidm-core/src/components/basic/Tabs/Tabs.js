@@ -61,16 +61,12 @@ export default function BasicTabs(props) {
     if (!eventKey) {
       // if no value was specified, try to use eventKey
       eventKey = child.props.eventKey
-      console.log("eventKey")
     } else if (!eventKey && eventKey !== 0) {
       // if no value or eventKey was specified, use index instead
       eventKey = index;
-      console.log("index")
     } else {
       eventKey = `${ eventKey }`;
-      console.log("string eventkey")
     }
-    console.log("result", eventKey)
     if (Utils.Ui.isEmpty(value)) {
       value = eventKey;
     }
