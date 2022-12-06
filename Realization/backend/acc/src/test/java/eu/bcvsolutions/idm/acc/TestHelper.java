@@ -280,7 +280,13 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 
 	void deleteSystem(UUID systemId);
 
-    AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto roleA);
+	/**
+	 * Create direct (without role request) account role assignment
+	 * @param accAccountDto {@link AccAccountDto} to assign role to
+	 * @param role {@link IdmRoleDto} to assign
+	 * @return saved AccAccountRoleAssignmentDto
+	 */
+    AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role);
 
     /**
      * Create direct (without role request) account role assignment with validity.

@@ -8,9 +8,6 @@ import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCatalogueDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeNodeDto;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * Type of entity on target system
@@ -19,10 +16,7 @@ import org.springframework.context.ApplicationContextAware;
  * @author Radek Tomiška
  *
  */
-public enum SystemEntityType
-{
-
-
+public enum SystemEntityType {
 
 	IDENTITY(IdmIdentityDto.class, true, true),
 	ROLE(IdmRoleDto.class,true, true),
@@ -36,7 +30,6 @@ public enum SystemEntityType
 	private boolean supportsProvisioning;
 	private boolean supportsSync;
 
-
 	private SystemEntityType(Class<? extends AbstractDto> entityType, boolean supportsProvisioning, boolean supportsSync) {
 		this.entityType = entityType;
 		this.supportsProvisioning = supportsProvisioning;
@@ -44,6 +37,7 @@ public enum SystemEntityType
 	}
 
 	public Class<? extends AbstractDto> getEntityType() {
+		
 		return entityType;
 	}
 	
@@ -80,7 +74,6 @@ public enum SystemEntityType
 	public boolean isSupportsSync() {
 		return supportsSync;
 	}
-
-
-
+	
+	
 }
