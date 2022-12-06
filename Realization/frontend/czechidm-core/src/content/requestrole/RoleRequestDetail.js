@@ -13,11 +13,13 @@ import RoleRequestStateEnum from '../../enums/RoleRequestStateEnum';
 import RequestIdentityRoleTable from './RequestIdentityRoleTable';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
+import ComponentService from "../../services/ComponentService";
 //
 const uiKey = 'role-request';
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const roleRequestManager = new RoleRequestManager();
 const identityRoleManager = new IdentityRoleManager();
+const componentService = new ComponentService()
 
 /**
  * Detail of the role request
@@ -64,11 +66,15 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   _initComponent(props) {
     const { entityId } = props;
     const _entityId = entityId || props.match.params.entityId;
+    const applicantType = this.resolveApplicantType(props.location.query?.isAccount);
     if (this._getIsNew(props)) {
       this.setState({
         showLoading: false,
         request: {
-          applicant: {id: props.location.query.applicantId},
+          applicant: {
+            id: props.location.query.applicantId,
+            applicantType: applicantType
+          },
           state: RoleRequestStateEnum.findKeyBySymbol(RoleRequestStateEnum.CONCEPT),
           requestedByType: 'MANUALLY'
         },
@@ -289,19 +295,19 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   }
 
   _getApplicantAndImplementer(request) {
-    // TODO get ID from applicant dto
+    const infoComponent = request && request.applicant ? componentService.getApplicantInfoComponent(request.applicant.applicantType) : null;
     return (
       <div>
         <Basic.LabelWrapper
-          rendered={ request !== null && !_.isNil(request.applicant) }
+          rendered={ request !== null && !_.isNil(request.applicant && infoComponent) }
           readOnly
           ref="applicant"
           label={this.i18n('entity.RoleRequest.applicant')}>
-          <Advanced.IdentityInfo
-            entityIdentifier={ request && request.applicant.id }
-            showLoading={!request}/>
-        </Basic.LabelWrapper>
+          <infoComponent.component
+              entityIdentifier={ request && request.applicant.id }
+              showLoading={!request}/>
 
+        </Basic.LabelWrapper>
         <Basic.LabelWrapper
           rendered={ request !== null && !_.isNil(request.creatorId) && request.state !== 'CONCEPT'}
           readOnly
@@ -593,6 +599,12 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
         </form>
       </Basic.Div>
     );
+  }
+
+  resolveApplicantType(isAccount) {
+    // This mechanism with isAccount flag will have to be rewritten to something more dynamic when another applicant type
+    // is introduced
+    return isAccount ? "eu.bcvsolutions.idm.tech.model.dto.TechnicalAccountDto" : "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto";
   }
 }
 

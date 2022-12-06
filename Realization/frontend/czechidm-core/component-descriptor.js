@@ -1015,6 +1015,13 @@ module.exports = {
       ownerInfoComponent: require('./src/components/advanced/IdentityContractInfo/IdentityContractInfo').default,
       locale: "core:entity.IdentityContract.select",
       filterCode: "identityContractId"
+    },
+    {
+      id: "identity-applicant-info",
+      type: 'applicant-info',
+      entityType: "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto",
+      component: require('./src/components/advanced/IdentityInfo/IdentityInfo').default,
+      manager: require('./src/redux').IdentityManager
     }
   ]
 };
