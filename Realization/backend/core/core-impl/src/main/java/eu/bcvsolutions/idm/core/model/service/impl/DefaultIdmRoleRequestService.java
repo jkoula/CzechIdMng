@@ -192,11 +192,6 @@ public class DefaultIdmRoleRequestService
 			predicates.add(builder.equal(root.get(IdmRoleRequest_.duplicatedToRequest).get(AbstractEntity_.id),
 					filter.getDuplicatedToRequestId()));
 		}
-		// TODO
-//		if (StringUtils.isNotEmpty(filter.getApplicant())) {
-//			predicates.add(builder.equal(root.get(IdmIdentityRoleRequest_.applicant).get(IdmIdentity_.username),
-//					filter.getApplicant()));
-//		}
 		UUID creatorId = filter.getCreatorId();
 		if (creatorId != null) {
 			predicates.add(builder.equal(root.get(AbstractEntity_.creatorId), creatorId));
