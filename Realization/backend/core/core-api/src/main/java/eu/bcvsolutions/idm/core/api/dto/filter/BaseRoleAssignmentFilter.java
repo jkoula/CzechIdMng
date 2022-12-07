@@ -4,7 +4,9 @@ import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
 import org.springframework.util.MultiValueMap;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -163,6 +165,10 @@ public abstract class BaseRoleAssignmentFilter extends DataFilter implements Own
 
     public void setIdentityId(UUID identityId) {
     	set(BaseRoleAssignmentFilter.PARAMETER_IDENTITY_ID, identityId);
+    }
+
+    public void setRoleAssignmentUuids(Set<UUID> identityRoleIds) {
+        setIds(new ArrayList<>(identityRoleIds));
     }
 
     public abstract void setOwnerId(UUID id);

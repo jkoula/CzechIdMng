@@ -11,10 +11,12 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
+import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
@@ -94,6 +96,11 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
         return identityAccountService.find(filter, null).stream()
                 .map(accIdentityAccountDto -> DtoUtils.getEmbedded(accIdentityAccountDto, AccIdentityAccount_.identity,
                 IdmIdentityDto.class)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Class<? extends AbstractConceptRoleRequestDto> getRelatedConceptType() {
+        return AccAccountConceptRoleRequestDto.class;
     }
 
     @Override

@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.getLowercaseFieldNameFromGetter;
 import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.invokeGetter;
 import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.invokeSetter;
+import static eu.bcvsolutions.idm.core.api.utils.ReflectionUtils.translateFilter;
 
 /**
  *
@@ -138,30 +139,7 @@ public class MultiSourcePagedResource<DTO extends BaseDto, INNERFILTER extends D
         return new PageImpl<>(result, nullSafePageable, total);
     }
 
-    private INNERFILTER translateFilter(DataFilter filter, Class<INNERFILTER> filterClass) {
-        final INNERFILTER innerfilter = ReflectionUtils.instantiateUsingNoArgConstructor(filterClass, null);
-        if (filter == null) {
-            return innerfilter;
-        }
-        // Set values using data map
-        final MultiValueMap<String, Object> data = filter.getData();
-        data.forEach((key, value) -> invokeSetter(innerfilter, key, toSingleValue(value)));
 
-        // Set values using getters
-        // This is a fallback for filters which combine DataFilter with internal fields
-        ReflectionUtils.getAllGetterMethods(filter.getClass())
-                .forEach(getter -> {
-                    final String getterKey = getLowercaseFieldNameFromGetter(getter);
-                    final Object valueToSet = invokeGetter(filter, getterKey);
-                    invokeSetter(innerfilter, getterKey, valueToSet);
-                });
-
-        return innerfilter;
-    }
-
-    private Object toSingleValue(List<Object> value) {
-        return value.stream().findFirst().orElse(null);
-    }
 
     private Pageable getCurrentPageable(Pageable originalPageable, long total, int missingCount) {
         if (originalPageable.isUnpaged()) {

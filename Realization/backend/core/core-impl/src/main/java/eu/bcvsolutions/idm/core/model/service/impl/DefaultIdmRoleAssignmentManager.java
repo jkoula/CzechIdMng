@@ -1,7 +1,7 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
@@ -10,6 +10,8 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
+import eu.bcvsolutions.idm.core.api.utils.ReflectionUtils;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
@@ -77,8 +79,7 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
     public List<AbstractRoleAssignmentDto> find(IdmRequestIdentityRoleFilter identityRoleFilter, Pageable pageable,
             BiConsumer<AbstractRoleAssignmentDto, IdmRoleAssignmentService<AbstractRoleAssignmentDto, BaseRoleAssignmentFilter>> consumer) {
         return assignmentServices.values().stream().flatMap(service -> {
-            final BaseRoleAssignmentFilter filter = service.getFilter();
-            modelMapper.map(identityRoleFilter, filter);
+            final BaseRoleAssignmentFilter filter = ReflectionUtils.translateFilter(identityRoleFilter, service.getFilter().getClass());
             final Page<AbstractRoleAssignmentDto> page = service.find(filter, pageable);
             //
             page.forEach(o -> consumer.accept(o, service));

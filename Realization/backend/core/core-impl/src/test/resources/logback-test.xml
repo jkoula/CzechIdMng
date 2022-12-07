@@ -17,12 +17,12 @@
 		</encoder>
 	</appender>
 
-	<root level="WARN">
+	<root level="INFO">
 		<appender-ref ref="CONSOLE" />
 	</root>
 	
-	<logger name="eu.bcvsolutions" level="ERROR" />
-	<logger name="org.springframework" level="WARN"/>
+	<logger name="eu.bcvsolutions" level="INFO" />
+	<logger name="org.springframework" level="INFO"/>
 	<logger name="org.springframework.web" level="WARN"/>
 	<logger name="org.hibernate.SQL" level="WARN"/>
 	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>

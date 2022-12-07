@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -238,7 +239,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 	@Test
 	public void testFindByWrongApplicant() throws Exception {
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
-		filter.set("applicant", "not-exist-name");
+		filter.set("applicantId", UUID.randomUUID().toString());
 		List<IdmRoleRequestDto> results = find(filter);
 		//
 		Assert.assertTrue(results.isEmpty());
@@ -256,7 +257,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		//
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
 		filter.set("state", RoleRequestState.EXECUTED.name());
-		filter.set("applicant", requestOne.getApplicant().toString());
+		filter.set("applicantId", requestOne.getApplicant().getId().toString());
 		//
 		List<IdmRoleRequestDto> results = find(filter);
 		Assert.assertEquals(1, results.size());
@@ -321,7 +322,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		//
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
 		filter.put("states", Lists.newArrayList(RoleRequestState.EXECUTED.name(), RoleRequestState.CANCELED.name()));
-		filter.set("applicant", requestOne.getApplicant().toString());
+		filter.set("applicantId", requestOne.getApplicant().getId().toString());
 		//
 		List<IdmRoleRequestDto> results = find(filter);
 		Assert.assertEquals(2, results.size());

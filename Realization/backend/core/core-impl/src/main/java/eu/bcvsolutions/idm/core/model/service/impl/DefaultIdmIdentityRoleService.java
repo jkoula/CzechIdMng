@@ -13,6 +13,8 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
@@ -286,6 +288,11 @@ public class DefaultIdmIdentityRoleService
 				IdmIdentityContractDto.class);
 		//
 		return lookupService.lookupEmbeddedDto(contract, IdmIdentityContract_.identity);
+	}
+
+	@Override
+	public Class<? extends AbstractConceptRoleRequestDto> getRelatedConceptType() {
+		return IdmConceptRoleRequestDto.class;
 	}
 
 	@Override

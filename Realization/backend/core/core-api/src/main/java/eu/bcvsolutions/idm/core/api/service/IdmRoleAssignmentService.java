@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.api.service;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -120,4 +121,6 @@ public interface IdmRoleAssignmentService<D extends AbstractRoleAssignmentDto, F
     List<D> findAllByOwnerId(UUID ownerUuid);
 
     IdmIdentityDto getRelatedIdentity(D roleAssignment);
+
+    Class<? extends AbstractConceptRoleRequestDto> getRelatedConceptType();
 }

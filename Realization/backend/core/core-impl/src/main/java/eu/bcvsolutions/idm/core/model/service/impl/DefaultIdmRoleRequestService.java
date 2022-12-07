@@ -26,6 +26,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
+import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue_;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -63,7 +67,6 @@ import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -782,102 +785,111 @@ public class DefaultIdmRoleRequestService
 		Assert.notNull(requestByIdentityDto.getIdentityContract(), "Contract must be filled for create role request!");
 
 		UUID identityContractId = requestByIdentityDto.getIdentityContract();
-		UUID roleRequestId = requestByIdentityDto.getRoleRequest();
 		LocalDate validFrom = requestByIdentityDto.getValidFrom();
 		LocalDate validTill = requestByIdentityDto.getValidTill();
 		boolean copyRoleParameters = requestByIdentityDto.isCopyRoleParameters();
+		final UUID roleRequestId = getRoleRequestId(requestByIdentityDto, identityContractId);
 
-		List<UUID> identityRoles = requestByIdentityDto.getIdentityRoles();
+		final IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
+		filter.setIds(requestByIdentityDto.getIdentityRoles());
 
-		if (roleRequestId == null) {
+		roleAssignmentManager.find(filter, null, (assignment, service) -> processRoleToCopy(assignment, service, roleRequestId, validFrom, validTill, copyRoleParameters));
+
+		return this.get(roleRequestId);
+	}
+
+	private UUID getRoleRequestId(IdmRoleRequestByIdentityDto requestByIdentityDto, UUID identityContractId) {
+		if (requestByIdentityDto.getRoleRequest() == null) {
 			IdmIdentityContractDto identityContractDto = identityContractService.get(identityContractId);
 			IdmRoleRequestDto request = this.createManualRequest(identityContractDto.getIdentity());
-			roleRequestId = request.getId();
+			return request.getId();
+		} else {
+			return requestByIdentityDto.getRoleRequest();
+		}
+	}
+
+	private void processRoleToCopy(AbstractRoleAssignmentDto assignment, IdmRoleAssignmentService<AbstractRoleAssignmentDto, BaseRoleAssignmentFilter> service, UUID roleRequestId, LocalDate validFrom, LocalDate validTill, boolean copyRoleParameters) {
+		// Flush Hibernate in batch - performance improving TODO this is not the way to do it
+		/*if (i % 20 == 0 && i > 0) {
+			flushHibernateSession();
+		}*/
+		final AbstractConceptRoleRequestDto concept = conceptRoleRequestManager.getServiceForConcept(service.getRelatedConceptType()).createEmptyConcept();
+		concept.setOwnerUuid(assignment.getEntity());
+		concept.setRoleRequest(roleRequestId);
+		concept.setRole(assignment.getRole());
+		concept.setValidFrom(validFrom);
+		concept.setValidTill(validTill);
+		concept.setOperation(ADD);
+		concept.addToLog(MessageFormat.format(
+				"Concept was added from the copy roles operation (includes identity-role attributes [{0}]).",
+				copyRoleParameters));
+
+		IdmRoleDto roleDto = DtoUtils.getEmbedded(assignment, AbstractRoleAssignment_.role, IdmRoleDto.class);
+		// Copy role parameters
+		if (copyRoleParameters) {
+			copyParameters(assignment, concept, roleDto);
 		}
 
-		for (int i = 0; identityRoles.size() > i; i++) {
-			UUID identityRoleId = identityRoles.get(i);
-			// Flush Hibernate in batch - performance improving
-			if (i % 20 == 0 && i > 0) {
-				 flushHibernateSession();
-			}
-			IdmIdentityRoleDto identityRoleDto = identityRoleThinService.get(identityRoleId);
-			if (identityRoleDto == null) {
-				LOG.error("For given identity role id [{}] was not found entity. ", identityRoleId);
-				continue;
-			}
+		conceptRoleRequestManager.save(concept);
+	}
 
-			IdmConceptRoleRequestDto conceptRoleRequestDto = new IdmConceptRoleRequestDto();
-			conceptRoleRequestDto.setIdentityContract(identityContractId);
-			conceptRoleRequestDto.setRoleRequest(roleRequestId);
-			conceptRoleRequestDto.setRole(identityRoleDto.getRole());
-			conceptRoleRequestDto.setValidFrom(validFrom);
-			conceptRoleRequestDto.setValidTill(validTill);
-			conceptRoleRequestDto.setOperation(ADD);
-			conceptRoleRequestDto.addToLog(MessageFormat.format(
-					"Concept was added from the copy roles operation (includes identity-role attributes [{0}]).",
-					 copyRoleParameters));
+	private void copyParameters(AbstractRoleAssignmentDto assignment, AbstractConceptRoleRequestDto concept, IdmRoleDto roleDto) {
+		// For copy must exist identity role attribute definition
+		if (roleDto.getIdentityRoleAttributeDefinition() != null) {
 
-			IdmRoleDto roleDto = DtoUtils.getEmbedded(identityRoleDto, AbstractRoleAssignment_.role, IdmRoleDto.class);
-			// Copy role parameters
-			if (copyRoleParameters) {
-				// For copy must exist identity role attribute definition
-				if (roleDto.getIdentityRoleAttributeDefinition() != null) {
-					IdmFormInstanceDto formInstance = identityRoleService.getRoleAttributeValues(identityRoleDto);
+			IdmFormInstanceDto formInstance = roleAssignmentManager.getServiceForAssignment(assignment).getRoleAttributeValues(assignment);
 
-					List<IdmFormValueDto> values = formInstance.getValues();
-					List<IdmFormValueDto> finalValues = new ArrayList<>(values);
-					// Iterate over all values and find values that must be deep copied
-					for (IdmFormValueDto value : values) {
-						IdmFormAttributeDto attribute = DtoUtils.getEmbedded(value, IdmFormValue_.formAttribute, IdmFormAttributeDto.class, null);
-						if (attribute == null) {
-							attribute = formAttributeService.get(value.getFormAttribute());
-						}
+			List<IdmFormValueDto> values = formInstance.getValues();
+			List<IdmFormValueDto> finalValues = new ArrayList<>(values);
+			// Iterate over all values and find values that must be deep copied
+			for (IdmFormValueDto value : values) {
+				IdmFormAttributeDto attribute = DtoUtils.getEmbedded(value, AbstractFormValue_.formAttribute, IdmFormAttributeDto.class, null);
+				if (attribute == null) {
+					attribute = formAttributeService.get(value.getFormAttribute());
+				}
 
-						// Attachments are one of attribute with deep copy
-						// TODO: confidential values are another, but identity role doesn't support them
-						if (attribute.getPersistentType() == PersistentType.ATTACHMENT) {
-							finalValues.remove(value);
-							IdmFormValueDto valueCopy = new IdmFormValueDto(attribute);
-							IdmAttachmentDto originalAttachmentDto = attachmentManager.get(value.getUuidValue());
-
-							ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-							try (InputStream inputStream = attachmentManager.getAttachmentData(originalAttachmentDto.getId())) {
-								IOUtils.copy(inputStream, outputStream);
-							} catch (IOException e) {
-								LOG.error("Error during copy attachment data.", e);
-								throw new ResultCodeException(CoreResultCode.ATTACHMENT_CREATE_FAILED, ImmutableMap.of(
-										"attachmentName", originalAttachmentDto.getName(),
-										"ownerType", originalAttachmentDto.getOwnerType(),
-										"ownerId", originalAttachmentDto.getOwnerId() == null ? "" : originalAttachmentDto.getOwnerId().toString())
-										, e);
-							}
-
-							IdmAttachmentDto attachmentCopy = new IdmAttachmentDto();
-							attachmentCopy.setOwnerType(AttachmentManager.TEMPORARY_ATTACHMENT_OWNER_TYPE);
-							attachmentCopy.setName(originalAttachmentDto.getName());
-							attachmentCopy.setMimetype(originalAttachmentDto.getMimetype());
-							attachmentCopy.setInputData(new ByteArrayInputStream(outputStream.toByteArray()));
-
-							attachmentCopy = attachmentManager.saveAttachment(null, attachmentCopy); // owner and version is resolved after attachment is saved
-							valueCopy.setUuidValue(attachmentCopy.getId());
-							valueCopy.setShortTextValue(attachmentCopy.getName());
-
-							finalValues.add(valueCopy);
-						}
-					}
-
-					formInstance.setValues(finalValues);
-
-					conceptRoleRequestDto.setEavs(Lists.newArrayList(formInstance));
+				// Attachments are one of attribute with deep copy
+				// TODO: confidential values are another, but identity role doesn't support them
+				if (attribute.getPersistentType() == PersistentType.ATTACHMENT) {
+					finalValues.remove(value);
+					IdmFormValueDto valueCopy = copyAttachmentValue(value, attribute);
+					finalValues.add(valueCopy);
 				}
 			}
 
-			conceptRoleRequestManager.save(conceptRoleRequestDto);
+			formInstance.setValues(finalValues);
+
+			concept.setEavs(Lists.newArrayList(formInstance));
+		}
+	}
+
+	private IdmFormValueDto copyAttachmentValue(IdmFormValueDto value, IdmFormAttributeDto attribute) {
+		IdmFormValueDto valueCopy = new IdmFormValueDto(attribute);
+		IdmAttachmentDto originalAttachmentDto = attachmentManager.get(value.getUuidValue());
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		try (InputStream inputStream = attachmentManager.getAttachmentData(originalAttachmentDto.getId())) {
+			IOUtils.copy(inputStream, outputStream);
+		} catch (IOException e) {
+			LOG.error("Error during copy attachment data.", e);
+			throw new ResultCodeException(CoreResultCode.ATTACHMENT_CREATE_FAILED, ImmutableMap.of(
+					"attachmentName", originalAttachmentDto.getName(),
+					"ownerType", originalAttachmentDto.getOwnerType(),
+					"ownerId", originalAttachmentDto.getOwnerId() == null ? "" : originalAttachmentDto.getOwnerId().toString())
+					, e);
 		}
 
-		return this.get(roleRequestId);
+		IdmAttachmentDto attachmentCopy = new IdmAttachmentDto();
+		attachmentCopy.setOwnerType(AttachmentManager.TEMPORARY_ATTACHMENT_OWNER_TYPE);
+		attachmentCopy.setName(originalAttachmentDto.getName());
+		attachmentCopy.setMimetype(originalAttachmentDto.getMimetype());
+		attachmentCopy.setInputData(new ByteArrayInputStream(outputStream.toByteArray()));
+
+		attachmentCopy = attachmentManager.saveAttachment(null, attachmentCopy); // owner and version is resolved after attachment is saved
+		valueCopy.setUuidValue(attachmentCopy.getId());
+		valueCopy.setShortTextValue(attachmentCopy.getName());
+		return valueCopy;
 	}
 
 	@Override

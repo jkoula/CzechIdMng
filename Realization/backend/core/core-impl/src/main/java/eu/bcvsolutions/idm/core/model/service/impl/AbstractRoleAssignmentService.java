@@ -179,6 +179,8 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         if (roleSystemId != null) {
             predicates.add(builder.equal(root.get(AbstractRoleAssignment_.roleSystem), roleSystemId));
         }
+
+
         return predicates;
     }
 

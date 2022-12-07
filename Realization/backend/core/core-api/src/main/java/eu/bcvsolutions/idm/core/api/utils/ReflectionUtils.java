@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.api.utils;
 
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
+import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -125,5 +126,30 @@ public class ReflectionUtils {
                 throw new RuntimeException(e);
             }
         }).orElse(null);
+    }
+
+    public static <A> A translateFilter(DataFilter filter, Class<A> filterClass) {
+        final A innerfilter = ReflectionUtils.instantiateUsingNoArgConstructor(filterClass, null);
+        if (filter == null) {
+            return innerfilter;
+        }
+        // Set values using data map
+        final MultiValueMap<String, Object> data = filter.getData();
+        data.forEach((key, value) -> invokeSetter(innerfilter, key, toSingleValue(value)));
+
+        // Set values using getters
+        // This is a fallback for filters which combine DataFilter with internal fields
+        ReflectionUtils.getAllGetterMethods(filter.getClass())
+                .forEach(getter -> {
+                    final String getterKey = getLowercaseFieldNameFromGetter(getter);
+                    final Object valueToSet = invokeGetter(filter, getterKey);
+                    invokeSetter(innerfilter, getterKey, valueToSet);
+                });
+
+        return innerfilter;
+    }
+
+    private static Object toSingleValue(List<Object> value) {
+        return value.stream().findFirst().orElse(null);
     }
 }
