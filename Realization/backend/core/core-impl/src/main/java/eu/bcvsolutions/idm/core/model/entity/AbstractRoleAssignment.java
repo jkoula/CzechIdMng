@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class AbstractRoleAssignment extends AbstractEntity implements FormableEntity, ValidableEntity, Identifiable {
+public abstract class AbstractRoleAssignment extends AbstractEntity implements FormableEntity, ValidableEntity, Identifiable {
 
     @NotNull
     @Audited

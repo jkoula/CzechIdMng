@@ -8,7 +8,7 @@ import AccountValueDecorator from './AccountValueDecorator';
 * Component for select accounts.
 *
 * @author Peter Štrunc
-* @since 10.1.0
+* @since 13.0.0
 */
 export default class AccountSelect extends Advanced.EntitySelectBox {
 
@@ -19,7 +19,7 @@ export default class AccountSelect extends Advanced.EntitySelectBox {
       return null;
     }
     if (entityType && entityType !== 'account') {
-      LOGGER.warn(`IdentitySelect supports identity entity type only, given [${ entityType }] type will be ignored.`);
+      LOGGER.warn(`AccountSelect supports account entity type only, given [${ entityType }] type will be ignored.`);
     }
     //
     return (

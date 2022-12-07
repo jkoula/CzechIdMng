@@ -4,7 +4,7 @@ import { Basic } from 'czechidm-core';
  * Identity select option decorator.
  *
  * @author Peter Štrunc
- * @since 10.1.0
+ * @since 13.0.0
  */
 export default class AccountOptionDecorator extends Basic.SelectBox.OptionDecorator {
 

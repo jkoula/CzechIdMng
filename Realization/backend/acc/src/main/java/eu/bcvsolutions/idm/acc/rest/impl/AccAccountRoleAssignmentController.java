@@ -58,12 +58,12 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = BaseDtoController.BASE_PATH + "/" + AccModuleDescriptor.MODULE_ID + "/account-role-assignments")
 @Api(
-		value = SysAccountRoleAssignmentController.TAG,
+		value = AccAccountRoleAssignmentController.TAG,
 		description = "Operations with account role assignments",
-		tags = { SysAccountRoleAssignmentController.TAG },
+		tags = { AccAccountRoleAssignmentController.TAG },
 		produces = BaseController.APPLICATION_HAL_JSON_VALUE,
 		consumes = MediaType.APPLICATION_JSON_VALUE)
-public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoController<AccAccountRoleAssignmentDto, AccAccountRoleAssignmentFilter> {
+public class AccAccountRoleAssignmentController extends AbstractReadWriteDtoController<AccAccountRoleAssignmentDto, AccAccountRoleAssignmentFilter> {
 
 	protected static final String TAG = "Account role assignments";
 	//
@@ -72,7 +72,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@Autowired private FormService formService;
 
 	@Autowired
-	public SysAccountRoleAssignmentController(AccAccountRoleAssignmentService service) {
+	public AccAccountRoleAssignmentController(AccAccountRoleAssignmentService service) {
 		super(service);
 	}
 	
@@ -83,7 +83,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "Search account role assignments (/search/quick alias)",
 			nickname = "searchAccountRoleAssignments",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = {
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_READ, description = "") }),
@@ -102,7 +102,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "Search account role assignment",
 			nickname = "searchQuickAccountRoleAssignments",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = {
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_READ, description = "") }),
@@ -121,7 +121,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "Autocomplete account role assignments (selectbox usage)",
 			nickname = "autocompleteAccountRoleAssignments",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_AUTOCOMPLETE, description = "") }),
@@ -140,7 +140,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "Find assigned roles, which can be requested", 
 			nickname = "findCanBeRequestedAccountRoleAssignments",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_CANBEREQUESTED, description = "") }),
@@ -160,7 +160,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "The number of entities that match the filter", 
 			nickname = "countAccountRoleAssignments",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_COUNT, description = "") }),
@@ -179,7 +179,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 			value = "Account role assignment detail",
 			nickname = "getAccountRoleAssignment",
 			response = AccAccountRoleAssignmentDto.class,
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_READ, description = "") }),
@@ -199,7 +199,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "What logged identity can do with given record", 
 			nickname = "getPermissionsOnAccountRoleAssignment",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_READ, description = "") }),
@@ -225,7 +225,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "Account role assignment extended attributes form definitions",
 			nickname = "getAccountRoleAssignmentFormDefinitions",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_READ, description = "") }),
@@ -264,7 +264,7 @@ public class SysAccountRoleAssignmentController extends AbstractReadWriteDtoCont
 	@ApiOperation(
 			value = "Account role assignment form definition - read values",
 			nickname = "getAccountRoleFormValues",
-			tags = { SysAccountRoleAssignmentController.TAG },
+			tags = { AccAccountRoleAssignmentController.TAG },
 			authorizations = { 
 					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = AccGroupPermission.ACCOUNTROLEASSIGNMENT_READ, description = "") }),

@@ -39,25 +39,25 @@ public abstract class AbstractRoleAssignmentValidProcessor<A extends AbstractRol
     public EventResult<T> process(EntityEvent<T> event) {
         // IdentityRole and IdentityContract must exist - referential integrity.
         //
-        // object identityRole is never null
-        UUID identityRoleId = event.getContent().getRoleAssignmentUuid();
-        A identityRole = roleAssignmentService.get(identityRoleId);
+        // object roleAssignment is never null
+        UUID roleAssignmentId = event.getContent().getRoleAssignmentUuid();
+        A roleAssignment = roleAssignmentService.get(roleAssignmentId);
         //
-        if (identityRole == null) {
-            LOG.warn("[AbstractRoleAssignmentValidProcessor] Identity role doesn't exist for identity role valid request id: [{}]", event.getContent().getId());
+        if (roleAssignment == null) {
+            LOG.warn("[AbstractRoleAssignmentValidProcessor] Role assignment doesn't exist for role assignment valid request id: [{}]", event.getContent().getId());
             return new DefaultEventResult<>(event, this);
         }
         //
-        AbstractDto toProvision = getDtoToProvision(identityRole);
+        AbstractDto toProvision = getDtoToProvision(roleAssignment);
         if (toProvision != null) {
-            LOG.info("[AbstractRoleAssignmentValidProcessor] Start with provisioning for identity role valid request id : [{}]", event.getContent().getId());
+            LOG.info("[AbstractRoleAssignmentValidProcessor] Start with provisioning for role assignment valid request id : [{}]", event.getContent().getId());
             boolean requiredProvisioning = getProvisioningService().accountManagement(toProvision);
             if (requiredProvisioning) {
                 // do provisioning, for newly valid role
                 getProvisioningService().doProvisioning(toProvision);
             }
         } else {
-            LOG.warn("[AbstractRoleAssignmentValidProcessor] Identity contract doesn't exist for identity role valid request id: [{}]", event.getContent().getId());
+            LOG.warn("[AbstractRoleAssignmentValidProcessor] Identity contract doesn't exist for role assignment valid request id: [{}]", event.getContent().getId());
         }
         //
         return new DefaultEventResult<>(event, this);

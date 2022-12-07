@@ -132,7 +132,6 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
         this.context.store.dispatch(roleRequestManager.updateEntity(formEntity, `${uiKey}-detail`, this.afterSaveAndStartRequest.bind(this)));
       } else {
         // => save only
-        console.log("eeeeee Update: ", formEntity)
         this.context.store.dispatch(roleRequestManager.updateEntity(formEntity, `${uiKey}-detail`, (createdEntity, error) => {
           this.afterSave(createdEntity, error, true);
         }));

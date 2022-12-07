@@ -11,7 +11,7 @@ import javax.persistence.MappedSuperclass;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 @MappedSuperclass
-public class AbstractRoleAssignmentValidRequest extends AbstractEntity {
+public abstract class AbstractRoleAssignmentValidRequest extends AbstractEntity {
     @Embedded
     private OperationResult result;
     @Column(name = "current_attempt")

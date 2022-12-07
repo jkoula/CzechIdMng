@@ -722,7 +722,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                   }
                   //
                   const componentInfo = componentService.getConcepComponentByOwnerType(data[rowIndex].ownerType)
-                  console.log("oooo", componentInfo, data[rowIndex])
                   return (
                     <componentInfo.ownerInfoComponent
                       entityIdentifier={ owner.id }

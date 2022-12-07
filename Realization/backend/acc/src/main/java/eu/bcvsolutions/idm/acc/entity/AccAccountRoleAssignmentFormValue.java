@@ -19,7 +19,7 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "idm_concept_role_form_value", indexes = {
+@Table(name = "acc_role_assignment_form_value", indexes = {
 		@Index(name = "idx_acc_role_ass_form_a", columnList = "owner_id"),
 		@Index(name = "idx_acc_role_ass_form_a_def", columnList = "attribute_id"),
 		@Index(name = "idx_acc_role_ass_form_stxt", columnList = "short_text_value"),

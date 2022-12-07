@@ -109,7 +109,6 @@ conceptManager.getServiceForConcept(conceptDto).save(conceptDto);</script>
     <sequenceFlow id="flow39" sourceRef="exclusivegateway1" targetRef="scripttask5"></sequenceFlow>
     <scriptTask id="scripttask8" name="Set IN_PROGRESS state to concept" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
- println("aaaaaaaaa")
 // Set and save state IN_PROGRESS to concept
 def conceptDto = conceptManager.getServiceForConcept(conceptRole).get(conceptRole.id,null);
 conceptDto.setState(RoleRequestState.IN_PROGRESS);
@@ -129,7 +128,6 @@ def candidates = null;
 //Find all managers
 def requestDto = DtoUtils.getEmbedded(conceptRole, "roleRequest", IdmRoleRequestDto.class);
 candidates = roleRequestService.getGuarantorsForApplicant(requestDto);
-      println("aaaaaaa $candidates")
 
 // If is list of candidates empty, then will be added ADMIN user as default approver
 if(candidates.isEmpty()){

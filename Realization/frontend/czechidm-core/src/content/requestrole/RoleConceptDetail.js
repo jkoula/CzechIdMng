@@ -115,8 +115,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
   save(requestId, cb = null) {
     const entity = this.getEntity();
     entity.roleRequest = requestId;
-    //const {selectedOwnerType} = this.state;
-
 
     this.context.store.dispatch(requestIdentityRoleManager.createEntity(entity, null, cb));
   }
@@ -176,7 +174,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
    */
   _onChangeSelectOfContract(value) {
     const entity = this.state && this.state.entity ? this.state.entity : this.props.entity;
-    console.log("_onChangeSelectOfContract entity", entity)
     const {selectedOwnerType} = this.state;
     let validFrom = value ? value.validFrom : null;
     const now = moment().utc().valueOf();
@@ -184,7 +181,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       validFrom = now;
     }
     const entityFormData = _.merge({}, entity);
-    console.log("_onChangeSelectOfContract entityFormData", entityFormData)
     entityFormData.validFrom = validFrom;
     entityFormData[selectedOwnerType] = value;
     if (this.refs.role) {
@@ -193,7 +189,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     if (this.props.entity) {
       this.setState({entity: entityFormData});
     }
-    console.log("_onChangeSelectOfContract entityFormData after setstate", entityFormData)
     return true;
   }
 
@@ -296,7 +291,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     }
 
     const components = componentService.getRoleAssignmentComponents();
-    console.log("componentsqqqq", components);
 
     return (
       <Basic.AbstractForm
@@ -369,9 +363,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
                                         new SearchParameters().clearSort()
                                     }
                                     pageSize={100}
-                                    //label={this.i18n('entity.IdentityRole.identityContract.label')}
-                                    //placeholder={this.i18n('entity.IdentityRole.identityContract.placeholder')}
-                                    //helpBlock={this.i18n('entity.IdentityRole.identityContract.help')}
                                     returnProperty={false}
                                     readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
                                     onChange={this._onChangeSelectOfContract.bind(this)}

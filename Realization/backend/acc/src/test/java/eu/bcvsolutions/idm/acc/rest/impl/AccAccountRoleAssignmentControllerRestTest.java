@@ -10,19 +10,14 @@ import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
-import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
-import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAuthorizationPolicyDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.RoleBasePermission;
@@ -41,10 +36,10 @@ import java.util.UUID;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 @Component
-public class SysAccountRoleAssignmentControllerRestTest extends AbstractRoleAssignmentControllerRestTest<AccAccountRoleAssignmentDto, AccAccountRoleAssignmentFilter> {
+public class AccAccountRoleAssignmentControllerRestTest extends AbstractRoleAssignmentControllerRestTest<AccAccountRoleAssignmentDto, AccAccountRoleAssignmentFilter> {
 
     @Autowired
-    SysAccountRoleAssignmentController controller;
+    AccAccountRoleAssignmentController controller;
 
     @Autowired
     DefaultAccTestHelper accHelper;

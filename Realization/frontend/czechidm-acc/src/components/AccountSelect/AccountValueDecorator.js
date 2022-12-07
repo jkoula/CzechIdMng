@@ -1,10 +1,10 @@
 import { Basic, Utils } from 'czechidm-core';
 
 /**
- * Identity select value decorator.
+ * Account select value decorator.
  *
- * @author Radek Tomiška
- * @since 10.1.0
+ * @author Peter Štrunc
+ * @since 13.0.0
  */
 export default class AccountValueDecorator extends Basic.SelectBox.ValueDecorator {
 
