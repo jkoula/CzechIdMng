@@ -10,10 +10,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.Opt;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -699,5 +704,24 @@ public class ParameterConverter {
 			throw new CoreException(ex);
 		}
 		return output;
+	}
+
+	public Class<?> toClass(MultiValueMap<String, Object> data, String ownerType) {
+		if (data.getFirst(ownerType) instanceof Class<?>) {
+			return (Class<?>) data.getFirst(ownerType);
+		}
+		// Try to transform String to class
+		return Optional.ofNullable(data.getFirst(ownerType))
+				.map(String::valueOf)
+				.flatMap(this::stringToClass)
+				.orElse(null);
+	}
+
+	private Optional<Class<?>> stringToClass(final String s) {
+		try {
+			return Optional.of(Class.forName(s));
+		} catch (ClassNotFoundException e) {
+			return Optional.empty();
+		}
 	}
 }

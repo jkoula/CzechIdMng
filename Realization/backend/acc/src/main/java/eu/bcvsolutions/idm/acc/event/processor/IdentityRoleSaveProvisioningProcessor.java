@@ -3,6 +3,8 @@ package eu.bcvsolutions.idm.acc.event.processor;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +45,15 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 @Component
 @Enabled(AccModuleDescriptor.MODULE_ID)
 @Description("Executes account management and provisioning after identity role is saved.")
-public class IdentityRoleSaveProvisioningProcessor extends AbstractEntityEventProcessor<IdmIdentityRoleDto> {
+public class IdentityRoleSaveProvisioningProcessor extends AbstractEntityEventProcessor<AbstractRoleAssignmentDto> {
 
 	public static final String PROCESSOR_NAME = "identity-role-save-provisioning-processor";
 	private static final Logger LOG = LoggerFactory.getLogger(IdentityRoleSaveProvisioningProcessor.class);
 	//
-	@Autowired private IdmIdentityContractService identityContractService;
 	@Autowired private EntityEventManager entityEventManager;
 	@Autowired private AccAccountManagementService accountManagementService;
 	@Autowired private ProvisioningService provisioningService;
-	@Autowired private IdmIdentityRoleService identityRoleService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 	@Autowired private AccAccountService accountService;
 	
 
@@ -70,7 +71,7 @@ public class IdentityRoleSaveProvisioningProcessor extends AbstractEntityEventPr
 	 *  Look out, request event is already closed, when asynchronous processing is disabled.
 	 */
 	@Override
-	public boolean conditional(EntityEvent<IdmIdentityRoleDto> event) {
+	public boolean conditional(EntityEvent<AbstractRoleAssignmentDto> event) {
 		if (!super.conditional(event)) {
 			return false;
 		}
@@ -98,11 +99,11 @@ public class IdentityRoleSaveProvisioningProcessor extends AbstractEntityEventPr
 	}
  
 	@Override
-	public EventResult<IdmIdentityRoleDto> process(EntityEvent<IdmIdentityRoleDto> event) {
-		IdmIdentityRoleDto identityRole = event.getContent();
+	public EventResult<AbstractRoleAssignmentDto> process(EntityEvent<AbstractRoleAssignmentDto> event) {
+		AbstractRoleAssignmentDto roleAssignment = event.getContent();
 		
 		// If for this role doesn't exists any mapped system, the is provisioning useless!
-		UUID roleId = identityRole.getRole();
+		UUID roleId = roleAssignment.getRole();
 		SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
 		roleSystemFilter.setRoleId(roleId);
 		
@@ -115,22 +116,21 @@ public class IdentityRoleSaveProvisioningProcessor extends AbstractEntityEventPr
 		// return new DefaultEventResult<>(event, this);
 		// }
 				
-		IdmIdentityContractDto identityContract = identityContractService.get(identityRole.getIdentityContract());
-		IdmIdentityDto identity = DtoUtils.getEmbedded(identityContract, IdmIdentityContract_.identity);
+		IdmIdentityDto identity = roleAssignmentManager.getServiceForAssignment(roleAssignment).getRelatedIdentity(roleAssignment);
 		
 		// TODO: Basically this doesn't work, because identity-role is already created
 		// (not committed). So every times will be called update ACM, but this isn't big issue (only
 		// some redundant selects will be executed).
 		// TODO: event.getParentType() === CREATE can be used instead
-		boolean isNew = identityRoleService.isNew(identityRole);
+		boolean isNew = roleAssignmentManager.getServiceForAssignment(roleAssignment).isNew(roleAssignment);
 		
-		LOG.debug("Call account management for identity [{}] and identity-role [{}]", identity.getUsername(), identityRole.toString());
+		LOG.debug("Call account management for identity [{}] and identity-role [{}]", identity.getUsername(), roleAssignment.toString());
 		
 		List<UUID> accountIds = null;
 		if(isNew) {
-			accountIds = accountManagementService.resolveNewIdentityRoles(identity, identityRole);
+			accountIds = accountManagementService.resolveNewIdentityRoles(identity, roleAssignment);
 		} else {
-			accountIds = accountManagementService.resolveUpdatedIdentityRoles(identity, identityRole);
+			accountIds = accountManagementService.resolveUpdatedIdentityRoles(identity, roleAssignment);
 		}
 		
 		if (accountIds != null) {

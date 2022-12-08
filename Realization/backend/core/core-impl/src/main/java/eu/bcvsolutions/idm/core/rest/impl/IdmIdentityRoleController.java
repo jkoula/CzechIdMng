@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -66,7 +67,7 @@ import io.swagger.annotations.AuthorizationScope;
 		consumes = MediaType.APPLICATION_JSON_VALUE)
 public class IdmIdentityRoleController extends AbstractReadWriteDtoController<IdmIdentityRoleDto, IdmIdentityRoleFilter> {
 	
-	protected static final String TAG = "Identity roles ~ assigned roles";
+	public static final String TAG = "Identity roles ~ assigned roles";
 	//
 	@Autowired private IdmFormDefinitionController formDefinitionController;
 	@Autowired private IdmRoleService roleService;
@@ -294,8 +295,8 @@ public class IdmIdentityRoleController extends AbstractReadWriteDtoController<Id
 	protected IdmIdentityRoleFilter toFilter(MultiValueMap<String, Object> parameters) {
 		IdmIdentityRoleFilter filter = new  IdmIdentityRoleFilter(parameters);
 		// TODO: resolve codeable parameters automatically ...
-		filter.setIdentityId(getParameterConverter().toEntityUuid(parameters, IdmIdentityRoleFilter.PARAMETER_IDENTITY_ID, IdmIdentityDto.class));
-		filter.setRoleId(getParameterConverter().toEntityUuid(parameters, IdmIdentityRoleFilter.PARAMETER_ROLE_ID, IdmRoleDto.class));
+		filter.setIdentityId(getParameterConverter().toEntityUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_IDENTITY_ID, IdmIdentityDto.class));
+		filter.setRoleId(getParameterConverter().toEntityUuid(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ID, IdmRoleDto.class));
 		//
 		return filter;
 	}

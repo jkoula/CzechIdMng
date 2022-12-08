@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -18,6 +19,7 @@ import eu.bcvsolutions.idm.core.api.exception.ForbiddenEntityException;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.rest.impl.IdmConceptRoleRequestController;
+import eu.bcvsolutions.idm.core.security.api.domain.ContractBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdentityBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.LoginDto;
@@ -43,7 +45,7 @@ public class RoleRequestByIdentityEvaluatorIntegrationTest extends AbstractEvalu
 		IdmIdentityDto identityTwo = getHelper().createIdentity();
 		// create policy
 		IdmRoleDto role = getHelper().createRole();
-		getHelper().createUuidPolicy(role.getId(), identityOne.getId(), IdmBasePermission.READ);
+		getHelper().createUuidPolicy(role.getId(), identityOne.getId(), IdmBasePermission.READ, ContractBasePermission.CHANGEPERMISSION, ContractBasePermission.CANBEREQUESTED);
 		getHelper().createIdentityRole(identityTwo, role);
 		getHelper().createIdentityRole(identityTwo, roleService.getByCode(RoleConfiguration.DEFAULT_DEFAULT_ROLE));
 		IdmRoleRequestDto roleRequest = getHelper().assignRoles(getHelper().getPrimeContract(identityOne.getId()), role);
@@ -93,7 +95,7 @@ public class RoleRequestByIdentityEvaluatorIntegrationTest extends AbstractEvalu
 			loginService.login(new LoginDto(identityOne.getUsername(), identityOne.getPassword()));
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(identityTwo.getId());
+			roleRequest.setApplicant(new ApplicantImplDto(identityTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
 		} finally {
@@ -116,7 +118,7 @@ public class RoleRequestByIdentityEvaluatorIntegrationTest extends AbstractEvalu
 			loginService.login(new LoginDto(identityOne.getUsername(), identityOne.getPassword()));
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(identityTwo.getId());
+			roleRequest.setApplicant(new ApplicantImplDto(identityTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest = roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
 			//

@@ -9,14 +9,16 @@ import org.springframework.util.MultiValueMap;
  *
  * @author Vít Švanda
  */
-public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
-	
-    private UUID identityId;
-    private boolean includeEav = false;
-    private boolean onlyChanges = false;
-    private boolean includeCandidates = false;
-    private boolean includeCrossDomainsSystemsCount = false;
-    
+public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter implements FormableFilter{
+	private Boolean includeEav = false;
+    private Boolean onlyChanges = false;
+    private Boolean includeCandidates = false;
+    private Boolean includeCrossDomainsSystemsCount = false;
+
+	public static final String ONLY_ASSIGNMENTS_PARAMETER = "onlyAssignments";
+	public static final String VALID_PARAMETER = "isValid";
+	public static final String ROLE_SYSTEM_ID = "roleSystemId";
+
     public IdmRequestIdentityRoleFilter() {
 		super();
 	}
@@ -25,43 +27,60 @@ public class IdmRequestIdentityRoleFilter extends IdmConceptRoleRequestFilter {
     	super(data);
     }
 
-	public UUID getIdentityId() {
-		return identityId;
+	public Boolean isOnlyAssignments() {
+		return getParameterConverter().toBoolean(getData(), ONLY_ASSIGNMENTS_PARAMETER, false);
 	}
 
-	public void setIdentityId(UUID identityId) {
-		this.identityId = identityId;
+	public void setOnlyAssignments(Boolean onlyAssignments) {
+		set(ONLY_ASSIGNMENTS_PARAMETER, onlyAssignments);
 	}
 
-	public boolean isIncludeEav() {
+	public Boolean isIncludeEav() {
 		return includeEav;
 	}
 
-	public void setIncludeEav(boolean includeEav) {
+	public void setIncludeEav(Boolean includeEav) {
 		this.includeEav = includeEav;
 	}
 
-	public boolean isOnlyChanges() {
+	public Boolean isOnlyChanges() {
 		return onlyChanges;
 	}
 
-	public void setOnlyChanges(boolean onlyChanges) {
+	public void setOnlyChanges(Boolean onlyChanges) {
 		this.onlyChanges = onlyChanges;
 	}
 
-	public boolean isIncludeCandidates() {
+	public Boolean isIncludeCandidates() {
 		return includeCandidates;
 	}
 
-	public void setIncludeCandidates(boolean includeCandidates) {
+	public void setIncludeCandidates(Boolean includeCandidates) {
 		this.includeCandidates = includeCandidates;
 	}
 
-	public boolean isIncludeCrossDomainsSystemsCount() {
+	public Boolean isIncludeCrossDomainsSystemsCount() {
 		return includeCrossDomainsSystemsCount;
 	}
 
-	public void setIncludeCrossDomainsSystemsCount(boolean includeCrossDomainsSystemsCount) {
+	public void setIncludeCrossDomainsSystemsCount(Boolean includeCrossDomainsSystemsCount) {
 		this.includeCrossDomainsSystemsCount = includeCrossDomainsSystemsCount;
 	}
+
+	public void setRoleSystemId(UUID id) {
+		set(ROLE_SYSTEM_ID, id);
+	}
+
+	public UUID getRoleSystemId() {
+		return getParameterConverter().toUuid(getData(), ROLE_SYSTEM_ID);
+	}
+
+	public void setValid(Boolean val) {
+		set(VALID_PARAMETER, val);
+	}
+
+	public Boolean isValid() {
+		return getParameterConverter().toBoolean(getData(), VALID_PARAMETER);
+	}
+
 }

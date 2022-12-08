@@ -15,6 +15,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,8 +124,7 @@ public class DefaultFilterManager implements FilterManager {
 					continue;
 				}
 				// check property is processed by service
-				if (!getRegisteredServiceFilters().containsKey(key) // by service definition
-						&& !getRegisteredFilters(entityClass, filter.getClass()).containsKey(key)) { // by filter instance
+				if (isFilterSupported(filter, entityClass, key)) { // by filter instance
 					FilterNotSupportedException ex = new FilterNotSupportedException(key);
 					//
 					if (configurationService.getBooleanValue(
@@ -148,6 +148,11 @@ public class DefaultFilterManager implements FilterManager {
 		}
 		//
 		return predicates;
+	}
+
+	public boolean isFilterSupported(DataFilter filter, Class<? extends BaseEntity> entityClass, FilterKey key) {
+		return !getRegisteredServiceFilters().containsKey(key) // by service definition
+				&& !getRegisteredFilters(entityClass, filter.getClass()).containsKey(key);
 	}
 
 	/**
@@ -210,7 +215,16 @@ public class DefaultFilterManager implements FilterManager {
 		// not ok
 		throw new FilterSizeExceededException(filterKey, size, maximum);
 	}
-	
+
+	@Override
+	public Set<String> getAllowedFilterProperties(Class<BaseDto> clazz) {
+		final Map<FilterKey, FilterBuilderDto> registeredServiceFilters1 = getRegisteredServiceFilters();
+		return registeredServiceFilters1.entrySet().stream()
+				.filter(filterKeyFilterBuilderDtoEntry -> filterKeyFilterBuilderDtoEntry.getValue().equals(clazz))
+				.map(filterKeyFilterBuilderDtoEntry -> filterKeyFilterBuilderDtoEntry.getKey().getName())
+				.collect(Collectors.toSet());
+	}
+
 	/**
 	 * Registered filters - by service and filter builders.
 	 * 

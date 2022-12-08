@@ -41,10 +41,13 @@ import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.AccountWizardDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemEntityDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccountWizardManager;
 import eu.bcvsolutions.idm.acc.service.api.AccountWizardsService;
@@ -55,11 +58,14 @@ import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ResolvedIncompatibleRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.ResultModels;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
 import eu.bcvsolutions.idm.core.api.rest.WizardController;
+import eu.bcvsolutions.idm.core.api.service.IdmIncompatibleRoleService;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
@@ -68,6 +74,7 @@ import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.eav.rest.impl.AbstractFormableDtoController;
 import eu.bcvsolutions.idm.core.eav.rest.impl.IdmFormDefinitionController;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
@@ -103,6 +110,8 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 	@Autowired private SysSystemEntityService systemEntityService;
 	@Autowired private IdmFormDefinitionService formDefinitionService;
 	@Autowired private AccountWizardManager accountWizardManager;
+	@Autowired private IdmIncompatibleRoleService incompatibleRoleService;
+	@Autowired private AccAccountRoleAssignmentService accountRoleAssignmentService;
 	private final IdmFormDefinitionController formDefinitionController;
 	
 	@Autowired
@@ -689,6 +698,46 @@ public class AccAccountController extends AbstractFormableDtoController<AccAccou
 	public ResponseEntity<AccountWizardDto> loadWizardType(@NotNull @Valid @RequestBody AccountWizardDto wizardDto) {
 		// Returning error, because loading wizard is not supported, we are using wizard only for new accounts
 		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/{backendId}/incompatible-roles", method = RequestMethod.GET)
+	@PreAuthorize("hasAuthority('" + AccGroupPermission.ACCOUNT_READ + "')")
+	@ApiOperation(
+			value = "Incompatible roles assigned to account",
+			nickname = "getAccountIncompatibleRoles",
+			tags = { AccAccountController.TAG },
+			authorizations = {
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "") }),
+					@Authorization(value = SwaggerConfig.AUTHENTICATION_CIDMST, scopes = {
+							@AuthorizationScope(scope = AccGroupPermission.ACCOUNT_READ, description = "") })
+			},
+			notes = "Incompatible roles are resolved from assigned account roles, which can logged used read.")
+	public Resources<?> getIncompatibleRoles(
+			@ApiParam(value = "Account's uuid identifier.", required = true)
+			@PathVariable String backendId) {
+		AccAccountDto accountDto = getDto(backendId);
+		if (accountDto == null) {
+			throw new ResultCodeException(CoreResultCode.NOT_FOUND, ImmutableMap.of("entity", backendId));
+		}
+		//
+		AccAccountRoleAssignmentFilter filter = new AccAccountRoleAssignmentFilter();
+		filter.setAccountId(accountDto.getId());
+		List<AccAccountRoleAssignmentDto> accountRoles = accountRoleAssignmentService.find(filter, null, IdmBasePermission.READ).getContent();
+		//
+		Set<ResolvedIncompatibleRoleDto> incompatibleRoles = incompatibleRoleService.resolveIncompatibleRoles(
+				accountRoles
+						.stream()
+						.map(ar -> {
+							IdmRoleDto role = DtoUtils.getEmbedded(ar, IdmIdentityRole_.role);
+							//
+							return role;
+						})
+						.collect(Collectors.toList())
+		);
+		//
+		return toResources(incompatibleRoles, ResolvedIncompatibleRoleDto.class);
 	}
 
 	/**

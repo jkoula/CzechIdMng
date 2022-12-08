@@ -936,6 +936,7 @@ execution.setVariable("logItem", logItem);
               import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
               import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
               import java.text.MessageFormat;
+              import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto
 
                 def resolveMembers(roleId, membersAttribute) { // resolving membership - if some identities are already part of this group
                     String formAttribute = identityIdentificatorFormAttributeCode;
@@ -981,7 +982,7 @@ execution.setVariable("logItem", logItem);
                 def addRoleToUser(roleId, userId, contract) {
                     def operation = ConceptRoleRequestOperation.ADD;
                     def roleRequest = new IdmRoleRequestDto();
-                    roleRequest.setApplicant(userId);
+                    roleRequest.setApplicant(new ApplicantImplDto(userId, IdmIdentityDto.class.getCanonicalName()));
                     roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
                     roleRequest.setExecuteImmediately(true);
                     roleRequest = roleRequestService.save(roleRequest);

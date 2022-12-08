@@ -20,7 +20,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRole;
  * 
  * @author Radek Tomiška
  */
-public interface IdmIdentityRoleRepository extends AbstractEntityRepository<IdmIdentityRole> {
+public interface IdmIdentityRoleRepository extends IdmRoleAssignmentRepository<IdmIdentityRole> {
 	
 	/**
 	 * @param identity

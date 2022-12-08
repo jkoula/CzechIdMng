@@ -54,7 +54,7 @@ public class DefaultSysRoleSystemService
 	@Autowired private IdmRoleCompositionService roleCompositionService;
 	@Autowired private LookupService lookupService;
 	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
-	@Autowired private IdmIdentityRoleService identityRoleService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 
 	@Autowired
 	public DefaultSysRoleSystemService(SysRoleSystemRepository repository) {
@@ -70,9 +70,9 @@ public class DefaultSysRoleSystemService
 		SysRoleSystem roleSystemEntity = this.getEntity(roleSystem.getId());
 
 		// Identity-role check.
-		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 		identityRoleFilter.setRoleSystemId(roleSystemEntity.getId());
-		long count = identityRoleService.count(identityRoleFilter);
+		long count = roleAssignmentManager.count(identityRoleFilter);
 		if (count > 0) {
 			IdmRoleDto roleDto = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.role, IdmRoleDto.class, null);
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE,
@@ -320,20 +320,6 @@ public class DefaultSysRoleSystemService
 
 			predicates.add(builder.exists(subquery));
 		}
-		
-		// Return role-system where is uses given attribute mapping
-		if (filter.getAttributeMappingId() != null) {
-			Subquery<SysRoleSystemAttribute> subquery = query.subquery(SysRoleSystemAttribute.class);
-			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
-			subquery.select(subRoot);
-
-			subquery.where(builder.and( //
-					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
-					builder.equal(subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping).get(AbstractEntity_.id),
-							filter.getAttributeMappingId())));
-
-			predicates.add(builder.exists(subquery));
-		}
 
 		// Get role-systems with cross domains groups for given role (using same merge attribute).
 		if (filter.getIsInCrossDomainGroupRoleId() != null) {
@@ -342,21 +328,11 @@ public class DefaultSysRoleSystemService
 			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
 			subquery.select(subRoot);
 
-			Subquery<SysSystemGroupSystem> subquerySystemGroup = query.subquery(SysSystemGroupSystem.class);
-			Root<SysSystemGroupSystem> subRootSystemGroup = subquerySystemGroup.from(SysSystemGroupSystem.class);
-			subquerySystemGroup.select(subRootSystemGroup);
+			final Subquery<SysSystemGroupSystem> subqueryForSystemGroup = DefaultSysRoleSystemAttributeService.getSubqueryForSystemGroup(subRoot, query, builder);
 
-			subquerySystemGroup.where(builder.and(
-							builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.mergeAttribute),
-									subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping))), // Correlation attribute
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.disabled),
-							Boolean.FALSE),
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.type),
-							SystemGroupType.CROSS_DOMAIN));
-							
 			subquery.where(builder.and( //
 					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
-					builder.exists(subquerySystemGroup),
+					builder.exists(subqueryForSystemGroup),
 					builder.equal(root.get(SysRoleSystem_.role).get(AbstractEntity_.id),
 							filter.getIsInCrossDomainGroupRoleId())));
 

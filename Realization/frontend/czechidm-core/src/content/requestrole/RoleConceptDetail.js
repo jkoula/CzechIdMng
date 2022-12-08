@@ -7,10 +7,13 @@ import { connect } from 'react-redux';
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
-import { IdentityContractManager, RoleTreeNodeManager, RoleManager, DataManager, IdentityRoleManager } from '../../redux';
+import { IdentityContractManager, RoleTreeNodeManager, RoleManager, DataManager, IdentityRoleManager, RequestIdentityRoleManager } from '../../redux';
 import SearchParameters from '../../domain/SearchParameters';
 import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
+import { AccountSelect, Managers } from 'czechidm-acc'
+import ComponentService from "../../services/ComponentService";
+
 
 const identityRoleManager = new IdentityRoleManager();
 const identityContractManager = new IdentityContractManager();
@@ -20,6 +23,9 @@ let selectedRole = null;
 let selectedIdentityRole = null;
 const uiKeyIdentityRoleFormInstance = 'identity-role-form-instance';
 const uiKeyRoleAttributeFormDefinition = 'role-attribute-form-definition';
+const componentService = new ComponentService();
+const requestIdentityRoleManager = new RequestIdentityRoleManager();
+
 
 /**
  * Detail of role concept request
@@ -30,8 +36,12 @@ export class RoleConceptDetail extends Basic.AbstractContent {
 
   constructor(props, context) {
     super(props, context);
+    const updatedEntity = {...props.entity};
+    updatedEntity[props.entity.ownerType] = props.entity.ownerUuid
     this.state = {
-      environment: ConfigLoader.getConfig('role.table.filter.environment', [])
+      entity: updatedEntity,
+      environment: ConfigLoader.getConfig('role.table.filter.environment', []),
+      selectedOwnerType: props.isAccount ? "eu.bcvsolutions.idm.acc.dto.AccAccountDto" : props.entity ? props.entity.ownerType :IdentityContractManager.ENTITY_TYPE
     };
   }
 
@@ -63,6 +73,54 @@ export class RoleConceptDetail extends Basic.AbstractContent {
 
   getForm() {
     return this.refs.form;
+  }
+
+  isValid() {
+    const eavForm = this.getEavForm();
+    if (!this.getForm().isFormValid()) {
+      return false;
+    }
+    return !(eavForm && !eavForm.isValid());
+  }
+
+  getEntity() {
+    let entity = this.getForm().getData();
+    const eavForm = this.getEavForm();
+    let eavValues = null;
+    const {selectedOwnerType} = this.state;
+    //
+    if (eavForm) {
+      eavValues = {values: eavForm.getValues()};
+    }
+
+    // Conversions
+    if ( entity[selectedOwnerType] && _.isObject( entity[selectedOwnerType])) {
+      entity[selectedOwnerType] =  entity[selectedOwnerType].id;
+    }
+    if (entity.role && _.isArray(entity.role)) {
+      entity.roles = entity.role;
+      entity.role = null;
+    }
+    entity.ownerUuid = entity[selectedOwnerType]
+    // Add EAV to entity
+    entity._eav = [eavValues];
+    //
+    const conceptComponentInfo = componentService.getConcepComponentByOwnerType(selectedOwnerType);
+    entity.assignmentType = conceptComponentInfo.entityType[0]
+
+    //
+    return entity;
+  }
+
+  save(requestId, cb = null) {
+    const entity = this.getEntity();
+    entity.roleRequest = requestId;
+
+    this.context.store.dispatch(requestIdentityRoleManager.createEntity(entity, null, cb));
+  }
+
+  handleTabSwitch = (newValue) => {
+    this.setState({selectedOwnerType: newValue})
   }
 
   _initComponent(props) {
@@ -116,6 +174,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
    */
   _onChangeSelectOfContract(value) {
     const entity = this.state && this.state.entity ? this.state.entity : this.props.entity;
+    const {selectedOwnerType} = this.state;
     let validFrom = value ? value.validFrom : null;
     const now = moment().utc().valueOf();
     if (validFrom && moment(validFrom).isBefore(now)) {
@@ -123,14 +182,13 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     }
     const entityFormData = _.merge({}, entity);
     entityFormData.validFrom = validFrom;
-    entityFormData.identityContract = value;
+    entityFormData[selectedOwnerType] = value;
     if (this.refs.role) {
       entityFormData.role = this.refs.role.getValue();
     }
     if (this.props.entity) {
       this.setState({entity: entityFormData});
     }
-
     return true;
   }
 
@@ -185,9 +243,11 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       isEdit,
       multiAdd,
       validationErrors,
-      showEnvironment
+      showEnvironment,
+      isAccount,
+      accountId
     } = this.props;
-    const { environment } = this.state;
+    const { environment,selectedOwnerType } = this.state;
     const entity = this.state.entity ? this.state.entity : this.props.entity;
 
     if (!entity) {
@@ -229,6 +289,8 @@ export class RoleConceptDetail extends Basic.AbstractContent {
         _formInstance = instance;
       });
     }
+
+    const components = componentService.getRoleAssignmentComponents();
 
     return (
       <Basic.AbstractForm
@@ -272,30 +334,52 @@ export class RoleConceptDetail extends Basic.AbstractContent {
           }
           helpBlock={ this.i18n('entity.IdentityRole.roleSystem.help')}
           label={ this.i18n('entity.IdentityRole.roleSystem.label') }/>
-        <Advanced.IdentityContractSelect
-          ref="identityContract"
-          manager={ identityContractManager }
-          forceSearchParameters={
-            new SearchParameters()
-              .setFilter('identity', identityUsername)
-              .setFilter('validNowOrInFuture', true)
-              .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
-              .setFilter('_permission_operator', 'or')
-          }
-          defaultSearchParameters={
-            new SearchParameters().clearSort()
-          }
-          pageSize={ 100 }
-          label={ this.i18n('entity.IdentityRole.identityContract.label') }
-          placeholder={ this.i18n('entity.IdentityRole.identityContract.placeholder') }
-          helpBlock={ this.i18n('entity.IdentityRole.identityContract.help') }
-          returnProperty={false}
-          readOnly={ !added || readOnly || !Utils.Entity.isNew(entity) }
-          onChange={ this._onChangeSelectOfContract.bind(this) }
-          niceLabel={ (contract) => identityContractManager.getNiceLabel(contract, false) }
-          required
-          useFirst
-          clearable={ false }/>
+
+        <Basic.Tabs  onSelect={this.handleTabSwitch} activeKey={selectedOwnerType}>
+            {
+                components.map(component => {
+                        const ManagerType = component.ownerManager;
+                        const managerInstance = new ManagerType();
+
+                        let forceParams = new SearchParameters()
+                        .setFilter('id', accountId)
+                        .setFilter('validNowOrInFuture', true)
+                        .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
+                        .setFilter('_permission_operator', 'or')
+
+                        if(!isAccount) {
+                          forceParams = forceParams.setFilter('identity', identityUsername);
+                        }
+
+                        return <Basic.Tab value={component.ownerType}
+                                          title={this.i18n(component.locale+'._type')}
+                                          rendered={isAccount ? component.ownerType === selectedOwnerType : true}>
+                            {
+                                component.ownerType === selectedOwnerType ? <component.ownerSelectComponent
+                                    ref={component.ownerType}
+                                    manager={managerInstance}
+                                    forceSearchParameters={forceParams}
+                                    defaultSearchParameters={
+                                        new SearchParameters().clearSort()
+                                    }
+                                    pageSize={100}
+                                    returnProperty={false}
+                                    readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
+                                    onChange={this._onChangeSelectOfContract.bind(this)}
+                                    niceLabel={(owner) => managerInstance.getNiceLabel(owner, false)}
+                                    required
+                                    useFirst
+                                    clearable={false}
+                                    disabled={isAccount}
+                                /> : <span/>
+                            }
+                        </Basic.Tab>
+                    }
+                )
+            }
+        </Basic.Tabs>
+
+
         <Basic.LabelWrapper
           label={ this.i18n('entity.IdentityRole.automaticRole.label') }
           helpBlock={ this.i18n('entity.IdentityRole.automaticRole.help') }
@@ -342,14 +426,17 @@ RoleConceptDetail.propTypes = {
   entity: PropTypes.object,
   identityUsername: PropTypes.string,
   readOnly: PropTypes.bool,
-  showEnvironment: PropTypes.bool
+  showEnvironment: PropTypes.bool,
+  isAccount: PropTypes.bool,
+  accountId: PropTypes.string
 };
 
 RoleConceptDetail.defaultProps = {
   multiAdd: false,
   showLoading: false,
   readOnly: true,
-  showEnvironment: true
+  showEnvironment: true,
+  isAccount: false
 };
 
 function select(state) {

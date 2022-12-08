@@ -15,16 +15,10 @@ import eu.bcvsolutions.idm.core.api.dto.filter.EmptyFilter;
  *
  */
 
-public interface IdmIdentityRoleValidRequestService extends ReadWriteDtoService<IdmIdentityRoleValidRequestDto, EmptyFilter> {
+public interface IdmIdentityRoleValidRequestService extends ReadWriteDtoService<IdmIdentityRoleValidRequestDto, EmptyFilter>, RoleAssignmentValidRequestService<IdmIdentityRoleValidRequestDto> {
 	
 	IdmIdentityRoleValidRequestDto createByIdentityRoleId(UUID identityRole);
-	
-	/**
-	 * Method find all {@link IdmIdentityRoleValidRequestDto} that can be process from now = role is valid form today.
-	 * @return
-	 */
-	List<IdmIdentityRoleValidRequestDto> findAllValid();
-	
+
 	/**
 	 * Method find all {@link IdmIdentityRoleValidRequestDto} that can be process from {@value from} given in parameter.
 	 * @param from

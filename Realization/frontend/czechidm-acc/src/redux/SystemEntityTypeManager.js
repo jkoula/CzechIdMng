@@ -24,10 +24,6 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
         return SystemEntityTypeManager.UI_KEY_SUPPORTED_ENTITY_TYPES;
     }
 
-    getUiKey() {
-        return 'entity-type';
-    }
-
     /**
      * Load entity options for specific mapping
      *

@@ -6,6 +6,7 @@ import java.util.concurrent.Executor;
 import javax.persistence.EntityManager;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.filter.MonitoringIgnorableFilterBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,6 @@ import eu.bcvsolutions.idm.core.model.repository.IdmTokenRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmTreeNodeRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmTreeTypeRepository;
 import eu.bcvsolutions.idm.core.model.repository.filter.DefaultFilterManager;
-import eu.bcvsolutions.idm.core.model.repository.filter.MonitoringIgnorableFilterBuilder;
 import eu.bcvsolutions.idm.core.model.repository.thin.IdmIdentityRoleThinRepository;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultConfigurationService;
 import eu.bcvsolutions.idm.core.model.service.impl.DefaultEntityEventManager;
@@ -235,6 +235,7 @@ public class IdmServiceConfiguration {
 	@Autowired private IdmCodeListRepository codeListRepository;
 	@Autowired private IdmCodeListItemRepository codeListItemRepository;
 	@Autowired private IdmAttachmentRepository attachmentRepository;
+	@Autowired private IdmAutomaticRoleRepository automaticRoleRepository;
 	@Autowired private IdmAutomaticRoleAttributeRepository automaticRoleAttributeRepository;
 	@Autowired private IdmAutomaticRoleAttributeRuleRepository automaticRoleAttributeRuleRepository;
 	@Autowired private IdmEntityEventRepository entityEventRepository;
@@ -683,8 +684,7 @@ public class IdmServiceConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(IdmRoleTreeNodeService.class)
 	public IdmRoleTreeNodeService roleTreeNodeService(
-			IdmRoleRequestService roleRequestService, 
-			IdmConceptRoleRequestService conceptRoleRequestService) {
+			IdmRoleRequestService roleRequestService) {
 		return new DefaultIdmRoleTreeNodeService(roleTreeNodeRepository, treeNodeRepository, entityEventManager(), identityRoleService());
 	}
 	
@@ -769,7 +769,8 @@ public class IdmServiceConfiguration {
 	@Bean(name = {"identityRoleService", "idmIdentityRoleService"})
 	@ConditionalOnMissingBean(IdmIdentityRoleService.class)
 	public IdmIdentityRoleService identityRoleService() {
-		return new DefaultIdmIdentityRoleService(identityRoleRepository,  formService(), entityEventManager());
+		return new DefaultIdmIdentityRoleService(identityRoleRepository,  formService(),
+				entityEventManager(), roleService(), lookupService(), automaticRoleRepository, filterManager());
 	}
 	
 	/**

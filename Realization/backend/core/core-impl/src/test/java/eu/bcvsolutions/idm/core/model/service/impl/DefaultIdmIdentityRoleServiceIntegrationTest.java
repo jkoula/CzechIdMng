@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -142,7 +143,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmIdentityRoleDto duplicated = service.getDuplicated(one, two, null);
 		assertNull(duplicated);
 
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
 		concept.setRole(role.getId());
 		concept.setIdentityContract(contract.getId());
@@ -154,10 +155,10 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		concept.setEmbedded(embedded);
 		concepts.add(concept);
 		
-		List<IdmConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
+		List<AbstractConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertFalse(removeDuplicities.isEmpty()); // EAVs for concept missing
 
-		concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		concepts = new ArrayList<>();
 
 		IdmFormInstanceDto instance = new IdmFormInstanceDto();
 		IdmFormValueDto value = new IdmFormValueDto(formAttributeDto);
@@ -169,7 +170,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertFalse(removeDuplicities.isEmpty()); // EAVs for concept is different
 
-		concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		concepts = new ArrayList<>();
 		value = new IdmFormValueDto(formAttributeDto);
 		value.setValue(ATTRIBUTE_ONE_DEFAULT_VALUE);
 		instance.setValues(Lists.newArrayList(value));
@@ -193,7 +194,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmIdentityRoleDto duplicated = service.getDuplicated(one, two, null);
 		assertNull(duplicated);
 
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
 		concept.setRole(role.getId());
 		concept.setIdentityContract(contract.getId());
@@ -205,10 +206,10 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		concept.setEmbedded(embedded);
 		concepts.add(concept);
 
-		List<IdmConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
+		List<AbstractConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertTrue(removeDuplicities.isEmpty()); // concept is duplicit with one
 
-		concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		concepts = new ArrayList<>();
 		concept.setRole(UUID.randomUUID());
 		concept.setDuplicate(null);
 		concept.setDuplicates(null);
@@ -217,7 +218,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertFalse(removeDuplicities.isEmpty()); // Role is different
 
-		concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		concepts = new ArrayList<>();
 		concept.setRole(role.getId());
 		concept.setValidFrom(LocalDate.now().plusDays(50));
 		concept.setValidTill(LocalDate.now().plusDays(60));
@@ -239,7 +240,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmIdentityRoleDto one = getHelper().createIdentityRole(identity, role, null, null);
 
 
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
 		concept.setRole(role.getId());
 		concept.setIdentityContract(contract.getId());
@@ -249,10 +250,10 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		concept.setEmbedded(embedded);
 		concepts.add(concept);
 
-		List<IdmConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
+		List<AbstractConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertTrue(removeDuplicities.isEmpty()); // concept is duplicit with one
 
-		concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		concepts = new ArrayList<>();
 		concept.setDuplicate(null);
 		concept.setDuplicates(null);
 		concepts.add(concept);
@@ -280,7 +281,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		getHelper().createIdentityRole(identity, role, null, null);
 		 getHelper().createIdentityRole(identity, role, null, null);
 
-		List<IdmConceptRoleRequestDto> duplicities = roleRequestService.removeDuplicities(new ArrayList<IdmConceptRoleRequestDto>(), identity.getId());
+		List<AbstractConceptRoleRequestDto> duplicities = roleRequestService.removeDuplicities(new ArrayList<>(), identity.getId());
 		assertTrue(duplicities.isEmpty()); // Deduplication with concept doesn't check current identity roles
 	}
 
@@ -291,7 +292,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		IdmRoleDto role = getHelper().createRole();
 
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		IdmConceptRoleRequestDto conceptOne = new IdmConceptRoleRequestDto();
 		conceptOne.setRole(role.getId());
 		conceptOne.setIdentityContract(contract.getId());
@@ -310,7 +311,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		conceptTwo.setEmbedded(embedded);
 		concepts.add(conceptTwo);
 
-		List<IdmConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
+		List<AbstractConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertFalse(removeDuplicities.isEmpty()); // concept is duplicit with another concept
 		assertEquals(1, removeDuplicities.size());
 		assertEquals(2, concepts.size());
@@ -323,7 +324,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		IdmRoleDto role = getHelper().createRole();
 
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		for (int index = 0; index < 9; index++) {
 			IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
 			concept.setRole(role.getId());
@@ -337,7 +338,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		
 		assertEquals(9, concepts.size());
 
-		List<IdmConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
+		List<AbstractConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertFalse(removeDuplicities.isEmpty());
 		assertEquals(1, removeDuplicities.size());
 		assertEquals(9, concepts.size());
@@ -350,7 +351,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		IdmRoleDto role = getHelper().createRole();
 
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>();
 		for (int index = 10; index < 19; index++) {
 			IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
 			concept.setRole(role.getId());
@@ -365,12 +366,12 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		
 		assertEquals(9, concepts.size());
 
-		List<IdmConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
+		List<AbstractConceptRoleRequestDto> removeDuplicities = roleRequestService.removeDuplicities(concepts, identity.getId());
 		assertFalse(removeDuplicities.isEmpty());
 		assertEquals(1, removeDuplicities.size());
 		assertEquals(9, concepts.size());
-		
-		IdmConceptRoleRequestDto conceptRoleRequestDto = removeDuplicities.get(0);
+
+		AbstractConceptRoleRequestDto conceptRoleRequestDto = removeDuplicities.get(0);
 		assertEquals(LocalDate.now().plusDays(18), conceptRoleRequestDto.getValidTill());
 	}
 
@@ -391,7 +392,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		concept.setValidFrom(LocalDate.now().minusDays(5));
 		concept.setValidTill(LocalDate.now().plusDays(5));
 
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(Lists.newArrayList(concept), Lists.newArrayList());
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(Lists.newArrayList(concept), Lists.newArrayList());
 		assertEquals(1, duplicates.size());
 		assertEquals(concept.getId(), duplicates.get(0).getId());
 		assertTrue(duplicates.get(0) == concept);
@@ -450,12 +451,12 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		conceptFour.setValidFrom(LocalDate.now().minusDays(10));
 		conceptFour.setValidTill(LocalDate.now().plusDays(2));
 
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
 				Lists.newArrayList(conceptOne, conceptTwo, conceptThrid, conceptFour),
 				Lists.newArrayList());
 		assertEquals(4, duplicates.size());
 
-		for (IdmConceptRoleRequestDto concept : duplicates) {
+		for (AbstractConceptRoleRequestDto concept : duplicates) {
 			if (concept.getId().equals(conceptOne.getId())) {
 				assertFalse(concept.getDuplicate());
 			} else if (concept.getId().equals(conceptTwo.getId())) {
@@ -502,12 +503,12 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		conceptTwo.setIdentityContract(contractId);
 		conceptTwo.setOperation(ConceptRoleRequestOperation.ADD);
 
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
 				Lists.newArrayList(conceptOne, conceptTwo),
 				Lists.newArrayList());
 		assertEquals(2, duplicates.size());
 
-		for (IdmConceptRoleRequestDto concept : duplicates) {
+		for (AbstractConceptRoleRequestDto concept : duplicates) {
 			if (concept.getId().equals(conceptOne.getId())) {
 				assertFalse(concept.getDuplicate());
 			} else if (concept.getId().equals(conceptTwo.getId())) {
@@ -544,13 +545,13 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		conceptTwo.setIdentityContract(contractId);
 		conceptTwo.setOperation(ConceptRoleRequestOperation.ADD);
 
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
 				Lists.newArrayList(conceptOne, conceptTwo),
 				Lists.newArrayList());
 		assertEquals(2, duplicates.size());
 
 		// Both concepts are same. Duplicates is controlled by order in list
-		for (IdmConceptRoleRequestDto concept : duplicates) {
+		for (AbstractConceptRoleRequestDto concept : duplicates) {
 			if (concept.getId().equals(conceptOne.getId())) {
 				assertFalse(concept.getDuplicate());
 			} else if (concept.getId().equals(conceptTwo.getId())) {
@@ -569,7 +570,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 	@Test
 	public void testMarkDuplicatesBetweenConceptsEmpty() {
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(
 				Lists.newArrayList(),
 				Lists.newArrayList());
 		assertEquals(0, duplicates.size());
@@ -590,7 +591,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		concept.setEmbedded(embedded);
 		concept.setOperation(ConceptRoleRequestOperation.ADD);
 
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(Lists.newArrayList(concept), Lists.newArrayList(identityRole));
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(Lists.newArrayList(concept), Lists.newArrayList(identityRole));
 		assertEquals(1, duplicates.size());
 
 		DuplicateRolesDto duplicateWithRoles = duplicates.get(0).getDuplicates();
@@ -617,7 +618,7 @@ public class DefaultIdmIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		concept.setEmbedded(embedded);
 		concept.setOperation(ConceptRoleRequestOperation.ADD);
 
-		List<IdmConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(Lists.newArrayList(concept), Lists.newArrayList(identityRole));
+		List<AbstractConceptRoleRequestDto> duplicates = roleRequestService.markDuplicates(Lists.newArrayList(concept), Lists.newArrayList(identityRole));
 		assertEquals(1, duplicates.size());
 		
 		DuplicateRolesDto duplicateWithRoles = duplicates.get(0).getDuplicates();

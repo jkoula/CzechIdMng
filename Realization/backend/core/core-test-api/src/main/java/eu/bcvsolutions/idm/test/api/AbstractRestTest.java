@@ -226,7 +226,7 @@ public abstract class AbstractRestTest extends AbstractIntegrationTest {
 			//
 			// convert embedded object to target DTO classes
 			List<T> results = new ArrayList<>();
-			jsonResources.forEach(jsonResource -> {
+			 jsonResources.forEach(jsonResource -> {
 				results.add(getMapper().convertValue(jsonResource, dtoClass));
 			});
 			//

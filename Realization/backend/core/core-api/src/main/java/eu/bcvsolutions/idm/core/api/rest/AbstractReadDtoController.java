@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import eu.bcvsolutions.idm.core.api.utils.ReflectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -74,6 +76,8 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	@Autowired private ObjectMapper objectMapper;
 	@Autowired private LookupService lookupService;
 	@Autowired private BulkActionManager bulkActionManager;
+
+	@Autowired(required = false) private List<PluggableFilterTranslator<F>> translators;
 	//
 	private FilterConverter filterConverter;
 	private final ReadDtoService<DTO, F> service;
@@ -420,12 +424,34 @@ public abstract class AbstractReadDtoController<DTO extends BaseDto, F extends B
 	 * Transforms request parameters to:
 	 * - {@link BaseFilter} using object mapper
 	 * - {@link DataFilter} using reflection with constructor(parameters).
-	 * 
+	 *
+	 * @deprecated It is no longer advised to override this method. To supply logic for translating filters, please provide
+	 * 				bean of type {@link PluggableFilterTranslator}
 	 * @param parameters
 	 * @return
 	 */
-	protected F toFilter(MultiValueMap<String, Object> parameters) {	
-		return getParameterConverter().toFilter(parameters, getService().getFilterClass());
+	@Deprecated
+	protected F toFilter(MultiValueMap<String, Object> parameters) {
+		return paramsToFilter(parameters);
+	}
+
+	protected final F paramsToFilter(MultiValueMap<String, Object> parameters) {
+		final List<PluggableFilterTranslator<F>> pluggableTranslators = getPluggableTranslators();
+		if (pluggableTranslators.isEmpty()) {
+			return getParameterConverter().toFilter(parameters, getService().getFilterClass());
+		}
+		F filter = null;
+		for (PluggableFilterTranslator<F> translator : pluggableTranslators) {
+			filter = translator.transform(Optional.ofNullable(filter), parameters);
+		}
+		return filter;
+	}
+
+	protected final List<PluggableFilterTranslator<F>> getPluggableTranslators() {
+		if (this.translators == null) {
+			return Collections.emptyList();
+		}
+		return translators;
 	}
 	
 	/**

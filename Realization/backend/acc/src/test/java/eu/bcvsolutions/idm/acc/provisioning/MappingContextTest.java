@@ -4,12 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -180,10 +182,10 @@ public class MappingContextTest extends AbstractIntegrationTest {
 
 		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
 		identityRoleFilter.setIdentityId(identity.getId());
-		List<IdmIdentityRoleDto> identityRoles = identityRoleService
+		List<AbstractRoleAssignmentDto> identityRoles = new ArrayList<>(identityRoleService
 				.find(identityRoleFilter,
 						PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmIdentityRole_.created.getName())))
-				.getContent();
+				.getContent());
 		Assert.assertEquals(2, identityRoles.size());
 
 		TestResource resource = helper.findResource(identity.getUsername());

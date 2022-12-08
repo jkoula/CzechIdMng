@@ -1125,4 +1125,6 @@ public interface TestHelper {
 	IdmScriptDto createScript(String code, IdmScriptCategory category, String ...lines);
 
 	IdmLongRunningTaskDto createLongRunningTask(LongRunningTaskExecutor<?> executor);
+
+	IdmRoleDto createRoleIfNotExists(String incompatibilityRoleTest);
 }

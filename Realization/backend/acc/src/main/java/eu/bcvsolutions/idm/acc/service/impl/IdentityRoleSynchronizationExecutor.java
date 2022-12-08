@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.service.impl;
 
 import java.text.MessageFormat;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,6 @@ import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 
 @Component
 public class IdentityRoleSynchronizationExecutor extends AbstractSynchronizationExecutor<IdmIdentityRoleDto>
@@ -49,7 +49,7 @@ public class IdentityRoleSynchronizationExecutor extends AbstractSynchronization
 				MessageFormat.format(
 						"Call provisioning (process IdentityRoleEvent.UPDATE) for identity-role ({0}).",
 						entity.getId()));
-		entityEventManager.process(new IdentityRoleEvent(IdentityRoleEventType.UPDATE, entity)).getContent();
+		entityEventManager.process(new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE, entity)).getContent();
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public class IdentityRoleSynchronizationExecutor extends AbstractSynchronization
 		// Content will be set in service (we need do transform entity to DTO). 
 		// Here we set only dummy DTO (null content is not allowed)
 		EntityEvent<IdmIdentityRoleDto> event = new IdentityRoleEvent(
-				service.isNew(entity) ? IdentityRoleEventType.CREATE : IdentityRoleEventType.UPDATE, 
+				service.isNew(entity) ? AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE : AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE,
 				entity, 
 				ImmutableMap.of(ProvisioningService.SKIP_PROVISIONING, skipProvisioning));
 		

@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.core.model.event.processor.identity;
 
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -16,7 +18,6 @@ import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 
 /**
  * Assign sub roles of currently assigned identity roles.
@@ -39,7 +40,7 @@ public class IdentityRoleAssignSubRolesProcessor
 	@Autowired private IdmRoleCompositionService roleCompositionService;
 	
 	public IdentityRoleAssignSubRolesProcessor() {
-		super(IdentityRoleEventType.NOTIFY);
+		super(AbstractRoleAssignmentEvent.RoleAssignmentEventType.NOTIFY);
 	}
 	
 	@Override
@@ -53,7 +54,7 @@ public class IdentityRoleAssignSubRolesProcessor
 			return false;
 		}
 		// listen event only if role has some sub roles
-		IdmRoleDto assignedRole = DtoUtils.getEmbedded(event.getContent(), IdmIdentityRole_.role, (IdmRoleDto) null);
+		IdmRoleDto assignedRole = DtoUtils.getEmbedded(event.getContent(), AbstractRoleAssignment_.role, (IdmRoleDto) null);
 		if (assignedRole == null) {
 			return true;
 		}

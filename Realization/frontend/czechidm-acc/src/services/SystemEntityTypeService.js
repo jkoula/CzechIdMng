@@ -57,6 +57,20 @@ export default class SystemEntityTypeService extends Services.AbstractService {
         });
     }
 
+    /**
+    * Returns resource by given id
+    *
+    * @param  {string|number} id resource identifier
+    * @return {Promise} promise with response
+    */
+    getById(id) {
+        return super.getById(id).then(json => {
+            let result = { ...json } ;
+            result.id = result.systemEntityCode;
+            return result;
+        });
+    }
+
     getNiceLabel(entity) {
         return Services.LocalizationService.i18n(`${entity.module}:entity.SystemEntityType.${entity.systemEntityCode}.label`);
     }

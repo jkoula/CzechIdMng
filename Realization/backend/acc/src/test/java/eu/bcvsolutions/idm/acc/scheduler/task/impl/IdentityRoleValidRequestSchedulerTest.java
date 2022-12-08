@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import java.time.LocalDate;
+
+import eu.bcvsolutions.idm.core.api.service.RoleAssignmentValidRequestService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,6 +82,8 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 	@Autowired private IdmIdentityRoleRepository identityRoleRepository;
 	@Autowired private IdmLongRunningTaskService longRunningTaskService;
 	@Autowired private IdmIdentityRoleValidRequestService identityRoleValidRequestService;
+
+	@Autowired List<RoleAssignmentValidRequestService> vrs;
 	//
 	// local variables
 	private SysSystemDto system = null;
@@ -159,7 +163,7 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 		// it must not exists
 		assertEquals(true, list.isEmpty());
 		//
-		IdentityRoleValidRequestTaskExecutor taskExecutor1 = new IdentityRoleValidRequestTaskExecutor();
+		IdentityRoleValidRequestTaskExecutor taskExecutor1 = new IdentityRoleValidRequestTaskExecutor(vrs);
 		
 		LongRunningFutureTask<Boolean> futureTask1 = longRunningTaskManager.execute(taskExecutor1);
 		assertEquals(true, futureTask1.getFutureTask().get());
@@ -181,7 +185,7 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 		identityRoleRepository.save(identityRole);
 		
 		// execute again
-		IdentityRoleValidRequestTaskExecutor taskExecutor2 = new IdentityRoleValidRequestTaskExecutor();
+		IdentityRoleValidRequestTaskExecutor taskExecutor2 = new IdentityRoleValidRequestTaskExecutor(vrs);
 
 		LongRunningFutureTask<Boolean> futureTask2 = longRunningTaskManager.execute(taskExecutor2);
 		
@@ -239,7 +243,7 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 		list = identityRoleValidRequestService.findAllValid();
 		assertEquals(MAX_CREATE, list.size());
 		
-		IdentityRoleValidRequestTaskExecutor taskExecutor = new IdentityRoleValidRequestTaskExecutor();
+		IdentityRoleValidRequestTaskExecutor taskExecutor = new IdentityRoleValidRequestTaskExecutor(vrs);
 		LongRunningFutureTask<Boolean> futureTask = longRunningTaskManager.execute(taskExecutor);
 		
 		assertEquals(true, futureTask.getFutureTask().get());

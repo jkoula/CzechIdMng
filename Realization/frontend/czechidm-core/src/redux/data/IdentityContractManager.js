@@ -1,5 +1,6 @@
 import FormableEntityManager from './FormableEntityManager';
 import { IdentityContractService } from '../../services';
+import ConceptRoleRequestManager from "./ConceptRoleRequestManager";
 
 /**
  * Identity contracts
@@ -48,3 +49,5 @@ export default class IdentityContractManager extends FormableEntityManager {
     return this.getService().getNiceLabel(entity, showIdentity);
   }
 }
+
+IdentityContractManager.ENTITY_TYPE = "eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto";

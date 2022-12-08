@@ -28,6 +28,7 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmAutomaticRoleAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
@@ -219,7 +220,7 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setState(RoleRequestState.CONCEPT);
 			roleRequest.setExecuteImmediately(true); // without approval
-			roleRequest.setApplicant(identityId);
+			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 			roleRequest = roleRequestService.save(roleRequest);
 			//
@@ -285,7 +286,7 @@ public class RemoveAutomaticRoleTaskExecutor extends AbstractSchedulableStateful
 				//
 				// Find all concepts and remove relation on automatic role
 				IdmConceptRoleRequestFilter conceptRequestFilter = new IdmConceptRoleRequestFilter();
-				conceptRequestFilter.setAutomaticRole(getAutomaticRoleId());
+				conceptRequestFilter.setAutomaticRoleId(getAutomaticRoleId());
 				//
 				List<IdmConceptRoleRequestDto> concepts = conceptRequestService.find(conceptRequestFilter, null).getContent();
 

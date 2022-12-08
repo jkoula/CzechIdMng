@@ -253,7 +253,7 @@ public class DefaultIdmAutomaticRoleRequestService extends
 			variables.put("approvalForAutomaticRole", Boolean.TRUE);
 
 			ProcessInstance processInstance = workflowProcessInstanceService.startProcess(wfDefinition,
-					IdmRoleDto.class.getSimpleName(), request.getCreator(), request.getCreatorId().toString(),
+					IdmRoleDto.class.getSimpleName(), request.getCreatorId().toString(),
 					variables);
 			// We have to refresh request (maybe was changed in wf process)
 			request = this.get(request.getId());

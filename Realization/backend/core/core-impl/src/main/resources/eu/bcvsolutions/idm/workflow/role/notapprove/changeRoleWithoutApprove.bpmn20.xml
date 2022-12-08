@@ -17,11 +17,11 @@
       <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
  
 // Set and save state APPROVED to concept
-def conceptDto = conceptRoleRequestService.get(conceptRole.id);
+def conceptDto = conceptManager.getServiceForConcept(conceptRole).get(conceptRole.id);
 conceptDto.setState(RoleRequestState.APPROVED);
 // Save process ID to concept
 conceptDto.setWfProcessId(processInstanceId);
-conceptRoleRequestService.save(conceptDto);
+conceptManager.getServiceForConcept(conceptDto).save(conceptDto);
 </script>
     </scriptTask>
     <serviceTask id="servicetask6" name="Create name of process" activiti:expression="Remove role &quot;{{${conceptRole.role != null ? roleService.get(conceptRole.role, null).name : 'N/A'}}}&quot; (bez schvalování) asigned on &quot;{{${identityService.getNiceLabel(identityService.get(applicantIdentifier, null))}}}&quot; without approving" activiti:resultVariableName="processInstanceName"></serviceTask>

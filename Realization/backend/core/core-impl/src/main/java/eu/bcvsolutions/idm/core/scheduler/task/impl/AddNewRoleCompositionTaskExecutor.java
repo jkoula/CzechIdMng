@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,9 +21,11 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -132,7 +135,7 @@ public class AddNewRoleCompositionTaskExecutor extends AbstractSchedulableStatef
 					compositionFilter.setSuperiorId(identityRole.getRole());
 					compositionFilter.setId(roleCompositionId);
 					//
-					List<IdmConceptRoleRequestDto> concepts = roleCompositionService
+					List<AbstractConceptRoleRequestDto> concepts = roleCompositionService
 							.find(compositionFilter, null)
 							.stream()
 							.map(subRole -> {
@@ -155,7 +158,7 @@ public class AddNewRoleCompositionTaskExecutor extends AbstractSchedulableStatef
 					if (!concepts.isEmpty()) {
 						IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 						roleRequest.setConceptRoles(concepts);
-						roleRequest.setApplicant(contract.getIdentity());
+						roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 						roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 					}
 				});

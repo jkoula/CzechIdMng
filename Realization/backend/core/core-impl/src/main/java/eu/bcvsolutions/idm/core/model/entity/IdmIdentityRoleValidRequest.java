@@ -1,8 +1,6 @@
 package eu.bcvsolutions.idm.core.model.entity;
 
-import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Index;
@@ -12,9 +10,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
-import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 
 /**
  * Request to role that has valid in future
@@ -29,7 +24,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
 @Table(name = "idm_identity_role_valid_req", indexes = {
 		@Index(name = "idx_idm_identity_role_id", columnList = "identity_role_id")
 })
-public class IdmIdentityRoleValidRequest extends AbstractEntity {
+public class IdmIdentityRoleValidRequest extends AbstractRoleAssignmentValidRequest {
 
 	private static final long serialVersionUID = 4194613317799794221L;
 
@@ -38,12 +33,6 @@ public class IdmIdentityRoleValidRequest extends AbstractEntity {
 	@OneToOne(optional = false)
 	@JoinColumn(name = "identity_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	private IdmIdentityRole identityRole;
-	
-	@Embedded
-	private OperationResult result;
-	
-	@Column(name = "current_attempt")
-	private int currentAttempt = 0;
 
 	public IdmIdentityRole getIdentityRole() {
 		return identityRole;
@@ -52,24 +41,5 @@ public class IdmIdentityRoleValidRequest extends AbstractEntity {
 	public void setIdentityRole(IdmIdentityRole identityRole) {
 		this.identityRole = identityRole;
 	}
-	
-	public OperationResult getResult() {
-		return result;
-	}
-	
-	public void setResult(OperationResult result) {
-		this.result = result;
-	}
 
-	public int getCurrentAttempt() {
-		return currentAttempt;
-	}
-
-	public void setCurrentAttempt(int currentAttempt) {
-		this.currentAttempt = currentAttempt;
-	}
-	
-	public void increaseAttempt() {
-		this.currentAttempt++;
-	}
 }

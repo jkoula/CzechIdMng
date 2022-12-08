@@ -106,8 +106,7 @@ public abstract class AbstractWorkflowEventProcessor<DTO extends BaseDto> extend
 		IdmIdentityDto modifier = authentication == null ? null : authentication.getCurrentIdentity();
 		return workflowService.startProcess(
 				getWorkflowDefinitionKey(),
-				modifier == null ? null : modifier.getClass().getSimpleName(), 
-				authentication == null ? null : authentication.getCurrentUsername(), 
+				modifier == null ? null : modifier.getClass().getSimpleName(),
 				modifier == null || modifier.getId() == null ? null : modifier.getId().toString(), 
 				variables);
 	}

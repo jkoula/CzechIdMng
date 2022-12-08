@@ -67,4 +67,25 @@ export default class AccountService extends WizardService {
   getDefaultSearchParameters() {
     return super.getDefaultSearchParameters().setName(Domain.SearchParameters.NAME_QUICK).clearSort().setSort('systemEntity.uid');
   }
+
+    /**
+   * Incompatible roles are resolved from currently assigned account roles
+   *
+   * @param accountId {string}
+   * @param token {string}
+   * @return {Promise}
+   */
+    getIncompatibleRoles(accountId, token = null) {
+      return Services.RestApiService
+        .get(`${ this.getApiPath() }/${ encodeURIComponent(accountId) }/incompatible-roles`, token)
+        .then(response => {
+          return response.json();
+        })
+        .then(json => {
+          if (Utils.Response.hasError(json)) {
+            throw Utils.Response.getFirstError(json);
+          }
+          return json;
+        });
+    }
 }
