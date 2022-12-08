@@ -28,5 +28,6 @@
 	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="WARN"/>
 	<logger name="org.identityconnectors" level="ERROR"/>
 	<logger name="net.tirasa.connid" level="ERROR"/>
+	<logger name="org.activiti" level="INFO"/>
 
 </configuration>

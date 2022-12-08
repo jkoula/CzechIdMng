@@ -49,6 +49,7 @@ class IdentityRoleDashboard extends Basic.AbstractContent {
             forceSearchParameters={
               new Domain.SearchParameters()
                 .setFilter('identityId', entityId)
+                .setFilter('onlyAssignments', true)
                 .setFilter('directRole', true)
                 .setFilter('addEavMetadata', true)
             }

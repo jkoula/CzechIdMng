@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
@@ -12,11 +13,13 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleFormAttributeDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleFormAttributeFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.exception.InvalidFormException;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRequestIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleFormAttributeService;
@@ -48,6 +51,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -71,6 +75,9 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 	@Autowired
 	private IdmRoleFormAttributeService roleFormAttributeService;
 
+	@Autowired
+	private IdmConceptRoleRequestService conceptRoleRequestService;
+
 	private final static String IP = "IP";
 	private final static String NUMBER_OF_FINGERS = "NUMBER_OF_FINGERS";
 
@@ -93,7 +100,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -104,7 +111,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertNotNull(request);
@@ -115,9 +122,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		// cast here is probably ok
+		IdmConceptRoleRequestDto concept = (IdmConceptRoleRequestDto) request.getConceptRoles().get(0);
 		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
@@ -143,7 +151,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setRoles(Sets.newSet(roleTwo.getId(), roleThree.getId()));
 		dto.setValidFrom(LocalDate.now().minusDays(1));
@@ -154,7 +162,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertNotNull(createdRequestIdentityRole);
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertNotNull(request);
@@ -165,10 +173,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(3, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		request.getConceptRoles().forEach(concept -> {
-			Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+			Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 			Assert.assertTrue(roles.contains(concept.getRole()));
 			Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
 			Assert.assertEquals(createdRequestIdentityRole.getValidTill(), concept.getValidTill());
@@ -197,9 +205,9 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for remove identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
-		dto.setIdentityRole(identityRoles.get(0).getId());
-		dto.setId(dto.getIdentityRole());
+		dto.setOwnerUuid(contract.getId());
+		dto.setRoleAssignmentUuid(identityRoles.get(0).getId());
+		dto.setId(dto.getRoleAssignmentUuid());
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService
 				.deleteRequestIdentityRole(dto);
@@ -208,7 +216,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -216,10 +224,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(ConceptRoleRequestOperation.REMOVE, concept.getOperation());
 
@@ -241,11 +249,12 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for updated identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
-		dto.setIdentityRole(identityRoles.get(0).getId());
-		dto.setId(dto.getIdentityRole());
+		dto.setOwnerUuid(contract.getId());
+		dto.setRoleAssignmentUuid(identityRoles.get(0).getId());
+		dto.setId(dto.getRoleAssignmentUuid());
 		dto.setValidFrom(LocalDate.now().minusDays(10));
 		dto.setValidTill(LocalDate.now().plusDays(10));
+		dto.setState(RoleRequestState.IN_PROGRESS);
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
 
@@ -253,7 +262,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -261,10 +270,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(ConceptRoleRequestOperation.UPDATE, concept.getOperation());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
@@ -286,7 +295,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
@@ -300,7 +309,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -308,10 +317,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
 		Assert.assertEquals(createdRequestIdentityRole.getValidTill(), concept.getValidTill());
@@ -338,11 +347,12 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for updated identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
-		dto.setIdentityRole(identityRoles.get(0).getId());
-		dto.setId(dto.getIdentityRole());
+		dto.setOwnerUuid(contract.getId());
+		dto.setRoleAssignmentUuid(identityRoles.get(0).getId());
+		dto.setId(dto.getRoleAssignmentUuid());
 		dto.setValidFrom(LocalDate.now().plusDays(5));
 		dto.setValidTill(LocalDate.now().minusDays(10));
+		dto.setState(RoleRequestState.IN_PROGRESS);
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
 		Assert.assertEquals(LocalDate.now().plusDays(5), createdRequestIdentityRole.getValidFrom());
@@ -357,7 +367,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -365,10 +375,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
-		IdmConceptRoleRequestDto concept = request.getConceptRoles().get(0);
-		Assert.assertEquals(contract.getId(), concept.getIdentityContract());
+		AbstractConceptRoleRequestDto concept = request.getConceptRoles().get(0);
+		Assert.assertEquals(contract.getId(), concept.getOwnerUuid());
 		Assert.assertEquals(role.getId(), concept.getRole());
 		Assert.assertEquals(ConceptRoleRequestOperation.UPDATE, concept.getOperation());
 		Assert.assertEquals(createdRequestIdentityRole.getValidFrom(), concept.getValidFrom());
@@ -390,7 +400,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -401,7 +411,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Request must been created
 		Assert.assertNotNull(createdRequestIdentityRole.getRoleRequest());
 		Assert.assertEquals(role.getId(), createdRequestIdentityRole.getRole());
-		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getIdentityContract());
+		Assert.assertEquals(contract.getId(), createdRequestIdentityRole.getOwnerUuid());
 
 		IdmRoleRequestDto request = roleRequestService.get(createdRequestIdentityRole.getRoleRequest(),
 				new IdmRoleRequestFilter(true));
@@ -409,7 +419,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Concepts are not empty now
 		Assert.assertEquals(1, request.getConceptRoles().size());
 		// Applicant must be ours identity
-		Assert.assertEquals(contract.getIdentity(), request.getApplicant());
+		Assert.assertEquals(contract.getIdentity(), request.getApplicant().getId());
 
 		// Delete adding concept
 		requestIdentityRoleService.deleteRequestIdentityRole(createdRequestIdentityRole);
@@ -430,7 +440,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmRoleDto role = this.getHelper().createRole();
 
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
-		filter.setIdentityId(identity.getId());
+		filter.setIdentity(identity.getId());
+		final List<IdmIdentityRoleDto> allByIdentity = identityRoleService.findAllByIdentity(identity.getId());
 
 		// We expecting only one already assigned identity-role
 		List<IdmRequestIdentityRoleDto> requestIdentityRoles = requestIdentityRoleService.find(filter, null)
@@ -440,10 +451,11 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
+		dto.setOperation(ConceptRoleRequestOperation.ADD);
 
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = requestIdentityRoleService.save(dto);
 		Assert.assertNotNull(createdRequestIdentityRole);
@@ -452,7 +464,18 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Filter will be filtering by this request
 		filter.setRoleRequestId(createdRequestIdentityRole.getRoleRequest());
 
+
+		IdmIdentityRoleFilter irf = new IdmIdentityRoleFilter();
+
+		irf.setIdentityId(identity.getId());
+		final Page<IdmIdentityRoleDto> idmIdentityRoleDtos = identityRoleService.find(irf,null);
+
 		// We expecting two items, one assigned identity-role and one adding concept
+		IdmConceptRoleRequestFilter crf = new IdmConceptRoleRequestFilter();
+		crf.setIdentity(identity.getId());
+		crf.setRoleRequestId(createdRequestIdentityRole.getRoleRequest());
+		crf.setIdentityRoleIsNull(true);
+		final Page<IdmConceptRoleRequestDto> idmConceptRoleRequestDtos = conceptRoleRequestService.find(crf, null);
 		requestIdentityRoles = requestIdentityRoleService.find(filter, null).getContent();
 		Assert.assertEquals(2, requestIdentityRoles.size());
 
@@ -468,7 +491,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Create request for remove identity-role
 		IdmRequestIdentityRoleDto dtoForRemove = new IdmRequestIdentityRoleDto();
 		dtoForRemove.setRoleRequest(createdRequestIdentityRole.getRoleRequest());
-		dtoForRemove.setIdentityRole(identityRole.getId());
+		dtoForRemove.setRoleAssignmentUuid(identityRole.getId());
 		dtoForRemove.setId(identityRole.getId());
 
 		// Remove existing identity-role -> new removing concept
@@ -485,9 +508,8 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 				.findFirst().orElse(null);
 		Assert.assertNotNull(removingConcept);
 		Assert.assertEquals(createdRequestIdentityRole.getRoleRequest(), removingConcept.getRoleRequest());
-		Assert.assertEquals(identityRole.getId(), removingConcept.getIdentityRole());
-		Assert.assertNotEquals(removingConcept.getId(), removingConcept.getIdentityRole());
-
+		Assert.assertEquals(identityRole.getId(), removingConcept.getRoleAssignmentUuid());
+		Assert.assertNotEquals(removingConcept.getId(), removingConcept.getRoleAssignmentUuid());
 	}
 	
 	@Test
@@ -500,7 +522,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		IdmRoleDto role = this.getHelper().createRole();
 
 		IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
-		filter.setIdentityId(identity.getId());
+		filter.setIdentity(identity.getId());
 		filter.setRoleText(assignedRole.getCode());
 
 		// We expecting only one already assigned identity-role
@@ -511,7 +533,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request for new identity-role
 		IdmRequestIdentityRoleDto dto = new IdmRequestIdentityRoleDto();
-		dto.setIdentityContract(contract.getId());
+		dto.setOwnerUuid(contract.getId());
 		dto.setRole(role.getId());
 		dto.setValidFrom(LocalDate.now().minusDays(1));
 		dto.setValidTill(LocalDate.now().plusDays(10));
@@ -562,7 +584,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request identity-role
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());
@@ -586,7 +608,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertNotNull(request);
 
 		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
-		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setIdentity(identity.getId());
 		filterRequestIdentityRole.setRoleRequestId(request.getId());
 		// Include EAV attributes
 		filterRequestIdentityRole.setIncludeEav(true);
@@ -635,7 +657,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request identity-role
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());
@@ -660,7 +682,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		getHelper().executeRequest(request, false, true);
 
 		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
-		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setIdentity(identity.getId());
 		filterRequestIdentityRole.setRoleRequestId(request.getId());
 		// Include EAV attributes
 		filterRequestIdentityRole.setIncludeEav(true);
@@ -678,7 +700,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(((BigDecimal)formValueDto.getValue()).longValue(), ((BigDecimal)value).longValue());
 		IdmFormAttributeDto mappedAttribute = formInstance.getMappedAttribute(formValue.getFormAttribute());
 		Assert.assertNotNull(mappedAttribute);
-		Assert.assertNull(formInstance.getValidationErrors());
+		Assert.assertEquals(0, formInstance.getValidationErrors().size());
 
 		identityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
 		assertEquals(1, identityRoles.size());
@@ -686,10 +708,10 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		// Create request for change an identity-role
 		IdmRequestIdentityRoleDto changeRequestIdentityRole = new IdmRequestIdentityRoleDto();
 		changeRequestIdentityRole.setId(identityRoles.get(0).getId());
-		changeRequestIdentityRole.setIdentityContract(contract.getId());
+		changeRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		changeRequestIdentityRole.setValidFrom(LocalDate.now());
-		changeRequestIdentityRole.setIdentityRole(identityRoles.get(0).getId());
+		changeRequestIdentityRole.setRoleAssignmentUuid(identityRoles.get(0).getId());
 		changeRequestIdentityRole.setEavs(forms);
 		changeRequestIdentityRole = requestIdentityRoleService.save(changeRequestIdentityRole);
 
@@ -734,7 +756,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 
 		// Create request identity-role
 		IdmRequestIdentityRoleDto createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());
@@ -759,7 +781,7 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		getHelper().executeRequest(request, false, true);
 
 		IdmRequestIdentityRoleFilter filterRequestIdentityRole = new IdmRequestIdentityRoleFilter();
-		filterRequestIdentityRole.setIdentityId(identity.getId());
+		filterRequestIdentityRole.setIdentity(identity.getId());
 		filterRequestIdentityRole.setRoleRequestId(request.getId());
 		// Include EAV attributes
 		filterRequestIdentityRole.setIncludeEav(true);
@@ -777,14 +799,14 @@ public class IdmRequestIdentityRoleServiceIntegrationTest extends AbstractIntegr
 		Assert.assertEquals(((BigDecimal)formValueDto.getValue()).longValue(), ((BigDecimal)value).longValue());
 		IdmFormAttributeDto mappedAttribute = formInstance.getMappedAttribute(formValue.getFormAttribute());
 		Assert.assertNotNull(mappedAttribute);
-		Assert.assertNull(formInstance.getValidationErrors());
+		Assert.assertEquals(0, formInstance.getValidationErrors().size());
 
 		identityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
 		assertEquals(1, identityRoles.size());
 		
 		// Create request identity-role
 		createdRequestIdentityRole = new IdmRequestIdentityRoleDto();
-		createdRequestIdentityRole.setIdentityContract(contract.getId());
+		createdRequestIdentityRole.setOwnerUuid(contract.getId());
 		// Change the valid from
 		createdRequestIdentityRole.setValidFrom(LocalDate.now());
 		createdRequestIdentityRole.setRole(role.getId());

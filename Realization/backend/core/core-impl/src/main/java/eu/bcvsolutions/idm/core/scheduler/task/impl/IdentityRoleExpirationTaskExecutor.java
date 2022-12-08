@@ -19,8 +19,10 @@ import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
@@ -118,7 +120,7 @@ public class IdentityRoleExpirationTaskExecutor extends AbstractSchedulableState
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setState(RoleRequestState.CONCEPT);
 			roleRequest.setExecuteImmediately(true); // without approval
-			roleRequest.setApplicant(identityId);
+			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 			roleRequest = roleRequestService.save(roleRequest);
 			//

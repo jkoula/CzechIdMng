@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmGenerateValueDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -162,7 +163,7 @@ public class ConceptRoleRequestFormDefaultValueGeneratorTest extends AbstractGen
 		
 		IdmRoleRequestDto requestDto = new IdmRoleRequestDto();
 		requestDto.setExecuteImmediately(true);
-		requestDto.setApplicant(identity.getId());
+		requestDto.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestDto.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestDto = roleRequestService.save(requestDto);
 

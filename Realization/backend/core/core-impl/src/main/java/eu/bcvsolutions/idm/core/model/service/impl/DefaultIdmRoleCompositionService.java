@@ -14,6 +14,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +44,6 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.model.repository.IdmRoleCompositionRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
@@ -146,7 +146,7 @@ public class DefaultIdmRoleCompositionService
 				directSubRoles.size(), identityRole.getId(), identityRole.getRole());
 		//
 		Map<String, Serializable> props = resolveProperties(event);
-		Set<UUID> processedRoles = (Set<UUID>) props.get(IdentityRoleEvent.PROPERTY_PROCESSED_ROLES);
+		Set<UUID> processedRoles = (Set<UUID>) props.get(AbstractRoleAssignmentEvent.PROPERTY_PROCESSED_ROLES);
 		processedRoles.add(identityRole.getRole());
 		//
 		directSubRoles
@@ -177,12 +177,12 @@ public class DefaultIdmRoleCompositionService
 						subIdentityRole.setRoleComposition(subRoleComposition.getId());
 						//
 						processedRoles.add(subRole.getId());
-						IdentityRoleEvent subEvent = new IdentityRoleEvent(IdentityRoleEventType.CREATE, subIdentityRole, props);
+						IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.CREATE, subIdentityRole, props);
 						// 
 						identityRoleService.publish(subEvent, event, permission);
 						// Notes new created assigned role to parent event
 						IdmIdentityRoleDto subContent = subEvent.getContent();
-						notingAssignedRole(event, subEvent, subContent, IdentityRoleEvent.PROPERTY_ASSIGNED_NEW_ROLES);
+						notingAssignedRole(event, subEvent, subContent, AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_NEW_ROLES);
 					}
 				}
 			});
@@ -202,7 +202,7 @@ public class DefaultIdmRoleCompositionService
 		identityRoleService
 			.find(filter, null)
 			.forEach(subIdentityRole -> {
-				IdentityRoleEvent subEvent = new IdentityRoleEvent(IdentityRoleEventType.DELETE, subIdentityRole);
+				IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE, subIdentityRole);
 				//
 				identityRoleService.publish(subEvent, event, permission);
 				// Notes identity-accounts to ACM
@@ -231,12 +231,12 @@ public class DefaultIdmRoleCompositionService
 				subIdentityRole.setValidFrom(identityRole.getValidFrom());
 				subIdentityRole.setValidTill(identityRole.getValidTill());
 				//
-				IdentityRoleEvent subEvent = new IdentityRoleEvent(IdentityRoleEventType.UPDATE, subIdentityRole);
+				IdentityRoleEvent subEvent = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.UPDATE, subIdentityRole);
 				//
 				identityRoleService.publish(subEvent, event, permission);
 				// Notes updated assigned role to parent event
 				IdmIdentityRoleDto subContent = subEvent.getContent();
-				notingAssignedRole(event, subEvent, subContent, IdentityRoleEvent.PROPERTY_ASSIGNED_UPDATED_ROLES);
+				notingAssignedRole(event, subEvent, subContent, AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_UPDATED_ROLES);
 			});
 	}
 	
@@ -383,10 +383,10 @@ public class DefaultIdmRoleCompositionService
 	private Map<String, Serializable> resolveProperties(EntityEvent<IdmIdentityRoleDto> event) {
 		Map<String, Serializable> props = new HashMap<>();
 		//
-		if (event.getProperties().containsKey(IdentityRoleEvent.PROPERTY_PROCESSED_ROLES)) {
-			props.put(IdentityRoleEvent.PROPERTY_PROCESSED_ROLES, event.getProperties().get(IdentityRoleEvent.PROPERTY_PROCESSED_ROLES));
+		if (event.getProperties().containsKey(AbstractRoleAssignmentEvent.PROPERTY_PROCESSED_ROLES)) {
+			props.put(AbstractRoleAssignmentEvent.PROPERTY_PROCESSED_ROLES, event.getProperties().get(AbstractRoleAssignmentEvent.PROPERTY_PROCESSED_ROLES));
 		} else {
-			props.put(IdentityRoleEvent.PROPERTY_PROCESSED_ROLES, new HashSet<UUID>());
+			props.put(AbstractRoleAssignmentEvent.PROPERTY_PROCESSED_ROLES, new HashSet<UUID>());
 		}
 		//
 		return props;

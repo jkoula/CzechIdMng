@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +24,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmAuthorizationPolicyService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.security.api.service.GrantedAuthoritiesFactory;
 import eu.bcvsolutions.idm.core.security.api.service.TokenManager;
 import eu.bcvsolutions.idm.core.security.service.impl.IdmAuthorityHierarchy;
@@ -51,7 +51,7 @@ public class IdentityRoleDeleteAuthoritiesProcessor
 	@Autowired private IdmAuthorizationPolicyService authorizationPolicyService;
 	
 	public IdentityRoleDeleteAuthoritiesProcessor() {
-		super(IdentityRoleEventType.DELETE);
+		super(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE);
 	}
 
 	@Override

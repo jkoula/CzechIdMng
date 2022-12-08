@@ -4,70 +4,34 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import eu.bcvsolutions.idm.acc.domain.AccResultCode;
 import eu.bcvsolutions.idm.acc.domain.SystemGroupType;
-import eu.bcvsolutions.idm.acc.dto.SysRoleSystemAttributeDto;
-import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
-import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
-import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
-import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
+import eu.bcvsolutions.idm.acc.dto.*;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
-import eu.bcvsolutions.idm.acc.entity.SysRoleSystem;
-import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute;
-import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
-import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroupSystem_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemGroup_;
-import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
-import eu.bcvsolutions.idm.acc.entity.SysSystem_;
+import eu.bcvsolutions.idm.acc.entity.*;
 import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.repository.SysRoleSystemRepository;
-import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
-import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
-import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
-import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.ExportDescriptorDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmExportImportDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmRoleCompositionDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.acc.service.api.*;
+import eu.bcvsolutions.idm.core.api.dto.*;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.AbstractReadWriteDtoService;
-import eu.bcvsolutions.idm.core.api.service.ExportManager;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
-import eu.bcvsolutions.idm.core.api.service.LookupService;
-import eu.bcvsolutions.idm.core.api.service.RequestManager;
+import eu.bcvsolutions.idm.core.api.service.*;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import javax.annotation.Priority;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import javax.annotation.Priority;
+import javax.persistence.criteria.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Role could assign identity account on target system.
@@ -90,7 +54,7 @@ public class DefaultSysRoleSystemService
 	@Autowired private IdmRoleCompositionService roleCompositionService;
 	@Autowired private LookupService lookupService;
 	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
-	@Autowired private IdmIdentityRoleService identityRoleService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 
 	@Autowired
 	public DefaultSysRoleSystemService(SysRoleSystemRepository repository) {
@@ -106,9 +70,9 @@ public class DefaultSysRoleSystemService
 		SysRoleSystem roleSystemEntity = this.getEntity(roleSystem.getId());
 
 		// Identity-role check.
-		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 		identityRoleFilter.setRoleSystemId(roleSystemEntity.getId());
-		long count = identityRoleService.count(identityRoleFilter);
+		long count = roleAssignmentManager.count(identityRoleFilter);
 		if (count > 0) {
 			IdmRoleDto roleDto = DtoUtils.getEmbedded(roleSystem, SysRoleSystem_.role, IdmRoleDto.class, null);
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_IS_USE_IN_IDENTITY_ROLE,
@@ -150,13 +114,8 @@ public class DefaultSysRoleSystemService
 		Assert.notNull(dto.getSystem(), "System cannot be null!");
 		Assert.notNull(dto.getSystemMapping(), "System mapping cannot be null!");
 
-		// Only Identity supports ACM by role
 		SysSystemMappingDto systemMappingDto = systemMappingService.get(dto.getSystemMapping());
-		if (systemMappingDto != null && !IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE.equals(systemMappingDto.getEntityType())) {
-			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_SUPPORTS_ONLY_IDENTITY,
-					ImmutableMap.of("entityType", systemMappingDto.getEntityType()));
-		}
-		
+
 		// Used System mapping has to belong to the System the role is assigned to
 		UUID systemUUID = dto.getSystem();
 		UUID systemMappingSystemUUID = ((SysSchemaObjectClassDto) lookupService.lookupEmbeddedDto(systemMappingDto,
@@ -361,20 +320,6 @@ public class DefaultSysRoleSystemService
 
 			predicates.add(builder.exists(subquery));
 		}
-		
-		// Return role-system where is uses given attribute mapping
-		if (filter.getAttributeMappingId() != null) {
-			Subquery<SysRoleSystemAttribute> subquery = query.subquery(SysRoleSystemAttribute.class);
-			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
-			subquery.select(subRoot);
-
-			subquery.where(builder.and( //
-					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
-					builder.equal(subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping).get(AbstractEntity_.id),
-							filter.getAttributeMappingId())));
-
-			predicates.add(builder.exists(subquery));
-		}
 
 		// Get role-systems with cross domains groups for given role (using same merge attribute).
 		if (filter.getIsInCrossDomainGroupRoleId() != null) {
@@ -383,21 +328,11 @@ public class DefaultSysRoleSystemService
 			Root<SysRoleSystemAttribute> subRoot = subquery.from(SysRoleSystemAttribute.class);
 			subquery.select(subRoot);
 
-			Subquery<SysSystemGroupSystem> subquerySystemGroup = query.subquery(SysSystemGroupSystem.class);
-			Root<SysSystemGroupSystem> subRootSystemGroup = subquerySystemGroup.from(SysSystemGroupSystem.class);
-			subquerySystemGroup.select(subRootSystemGroup);
+			final Subquery<SysSystemGroupSystem> subqueryForSystemGroup = DefaultSysRoleSystemAttributeService.getSubqueryForSystemGroup(subRoot, query, builder);
 
-			subquerySystemGroup.where(builder.and(
-							builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.mergeAttribute),
-									subRoot.get(SysRoleSystemAttribute_.systemAttributeMapping))), // Correlation attribute
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.disabled),
-							Boolean.FALSE),
-					builder.equal(subRootSystemGroup.get(SysSystemGroupSystem_.systemGroup).get(SysSystemGroup_.type),
-							SystemGroupType.CROSS_DOMAIN));
-							
 			subquery.where(builder.and( //
 					builder.equal(subRoot.get(SysRoleSystemAttribute_.roleSystem), root), // Correlation attribute
-					builder.exists(subquerySystemGroup),
+					builder.exists(subqueryForSystemGroup),
 					builder.equal(root.get(SysRoleSystem_.role).get(AbstractEntity_.id),
 							filter.getIsInCrossDomainGroupRoleId())));
 

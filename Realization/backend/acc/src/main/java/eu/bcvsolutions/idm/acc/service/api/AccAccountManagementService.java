@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 
 /**
@@ -34,14 +34,14 @@ public interface AccAccountManagementService {
 	 * @param entity
 	 * @return list of accounts IDs (used this identity-role)
 	 */
-	List<UUID> deleteIdentityAccount(IdmIdentityRoleDto identityRole);
+	List<UUID> deleteIdentityAccount(AbstractRoleAssignmentDto identityRole);
 	
 	/**
 	 * Identity role is deleting, we have to delete linked identity accounts, or mark them for delete
 	 * 
 	 * @param event
 	 */
-	void deleteIdentityAccount(EntityEvent<IdmIdentityRoleDto> event);
+	void deleteIdentityAccount(EntityEvent<AbstractRoleAssignmentDto> event);
 	
 	/**
 	 * Return UID for this dto and roleSystem. First, the transform script
@@ -62,7 +62,7 @@ public interface AccAccountManagementService {
 	 * @param identityRoles
 	 * @return List account's IDs for modified by this action (for this accounts provisioning should be executed).
 	 */
-	List<UUID> resolveNewIdentityRoles(IdmIdentityDto identity, IdmIdentityRoleDto... identityRoles);
+	List<UUID> resolveNewIdentityRoles(IdmIdentityDto identity, AbstractRoleAssignmentDto... identityRoles);
 
 	/**
 	 * Create or delete identity-accounts and accounts for given identity-roles
@@ -71,5 +71,5 @@ public interface AccAccountManagementService {
 	 * @param identityRoles
 	 * @return List account's IDs for modified by this action (for this accounts provisioning should be executed).
 	 */
-	List<UUID> resolveUpdatedIdentityRoles(IdmIdentityDto identity, IdmIdentityRoleDto... identityRoles);
+	List<UUID> resolveUpdatedIdentityRoles(IdmIdentityDto identity, AbstractRoleAssignmentDto... identityRoles);
 }

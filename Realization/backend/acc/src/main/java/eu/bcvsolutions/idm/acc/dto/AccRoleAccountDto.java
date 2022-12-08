@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.acc.dto;
 
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;

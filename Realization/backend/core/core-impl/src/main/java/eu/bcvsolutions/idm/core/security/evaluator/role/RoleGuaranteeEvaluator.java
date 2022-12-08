@@ -11,6 +11,8 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
 import java.time.LocalDate;
+
+import eu.bcvsolutions.idm.core.model.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.data.domain.PageRequest;
@@ -23,15 +25,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleGuaranteeRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleGuaranteeService;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
-import eu.bcvsolutions.idm.core.model.entity.IdmRole;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleGuarantee;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleGuaranteeRole;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleGuaranteeRole_;
-import eu.bcvsolutions.idm.core.model.entity.IdmRoleGuarantee_;
 import eu.bcvsolutions.idm.core.security.api.domain.AbstractAuthentication;
 import eu.bcvsolutions.idm.core.security.api.domain.AuthorizationPolicy;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;

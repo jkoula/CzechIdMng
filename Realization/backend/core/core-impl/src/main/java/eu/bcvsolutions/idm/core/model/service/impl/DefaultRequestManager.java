@@ -236,7 +236,7 @@ public class DefaultRequestManager implements RequestManager {
 			variables.put(EntityEvent.EVENT_PROPERTY, event);
 
 			ProcessInstance processInstance = workflowProcessInstanceService.startProcess(wfDefinition,
-					IdmRoleDto.class.getSimpleName(), request.getCreator(), request.getCreatorId().toString(),
+					IdmRoleDto.class.getSimpleName(), request.getCreatorId().toString(),
 					variables);
 			// We have to refresh request (maybe was changed in wf process)
 			request = requestService.get(request.getId());

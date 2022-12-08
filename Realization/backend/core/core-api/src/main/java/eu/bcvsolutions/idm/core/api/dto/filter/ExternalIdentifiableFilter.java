@@ -29,4 +29,15 @@ public interface ExternalIdentifiableFilter extends ExternalIdentifiable, BaseDa
 	default public void setExternalId(String externalId) {
 		set(PROPERTY_EXTERNAL_ID, externalId);
 	}
+
+	/**
+	 * This method is useful in those cases, where user wants to distinguish between cases, when externalId is null and
+	 * when it has not been set at all. Typical usecase is enabling search of {@link ExternalIdentifiable} objects with null
+	 * externalId.
+	 *
+	 * @return true, if property externalId has been set to this filter.
+	 */
+	default public boolean containsExternalId() {
+		return getData().containsKey(PROPERTY_EXTERNAL_ID);
+	}
 }

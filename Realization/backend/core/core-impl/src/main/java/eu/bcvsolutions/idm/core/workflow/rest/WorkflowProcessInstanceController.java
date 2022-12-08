@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.rest.AbstractReadWriteDtoController;
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.api.rest.BaseDtoController;
@@ -102,8 +101,7 @@ public class WorkflowProcessInstanceController extends AbstractReadWriteDtoContr
 		WorkflowFilterDto filter = super.toFilter(parameters);
 		String applicant = getParameterConverter().toString(parameters, "identity");
 		if (applicant != null) {
-				IdmIdentityDto identityDto = (IdmIdentityDto) entityLookupService.lookupDto(IdmIdentityDto.class, applicant);
-				filter.getEqualsVariables().put(WorkflowProcessInstanceService.APPLICANT_IDENTIFIER, identityDto.getId());
+				filter.getEqualsVariables().put(WorkflowProcessInstanceService.APPLICANT_IDENTIFIER, applicant);
 		}
 		
 		return filter;

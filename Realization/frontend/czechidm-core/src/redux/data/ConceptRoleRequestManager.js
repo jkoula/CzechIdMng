@@ -19,4 +19,10 @@ export default class ConceptRoleRequestManager extends FormableEntityManager {
   getCollectionType() {
     return 'conceptRoleRequests';
   }
+
+  getEmbeddedOwner(concept) {
+    return concept._embedded.identityContract
+  }
 }
+
+ConceptRoleRequestManager.ENTITY_TYPE = "eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto";

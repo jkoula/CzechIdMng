@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
+import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue_;
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -92,7 +98,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 	private final IdmIdentityService identityService;
 	private final AccAccountManagementService accountManagementService;
 	@Autowired
-	private IdmIdentityRoleService identityRoleService;
+	private IdmRoleAssignmentManager roleAssignmentManager;
 	@Autowired
 	private IdmIdentityContractService identityContractService;
 	@Autowired
@@ -248,21 +254,20 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 				)) { //
 			assertNotNull(dto.getId());
 
-			IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+			IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 			identityRoleFilter.setIdentityId(dto.getId());
 			identityRoleFilter.setValid(Boolean.TRUE);
-			List<IdmIdentityRoleDto> identityRoles = identityRoleService
+			List<AbstractRoleAssignmentDto> identityRoles = roleAssignmentManager
 					.find(identityRoleFilter,
-							PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmIdentityRole_.created.getName())))
-					.getContent();
-			List<IdmIdentityRoleDto> identityRolesToProcess;
+							PageRequest.of(0, Integer.MAX_VALUE, Sort.by(AbstractEntity_.created.getName())), (a, b) -> {});
+			List<AbstractRoleAssignmentDto> identityRolesToProcess;
 
 			if (ASSIGNED_ROLES_FOR_SYSTEM_FIELD.equals(attribute.getIdmPropertyName())) {
 				// For ASSIGNED_ROLES_FOR_SYSTEM_FIELD we will convert only identity-roles for
 				// that identity and given system
 				assertNotNull(system.getId());
 
-				List<IdmIdentityRoleDto> identityRolesForSystem = Lists.newArrayList();
+				List<AbstractRoleAssignmentDto> identityRolesForSystem = Lists.newArrayList();
 				AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 				identityAccountFilter.setIdentityId(dto.getId());
 				identityAccountFilter.setSystemId(system.getId());
@@ -283,7 +288,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 
 			List<AssignedRoleDto> assignedRoles = new ArrayList<>();
 			identityRolesToProcess.forEach(identityRole -> {
-				IdmFormInstanceDto formInstanceDto = identityRoleService.getRoleAttributeValues(identityRole);
+				IdmFormInstanceDto formInstanceDto = roleAssignmentManager.getServiceForAssignment(identityRole).getRoleAttributeValues(identityRole);
 				identityRole.getEavs().clear();
 				identityRole.getEavs().add(formInstanceDto);
 				// Convert identityRole to AssignedRoleDto
@@ -311,7 +316,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		return super.getAttributeValue(uid, dto, attribute, system, mappingContext, accountDto);
 	}
 
-	public static AssignedRoleDto convertToAssignedRoleDto(IdmIdentityRoleDto identityRole) {
+	public static AssignedRoleDto convertToAssignedRoleDto(AbstractRoleAssignmentDto identityRole) {
 		if (identityRole == null) {
 			return null;
 		}
@@ -321,7 +326,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		dto.setExternalId(identityRole.getExternalId());
 		dto.setValidFrom(identityRole.getValidFrom());
 		dto.setValidTill(identityRole.getValidTill());
-		dto.setRole(DtoUtils.getEmbedded(identityRole, IdmIdentityRole_.role, IdmRoleDto.class, null));
+		dto.setRole(DtoUtils.getEmbedded(identityRole, AbstractRoleAssignment_.role, IdmRoleDto.class, null));
 		dto.setIdentityContract(DtoUtils.getEmbedded(identityRole, IdmIdentityRole_.identityContract,
 				IdmIdentityContractDto.class, null));
 		dto.setContractPosition(DtoUtils.getEmbedded(identityRole, IdmIdentityRole_.contractPosition,
@@ -330,7 +335,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 				DtoUtils.getEmbedded(identityRole, IdmIdentityRole_.directRole, IdmIdentityRoleDto.class, null));
 		dto.setRoleTreeNode(DtoUtils.getEmbedded(identityRole, IdmIdentityRoleDto.PROPERTY_ROLE_TREE_NODE,
 				AbstractIdmAutomaticRoleDto.class, null));
-		dto.setRoleComposition(DtoUtils.getEmbedded(identityRole, IdmIdentityRole_.roleComposition,
+		dto.setRoleComposition(DtoUtils.getEmbedded(identityRole, AbstractRoleAssignment_.roleComposition,
 				IdmRoleCompositionDto.class, null));
 
 		UUID definition = dto.getRole().getIdentityRoleAttributeDefinition();
@@ -352,8 +357,7 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 							List<IdmFormValueDto> formValues = values.stream() // Search all values for one attribute
 									.filter(value -> attribute.equals(value.getFormAttribute())) //
 									.collect(Collectors.toList()); //
-							IdmFormAttributeDto formAttributeDto = DtoUtils.getEmbedded(formValues.get(0),
-									IdmFormValue_.formAttribute, IdmFormAttributeDto.class);
+							IdmFormAttributeDto formAttributeDto = DtoUtils.getEmbedded(formValues.get(0), AbstractFormValue_.formAttribute, IdmFormAttributeDto.class);
 
 							dto.getAttributes().put(formAttributeDto.getCode(), formValues.stream() //
 									.map(IdmFormValueDto::getValue) // Value is always list

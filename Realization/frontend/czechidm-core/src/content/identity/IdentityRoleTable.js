@@ -16,20 +16,25 @@ import {
   IdentityContractManager,
   CodeListManager,
   DataManager,
-  ConfigurationManager
+  ConfigurationManager, RequestIdentityRoleManager
 } from '../../redux';
 import IdentityRoleEav from './IdentityRoleEav';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
+import ComponentService from "../../services/ComponentService";
 
-const manager = new IdentityRoleManager(); // default manager
+//const manager = new IdentityRoleManager(); // default manager
+const manager =  new RequestIdentityRoleManager();
 const identityManager = new IdentityManager();
 const roleManager = new RoleManager();
 const roleTreeNodeManager = new RoleTreeNodeManager();
 const identityContractManager = new IdentityContractManager();
 const codeListManager = new CodeListManager();
 const uiKeyIncompatibleRoles = 'identity-incompatible-roles-';
+const componentService = new ComponentService();
+
+
 const TEST_ADD_ROLE_DIRECTLY = false;
 
 /**
@@ -193,6 +198,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     if (forceSearchParameters && hasIdentityForceFilter) {
       contractForceSearchparameters = new SearchParameters().setFilter('identity', forceSearchParameters.getFilters().get('identityId'));
     }
+    forceSearchParameters.setFilter('onlyAssignments', 'true');
     const _columns = this.getColumns();
     //
     return (
@@ -285,7 +291,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                 </Basic.Row>
               </Basic.AbstractForm>
             </Advanced.Filter>
-          }> 
+          }>
           <Advanced.Column
             header=""
             className="detail-button"
@@ -395,15 +401,29 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
             property="identityContract"
             cell={
               /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data, property }) => (
-                <Advanced.EntityInfo
-                  entityType="identityContract"
-                  entityIdentifier={ data[rowIndex][property] }
-                  entity={ data[rowIndex]._embedded[property] }
-                  showIdentity={ false }
-                  face="popover"
-                  showIcon />
-              )
+              ({ rowIndex, data }) => {
+                const manager = componentService.getManagerForConceptByOwnerType(data[rowIndex].ownerType)
+
+                const owner = manager.getEmbeddedOwner(data[rowIndex]);
+                if (!owner) {
+                  return (
+                      <Basic.Label
+                          level="default"
+                          value={this.i18n('label.removed')}
+                          title={this.i18n('content.audit.revision.deleted')}/>
+                  );
+                }
+                //
+                const componentInfo = componentService.getConcepComponentByOwnerType(data[rowIndex].ownerType)
+                return (
+                    <componentInfo.ownerInfoComponent
+                        entityIdentifier={owner.id}
+                        entity={owner}
+                        showIdentity={false}
+                        showIcon
+                        face="popover"/>
+                );
+              }
             }
             rendered={ _.includes(columns, 'identityContract') }/>
           <Advanced.Column

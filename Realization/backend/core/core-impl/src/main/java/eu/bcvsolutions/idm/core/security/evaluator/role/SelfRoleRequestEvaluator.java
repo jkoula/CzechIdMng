@@ -47,7 +47,7 @@ public class SelfRoleRequestEvaluator extends AbstractAuthorizationEvaluator<Idm
 		if (!securityService.isAuthenticated()) {
 			return null;
 		}
-		return builder.equal(root.get(IdmRoleRequest_.applicant).get(IdmIdentity_.id), securityService.getCurrentId());
+		return builder.equal(root.get(IdmRoleRequest_.applicant), securityService.getCurrentId());
 	}
 	
 	@Override

@@ -2,12 +2,14 @@ package eu.bcvsolutions.idm.core.model.delegation.type;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmDelegationDefinitionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityContractFilter;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractDelegationType;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowTaskInstanceDto;
@@ -16,6 +18,8 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.apache.commons.collections.CollectionUtils;
 import org.modelmapper.internal.util.Assert;
@@ -35,7 +39,9 @@ public class ApproveRoleByManagerDelegationType extends AbstractDelegationType {
 
 	public static final String NAME = "approve-role-by-manager-delegation-type";
 	private static final String ROLE_CONCEPT_PROPERTY = "conceptRole";
-	
+
+	@Autowired
+	private IdmConceptRoleRequestManager conceptRoleRequestManager;
 	@Autowired
 	private IdmIdentityContractService identityContractService;
 	@Autowired
@@ -50,22 +56,26 @@ public class ApproveRoleByManagerDelegationType extends AbstractDelegationType {
 			VariableInstance variableInstance = (VariableInstance) conceptRoleObj;
 			conceptRoleObj = variableInstance.getValue();
 		}
-		if (!(conceptRoleObj instanceof IdmConceptRoleRequestDto)) {
+		if (!(conceptRoleObj instanceof AbstractConceptRoleRequestDto)) {
 			throw new CoreException(MessageFormat.format("For this delegation type [{0}], must workflow task contains '{1}' [WorkflowTaskInstanceDto] variable",
 					NAME,
 					ROLE_CONCEPT_PROPERTY));
 		}
-		IdmConceptRoleRequestDto conceptRole = (IdmConceptRoleRequestDto) conceptRoleObj;
-		UUID contractFromRequest = conceptRole.getIdentityContract();
+		AbstractConceptRoleRequestDto conceptRole = (AbstractConceptRoleRequestDto) conceptRoleObj;
+		List<UUID> contractFromRequest = conceptRoleRequestManager.getServiceForConcept(conceptRole).resolveManagerContractsForApproval(conceptRole);
 		Assert.notNull(contractFromRequest, "Contract ID from the concept of the request cannot be null!");
-		
-		// Filtering managers contracts by subordinates contract.
-		IdmIdentityContractFilter contractFilter = new IdmIdentityContractFilter();
-		contractFilter.setIdentity(delegatorId);
-		contractFilter.setManagersByContract(contractFromRequest);
-		
-		List<IdmIdentityContractDto> managersContracts = identityContractService.find(contractFilter, null).getContent();
-		
+		Assert.isTrue(!contractFromRequest.isEmpty(), "Contract ID from the concept of the request cannot be null!");
+
+		List<IdmIdentityContractDto> managersContracts = contractFromRequest.stream().map(uuid -> {
+			// Filtering managers contracts by subordinates contract.
+			IdmIdentityContractFilter contractFilter = new IdmIdentityContractFilter();
+			contractFilter.setIdentity(delegatorId);
+			contractFilter.setManagersByContract(uuid);
+			return contractFilter;
+
+		}).flatMap(contractFilter -> identityContractService.find(contractFilter, null).stream()).collect(Collectors.toList());
+
+
 		if (managersContracts.isEmpty()) {
 			return null;
 		}

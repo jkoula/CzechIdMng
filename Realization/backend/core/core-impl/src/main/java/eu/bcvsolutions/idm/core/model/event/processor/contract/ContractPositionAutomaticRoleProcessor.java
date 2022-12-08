@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,11 @@ import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
@@ -138,7 +141,7 @@ public class ContractPositionAutomaticRoleProcessor
 		addedAutomaticRoles.removeIf(a -> {
 			return previousAutomaticRoles.contains(a.getId());
 		});
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>(removedAutomaticRoles.size() + addedAutomaticRoles.size());
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>(removedAutomaticRoles.size() + addedAutomaticRoles.size());
 		//
 		for(UUID removedAutomaticRole : removedAutomaticRoles) {
 			Iterator<IdmIdentityRoleDto> iter = assignedRoles.iterator();
@@ -202,7 +205,7 @@ public class ContractPositionAutomaticRoleProcessor
 				// execute new request
 				roleRequest = new IdmRoleRequestDto();
 				roleRequest.setConceptRoles(concepts);
-				roleRequest.setApplicant(contract.getIdentity());
+				roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 				roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), event);
 			}
 			event.getProperties().put(IdentityContractUpdateByAutomaticRoleProcessor.EVENT_PROPERTY_REQUEST, roleRequest);

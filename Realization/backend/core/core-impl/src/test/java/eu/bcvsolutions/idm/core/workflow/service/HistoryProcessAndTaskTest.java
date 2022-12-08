@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.bcvsolutions.idm.core.AbstractCoreWorkflowIntegrationTest;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.model.event.processor.module.InitTestDataProcessor;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
@@ -49,6 +50,8 @@ public class HistoryProcessAndTaskTest extends AbstractCoreWorkflowIntegrationTe
 	private WorkflowHistoricTaskInstanceService historicTaskService;
 	@Autowired
 	private LookupService lookupService;
+	@Autowired
+	private IdmIdentityService identityService;
 
 	@Before
 	public void login() {
@@ -62,9 +65,10 @@ public class HistoryProcessAndTaskTest extends AbstractCoreWorkflowIntegrationTe
 
 	@Test
 	public void deployAndRunProcess() {
+		IdmIdentityDto identityDto = identityService.getByUsername(InitTestDataProcessor.TEST_USER_1);
 		//Deploy process
 		//Start instance of process
-		ProcessInstance instance = processInstanceService.startProcess(PROCESS_KEY, null, InitTestDataProcessor.TEST_USER_1, null,
+		ProcessInstance instance = processInstanceService.startProcess(PROCESS_KEY, null, identityDto.getId().toString(),
 				null);
 		logout();
 		// Log as user without ADMIN rights

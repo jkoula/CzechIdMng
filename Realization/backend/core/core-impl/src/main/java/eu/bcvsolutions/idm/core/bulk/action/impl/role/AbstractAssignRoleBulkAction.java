@@ -21,9 +21,11 @@ import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
@@ -146,7 +148,7 @@ public abstract class AbstractAssignRoleBulkAction<DTO extends AbstractDto, F ex
 			}
 			// create request, if exists at least one concept create and starts request
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(identityId);
+			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setLog("Request was created by bulk action.");
 			roleRequest.setExecuteImmediately(!approve); // if set approve, don't execute immediately

@@ -129,14 +129,6 @@ public interface IdmIdentityService extends
 	List<IdmIdentityDto> findAllManagers(UUID forIdentity, UUID byTreeType);
 
 	/**
-	 * Method finds all identity's managers by identity contract and return managers
-	 * 
-	 * @param forIdentity
-	 * @return identity managers
-	 */
-	List<IdmIdentityDto> findAllManagers(UUID forIdentity);
-
-	/**
 	 * Contains list of identities some identity with given username.
 	 * If yes, then return true.
 	 * 

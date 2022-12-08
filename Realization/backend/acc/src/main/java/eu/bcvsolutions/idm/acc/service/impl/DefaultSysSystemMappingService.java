@@ -74,10 +74,8 @@ public class DefaultSysSystemMappingService
 	private SysSchemaAttributeService attributeService;
 	@Lazy
 	@Autowired
-	private IdmIdentityRoleService identityRoleService;
-	@Lazy
-	@Autowired
-	private IdmIdentityContractService identityContractService;
+	private IdmRoleAssignmentManager roleAssignmentManager;
+
 	@Lazy
 	@Autowired
 	private IdmTreeTypeService treeTypeService;
@@ -89,6 +87,10 @@ public class DefaultSysSystemMappingService
 	private SysSystemEntityService systemEntityService;
 	@Autowired
 	private SysSystemEntityTypeManager systemEntityManager;
+
+	@Lazy
+	@Autowired
+	private IdmIdentityContractService identityContractService;
 
 	@Autowired
 	public DefaultSysSystemMappingService(
@@ -437,19 +439,18 @@ public class DefaultSysSystemMappingService
 		}
 
 		if ((mapping.isAddContextIdentityRoles() || mapping.isAddContextIdentityRolesForSystem()) &&  dto instanceof IdmIdentityDto) {
-			IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+			IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 			identityRoleFilter.setIdentityId(dto.getId());
-			List<IdmIdentityRoleDto> identityRoles = identityRoleService
+			List<AbstractRoleAssignmentDto> identityRoles = roleAssignmentManager
 					.find(identityRoleFilter,
-							PageRequest.of(0, Integer.MAX_VALUE, Sort.by(IdmIdentityRole_.created.getName())))
-					.getContent();
+							PageRequest.of(0, Integer.MAX_VALUE, Sort.by(AbstractEntity_.created.getName())), (a,b) -> {});
 			if (mapping.isAddContextIdentityRoles()) {
 				// Set all identity-roles to the context.
 				mappingContext.setIdentityRoles(identityRoles);
 			}
 			if (mapping.isAddContextIdentityRolesForSystem()) {
 				Assert.notNull(system.getId(), "System identifier is required.");
-				List<IdmIdentityRoleDto> identityRolesForSystem = Lists.newArrayList();
+				List<AbstractRoleAssignmentDto> identityRolesForSystem = Lists.newArrayList();
 				AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 				identityAccountFilter.setIdentityId(dto.getId());
 				identityAccountFilter.setSystemId(system.getId());

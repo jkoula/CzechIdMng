@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -13,8 +14,10 @@ import com.google.common.collect.Lists;
 import eu.bcvsolutions.idm.core.api.domain.AutomaticRoleAttributeRuleType;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
@@ -81,7 +84,7 @@ public class IdentityContractAutomaticRoleProcessor extends CoreEventProcessor<I
 		Set<AbstractIdmAutomaticRoleDto> allNotPassedAutomaticRoleForContract = automaticRoleAttributeService
 				.getRulesForContract(false, type, contractId);
 		// we don't know precious size - guava is used instead simple ArrayList constructor
-		List<IdmConceptRoleRequestDto> concepts = Lists.newArrayListWithExpectedSize(
+		List<AbstractConceptRoleRequestDto> concepts = Lists.newArrayListWithExpectedSize(
 				allNewPassedAutomaticRoleForContract.size() + allNotPassedAutomaticRoleForContract.size()
 		);
 		//
@@ -119,7 +122,7 @@ public class IdentityContractAutomaticRoleProcessor extends CoreEventProcessor<I
 		// Execute concepts
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(identityContract.getIdentity());
+		roleRequest.setApplicant(new ApplicantImplDto(identityContract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), event);
 		//
 		return new DefaultEventResult<>(event, this);

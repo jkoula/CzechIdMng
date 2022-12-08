@@ -41,7 +41,7 @@ public abstract class AbstractWorkflowStatefulExecutor<T extends AbstractDto> ex
 		variables.put(DTO_WF_PARAM, dto);
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		// execute process
-		ProcessInstance pi = workflowService.startProcess(this.getWorkflowName(), null, authentication.getName(), null, variables);
+		ProcessInstance pi = workflowService.startProcess(this.getWorkflowName(), null, null, variables);
 		
 		if (pi instanceof VariableScope) {
 			VariableScope vs = (VariableScope) pi;

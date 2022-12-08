@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,6 @@ import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 
 /**
@@ -58,7 +58,7 @@ public class IdentityRoleDeleteProvisioningProcessor extends AbstractEntityEvent
 	@Autowired private SysSystemGroupSystemService systemGroupSystemService;
 
 	public IdentityRoleDeleteProvisioningProcessor() {
-		super(IdentityRoleEventType.DELETE);
+		super(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE);
 	}
 	
 	/**

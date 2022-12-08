@@ -2198,7 +2198,7 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 		variables.put(SynchronizationService.WF_VARIABLE_KEY_SYSTEM_ID, context.getSystem().getId());
 
 		ProcessInstance processInstance = workflowProcessInstanceService.startProcess(wfDefinitionKey,
-				SysSyncConfig.class.getSimpleName(), uid, config.getId().toString(), variables);
+				SysSyncConfig.class.getSimpleName(), config.getId().toString(), variables);
 
 		if (processInstance instanceof VariableScope) {
 			Object logItemObj = ((VariableScope) processInstance)

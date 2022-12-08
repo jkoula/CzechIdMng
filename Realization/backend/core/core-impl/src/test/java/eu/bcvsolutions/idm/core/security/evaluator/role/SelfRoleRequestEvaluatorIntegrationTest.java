@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.config.domain.RoleConfiguration;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
@@ -98,7 +99,7 @@ public class SelfRoleRequestEvaluatorIntegrationTest extends AbstractEvaluatorIn
 			getHelper().login(identityOne);
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(identityOne.getId());
+			roleRequest.setApplicant(new ApplicantImplDto(identityOne.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest = roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
 			//
