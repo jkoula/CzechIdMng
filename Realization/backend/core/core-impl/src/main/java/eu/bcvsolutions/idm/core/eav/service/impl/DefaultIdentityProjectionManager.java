@@ -21,6 +21,7 @@ import eu.bcvsolutions.idm.core.api.domain.ConfigurationMap;
 import eu.bcvsolutions.idm.core.api.domain.IdentityState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -381,7 +382,7 @@ public class DefaultIdentityProjectionManager implements IdentityProjectionManag
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 				roleRequest.setState(RoleRequestState.CONCEPT);
 				roleRequest.setExecuteImmediately(false);
-				roleRequest.setApplicant(identity.getId());
+				roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 				roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 				roleRequest = roleRequestService.save(roleRequest);
 				//

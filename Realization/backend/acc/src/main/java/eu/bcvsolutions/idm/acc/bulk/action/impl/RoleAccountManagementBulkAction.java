@@ -9,6 +9,9 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +71,7 @@ public class RoleAccountManagementBulkAction extends AbstractBulkAction<IdmRoleD
 	@Autowired
 	private IdmRoleService roleService;
 	@Autowired
-	private IdmIdentityRoleService identityRoleService;
+	private IdmRoleAssignmentManager roleAssignmentManager;
 	@Autowired 
 	private AccAccountManagementService accountManagementService;
 	@Autowired 
@@ -81,22 +84,21 @@ public class RoleAccountManagementBulkAction extends AbstractBulkAction<IdmRoleD
 		Assert.notNull(dto, "Role is required!");
 		Assert.notNull(dto.getId(), "Id of role is required!");
 		
-		List<IdmIdentityRoleDto> successIdentityRoles = Lists.newArrayList();
-		Map<IdmIdentityRoleDto, Exception> failedIdentityRoles = Maps.newLinkedHashMap();
+		List<AbstractRoleAssignmentDto> successIdentityRoles = Lists.newArrayList();
+		Map<AbstractRoleAssignmentDto, Exception> failedIdentityRoles = Maps.newLinkedHashMap();
 
-		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 		identityRoleFilter.setRoleId(dto.getId());
 
 		// Load all identity roles for this roleId.
 		// Without check on IdentityRole UPDATE permissions. This operation is
 		// controlled by UPDATE right on this role!
-		List<IdmIdentityRoleDto> allIdentityRoles = identityRoleService.find(identityRoleFilter, null).getContent();
+		final List<AbstractRoleAssignmentDto> allRoleAssignments = roleAssignmentManager.find(identityRoleFilter, null, (assignment, service) -> {
+			IdmIdentityDto identity = getEmbeddedIdentity(assignment);
 
-		allIdentityRoles.forEach(identityRole -> {
-			IdmIdentityDto identity = getEmbeddedIdentity(identityRole);
 			try {
 				// Execute account management for identity and exists assigned role
-				List<UUID> accountIds = accountManagementService.resolveUpdatedIdentityRoles(identity, identityRole);
+				List<UUID> accountIds = accountManagementService.resolveUpdatedIdentityRoles(identity, assignment);
 				// Execute provisioning
 				accountIds.forEach(accountId -> {
 					AccAccountDto account = accountService.get(accountId);
@@ -105,43 +107,53 @@ public class RoleAccountManagementBulkAction extends AbstractBulkAction<IdmRoleD
 						provisioningService.doProvisioning(account, identity);
 					}
 				});
-				successIdentityRoles.add(identityRole);
+				successIdentityRoles.add(assignment);
 			} catch (Exception ex) {
-				LOG.error("Call acm and provisioning for assigned role [{}], identity [{}] failed",
-						identityRole.getId(), identity.getUsername(), ex);
+				LOG.error("Call acm and provisioning for assigned role [{}], identity [{}] failed", assignment.getId(), identity.getUsername(), ex);
 				//
-				failedIdentityRoles.put(identityRole, ex);
+				failedIdentityRoles.put(assignment, ex);
 			}
 		});
 
 		OperationResult operationResult = new OperationResult(OperationState.EXECUTED);
 		StringBuilder message = new StringBuilder();
+		operationResult = handleFailedRoleAssignments(dto, failedIdentityRoles, operationResult, message, allRoleAssignments);
+		handleSuccessfullRoleAssignments(dto, successIdentityRoles, message, allRoleAssignments);
+
+		operationResult.setCause(message.toString());
+		return operationResult;
+	}
+
+	private void handleSuccessfullRoleAssignments(IdmRoleDto dto, List<AbstractRoleAssignmentDto> successIdentityRoles, StringBuilder message, List<AbstractRoleAssignmentDto> allRoleAssignments) {
+		if (!successIdentityRoles.isEmpty()) {
+			message.append('\n');
+			message.append('\n');
+			message.append(MessageFormat.format(
+					"For the role [{0}], [{1}] of role assignments were call acm and provisioning [{2}]. Assigned role UUIDs:",
+					dto.getCode(), allRoleAssignments.size(), successIdentityRoles.size()));
+			successIdentityRoles.forEach(identityRole -> {
+				message.append('\n');
+				message.append(MessageFormat.format("[{0}], identity [{1}]",
+						identityRole.getId(), getEmbeddedIdentity(identityRole).getUsername()));
+			});
+		}
+	}
+
+	private OperationResult handleFailedRoleAssignments(IdmRoleDto dto, Map<AbstractRoleAssignmentDto, Exception> failedIdentityRoles, OperationResult operationResult, StringBuilder message,
+			List<AbstractRoleAssignmentDto> allRoleAssignments) {
 		if (!failedIdentityRoles.isEmpty()) {
 			operationResult = new OperationResult(OperationState.EXCEPTION);
 			//
 			message.append(MessageFormat.format(
 					"For the role [{0}], [{1}] of identity roles were FAILED acm or provisioning [{2}]. Assigned role UUIDs:\n",
-					dto.getCode(), allIdentityRoles.size(), failedIdentityRoles.size()));
+					dto.getCode(), allRoleAssignments.size(), failedIdentityRoles.size()));
 			failedIdentityRoles.forEach((identityRole, ex) -> {
 				message.append('\n');
-				message.append(MessageFormat.format("[{0}], identity [{1}], exception:\n{2}", 
+				message.append(MessageFormat.format("[{0}], identity [{1}], exception:\n{2}",
 						identityRole.getId(), getEmbeddedIdentity(identityRole).getUsername(), ex));
 				message.append('\n');
-			});			
+			});
 		}
-		if (!successIdentityRoles.isEmpty()) {
-			message.append('\n');
-			message.append('\n');
-			message.append(MessageFormat.format(
-					"For the role [{0}], [{1}] of identity roles were call acm and provisioning [{2}]. Assigned role UUIDs:",
-					dto.getCode(), allIdentityRoles.size(), successIdentityRoles.size()));
-			successIdentityRoles.forEach(identityRole -> {
-				message.append('\n');
-				message.append(MessageFormat.format("[{0}], identity [{1}]", 
-						identityRole.getId(), getEmbeddedIdentity(identityRole).getUsername()));
-			});	
-		}
-		operationResult.setCause(message.toString());
 		return operationResult;
 	}
 
@@ -153,11 +165,11 @@ public class RoleAccountManagementBulkAction extends AbstractBulkAction<IdmRoleD
 
 		Map<ResultModel, Long> models = new HashMap<>();
 		entities.forEach(roleId -> {
-			IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+			IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 			identityRoleFilter.setRoleId(roleId);
 			IdmRoleDto role = getService().get(roleId);
 
-			long count = identityRoleService.find(identityRoleFilter, PageRequest.of(0, 1)).getTotalElements();
+			long count = roleAssignmentManager.find(identityRoleFilter, PageRequest.of(0, 1)).getTotalElements();
 			if (count > 0) {
 				models.put(new DefaultResultModel(AccResultCode.ROLE_ACM_BULK_ACTION_NUMBER_OF_IDENTITIES,
 						ImmutableMap.of("role", role.getCode(), "count", count)), count);
@@ -211,13 +223,10 @@ public class RoleAccountManagementBulkAction extends AbstractBulkAction<IdmRoleD
 	/**
 	 * Identity is required in embedded.
 	 * 
-	 * @param identityRole
+	 * @param roleAssignment
 	 * @return
 	 */
-	private IdmIdentityDto getEmbeddedIdentity(IdmIdentityRoleDto identityRole) {
-		IdmIdentityContractDto contract = DtoUtils.getEmbedded(identityRole, IdmIdentityRole_.identityContract,
-				IdmIdentityContractDto.class);
-		//
-		return getLookupService().lookupEmbeddedDto(contract, IdmIdentityContract_.identity);
+	private IdmIdentityDto getEmbeddedIdentity(AbstractRoleAssignmentDto roleAssignment) {
+		return roleAssignmentManager.getServiceForAssignment(roleAssignment).getRelatedIdentity(roleAssignment);
 	}
 }

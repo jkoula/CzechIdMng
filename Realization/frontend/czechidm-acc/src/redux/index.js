@@ -30,6 +30,7 @@ import SystemGroupSystemManager from './SystemGroupSystemManager';
 import SystemOwnerRoleManager from './SystemOwnerRoleManager';
 import SystemOwnerManager from './SystemOwnerManager';
 import SystemEntityTypeManager from './SystemEntityTypeManager';
+import RequestAccountRoleManager from "./RequestAccountRoleManager";
 
 const ManagerRoot = {
   SystemManager,
@@ -60,6 +61,7 @@ const ManagerRoot = {
   UniformPasswordSystemManager,
   RemoteServerManager,
   SystemGroupManager,
+  RequestAccountRoleManager,
   SystemGroupSystemManager,
   SystemOwnerRoleManager,
   SystemOwnerManager,

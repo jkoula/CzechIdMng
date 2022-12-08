@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
+import eu.bcvsolutions.idm.core.model.event.processor.ConceptCancellingProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +66,9 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
  */
 @Component("accAccountDeleteProcessor")
 @Description("Ensures referential integrity. Cannot be disabled.")
-public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> implements AccountProcessor {
+public class AccountDeleteProcessor
+		extends ConceptCancellingProcessor<AccAccountDto, AccAccountConceptRoleRequestDto, AccAccountConceptRoleRequestFilter, AccAccountRoleAssignmentDto>
+		implements AccountProcessor {
 
 	private static final String PROCESSOR_NAME = "account-delete-processor";
 	private final AccAccountService accountService;
@@ -81,8 +89,9 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 			AccRoleAccountService roleAccountService, AccTreeAccountService treeAccountService,
 			AccContractAccountService contractAccountService,
 			AccRoleCatalogueAccountService roleCatalogueAccountService,
-			AccIdentityAccountService identityAccountService, ProvisioningService provisioningService) {
-		super(AccountEventType.DELETE);
+			AccIdentityAccountService identityAccountService, ProvisioningService provisioningService, AccAccountConceptRoleRequestService accountConceptRoleRequestService,
+			AccAccountRoleAssignmentService accountRoleAssignmentService, IdmRoleRequestService roleRequestService) {
+		super(accountConceptRoleRequestService, accountRoleAssignmentService, roleRequestService,AccountEventType.DELETE);
 		//
 		Assert.notNull(accountService, "Service is required.");
 		Assert.notNull(entityEventManager, "Manager is required.");
@@ -128,12 +137,19 @@ public class AccountDeleteProcessor extends CoreEventProcessor<AccAccountDto> im
 					ImmutableMap.of("uid", account.getUid()));
 		}
 
+		// Find all concepts and remove relation on contract
+		removeRelatedConcepts(account.getId());
+		//
+
+
 		// delete all identity accounts
 		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 		identityAccountFilter.setAccountId(account.getId());
 		List<AccIdentityAccountDto> identityAccounts = identityAccountService.find(identityAccountFilter, null)
 				.getContent();
 		for (AccIdentityAccountDto identityAccount : identityAccounts) {
+			// delete referenced role assignment
+			removeRelatedAssignedRoles(event, identityAccount.getIdentity(), account.getId(), false);
 			identityAccountService.delete(identityAccount, deleteTargetAccount);
 		}
 

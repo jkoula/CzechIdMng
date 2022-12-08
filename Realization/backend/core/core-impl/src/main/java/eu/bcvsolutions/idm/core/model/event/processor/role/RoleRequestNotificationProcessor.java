@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.CoreModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -138,26 +139,30 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 				.filter(concept -> ConceptRoleRequestOperation.REMOVE == concept.getOperation()) //
 				.collect(Collectors.toSet()); //
 
-		IdmIdentityDto applicantIdentity = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant.getName(),
-				IdmIdentityDto.class);
-		IdmIdentityDto implementerIdentity = identityService.get(request.getCreatorId());
+		IdmIdentityDto applicantIdentity = null;
+		if (IdmIdentityDto.class.getCanonicalName().equals(request.getApplicant().getApplicantType())) {
+			applicantIdentity = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant.getName(),
+					IdmIdentityDto.class);
+		}
 
-		if (implementerIdentity.equals(applicantIdentity)) {
+		IdmIdentityDto implementerIdentity = request.getCreatorId() == null ? null : identityService.get(request.getCreatorId());
+
+		if (applicantIdentity != null && applicantIdentity.equals(implementerIdentity)) {
 			// Send notification only to implementer if
 			// implementer and applicant is same identity
 			if (sendNotificationToImplementer || sendNotificationToApplicant) {
-				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
+				send(CoreModule.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
 						removedRoles, applicantIdentity, implementerIdentity);
 			}
 		} else {
 			// Send notification to applicant
-			if (sendNotificationToApplicant) {
-				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_APPLICANT, request, from, addedRoles, changedRoles, removedRoles,
+			if (sendNotificationToApplicant && applicantIdentity != null) {
+				send(CoreModule.TOPIC_REQUEST_REALIZED_APPLICANT, request, from, addedRoles, changedRoles, removedRoles,
 						applicantIdentity, applicantIdentity);
 			}
 			// Send notification to implementer
-			if (sendNotificationToImplementer) {
-				send(CoreModuleDescriptor.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
+			if (sendNotificationToImplementer && implementerIdentity != null) {
+				send(CoreModule.TOPIC_REQUEST_REALIZED_IMPLEMENTER, request, from, addedRoles, changedRoles,
 						removedRoles, applicantIdentity, implementerIdentity);
 			}
 		}

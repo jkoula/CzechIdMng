@@ -24,9 +24,11 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractIdmAutomaticRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmContractPositionDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleTreeNodeDto;
@@ -261,7 +263,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			roleRequest.getConceptRoles().addAll(changeValidable(contract, getAssignedAutomaticRoles(contract.getId())));
 		}
 		// start request at end asynchronously
-		roleRequest.setApplicant(contract.getIdentity());
+		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
 		roleRequestService.startConcepts(requestEvent, event);
 		//

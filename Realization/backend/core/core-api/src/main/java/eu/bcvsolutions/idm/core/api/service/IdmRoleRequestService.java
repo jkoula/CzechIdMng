@@ -9,9 +9,13 @@ import java.util.UUID;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.Loggable;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestByIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -115,8 +119,10 @@ public interface IdmRoleRequestService extends
 	 * @return
 	 */
 	IdmRoleRequestDto executeRequest(EntityEvent<IdmRoleRequestDto> requestEvent);
-	
-	/**
+
+
+
+    /**
 	 * Execute concepts via request - usable programmatically, where identity roles are added / updated / removed.
 	 * Lookout: synchronous request (and provisioning) is executed - usable for removal (delete identity, contract) 
 	 * operations only or where provisioning is skipped.
@@ -128,7 +134,7 @@ public interface IdmRoleRequestService extends
 	 * @since 9.6.0
 	 * @see #startConcepts(EntityEvent, EntityEvent)
 	 */
-	IdmRoleRequestDto executeConceptsImmediate(UUID applicant, List<IdmConceptRoleRequestDto> concepts);
+	IdmRoleRequestDto executeConceptsImmediate(UUID applicant, List<? extends AbstractConceptRoleRequestDto> concepts);
 
 	/**
 	 * Execute concepts via request - usable programmatically, where identity roles are added / updated / removed.
@@ -144,7 +150,7 @@ public interface IdmRoleRequestService extends
 	 * @since 9.7.1
 	 * @see #startConcepts(EntityEvent, EntityEvent)
 	 */
-	IdmRoleRequestDto executeConceptsImmediate(UUID applicant, List<IdmConceptRoleRequestDto> concepts,
+	IdmRoleRequestDto executeConceptsImmediate(UUID applicant, List<? extends AbstractConceptRoleRequestDto> concepts,
 			Map<String, Serializable> additionalProperties);
 	
 	/**
@@ -213,10 +219,10 @@ public interface IdmRoleRequestService extends
 	Set<ResolvedIncompatibleRoleDto> getIncompatibleRoles(IdmRoleRequestDto request, IdmBasePermission... permissions);
 
 	/**
-	 * Remove founded duplicates with given {@link IdmConceptRoleRequestDto} and between {@link IdmIdentityRoleDto}.
+	 * Remove found duplicates with given {@link IdmConceptRoleRequestDto} and between {@link IdmIdentityRoleDto}.
 	 * This operation return new list of {@link IdmConceptRoleRequestDto} without duplicates.<br />
 	 * <br />
-	 * Duplicates will be removed with duplicates founded in concept and with all another identity roles (except automatic and subroles).
+	 * Duplicates will be removed with duplicates found in concept and with all another identity roles (except automatic and subroles).
 	 * <br />
 	 * Given concepts must not be immutable.
 	 *
@@ -224,30 +230,30 @@ public interface IdmRoleRequestService extends
 	 * @param identityId
 	 * @return
 	 */
-	List<IdmConceptRoleRequestDto> removeDuplicities(List<IdmConceptRoleRequestDto> concepts, UUID identityId);
+	List<AbstractConceptRoleRequestDto> removeDuplicities(List<AbstractConceptRoleRequestDto> concepts, UUID identityId);
 
 	/**
-	 * Mark all returned {@link IdmConceptRoleRequestDto} with {@link IdmConceptRoleRequestDto#isDuplicit()}.
+	 * Mark all returned {@link IdmConceptRoleRequestDto} with {@link AbstractConceptRoleRequestDto#getDuplicate()}}.
 	 * This operation expect that for given concept will be exists eavs as subdefinition (if role supports this).
 	 *
 	 * @param concepts
 	 * @param allByIdentity
 	 * @return
 	 */
-	List<IdmConceptRoleRequestDto> markDuplicates(List<IdmConceptRoleRequestDto> concepts,
-			List<IdmIdentityRoleDto> allByIdentity);
+	List<AbstractConceptRoleRequestDto> markDuplicates(List<AbstractConceptRoleRequestDto> concepts,
+			List<AbstractRoleAssignmentDto> allByIdentity);
 
 	/**
-	 * Method create {@link IdmConceptRoleRequestDto}
-	 * 
-	 * @param roleRequest
-	 * @param contract
-	 * @param roleId
-	 * @param operation
-	 * @return
-	 */
-	IdmConceptRoleRequestDto createConcept(IdmRoleRequestDto roleRequest, IdmIdentityContractDto contract, UUID identityRoleId, UUID roleId,
-			ConceptRoleRequestOperation operation);
+     * Method create {@link IdmConceptRoleRequestDto}
+     *
+     * @param roleRequest
+     * @param contract
+     * @param roleId
+     * @param operation
+     * @return
+     */
+	AbstractConceptRoleRequestDto createConcept(IdmRoleRequestDto roleRequest, IdmIdentityContractDto contract, UUID identityRoleId, UUID roleId,
+                                                ConceptRoleRequestOperation operation);
 
 	/**
 	 * Refresh state on a systems. If is state changed, then will be returned in the request
@@ -256,4 +262,13 @@ public interface IdmRoleRequestService extends
 	 */
 	IdmRoleRequestDto refreshSystemState(IdmRoleRequestDto request);
 
+	IdmRoleRequestDto createRequest(IdmRequestIdentityRoleDto dto);
+
+	IdmIdentityDto getApplicantAsIdentity(IdmRoleRequestDto request);
+
+	List<IdmIdentityDto> getGuarantorsForApplicant(IdmRoleRequestDto request);
+
+	ApplicantService getApplicantService(String applicantType);
+
+	ApplicantService getApplicantServiceByAccountType(String accountType);
 }

@@ -153,7 +153,7 @@ public class DefaultSysRoleSystemAttributeServiceTest extends AbstractIntegratio
 		
 		IdmRoleRequestDto request = helper.createRoleRequest(identity, role);
 		request = helper.executeRequest(request, false, true);
-		UUID identityRoleId = request.getConceptRoles().get(0).getIdentityRole();
+		UUID identityRoleId = request.getConceptRoles().get(0).getRoleAssignmentUuid();
 		
 		IdmIdentityRoleDto identityRole = identityRoleService.get(identityRoleId);
 		

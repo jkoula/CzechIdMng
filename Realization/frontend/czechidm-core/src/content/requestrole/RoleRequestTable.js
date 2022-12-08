@@ -270,7 +270,7 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
                 const entity = data[rowIndex];
                 return (
                   <Advanced.IdentityInfo
-                    entityIdentifier={ entity.applicant }
+                    entityIdentifier={ entity.applicant.id }
                     entity={ entity._embedded.applicant }
                     face="popover"
                     showIcon/>

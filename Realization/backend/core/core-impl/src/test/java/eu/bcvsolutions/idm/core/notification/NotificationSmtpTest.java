@@ -142,6 +142,9 @@ public class NotificationSmtpTest extends AbstractNotificationTest {
 
 	@Test
 	public void B_sendEmailViaSmtpByWf() throws InterruptedException, BindPortException, OutOfRangePortException {
+		if (!this.isRunning()) {
+			this.startSmtpServer();
+		}
 		assertTrue(this.isRunning());
 		
 		// init observer for this test only
@@ -156,8 +159,8 @@ public class NotificationSmtpTest extends AbstractNotificationTest {
 		identity.setEmail("example@example.tld");
 		identity = identityService.save(identity);
 
-		processInstanceService.startProcess(WF_NAME, null,
-				InitTestDataProcessor.TEST_USER_1, null, null);
+		IdmIdentityDto testUser1 = identityService.getByUsername(InitTestDataProcessor.TEST_USER_1);
+		processInstanceService.startProcess(WF_NAME, null, testUser1.getId().toString(), null);
 		// email is send by apache camel asynchronously
 		if (observer.getEmails().size() == currentEmails) {
 			observer.waitForMails();

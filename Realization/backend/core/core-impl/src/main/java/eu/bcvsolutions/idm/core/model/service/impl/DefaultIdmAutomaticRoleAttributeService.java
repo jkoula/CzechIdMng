@@ -23,6 +23,10 @@ import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.SingularAttribute;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +99,6 @@ import eu.bcvsolutions.idm.core.model.event.AutomaticRoleAttributeEvent;
 import eu.bcvsolutions.idm.core.model.event.AutomaticRoleAttributeEvent.AutomaticRoleAttributeEventType;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent.IdentityRoleEventType;
 import eu.bcvsolutions.idm.core.model.event.RoleRequestEvent.RoleRequestEventType;
 import eu.bcvsolutions.idm.core.model.event.processor.role.AutomaticRoleAttributeDeleteProcessor;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleAttributeRepository;
@@ -215,7 +218,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	public void removeAutomaticRoles(IdmIdentityRoleDto identityRole) {
 		Assert.notNull(identityRole.getAutomaticRole(), "Automatic role is required.");
 		// skip check granted authorities
-		IdentityRoleEvent event = new IdentityRoleEvent(IdentityRoleEventType.DELETE, identityRole);
+		IdentityRoleEvent event = new IdentityRoleEvent(AbstractRoleAssignmentEvent.RoleAssignmentEventType.DELETE, identityRole);
 		event.getProperties().put(IdmIdentityRoleService.SKIP_CHECK_AUTHORITIES, Boolean.TRUE);
 		identityRoleService.publish(event);
 	}
@@ -229,7 +232,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	@Override
 	@Transactional
 	public void removeAutomaticRolesInternal(UUID contractId, Set<AbstractIdmAutomaticRoleDto> automaticRoles) {
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<IdmConceptRoleRequestDto>();
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<AbstractConceptRoleRequestDto>();
 
 		// Identity id is get from embedded identity role. This is little speedup.
 		UUID identityId = null;
@@ -259,7 +262,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 		// Execute concepts
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(identityId);
+		roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 	}
 	
@@ -481,9 +484,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * 
 	 * @param automaticRoleId
 	 * @param rules
-	 * @param onlyNew
 	 * @param passed
-	 * @param identityId
 	 * @param contractId
 	 * @return
 	 */
@@ -802,7 +803,6 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * @param value
 	 * @param cb
 	 * @param comparsion
-	 * @param neq
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -1083,7 +1083,6 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * Cast value in string to given persistent type
 	 *
 	 * @param value
-	 * @param persistentType
 	 * @param comparison
 	 * @return
 	 */
@@ -1109,7 +1108,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 	 * @param automaticRoles
 	 */
 	private void createIdentityRoles(IdmIdentityContractDto contract, IdmContractPositionDto contractPosition, Set<AbstractIdmAutomaticRoleDto> automaticRoles) {		
-		List<IdmConceptRoleRequestDto> concepts = new ArrayList<>(automaticRoles.size());
+		List<AbstractConceptRoleRequestDto> concepts = new ArrayList<>(automaticRoles.size());
 
 		for (AbstractIdmAutomaticRoleDto autoRole : automaticRoles) {
 			IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
@@ -1124,7 +1123,7 @@ public class DefaultIdmAutomaticRoleAttributeService
 		//
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(contract.getIdentity());
+		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 	}
 	

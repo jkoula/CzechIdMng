@@ -21,6 +21,13 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
     return 'requestIdentityRoles';
   }
 
+  createEntity(entity, uiKey = null, cb = null) {
+    if (entity && !entity.assignmentType) {
+      entity.assignmentType = RequestIdentityRoleManager.ENTITY_TYPE
+    }
+    return super.createEntity(entity, uiKey, cb)
+  }
+
   /**
    * Delete entity
    *
@@ -38,6 +45,7 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
     uiKey = this.resolveUiKey(uiKey, entity.id);
     return (dispatch) => {
       dispatch(this.requestEntity(entity.id, uiKey));
+      console.log("daaaaata manager", entity)
       this.getService().delete(entity)
       .then((json) => {
         if (cb) {
@@ -132,3 +140,4 @@ export default class RequestIdentityRoleManager extends FormableEntityManager {
      };
    }
 }
+RequestIdentityRoleManager.ENTITY_TYPE = "eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto";

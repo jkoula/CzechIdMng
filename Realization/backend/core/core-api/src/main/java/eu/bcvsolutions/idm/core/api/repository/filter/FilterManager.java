@@ -1,12 +1,14 @@
 package eu.bcvsolutions.idm.core.api.repository.filter;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.FilterBuilderDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.FilterBuilderFilter;
@@ -100,4 +102,6 @@ public interface FilterManager {
      * @since 10.6.0
      */
     <T> List<T> checkFilterSizeExceeded(FilterKey filterKey, List<T> filterValues);
+
+	public Set<String> getAllowedFilterProperties(Class<BaseDto> clazz);
 }

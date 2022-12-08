@@ -10,8 +10,11 @@ import eu.bcvsolutions.idm.acc.service.api.AccRoleAccountService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningBreakRecipientService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSyncConfigService;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
@@ -19,6 +22,7 @@ import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.event.processor.RoleProcessor;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.model.event.RoleEvent.RoleEventType;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +47,7 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 	@Autowired private SysProvisioningBreakRecipientService provisioningBreakRecipientService;
 	@Autowired private SysSyncConfigRepository syncConfigRepository;
 	@Autowired private SysSyncConfigService syncConfigService;
-	@Autowired private IdmIdentityRoleService identityRoleService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 
 	public RoleDeleteProcessor() {
 		super(RoleEventType.DELETE);
@@ -69,13 +73,13 @@ public class RoleDeleteProcessor extends CoreEventProcessor<IdmRoleDto> implemen
 		roleSystemService.find(roleSystemFilter, null).forEach(roleSystem -> {
 			// Identity-role clear relations to a role-system, but only on force-delete!
 			if (forceDelete) {
-				IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+				IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 				identityRoleFilter.setRoleSystemId(roleSystem.getId());
-				identityRoleService.find(identityRoleFilter, null).stream()
-						.forEach(identityRole -> {
+
+				roleAssignmentManager.find(identityRoleFilter, null, (identityRole, service) -> {
 							// Clear role-system. Identity-role will be removed in next processor.
 							identityRole.setRoleSystem(null);
-							identityRoleService.saveInternal(identityRole);
+							service.saveInternal(identityRole);
 						});
 
 			}

@@ -1,6 +1,7 @@
 package eu.bcvsolutions.idm.acc.domain;
 
 import com.google.common.collect.Maps;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.ic.api.IcConnectorObject;
@@ -19,8 +20,8 @@ import java.util.Map;
 public class MappingContext {
 
 	private List<IdmIdentityContractDto> contracts;
-	private List<IdmIdentityRoleDto> identityRoles;
-	private List<IdmIdentityRoleDto> identityRolesForSystem;
+	private List<AbstractRoleAssignmentDto> identityRoles;
+	private List<AbstractRoleAssignmentDto> identityRolesForSystem;
 	private IcConnectorObject connectorObject;
 
 	private Map<String, Object> context;
@@ -49,11 +50,11 @@ public class MappingContext {
 		this.contracts = contracts;
 	}
 
-	public List<IdmIdentityRoleDto> getIdentityRoles() {
+	public List<AbstractRoleAssignmentDto> getIdentityRoles() {
 		return identityRoles;
 	}
 
-	public void setIdentityRoles(List<IdmIdentityRoleDto> identityRoles) {
+	public void setIdentityRoles(List<AbstractRoleAssignmentDto> identityRoles) {
 		this.identityRoles = identityRoles;
 	}
 
@@ -65,11 +66,11 @@ public class MappingContext {
 		return connectorObject;
 	}
 
-	public List<IdmIdentityRoleDto> getIdentityRolesForSystem() {
+	public List<AbstractRoleAssignmentDto> getIdentityRolesForSystem() {
 		return identityRolesForSystem;
 	}
 
-	public void setIdentityRolesForSystem(List<IdmIdentityRoleDto> identityRolesForSystem) {
+	public void setIdentityRolesForSystem(List<AbstractRoleAssignmentDto> identityRolesForSystem) {
 		this.identityRolesForSystem = identityRolesForSystem;
 	}
 

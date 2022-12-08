@@ -1,5 +1,7 @@
 package eu.bcvsolutions.idm.core.model.entity;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;
@@ -17,11 +19,15 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Type;
 import org.hibernate.envers.Audited;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
 import eu.bcvsolutions.idm.core.api.entity.OperationResult;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 
 /**
  * Request for roles
@@ -31,7 +37,7 @@ import eu.bcvsolutions.idm.core.api.entity.OperationResult;
  */
 @Entity
 @Table(name = "idm_role_request", indexes = {
-		@Index(name = "idx_idm_role_request_app_id", columnList = "applicant_id"),
+		@Index(name = "idx_idm_role_request_app_id", columnList = "applicant"),
 		@Index(name = "idx_idm_role_request_state", columnList = "state")
 })
 public class IdmRoleRequest extends AbstractEntity {
@@ -40,9 +46,11 @@ public class IdmRoleRequest extends AbstractEntity {
 
 	@Audited
 	@NotNull
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "applicant_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-	private IdmIdentity applicant;
+	@JsonDeserialize(as = UUID.class)
+	private UUID applicant;
+
+	@Column(name = "applicant_type")
+	private String applicantType;
 
 	@Audited
 	@NotNull
@@ -87,12 +95,23 @@ public class IdmRoleRequest extends AbstractEntity {
 	@Column(name = "description", length = DefaultFieldLengths.DESCRIPTION)
 	private String description;
 
-	public IdmIdentity getApplicant() {
-		return applicant;
+	public ApplicantDto getApplicant() {
+		ApplicantImplDto applicantImplDto = new ApplicantImplDto();
+		applicantImplDto.setId(applicant);
+		applicantImplDto.setApplicantType(applicantType);
+		return applicantImplDto;
 	}
 
-	public void setApplicant(IdmIdentity applicant) {
+	public void setApplicant(UUID applicant) {
 		this.applicant = applicant;
+	}
+
+	public String getApplicantType() {
+		return applicantType;
+	}
+
+	public void setApplicantType(String applicantType) {
+		this.applicantType = applicantType;
 	}
 
 	public RoleRequestState getState() {

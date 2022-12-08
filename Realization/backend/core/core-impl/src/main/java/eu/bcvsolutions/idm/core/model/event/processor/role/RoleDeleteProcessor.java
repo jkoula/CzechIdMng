@@ -9,9 +9,21 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 
 import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
+import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -23,8 +35,6 @@ import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
@@ -50,7 +60,6 @@ import eu.bcvsolutions.idm.core.api.service.IdmAuthorizationPolicyService;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
-import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIncompatibleRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCatalogueRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
@@ -85,9 +94,9 @@ public class RoleDeleteProcessor
 	//
 	@Autowired private IdmRoleService service;
 	@Autowired private LookupService lookupService;
-	@Autowired private IdmIdentityRoleService identityRoleService;
+	@Autowired private IdmRoleAssignmentManager roleAssignmentManager;
 	@Autowired private IdmRoleRequestService roleRequestService;
-	@Autowired private IdmConceptRoleRequestService conceptRoleRequestService;
+	@Autowired private IdmConceptRoleRequestManager conceptRoleRequestManager;
 	@Autowired private IdmRoleTreeNodeService roleTreeNodeService;
 	@Autowired private IdmAuthorizationPolicyService authorizationPolicyService;
 	@Autowired private IdmAutomaticRoleAttributeService automaticRoleAttributeService;
@@ -126,12 +135,12 @@ public class RoleDeleteProcessor
 			checkWithoutForceDelete(role);
 		}
 		//
-		// Find all concepts and remove relation on role - has to be the first => concepts are created bellow 
-		IdmConceptRoleRequestFilter conceptRequestFilter = new IdmConceptRoleRequestFilter();
-		conceptRequestFilter.setRoleId(roleId);
-		List<IdmConceptRoleRequestDto> concepts = conceptRoleRequestService.find(conceptRequestFilter, null).getContent();
+		// Find all concepts and remove relation on role - has to be the first => concepts are created bellow
+		List<AbstractConceptRoleRequestDto> concepts = conceptRoleRequestManager.getAllByRoleId(roleId);
 		for (int counter = 0; counter < concepts.size(); counter++) {
-			IdmConceptRoleRequestDto concept = concepts.get(counter);
+			AbstractConceptRoleRequestDto concept = concepts.get(counter);
+			final IdmGeneralConceptRoleRequestService<AbstractRoleAssignmentDto, AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter> serviceForConcept =
+					conceptRoleRequestManager.getServiceForConcept(concept);
 			String message = null;
 			if (concept.getState().isTerminatedState()) {
 				message = MessageFormat.format(
@@ -142,10 +151,10 @@ public class RoleDeleteProcessor
 						"Request change in concept [{0}], was not executed, because requested role [{1}] was deleted (not from this role request)!",
 						concept.getId(), role.getCode());
 				// Cancel concept and WF
-				concept = conceptRoleRequestService.cancel(concept);
+				concept = serviceForConcept.cancel(concept);
 			}
-			conceptRoleRequestService.addToLog(concept, message);
-			conceptRoleRequestService.save(concept);
+			serviceForConcept.addToLog(concept, message);
+			serviceForConcept.save(concept);
 			if (counter % 100 == 0) {
 				clearSession();
 			}
@@ -154,24 +163,25 @@ public class RoleDeleteProcessor
 		// remove related assigned roles etc.
 		if (forceDelete) {
 			// remove directly assigned assigned roles (not automatic)
-			IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+			IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 			identityRoleFilter.setRoleId(roleId);
 			identityRoleFilter.setDirectRole(Boolean.TRUE);
 			identityRoleFilter.setAutomaticRole(Boolean.FALSE);
-			List<IdmIdentityRoleDto> assignedRoles = identityRoleService.find(identityRoleFilter, null).getContent();
+			List<IdmRequestIdentityRoleDto> assignedRoles = roleAssignmentManager.find(identityRoleFilter, null).getContent();
 			for (int counter = 0; counter < assignedRoles.size(); counter++) {
-				IdmIdentityRoleDto identityRole = assignedRoles.get(counter);
-				IdmIdentityContractDto contract = lookupService.lookupEmbeddedDto(identityRole, IdmIdentityRoleDto.PROPERTY_IDENTITY_CONTRACT);
-				UUID identityId = contract.getIdentity();
+				IdmRequestIdentityRoleDto identityRole = assignedRoles.get(counter);
+				final IdmGeneralConceptRoleRequestService<AbstractRoleAssignmentDto, ? extends AbstractConceptRoleRequestDto, IdmBaseConceptRoleRequestFilter> serviceForConcept =
+						conceptRoleRequestManager.getServiceForConcept(identityRole.getAssignmentType());
+				ApplicantDto applicantId = serviceForConcept.resolveApplicant(identityRole);
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-				roleRequest.setApplicant(identityId);
+				roleRequest.setApplicant(new ApplicantImplDto(applicantId.getId(), identityRole.getOwnerType().getCanonicalName()));
 				//
-				IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
-				conceptRoleRequest.setIdentityRole(identityRole.getId());
+				AbstractConceptRoleRequestDto conceptRoleRequest = serviceForConcept.createEmptyConcept();
+				conceptRoleRequest.setRoleAssignmentUuid(identityRole.getId());
 				conceptRoleRequest.setRole(identityRole.getRole());
 				conceptRoleRequest.setOperation(ConceptRoleRequestOperation.REMOVE);
-				conceptRoleRequest.setIdentityContract(contract.getId());
-				conceptRoleRequest.setContractPosition(identityRole.getContractPosition());
+				conceptRoleRequest.setOwnerUuid(applicantId.getConceptOwner());
+				conceptRoleRequest.setOwnerUuid(identityRole.getOwnerUuid());
 				roleRequest.getConceptRoles().add(conceptRoleRequest);
 				//
 				// start event
@@ -339,9 +349,9 @@ public class RoleDeleteProcessor
 	private void checkWithoutForceDelete(IdmRoleDto role) {
 		UUID roleId = role.getId();
 		// check assigned roles
-		IdmIdentityRoleFilter identityRoleFilter = new IdmIdentityRoleFilter();
+		IdmRequestIdentityRoleFilter identityRoleFilter = new IdmRequestIdentityRoleFilter();
 		identityRoleFilter.setRoleId(roleId);
-		if (identityRoleService.count(identityRoleFilter) > 0) {		
+		if (roleAssignmentManager.count(identityRoleFilter) > 0) {
 			throw new ResultCodeException(
 					CoreResultCode.ROLE_DELETE_FAILED_IDENTITY_ASSIGNED, 
 					ImmutableMap.of("role", role.getCode())

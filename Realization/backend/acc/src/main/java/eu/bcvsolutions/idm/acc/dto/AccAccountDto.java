@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.acc.dto;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 
 @Relation(collectionRelation = "accounts")
-public class AccAccountDto extends FormableDto implements ExternalIdentifiable {
+public class AccAccountDto extends FormableDto implements ExternalIdentifiable, Serializable {
 
 	private static final long serialVersionUID = 1L;
 

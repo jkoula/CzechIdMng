@@ -41,7 +41,7 @@ Input variables:
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{decision.equals("approve")}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow31" name="Identity role not exist" sourceRef="exclusivegateway5" targetRef="scripttask7">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{identityRoleService.get(conceptRole.identityRole,null) == null}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{conceptManager.getServiceForConcept(conceptRole).fetchAssignment(conceptRole) == null}]]></conditionExpression>
     </sequenceFlow>
     <endEvent id="endevent5" name="End - Identity role with given ID not found">
       <documentation>Identity role with given ID not found</documentation>
@@ -51,36 +51,36 @@ Input variables:
       <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
  
 // Set and save state APPROVED to concept
-def conceptDto = conceptRoleRequestService.get(conceptRole.id,null);
+def conceptDto = conceptManager.getServiceForConcept(conceptRole).get(conceptRole.id,null);
 conceptDto.setState(RoleRequestState.APPROVED);
 
 // Set current validity dates
 // conceptDto.setValidFrom(conceptRole.validFrom);
 // conceptDto.setValidTill(conceptRole.validTill);
 
-conceptRoleRequestService.save(conceptDto);</script>
+conceptManager.getServiceForConcept(conceptDto).save(conceptDto);</script>
     </scriptTask>
     <sequenceFlow id="flow35" sourceRef="exclusivegateway5" targetRef="scripttask5">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{identityRoleService.get(conceptRole.identityRole,null) != null}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[#{conceptManager.getServiceForConcept(conceptRole).fetchAssignment(conceptRole) != null}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow36" sourceRef="scripttask5" targetRef="endevent2"></sequenceFlow>
     <scriptTask id="scripttask6" name="Set DISAPPROVED state to concept" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
  
 // Set and save state DISAPPROVED to concept
-def conceptDto = conceptRoleRequestService.get(conceptRole.id,null);
+def conceptDto = conceptManager.getServiceForConcept(conceptRole).get(conceptRole.id,null);
 conceptDto.setState(RoleRequestState.DISAPPROVED);
-conceptRoleRequestService.save(conceptDto);</script>
+conceptManager.getServiceForConcept(conceptDto).save(conceptDto);</script>
     </scriptTask>
     <sequenceFlow id="flow37" sourceRef="scripttask6" targetRef="endevent4"></sequenceFlow>
     <scriptTask id="scripttask7" name="Set CANCELED state to concept" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
  
 // Set and save state CANCELED to concept
-def conceptDto = conceptRoleRequestService.get(conceptRole.id,null);
+def conceptDto = conceptManager.getServiceForConcept(conceptRole).get(conceptRole.id,null);
 conceptDto.setState(RoleRequestState.CANCELED);
-conceptRoleRequestService.addToLog(conceptDto, 'Identity role not exist!');
-conceptRoleRequestService.save(conceptDto);</script>
+conceptManager.getServiceForConcept(conceptDto).addToLog(conceptDto, 'Identity role not exist!');
+conceptManager.getServiceForConcept(conceptDto).save(conceptDto);</script>
     </scriptTask>
     <sequenceFlow id="flow38" sourceRef="scripttask7" targetRef="endevent5"></sequenceFlow>
     <sequenceFlow id="flow39" sourceRef="startevent1" targetRef="servicetask5"></sequenceFlow>
@@ -88,11 +88,11 @@ conceptRoleRequestService.save(conceptDto);</script>
       <script>import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
  
 // Set and save state IN_PROGRESS to concept
-def conceptDto = conceptRoleRequestService.get(conceptRole.id,null);
+def conceptDto = conceptManager.getServiceForConcept(conceptRole).get(conceptRole.id,null);
 conceptDto.setState(RoleRequestState.IN_PROGRESS);
 // Save process ID to concept
 conceptDto.setWfProcessId(processInstanceId);
-conceptRoleRequestService.save(conceptDto);</script>
+conceptManager.getServiceForConcept(conceptDto).save(conceptDto);</script>
     </scriptTask>
     <sequenceFlow id="flow40" sourceRef="scripttask8" targetRef="scripttask9"></sequenceFlow>
     <scriptTask id="scripttask9" name="Find all managers (for applicant) and resolve if we can skip next task" scriptFormat="groovy" activiti:autoStoreVariables="false">

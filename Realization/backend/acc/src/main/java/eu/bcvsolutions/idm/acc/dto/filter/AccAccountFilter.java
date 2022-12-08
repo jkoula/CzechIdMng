@@ -43,6 +43,17 @@ public class AccAccountFilter extends DataFilter implements ExternalIdentifiable
 	private UUID formDefinitionId;
 	private String externalId;
 	private Boolean hasFormDefinition;
+
+	// Not used at the moment, but needed in order to prevent error when searching from general role request page
+	private boolean validNowOrInFuture;
+
+	public boolean isValidNowOrInFuture() {
+		return validNowOrInFuture;
+	}
+
+	public void setValidNowOrInFuture(boolean validNowOrInFuture) {
+		this.validNowOrInFuture = validNowOrInFuture;
+	}
 	
 	public AccAccountFilter() {
 		this(new LinkedMultiValueMap<>());

@@ -26,14 +26,13 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
     private static final long serialVersionUID = 1L;
     public static final String WF_PROCESS_FIELD = "wfProcessId";
 
-    @Embedded(dtoClass = IdmIdentityDto.class)
-    private UUID applicant;
+    private ApplicantImplDto applicant;
     private RoleRequestState state;
     private RoleRequestedByType requestedByType;
     //In embedded map, is under wfProcessId key actual task - WorkflowProcessInstanceDto.class
     private String wfProcessId;
     private String originalRequest;
-    private List<IdmConceptRoleRequestDto> conceptRoles;
+    private List<AbstractConceptRoleRequestDto> conceptRoles;
     private boolean executeImmediately = false;
     @Embedded(dtoClass = IdmRoleRequestDto.class)
     private UUID duplicatedToRequest;
@@ -67,22 +66,22 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
         this.originalRequest = originalRequest;
     }
 
-    public UUID getApplicant() {
+    public ApplicantImplDto getApplicant() {
         return applicant;
     }
 
-    public void setApplicant(UUID applicant) {
+    public void setApplicant(ApplicantImplDto applicant) {
         this.applicant = applicant;
     }
 
-    public List<IdmConceptRoleRequestDto> getConceptRoles() {
+    public List<AbstractConceptRoleRequestDto> getConceptRoles() {
         if (conceptRoles == null) {
             conceptRoles = new ArrayList<>();
         }
         return conceptRoles;
     }
 
-    public void setConceptRoles(List<IdmConceptRoleRequestDto> conceptRoles) {
+    public void setConceptRoles(List<AbstractConceptRoleRequestDto> conceptRoles) {
         this.conceptRoles = conceptRoles;
     }
 

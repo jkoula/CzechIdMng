@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import java.time.ZonedDateTime;
+
+import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.model.event.IdentityRoleValidRequestEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +32,15 @@ public class DefaultIdentityRoleValidRequestService
 		implements IdmIdentityRoleValidRequestService {
 	
 	private final IdmIdentityRoleValidRequestRepository repository;
+	private final EntityEventManager entityEventManager;
 	
 	@Autowired
 	public DefaultIdentityRoleValidRequestService(
-			IdmIdentityRoleValidRequestRepository repository) {
+			IdmIdentityRoleValidRequestRepository repository, EntityEventManager entityEventManager) {
 		super(repository);
 		//
 		this.repository = repository;
+		this.entityEventManager = entityEventManager;
 	}
 
 	@Override
@@ -55,6 +60,19 @@ public class DefaultIdentityRoleValidRequestService
 	@Override
 	public List<IdmIdentityRoleValidRequestDto> findAllValid() {
 		return this.findAllValidFrom(ZonedDateTime.now());
+	}
+	@Override
+	public void publishOrIncrease(IdmIdentityRoleValidRequestDto validRequestDto) {
+		try {
+			// after success provisioning is request removed from db
+			entityEventManager.process(new IdentityRoleValidRequestEvent<>(IdentityRoleValidRequestEvent.IdentityRoleValidRequestEventType.IDENTITY_ROLE_VALID, validRequestDto));
+		} catch (RuntimeException e) {
+			// log failed operation
+			validRequestDto.increaseAttempt();
+			validRequestDto.setResult(new OperationResult.Builder(OperationState.NOT_EXECUTED).setCause(e).build());
+
+			this.save(validRequestDto);
+		}
 	}
 
 	@Override

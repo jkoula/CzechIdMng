@@ -352,10 +352,11 @@ class IdentityRoles extends Basic.AbstractContent {
               ref="direct_roles"
               key="direct_roles"
               uiKey={ `${uiKey}-${entityId}` }
-              forceSearchParameters={ new SearchParameters()
-                .setFilter('identityId', entityId)
-                .setFilter('directRole', true)
-                .setFilter('addEavMetadata', true) }
+              forceSearchParameters={new SearchParameters()
+                  .setFilter('identityId', entityId)
+                  .setFilter('directRole', true)
+                  .setFilter('addEavMetadata', true)
+                  .setFilter('onlyAssignments', true)}
               showAddButton={ false }
               showRefreshButton={ false }
               match={ this.props.match }
@@ -374,9 +375,10 @@ class IdentityRoles extends Basic.AbstractContent {
               key="sub_roles"
               uiKey={ `${uiKey}-sub-${entityId}` }
               forceSearchParameters={ new SearchParameters()
-                .setFilter('identityId', entityId)
-                .setFilter('directRole', false)
-                .setFilter('addEavMetadata', true) }
+                  .setFilter('identityId', entityId)
+                  .setFilter('directRole', false)
+                  .setFilter('addEavMetadata', true)
+                  .setFilter('onlyAssignments', true)}
               showAddButton={ false }
               showRefreshButton={ false }
               match={ this.props.match }
