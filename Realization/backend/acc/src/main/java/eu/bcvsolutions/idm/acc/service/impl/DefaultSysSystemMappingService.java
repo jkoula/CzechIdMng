@@ -18,6 +18,8 @@ import eu.bcvsolutions.idm.acc.system.entity.SystemEntityTypeRegistrable;
 import eu.bcvsolutions.idm.core.api.domain.IdmScriptCategory;
 import eu.bcvsolutions.idm.core.api.dto.*;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.*;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
