@@ -263,7 +263,7 @@ public class IdentityContractUpdateByAutomaticRoleProcessor
 			roleRequest.getConceptRoles().addAll(changeValidable(contract, getAssignedAutomaticRoles(contract.getId())));
 		}
 		// start request at end asynchronously
-		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
 		roleRequestService.startConcepts(requestEvent, event);
 		//

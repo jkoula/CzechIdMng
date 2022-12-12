@@ -36,7 +36,7 @@ public class AccountConceptFilterBuilder extends AbstractFilterBuilder<AccAccoun
     @Override
     public Predicate getPredicate(Root<AccAccountConceptRoleRequest> root, AbstractQuery<?> query, CriteriaBuilder builder, AccAccountConceptRoleRequestFilter filter) {
         if (filter.getOwnerUuid() != null) {
-            return builder.equal(root.get(AccAccountConceptRoleRequest_.accAccount).get(AbstractEntity_.id), filter.getOwnerUuid());
+            return builder.equal(root.get(AccAccountConceptRoleRequest_.account).get(AbstractEntity_.id), filter.getOwnerUuid());
         }
         return null;
     }

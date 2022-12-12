@@ -55,7 +55,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutorIntegrationTest extends Abstr
 		roleRequest.setExecuteImmediately(true); // without approval
 		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 		IdmIdentityDto applicant = getHelper().createIdentity((GuardedString) null);
-		roleRequest.setApplicant(new ApplicantImplDto(applicant.getId(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicant.getId(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.save(roleRequest);
 		IdmConceptRoleRequestDto conceptRoleRequest = new IdmConceptRoleRequestDto();
 		IdmIdentityContractDto contract = getHelper().getPrimeContract(applicant);

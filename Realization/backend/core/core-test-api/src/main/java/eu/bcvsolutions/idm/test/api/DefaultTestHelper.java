@@ -770,7 +770,7 @@ public class DefaultTestHelper implements TestHelper {
 	@Override
 	public IdmRoleRequestDto createRoleRequest(IdmIdentityContractDto contract, ConceptRoleRequestOperation operation, IdmRoleDto... roles) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(true);
 		roleRequest = roleRequestService.save(roleRequest);

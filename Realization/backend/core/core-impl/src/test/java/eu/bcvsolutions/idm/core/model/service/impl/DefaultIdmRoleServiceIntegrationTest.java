@@ -469,7 +469,7 @@ public class DefaultIdmRoleServiceIntegrationTest extends AbstractRestTest {
 		formInstance.getValues().add(formValue);
 		// Create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setExecuteImmediately(true);
 		request = roleRequestService.save(request);
@@ -532,7 +532,7 @@ public class DefaultIdmRoleServiceIntegrationTest extends AbstractRestTest {
 		formInstance.getValues().add(formValue);
 		// Create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setExecuteImmediately(true);
 		request = roleRequestService.save(request);
@@ -610,7 +610,7 @@ public class DefaultIdmRoleServiceIntegrationTest extends AbstractRestTest {
 		formInstanceChanged.getValues().add(formValueChanged);
 		// Create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setExecuteImmediately(true);
 		request = roleRequestService.save(request);
@@ -701,7 +701,7 @@ public class DefaultIdmRoleServiceIntegrationTest extends AbstractRestTest {
 		formInstanceChanged.getValues().add(formValueChanged);
 		// Create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setExecuteImmediately(true);
 		request = roleRequestService.save(request);

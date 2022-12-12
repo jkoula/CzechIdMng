@@ -137,7 +137,7 @@ public class RemoveRoleCompositionTaskExecutor extends AbstractSchedulableStatef
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setState(RoleRequestState.CONCEPT);
 			roleRequest.setExecuteImmediately(true); // without approval
-			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 			roleRequest = roleRequestService.save(roleRequest);
 			// create concepts

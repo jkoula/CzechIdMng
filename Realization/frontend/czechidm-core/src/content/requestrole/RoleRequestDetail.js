@@ -71,7 +71,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       this.setState({
         showLoading: false,
         request: {
-          applicant: {
+          applicantInfo: {
             id: props.location.query.applicantId,
             applicantType: applicantType
           },
@@ -295,16 +295,17 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   }
 
   _getApplicantAndImplementer(request) {
-    const infoComponent = request && request.applicant ? componentService.getApplicantInfoComponent(request.applicant.applicantType) : null;
+    const infoComponent = request && request.applicantInfo ? componentService.getApplicantInfoComponent(request.applicantInfo.applicantType) : null;
+    console.log("aaaa",  request, infoComponent)
     return (
       <div>
         <Basic.LabelWrapper
-          rendered={ request !== null && !_.isNil(request.applicant && infoComponent) }
+          rendered={ request !== null && !_.isNil(request.applicantInfo && infoComponent) }
           readOnly
           ref="applicant"
           label={this.i18n('entity.RoleRequest.applicant')}>
           <infoComponent.component
-              entityIdentifier={ request && request.applicant.id }
+              entityIdentifier={ request && request.applicant }
               showLoading={!request}/>
 
         </Basic.LabelWrapper>
@@ -325,8 +326,9 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   _getIdentityId(props) {
     const { _request, location} = props;
     const applicantFromUrl = location && location.query ? location.query.applicantId : null;
+    console.log("rrrrrr", applicantFromUrl)
 
-    return _request ? _request.applicant.id : applicantFromUrl;
+    return _request ? _request.applicantInfo.id : applicantFromUrl;
   }
 
   render() {
@@ -632,7 +634,8 @@ function select(state, component) {
   const applicantFromUrl = component.location && component.location.query ? component.location.query.applicantId : null;
   const isAccountFromURL = component.location && component.location.query ? component.location.query.isAccount : null;
   const accountIdFromURL = component.location && component.location.query ? component.location.query.accountId : null;
-  const identityId = entity ? entity.applicant.id : applicantFromUrl;
+  const identityId = entity ? entity.applicantInfo.id : applicantFromUrl;
+  console.log("rrrrrr", identityId, applicantFromUrl)
   if (entity && entity._embedded && entity._embedded.wfProcessId) {
     entity.currentActivity = entity._embedded.wfProcessId.name;
     entity.candicateUsers = entity._embedded.wfProcessId.candicateUsers;

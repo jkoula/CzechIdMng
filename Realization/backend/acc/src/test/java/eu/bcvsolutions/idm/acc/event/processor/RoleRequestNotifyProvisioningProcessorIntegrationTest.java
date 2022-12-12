@@ -123,7 +123,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			// remove one role and add other
 			IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setExecuteImmediately(true);
 			IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);
@@ -302,7 +302,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 		// remove one role and add other
 		IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
 		final IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(true);
 		final IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);
@@ -392,7 +392,7 @@ public class RoleRequestNotifyProvisioningProcessorIntegrationTest extends Abstr
 			// remove one role and add other
 			IdmIdentityContractDto contract = getHelper().getPrimeContract(identity.getId());
 			final IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setExecuteImmediately(true);
 			final IdmRoleRequestDto roleRequestTwo = roleRequestService.save(roleRequest);

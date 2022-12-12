@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -513,7 +514,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setConceptRoles(Lists.newArrayList(conceptRoleRequest));
-			roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 			RoleRequestEvent roleRequestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
 			roleRequest = roleRequestService.startConcepts(roleRequestEvent, null);
 			//
@@ -594,7 +595,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 			roleRequest.setConceptRoles(Lists.newArrayList(conceptRoleRequest));
-			roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 			RoleRequestEvent roleRequestEvent = new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest);
 			roleRequest = roleRequestService.startConcepts(roleRequestEvent, null);
 			//
@@ -642,7 +643,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 		UUID identityRoleId = identityRole.getId();
 		IdmIdentityContractDto identityContract = getLookupService().lookupEmbeddedDto(identityRole, IdmIdentityRole_.identityContract);
 		IdmIdentityDto identity = getLookupService().lookupEmbeddedDto(identityContract, IdmIdentityContract_.identity);
-		IdmRoleDto role = getLookupService().lookupEmbeddedDto(identityRole, IdmIdentityRole_.role);
+		IdmRoleDto role = getLookupService().lookupEmbeddedDto(identityRole, AbstractRoleAssignment_.role);
 		//
 		if (!processedIdentityRoles.contains(identityRoleId)) {
 			// remove role by request
@@ -655,7 +656,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 				//
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
     			roleRequest.setConceptRoles(Lists.newArrayList(conceptRoleRequest));
-				roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+				roleRequest.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
     			roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 				// log successfully removed identity role
 				ResultModel resultModel = new DefaultResultModel(

@@ -2,7 +2,6 @@ package eu.bcvsolutions.idm.acc.dto;
 
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import org.springframework.hateoas.core.Relation;
 
 import java.io.ObjectInputStream;
@@ -16,7 +15,7 @@ public class AccAccountRoleAssignmentDto extends AbstractRoleAssignmentDto {
 
     private static final long serialVersionUID = 1L;
     @Embedded(dtoClass = AccAccountDto.class)
-    private UUID accAccount;
+    private UUID account;
 
     @Embedded(dtoClass = AccAccountRoleAssignmentDto.class)
     protected UUID directRole; // direct identity role
@@ -39,21 +38,21 @@ public class AccAccountRoleAssignmentDto extends AbstractRoleAssignmentDto {
         super.readObject(ois);
         ObjectInputStream.GetField readFields = ois.readFields();
         //
-        accAccount = (UUID) readFields.get("accAccount", null);
+        account = (UUID) readFields.get("accAccount", null);
         directRole = (UUID) readFields.get("directRole", null);
     }
 
-    public UUID getAccAccount() {
-        return accAccount;
+    public UUID getAccount() {
+        return account;
     }
 
-    public void setAccAccount(UUID account) {
-        this.accAccount = account;
+    public void setAccount(UUID account) {
+        this.account = account;
     }
 
     @Override
     public UUID getEntity() {
-        return getAccAccount();
+        return getAccount();
     }
 
     public UUID getDirectRole() {

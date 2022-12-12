@@ -122,7 +122,7 @@ public class IdentityContractAutomaticRoleProcessor extends CoreEventProcessor<I
 		// Execute concepts
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(new ApplicantImplDto(identityContract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(identityContract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), event);
 		//
 		return new DefaultEventResult<>(event, this);

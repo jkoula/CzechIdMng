@@ -813,7 +813,7 @@ public abstract class AbstractIdmRoleFormAttributeServiceIntegrationTest extends
 	
 	public IdmRoleRequestDto createRoleRequest(UUID applicantId, String applicantType) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(true);
 		return roleRequestService.save(roleRequest);

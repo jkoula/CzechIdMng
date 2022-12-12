@@ -132,7 +132,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             predicates.add(builder.equal(root.get(AccAccountConceptRoleRequest_.accountRole).get(AbstractEntity_.id), filter.getAccountRole()));
         }
         if (filter.getAccountuuid() != null) {
-            predicates.add(builder.equal(root.get(AccAccountConceptRoleRequest_.accAccount).get(AbstractEntity_.id), filter.getAccountuuid()));
+            predicates.add(builder.equal(root.get(AccAccountConceptRoleRequest_.account).get(AbstractEntity_.id), filter.getAccountuuid()));
         }
 
         Set<UUID> ids = filter.getAccountRoleUuids();
@@ -151,7 +151,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
 
             identityAccountSubquery.where(
                     builder.and(
-                            builder.equal(root.get(AccAccountConceptRoleRequest_.accAccount), identityAccountRoot.get(AccIdentityAccount_.account)),
+                            builder.equal(root.get(AccAccountConceptRoleRequest_.account), identityAccountRoot.get(AccIdentityAccount_.account)),
                             builder.equal(identityAccountRoot.get(AccIdentityAccount_.identity).get(AbstractEntity_.id), filter.getIdentity())
                     ));
             predicates.add(builder.exists(identityAccountSubquery));
@@ -175,15 +175,15 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             return null;
         }
         AccAccountRoleAssignmentDto accountRoleDto = new AccAccountRoleAssignmentDto();
-        accountRoleDto.setAccAccount(conceptRole.getAccAccount());
+        accountRoleDto.setAccount(conceptRole.getAccount());
         return accountRoleDto;
     }
 
     @Override
     protected AccAccountRoleAssignmentDto getRoleAssignmentDtoInternal(AccAccountConceptRoleRequestDto concept, IdmRoleDto subRole) {
-        AccAccountDto account = DtoUtils.getEmbedded(concept, AccAccountConceptRoleRequest_.accAccount, AccAccountDto.class, null);
+        AccAccountDto account = DtoUtils.getEmbedded(concept, AccAccountConceptRoleRequest_.account, AccAccountDto.class, null);
         AccAccountRoleAssignmentDto identityRoleDto = new AccAccountRoleAssignmentDto();
-        identityRoleDto.setAccAccount(account.getId());
+        identityRoleDto.setAccount(account.getId());
         return identityRoleDto;
     }
 
@@ -195,7 +195,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     protected AccAccountRoleAssignmentDto createAssignmentFromConceptInternal(AccAccountConceptRoleRequestDto concept) {
         AccAccountRoleAssignmentDto result = new AccAccountRoleAssignmentDto();
-        result.setAccAccount(concept.getAccAccount());
+        result.setAccount(concept.getAccount());
 
         return result;
     }
@@ -316,7 +316,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     public boolean validOwnership(AccAccountConceptRoleRequestDto concept, UUID applicantId) {
         // concept for account is valid only if applicant is the same as the account owner
         AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
-        identityAccountFilter.setAccountId(concept.getAccAccount());
+        identityAccountFilter.setAccountId(concept.getAccount());
         return identityAccountService.find(identityAccountFilter, null).stream().allMatch(accIdentityAccountDto -> accIdentityAccountDto.getIdentity().equals(applicantId));
     }
 
@@ -364,7 +364,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     protected AccAccountConceptRoleRequestDto requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto) {
         final AccAccountConceptRoleRequestDto map = modelMapper.map(dto, AccAccountConceptRoleRequestDto.class);
-        map.setAccAccount(dto.getOwnerUuid());
+        map.setAccount(dto.getOwnerUuid());
         map.setAccountRole(dto.getRoleAssignmentUuid());
         return map;
     }
@@ -377,7 +377,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     protected AccAccountConceptRoleRequestDto createEmptyConceptWithRoleAssignmentData(AccAccountRoleAssignmentDto roleAssignment) {
         AccAccountConceptRoleRequestDto conceptRoleRequest = new AccAccountConceptRoleRequestDto();
-        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccAccount());
+        conceptRoleRequest.setOwnerUuid(roleAssignment.getAccount());
 
         return conceptRoleRequest;
     }
@@ -390,7 +390,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     public AccAccountConceptRoleRequestDto createConceptToRemoveIdentityRole(AccAccountConceptRoleRequestDto concept, AccAccountRoleAssignmentDto identityRoleAssignment) {
         AccAccountConceptRoleRequestDto removeConcept = new AccAccountConceptRoleRequestDto();
-        removeConcept.setAccAccount(identityRoleAssignment.getAccAccount());
+        removeConcept.setAccount(identityRoleAssignment.getAccount());
         removeConcept.setAccountRole(identityRoleAssignment.getId());
         removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
         if (concept != null) {
@@ -404,7 +404,7 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     @Override
     public AccAccountConceptRoleRequestDto createConceptToRemoveIdentityRole(AccAccountRoleAssignmentDto roleAssignment) {
         AccAccountConceptRoleRequestDto removeConcept = createEmptyConcept();
-        removeConcept.setAccAccount(roleAssignment.getAccAccount());
+        removeConcept.setAccount(roleAssignment.getAccount());
         removeConcept.setAccountRole(roleAssignment.getId());
         removeConcept.setOperation(ConceptRoleRequestOperation.REMOVE);
         return removeConcept;

@@ -174,7 +174,7 @@ public class RoleDeleteProcessor
 						conceptRoleRequestManager.getServiceForConcept(identityRole.getAssignmentType());
 				ApplicantDto applicantId = serviceForConcept.resolveApplicant(identityRole);
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-				roleRequest.setApplicant(new ApplicantImplDto(applicantId.getId(), identityRole.getOwnerType().getCanonicalName()));
+				roleRequest.setApplicantInfo(new ApplicantImplDto(applicantId.getId(), identityRole.getOwnerType().getCanonicalName()));
 				//
 				AbstractConceptRoleRequestDto conceptRoleRequest = serviceForConcept.createEmptyConcept();
 				conceptRoleRequest.setRoleAssignmentUuid(identityRole.getId());

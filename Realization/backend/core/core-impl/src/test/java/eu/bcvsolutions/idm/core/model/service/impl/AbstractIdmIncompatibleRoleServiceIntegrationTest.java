@@ -285,7 +285,7 @@ public abstract class AbstractIdmIncompatibleRoleServiceIntegrationTest extends 
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setState(RoleRequestState.CONCEPT);
 		roleRequest.setExecuteImmediately(true); // without approval
-		roleRequest.setApplicant(new ApplicantImplDto(applicantId, owner.getClass().getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicantId, owner.getClass().getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest = getHelper().getService(IdmRoleRequestService.class).save(roleRequest);
 		//
@@ -381,7 +381,7 @@ public abstract class AbstractIdmIncompatibleRoleServiceIntegrationTest extends 
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setState(RoleRequestState.CONCEPT);
 		roleRequest.setExecuteImmediately(true); // without approval
-		roleRequest.setApplicant(new ApplicantImplDto(applicantId, owner.getClass().getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicantId, owner.getClass().getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest = getHelper().getService(IdmRoleRequestService.class).save(roleRequest);
 		//

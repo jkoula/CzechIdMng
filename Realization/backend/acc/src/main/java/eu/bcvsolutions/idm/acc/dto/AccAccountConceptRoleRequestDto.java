@@ -16,17 +16,17 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
     private static final long serialVersionUID = 1L;
 
     @Embedded(dtoClass = AccAccountDto.class)
-    private UUID accAccount;
+    private UUID account;
 
     @Embedded(dtoClass = AccAccountRoleAssignmentDto.class)
     private UUID accountRole;
 
-    public UUID getAccAccount() {
-        return accAccount;
+    public UUID getAccount() {
+        return account;
     }
 
-    public void setAccAccount(UUID accAccount) {
-        this.accAccount = accAccount;
+    public void setAccount(UUID account) {
+        this.account = account;
     }
 
     public UUID getAccountRole() {
@@ -49,12 +49,12 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
 
     @Override
     public UUID getOwnerUuid() {
-        return getAccAccount();
+        return getAccount();
     }
 
     @Override
     public void setOwnerUuid(UUID id) {
-        setAccAccount(id);
+        setAccount(id);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class AccAccountConceptRoleRequestDto extends AbstractConceptRoleRequestD
         // from concept
         conceptRoleRequest.setValidFrom(getValidFrom());
         conceptRoleRequest.setValidTill(getValidTill());
-        conceptRoleRequest.setAccAccount(getAccAccount());
+        conceptRoleRequest.setAccount(getAccount());
         // from assigned (~changed) sub role
         conceptRoleRequest.setDirectConcept(getId());
         // save and add to concepts to be processed

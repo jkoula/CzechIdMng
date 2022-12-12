@@ -217,7 +217,7 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 
 		// create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED);

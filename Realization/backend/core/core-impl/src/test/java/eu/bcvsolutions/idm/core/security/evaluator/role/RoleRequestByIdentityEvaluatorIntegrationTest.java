@@ -95,7 +95,7 @@ public class RoleRequestByIdentityEvaluatorIntegrationTest extends AbstractEvalu
 			loginService.login(new LoginDto(identityOne.getUsername(), identityOne.getPassword()));
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(new ApplicantImplDto(identityTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identityTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
 		} finally {
@@ -118,7 +118,7 @@ public class RoleRequestByIdentityEvaluatorIntegrationTest extends AbstractEvalu
 			loginService.login(new LoginDto(identityOne.getUsername(), identityOne.getPassword()));
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(new ApplicantImplDto(identityTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identityTwo.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest = roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
 			//

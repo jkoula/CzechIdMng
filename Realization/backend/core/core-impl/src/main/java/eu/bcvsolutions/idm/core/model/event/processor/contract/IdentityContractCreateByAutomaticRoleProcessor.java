@@ -105,7 +105,7 @@ public class IdentityContractCreateByAutomaticRoleProcessor
 		//
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setConceptRoles(concepts);
-		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), event);
 		//
 		return new DefaultEventResult<>(event, this);

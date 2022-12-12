@@ -14,7 +14,6 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.*;
-import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -84,7 +83,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountDto accAccountDto = accountService.get(identityAccount.getAccount());
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED); // can not be saved (after
@@ -105,7 +104,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		conceptA.setRole(roleA.getId());
 		conceptA.setValidFrom(validFrom);
 		conceptA.setValidTill(validTill);
-		conceptA.setAccAccount(accAccountDto.getId());
+		conceptA.setAccount(accAccountDto.getId());
 		conceptA = accAccountConceptRoleRequestService.save(conceptA);
 
 		Assert.assertEquals(RoleRequestState.CONCEPT, conceptA.getState());
@@ -133,7 +132,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(accAccountDto, roleA);
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -148,7 +147,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		conceptA.setOperation(ConceptRoleRequestOperation.UPDATE);
 		conceptA.setValidFrom(validFrom);
 		conceptA.setValidTill(null);
-		conceptA.setAccAccount(accAccountDto.getId());
+		conceptA.setAccount(accAccountDto.getId());
 		conceptA.setAccountRole(identityRoles.stream().findFirst().get().getId());
 		conceptA = accAccountConceptRoleRequestService.save(conceptA);
 
@@ -177,7 +176,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		final AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(accAccountDto, roleA);
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -190,7 +189,7 @@ public class DefaultIdmRoleRequestServiceTest extends AbstractIntegrationTest {
 		conceptA.setRoleRequest(request.getId());
 		conceptA.setRole(identityRoles.stream().findFirst().get().getRole());
 		conceptA.setOperation(ConceptRoleRequestOperation.REMOVE);
-		conceptA.setAccAccount(accAccountDto.getId());
+		conceptA.setAccount(accAccountDto.getId());
 		conceptA = accAccountConceptRoleRequestService.save(conceptA);
 
 		getHelper().startRequestInternal(request, true, true);

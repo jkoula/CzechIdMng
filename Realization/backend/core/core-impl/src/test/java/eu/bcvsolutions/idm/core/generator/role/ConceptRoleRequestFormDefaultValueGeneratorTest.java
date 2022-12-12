@@ -163,7 +163,7 @@ public class ConceptRoleRequestFormDefaultValueGeneratorTest extends AbstractGen
 		
 		IdmRoleRequestDto requestDto = new IdmRoleRequestDto();
 		requestDto.setExecuteImmediately(true);
-		requestDto.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		requestDto.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestDto.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestDto = roleRequestService.save(requestDto);
 

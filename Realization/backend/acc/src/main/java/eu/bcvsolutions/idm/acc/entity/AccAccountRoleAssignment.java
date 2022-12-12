@@ -6,7 +6,6 @@ import eu.bcvsolutions.idm.core.api.domain.ExternalIdentifiable;
 import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -18,11 +17,11 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "acc_account_role_assignment", indexes = {
-        @Index(name = "idx_acc_account_role_assign_ident_a", columnList = "account_id"),
+        @Index(name = "idx_acc_account_role_assign_ident_a", columnList = "account"),
         @Index(name = "idx_acc_account_role_assign_role", columnList = "role_id"),
         @Index(name = "idx_acc_account_role_assign_aut_r", columnList = "automatic_role_id"),
         @Index(name = "idx_acc_account_role_assign_ext_id", columnList = "external_id"),
-        @Index(name = "idx_acc_account_role_assign_d_r_id", columnList = "direct_role_id"),
+        @Index(name = "idx_acc_account_role_assign_d_r_id", columnList = "direct_role"),
         @Index(name = "idx_acc_account_role_assign_comp_id", columnList = "role_composition_id")
 })
 public class AccAccountRoleAssignment extends AbstractRoleAssignment implements ValidableEntity, AuditSearchable, ExternalIdentifiable, FormableEntity {
@@ -39,12 +38,12 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
     @Audited
     @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private AccAccount accAccount;
+    @JoinColumn(name = "account", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private AccAccount account;
 
     @Audited
     @ManyToOne
-    @JoinColumn(name = "direct_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "direct_role", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     protected AccAccountRoleAssignment directRole;
 
     public String getExternalId() {
@@ -55,22 +54,22 @@ public class AccAccountRoleAssignment extends AbstractRoleAssignment implements 
         this.externalId = externalId;
     }
 
-    public AccAccount getAccAccount() {
-        return accAccount;
+    public AccAccount getAccount() {
+        return account;
     }
 
-    public void setAccAccount(AccAccount account) {
-        this.accAccount = account;
+    public void setAccount(AccAccount account) {
+        this.account = account;
     }
 
     @Override
     public String getOwnerId() {
-        return getAccAccount().getId().toString();
+        return getAccount().getId().toString();
     }
 
     @Override
     public String getOwnerCode() {
-        return getAccAccount().getUid();
+        return getAccount().getUid();
     }
 
     @Override

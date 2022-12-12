@@ -11,7 +11,7 @@ import java.util.UUID;
  * @author Peter Štrunc <github.com/peter-strunc>
  */
 public interface AccAccountRoleRepository extends IdmRoleAssignmentRepository<AccAccountRoleAssignment> {
-    List<AccAccountRoleAssignment> findByAccAccount_Id(UUID id);
+    List<AccAccountRoleAssignment> findByAccount(UUID id);
 
 
 }
