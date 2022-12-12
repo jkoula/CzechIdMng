@@ -37,7 +37,7 @@ import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
  */
 @Entity
 @Table(name = "idm_role_request", indexes = {
-		@Index(name = "idx_idm_role_request_app_id", columnList = "applicant"),
+		@Index(name = "idx_idm_role_request_app_id", columnList = "applicant_id"),
 		@Index(name = "idx_idm_role_request_state", columnList = "state")
 })
 public class IdmRoleRequest extends AbstractEntity {
@@ -47,6 +47,7 @@ public class IdmRoleRequest extends AbstractEntity {
 	@Audited
 	@NotNull
 	@JsonDeserialize(as = UUID.class)
+	@Column(name = "applicant_id")
 	private UUID applicant;
 
 	@Column(name = "applicant_type")
