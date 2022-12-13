@@ -106,7 +106,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
 
     @Override
     public List<AccAccountRoleAssignmentDto> findByAccountId(UUID id) {
-        return toDtos(accAccountRoleRepository.findByAccount(id), false);
+        return toDtos(accAccountRoleRepository.findByAccount_Id(id), false);
     }
 
     @Override
