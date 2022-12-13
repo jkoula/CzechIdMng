@@ -27,7 +27,7 @@ export default class RequestAccountRoleManager extends Managers.RequestIdentityR
   }
 
   getEmbeddedOwner(concept) {
-    return concept._embedded.accAccount
+    return concept._embedded.account
   }
 
 }

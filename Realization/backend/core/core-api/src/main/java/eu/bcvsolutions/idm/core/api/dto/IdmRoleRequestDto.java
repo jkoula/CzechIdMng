@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto.Converter;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -29,6 +31,7 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
 
     private UUID applicant;
 
+    @JsonDeserialize(converter = Converter.class)
     private ApplicantDto applicantInfo;
     private RoleRequestState state;
     private RoleRequestedByType requestedByType;

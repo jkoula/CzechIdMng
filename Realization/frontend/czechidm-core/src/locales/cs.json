@@ -4907,6 +4907,13 @@
         "help": "Oprávnění, které budou přidělena pro vybraný typ entity dle nastaveného vyhodnocení"
       }
     },
+    "RequestIdentityRole": {
+      "directRole": {
+        "label": "Přiděleno díky roli",
+        "title": "Napřímo přidělená role, díky které je přidělena i tato role. Napřímo přidělená role zahrnuje tuto roli.",
+        "help": "$t(entity.IdentityRole.directRole.title)"
+      }
+    },
     "IdentityRole": {
       "_type": "Přiřazená role",
       "role" : "Název role",

@@ -574,11 +574,11 @@ public class DefaultIdmRoleRequestService
 		if (entity != null && entity.getApplicant() != null) {
 			// this ensures backwards compatibility for requests which do not have applicantType set
 			final String applicantType = entity.getApplicantType() == null ? IdmIdentityDto.class.getCanonicalName() : entity.getApplicantType();
-			requestDto.setApplicantInfo(new ApplicantImplDto(entity.getId(), applicantType));
+			requestDto.setApplicantInfo(new ApplicantImplDto(entity.getApplicant(), applicantType));
 
 			var applicantService = getApplicantService(entity.getApplicantType());
 			if (applicantService != null) {
-				BaseDto applicantDto = applicantService.get(entity.getId());
+				BaseDto applicantDto = applicantService.get(entity.getApplicant());
 				requestDto.getEmbedded().put(APPLICANT_INFO_FIELD, applicantDto);
 			}
 
@@ -654,9 +654,14 @@ public class DefaultIdmRoleRequestService
 		}
 
 		IdmRoleRequest idmRoleRequest = super.toEntity(dto, entity);
+		// Backwards compatibility and preventing unwanted error if applicant field is not set, but applicantInfo is
 		if (dto.getApplicantInfo() != null) {
-			idmRoleRequest.setApplicantType(dto.getApplicantInfo().getApplicantType());
-			idmRoleRequest.setApplicant(dto.getApplicantInfo().getId());
+			if (idmRoleRequest.getApplicant() == null) {
+				idmRoleRequest.setApplicant(dto.getApplicantInfo().getId());
+			}
+			if (idmRoleRequest.getApplicantType() == null) {
+				idmRoleRequest.setApplicantType(dto.getApplicantInfo().getApplicantType());
+			}
 		}
 		return idmRoleRequest;
 	}

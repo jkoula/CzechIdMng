@@ -496,7 +496,7 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
                 // Get form instance from given concept first
                 if (eavs != null && eavs.size() == 1) {
                     conceptFormInstance = eavs.get(0);
-                    if (conceptFormInstance.getFormDefinition() == null) {
+                    if (conceptFormInstance != null && conceptFormInstance.getFormDefinition() == null) {
                         conceptFormInstance.setFormDefinition(formDefinitionDto);
                     }
                 } else if (dto.getId() != null){

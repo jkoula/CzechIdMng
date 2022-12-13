@@ -3,6 +3,7 @@ import React from 'react';
 import * as Basic from "../../components/basic";
 import ComponentService from "../../services/ComponentService";
 import AdvancedColumn from "../../components/advanced/Table/Column";
+import LocalizationService from "../../services/LocalizationService";
 
 const componentService = new ComponentService();
 
@@ -12,14 +13,14 @@ export default class OwnerCell extends AdvancedColumn {
         const {entity} = this.props;
 
         const manager = componentService.getManagerForConceptByOwnerType(entity.ownerType)
-
         const owner = manager.getEmbeddedOwner(entity);
+        console.log("trtr", manager, owner)
         if (!owner) {
             return (
                 <Basic.Label
                     level="default"
-                    value={ this.i18n('label.removed') }
-                    title={ this.i18n('content.audit.revision.deleted') }/>
+                    value={ LocalizationService.i18n('label.removed') }
+                    title={ LocalizationService.i18n('content.audit.revision.deleted') }/>
             );
         }
         //

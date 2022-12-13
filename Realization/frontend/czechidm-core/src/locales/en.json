@@ -4854,6 +4854,13 @@
         "help": "Permissions will be granted by evaluator configuration"
       }
     },
+    "RequestIdentityRole": {
+      "directRole": {
+        "label": "Assigned by role",
+        "title": "Directly assigned role, which assigned this role as well (business role).",
+        "help": "$t(entity.IdentityRole.directRole.title)"
+      }
+    },
     "IdentityRole": {
       "_type": "Assigned role",
       "role" : "Role",

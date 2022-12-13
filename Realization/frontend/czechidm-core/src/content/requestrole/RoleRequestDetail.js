@@ -83,7 +83,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       });
     } else {
       this.context.store.dispatch(roleRequestManager.fetchEntity(_entityId, null, (entity, error) => {
-        const {isAccount, accountId} = this.props.location.state;
+        const {isAccount, accountId} = this.props.match;
         if (error) {
           this.setState({
             errorOccurred: true,
@@ -305,7 +305,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
           ref="applicant"
           label={this.i18n('entity.RoleRequest.applicant')}>
           <infoComponent.component
-              entityIdentifier={ request && request.applicant }
+              entityIdentifier={ request && request.applicantInfo.id }
               showLoading={!request}/>
 
         </Basic.LabelWrapper>
@@ -326,7 +326,6 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   _getIdentityId(props) {
     const { _request, location} = props;
     const applicantFromUrl = location && location.query ? location.query.applicantId : null;
-    console.log("rrrrrr", applicantFromUrl)
 
     return _request ? _request.applicantInfo.id : applicantFromUrl;
   }
