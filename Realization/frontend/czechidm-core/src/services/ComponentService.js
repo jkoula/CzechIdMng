@@ -194,7 +194,6 @@ export default class ComponentService {
   }
 
   getApplicantInfoComponent(applicantType) {
-    console.log("uuuu applicantType", applicantType)
     return this.getComponentByEntityType(ComponentService.APPLICANT_INFO_COMPONENT_TYPE, applicantType);
   }
 

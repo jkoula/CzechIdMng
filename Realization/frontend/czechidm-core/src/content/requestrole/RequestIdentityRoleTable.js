@@ -502,7 +502,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (identityId && !isAccount) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
       forceSearchParameters = forceSearchParameters.setFilter('accountId', null);
-      //forceSearchParameters = forceSearchParameters.setFilter('ownerType', null);
       forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', null);
     }
     if (isAccount && accountId) {

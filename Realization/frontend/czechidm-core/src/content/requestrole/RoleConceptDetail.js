@@ -410,9 +410,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
                             new SearchParameters().clearSort()
                           }
                           pageSize={100}
-                          //label={this.i18n('entity.IdentityRole.identityContract.label')}
-                          //placeholder={this.i18n('entity.IdentityRole.identityContract.placeholder')}
-                          //helpBlock={this.i18n('entity.IdentityRole.identityContract.help')}
                           returnProperty={false}
                           readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
                           onChange={this._onChangeSelectOfContract.bind(this)}
