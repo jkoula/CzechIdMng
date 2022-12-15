@@ -66,7 +66,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   _initComponent(props) {
     const { entityId } = props;
     const _entityId = entityId || props.match.params.entityId;
-    const applicantType = this.resolveApplicantType(props.location.query?.isAccount);
+    const applicantType = this.resolveApplicantType(props.location.query?.applicantType);
     if (this._getIsNew(props)) {
       this.setState({
         showLoading: false,
@@ -296,7 +296,6 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
 
   _getApplicantAndImplementer(request) {
     const infoComponent = request && request.applicantInfo ? componentService.getApplicantInfoComponent(request.applicantInfo.applicantType) : null;
-    console.log("aaaa",  request, infoComponent)
     return (
       <div>
         <Basic.LabelWrapper
@@ -304,10 +303,11 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
           readOnly
           ref="applicant"
           label={this.i18n('entity.RoleRequest.applicant')}>
-          <infoComponent.component
-              entityIdentifier={ request && request.applicantInfo.id }
-              showLoading={!request}/>
-
+          {
+            infoComponent && <infoComponent.component
+                  entityIdentifier={ request && request.applicantInfo.id }
+                  showLoading={!request}/>
+          }
         </Basic.LabelWrapper>
         <Basic.LabelWrapper
           rendered={ request !== null && !_.isNil(request.creatorId) && request.state !== 'CONCEPT'}
@@ -602,10 +602,16 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     );
   }
 
-  resolveApplicantType(isAccount) {
-    // This mechanism with isAccount flag will have to be rewritten to something more dynamic when another applicant type
-    // is introduced
-    return isAccount ? "eu.bcvsolutions.idm.tech.model.dto.TechnicalAccountDto" : "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto";
+  resolveApplicantType(applicantType) {
+    // TODO refactor this to componentService
+    switch (applicantType) {
+      case "IDENTITY":
+        return "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto";
+      case "TECHNICAL_ACCOUNT":
+        return "eu.bcvsolutions.idm.tech.model.dto.TechnicalAccountDto";
+      default:
+        return "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto";
+    }
   }
 }
 
@@ -634,7 +640,6 @@ function select(state, component) {
   const isAccountFromURL = component.location && component.location.query ? component.location.query.isAccount : null;
   const accountIdFromURL = component.location && component.location.query ? component.location.query.accountId : null;
   const identityId = entity ? entity.applicantInfo.id : applicantFromUrl;
-  console.log("rrrrrr", identityId, applicantFromUrl)
   if (entity && entity._embedded && entity._embedded.wfProcessId) {
     entity.currentActivity = entity._embedded.wfProcessId.name;
     entity.candicateUsers = entity._embedded.wfProcessId.candicateUsers;

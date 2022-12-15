@@ -34,7 +34,6 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
      * @return {object} - action
      */
      fetchEntityByMapping(id, systemMappingId, uiKey = null, cb = null) {
-        console.log("asdfas");
         return (dispatch, getState) => {
         if (getState().security.userContext.isExpired) {
             return dispatch({

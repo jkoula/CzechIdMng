@@ -416,6 +416,7 @@ public class DefaultIdmRoleRequestService
 			return true;
 		}
 
+		// Embedded applicant must be present
 		BaseDto applicant = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant, BaseDto.class);
 		Map<String, Object> variables = new HashMap<>();
 		IdmRoleRequestDto eventRequest = event.getContent();
@@ -579,7 +580,7 @@ public class DefaultIdmRoleRequestService
 			var applicantService = getApplicantService(entity.getApplicantType());
 			if (applicantService != null) {
 				BaseDto applicantDto = applicantService.get(entity.getApplicant());
-				requestDto.getEmbedded().put(APPLICANT_INFO_FIELD, applicantDto);
+				requestDto.getEmbedded().put(IdmRoleRequest_.applicant.getName(), applicantDto);
 			}
 
 		}

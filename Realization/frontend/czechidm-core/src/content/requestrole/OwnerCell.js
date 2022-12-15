@@ -14,7 +14,6 @@ export default class OwnerCell extends AdvancedColumn {
 
         const manager = componentService.getManagerForConceptByOwnerType(entity.ownerType)
         const owner = manager.getEmbeddedOwner(entity);
-        console.log("trtr", manager, owner)
         if (!owner) {
             return (
                 <Basic.Label

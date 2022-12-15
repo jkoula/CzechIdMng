@@ -251,7 +251,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     } = this.props;
     const { environment,selectedOwnerType } = this.state;
     const entity = this.state.entity ? this.state.entity : this.props.entity;
-    console.log("uuu", this.state);
 
     if (!entity) {
       return null;
