@@ -37,6 +37,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
+import eu.bcvsolutions.idm.acc.service.api.AccAccountManagementService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.ProvisioningService;
 import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
@@ -88,6 +89,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 	private FormService formService;
 	@Autowired
 	private IdmIdentityService identityService;
+	@Autowired
+	private AccAccountManagementService accountManagementService;
 
 	@Test
 	public void createOtherAccountAlone() {
@@ -313,6 +316,9 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		assertNotNull(accountMapping);
 		assertEquals(AccountType.PERSONAL_OTHER, accountMapping.getAccountType());
 
+		// do account management
+		accountManagementService.resolveIdentityAccounts(identityDto);
+		// do provisioning
 		provisioningService.doProvisioning(identityDto);
 
 		SysProvisioningOperationFilter provisioningOperationFilter = new SysProvisioningOperationFilter();
@@ -368,6 +374,8 @@ public class ProvisioningOtherAccountsTest extends AbstractIntegrationTest {
 		assertNotNull(emailAttribute);
 		getHelper().setEavValue(accountFound, emailAttribute, AccAccount.class, "overriden value", PersistentType.SHORTTEXT, finalFormDefinitionDto);
 
+		// do account management
+		accountManagementService.resolveIdentityAccounts(identityDto);
 		// do provisioning
 		provisioningService.doProvisioning(identityDto);
 

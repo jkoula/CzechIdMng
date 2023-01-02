@@ -17,23 +17,29 @@ import com.beust.jcommander.internal.Lists;
 import eu.bcvsolutions.idm.acc.AccModuleDescriptor;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
+import eu.bcvsolutions.idm.acc.dto.SysSystemAttributeMappingDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemDto;
 import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSchemaAttributeFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
+import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.entity.AccSchemaFormAttribute;
 import eu.bcvsolutions.idm.acc.entity.AccSchemaFormAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysSchemaObjectClass_;
+import eu.bcvsolutions.idm.acc.entity.SysSystemAttributeMapping_;
 import eu.bcvsolutions.idm.acc.entity.SysSystemMapping_;
 import eu.bcvsolutions.idm.acc.repository.AccSchemaFormAttributeRepository;
 import eu.bcvsolutions.idm.acc.repository.filter.AccSchemaFormAttributeFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.core.api.service.AbstractEventableDtoService;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
@@ -41,6 +47,7 @@ import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
 import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormDefinitionFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
@@ -72,7 +79,9 @@ implements AccSchemaFormAttributeService {
 	private SysSchemaAttributeService schemaAttributeService;
 	@Autowired
 	private FormService formService;
-	
+	@Autowired
+	private SysSystemAttributeMappingService systemAttributeMappingService;
+
 	public DefaultAccSchemaFormAttributeService(AccSchemaFormAttributeRepository repository,
 			EntityEventManager entityEventManager) {
 		super(repository, entityEventManager);
@@ -249,7 +258,61 @@ implements AccSchemaFormAttributeService {
 		SysSchemaObjectClassDto objectClass = DtoUtils.getEmbedded(mapping, SysSystemMapping_.objectClass, SysSchemaObjectClassDto.class);
 		return getSchemaFormDefinition(objectClass);
 	}
-	
+
+	@Override
+	public boolean isUidAttributeOverriddenForAccount(AccAccountDto account) {
+		SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
+		if (mapping == null) {
+			return false;
+		}
+		SysSystemAttributeMappingFilter mappingAttributeFilter = new SysSystemAttributeMappingFilter();
+		mappingAttributeFilter.setIsUid(Boolean.TRUE);
+		mappingAttributeFilter.setSystemMappingId(mapping.getId());
+		List<SysSystemAttributeMappingDto> attributes = systemAttributeMappingService.find(mappingAttributeFilter, null).getContent();
+		if (attributes.size() != 1) {
+			return false;
+		}
+		//
+		SysSchemaAttributeDto uidSchemaAttribute = DtoUtils.getEmbedded(attributes.get(0), SysSystemAttributeMapping_.schemaAttribute, SysSchemaAttributeDto.class, null);
+		if (uidSchemaAttribute == null) {
+			return false;
+		}
+
+		return isAttributeOverriddenForAccount(account, uidSchemaAttribute);
+	}
+
+	@Override
+	public boolean isAttributeOverriddenForAccount(AccAccountDto account, SysSchemaAttributeDto schemaAttribute) {
+		SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
+		if (mapping == null) {
+			return false;
+		}
+		IdmFormDefinitionDto schemaFormDefinition = this.getSchemaFormDefinition(mapping);
+		if (schemaFormDefinition == null) {
+			return false;
+		}
+		IdmFormAttributeDto formAttribute = this.findFormAttribute(schemaAttribute, schemaFormDefinition);
+		if (formAttribute == null) {
+			return false;
+		}
+		List<IdmFormValueDto> values = formService.getValues(account, formAttribute, null);
+		if (!values.isEmpty()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public boolean isAttributeOverriddenForAccount(AccIdentityAccountDto identityAccount, SysSchemaAttributeDto schemaAttribute) {
+		AccAccountDto account = DtoUtils.getEmbedded(identityAccount, AccIdentityAccount_.account, AccAccountDto.class, null);
+		if (account == null) {
+			return false;
+		}
+
+		return this.isAttributeOverriddenForAccount(account, schemaAttribute);
+	}
+
 	private IdmFormDefinitionDto createSchemaFormDefinition(SysSystemDto system, SysSchemaObjectClassDto objectClass) {
 		IdmFormDefinitionDto formDefinition = new IdmFormDefinitionDto();
 		formDefinition.setCode(createFormDefinitionCode(system, objectClass));

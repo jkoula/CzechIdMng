@@ -1,16 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
-import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
-import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
-import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
-import eu.bcvsolutions.idm.core.api.service.LookupService;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -44,6 +33,7 @@ import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemAttributeFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysRoleSystemFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemAttributeMappingFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystemAttribute_;
 import eu.bcvsolutions.idm.acc.entity.SysRoleSystem_;
@@ -52,26 +42,36 @@ import eu.bcvsolutions.idm.acc.exception.ProvisioningException;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountManagementService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
+import eu.bcvsolutions.idm.acc.service.api.AccSchemaFormAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemAttributeService;
 import eu.bcvsolutions.idm.acc.service.api.SysRoleSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSchemaObjectClassService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
+import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmEntityStateFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 
 /**
  * Service for control account management. Account management is supported for
@@ -104,6 +104,8 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 	private LookupService lookupService;
 	@Autowired
 	private SysSystemGroupSystemService systemGroupSystemService;
+	@Autowired
+	private AccSchemaFormAttributeService schemaFormAttributeService;
 
 	@Autowired
 	public DefaultAccAccountManagementService(SysRoleSystemService roleSystemService, AccAccountService accountService,
@@ -625,12 +627,17 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 				// Has identity account same UID as account?
 				AccAccountDto account = AccIdentityAccountService.getEmbeddedAccount(identityAccount);
 				if (!uid.equals(account.getUid())) {
+					// We need to check that UID is not manually overridden because we cannot delete the account if it is
+					boolean uidOverridden = schemaFormAttributeService.isUidAttributeOverriddenForAccount(account);
+
 					// We found identityAccount for same identity and roleSystem, but this
 					// identityAccount is link to Account with different UID. It's probably means
 					// definition of UID
 					// (transformation) on roleSystem was changed. We have to delete this
 					// identityAccount.
-					identityAccountsToDelete.add(identityAccount);
+					if (!uidOverridden) {
+						identityAccountsToDelete.add(identityAccount);
+					}
 				}
 			}
 		});
