@@ -1,10 +1,5 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
+import eu.bcvsolutions.idm.acc.domain.AccountType;
 import eu.bcvsolutions.idm.acc.domain.AttributeMappingStrategyType;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningContext;
 import eu.bcvsolutions.idm.acc.domain.ProvisioningEventType;
@@ -63,6 +59,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import static org.junit.Assert.*;
 
 /**
  * Test for provisioning merge
@@ -71,9 +68,9 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Tomáš Doischer
  */
 public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationTest {
-	private static final String RIGHTS_ATTRIBUTE = "RIGHTS";
-	private static final String ONE_VALUE = "ONE";
-	private static final String TWO_VALUE = "TWO";
+	public static final String RIGHTS_ATTRIBUTE = "RIGHTS";
+	public static final String ONE_VALUE = "ONE";
+	public static final String TWO_VALUE = "TWO";
 
 	@Autowired
 	private SysSystemAttributeMappingService attributeMappingService;
@@ -185,7 +182,7 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 		
 		IdmRoleDto roleOne = helper.createRole();
 
-		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system);
+		SysRoleSystemDto roleSystemOne = helper.createRoleSystem(roleOne, system, AccountType.PERSONAL, false);
 
 		SysSchemaAttributeDto rightsSchemaAttribute = new SysSchemaAttributeDto();
 		rightsSchemaAttribute.setObjectClass(mapping.getObjectClass());

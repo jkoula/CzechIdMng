@@ -169,6 +169,16 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType);
 
 	/**
+	 * Assing system to given role with mapping (provisioning, identity)
+	 * @param role
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType,
+			boolean createAccountByDefault);
+
+	/**
 	 * Find account on target system
 	 * 
 	 * @param uid

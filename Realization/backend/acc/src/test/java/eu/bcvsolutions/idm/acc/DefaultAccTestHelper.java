@@ -1,7 +1,5 @@
 package eu.bcvsolutions.idm.acc;
 
-import static org.junit.Assert.assertEquals;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +82,7 @@ import eu.bcvsolutions.idm.core.api.config.flyway.IdmFlywayMigrationStrategy;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
@@ -96,7 +95,9 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import joptsimple.internal.Strings;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Acc / Provisioning test helper
@@ -392,10 +393,16 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 
 	@Override
 	public SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType) {
+		return createRoleSystem(role, system, accountType, true);
+	}
+
+	@Override
+	public SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType,
+				boolean createAccountByDefault) {
 		SysRoleSystemDto roleSystem = new SysRoleSystemDto();
 		roleSystem.setRole(role.getId());
 		roleSystem.setSystem(system.getId());
-		roleSystem.setCreateAccountByDefault(true);
+		roleSystem.setCreateAccountByDefault(createAccountByDefault);
 		// default mapping
 		SysSystemMappingFilter systemMappingFilter = new SysSystemMappingFilter();
 		systemMappingFilter.setSystemId(system.getId());
