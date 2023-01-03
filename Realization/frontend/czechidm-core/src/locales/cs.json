@@ -2769,6 +2769,10 @@
         "saveConcept":{
           "label": "Uložit koncept",
           "tooltip": "Uloží koncept žádosti. Žádost nebude podána."
+        },
+        "addRole":{
+          "title": "Přidat novou roli",
+          "text": "Přidat do žádosti novou roli."
         }
       },
       "confirm-incompatible-role": {

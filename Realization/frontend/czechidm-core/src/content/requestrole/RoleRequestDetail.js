@@ -427,8 +427,8 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                   <Basic.Alert
                     level="success"
                     style={{ marginTop: 25, marginRight: 0, marginLeft: 0 }}
-                    title={ this.i18n('Přidat novou roli') }
-                    text={ this.i18n('Přidat do žádosti novou roli.') }
+                    title={ this.i18n('button.addRole.title') }
+                    text={ this.i18n('button.addRole.text') }
                     rendered={ this.isDevelopment() && SecurityManager.hasAuthority('ROLE_CANBEREQUESTED') }
                     buttons={[
                       <Basic.Button
@@ -438,7 +438,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                         onClick={ () => this.refs.conceptTable._addConcept() }
                         title={ this.i18n('button.createRequest.tooltip') }
                         style={{ minWidth: 150 }}>
-                        { this.i18n('Přidat novou roli') }
+                        { this.i18n('button.addRole.title') }
                       </Basic.Button>
                     ]}/>
                   <Basic.Alert
