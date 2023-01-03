@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.service.api;
 import java.util.List;
 
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccSchemaFormAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaAttributeDto;
 import eu.bcvsolutions.idm.acc.dto.SysSchemaObjectClassDto;
@@ -94,4 +95,10 @@ public interface AccSchemaFormAttributeService extends EventableDtoService<AccSc
 	 * @return
 	 */
 	IdmFormDefinitionDto getSchemaFormDefinition(SysSystemMappingDto mapping);
+
+	boolean isUidAttributeOverriddenForAccount(AccAccountDto account);
+
+	boolean isAttributeOverriddenForAccount(AccAccountDto account, SysSchemaAttributeDto schemaAttribute);
+
+	boolean isAttributeOverriddenForAccount(AccIdentityAccountDto identityAccount, SysSchemaAttributeDto schemaAttribute);
 }
