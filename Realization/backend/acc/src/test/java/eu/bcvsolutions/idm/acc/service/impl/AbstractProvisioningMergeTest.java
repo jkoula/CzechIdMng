@@ -73,13 +73,13 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 	public static final String TWO_VALUE = "TWO";
 
 	@Autowired
-	private SysSystemAttributeMappingService attributeMappingService;
+	protected SysSystemAttributeMappingService attributeMappingService;
 	@Autowired
 	private SysSchemaObjectClassService schemaService;
 	@Autowired
-	private SysSchemaAttributeService schemaAttributeService;
+	protected SysSchemaAttributeService schemaAttributeService;
 	@Autowired
-	private SysRoleSystemAttributeService roleSystemAttributeService;
+	protected SysRoleSystemAttributeService roleSystemAttributeService;
 	@Autowired
 	private SysAttributeControlledValueService attributeControlledValueService;
 	@Autowired
@@ -87,13 +87,13 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 	@Autowired
 	private SysRoleSystemService roleSystemService;
 	@Autowired
-	private SysProvisioningArchiveService provisioningArchiveService;
+	protected SysProvisioningArchiveService provisioningArchiveService;
 	@Autowired
 	private IdmIdentityContractService identityContractService;
 	@Autowired
 	private IdmIdentityService identityService;
 	@Autowired
-	private IdmRoleRequestService roleRequestService;
+	protected IdmRoleRequestService roleRequestService;
 
 	@Test
 	public void testAttribteControlledValues() {

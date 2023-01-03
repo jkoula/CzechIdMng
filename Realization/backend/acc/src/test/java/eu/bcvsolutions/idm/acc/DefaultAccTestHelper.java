@@ -55,6 +55,8 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncItemLogFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
+import eu.bcvsolutions.idm.acc.entity.AccAccount;
+import eu.bcvsolutions.idm.acc.entity.AccAccount_;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.scheduler.task.impl.SynchronizationSchedulableTaskExecutor;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
@@ -91,9 +93,14 @@ import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.filter.IdmFormAttributeFilter;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
+import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import joptsimple.internal.Strings;
@@ -136,6 +143,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Autowired private AccAccountRoleAssignmentService accAccountRoleAssignmentService;
 	@Autowired private IdmRoleRequestService roleRequestService;
 	@Autowired private AccAccountConceptRoleRequestService accountConceptRoleRequestService;
+	@Autowired private IdmFormAttributeService formAttributeService;
 
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -614,9 +622,9 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 		//
 		this.createIdentityRole(identity, roleOne);
 		//
-		AccAccountFilter accountFilter = new AccAccountFilter();
-		accountFilter.setUid(identity.getUsername());
-		AccAccountDto account = accountService.find(accountFilter, null).stream().findFirst().orElse(null);
+			AccAccountFilter accountFilter = new AccAccountFilter();
+			accountFilter.setUid(identity.getUsername());
+			AccAccountDto account = accountService.find(accountFilter, null).stream().findFirst().orElse(null);
 		return account;
 	}
 
@@ -741,5 +749,26 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 
 	public AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to) {
 		return createAccountRoleAssignment(accAccountDto.getId(), role.getId(), from, to);
+	}
+
+	@Override
+	public void changeAccountUid(AccAccountDto account, String newAccountUid) {
+		SysSystemEntityDto sysSystemEntityDto = systemEntityService.get(account.getSystemEntity());
+		sysSystemEntityDto.setUid(newAccountUid);
+		systemEntityService.save(sysSystemEntityDto);
+		account.setUid(newAccountUid);
+		accountService.save(account);
+		// set the eav value as well
+		IdmFormDefinitionDto formDefinitionDto = DtoUtils.getEmbedded(account, AccAccount_.formDefinition, IdmFormDefinitionDto.class, null);
+		IdmFormAttributeFilter formAttributeFilter = new IdmFormAttributeFilter();
+		formAttributeFilter.setDefinitionId(formDefinitionDto.getId());
+		formAttributeFilter.setCode(TestHelper.ATTRIBUTE_MAPPING_NAME);
+		List<IdmFormAttributeDto> formAttributes = formAttributeService.find(formAttributeFilter, null).getContent();
+		IdmFormAttributeDto uidFormAttribute = formAttributes
+				.stream()
+				.filter(formAttribute -> formAttribute.getCode().equals(TestHelper.ATTRIBUTE_MAPPING_NAME))
+				.findFirst()
+				.orElse(null);
+		this.setEavValue(account, uidFormAttribute, AccAccount.class, newAccountUid, PersistentType.SHORTTEXT, formDefinitionDto);
 	}
 }
