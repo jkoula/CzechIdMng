@@ -2,6 +2,8 @@ package eu.bcvsolutions.idm.acc.service.impl;
 
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.bcvsolutions.idm.acc.TestHelper;
@@ -31,9 +33,7 @@ public class ProvisioningMergeTest extends AbstractProvisioningMergeTest {
 	private TestHelper helper;
 	
 	@Override
-	AbstractConceptRoleRequestDto createConceptRoleRequest(
-			IdmRoleRequestDto request, IdmRoleDto role,
-			UUID ownerId) {
+    protected AbstractConceptRoleRequestDto createConceptRoleRequest(IdmRoleRequestDto request, IdmRoleDto role, UUID ownerId) {
 		IdmConceptRoleRequestDto concept = new IdmConceptRoleRequestDto();
 		concept.setRoleRequest(request.getId());
 		concept.setState(RoleRequestState.EXECUTED);
@@ -44,16 +44,17 @@ public class ProvisioningMergeTest extends AbstractProvisioningMergeTest {
 	}
 
 	@Override
-	AbstractDto createOwner() {
+	protected AbstractDto createOwner() {
 		IdmIdentityDto identity = helper.createIdentity();
 		IdmIdentityContractDto contract = helper.createContract(identity);
 		return contract;
 	}
 
 	@Override
-	UUID getApplicant(AbstractDto owner) {
+	protected ApplicantDto getApplicant(AbstractDto owner) {
 		if (owner instanceof IdmIdentityContractDto) {
-			return ((IdmIdentityContractDto) owner).getIdentity();
+			final UUID identity = ((IdmIdentityContractDto) owner).getIdentity();
+			return new ApplicantImplDto(identity, IdmIdentityDto.class.getCanonicalName());
 		} else {
 			throw new UnsupportedOperationException(String.format("This owner type is not supported! Owner: [{}]", owner));
 		}
