@@ -96,11 +96,8 @@ public class IdmRoleRequest extends AbstractEntity {
 	@Column(name = "description", length = DefaultFieldLengths.DESCRIPTION)
 	private String description;
 
-	public ApplicantDto getApplicant() {
-		ApplicantImplDto applicantImplDto = new ApplicantImplDto();
-		applicantImplDto.setId(applicant);
-		applicantImplDto.setApplicantType(applicantType);
-		return applicantImplDto;
+	public UUID getApplicant() {
+		return this.applicant;
 	}
 
 	public void setApplicant(UUID applicant) {

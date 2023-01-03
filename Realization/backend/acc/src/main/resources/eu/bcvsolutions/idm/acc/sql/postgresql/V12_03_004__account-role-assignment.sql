@@ -31,12 +31,12 @@ create table acc_account_concept_role_request
     automatic_role_id    bytea,
     role_id              bytea,
     request_role_id      bytea        not null,
-    account_id           bytea,
-    identity_role_id     bytea
+    account              bytea,
+    account_role         bytea
 );
 
 create index idx_acc_conc_role_account_id
-    on acc_account_concept_role_request (account_id);
+    on acc_account_concept_role_request (account);
 
 create index idx_acc_conc_role_request
     on acc_account_concept_role_request (request_role_id);
@@ -95,9 +95,9 @@ create table acc_account_concept_role_request_a
     role_m                 boolean,
     request_role_id        bytea,
     role_request_m         boolean,
-    account_id             bytea,
-    acc_account_m          boolean,
-    identity_role_id       bytea,
+    account                bytea,
+    account_m              boolean,
+    account_role           bytea,
     account_role_m         boolean,
     primary key (id, rev)
 );
@@ -123,17 +123,17 @@ create table acc_account_role_assignment
     valid_till           date,
     external_id          varchar(255),
     automatic_role_id    bytea,
-    direct_role_id       bytea,
+    direct_role          bytea,
     role_id              bytea        not null,
     role_composition_id  bytea,
-    account_id           bytea        not null
+    account              bytea        not null
 );
 
 alter table acc_account_role_assignment
     owner to idmadmin;
 
 create index idx_acc_account_role_assign_ident_a
-    on acc_account_role_assignment (account_id);
+    on acc_account_role_assignment (account);
 
 create index idx_acc_account_role_assign_role
     on acc_account_role_assignment (role_id);
@@ -145,7 +145,7 @@ create index idx_acc_account_role_assign_ext_id
     on acc_account_role_assignment (external_id);
 
 create index idx_acc_account_role_assign_d_r_id
-    on acc_account_role_assignment (direct_role_id);
+    on acc_account_role_assignment (direct_role);
 
 create index idx_acc_account_role_assign_comp_id
     on acc_account_role_assignment (role_composition_id);
@@ -187,14 +187,14 @@ create table acc_account_role_assignment_a
     external_id_m          boolean,
     automatic_role_id      bytea,
     automatic_role_m       boolean,
-    direct_role_id         bytea,
+    direct_role         bytea,
     direct_role_m          boolean,
     role_id                bytea,
     role_m                 boolean,
     role_composition_id    bytea,
     role_composition_m     boolean,
-    account_id             bytea,
-    account_m              boolean,
+    account             bytea,
+    account_m           boolean,
     primary key (id, rev)
 );
 

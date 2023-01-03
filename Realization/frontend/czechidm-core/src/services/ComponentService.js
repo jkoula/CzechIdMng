@@ -193,6 +193,10 @@ export default class ComponentService {
     return this.getComponentByAttributeValue(ComponentService.ROLE_CONCEPT_MANAGER, selectedOwnerType, "ownerType");
   }
 
+  getApplicantInfoComponent(applicantType) {
+    return this.getComponentByEntityType(ComponentService.APPLICANT_INFO_COMPONENT_TYPE, applicantType);
+  }
+
 }
 // reserved component types
 ComponentService.ENTITY_INFO_COMPONENT_TYPE = 'entity-info';
@@ -208,3 +212,5 @@ ComponentService.MODAL_COMPONENT_TYPE = 'modal';
 ComponentService.MONITORING_RESULT_BUTTON_COMPONENT_TYPE = 'monitoring-result-button';
 ComponentService.UNIVERSAL_SEARCH_TYPE = 'universal-search-type';
 ComponentService.ROLE_CONCEPT_MANAGER = 'role-concept-manager';
+ComponentService.APPLICANT_INFO_COMPONENT_TYPE = 'applicant-info';
+

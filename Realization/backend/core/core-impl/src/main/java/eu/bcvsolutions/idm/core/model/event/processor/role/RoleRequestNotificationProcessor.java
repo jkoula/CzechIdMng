@@ -140,7 +140,7 @@ public class RoleRequestNotificationProcessor extends CoreEventProcessor<IdmRole
 				.collect(Collectors.toSet()); //
 
 		IdmIdentityDto applicantIdentity = null;
-		if (IdmIdentityDto.class.getCanonicalName().equals(request.getApplicant().getApplicantType())) {
+		if (IdmIdentityDto.class.getCanonicalName().equals(request.getApplicantInfo().getApplicantType())) {
 			applicantIdentity = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant.getName(),
 					IdmIdentityDto.class);
 		}

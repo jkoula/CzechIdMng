@@ -2769,6 +2769,10 @@
         "saveConcept":{
           "label": "Uložit koncept",
           "tooltip": "Uloží koncept žádosti. Žádost nebude podána."
+        },
+        "addRole":{
+          "title": "Přidat novou roli",
+          "text": "Přidat do žádosti novou roli."
         }
       },
       "confirm-incompatible-role": {
@@ -3313,6 +3317,9 @@
           },
           "identity": {
             "placeholder": "$t(entity.Identity._type)"
+          },
+          "ownerSelect": {
+            "placeholder": "Přiřazeno na"
           }
         },
         "changePermissions": "Žádost o změnu rolí",
@@ -4904,9 +4911,19 @@
         "help": "Oprávnění, které budou přidělena pro vybraný typ entity dle nastaveného vyhodnocení"
       }
     },
+    "RequestIdentityRole": {
+      "directRole": {
+        "label": "Přiděleno díky roli",
+        "title": "Napřímo přidělená role, díky které je přidělena i tato role. Napřímo přidělená role zahrnuje tuto roli.",
+        "help": "$t(entity.IdentityRole.directRole.title)"
+      }
+    },
     "IdentityRole": {
       "_type": "Přiřazená role",
       "role" : "Název role",
+      "owner": {
+        "title": "Přiřazeno na"
+      },
       "identityContract": {
         "label": "PPV",
         "title": "Pracovně právní vztah",
@@ -5017,6 +5034,12 @@
         "label": "Hlavní pozice",
         "help": "Hlavní / primární pracovní pozice. Bude použita například pro zobrazení pozice uživatele.",
         "title": "Hlavní pozice"
+      },
+      "select": {
+        "label": "Pracovní pozice",
+        "help": "Pracovní pozice",
+        "title": "Pracovní pozice",
+        "placeholder": "Vyberte pracovní pozici"
       },
       "state": {
         "label": "Stav",

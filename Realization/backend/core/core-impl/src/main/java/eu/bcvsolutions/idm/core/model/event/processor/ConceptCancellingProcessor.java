@@ -78,7 +78,7 @@ public abstract class ConceptCancellingProcessor<O extends BaseDto,
         });
         if (forceDelete) { // ~ async with force
             IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-            roleRequest.setApplicant(new ApplicantImplDto(applicant, IdmIdentityDto.class.getCanonicalName()));
+            roleRequest.setApplicantInfo(new ApplicantImplDto(applicant, IdmIdentityDto.class.getCanonicalName()));
             roleRequest.setConceptRoles(concepts);
             //
             RoleRequestEvent requestEvent = new RoleRequestEvent(RoleRequestEvent.RoleRequestEventType.EXCECUTE, roleRequest);

@@ -382,7 +382,7 @@ public class DefaultIdentityProjectionManager implements IdentityProjectionManag
 				IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 				roleRequest.setState(RoleRequestState.CONCEPT);
 				roleRequest.setExecuteImmediately(false);
-				roleRequest.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+				roleRequest.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 				roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 				roleRequest = roleRequestService.save(roleRequest);
 				//

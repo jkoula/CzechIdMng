@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "acc_account_concept_role_request", indexes = {
-        @Index(name = "idx_acc_conc_role_account_id", columnList = "account_id"),
+        @Index(name = "idx_acc_conc_role_account_id", columnList = "account"),
         @Index(name = "idx_acc_conc_role_request", columnList = "request_role_id"),
         @Index(name = "idx_acc_conc_role_role", columnList = "role_id")
 })
@@ -23,13 +23,13 @@ public class AccAccountConceptRoleRequest extends AbstractConceptRoleRequest {
     @Audited
     @ManyToOne(optional = true)
     @NotFound(action = NotFoundAction.IGNORE)
-    @JoinColumn(name = "account_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    private AccAccount accAccount;
+    @JoinColumn(name = "account", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    private AccAccount account;
 
     @Audited
     @ManyToOne(optional = true)
     @NotFound(action = NotFoundAction.IGNORE)
-    @JoinColumn(name = "identity_role_id", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "account_role", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private AccAccountRoleAssignment accountRole;
 
     public AccAccountRoleAssignment getAccountRole() {
@@ -40,11 +40,11 @@ public class AccAccountConceptRoleRequest extends AbstractConceptRoleRequest {
         this.accountRole = accountRole;
     }
 
-    public AccAccount getAccAccount() {
-        return accAccount;
+    public AccAccount getAccount() {
+        return account;
     }
 
-    public void setAccAccount(AccAccount accAccount) {
-        this.accAccount = accAccount;
+    public void setAccount(AccAccount accAccount) {
+        this.account = accAccount;
     }
 }

@@ -135,7 +135,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		IdmIdentityContractDto contractA = identityContractService.getPrimeContract(testA.getId());
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED); // can not be saved (after
@@ -184,7 +184,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		getHelper().createIdentityRole(testA, roleA);
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -226,7 +226,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		getHelper().createIdentityRole(testA, roleA);
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -260,7 +260,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		IdmIdentityContractDto contractB = identityContractService.getPrimeContract(testB.getId());
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -299,7 +299,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		IdmIdentityContractDto contractA = identityContractService.getPrimeContract(testA.getId());
 
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(testA.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request = roleRequestService.save(request);
@@ -777,7 +777,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		//
 		// change superior role validity by concept
 		request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED);
@@ -807,7 +807,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		//
 		// and remove
 		request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED);
@@ -841,7 +841,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		//
 		// create two requests
 		IdmRoleRequestDto requestOne = new IdmRoleRequestDto();
-		requestOne.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		requestOne.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestOne.setExecuteImmediately(true);
 		requestOne.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestOne.setState(RoleRequestState.EXECUTED);
@@ -859,7 +859,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		//
 		// create two requests
 		IdmRoleRequestDto requestTwo = new IdmRoleRequestDto();
-		requestTwo.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		requestTwo.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestTwo.setExecuteImmediately(true);
 		requestTwo.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestTwo.setState(RoleRequestState.EXECUTED);
@@ -902,7 +902,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		//
 		// create two requests
 		IdmRoleRequestDto requestOne = new IdmRoleRequestDto();
-		requestOne.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		requestOne.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestOne.setExecuteImmediately(true);
 		requestOne.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestOne.setState(RoleRequestState.EXECUTED);
@@ -920,7 +920,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		//
 		// create two requests
 		IdmRoleRequestDto requestTwo = new IdmRoleRequestDto();
-		requestTwo.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		requestTwo.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestTwo.setExecuteImmediately(true);
 		requestTwo.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestTwo.setState(RoleRequestState.EXECUTED);
@@ -976,7 +976,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 			formInstance.getValues().add(formValue);
 			// Create request
 			IdmRoleRequestDto request = new IdmRoleRequestDto();
-			request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+			request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 			request.setRequestedByType(RoleRequestedByType.MANUALLY);
 			request.setExecuteImmediately(true);
 			request = roleRequestService.save(request);
@@ -1059,7 +1059,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		formInstance.getValues().add(formValue);
 		// Create requestTwo
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setExecuteImmediately(true);
 		request = roleRequestService.save(request);
@@ -1115,7 +1115,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 		formInstanceTwo.getValues().add(formValueTwo);
 		// Create requestTwo
 		IdmRoleRequestDto requestTwo = new IdmRoleRequestDto();
-		requestTwo.setApplicant(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
+		requestTwo.setApplicantInfo(new ApplicantImplDto(identity.getId(), IdmIdentityDto.class.getCanonicalName()));
 		requestTwo.setRequestedByType(RoleRequestedByType.MANUALLY);
 		requestTwo.setExecuteImmediately(true);
 		requestTwo = roleRequestService.save(requestTwo);
@@ -1188,7 +1188,7 @@ public class DefaultIdmRoleRequestServiceIntegrationTest extends AbstractCoreWor
 	
 	public IdmRoleRequestDto createDeleteRoleRequest(IdmIdentityContractDto contract, List<IdmIdentityRoleDto> assignedRoles) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(true);
 		roleRequest = roleRequestService.save(roleRequest);

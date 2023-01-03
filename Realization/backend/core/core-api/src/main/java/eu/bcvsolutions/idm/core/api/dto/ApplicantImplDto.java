@@ -1,7 +1,11 @@
 package eu.bcvsolutions.idm.core.api.dto;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.databind.util.Converter;
 import eu.bcvsolutions.idm.core.api.domain.Identifiable;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import org.modelmapper.ModelMapper;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -67,5 +71,26 @@ public class ApplicantImplDto implements ApplicantDto {
 
     public void setValidTill(LocalDate validTill) {
         this.validTill = validTill;
+    }
+
+    public static final class Converter implements com.fasterxml.jackson.databind.util.Converter {
+        @Override
+        public Object convert(Object o) {
+            // this should contain only basic types, so we can use bare ModelMapper
+            ModelMapper mapper = new ModelMapper();
+            ApplicantImplDto result = new ApplicantImplDto();
+            mapper.map(o, result);
+            return result;
+        }
+
+        @Override
+        public JavaType getInputType(TypeFactory typeFactory) {
+            return typeFactory.constructFromCanonical(Object.class.getCanonicalName());
+        }
+
+        @Override
+        public JavaType getOutputType(TypeFactory typeFactory) {
+            return typeFactory.constructFromCanonical(ApplicantImplDto.class.getCanonicalName());
+        }
     }
 }

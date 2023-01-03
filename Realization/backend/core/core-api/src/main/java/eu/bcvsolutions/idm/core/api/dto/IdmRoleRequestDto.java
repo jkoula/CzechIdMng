@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto.Converter;
 import org.springframework.hateoas.core.Relation;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
@@ -25,8 +27,12 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
 
     private static final long serialVersionUID = 1L;
     public static final String WF_PROCESS_FIELD = "wfProcessId";
+    public static final String APPLICANT_INFO_FIELD = "applicantInfo";
 
-    private ApplicantImplDto applicant;
+    private UUID applicant;
+
+    @JsonDeserialize(converter = Converter.class)
+    private ApplicantDto applicantInfo;
     private RoleRequestState state;
     private RoleRequestedByType requestedByType;
     //In embedded map, is under wfProcessId key actual task - WorkflowProcessInstanceDto.class
@@ -66,12 +72,24 @@ public class IdmRoleRequestDto extends AbstractDto implements Loggable {
         this.originalRequest = originalRequest;
     }
 
-    public ApplicantImplDto getApplicant() {
+    public UUID getApplicant() {
         return applicant;
     }
 
-    public void setApplicant(ApplicantImplDto applicant) {
+    public void setApplicant(UUID applicant) {
         this.applicant = applicant;
+    }
+
+    public ApplicantDto getApplicantInfo() {
+        if (applicantInfo == null && applicant != null) {
+            // fallback for backwards compatibility
+            applicantInfo = new ApplicantImplDto(applicant, IdmIdentityDto.class.getCanonicalName());
+        }
+        return applicantInfo;
+    }
+
+    public void setApplicantInfo(ApplicantDto applicantInfo) {
+        this.applicantInfo = applicantInfo;
     }
 
     public List<AbstractConceptRoleRequestDto> getConceptRoles() {

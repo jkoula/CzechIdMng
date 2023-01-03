@@ -99,7 +99,7 @@ public class SelfRoleRequestEvaluatorIntegrationTest extends AbstractEvaluatorIn
 			getHelper().login(identityOne);
 			//
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(new ApplicantImplDto(identityOne.getId(), IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identityOne.getId(), IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest = roleRequestService.save(roleRequest, IdmBasePermission.CREATE);
 			//

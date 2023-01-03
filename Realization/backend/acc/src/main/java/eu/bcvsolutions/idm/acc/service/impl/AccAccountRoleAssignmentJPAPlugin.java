@@ -87,7 +87,7 @@ public class AccAccountRoleAssignmentJPAPlugin implements SysRoleAssignmentJPAPl
     }
 
     private Predicate getIdentityPredicate(CriteriaQuery<?> query, CriteriaBuilder builder, SysRoleSystemAttributeFilter filter, Root<AccAccountRoleAssignment> subRootRs) {
-        final Join<AccAccountRoleAssignment, AccAccount> assignmentAccountJoinRs = subRootRs.join(AccAccountRoleAssignment_.accAccount);
+        final Join<AccAccountRoleAssignment, AccAccount> assignmentAccountJoinRs = subRootRs.join(AccAccountRoleAssignment_.account);
 
         Subquery<AccIdentityAccount> identAccSubqueryRs = query.subquery(AccIdentityAccount.class);
         Root<AccIdentityAccount> identAccSubrootRs = identAccSubqueryRs.from(AccIdentityAccount.class);
@@ -119,7 +119,7 @@ public class AccAccountRoleAssignmentJPAPlugin implements SysRoleAssignmentJPAPl
 
     private Predicate getIdentityPredicate(CriteriaQuery<?> query, CriteriaBuilder builder, SysRoleSystemAttributeFilter filter, Subquery<AccAccountRoleAssignment> subquery,
             Root<AccAccountRoleAssignment> subRoot, Predicate correlationPredicate) {
-        final Join<AccAccountRoleAssignment, AccAccount> assignmentAccountJoin = subRoot.join(AccAccountRoleAssignment_.accAccount);
+        final Join<AccAccountRoleAssignment, AccAccount> assignmentAccountJoin = subRoot.join(AccAccountRoleAssignment_.account);
 
         Subquery<AccIdentityAccount> identAccSubquery = query.subquery(AccIdentityAccount.class);
         Root<AccIdentityAccount> identAccSubroot = identAccSubquery.from(AccIdentityAccount.class);
@@ -150,7 +150,7 @@ public class AccAccountRoleAssignmentJPAPlugin implements SysRoleAssignmentJPAPl
         // Correlation attribute predicate
         Predicate correlationPredicate = builder.and(
                         builder.equal(subRoot.get(AbstractRoleAssignment_.role), root.get(SysRoleSystemAttribute_.roleSystem).get(SysRoleSystem_.role)),
-                        builder.equal(subRoot.get(AccAccountRoleAssignment_.accAccount).get(AbstractEntity_.id), filter.getAccountId())
+                        builder.equal(subRoot.get(AccAccountRoleAssignment_.account).get(AbstractEntity_.id), filter.getAccountId())
                 ); // Correlation attribute
 
         // Identity predicate - AccountRoleAssignment -> AccAccount -> IdmIdentityAccount

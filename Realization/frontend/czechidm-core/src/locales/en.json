@@ -2718,6 +2718,10 @@
         "saveConcept":{
           "label": "Save concept",
           "tooltip": "Save the concept of this request. Request will be not started."
+        },
+        "addRole":{
+          "title": "Add new role",
+          "text": "Add new role to this request."
         }
       },
       "confirm-incompatible-role": {
@@ -3260,6 +3264,9 @@
           },
           "identity": {
             "placeholder": "$t(entity.Identity._type)"
+          },
+          "ownerSelect": {
+            "placeholder": "Assigned to"
           }
         },
         "changePermissions": "Request to change roles",
@@ -4851,9 +4858,19 @@
         "help": "Permissions will be granted by evaluator configuration"
       }
     },
+    "RequestIdentityRole": {
+      "directRole": {
+        "label": "Assigned by role",
+        "title": "Directly assigned role, which assigned this role as well (business role).",
+        "help": "$t(entity.IdentityRole.directRole.title)"
+      }
+    },
     "IdentityRole": {
       "_type": "Assigned role",
       "role" : "Role",
+      "owner": {
+        "title": "Assigned to"
+      },
       "identityContract": {
         "label": "Contracted position",
         "title": "Contracted position",
@@ -4963,6 +4980,12 @@
         "label": "Main position",
         "help": "Main / prime work position.",
         "title": "Main position"
+      },
+      "select": {
+        "label": "Contract position",
+        "help": "Contract position",
+        "title": "Contract position",
+        "placeholder": "Select contract position"
       },
       "state": {
         "label": "State",

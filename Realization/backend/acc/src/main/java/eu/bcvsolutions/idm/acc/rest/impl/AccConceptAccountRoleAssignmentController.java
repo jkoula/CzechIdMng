@@ -198,12 +198,12 @@ public class AccConceptAccountRoleAssignmentController
 				&& dto.getAccountRole() != null //
 				&& dto.getOperation() != null //
 				&& ConceptRoleRequestOperation.ADD != dto.getOperation() //
-				&& dto.getAccAccount() != null) {
+				&& dto.getAccount() != null) {
 			AccAccountConceptRoleRequestFilter filter = new AccAccountConceptRoleRequestFilter();
 			filter.setAccountRole(dto.getAccountRole());
 			filter.setRoleRequestId(dto.getRoleRequest());
 			filter.setOperation(dto.getOperation());
-			filter.setAccountuuid(dto.getAccAccount());
+			filter.setAccountuuid(dto.getAccount());
 			List<AccAccountConceptRoleRequestDto> duplicates = getService().find(filter, PageRequest.of(0, 1)).getContent();
 			duplicates.forEach(duplicate -> {
 				// Delete duplicated concept first

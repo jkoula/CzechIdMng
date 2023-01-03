@@ -13,11 +13,13 @@ import RoleRequestStateEnum from '../../enums/RoleRequestStateEnum';
 import RequestIdentityRoleTable from './RequestIdentityRoleTable';
 import IncompatibleRoleWarning from '../role/IncompatibleRoleWarning';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
+import ComponentService from "../../services/ComponentService";
 //
 const uiKey = 'role-request';
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const roleRequestManager = new RoleRequestManager();
 const identityRoleManager = new IdentityRoleManager();
+const componentService = new ComponentService()
 
 /**
  * Detail of the role request
@@ -64,11 +66,15 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   _initComponent(props) {
     const { entityId } = props;
     const _entityId = entityId || props.match.params.entityId;
+    const applicantType = this.resolveApplicantType(props.location.query?.applicantType);
     if (this._getIsNew(props)) {
       this.setState({
         showLoading: false,
         request: {
-          applicant: {id: props.location.query.applicantId},
+          applicantInfo: {
+            id: props.location.query.applicantId,
+            applicantType: applicantType
+          },
           state: RoleRequestStateEnum.findKeyBySymbol(RoleRequestStateEnum.CONCEPT),
           requestedByType: 'MANUALLY'
         },
@@ -77,7 +83,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       });
     } else {
       this.context.store.dispatch(roleRequestManager.fetchEntity(_entityId, null, (entity, error) => {
-        const {isAccount, accountId} = this.props.location.state;
+        const {isAccount, accountId} = this.props.match;
         if (error) {
           this.setState({
             errorOccurred: true,
@@ -289,19 +295,20 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
   }
 
   _getApplicantAndImplementer(request) {
-    // TODO get ID from applicant dto
+    const infoComponent = request && request.applicantInfo ? componentService.getApplicantInfoComponent(request.applicantInfo.applicantType) : null;
     return (
       <div>
         <Basic.LabelWrapper
-          rendered={ request !== null && !_.isNil(request.applicant) }
+          rendered={ request !== null && !_.isNil(request.applicantInfo && infoComponent) }
           readOnly
           ref="applicant"
           label={this.i18n('entity.RoleRequest.applicant')}>
-          <Advanced.IdentityInfo
-            entityIdentifier={ request && request.applicant.id }
-            showLoading={!request}/>
+          {
+            infoComponent && <infoComponent.component
+                  entityIdentifier={ request && request.applicantInfo.id }
+                  showLoading={!request}/>
+          }
         </Basic.LabelWrapper>
-
         <Basic.LabelWrapper
           rendered={ request !== null && !_.isNil(request.creatorId) && request.state !== 'CONCEPT'}
           readOnly
@@ -320,7 +327,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     const { _request, location} = props;
     const applicantFromUrl = location && location.query ? location.query.applicantId : null;
 
-    return _request ? _request.applicant.id : applicantFromUrl;
+    return _request ? _request.applicantInfo.id : applicantFromUrl;
   }
 
   render() {
@@ -420,8 +427,8 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                   <Basic.Alert
                     level="success"
                     style={{ marginTop: 25, marginRight: 0, marginLeft: 0 }}
-                    title={ this.i18n('Přidat novou roli') }
-                    text={ this.i18n('Přidat do žádosti novou roli.') }
+                    title={ this.i18n('button.addRole.title') }
+                    text={ this.i18n('button.addRole.text') }
                     rendered={ this.isDevelopment() && SecurityManager.hasAuthority('ROLE_CANBEREQUESTED') }
                     buttons={[
                       <Basic.Button
@@ -431,7 +438,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                         onClick={ () => this.refs.conceptTable._addConcept() }
                         title={ this.i18n('button.createRequest.tooltip') }
                         style={{ minWidth: 150 }}>
-                        { this.i18n('Přidat novou roli') }
+                        { this.i18n('button.addRole.title') }
                       </Basic.Button>
                     ]}/>
                   <Basic.Alert
@@ -594,6 +601,18 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
       </Basic.Div>
     );
   }
+
+  resolveApplicantType(applicantType) {
+    // TODO refactor this to componentService
+    switch (applicantType) {
+      case "IDENTITY":
+        return "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto";
+      case "TECHNICAL_ACCOUNT":
+        return "eu.bcvsolutions.idm.tech.model.dto.TechnicalAccountDto";
+      default:
+        return "eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto";
+    }
+  }
 }
 
 RoleRequestDetail.propTypes = {
@@ -620,7 +639,7 @@ function select(state, component) {
   const applicantFromUrl = component.location && component.location.query ? component.location.query.applicantId : null;
   const isAccountFromURL = component.location && component.location.query ? component.location.query.isAccount : null;
   const accountIdFromURL = component.location && component.location.query ? component.location.query.accountId : null;
-  const identityId = entity ? entity.applicant.id : applicantFromUrl;
+  const identityId = entity ? entity.applicantInfo.id : applicantFromUrl;
   if (entity && entity._embedded && entity._embedded.wfProcessId) {
     entity.currentActivity = entity._embedded.wfProcessId.name;
     entity.candicateUsers = entity._embedded.wfProcessId.candicateUsers;

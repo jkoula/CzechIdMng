@@ -1895,7 +1895,7 @@ public abstract class AbstractChangeIdentityPermissionTest extends AbstractCoreW
 	
 	public IdmRoleRequestDto createRoleRequest(UUID applicantId) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(false);
 		roleRequest.setCreatorId(applicantId);

@@ -17,10 +17,12 @@ import IdentitiesInfo from '../identity/IdentitiesInfo';
 import ComponentService from "../../services/ComponentService";
 
 import { ConfigurationManager } from '../../redux';
+import {IdentityRoleTableFilter} from "../identity/IdentityRoleTableFilter";
+import OwnerCell from "./OwnerCell";
+import {data} from "../../redux/data/reducer";
 const uiKeyIncompatibleRoles = 'request-incompatible-roles-';
 const requestIdentityRoleManager = new RequestIdentityRoleManager();
 const roleRequestManager = new RoleRequestManager();
-const identityContractManager = new IdentityContractManager();
 const componentService = new ComponentService();
 
 /**
@@ -89,14 +91,14 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.useFilterForm(this.refs.filterForm);
+    this.refs.table.useFilterForm(this.refs.filterForm.getFilterForm());
   }
 
   cancelFilter(event) {
     if (event) {
       event.preventDefault();
     }
-    this.refs.table.cancelFilter(this.refs.filterForm);
+    this.refs.table.cancelFilter(this.refs.filterForm.getFilterForm());
   }
 
   /**
@@ -489,7 +491,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       validationErrors
     } = this.state;
 
-    const identityUsername = request && request.applicant.id;
+    const identityUsername = request && request.applicantInfo.id;
     let forceSearchParameters = new SearchParameters();
     if (request) {
       forceSearchParameters = forceSearchParameters.setFilter('roleRequestId', request.id);
@@ -500,7 +502,6 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (identityId && !isAccount) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
       forceSearchParameters = forceSearchParameters.setFilter('accountId', null);
-      forceSearchParameters = forceSearchParameters.setFilter('ownerType', null);
       forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', null);
     }
     if (isAccount && accountId) {
@@ -514,8 +515,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     forceSearchParameters = forceSearchParameters.setFilter('includeCrossDomainsSystemsCount', true);
     //
     const showLoading = this.props.showLoading || this.state.showLoading;
-    const contractForceSearchparameters = new SearchParameters().setFilter('identity', identityUsername);
-    const ownerTypeOptions = this.getOwnerTypeOptions();
+    const contractForceSearchParameters = new SearchParameters().setFilter('identity', identityUsername);
     //
     return (
       <Basic.Div>
@@ -577,57 +577,14 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
             rowClass={this._getRowClass}
             forceSearchParameters={forceSearchParameters}
             filter={
-              <Advanced.Filter onSubmit={ this.useFilter.bind(this) }>
-                <Basic.AbstractForm ref="filterForm">
-                  <Basic.Row className="last">
-                    <Basic.Col lg={ 3 }>
-                      <Advanced.Filter.TextField
-                        ref="roleText"
-                        placeholder={ this.i18n('content.identity.roles.filter.role.placeholder') }
-                        header={ this.i18n('content.identity.roles.filter.role.placeholder') }
-                        help={ Advanced.Filter.getTextHelp() }
-                        onKeyPress={ (event) => {
-                          // Filter is embedded in request form => onEnter on input only.
-                          if (event.key === 'Enter') {
-                            this.useFilter();
-                          }
-                        }}/>
-                    </Basic.Col>
-                    <Basic.Col lg={ 3 } className={ showEnvironment ? '' : 'hidden'}>
-                      <Advanced.CodeListSelect
-                        ref="roleEnvironment"
-                        code="environment"
-                        label={ null }
-                        placeholder={ this.i18n('entity.Role.environment.label') }
-                        multiSelect/>
-                    </Basic.Col>
-                    <Basic.Col lg={ showEnvironment ? 3 : 6 }>
-                      <Advanced.Filter.SelectBox
-                        ref="identityContractId"
-                        placeholder={ this.i18n('entity.IdentityRole.identityContract.title') }
-                        manager={ identityContractManager }
-                        forceSearchParameters={ contractForceSearchparameters }
-                        niceLabel={ (entity) => identityContractManager.getNiceLabel(entity, false) }
-                        rendered={!isAccount}/>
-                    </Basic.Col>
-                    <Basic.Col lg={ showEnvironment ? 3 : 6 }>
-                      <Advanced.Filter.EnumSelectBox
-                          ref="ownerType"
-                          placeholder={ "TODO" }
-                          niceLabel={ "TODO"}
-                          options={ ownerTypeOptions }/>
-                    </Basic.Col>
-                    <Basic.Col lg={ 3 } className="text-right">
-                      <Basic.Button onClick={ this.cancelFilter.bind(this) } style={{ marginRight: 5 }}>
-                        { this.i18n('button.filter.cancel') }
-                      </Basic.Button>
-                      <Basic.Button level="primary" onClick={ this.useFilter.bind(this) } >
-                        { this.i18n('button.filter.use') }
-                      </Basic.Button>
-                    </Basic.Col>
-                  </Basic.Row>
-                </Basic.AbstractForm>
-              </Advanced.Filter>
+              <IdentityRoleTableFilter ref="filterForm"
+                                       showEnvironment={showEnvironment}
+                                       hasRoleForceFilter={false}
+                                       hasIdentityForceFilter={true}
+                                       contractForceSearchParameters={contractForceSearchParameters}
+                                       useFilter={this.useFilter.bind(this)}
+                                       cancelFilter={this.cancelFilter.bind(this)}
+              />
             }
             _searchParameters={ this.getSearchParameters() }>
             <Advanced.Column
@@ -706,32 +663,9 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               }/>
             <Advanced.Column
               property="contractPosition"
-              header={ this.i18n('entity.IdentityRole.identityContract.title') }
-              cell={
-                ({rowIndex, data}) => {
-                  const manager = componentService.getManagerForConceptByOwnerType(data[rowIndex].ownerType)
-
-                  const owner = manager.getEmbeddedOwner(data[rowIndex]);
-                  if (!owner) {
-                    return (
-                      <Basic.Label
-                        level="default"
-                        value={ this.i18n('label.removed') }
-                        title={ this.i18n('content.audit.revision.deleted') }/>
-                    );
-                  }
-                  //
-                  const componentInfo = componentService.getConcepComponentByOwnerType(data[rowIndex].ownerType)
-                  return (
-                    <componentInfo.ownerInfoComponent
-                      entityIdentifier={ owner.id }
-                      entity={ owner }
-                      showIdentity={ false }
-                      showIcon
-                      face="popover" />
-                  );
-                }
-              }/>
+              header={ this.i18n('entity.IdentityRole.owner.title')}
+              cell={ ({rowIndex, data}) => <OwnerCell entity={ data[rowIndex]}/> }
+              />
             <Advanced.Column
               header={ this.i18n('entity.RoleRequest.candicateUsers') }
               property="candicateUsers"

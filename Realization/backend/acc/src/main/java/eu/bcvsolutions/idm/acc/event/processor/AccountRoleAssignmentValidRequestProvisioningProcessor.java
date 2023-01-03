@@ -8,11 +8,9 @@ import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityContractService;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleValidRequestEvent.IdentityRoleValidRequestEventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -65,10 +63,10 @@ public class AccountRoleAssignmentValidRequestProvisioningProcessor extends Abst
 	@Override
 	protected AbstractDto getDtoToProvision(AccAccountRoleAssignmentDto roleAssignment) {
 		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
-		identityAccountFilter.setAccountId(roleAssignment.getAccAccount());
+		identityAccountFilter.setAccountId(roleAssignment.getAccount());
 		final List<AccIdentityAccountDto> accIdentityAccountDtos = identityAccountService.find(identityAccountFilter, null).getContent();
 		if (accIdentityAccountDtos.size() > 1) {
-			LOG.warn("Multiple owners of account {} found. None will be provisioned", roleAssignment.getAccAccount());
+			LOG.warn("Multiple owners of account {} found. None will be provisioned", roleAssignment.getAccount());
 			return null;
 		}
 
@@ -76,7 +74,7 @@ public class AccountRoleAssignmentValidRequestProvisioningProcessor extends Abst
 			final AccIdentityAccountDto accIdentityAccountDto = accIdentityAccountDtos.get(0);
 			return DtoUtils.getEmbedded(accIdentityAccountDto, AccIdentityAccount_.identity);
 		} else {
-			LOG.warn("No identities found for provisioning of an account {}", roleAssignment.getAccAccount());
+			LOG.warn("No identities found for provisioning of an account {}", roleAssignment.getAccount());
 			return null;
 		}
 	}

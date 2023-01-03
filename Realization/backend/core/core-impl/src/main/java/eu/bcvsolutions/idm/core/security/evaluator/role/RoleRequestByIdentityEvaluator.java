@@ -9,6 +9,8 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
+import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
+import org.activiti.engine.IdentityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -46,11 +48,13 @@ public class RoleRequestByIdentityEvaluator extends AbstractTransitiveEvaluator<
 
 	@Autowired private AuthorizationManager authorizationManager;
 	@Autowired private SecurityService securityService;
-	@Autowired private IdmIdentityContractService contractService; 
+	@Autowired private IdmIdentityContractService contractService;
+
+	@Autowired private IdmIdentityService identityService;
 	
 	@Override
 	protected Identifiable getOwner(IdmRoleRequest entity) {
-		return entity.getApplicant();
+		return identityService.get(entity.getApplicant());
 	}
 	
 	@Override
@@ -79,11 +83,11 @@ public class RoleRequestByIdentityEvaluator extends AbstractTransitiveEvaluator<
 	public Set<String> getPermissions(IdmRoleRequest entity, AuthorizationPolicy policy) {
 		Set<String> permissions = super.getPermissions(entity, policy);
 		// Add permissions, when CHANGEPERMISSION or CANBEREQUESTED is available on at least one contract of selected identity.
-		ApplicantDto applicant = entity.getApplicant();
+		UUID applicant = entity.getApplicant();
 		if (applicant != null) {
 			IdmIdentityContractFilter filter = new IdmIdentityContractFilter();
 			filter.setEvaluatePermissionOperator(PermissionContext.OPERATOR_OR);
-			filter.setIdentity(applicant.getId());
+			filter.setIdentity(applicant);
 			//
 			if (contractService.count(filter, ContractBasePermission.CHANGEPERMISSION, ContractBasePermission.CANBEREQUESTED) > 0) {
 				permissions.add(IdmBasePermission.READ.getName());

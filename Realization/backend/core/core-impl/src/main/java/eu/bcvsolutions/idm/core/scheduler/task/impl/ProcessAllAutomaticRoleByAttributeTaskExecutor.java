@@ -138,7 +138,7 @@ public class ProcessAllAutomaticRoleByAttributeTaskExecutor extends AbstractSche
 
     		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
     		roleRequest.setConceptRoles(concepts);
-    		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+    		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
     		roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 
 			canContinue = updateState();
@@ -175,7 +175,7 @@ public class ProcessAllAutomaticRoleByAttributeTaskExecutor extends AbstractSche
     			
     			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
     			roleRequest.setConceptRoles(concepts);
-    			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
+    			roleRequest.setApplicantInfo(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
     			roleRequest = roleRequestService.startConcepts(new RoleRequestEvent(RoleRequestEventType.EXCECUTE, roleRequest), null);
 
     			canContinue = updateState();

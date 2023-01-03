@@ -13,17 +13,13 @@ import javax.persistence.criteria.Subquery;
 
 import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
-import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
@@ -92,7 +88,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     @Override
     public IdmIdentityDto getRelatedIdentity(AccAccountRoleAssignmentDto roleAssignment) {
         AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
-        filter.setAccountId(roleAssignment.getAccAccount());
+        filter.setAccountId(roleAssignment.getAccount());
         return identityAccountService.find(filter, null).stream()
                 .map(accIdentityAccountDto -> DtoUtils.getEmbedded(accIdentityAccountDto, AccIdentityAccount_.identity,
                 IdmIdentityDto.class)).findFirst().orElse(null);
@@ -110,7 +106,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
 
     @Override
     public List<AccAccountRoleAssignmentDto> findByAccountId(UUID id) {
-        return toDtos(accAccountRoleRepository.findByAccAccount_Id(id), false);
+        return toDtos(accAccountRoleRepository.findByAccount_Id(id), false);
     }
 
     @Override
@@ -122,13 +118,13 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
             text = text.toLowerCase();
             predicates.add(
                     builder.like(
-                            builder.lower(root.get(AccAccountRoleAssignment_.accAccount).get(AccAccount_.uid)),
+                            builder.lower(root.get(AccAccountRoleAssignment_.account).get(AccAccount_.uid)),
                             "%" + text + "%")
             );
         }
 
         if (filter.getAccountId() != null) {
-            predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.accAccount).get(AbstractEntity_.id), filter.getAccountId()));
+            predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.account).get(AbstractEntity_.id), filter.getAccountId()));
         }
 
         Boolean valid = filter.getValid();
@@ -154,7 +150,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
             identityAccountSubquery.select(identityAccountRoot);
             identityAccountSubquery.where(
                     builder.and(
-                            builder.equal(identityAccountRoot.get(AccIdentityAccount_.account), root.get(AccAccountRoleAssignment_.accAccount)),
+                            builder.equal(identityAccountRoot.get(AccIdentityAccount_.account), root.get(AccAccountRoleAssignment_.account)),
                             builder.equal(identityAccountRoot.get(AccIdentityAccount_.identity).get(AbstractEntity_.id), identityId)
                     )
             );
@@ -163,7 +159,7 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
         
         final UUID accountId = filter.getAccountId();
         if (accountId != null) {
-        	predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.accAccount).get(AbstractEntity_.id), accountId));
+        	predicates.add(builder.equal(root.get(AccAccountRoleAssignment_.account).get(AbstractEntity_.id), accountId));
         }
 
         UUID directRoleId = filter.getDirectRoleId();

@@ -11,7 +11,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
-import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,6 @@ import eu.bcvsolutions.idm.acc.dto.filter.SysSyncConfigFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSyncItemLogFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemMappingFilter;
-import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment_;
 import eu.bcvsolutions.idm.acc.entity.TestResource;
 import eu.bcvsolutions.idm.acc.scheduler.task.impl.SynchronizationSchedulableTaskExecutor;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
@@ -94,7 +92,6 @@ import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.service.IdmAutomaticRoleAttributeService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleTreeNodeService;
-import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
@@ -583,7 +580,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Override
 	public AccAccountRoleAssignmentDto createAccountRoleAssignment(UUID accountId, UUID roleId, LocalDate from, LocalDate to) {
 		AccAccountRoleAssignmentDto roleAssignmentDto = new AccAccountRoleAssignmentDto();
-		roleAssignmentDto.setAccAccount(accountId);
+		roleAssignmentDto.setAccount(accountId);
 		roleAssignmentDto.setRole(roleId);
 		roleAssignmentDto.setValidFrom(from);
 		roleAssignmentDto.setValidTill(to);
@@ -694,7 +691,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 			UUID accountId, UUID roleAssignmentId, ConceptRoleRequestOperation operationType, LocalDate validFrom,
 			LocalDate validTill) {
 		AccAccountConceptRoleRequestDto concept = new AccAccountConceptRoleRequestDto();
-		concept.setAccAccount(accountId);
+		concept.setAccount(accountId);
 		concept.setRole(roleId);
 		concept.setOperation(operationType);
 		concept.setRoleAssignmentUuid(roleAssignmentId);
@@ -719,7 +716,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	@Override
 	public IdmRoleRequestDto createRoleRequest(UUID identityId, boolean executeImmediately) {
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(executeImmediately);
 		return roleRequestService.save(roleRequest);

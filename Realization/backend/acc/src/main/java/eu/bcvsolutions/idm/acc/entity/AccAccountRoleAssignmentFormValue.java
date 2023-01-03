@@ -20,10 +20,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "acc_role_assignment_form_value", indexes = {
-		@Index(name = "idx_acc_role_ass_form_a", columnList = "owner_id"),
-		@Index(name = "idx_acc_role_ass_form_a_def", columnList = "attribute_id"),
-		@Index(name = "idx_acc_role_ass_form_stxt", columnList = "short_text_value"),
-		@Index(name = "idx_acc_role_ass_form_uuid", columnList = "uuid_value") })
+		@Index(name = "idx_acc_role_assignment_form", columnList = "owner_id"),
+		@Index(name = "idx_acc_role_assignment_form_def", columnList = "attribute_id"),
+		@Index(name = "idx_acc_role_assignment_form_stxt", columnList = "short_text_value"),
+		@Index(name = "idx_acc_role_assignment_form_uuid", columnList = "uuid_value") })
 public class AccAccountRoleAssignmentFormValue extends AbstractFormValue<AccAccountRoleAssignment> {
 
 	private static final long serialVersionUID = 1L;

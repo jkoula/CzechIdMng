@@ -1380,7 +1380,7 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 
 	private IdmRoleRequestDto createRoleRequest(IdmIdentityDto test1) {
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(test1.getId(), IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(new ApplicantImplDto(test1.getId(), IdmIdentityDto.class.getCanonicalName()));
 		request.setExecuteImmediately(false);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		return request;

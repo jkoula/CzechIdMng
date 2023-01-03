@@ -8,7 +8,6 @@ import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.model.service.impl.adapter.AbstractRoleAssignmentConceptCompilingAdapter;
@@ -39,7 +38,7 @@ public class DefaultAccountConceptRoleAdapter extends AbstractRoleAssignmentConc
     @Override
     protected IdmRequestIdentityRoleDto roleAssignmentToReqIdentityRole(AccAccountRoleAssignmentDto roleAssignment) {
         IdmRequestIdentityRoleDto result = new IdmRequestIdentityRoleDto();
-        result.setOwnerUuid(roleAssignment.getAccAccount());
+        result.setOwnerUuid(roleAssignment.getAccount());
         result.setAssignmentType(AccAccountConceptRoleRequestDto.class);
         result.setOwnerType(AccAccountDto.class);
         result.getEmbedded().putAll(roleAssignment.getEmbedded());

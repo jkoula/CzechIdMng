@@ -133,7 +133,7 @@ public class IdentityRoleByIdentityDeduplicationBulkAction
 		}
 
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setLog("Request was created by bulk action (deduplication).");
 		roleRequest.setExecuteImmediately(!isApprove()); // if set approve, dont execute immediately

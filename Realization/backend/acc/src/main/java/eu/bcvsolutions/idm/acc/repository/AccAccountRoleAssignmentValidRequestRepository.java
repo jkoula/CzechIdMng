@@ -32,7 +32,7 @@ public interface AccAccountRoleAssignmentValidRequestRepository extends Abstract
 	 * @param accAccountId
 	 * @return
 	 */
-	List<AccAccountRoleAssignmentValidRequest> findByAccountRoleAssignment_AccAccount_Id(@Param("accAccountId") UUID accAccountId);
+	List<AccAccountRoleAssignmentValidRequest> findByAccountRoleAssignment_Account(@Param("accAccountId") UUID accAccountId);
 	
 	/**
 	 * Find all {@link AccAccountRoleAssignmentValidRequest} for role

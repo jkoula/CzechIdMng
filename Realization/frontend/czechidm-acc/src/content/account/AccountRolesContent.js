@@ -206,7 +206,7 @@ class AccountRolesContent extends Basic.AbstractContent {
     const { entity } = this.props;
     const { entityId } = this.props.match.params;
     const uuidId = uuid.v1();
-    this.context.history.push(`/role-requests/${ uuidId }/new?new=1&applicantId=${ entity.targetEntityId }&isAccount=true&accountId=${ entityId }`);
+    this.context.history.push(`/role-requests/${ uuidId }/new?new=1&applicantId=${ entity.targetEntityId }&isAccount=true&accountId=${ entityId }&applicantType=${ entity.entityType }`);
   }
 
   _refreshAll(props = null) {

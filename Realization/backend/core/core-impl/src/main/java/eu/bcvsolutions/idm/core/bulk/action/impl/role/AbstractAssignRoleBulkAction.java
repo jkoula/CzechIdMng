@@ -148,7 +148,7 @@ public abstract class AbstractAssignRoleBulkAction<DTO extends AbstractDto, F ex
 			}
 			// create request, if exists at least one concept create and starts request
 			IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-			roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
+			roleRequest.setApplicantInfo(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 			roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 			roleRequest.setLog("Request was created by bulk action.");
 			roleRequest.setExecuteImmediately(!approve); // if set approve, don't execute immediately

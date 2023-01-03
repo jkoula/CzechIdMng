@@ -56,7 +56,7 @@ public class SelfRoleRequestEvaluator extends AbstractAuthorizationEvaluator<Idm
 		if (entity == null || !securityService.isAuthenticated()) {
 			return permissions;
 		}
-		if (securityService.getCurrentId().equals(entity.getApplicant().getId())) {
+		if (securityService.getCurrentId().equals(entity.getId())) {
 			permissions.addAll(policy.getPermissions());
 		}
 		return permissions;

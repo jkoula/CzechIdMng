@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,7 +172,7 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 		AbstractDto owner = createOwner();
 		SysSystemDto system;
 		SysSystemMappingDto mapping;
-		UUID applicantId = getApplicant(owner);
+		ApplicantDto applicant = getApplicant(owner);
 		if (owner instanceof AccAccountDto) {
 			system = DtoUtils.getEmbedded(owner, AccAccount_.system, SysSystemDto.class, null);
 			mapping = DtoUtils.getEmbedded(owner, AccAccount_.systemMapping, SysSystemMappingDto.class, null);
@@ -217,7 +218,7 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 
 		// create request
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
-		request.setApplicant(new ApplicantImplDto(applicantId, IdmIdentityDto.class.getCanonicalName()));
+		request.setApplicantInfo(applicant);
 		request.setExecuteImmediately(true);
 		request.setRequestedByType(RoleRequestedByType.MANUALLY);
 		request.setState(RoleRequestState.EXECUTED);
@@ -1412,12 +1413,9 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 		assertEquals(2, values.size());
 	}
 	
-	abstract AbstractConceptRoleRequestDto createConceptRoleRequest(
-			IdmRoleRequestDto request,
-			IdmRoleDto role,
-			UUID ownerId);
+	protected abstract AbstractConceptRoleRequestDto createConceptRoleRequest(IdmRoleRequestDto request, IdmRoleDto role, UUID ownerId);
 	
-	abstract AbstractDto createOwner();
+	protected abstract AbstractDto createOwner();
 	
-	abstract UUID getApplicant(AbstractDto owner);
+	protected abstract ApplicantDto getApplicant(AbstractDto owner);
 }

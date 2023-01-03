@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.core.model.service.impl;
 import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.ADD;
 import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.REMOVE;
 import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.UPDATE;
+import static eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto.APPLICANT_INFO_FIELD;
 import static eu.bcvsolutions.idm.core.api.dto.OperationResultDto.PROPERTY_STATE;
 
 import java.io.ByteArrayOutputStream;
@@ -103,7 +104,6 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
-import eu.bcvsolutions.idm.core.eav.entity.IdmFormValue_;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -416,6 +416,7 @@ public class DefaultIdmRoleRequestService
 			return true;
 		}
 
+		// Embedded applicant must be present
 		BaseDto applicant = DtoUtils.getEmbedded(request, IdmRoleRequest_.applicant, BaseDto.class);
 		Map<String, Object> variables = new HashMap<>();
 		IdmRoleRequestDto eventRequest = event.getContent();
@@ -465,7 +466,7 @@ public class DefaultIdmRoleRequestService
 		Assert.notNull(request, "Role request is required!");
 
 		List<? extends AbstractConceptRoleRequestDto> concepts = request.getConceptRoles();
-		UUID applicantId = request.getApplicant().getId();
+		UUID applicantId = request.getApplicantInfo().getId();
 
 		boolean identityNotSame = concepts.stream().anyMatch(concept -> !conceptRoleRequestManager.getServiceForConcept(concept).validOwnership(concept, applicantId));
 
@@ -572,12 +573,14 @@ public class DefaultIdmRoleRequestService
 	public IdmRoleRequestDto toDto(IdmRoleRequest entity, IdmRoleRequestDto dto, IdmRoleRequestFilter filter) {
 		IdmRoleRequestDto requestDto = super.toDto(entity, dto, filter);
 		if (entity != null && entity.getApplicant() != null) {
-			requestDto.setApplicant(new ApplicantImplDto(entity.getApplicant().getId(), entity.getApplicantType()));
+			// this ensures backwards compatibility for requests which do not have applicantType set
+			final String applicantType = entity.getApplicantType() == null ? IdmIdentityDto.class.getCanonicalName() : entity.getApplicantType();
+			requestDto.setApplicantInfo(new ApplicantImplDto(entity.getApplicant(), applicantType));
 
-			var applicantService = getApplicantService(entity.getApplicant().getApplicantType());
+			var applicantService = getApplicantService(entity.getApplicantType());
 			if (applicantService != null) {
-				BaseDto applicantDto = applicantService.get(entity.getApplicant().getId());
-				requestDto.getEmbedded().put("applicant", applicantDto);
+				BaseDto applicantDto = applicantService.get(entity.getApplicant());
+				requestDto.getEmbedded().put(IdmRoleRequest_.applicant.getName(), applicantDto);
 			}
 
 		}
@@ -652,9 +655,14 @@ public class DefaultIdmRoleRequestService
 		}
 
 		IdmRoleRequest idmRoleRequest = super.toEntity(dto, entity);
-		if (dto.getApplicant() != null) {
-			idmRoleRequest.setApplicantType(dto.getApplicant().getApplicantType());
-			idmRoleRequest.setApplicant(dto.getApplicant().getId());
+		// Backwards compatibility and preventing unwanted error if applicant field is not set, but applicantInfo is
+		if (dto.getApplicantInfo() != null) {
+			if (idmRoleRequest.getApplicant() == null) {
+				idmRoleRequest.setApplicant(dto.getApplicantInfo().getId());
+			}
+			if (idmRoleRequest.getApplicantType() == null) {
+				idmRoleRequest.setApplicantType(dto.getApplicantInfo().getApplicantType());
+			}
 		}
 		return idmRoleRequest;
 	}
@@ -728,18 +736,18 @@ public class DefaultIdmRoleRequestService
 
 	@Override
 	public IdmIdentityDto getApplicantAsIdentity(IdmRoleRequestDto request) {
-		if (IdmIdentityDto.class.getCanonicalName().equals(request.getApplicant().getApplicantType())) {
-			return identityService.get(request.getApplicant().getId());
+		if (IdmIdentityDto.class.getCanonicalName().equals(request.getApplicantInfo().getApplicantType())) {
+			return identityService.get(request.getApplicantInfo().getId());
 		}
 		return null;
 	}
 
 	@Override
 	public List<IdmIdentityDto> getGuarantorsForApplicant(IdmRoleRequestDto request) {
-		var applicantService = getApplicantService(request.getApplicant().getApplicantType());
+		var applicantService = getApplicantService(request.getApplicantInfo().getApplicantType());
 
 		if (applicantService != null) {
-			return applicantService.findAllManagers(request.getApplicant().getId());
+			return applicantService.findAllManagers(request.getApplicantInfo().getId());
 		}
 
 		return new ArrayList<>();
@@ -749,7 +757,7 @@ public class DefaultIdmRoleRequestService
 		Assert.notNull(applicant, "Applicant must be filled for create role request!");
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setId(id);
-		roleRequest.setApplicant(new ApplicantImplDto(applicant, applicantType));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicant, applicantType));
 		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 		roleRequest.setExecuteImmediately(true);
 		roleRequest = this.save(roleRequest);
@@ -766,7 +774,7 @@ public class DefaultIdmRoleRequestService
 	public IdmRoleRequestDto createRequest(IdmIdentityContractDto contract, IdmRoleDto... roles) {
 		Assert.notNull(contract, "Contract must be filled for create role request!");
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 		roleRequest.setExecuteImmediately(true);
 		roleRequest = this.save(roleRequest);
@@ -895,10 +903,10 @@ public class DefaultIdmRoleRequestService
 	@Override
 	public Set<ResolvedIncompatibleRoleDto> getIncompatibleRoles(IdmRoleRequestDto request, IdmBasePermission... permissions) {
 		// Currently assigned roles
-		var applicantService = getApplicantService(request.getApplicant().getApplicantType());
+		var applicantService = getApplicantService(request.getApplicantInfo().getApplicantType());
 		List<AbstractRoleAssignmentDto> identityRoles = new ArrayList<>();
 		if (applicantService != null) {
-			identityRoles = applicantService.getAllRolesForApplicant(request.getApplicant().getId(), permissions);
+			identityRoles = applicantService.getAllRolesForApplicant(request.getApplicantInfo().getId(), permissions);
 		}
 		// Roles from concepts
 		List<AbstractConceptRoleRequestDto> concepts = conceptRoleRequestManager.findAllByRoleRequest(request.getId(), null, permissions);
@@ -1060,7 +1068,7 @@ public class DefaultIdmRoleRequestService
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setState(RoleRequestState.CONCEPT);
 		roleRequest.setExecuteImmediately(true); // without approval
-		roleRequest.setApplicant(new ApplicantImplDto(applicant, IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(applicant, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
 		roleRequest = save(roleRequest);
 		//
@@ -1091,7 +1099,7 @@ public class DefaultIdmRoleRequestService
 		IdmRoleRequestDto roleRequest = requestEvent.getContent();
 		Assert.notNull(roleRequest, "Request is required.");
 		List<? extends AbstractConceptRoleRequestDto> concepts = roleRequest.getConceptRoles();
-		ApplicantDto applicant = roleRequest.getApplicant();
+		ApplicantDto applicant = roleRequest.getApplicantInfo();
 		Assert.notNull(applicant, "Applicant is required.");
 		//
 		if (concepts == null || concepts.isEmpty()) {
@@ -1287,7 +1295,7 @@ public class DefaultIdmRoleRequestService
 	private IdmRoleRequestDto createManualRequest(UUID identityId) {
 		Assert.notNull(identityId, "Identity id must be filled for create role request!");
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
-		roleRequest.setApplicant(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
+		roleRequest.setApplicantInfo(new ApplicantImplDto(identityId, IdmIdentityDto.class.getCanonicalName()));
 		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest.setExecuteImmediately(false);
 		roleRequest = this.save(roleRequest);

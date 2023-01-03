@@ -215,19 +215,6 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                   </Typography>
                 </AccordionDetails>
               </Accordion>
-              <Accordion expanded={expanded === 'panel2'} onChange={this.handleChange.bind(this, 'panel2')}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel2bh-content"
-                  id="panel2bh-header"
-                >
-                  <Typography>{this.i18n(`${connectorType.module}:wizard.${connectorType.name}.steps.two.permission`)}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
             </Basic.AbstractForm>
           </Basic.Div>
         );
@@ -347,19 +334,6 @@ export default class DefaultAccountWizard extends Basic.AbstractContextComponent
                       readOnly
                       condensed />
                     : null}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion expanded={expanded === 'panel2'} onChange={this.handleChange.bind(this, 'panel2')}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2bh-content"
-                id="panel2bh-header"
-              >
-                <Typography>{this.i18n(`${connectorType.module}:wizard.${connectorType.name}.steps.three.permission`)}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>
                 </Typography>
               </AccordionDetails>
             </Accordion>

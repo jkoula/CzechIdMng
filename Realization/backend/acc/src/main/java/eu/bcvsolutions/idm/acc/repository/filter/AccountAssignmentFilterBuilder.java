@@ -33,7 +33,7 @@ public class AccountAssignmentFilterBuilder extends AbstractFilterBuilder<AccAcc
     @Override
     public Predicate getPredicate(Root<AccAccountRoleAssignment> root, AbstractQuery<?> query, CriteriaBuilder builder, AccAccountRoleAssignmentFilter filter) {
         if (filter.getAccountId() != null) {
-            return builder.equal(root.get(AccAccountRoleAssignment_.accAccount).get(AbstractEntity_.id), filter.getAccountId());
+            return builder.equal(root.get(AccAccountRoleAssignment_.account).get(AbstractEntity_.id), filter.getAccountId());
         }
         return null;
     }
