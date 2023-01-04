@@ -27,6 +27,7 @@ public class SysRoleSystemAttributeFilter implements BaseFilter {
 	 * Only TRUE and NULL is implemented!
 	 */
 	private Boolean isInCrossDomainGroupOrIsNoLogin;
+	private Boolean inCrossDomainGroup;
 
 	public Boolean getIsUid() {
 		return isUid;
@@ -115,5 +116,13 @@ public class SysRoleSystemAttributeFilter implements BaseFilter {
 	 */
 	public void setInCrossDomainGroupOrIsNoLogin(Boolean inCrossDomainGroup) {
 		isInCrossDomainGroupOrIsNoLogin = inCrossDomainGroup;
+	}
+
+	public Boolean getInCrossDomainGroup() {
+		return inCrossDomainGroup;
+	}
+
+	public void setInCrossDomainGroup(Boolean inCrossDomainGroup) {
+		this.inCrossDomainGroup = inCrossDomainGroup;
 	}
 }

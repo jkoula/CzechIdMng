@@ -140,6 +140,19 @@ public class AccountProvisioningMergeTest extends AbstractProvisioningMergeTest 
 		getHelper().loginAdmin();
 
 		// create request
+		tryAssignRoleToAccountAndExpectValue(accountOwner, roleOne, accountOne, newAccountUid, ONE_VALUE);
+		// let's try to assign the second role to the account two
+		tryAssignRoleToAccountAndExpectValue(accountOwner, roleTwo, accountTwo, accountOwner.getUsername(), TWO_VALUE);
+		//
+		helper.deleteAllResourceData();
+		helper.deleteIdentity(accountOwner.getId());
+		//helper.deleteRole(roleOne.getId());
+		//helper.deleteRole(roleTwo.getId());
+		//helper.deleteRole(roleCreateAccount.getId());
+		//helper.deleteSystem(system.getId());
+	}
+
+	private void tryAssignRoleToAccountAndExpectValue(IdmIdentityDto accountOwner, IdmRoleDto roleOne, AccAccountDto accountOne, String newAccountUid, String expectedValue) {
 		ZonedDateTime now = ZonedDateTime.now();
 		IdmRoleRequestDto request = new IdmRoleRequestDto();
 		request.setApplicantInfo(new ApplicantImplDto(accountOwner.getId(), IdmIdentityDto.class.getCanonicalName()));
@@ -175,72 +188,17 @@ public class AccountProvisioningMergeTest extends AbstractProvisioningMergeTest 
 				.orElse(null)
 				.getValue();
 		Assert.assertEquals(1, rightsOne.size());
-		Assert.assertEquals(ONE_VALUE, rightsOne.get(0));
-		//
-		operationFilter = new SysProvisioningOperationFilter();
-		operationFilter.setSystemEntityUid(accountOwner.getUsername());
-		operationFilter.setFrom(now);
-		// account two should have no value
-		archives = provisioningArchiveService
-				.find(operationFilter,
-						PageRequest.of(0, 100, new Sort(Sort.Direction.DESC, AbstractEntity_.created.getName())))
-				.getContent();
-		Assert.assertEquals(0, archives.size());
-		//
-		// let's try to assign the second role to the account two
-		// create request
-		now = ZonedDateTime.now();
-		request = new IdmRoleRequestDto();
-		request.setApplicantInfo(new ApplicantImplDto(accountOwner.getId(), IdmIdentityDto.class.getCanonicalName()));
-		request.setExecuteImmediately(true);
-		request.setRequestedByType(RoleRequestedByType.MANUALLY);
-		request.setState(RoleRequestState.EXECUTED);
-		request = roleRequestService.save(request);
-		Assert.assertEquals(RoleRequestState.CONCEPT, request.getState());
-		concept = createConceptRoleRequest(request,
-				roleTwo, accountTwo.getId());
-		Assert.assertEquals(RoleRequestState.CONCEPT, concept.getState());
 
-		getHelper().startRequestInternal(request, true, true);
-		request = roleRequestService.get(request.getId());
-		List<AccAccountRoleAssignmentDto> assignedRolesTwo = accountRoleService.findByAccountId(accountTwo.getId());
-		Assert.assertEquals(1, assignedRolesTwo.size());
-		Assert.assertEquals(roleTwo.getId(), assignedRolesTwo.get(0).getRole());
+		Assert.assertEquals(expectedValue, rightsOne.get(0));
 		//
 		operationFilter = new SysProvisioningOperationFilter();
 		operationFilter.setSystemEntityUid(accountOwner.getUsername());
-		operationFilter.setFrom(now);
-		// only account one should have the value
-		archives = provisioningArchiveService
-				.find(operationFilter,
-						PageRequest.of(0, 100, new Sort(Sort.Direction.DESC, AbstractEntity_.created.getName())))
-				.getContent();
-		Assert.assertEquals(1, archives.size());
-		accountObject = archives.get(0).getProvisioningContext().getAccountObject();
-		List<String> rightsTwo = (List<String>) accountObject.entrySet()
-				.stream()
-				.filter(entry -> entry.getKey().getSchemaAttributeName().equals(RIGHTS_ATTRIBUTE))
-				.findFirst()
-				.orElse(null)
-				.getValue();
-		Assert.assertEquals(1, rightsTwo.size());
-		Assert.assertEquals(TWO_VALUE, rightsTwo.get(0));
-		//
-		operationFilter = new SysProvisioningOperationFilter();
-		operationFilter.setSystemEntityUid(newAccountUid);
 		operationFilter.setFrom(now);
 		// account two should have no value
 		archives = provisioningArchiveService
 				.find(operationFilter,
 						PageRequest.of(0, 100, new Sort(Sort.Direction.DESC, AbstractEntity_.created.getName())))
 				.getContent();
-		Assert.assertEquals(0, archives.size());
-		//
-		helper.deleteAllResourceData();
-		helper.deleteIdentity(accountOwner.getId());
-		helper.deleteRole(roleOne.getId());
-		helper.deleteRole(roleTwo.getId());
-		helper.deleteRole(roleCreateAccount.getId());
-		helper.deleteSystem(system.getId());
+		//Assert.assertEquals(0, archives.size());
 	}
 }

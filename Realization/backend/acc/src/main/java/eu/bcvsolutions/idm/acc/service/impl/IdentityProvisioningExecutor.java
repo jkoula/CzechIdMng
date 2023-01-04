@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.acc.domain.AccountType;
+import eu.bcvsolutions.idm.acc.dto.SysSystemMappingDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
@@ -187,14 +189,16 @@ public class IdentityProvisioningExecutor extends AbstractProvisioningExecutor<I
 		// Cross-domains attributes and no-login attributes will be added only for default UID.
 		// It means, if some attributes override an UID attribute, then no additional attribute will be used!
 		boolean uidIsOverridden = roleSystemAttributesAll.stream().anyMatch(SysRoleSystemAttributeDto::isUid);
+		final SysSystemMappingDto sysSystemMappingDto = systemMappingService.get(mapping);
 
-		if (!uidIsOverridden) {
+		if (!uidIsOverridden && !sysSystemMappingDto.getAccountType().equals(AccountType.PERSONAL_OTHER)) {
 			// Add overridden attributes which are in a cross-domain group or is in no-login role.
 			// Beware - these attributes are added for every account (overridden attributes are not supported)
 			roleSystemAttributeFilter = new SysRoleSystemAttributeFilter();
 			roleSystemAttributeFilter.setRoleSystemRelationForIdentityId(entity.getId());
 			roleSystemAttributeFilter.setSystemMappingId(mapping);
 			roleSystemAttributeFilter.setInCrossDomainGroupOrIsNoLogin(Boolean.TRUE);
+			roleSystemAttributeFilter.setAccountId(account.getId());
 
 			List<SysRoleSystemAttributeDto> roleAttributesInCrossGroup = roleSystemAttributeService
 					.find(roleSystemAttributeFilter, null).getContent();
