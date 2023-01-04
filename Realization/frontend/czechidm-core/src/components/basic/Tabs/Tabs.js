@@ -92,7 +92,7 @@ export default function BasicTabs(props) {
     <div className="tab-horizontal" style={ style }>
       <AppBar position="static">
         <Tabs
-          value={ value }
+          value={ `${value}` }
           onChange={ handleChange }
           aria-label="basic tabs"
           className={ className }>
@@ -140,5 +140,6 @@ BasicTabs.propTypes = {
 };
 
 BasicTabs.defaultProps = {
-  ...AbstractComponent.defaultProps
+  ...AbstractComponent.defaultProps,
+  activeKey: "1"
 };
