@@ -365,7 +365,6 @@ class Table extends AbstractContextComponent {
       }
     }
     //
-    // console.log('differenceIndex', differenceIndex);
     this.setState({
       differenceIndex
     });
@@ -390,7 +389,6 @@ class Table extends AbstractContextComponent {
         transform: 'translate(0px, 0px)'
       });
     }
-    // console.log('cb', startIndex, ' -> ', differenceIndex);
     if (differenceIndex !== 0 && onDraggableStop) {
       onDraggableStop({
         data,

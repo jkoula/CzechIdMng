@@ -814,7 +814,6 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     const { data, startIndex, differenceIndex } = dndProps;
     const patchEntities = [];
     //
-    // console.log(startIndex, differenceIndex);
     if (differenceIndex > 0) { // move down
       // startIndex => increment for difference
       // last index
