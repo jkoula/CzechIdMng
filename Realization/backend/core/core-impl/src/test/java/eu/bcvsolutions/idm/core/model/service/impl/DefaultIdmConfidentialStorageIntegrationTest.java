@@ -1,8 +1,5 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,6 +44,8 @@ import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.service.CryptService;
 import eu.bcvsolutions.idm.core.security.service.impl.DefaultCryptService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for "naive" confidential storage (values are persisted in standard database).
@@ -418,7 +417,7 @@ public class DefaultIdmConfidentialStorageIntegrationTest extends AbstractIntegr
 		}
 
 		try {
-			confidentalStorage.get(identityThree, identityThree.getUsername());
+			confidentalStorage.get(identityThree.getId(), IdmIdentity.class, identityThree.getUsername());
 			Assert.fail();
 		} catch (Exception e) {
 			Assert.assertTrue(e.getCause() instanceof BadPaddingException);
