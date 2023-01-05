@@ -11,20 +11,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 
-import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
-import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
-import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
-import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
-import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
+import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment_;
 import eu.bcvsolutions.idm.acc.entity.AccAccount_;
@@ -34,8 +30,11 @@ import eu.bcvsolutions.idm.acc.event.AccAccountRoleAssignmentEvent;
 import eu.bcvsolutions.idm.acc.repository.AccAccountRoleRepository;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
+import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
 import eu.bcvsolutions.idm.acc.service.impl.adapter.DefaultAccountConceptRoleAdapter;
 import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
@@ -45,6 +44,7 @@ import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
@@ -97,11 +97,6 @@ public class DefaultAccAccountRoleAssignmentService extends AbstractRoleAssignme
     @Override
     public Class<? extends AbstractConceptRoleRequestDto> getRelatedConceptType() {
         return AccAccountConceptRoleRequestDto.class;
-    }
-
-    @Override
-    protected LocalDate getDateForValidTill(AccAccountRoleAssignmentDto one) {
-        return one.getValidTill();
     }
 
     @Override

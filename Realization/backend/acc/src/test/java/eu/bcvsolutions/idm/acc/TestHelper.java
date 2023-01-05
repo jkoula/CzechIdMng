@@ -432,4 +432,11 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 
 	AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to);
 
+	/**
+	 * Rename an account. Override the value of the UID attribute.
+	 *
+	 * @param account
+	 * @param newAccountUid
+	 */
+	void changeAccountUid(AccAccountDto account, String newAccountUid);
 }

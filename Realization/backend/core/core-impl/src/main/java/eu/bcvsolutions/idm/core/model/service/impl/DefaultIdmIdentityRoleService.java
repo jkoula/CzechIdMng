@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -10,20 +9,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
 
-import eu.bcvsolutions.idm.core.api.domain.PriorityType;
-import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
-import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
-import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
-import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
-import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,26 +19,38 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
+import eu.bcvsolutions.idm.core.api.domain.PriorityType;
+import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.repository.filter.FilterManager;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
+import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.api.utils.RepositoryUtils;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
+import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityContract_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
+import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmIdentityRoleRepository;
 import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
@@ -88,17 +86,6 @@ public class DefaultIdmIdentityRoleService
 	@Override
 	public AuthorizableType getAuthorizableType() {
 		return new AuthorizableType(CoreGroupPermission.IDENTITYROLE, getEntityClass());
-	}
-
-	@Override
-	public IdmIdentityRoleDto getDuplicated(IdmIdentityRoleDto one, IdmIdentityRoleDto two, Boolean skipSubdefinition) {
-		Assert.notNull(one, "The first assinged role to compare is required.");
-		Assert.notNull(two, "The second assinged role to compare is required.");
-		//
-		if (!one.getIdentityContract().equals(two.getIdentityContract())) {
-			return null;
-		}
-		return super.getDuplicated(one, two, skipSubdefinition);
 	}
 
 	@Override
@@ -215,31 +202,6 @@ public class DefaultIdmIdentityRoleService
 		//
 		return this.find(identityRoleFilter, pageable);
 	}
-
-	/**
-	 * Get valid till for {@link IdmIdentityRoleDto}. Valid till could be set from contract if
-	 * date is after valid till from contract.
-	 *
-	 * @param identityRole
-	 * @return
-	 */
-	@Override
-	protected LocalDate getDateForValidTill(IdmIdentityRoleDto identityRole) {
-		LocalDate validTill = identityRole.getValidTill();
-		IdmIdentityContractDto identityContractDto = DtoUtils.getEmbedded(identityRole, IdmIdentityRoleDto.PROPERTY_IDENTITY_CONTRACT, IdmIdentityContractDto.class, null);
-		LocalDate validTillContract = identityContractDto.getValidTill();
-
-		if (validTill != null && validTillContract != null && validTillContract.isAfter(validTill)) {
-			return validTill;
-		}
-
-		if (validTillContract == null && validTill != null) {
-			return validTill;
-		}
-
-		return validTillContract;
-	}
-
 
 	/**
 	 * Method provides specific logic for role assignment siem logging.
