@@ -1929,6 +1929,10 @@ public abstract class AbstractSynchronizationExecutor<DTO extends AbstractDto>
 				return true;
 			}
 			case WRITE_IF_NULL: {
+				// For creation isn't possible get value - owner doesn't exist.
+				if (create) {
+					return true;
+				}
 				Object value = systemAttributeMappingService.getAttributeValue(uid, dto, attribute);
 				return value == null;
 			}
