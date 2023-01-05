@@ -11,7 +11,7 @@ import eu.bcvsolutions.idm.core.api.event.EventType;
  * Events for system owner by role
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 public class SystemOwnerRoleEvent extends CoreEvent<SysSystemOwnerRoleDto> {
 

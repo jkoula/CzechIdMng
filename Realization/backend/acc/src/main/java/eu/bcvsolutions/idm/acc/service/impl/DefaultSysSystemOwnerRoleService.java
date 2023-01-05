@@ -31,7 +31,7 @@ import eu.bcvsolutions.idm.core.security.api.dto.AuthorizableType;
  * System owners - by role
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Service
 public class DefaultSysSystemOwnerRoleService extends AbstractEventableDtoService<SysSystemOwnerRoleDto, SysSystemOwnerRole, SysSystemOwnerRoleFilter>

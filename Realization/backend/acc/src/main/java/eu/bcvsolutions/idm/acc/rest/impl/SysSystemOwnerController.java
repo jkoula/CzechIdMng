@@ -44,7 +44,7 @@ import io.swagger.annotations.AuthorizationScope;
  * System owner controller
  * 
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @RestController
 @RequestMapping(value = BaseController.BASE_PATH + "/system-owners")

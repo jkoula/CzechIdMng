@@ -16,7 +16,7 @@ import eu.bcvsolutions.idm.core.api.event.EventResult;
  * Deletes system owner by role - ensures referential integrity.
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Component(SystemOwnerRoleDeleteProcessor.PROCESSOR_NAME)
 @Description("Deletes system owner by role from repository.")

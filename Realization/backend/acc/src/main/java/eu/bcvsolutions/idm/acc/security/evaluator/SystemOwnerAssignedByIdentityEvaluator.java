@@ -28,7 +28,7 @@ import eu.bcvsolutions.idm.core.security.evaluator.AbstractTransitiveEvaluator;
  * Permissions to assigned owners (by identity) by role.
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Component(SystemOwnerAssignedByIdentityEvaluator.EVALUATOR_NAME)
 @Description("Permissions to assigned owners (by identity) by role.")

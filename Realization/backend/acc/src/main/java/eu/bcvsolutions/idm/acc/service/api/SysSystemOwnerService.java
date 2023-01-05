@@ -15,7 +15,7 @@ import eu.bcvsolutions.idm.core.security.api.service.AuthorizableService;
  * Operations with system owners - by identity
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 public interface SysSystemOwnerService extends EventableDtoService<SysSystemOwnerDto, SysSystemOwnerFilter>,
 		AuthorizableService<SysSystemOwnerDto> {

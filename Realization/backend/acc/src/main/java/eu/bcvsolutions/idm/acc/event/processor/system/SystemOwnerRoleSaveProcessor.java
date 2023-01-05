@@ -16,7 +16,7 @@ import eu.bcvsolutions.idm.core.api.event.EventResult;
  * Persists system owner by role.
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Component(SystemOwnerRoleSaveProcessor.PROCESSOR_NAME)
 @Description("Persists system owner by role.")

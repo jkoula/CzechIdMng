@@ -22,7 +22,7 @@ import eu.bcvsolutions.idm.core.model.entity.IdmRole;
  * System owner by role
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Entity
 @Table(name = "idm_system_owner_role", indexes = {

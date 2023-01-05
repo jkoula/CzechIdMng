@@ -15,7 +15,7 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
  * Filter for {@link eu.bcvsolutions.idm.acc.dto.SysSystemOwnerRoleDto} - roles
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 public class SysSystemOwnerRoleFilter extends DataFilter implements ExternalIdentifiableFilter {
 

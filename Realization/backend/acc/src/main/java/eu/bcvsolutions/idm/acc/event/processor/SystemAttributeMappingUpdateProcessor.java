@@ -32,7 +32,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.LongRunningTaskManager;
  * Processor for save {@link SysSystemAttributeMappingDto}
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 
 @Component("accSystemAttributeMappingUpdateProcessor")
