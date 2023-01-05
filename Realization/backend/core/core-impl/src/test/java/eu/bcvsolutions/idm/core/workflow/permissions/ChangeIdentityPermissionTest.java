@@ -1,11 +1,5 @@
 package eu.bcvsolutions.idm.core.workflow.permissions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -13,42 +7,46 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
-import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
-import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
-import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
+import javax.persistence.EntityManager;
+import javax.persistence.TransactionRequiredException;
 
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestedByType;
 import eu.bcvsolutions.idm.core.api.dto.AbstractConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
+import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmRequestIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
+import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.event.processor.module.InitTestDataProcessor;
+import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmGroupPermission;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowFilterDto;
@@ -57,6 +55,7 @@ import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowHistoricTaskInstanceD
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowProcessInstanceDto;
 import eu.bcvsolutions.idm.core.workflow.model.dto.WorkflowTaskInstanceDto;
 import eu.bcvsolutions.idm.core.workflow.service.WorkflowProcessInstanceService;
+import static org.junit.Assert.*;
 
 /**
  * Test change permissions for identity.
@@ -72,7 +71,18 @@ public class ChangeIdentityPermissionTest extends AbstractChangeIdentityPermissi
 	private IdmIdentityRoleService identityRoleService;
 	@Autowired
 	private IdmConceptRoleRequestService conceptRoleRequestService;
+	@Autowired
+	@CoreEntityManager
+	private EntityManager entityManager;
 
+	@After
+	public void after() {
+		try {
+			entityManager.flush();
+		} catch (TransactionRequiredException e) {
+			// ignore
+		}
+	}
 	@Test
 	public void addSuperAdminRoleTest() {
 		ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS);
