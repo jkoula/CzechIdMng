@@ -3,7 +3,7 @@ import {Basic, Utils} from 'czechidm-core';
  * Identity select option decorator.
  *
  * @author Evgeniya Gorina
- * @since 12.3.0
+ * @since 13.0.0
  */
 export default class SystemOptionDecorator extends Basic.SelectBox.OptionDecorator {
 

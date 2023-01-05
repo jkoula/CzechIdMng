@@ -1,5 +1,5 @@
 --
--- CzechIdM 12.3.0 Flyway script
+-- CzechIdM 13.0.0 Flyway script
 -- BCV solutions s.r.o.
 --
 -- Account entity - add mapping column

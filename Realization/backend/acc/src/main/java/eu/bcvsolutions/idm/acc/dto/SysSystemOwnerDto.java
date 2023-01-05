@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiModelProperty;
  * Dto for system owner - identity
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Relation(collectionRelation = "systemOwners")
 public class SysSystemOwnerDto extends AbstractDto implements ExternalIdentifiable, Requestable {

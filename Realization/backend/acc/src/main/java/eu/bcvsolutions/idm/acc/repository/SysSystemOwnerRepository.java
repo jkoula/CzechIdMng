@@ -11,7 +11,7 @@ import eu.bcvsolutions.idm.core.api.repository.AbstractEntityRepository;
  * System owner repository
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 public interface SysSystemOwnerRepository extends AbstractEntityRepository<SysSystemOwner> {
 

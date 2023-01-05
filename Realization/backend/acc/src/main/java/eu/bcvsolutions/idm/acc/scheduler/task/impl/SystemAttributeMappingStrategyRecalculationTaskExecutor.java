@@ -36,7 +36,7 @@ import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExe
  * overloaded places (roles)
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Component(SystemAttributeMappingStrategyRecalculationTaskExecutor.TASK_NAME)
 public class SystemAttributeMappingStrategyRecalculationTaskExecutor extends AbstractSchedulableTaskExecutor<Boolean> {

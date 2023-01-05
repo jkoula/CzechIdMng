@@ -7,7 +7,7 @@ import eu.bcvsolutions.idm.core.api.event.EntityEventProcessor;
  * System owner by identity processors should implement this interface.
  * 
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 public interface SystemOwnerProcessor extends EntityEventProcessor<SysSystemOwnerDto> {
 	

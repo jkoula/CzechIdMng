@@ -43,7 +43,7 @@ import eu.bcvsolutions.idm.core.security.evaluator.AbstractAuthorizationEvaluato
  * Returns systems, where logged user is in system owners (by identity or by role).
  *
  * @author Roman Kucera
- * @since 12.3.0
+ * @since 13.0.0
  */
 @Component(SystemOwnerEvaluator.EVALUATOR_NAME)
 @Description("Returns systems, where logged user is in system owners (by identity or by role).")
