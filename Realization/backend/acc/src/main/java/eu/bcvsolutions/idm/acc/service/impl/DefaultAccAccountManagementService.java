@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -412,36 +414,61 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 		roleSystemForProvisioningFilter.setRoleId(identityRole.getRole());
 
 		roleSystemService.find(roleSystemForProvisioningFilter, null).getContent().stream()
-				.filter(roleSystem -> {
-					if (!roleSystem.isCreateAccountByDefault()) {
-						return true;
-					} else {
-						SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
-						systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
-						if (systemGroupSystemService.count(systemGroupSystemFilter) >= 1
-							&& (identityRole.getRoleSystem() == null || roleSystem.getId().equals(identityRole.getRoleSystem()))
-						) {
-							// This role-system overriding a merge attribute which is using in
-							// active cross-domain group and roleSystem in identity-role is null or same as role-system.
-							// -> Provisioning should be made.
-							return true;
-						}
-					}
-					return false;
-				})
-				.forEach(roleSystem -> {
-					IdmIdentityContractDto contractDto = lookupService.lookupEmbeddedDto(identityRole, IdmIdentityRole_.identityContract);
-
-					AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
-					identityAccountFilter.setSystemId(roleSystem.getSystem());
-					identityAccountFilter.setIdentityId(contractDto.getIdentity());
-					identityAccountService.find(identityAccountFilter, null).getContent()
-							.forEach(identityAccount ->
-								// Noting identity-accounts for delayed additional provisioning.
-								notingIdentityAccountForDelayedAcm(event, identityAccount, IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING));
-				});
+				.filter(roleSystem -> shouldProcessDelayedAcm(identityRole, roleSystem))
+				.forEach(roleSystem -> scheduleAllAccountsWithSameOwnerToDelayedAcm(event, identityRole, roleSystem));
 	}
-	
+
+	/**
+	 * Finds all {@link eu.bcvsolutions.idm.acc.entity.AccIdentityAccount} for given {@link SysRoleSystemDto#getSystem()} and {@link AbstractRoleAssignmentDto#getEntity()}
+	 * and schedules delayed account management for these accounts.
+	 *
+	 * @param event
+	 * @param roleAssignment
+	 * @param roleSystem
+	 */
+	private void scheduleAllAccountsWithSameOwnerToDelayedAcm(EntityEvent<AbstractRoleAssignmentDto> event, AbstractRoleAssignmentDto roleAssignment, SysRoleSystemDto roleSystem) {
+		final var serviceForAssignment = roleAssignmentManager.getServiceForAssignment(roleAssignment);
+		final IdmIdentityDto relatedIdentity = serviceForAssignment.getRelatedIdentity(roleAssignment);
+		//
+		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
+		identityAccountFilter.setSystemId(roleSystem.getSystem());
+		identityAccountFilter.setIdentityId(relatedIdentity.getId());
+		identityAccountService.find(identityAccountFilter, null).getContent()
+				.forEach(identityAccount ->
+					// Noting identity-accounts for delayed additional provisioning.
+					notingIdentityAccountForDelayedAcm(event, identityAccount, IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING));
+	}
+
+	/**
+	 * This method decides, whether all accounts for given {@link AbstractRoleAssignmentDto} and {@link SysRoleSystemDto} should
+	 * be scheduled for delayed account management.
+	 *
+	 * Method returns true if one of the following is met:
+	 * - {@link SysRoleSystemDto#isCreateAccountByDefault()} is false
+	 * - roleSystem is in cross domain system group
+	 *
+	 * @param roleAssignment
+	 * @param roleSystem
+	 * @return true, if role does not create account by default, or is in cross domain group
+	 */
+	private boolean shouldProcessDelayedAcm(AbstractRoleAssignmentDto roleAssignment, SysRoleSystemDto roleSystem) {
+		if (!roleSystem.isCreateAccountByDefault()) {
+			return true;
+		} else {
+			SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
+			systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
+			if (systemGroupSystemService.count(systemGroupSystemFilter) >= 1
+				&& (roleAssignment.getRoleSystem() == null || roleSystem.getId().equals(roleAssignment.getRoleSystem()))
+			) {
+				// This role-system overriding a merge attribute which is using in
+				// active cross-domain group and roleSystem in identity-role is null or same as role-system.
+				// -> Provisioning should be made.
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Resolve identity account to delete
 	 * 
