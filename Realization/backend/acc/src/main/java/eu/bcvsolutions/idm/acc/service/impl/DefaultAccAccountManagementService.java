@@ -599,7 +599,7 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 			AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 			identityAccountFilter.setSystemId(roleSystem.getSystem());
 			identityAccountFilter.setIdentityId(identity.getId());
-			AccIdentityAccountDto identityAccountDto = identityAccountService.find(identityAccountFilter, null)
+			List<AccIdentityAccountDto> identityAccountDto = identityAccountService.find(identityAccountFilter, null)
 					.getContent()
 					.stream()
 					.filter(accIdentityAccountDto -> accIdentityAccountDto.getRoleSystem() != null)
@@ -608,9 +608,9 @@ public class DefaultAccAccountManagementService implements AccAccountManagementS
 								return roleSystemFromIdentityAccount != null
 										&& roleSystem.getSystemMapping().equals(roleSystemFromIdentityAccount.getSystemMapping());
 							}
-					).findFirst().orElse(null);
-			if (identityAccountDto != null && additionalAccountsForProvisioning != null) {
-				additionalAccountsForProvisioning.add(identityAccountDto.getAccount());
+					).collect(Collectors.toList());
+			if (additionalAccountsForProvisioning != null) {
+				additionalAccountsForProvisioning.addAll(identityAccountDto.stream().map(AccIdentityAccountDto::getAccount).collect(Collectors.toList()));
 			}
 		}
 		return canBeCreated;

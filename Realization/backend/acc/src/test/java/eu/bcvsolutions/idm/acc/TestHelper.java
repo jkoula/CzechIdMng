@@ -169,6 +169,16 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType);
 
 	/**
+	 * Assing system to given role with mapping (provisioning, identity)
+	 * @param role
+	 * @param system
+	 * @param accountType
+	 * @return
+	 */
+	SysRoleSystemDto createRoleSystem(IdmRoleDto role, SysSystemDto system, AccountType accountType,
+			boolean createAccountByDefault);
+
+	/**
 	 * Find account on target system
 	 * 
 	 * @param uid
@@ -432,4 +442,11 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 
 	AccAccountRoleAssignmentDto createAccountRoleAssignment(AccAccountDto accAccountDto, IdmRoleDto role, LocalDate from, LocalDate to);
 
+	/**
+	 * Rename an account. Override the value of the UID attribute.
+	 *
+	 * @param account
+	 * @param newAccountUid
+	 */
+	void changeAccountUid(AccAccountDto account, String newAccountUid);
 }

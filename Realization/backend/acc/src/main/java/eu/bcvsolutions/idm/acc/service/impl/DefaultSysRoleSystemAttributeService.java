@@ -406,6 +406,13 @@ public class DefaultSysRoleSystemAttributeService extends
 					builder.exists(getSubqueryForSystemGroup(root, query, builder))
 			));
 		}
+
+		if (Boolean.TRUE.equals(filter.getInCrossDomainGroup())) {
+
+			predicates.add(
+					builder.exists(getSubqueryForSystemGroup(root, query, builder))
+			);
+		}
 		
 		return predicates;
 	}
