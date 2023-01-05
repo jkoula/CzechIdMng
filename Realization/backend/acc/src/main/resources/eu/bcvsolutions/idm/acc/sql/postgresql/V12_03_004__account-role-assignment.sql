@@ -129,9 +129,6 @@ create table acc_account_role_assignment
     account              bytea        not null
 );
 
-alter table acc_account_role_assignment
-    owner to idmadmin;
-
 create index idx_acc_account_role_assign_ident_a
     on acc_account_role_assignment (account);
 
