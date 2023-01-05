@@ -1,10 +1,5 @@
 package eu.bcvsolutions.idm.core.rest.impl;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -40,6 +35,10 @@ import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import eu.bcvsolutions.idm.test.api.TestHelper;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Controller tests
@@ -76,6 +75,7 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		IdmIdentityDto applicant = getHelper().createIdentity((GuardedString) null);
 		IdmRoleRequestDto dto = new IdmRoleRequestDto();
 		dto.setApplicantInfo(new ApplicantImplDto(applicant.getId(), IdmIdentityDto.class.getCanonicalName()));
+		dto.setApplicant(applicant.getId());
 		dto.setState(RoleRequestState.CONCEPT);
 		dto.setRequestedByType(RoleRequestedByType.MANUALLY);
 		//
@@ -314,15 +314,17 @@ public class IdmRoleRequestControllerRestTest extends AbstractReadWriteDtoContro
 		request = this.createDto();
 		request.setState(RoleRequestState.CANCELED);
 		request.setApplicantInfo(requestOne.getApplicantInfo());
+		request.setApplicant(requestOne.getApplicant());
 		IdmRoleRequestDto requestTwo = createDto(request);
 		request = this.createDto();
 		request.setState(RoleRequestState.APPROVED);
 		request.setApplicantInfo(requestOne.getApplicantInfo());
+		request.setApplicant(requestOne.getApplicant());
 		createDto(request); // other state
 		//
 		MultiValueMap<String, String> filter = new LinkedMultiValueMap<>();
 		filter.put("states", Lists.newArrayList(RoleRequestState.EXECUTED.name(), RoleRequestState.CANCELED.name()));
-		filter.set("applicantId", requestOne.getApplicantInfo().getId().toString());
+		filter.set("applicantId", requestOne.getApplicant().toString());
 		//
 		List<IdmRoleRequestDto> results = find(filter);
 		Assert.assertEquals(2, results.size());
