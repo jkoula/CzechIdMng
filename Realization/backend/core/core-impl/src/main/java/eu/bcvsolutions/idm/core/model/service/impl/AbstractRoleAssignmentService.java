@@ -302,6 +302,9 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
 
     public D getDuplicated(D one, D two, Boolean skipSubdefinition) {
         List<Pair<AbstractRoleAssignmentDto, Boolean>> duplicates = new ArrayList<>();
+        if (deduplicators == null) {
+            return null;
+        }
         for (PluggableRoleAssignmentDeduplicator deduplicator : deduplicators) {
             AbstractRoleAssignmentDto duplicated = deduplicator.getDuplicated(one, two, skipSubdefinition);
             if (duplicated == null) {

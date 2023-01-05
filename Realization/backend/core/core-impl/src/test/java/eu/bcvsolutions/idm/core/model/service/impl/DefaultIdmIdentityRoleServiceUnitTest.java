@@ -1,10 +1,5 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -15,9 +10,12 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 import com.google.common.collect.Lists;
 
@@ -27,6 +25,8 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.exception.CoreException;
 import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.adapter.CorePluggableRoleAssignmentDeduplicator;
+import eu.bcvsolutions.idm.core.api.service.adapter.PluggableRoleAssignmentDeduplicator;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
@@ -35,6 +35,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.model.repository.IdmIdentityRoleRepository;
 import eu.bcvsolutions.idm.test.api.AbstractUnitTest;
+import static org.junit.Assert.*;
 
 /**
  * Assigned roles integration tests
@@ -60,9 +61,18 @@ public class DefaultIdmIdentityRoleServiceUnitTest extends AbstractUnitTest {
 	@Mock private LookupService lookupService;
 	@Mock private FormService formService;
 	@Mock private EntityEventManager entityEventManager;
+	@InjectMocks private CorePluggableRoleAssignmentDeduplicator corePluggableRoleAssignmentDeduplicator;
+
+	@Spy
+	private List<PluggableRoleAssignmentDeduplicator> deduplicators = new ArrayList<>();
 	@InjectMocks
 	private DefaultIdmIdentityRoleService service;
-	
+
+	@Before
+	public void init() {
+		MockitoAnnotations.initMocks(this);
+		deduplicators.add(corePluggableRoleAssignmentDeduplicator);
+	}
 	@Test
 	public void testDuplicityValidInOpenInterval() {
 		/*			B
