@@ -1,6 +1,37 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import com.google.common.collect.Lists;
+
+import eu.bcvsolutions.idm.core.api.domain.Pair;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
@@ -20,10 +51,10 @@ import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleSystemService;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.adapter.PluggableRoleAssignmentDeduplicator;
 import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
-import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractFormableService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
@@ -31,45 +62,14 @@ import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment;
 import eu.bcvsolutions.idm.core.model.entity.AbstractRoleAssignment_;
 import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmAutomaticRoleAttribute;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentityRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleCatalogueRole_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
 import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
-import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmAutomaticRoleRepository;
 import eu.bcvsolutions.idm.core.model.repository.IdmRoleAssignmentRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -82,6 +82,8 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
     private final LookupService lookupService;
     @Autowired
     private IdmRoleSystemService roleSystemService;
+    @Autowired(required = false)
+    private List<PluggableRoleAssignmentDeduplicator> deduplicators;
 
     private final IdmRoleAssignmentRepository<E> roleAssignmentRepository;
 
@@ -299,94 +301,44 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
     }
 
     public D getDuplicated(D one, D two, Boolean skipSubdefinition) {
-        Assert.notNull(one, "The first assinged role to compare is required.");
-        Assert.notNull(two, "The second assinged role to compare is required.");
-        //
-        if (!one.getRole().equals(two.getRole())) {
-            // Role isn't same
+        List<Pair<AbstractRoleAssignmentDto, Boolean>> duplicates = new ArrayList<>();
+        if (deduplicators == null) {
+            return null;
+        }
+        for (PluggableRoleAssignmentDeduplicator deduplicator : deduplicators) {
+            AbstractRoleAssignmentDto duplicated = deduplicator.getDuplicated(one, two, skipSubdefinition);
+            if (duplicated == null) {
+                // according to this duplicator, this role assignment is not duplicated
+                return null;
+            }
+
+            Pair<AbstractRoleAssignmentDto, Boolean> duplicate = new Pair<>(duplicated, deduplicator.considerOrder());
+            duplicates.add(duplicate);
+        }
+
+        if (duplicates.isEmpty()) {
             return null;
         }
 
-        // Role-system isn't same.
-        if (one.getRoleSystem() == null) {
-            if (two.getRoleSystem() != null) {
-                return null;
+        Pair<AbstractRoleAssignmentDto, Boolean> result = null;
+
+        for (Pair<AbstractRoleAssignmentDto, Boolean> duplicate : duplicates) {
+            if (result == null) {
+                result = duplicate;
+            } else {
+                if (result.getFirst() != duplicate.getFirst()) {
+                    if (!result.getSecond() && duplicate.getSecond()) {
+                        result = duplicate;
+                    }
+                }
             }
-        } else if (!one.getRoleSystem().equals(two.getRoleSystem())) {
+        }
+
+        if (result == null) {
             return null;
         }
 
-
-        D manually = null;
-        D automatic = null;
-
-        if (isRoleAutomaticOrComposition(one)) {
-            automatic = one;
-            manually = two;
-        }
-
-        if (isRoleAutomaticOrComposition(two)) {
-            if (automatic != null) {
-                // Automatic role is set from role ONE -> Both identity roles are automatic
-                if (one.getDirectRole() == null
-                        || two.getDirectRole() == null
-                        || one.getRoleComposition() == null
-                        || two.getRoleComposition() == null) {
-                    // role was not created by business role definition
-                    return null;
-                }
-                if (Objects.equals(one.getDirectRole(), two.getDirectRole())
-                        && Objects.equals(one.getRoleComposition(), two.getRoleComposition())) {
-                    // #2034 compositon is duplicate
-                    return getIdentityRoleForRemove(one, two);
-                }
-                // automatic roles or composition is not duplicate
-                return null;
-            }
-            automatic = two;
-            manually = one;
-        }
-
-        /// Check duplicity for validity
-        D validityDuplicity = null;
-        if (automatic == null) {
-            // Check if ONE role is duplicate with TWO and change order
-            boolean duplicitOne = isIdentityRoleDatesDuplicit(one, two);
-            boolean duplicitTwo = isIdentityRoleDatesDuplicit(two, one);
-
-            if (duplicitOne && duplicitTwo) {
-                // Both roles are same call method for decide which role will be removed
-                validityDuplicity = getIdentityRoleForRemove(one, two);
-            } else if (duplicitOne) {
-                // Only role ONE is duplicit with TWO
-                validityDuplicity = one;
-            } else if (duplicitTwo) {
-                // Only role TWO is duplicit with ONE
-                validityDuplicity = two;
-            }
-        } else {
-            // In case that we have only manually and automatic compare only from one order
-            if (isIdentityRoleDatesDuplicit(manually, automatic)) {
-                validityDuplicity = manually;
-            }
-
-        }
-
-        // Check subdefinition can be skipped
-        // and must be checked after validity
-        if (BooleanUtils.isNotTrue(skipSubdefinition)) {
-            // Validity must be same and subdefinition also. Then is possible remove role.
-            // Subdefinition must be exactly same and isn't different between manually and automatic identity role
-            if (validityDuplicity != null && equalsSubdefinitions(one, two)) {
-                return validityDuplicity;
-            }
-        } else {
-            // Check for subdefintion is skipped return only duplicity
-            return validityDuplicity;
-        }
-
-        // No duplicity founded
-        return null;
+        return (D) result.getFirst();
     }
 
     /**
@@ -397,57 +349,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
      */
     public boolean isRoleAutomaticOrComposition(D identityRole) {
         return identityRole.getAutomaticRole() != null || identityRole.getDirectRole() != null;
-    }
-
-    /**
-     * Method decides identity role that will be removed if both roles are same.
-     * In default behavior is for removing choosen the newer. Method is protected for easy
-     * overriding.
-     *
-     * @param one
-     * @param two
-     * @return
-     */
-    protected D getIdentityRoleForRemove(D one, D two) {
-        // Both roles are same, remove newer
-        if (one.getCreated().isAfter(two.getCreated())) {
-            return one;
-        }
-        return two;
-    }
-
-    /**
-     * Check if role ONE is duplicit by date with role TWO. For example if is role ONE fully in interval of validite the
-     * role TWO.
-     *
-     * @param one
-     * @param two
-     * @return
-     */
-    private boolean isIdentityRoleDatesDuplicit(D one, D two) {
-        LocalDate validTillForFirst = getDateForValidTill(one);
-        // Validity role is in interval in a second role
-        if (isDatesInRange(one.getValidFrom(), validTillForFirst, two.getValidFrom(), two.getValidTill())) {
-            return true;
-        }
-
-        // Both role are valid
-        if (one.isValid() && two.isValid()) {
-            LocalDate validTillForTwo = two.getValidTill();
-            if ((validTillForFirst == null && validTillForTwo == null) ||
-                    (validTillForFirst != null && validTillForTwo != null && validTillForFirst.isEqual(validTillForTwo))) {
-                // Valid tills from both identity roles are same
-                return true;
-            } else if (validTillForFirst != null && validTillForTwo == null) {
-                // Second identity role has filled valid till but first not.
-                // This mean that role TWO has bigger validity till than ONE
-                return false;
-            } else if (validTillForFirst != null && validTillForFirst.isBefore(validTillForTwo)) {
-                // Valid till from manually role is before automatic, manually role could be removed
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -505,8 +406,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
                 .collect(Collectors.toMap(s -> s, s -> Boolean.TRUE));
     }
 
-    protected abstract LocalDate getDateForValidTill(D one);
-
 
     /**
      * Check if given dates is in range/interval the second ones.
@@ -530,60 +429,6 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
         }
 
         return leftIntervalSideOk && rightIntervalSideOk;
-    }
-
-    /**
-     * Compare subdefinition. Return true if subdefinition are same. If {@link IdmIdentityRoleDto} doesn't contain subdefinition
-     * return true.
-     *
-     * @param one
-     * @param two
-     * @return
-     */
-    private boolean equalsSubdefinitions(D one, D two) {
-
-        List<IdmFormInstanceDto> eavsOne = one.getEavs();
-        List<IdmFormInstanceDto> eavsTwo = two.getEavs();
-
-        // Size of form instance doesn't match
-        if (eavsOne.size() != eavsTwo.size()) {
-            return false;
-        }
-
-        // Form instances are empty, subdefiniton are equals
-        if (eavsOne.isEmpty()) {
-            return true;
-        }
-
-        // Now is possible only one form instance for identity role
-        // Get form instance from both identity roles
-        IdmFormInstanceDto formInstanceOne = eavsOne.get(0);
-        IdmFormInstanceDto formInstanceTwo = eavsTwo.get(0);
-
-        List<Serializable> oneValues = Collections.emptyList();
-        List<Serializable> twoValues = Collections.emptyList();
-        if (formInstanceOne != null) {
-            oneValues = eavsOne.get(0) //
-                    .getValues() //
-                    .stream() //
-                    .map(IdmFormValueDto::getValue) //
-                    .collect(Collectors.toList()); //
-        }
-        if (formInstanceTwo != null) {
-            twoValues = eavsTwo.get(0) //
-                    .getValues() //
-                    .stream() //
-                    .map(IdmFormValueDto::getValue) //
-                    .collect(Collectors.toList()); //
-        }
-
-        // Values doesn't match
-        if (oneValues.size() != twoValues.size()) {
-            return false;
-        }
-
-        // Compare collections
-        return CollectionUtils.isEqualCollection(oneValues, twoValues);
     }
 
     @Override

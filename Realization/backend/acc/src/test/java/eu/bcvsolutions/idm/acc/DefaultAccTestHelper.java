@@ -9,8 +9,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
-import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
-import eu.bcvsolutions.idm.core.security.api.domain.GuardedString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
