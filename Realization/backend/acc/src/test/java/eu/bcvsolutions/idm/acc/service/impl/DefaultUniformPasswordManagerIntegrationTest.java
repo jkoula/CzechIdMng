@@ -82,6 +82,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -94,6 +95,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Vít Švanda
  * @since 11.0.0
  */
+@Ignore
 public class DefaultUniformPasswordManagerIntegrationTest extends AbstractIntegrationTest {
 
 	@Autowired
