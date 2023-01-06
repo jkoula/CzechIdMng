@@ -982,7 +982,7 @@ execution.setVariable("logItem", logItem);
                 def addRoleToUser(roleId, userId, contract) {
                     def operation = ConceptRoleRequestOperation.ADD;
                     def roleRequest = new IdmRoleRequestDto();
-                    roleRequest.setApplicant(new ApplicantImplDto(userId, IdmIdentityDto.class.getCanonicalName()));
+                    roleRequest.setApplicantInfo(new ApplicantImplDto(userId, IdmIdentityDto.class.getCanonicalName()));
                     roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
                     roleRequest.setExecuteImmediately(true);
                     roleRequest = roleRequestService.save(roleRequest);
