@@ -360,6 +360,12 @@ class AccountDetail extends Basic.AbstractContent {
                         values[key] = valuetoInsert;
                         key++;
                       });
+                    } else {
+                      this.addMessage({
+                        title: this.i18n('acc:error.ACCOUNT_CANNOT_BE_READ_FROM_TARGET.title'),
+                        message: this.i18n('acc:error.ACCOUNT_CANNOT_BE_READ_FROM_TARGET.message', {account: entity.uid, system: entity._embedded.system.name}),
+                        level: 'error'
+                      });
                     }
 
                     this.setState({
@@ -408,6 +414,12 @@ class AccountDetail extends Basic.AbstractContent {
                         }
                         values[key] = valuetoInsert;
                         key++;
+                      });
+                    } else {
+                      this.addMessage({
+                        title: this.i18n('acc:error.ACCOUNT_CANNOT_BE_READ_FROM_TARGET.title'),
+                        message: this.i18n('acc:error.ACCOUNT_CANNOT_BE_READ_FROM_TARGET.message', {account: entity.uid, system: entity._embedded.system.name}),
+                        level: 'error'
                       });
                     }
 
