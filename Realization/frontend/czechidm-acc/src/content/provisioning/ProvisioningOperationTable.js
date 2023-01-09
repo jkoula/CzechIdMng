@@ -8,6 +8,7 @@ import { Basic, Advanced, Enums, Utils, Managers } from 'czechidm-core';
 import ProvisioningOperationTypeEnum from '../../domain/ProvisioningOperationTypeEnum';
 import EmptyProvisioningTypeEnum from '../../domain/EmptyProvisioningTypeEnum';
 import { SystemManager, SystemEntityTypeManager } from '../../redux';
+import SystemEntityTypeField from '../system/SystemEntityTypeField';
 
 const systemManager = new SystemManager();
 const systemEntityTypeManager = new SystemEntityTypeManager();
@@ -359,12 +360,11 @@ export class ProvisioningOperationTable extends Advanced.AbstractTableContent {
             face="text"
             cell={
               ({ rowIndex, data }) => {
-                const entity = data[rowIndex];
-                if (!entity || !entity.entityType) {
-                  return null;
-                }
+                const mapping = data[rowIndex]._embedded?.account?._embedded?.systemMapping;
+
                 return (
-                  systemEntityTypeManager.getNiceLabelForEntityType(entity)
+                  <SystemEntityTypeField
+                    mapping={ mapping }/>
                 );
               }
             }

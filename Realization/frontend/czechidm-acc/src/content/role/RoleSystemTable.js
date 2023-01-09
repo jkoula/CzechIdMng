@@ -8,9 +8,9 @@ import _ from 'lodash';
 import { Basic, Advanced, Utils } from 'czechidm-core';
 import SearchParameters from 'czechidm-core/src/domain/SearchParameters';
 import { DataManager, ConfigurationManager, RoleManager } from 'czechidm-core/src/redux';
-import { SystemMappingManager, SystemManager, RoleSystemManager } from '../../redux';
+import { SystemMappingManager, SystemManager, RoleSystemManager, SystemEntityTypeManager } from '../../redux';
 import { SystemInfo } from '../../components/SystemInfo/SystemInfo';
-import { SystemEntityTypeService } from '../../services/SystemEntityTypeService';
+import SystemEntityTypeField from '../system/SystemEntityTypeField';
 
 const originalManager = new RoleSystemManager();
 let manager = null;
@@ -204,12 +204,11 @@ export class RoleSystemTable extends Advanced.AbstractTableContent {
             face="text"
             cell={
               ({ rowIndex, data }) => {
-                const entity = data[rowIndex];
-                if (!entity._embedded || !entity._embedded.systemMapping || entity._embedded.systemMapping.entityType) {
-                  return null;
-                }
+                const mapping = data[rowIndex]._embedded.systemMapping;
+
                 return (
-                  SystemEntityTypeService.getNiceLabelForEntityType(entity._embedded.systemMapping.entityType)
+                  <SystemEntityTypeField
+                    mapping={ mapping }/>
                 );
               }
             }

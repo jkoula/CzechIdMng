@@ -7,11 +7,11 @@ import uuid from 'uuid';
 import { Basic, Advanced, Domain, Managers, Utils } from 'czechidm-core';
 import { SystemMappingManager, SystemManager, SystemEntityTypeManager } from '../../redux';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
+import SystemEntityTypeField from './SystemEntityTypeField';
 
 const uiKey = 'system-mappings-table';
 const manager = new SystemMappingManager();
 const systemManager = new SystemManager();
-const systemEntityTypeManager = new SystemEntityTypeManager();
 
 /**
  * System mapping list.
@@ -129,12 +129,9 @@ class SystemMappings extends Advanced.AbstractTableContent {
             face="text"
             cell={
               ({ rowIndex, data }) => {
-                const entity = data[rowIndex];
-                if (!entity || !entity.entityType) {
-                  return null;
-                }
                 return (
-                  systemEntityTypeManager.getNiceLabelForEntityType(entity)
+                  <SystemEntityTypeField
+                    mapping={ data[rowIndex] }/>
                 );
               }
             }

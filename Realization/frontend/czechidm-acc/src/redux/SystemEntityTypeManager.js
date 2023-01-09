@@ -97,6 +97,10 @@ export default class SystemEntityTypeManager extends Managers.EntityManager {
         }
     }
 
+    getNiceLabel(systemEntityType) {
+        return this.getService().getNiceLabel(systemEntityType);
+    }
+
     getCollectionType() {
         return 'systemEntityTypes';
     }
