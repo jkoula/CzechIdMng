@@ -3161,7 +3161,7 @@
         },
         "summary": {
           "name":  "Shrnutí",
-          "text": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Váš nový systém <strong>{{systemName}}</strong> byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového systému.</h3>",
+          "text": "<h2 style=\"margin-top: 0\">Gratulujeme,</h2><h3>Váš nový systém <strong>{{systemName}}</strong> byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového systému.</h3>",
           "mappingSystemOnRole": {
             "label": "Vytvořit roli přidělující tento systém.",
             "help": "Pokud chcete přidělovat účet na tomto systému pomocí role, pak jí zde můžete vybrat, či vytvořit novou."
@@ -3556,7 +3556,7 @@
         },
         "four": {
           "name": "Dokončení",
-          "help": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Nový další osobní účet byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového účtu.</h3>"
+          "help": "<h2 style=\"margin-top: 0\">Gratulujeme,</h2><h3>nový další osobní účet byl úspěšně vytvořen.</h3>"
         }
       }
     },
@@ -3584,7 +3584,7 @@
         },
         "four": {
           "name": "Dokončení",
-          "help": "<h2 style=\"margin-top: 0\">Gratulejeme,</h2><h3>Nový osobní účet byl úspěšně vytvořen.</h3><h3>Po dokončení budete přesměrování na detail nového účtu.</h3>"
+          "help": "<h2 style=\"margin-top: 0\">Gratulujeme,</h2><h3>nový osobní účet byl úspěšně vytvořen.</h3>"
         }
       }
     }
