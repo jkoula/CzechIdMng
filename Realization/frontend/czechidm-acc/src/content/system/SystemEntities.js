@@ -150,18 +150,7 @@ class SystemEntitiesContent extends Advanced.AbstractTableContent {
               width={ 75 }
               header={ this.i18n('acc:entity.SystemEntity.entityType') }
               sort
-              face="text"
-              cell={
-                ({ rowIndex, data }) => {
-                  const entity = data[rowIndex];
-                  if (!entity || !entity.entityType) {
-                    return null;
-                  }
-                  return (
-                    systemEntityTypeManager.getNiceLabelForEntityType(entity)
-                  );
-                }
-              } />
+              face="text"/>
             <Advanced.Column
               property="wish"
               sort
