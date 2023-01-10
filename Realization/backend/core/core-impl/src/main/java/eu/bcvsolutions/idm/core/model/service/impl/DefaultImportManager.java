@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
@@ -547,7 +547,7 @@ public class DefaultImportManager implements ImportManager {
 	private List<BaseDto> sortsDTOs(Class<? extends BaseDto> dtoClass, List<BaseDto> dtos) {
 
 		String itselfField = this.containsItselfTypeRelation(dtoClass);
-		if (itselfField == null) {
+		if (itselfField == null || "connectedSystemMappingId".equals(itselfField)) {
 			return dtos;
 		}
 		// Itself field was found.
