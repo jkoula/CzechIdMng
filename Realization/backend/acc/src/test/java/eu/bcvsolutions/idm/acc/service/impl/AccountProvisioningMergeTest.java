@@ -48,7 +48,6 @@ import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
  * @author Tomáš Doischer
  *
  */
-@Ignore
 public class AccountProvisioningMergeTest extends AbstractProvisioningMergeTest {
 
 	@Autowired

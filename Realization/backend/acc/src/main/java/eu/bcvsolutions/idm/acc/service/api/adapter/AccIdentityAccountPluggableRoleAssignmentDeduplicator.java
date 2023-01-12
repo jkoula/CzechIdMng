@@ -27,6 +27,7 @@ public class AccIdentityAccountPluggableRoleAssignmentDeduplicator implements Pl
 	public AbstractRoleAssignmentDto getDuplicated(AbstractRoleAssignmentDto one, AbstractRoleAssignmentDto two, Boolean skipSubdefinition) {
 		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 		identityAccountFilter.setIdentityRoleId(one.getId());
+
 		List<AccIdentityAccountDto> accIdentityAccountsOne = identityAccountService.find(identityAccountFilter, null).getContent();
 
 		identityAccountFilter = new AccIdentityAccountFilter();

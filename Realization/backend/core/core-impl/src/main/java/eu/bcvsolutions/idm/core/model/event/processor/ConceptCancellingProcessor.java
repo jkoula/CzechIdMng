@@ -91,4 +91,18 @@ public abstract class ConceptCancellingProcessor<O extends BaseDto,
         }
     }
 
+    /**
+     * This method should be executed as a fallback to remove any role assignments, which are still being present after removeRelatedAssignedRoles with given applicantId is
+     * executed.
+     *
+     * @param event
+     * @param id
+     * @param forceDelete
+     */
+    protected void removeRelatedAssignedRoles(EntityEvent<O> event, UUID ownerUuid, boolean forceDelete) {
+        roleAssignmentService.findAllByOwnerId(ownerUuid).forEach(identityRole -> {
+            roleAssignmentService.delete(identityRole);
+        });
+    }
+
 }

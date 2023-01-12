@@ -176,7 +176,7 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 		} else if (owner instanceof IdmIdentityContractDto) {
 			system = helper.createSystem("test_resource");
 			mapping = helper.createMapping(system);
-			
+
 			final IdmRoleDto loginRole = getHelper().createRole();
 			helper.createRoleSystem(loginRole, system, AccountType.PERSONAL);
 			getHelper().assignRoles((IdmIdentityContractDto) owner, loginRole);

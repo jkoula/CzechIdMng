@@ -613,7 +613,7 @@ public class DefaultAccTestHelper extends eu.bcvsolutions.idm.test.api.DefaultTe
 	public AccAccountDto createAccount(GuardedString password){
 		IdmIdentityDto identity = this.createIdentity(password);
 		//
-		SysSystemDto system = this.createSystem("test_resource");
+		SysSystemDto system = this.createSystem("test_resource", createName());
 		this.createMapping(system);
 		IdmRoleDto roleOne = this.createRole();
 		this.createRoleSystem(roleOne, system);
