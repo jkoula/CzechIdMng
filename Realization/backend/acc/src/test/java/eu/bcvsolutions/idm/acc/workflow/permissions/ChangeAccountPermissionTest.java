@@ -55,7 +55,7 @@ public class ChangeAccountPermissionTest extends AbstractChangeIdentityPermissio
 
 	@Override
 	protected void deleteOwner(AbstractDto owner) {
-		accountService.deleteById(owner.getId());
+		accountService.delete((AccAccountDto) owner);
 	}
 
 	@Override

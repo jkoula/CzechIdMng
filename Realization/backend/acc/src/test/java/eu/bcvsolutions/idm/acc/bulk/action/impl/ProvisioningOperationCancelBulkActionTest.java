@@ -329,7 +329,7 @@ public class ProvisioningOperationCancelBulkActionTest extends AbstractBulkActio
 		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityDto identityTwo = getHelper().createIdentity();
 
-		SysSystemDto system = helper.createTestResourceSystem(true);
+		SysSystemDto system = helper.createTestResourceSystem(true, helper.createName());
 		system.setDisabled(true);
 		system = systemService.save(system);
 

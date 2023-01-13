@@ -176,6 +176,10 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 		} else if (owner instanceof IdmIdentityContractDto) {
 			system = helper.createSystem("test_resource");
 			mapping = helper.createMapping(system);
+
+			final IdmRoleDto loginRole = getHelper().createRole();
+			helper.createRoleSystem(loginRole, system, AccountType.PERSONAL);
+			getHelper().assignRoles((IdmIdentityContractDto) owner, loginRole);
 		} else {
 			throw new UnsupportedOperationException(String.format("This owner type is not supported! Owner: [{}]", owner));
 		}
@@ -226,7 +230,10 @@ public abstract class AbstractProvisioningMergeTest extends AbstractIntegrationT
 		Assert.assertEquals(RoleRequestState.CONCEPT, concept.getState());
 
 		getHelper().startRequestInternal(request, true, true);
+		final UUID reqId = request.getId();
+		getHelper().waitForResult(res -> roleRequestService.get(reqId).getState() != RoleRequestState.EXECUTED, 1000, 30);
 		request = roleRequestService.get(request.getId());
+
 	}
 
 	@Test

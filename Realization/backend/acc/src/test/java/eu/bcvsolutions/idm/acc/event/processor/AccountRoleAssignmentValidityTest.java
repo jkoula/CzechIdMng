@@ -44,19 +44,21 @@ public class AccountRoleAssignmentValidityTest extends AbstractIntegrationTest {
 	public void testStartValidity() {
 		IdmRoleDto role = helper.createRole();
 		AccAccountDto account = helper.createAccount();
+		AccAccountRoleAssignmentFilter accountRoleFilter = new AccAccountRoleAssignmentFilter();
+		accountRoleFilter.setValid(Boolean.TRUE);
+		final long initialCountOfRoles = accountRoleService.find(accountRoleFilter, null).getTotalElements();
 		// create request that is valid in the future
 		helper.assignRoleToAccountViaRequest(account, LocalDate.now().plusDays(5l), null, true, role.getId());
 		//
-		AccAccountRoleAssignmentFilter accountRoleFilter = new AccAccountRoleAssignmentFilter();
-		accountRoleFilter.setValid(Boolean.TRUE);
+
 		List<AccAccountRoleAssignmentDto> accountRoles = accountRoleService.find(accountRoleFilter, null).getContent();
-		Assert.assertEquals(0, accountRoles.size());
+		Assert.assertEquals(initialCountOfRoles, accountRoles.size());
 		//
 		// update role assigment via request and set the role as valid
 		helper.updateAssignedAccountRoleViaRequest(account, LocalDate.now(), null, true, role.getId());
 		//
 		accountRoles = accountRoleService.find(accountRoleFilter, null).getContent();
-		Assert.assertEquals(1, accountRoles.size());
+		Assert.assertEquals(initialCountOfRoles + 1, accountRoles.size());
 	}
 	
 	@Test

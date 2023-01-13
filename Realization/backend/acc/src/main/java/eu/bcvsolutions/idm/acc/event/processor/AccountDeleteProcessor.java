@@ -10,6 +10,7 @@ import java.util.UUID;
 import eu.bcvsolutions.idm.acc.dto.AccAccountConceptRoleRequestDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
 import eu.bcvsolutions.idm.acc.dto.filter.AccAccountConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountConceptRoleRequestService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
 import eu.bcvsolutions.idm.core.model.event.processor.ConceptCancellingProcessor;
@@ -82,6 +83,8 @@ public class AccountDeleteProcessor
 	private AccContractSliceAccountService contractAccountSliceService;
 	@Autowired private SysSystemEntityTypeManager systemEntityManager;
 
+	@Autowired private AccAccountRoleAssignmentService accountRoleAssignmentService;
+
 	private static final Logger LOG = LoggerFactory.getLogger(AccountDeleteProcessor.class);
 
 	@Autowired
@@ -139,9 +142,6 @@ public class AccountDeleteProcessor
 
 		// Find all concepts and remove relation on contract
 		removeRelatedConcepts(account.getId());
-		//
-
-
 		// delete all identity accounts
 		AccIdentityAccountFilter identityAccountFilter = new AccIdentityAccountFilter();
 		identityAccountFilter.setAccountId(account.getId());
@@ -149,9 +149,10 @@ public class AccountDeleteProcessor
 				.getContent();
 		for (AccIdentityAccountDto identityAccount : identityAccounts) {
 			// delete referenced role assignment
-			removeRelatedAssignedRoles(event, identityAccount.getIdentity(), account.getId(), false);
+			removeRelatedAssignedRoles(event,identityAccount.getIdentity(), account.getId(), false);
 			identityAccountService.delete(identityAccount, deleteTargetAccount);
 		}
+		removeRelatedAssignedRoles(event, account.getId(), false);
 
 		// delete all role accounts
 		AccRoleAccountFilter roleAccountFilter = new AccRoleAccountFilter();
@@ -222,6 +223,7 @@ public class AccountDeleteProcessor
 
 		return new DefaultEventResult<>(event, this);
 	}
+
 
 	@Override
 	public int getOrder() {
