@@ -647,8 +647,8 @@ class AccountDetail extends Basic.AbstractContent {
           }>
           <Basic.Div style={{ paddingTop: 10 }}>
             <Grid container spacing={1}>
-              <Grid container item xs={12} spacing={3}>
-                <Grid item xs={1} >
+              <Grid container item spacing={3}>
+                <Grid item>
                   <Basic.Button
                     level="link"
                     key="edit_button"
@@ -662,7 +662,7 @@ class AccountDetail extends Basic.AbstractContent {
                     }
                   </Basic.Button>
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item>
                   <Basic.Button
                     level="link"
                     key="refresh_button"
@@ -683,7 +683,7 @@ class AccountDetail extends Basic.AbstractContent {
                     {this.i18n('control.save')}
                   </Basic.Button>
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item>
                   <Basic.Button
                     level="link"
                     key="discard_button"
@@ -695,19 +695,19 @@ class AccountDetail extends Basic.AbstractContent {
                     {this.i18n('control.discard')}
                   </Basic.Button>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item>
                   <TextField id="outlined-basic" label={this.i18n('control.attr-name')}
                     variant="outlined" size="small"
                     autoComplete='off' onChange={this.filterNameChanged.bind(this)}
                     value={attrName ? attrName : ''} />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item>
                   <TextField id="outlined-basic" label={this.i18n('control.attr-value')}
                     variant="outlined" size="small"
                     autoComplete='off' onChange={this.filterValueChanged.bind(this)}
                     value={attrValue ? attrValue : ''} />
                 </Grid>
-                <Grid item xs={1}>
+                <Grid item>
                   <Basic.Button
                     level="link"
                     key="cancel_button"
