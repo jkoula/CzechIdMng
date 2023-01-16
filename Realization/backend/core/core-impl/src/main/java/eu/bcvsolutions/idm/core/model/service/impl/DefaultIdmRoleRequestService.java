@@ -758,8 +758,7 @@ public class DefaultIdmRoleRequestService
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setId(id);
 		roleRequest.setApplicantInfo(new ApplicantImplDto(applicant, applicantType));
-		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
-		roleRequest.setExecuteImmediately(true);
+		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest = this.save(roleRequest);
 		if (roles != null) {
 			for (IdmRoleDto role : roles) {
@@ -775,8 +774,7 @@ public class DefaultIdmRoleRequestService
 		Assert.notNull(contract, "Contract must be filled for create role request!");
 		IdmRoleRequestDto roleRequest = new IdmRoleRequestDto();
 		roleRequest.setApplicantInfo(new ApplicantImplDto(contract.getIdentity(), IdmIdentityDto.class.getCanonicalName()));
-		roleRequest.setRequestedByType(RoleRequestedByType.AUTOMATICALLY);
-		roleRequest.setExecuteImmediately(true);
+		roleRequest.setRequestedByType(RoleRequestedByType.MANUALLY);
 		roleRequest = this.save(roleRequest);
 		if (roles != null) {
 			for (IdmRoleDto role : roles) {
