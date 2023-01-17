@@ -41,7 +41,7 @@ module.exports = {
     {
       id: 'account-info',
       type: 'entity-info',
-      entityType: ['account', 'AccountDto'],
+      entityType: ['account', 'AccountDto', 'AccAccount'],
       component: require('./src/components/AccountInfo/AccountInfo').default,
       manager: require('./src/redux').AccountManager
     },
