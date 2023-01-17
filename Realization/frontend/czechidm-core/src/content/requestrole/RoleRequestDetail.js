@@ -121,8 +121,13 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     if (!this.refs.form.isFormValid()) {
       return;
     }
-    const formEntity = this.refs.form.getData();
-    // TODO prepare applicant DTO
+    const {request} = this.state;
+    const formEntity = {
+      ...this.refs.form.getData(),
+      applicantInfo: request.applicantInfo,
+      applicant: request.applicantInfo?.id
+    };
+    //
     this.setState({showLoading: true}, () => {
       delete formEntity.conceptRoles;
 
