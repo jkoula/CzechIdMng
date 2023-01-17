@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 
-import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.bcvsolutions.idm.core.api.config.datasource.CoreEntityManager;
 import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
@@ -67,6 +67,7 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ExportManager;
 import eu.bcvsolutions.idm.core.api.service.IdmExportImportService;
 import eu.bcvsolutions.idm.core.api.service.IdmImportLogService;
+import eu.bcvsolutions.idm.core.api.domain.IgnoreSameTypeReferenceFieldDuringImport;
 import eu.bcvsolutions.idm.core.api.service.ImportManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
@@ -630,7 +631,7 @@ public class DefaultImportManager implements ImportManager {
 		for (Field field : fields) {
 
 			Class<? extends AbstractDto> dtoClassField = this.getDtoClassFromField(dtoClass, field.getName());
-			if (dtoClass == dtoClassField) {
+			if (dtoClass == dtoClassField && field.getAnnotation(IgnoreSameTypeReferenceFieldDuringImport.class) == null) {
 				return field.getName();
 			}
 		}
