@@ -1,4 +1,4 @@
-package eu.bcvsolutions.idm.core.api.service;
+package eu.bcvsolutions.idm.core.api.domain;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

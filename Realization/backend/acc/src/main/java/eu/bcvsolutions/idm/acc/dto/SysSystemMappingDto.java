@@ -10,7 +10,7 @@ import eu.bcvsolutions.idm.acc.entity.SysSystemMapping;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmTreeTypeDto;
-import eu.bcvsolutions.idm.core.api.service.IgnoreSameTypeReferenceFieldDuringImport;
+import eu.bcvsolutions.idm.core.api.domain.IgnoreSameTypeReferenceFieldDuringImport;
 
 /**
  * DTO for entity {@link SysSystemMapping}

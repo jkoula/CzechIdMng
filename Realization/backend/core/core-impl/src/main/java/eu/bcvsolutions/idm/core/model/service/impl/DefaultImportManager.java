@@ -67,7 +67,7 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ExportManager;
 import eu.bcvsolutions.idm.core.api.service.IdmExportImportService;
 import eu.bcvsolutions.idm.core.api.service.IdmImportLogService;
-import eu.bcvsolutions.idm.core.api.service.IgnoreSameTypeReferenceFieldDuringImport;
+import eu.bcvsolutions.idm.core.api.domain.IgnoreSameTypeReferenceFieldDuringImport;
 import eu.bcvsolutions.idm.core.api.service.ImportManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
