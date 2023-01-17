@@ -67,6 +67,7 @@ import eu.bcvsolutions.idm.core.api.exception.ResultCodeException;
 import eu.bcvsolutions.idm.core.api.service.ExportManager;
 import eu.bcvsolutions.idm.core.api.service.IdmExportImportService;
 import eu.bcvsolutions.idm.core.api.service.IdmImportLogService;
+import eu.bcvsolutions.idm.core.api.service.IgnoreSameTypeReferenceFieldDuringImport;
 import eu.bcvsolutions.idm.core.api.service.ImportManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
@@ -547,7 +548,7 @@ public class DefaultImportManager implements ImportManager {
 	private List<BaseDto> sortsDTOs(Class<? extends BaseDto> dtoClass, List<BaseDto> dtos) {
 
 		String itselfField = this.containsItselfTypeRelation(dtoClass);
-		if (itselfField == null || "connectedSystemMappingId".equals(itselfField)) {
+		if (itselfField == null) {
 			return dtos;
 		}
 		// Itself field was found.
@@ -630,7 +631,7 @@ public class DefaultImportManager implements ImportManager {
 		for (Field field : fields) {
 
 			Class<? extends AbstractDto> dtoClassField = this.getDtoClassFromField(dtoClass, field.getName());
-			if (dtoClass == dtoClassField) {
+			if (dtoClass == dtoClassField && field.getAnnotation(IgnoreSameTypeReferenceFieldDuringImport.class) == null) {
 				return field.getName();
 			}
 		}
