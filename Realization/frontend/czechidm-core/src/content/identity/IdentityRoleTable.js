@@ -24,6 +24,7 @@ import ConfigLoader from '../../utils/ConfigLoader';
 import ComponentService from "../../services/ComponentService";
 import {IdentityRoleTableFilter} from "./IdentityRoleTableFilter";
 import OwnerCell from "../requestrole/OwnerCell";
+import {AssignmentOwnerSelector} from "../requestrole/AssignmentOwnerSelector";
 
 //const manager = new IdentityRoleManager(); // default manager
 const manager =  new RequestIdentityRoleManager();
@@ -494,13 +495,18 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                       entityType="roleSystem"
                       readOnly
                       label={ this.i18n('entity.RoleSystem.label') }/>
-                    <Basic.SelectBox
-                      ref="identityContract"
-                      manager={ identityContractManager }
-                      label={ this.i18n('entity.IdentityRole.identityContract.label') }
-                      helpBlock={ this.i18n('entity.IdentityRole.identityContract.help') }
-                      readOnly={ !TEST_ADD_ROLE_DIRECTLY }
-                      required/>
+                    <AssignmentOwnerSelector
+                        ref="ownerSelector"
+                        entity={detail.entity}
+                        isNew={false}
+                        accountId={null}
+                        identityUsername = {null}
+                        isAccount = {false}
+                        // changing role assignment owner is not supported since it would allow for changing
+                        // between different owner types, which could result in unexpected behavior
+                        readOnly = {true}
+                        onChange={null}
+                    />
                     <Basic.LabelWrapper
                       label={ this.i18n('entity.IdentityRole.automaticRole.label') }
                       helpBlock={ this.i18n('entity.IdentityRole.automaticRole.help') }
@@ -535,7 +541,11 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                       <IdentityRoleTable
                         uiKey={ `${this.getUiKey()}-all-sub-roles` }
                         showAddButton={ false }
-                        forceSearchParameters={ new SearchParameters().setFilter('directRoleId', detail.entity.id) }
+                        forceSearchParameters={ new SearchParameters()
+                            .setFilter('directRoleId', detail.entity.id)
+                            .setFilter('identityId', detail.entity.ownerId)
+                            .setFilter('onlyAssignments', true)
+                      }
                         showDetailButton={ false }
                         match={ this.props.match }
                         columns={ _.difference(IdentityRoleTable.defaultProps.columns, ['identityContract', 'directRole', 'automaticRole']) }
