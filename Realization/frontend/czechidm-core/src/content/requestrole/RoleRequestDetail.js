@@ -121,7 +121,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     if (!this.refs.form.isFormValid()) {
       return;
     }
-    const {request} = this.state;
+    const request = this.state.request ? this.state.request : this.props._request;
     const formEntity = {
       ...this.refs.form.getData(),
       applicantInfo: request.applicantInfo,
