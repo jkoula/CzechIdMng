@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.api.utils;
 
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
+import org.springframework.context.annotation.Primary;
 import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.Constructor;
@@ -147,6 +148,13 @@ public class ReflectionUtils {
                 });
 
         return innerfilter;
+    }
+
+    public static <E> E resolveMultipleServices(E s1, E s2) {
+        if (s1.getClass().isAnnotationPresent(Primary.class)) {
+            return s1;
+        }
+        return s2;
     }
 
     private static Object toSingleValue(List<Object> value) {
