@@ -5,6 +5,7 @@ import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.FormableFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.OwnerTypeFilter;
 import eu.bcvsolutions.idm.core.api.rest.AbstractPluggableFilterTranslator;
@@ -32,6 +33,7 @@ public class IdmRequestIdentityRoleFilterTranslator extends AbstractPluggableFil
         filter.setRoleText(getParameterConverter().toString(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_TEXT));
         filter.setRoleEnvironments(getParameterConverter().toStrings(parameters, BaseRoleAssignmentFilter.PARAMETER_ROLE_ENVIRONMENT));
         filter.setRoleRequestId(getParameterConverter().toUuid(parameters, "roleRequestId"));
+        filter.setDirectRoleId(getParameterConverter().toUuid(parameters, IdmBaseConceptRoleRequestFilter.DIRECT_ROLE_ID_PARAMETER));
         filter.setState(getParameterConverter().toEnum(parameters, "state", RoleRequestState.class));
         filter.setOnlyChanges(getParameterConverter().toBoolean(parameters, "onlyChanges", false));
         filter.setIncludeCandidates(getParameterConverter().toBoolean(parameters, "includeCandidates", false));

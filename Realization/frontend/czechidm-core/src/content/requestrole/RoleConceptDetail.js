@@ -2,16 +2,24 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 //
 import * as Basic from '../../components/basic';
 import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
-import { IdentityContractManager, RoleTreeNodeManager, RoleManager, DataManager, IdentityRoleManager, RequestIdentityRoleManager } from '../../redux';
+import {
+  DataManager,
+  IdentityContractManager,
+  IdentityRoleManager,
+  RequestIdentityRoleManager,
+  RoleManager,
+  RoleTreeNodeManager
+} from '../../redux';
 import SearchParameters from '../../domain/SearchParameters';
 import FormInstance from '../../domain/FormInstance';
 import ConfigLoader from '../../utils/ConfigLoader';
 import ComponentService from "../../services/ComponentService";
+import {AssignmentOwnerSelector} from "./AssignmentOwnerSelector";
 
 
 const identityRoleManager = new IdentityRoleManager();
@@ -37,13 +45,10 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     super(props, context);
     const updatedEntity = {...props.entity};
     updatedEntity[props.entity.ownerType] = props.entity.ownerUuid
-    const ownerType = props.isAccount ?
-        "eu.bcvsolutions.idm.acc.dto.AccAccountDto" : props.entity && props.entity.ownerType ?
-            props.entity.ownerType :IdentityContractManager.ENTITY_TYPE;
+
     this.state = {
       entity: updatedEntity,
       environment: ConfigLoader.getConfig('role.table.filter.environment', []),
-      selectedOwnerType: ownerType
     };
   }
 
@@ -89,25 +94,25 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     let entity = this.getForm().getData();
     const eavForm = this.getEavForm();
     let eavValues = null;
-    const {selectedOwnerType} = this.state;
+    const ownerType = this.refs.ownerSelector.getSelectedOwnerType();
     //
     if (eavForm) {
       eavValues = {values: eavForm.getValues()};
     }
 
     // Conversions
-    if ( entity[selectedOwnerType] && _.isObject( entity[selectedOwnerType])) {
-      entity[selectedOwnerType] =  entity[selectedOwnerType].id;
+    if ( entity[ownerType] && _.isObject( entity[ownerType])) {
+      entity[ownerType] =  entity[ownerType].id;
     }
     if (entity.role && _.isArray(entity.role)) {
       entity.roles = entity.role;
       entity.role = null;
     }
-    entity.ownerUuid = entity[selectedOwnerType]
+    entity.ownerUuid = this.refs.ownerSelector.getValue();
     // Add EAV to entity
     entity._eav = [eavValues];
     //
-    const conceptComponentInfo = componentService.getConcepComponentByOwnerType(selectedOwnerType);
+    const conceptComponentInfo = componentService.getConcepComponentByOwnerType(ownerType);
     entity.assignmentType = conceptComponentInfo.entityType[0]
 
     //
@@ -119,10 +124,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     entity.roleRequest = requestId;
 
     this.context.store.dispatch(requestIdentityRoleManager.createEntity(entity, null, cb));
-  }
-
-  handleTabSwitch = (newValue) => {
-    this.setState({selectedOwnerType: newValue})
   }
 
   _initComponent(props) {
@@ -176,7 +177,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
    */
   _onChangeSelectOfContract(value) {
     const entity = this.state && this.state.entity ? this.state.entity : this.props.entity;
-    const {selectedOwnerType} = this.state;
+    const ownerType = this.refs.ownerSelector.getSelectedOwnerType()
     let validFrom = value ? value.validFrom : null;
     const now = moment().utc().valueOf();
     if (validFrom && moment(validFrom).isBefore(now)) {
@@ -184,7 +185,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     }
     const entityFormData = _.merge({}, entity);
     entityFormData.validFrom = validFrom;
-    entityFormData[selectedOwnerType] = value;
+    entityFormData[ownerType] = value;
     if (this.refs.role) {
       entityFormData.role = this.refs.role.getValue();
     }
@@ -249,7 +250,7 @@ export class RoleConceptDetail extends Basic.AbstractContent {
       isAccount,
       accountId
     } = this.props;
-    const { environment,selectedOwnerType } = this.state;
+    const { environment } = this.state;
     const entity = this.state.entity ? this.state.entity : this.props.entity;
 
     if (!entity) {
@@ -291,8 +292,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
         _formInstance = instance;
       });
     }
-
-    const tabs = this.getTabsForOwnerSelection(added, entity);
 
     return (
       <Basic.AbstractForm
@@ -336,9 +335,16 @@ export class RoleConceptDetail extends Basic.AbstractContent {
           }
           helpBlock={ this.i18n('entity.IdentityRole.roleSystem.help')}
           label={ this.i18n('entity.IdentityRole.roleSystem.label') }/>
-        <Basic.Tabs  onSelect={this.handleTabSwitch} activeKey={selectedOwnerType}>
-            { tabs }
-        </Basic.Tabs>
+          <AssignmentOwnerSelector
+              ref="ownerSelector"
+              entity={entity}
+              isNew={added}
+              accountId={accountId}
+              identityUsername = {identityUsername}
+              isAccount = {isAccount}
+              readOnly = {readOnly}
+              onChange={this._onChangeSelectOfContract.bind(this)}
+          />
         <Basic.LabelWrapper
           label={ this.i18n('entity.IdentityRole.automaticRole.label') }
           helpBlock={ this.i18n('entity.IdentityRole.automaticRole.help') }
@@ -377,54 +383,6 @@ export class RoleConceptDetail extends Basic.AbstractContent {
     );
   }
 
-  getTabsForOwnerSelection(added, entity) {
-    const { selectedOwnerType } = this.state;
-    const { identityUsername, accountId, isAccount, readOnly } = this.props;
-    const components = componentService.getRoleAssignmentComponents().toList();
-    const tabs = components.map(component => {
-          const ManagerType = component.ownerManager;
-          const managerInstance = new ManagerType();
-
-          let forceParams = new SearchParameters()
-              .setFilter('id', accountId)
-              .setFilter('validNowOrInFuture', true)
-              .setFilter('_permission', ['CHANGEPERMISSION', 'CANBEREQUESTED'])
-              .setFilter('_permission_operator', 'or')
-
-          if (!isAccount) {
-            forceParams = forceParams.setFilter('identity', identityUsername);
-          }
-
-          return <Basic.Tab value={component.ownerType}
-                            title={this.i18n(component.locale + '.label')}
-                            rendered={isAccount ? component.ownerType === selectedOwnerType : true}>
-            {
-              component.ownerType === selectedOwnerType ?
-                  (
-                      <component.ownerSelectComponent
-                          ref={component.ownerType}
-                          manager={managerInstance}
-                          forceSearchParameters={forceParams}
-                          defaultSearchParameters={
-                            new SearchParameters().clearSort()
-                          }
-                          pageSize={100}
-                          returnProperty={false}
-                          readOnly={!added || readOnly || !Utils.Entity.isNew(entity)}
-                          onChange={this._onChangeSelectOfContract.bind(this)}
-                          niceLabel={(owner) => managerInstance.getNiceLabel(owner, false)}
-                          required
-                          useFirst
-                          clearable={false}
-                          disabled={isAccount}
-                      />
-                  ) : <span/>
-            }
-          </Basic.Tab>
-        }
-    );
-    return tabs;
-  }
 }
 
 RoleConceptDetail.propTypes = {
