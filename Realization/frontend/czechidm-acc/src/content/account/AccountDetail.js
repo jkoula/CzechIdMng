@@ -503,6 +503,14 @@ class AccountDetail extends Basic.AbstractContent {
     });
   }
 
+  formatMultivalued(value) {
+    if (!value) {
+      return null;
+    }
+
+    return "🔑 " + value.replaceAll("\n","\n🔑 ");
+  }
+
   render() {
     const { entity } = this.props;
     const { rows, values, showEdit, changed, _showLoading, attrName, attrValue, showModal, focused } = this.state;
@@ -733,12 +741,12 @@ class AccountDetail extends Basic.AbstractContent {
                           {item.multiValue
                             ?
                             <Basic.Div>
-                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
+                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: 300 }}>{item.name}</p>
                               <TextField disabled={item.isRole} onBlur={this.focusLost.bind(this)}
                                 onChange={(e) => this.valueChange(e, item.key)} maxRows={4}
                                 autoComplete='off' multiline id="outlined-basic"
                                 value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
-                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 800 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label={this.i18n('control.manually')} />
                               </Basic.Div>
@@ -748,12 +756,12 @@ class AccountDetail extends Basic.AbstractContent {
                             </Basic.Div>
                             :
                             <Basic.Div>
-                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
+                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: 300 }}>{item.name}</p>
                               <TextField onBlur={this.focusLost.bind(this)}
                                 onChange={(e) => this.valueChange(e, item.key)} id="outlined-basic"
                                 autoComplete='off'
                                 value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
-                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 800 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" onDelete={(e) => this.stopOverride(e, item.key)} label={this.i18n('control.manually')} />
                               </Basic.Div>
@@ -765,20 +773,20 @@ class AccountDetail extends Basic.AbstractContent {
                           {item.multiValue
                             ?
                             <Basic.Div>
-                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
+                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: 300 }}>{item.name}</p>
                               <TextField disabled maxRows={4} multiline id="outlined-basic"
-                                value={(item.overridenValue != undefined ? item.overridenValue : item.value)}
-                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
+                                value={(item.overridenValue != undefined ? this.formatMultivalued(item.overridenValue) : (this.formatMultivalued(item.value)))}
+                                size="small" style={{ marginTop: -10, minWidth: 800 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" label={this.i18n('control.manually')} />
                               </Basic.Div>
                             </Basic.Div>
                             :
                             <Basic.Div>
-                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: '200px' }}>{item.name}</p>
+                              <p style={{ display: 'inline-block', marginRight: 10, minWidth: 300 }}>{item.name}</p>
                               <TextField disabled id="outlined-basic"
                                 value={(item.overridenValue != undefined ? item.overridenValue : (item.value ? item.value : ''))}
-                                size="small" style={{ marginTop: -10, minWidth: 400 }} />
+                                size="small" style={{ marginTop: -10, minWidth: 800 }} />
                               <Basic.Div rendered={item.overridenValue != undefined ? true : false} style={{ display: 'inline-block', marginTop: -10, marginLeft: 10 }}>
                                 <Chip color="secondary" size="small" label={this.i18n('control.manually')} />
                               </Basic.Div>
