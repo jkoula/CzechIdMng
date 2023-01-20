@@ -446,6 +446,11 @@ public class DefaultSysSystemMappingService
 		return mappings.get(0);
 	}
 
+	@Override
+	public SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType) {
+		return this.findProvisioningMapping(systemId, entityType, null);
+	}
+
 	private Integer getProtectionInterval(SysSystemMappingDto systemMapping) {
 
 		Assert.notNull(systemMapping, "Mapping cannot be null!");
