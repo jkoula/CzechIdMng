@@ -12,12 +12,15 @@ import eu.bcvsolutions.idm.core.api.service.IdmConceptRoleRequestManager;
 import eu.bcvsolutions.idm.core.api.service.IdmGeneralConceptRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.adapter.AdaptableService;
 import eu.bcvsolutions.idm.core.api.service.adapter.DtoAdapter;
+import eu.bcvsolutions.idm.core.api.utils.AutowireHelper;
+import eu.bcvsolutions.idm.core.api.utils.ReflectionUtils;
 import eu.bcvsolutions.idm.core.model.service.util.MultiSourcePagedResource;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
 import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.internal.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +48,7 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
             ModelMapper modelMapper, FilterManager filterManager) {
         super(modelMapper, conceptServices);
         this.conceptServices = conceptServices.stream()
-                .collect(Collectors.toMap(IdmGeneralConceptRoleRequestService::getType,
-                idmGeneralConceptRoleRequestService -> idmGeneralConceptRoleRequestService));
+                .collect(Collectors.toMap(IdmGeneralConceptRoleRequestService::getType, s -> s, ReflectionUtils::resolveMultipleServices));
         this.modelMapper = modelMapper;
         this.filterManager = filterManager;
     }

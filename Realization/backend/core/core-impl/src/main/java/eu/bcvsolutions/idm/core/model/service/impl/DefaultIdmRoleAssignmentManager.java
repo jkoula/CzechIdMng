@@ -49,7 +49,7 @@ public class DefaultIdmRoleAssignmentManager extends AbstractAdaptableMultiServi
 
         this.assignmentServices = assignmentServices.stream().collect(
                 Collectors.toMap(IdmRoleAssignmentService::getType,
-                idmGeneralConceptRoleRequestService ->  idmGeneralConceptRoleRequestService));
+                s ->  s, ReflectionUtils::resolveMultipleServices));
     }
 
     @Transactional(readOnly = true)
