@@ -87,6 +87,11 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     return searchParameters;
   }
 
+  componentDidMount() {
+    super.componentDidMount();
+    this.cancelFilter(null);
+  }
+
   useFilter(event) {
     if (event) {
       event.preventDefault();
