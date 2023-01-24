@@ -712,7 +712,7 @@ Due to breaking changes above, custom module requires some refactoring, before i
 - 🟠 ``SystemEntityType.IDENTITY`` ⇒ ``IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.CONTRACT`` ⇒ ``ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.ROLE`` ⇒ ``RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
-- 🟠 ``SystemEntityType.TREE`` ⇒ ``TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE``)
+- 🟠 ``SystemEntityType.TREE`` ⇒ ``TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.ROLE_CATALOGUE`` ⇒ ``RoleCatalogueSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.CONTRACT_SLICE`` ⇒ ``ContractSliceSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.IDENTITY_ROLE`` ⇒ ``IdentityRoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
