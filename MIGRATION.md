@@ -709,7 +709,7 @@ Due to breaking changes above, custom module requires some refactoring, before i
 
 > Case sensitive find is expected.
 
-- 🟡 ``SystemEntityType.IDENTITY`` ⇒ ``IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.IDENTITY`` ⇒ ``IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.CONTRACT`` ⇒ ``ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.ROLE`` ⇒ ``RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
 - 🟠 ``SystemEntityType.TREE`` ⇒ ``TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE``)
@@ -719,7 +719,7 @@ Due to breaking changes above, custom module requires some refactoring, before i
 
 ### Manual changes / cookbook
 
-- * Replaces above are expected*
+- *Replaces above are expected*
 - 🟠 **Account type** usage:
   - Account type is now a field of mapping, not of account itself. Remove setting the account type from account and set it for mapping.
 - 🟠 **Concept role request API** usage:
@@ -751,8 +751,8 @@ Starting with CzechIdM 13, roles can be assigned to objects other than contracts
 
 In general, the code you use in modules to work with role assignments should be backward compatible. However, without further changes, it will only work with identity roles (contract role assignments). If you want it to take other role assignments into consideration, you need to replace the specific services, DTOs, and filters for their abstract classes. For example:
 
-- 🟡 ``IdmIdentityRoleDto`` ⇒ ``AbstractRoleAssignmentDto``
-- 🟠 ``IdmIdentityRoleService`` ⇒ ``IdmRoleAssignmentService``
+- ``IdmIdentityRoleDto`` ⇒ ``AbstractRoleAssignmentDto``
+- ``IdmIdentityRoleService`` ⇒ ``IdmRoleAssignmentService``
 - ...
 
 Keep in mind, however, that this is major change in the business logic and that it may well not be necessary.
