@@ -163,7 +163,8 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 		// it must not exists
 		assertEquals(true, list.isEmpty());
 		//
-		IdentityRoleValidRequestTaskExecutor taskExecutor1 = new IdentityRoleValidRequestTaskExecutor(vrs);
+		IdentityRoleValidRequestTaskExecutor taskExecutor1 = new IdentityRoleValidRequestTaskExecutor();
+		taskExecutor1.setValidRequestServices(vrs);
 		
 		LongRunningFutureTask<Boolean> futureTask1 = longRunningTaskManager.execute(taskExecutor1);
 		assertEquals(true, futureTask1.getFutureTask().get());
@@ -185,7 +186,8 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 		identityRoleRepository.save(identityRole);
 		
 		// execute again
-		IdentityRoleValidRequestTaskExecutor taskExecutor2 = new IdentityRoleValidRequestTaskExecutor(vrs);
+		IdentityRoleValidRequestTaskExecutor taskExecutor2 = new IdentityRoleValidRequestTaskExecutor();
+		taskExecutor2.setValidRequestServices(vrs);
 
 		LongRunningFutureTask<Boolean> futureTask2 = longRunningTaskManager.execute(taskExecutor2);
 		
@@ -243,7 +245,8 @@ public class IdentityRoleValidRequestSchedulerTest extends AbstractIntegrationTe
 		list = identityRoleValidRequestService.findAllValid();
 		assertEquals(MAX_CREATE, list.size());
 		
-		IdentityRoleValidRequestTaskExecutor taskExecutor = new IdentityRoleValidRequestTaskExecutor(vrs);
+		IdentityRoleValidRequestTaskExecutor taskExecutor = new IdentityRoleValidRequestTaskExecutor();
+		taskExecutor.setValidRequestServices(vrs);
 		LongRunningFutureTask<Boolean> futureTask = longRunningTaskManager.execute(taskExecutor);
 		
 		assertEquals(true, futureTask.getFutureTask().get());
