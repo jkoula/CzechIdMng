@@ -1,7 +1,9 @@
 package eu.bcvsolutions.idm.core.scheduler.task.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -9,6 +11,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractRoleValidRequestDto;
 import eu.bcvsolutions.idm.core.api.service.RoleAssignmentValidRequestService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.PersistJobDataAfterExecution;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.core.scheduler.api.service.AbstractSchedulableTaskExecutor;
@@ -26,13 +29,27 @@ public class IdentityRoleValidRequestTaskExecutor extends AbstractSchedulableTas
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(IdentityRoleValidRequestTaskExecutor.class);
     public static final String TASK_NAME = "core-identity-role-valid-request-long-running-task";
 
-    private final List<RoleAssignmentValidRequestService<AbstractRoleValidRequestDto<?>>> validRequestServices;
+    private List<RoleAssignmentValidRequestService<AbstractRoleValidRequestDto<?>>> validRequestServices;
 
-    public IdentityRoleValidRequestTaskExecutor(List<RoleAssignmentValidRequestService> vrs) {
+    @Autowired
+    public IdentityRoleValidRequestTaskExecutor() {
+    }
+
+    public List<RoleAssignmentValidRequestService<AbstractRoleValidRequestDto<?>>> getValidRequestServices() {
+        return validRequestServices;
+    }
+
+    /**
+     * Setter injection is used here, because {@link eu.bcvsolutions.idm.core.scheduler.api.service.SchedulerManager} needs to
+     * have no arg constructor.
+     * 
+     * @param vrs
+     */
+    @Autowired
+    public void setValidRequestServices(List<RoleAssignmentValidRequestService> vrs) {
         this.validRequestServices = new ArrayList<>();
         vrs.forEach(validRequestServices::add);
     }
-
 
     @Override
     public String getName() {
