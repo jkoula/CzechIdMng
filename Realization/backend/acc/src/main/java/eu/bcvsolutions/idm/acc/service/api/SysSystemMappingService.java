@@ -101,6 +101,15 @@ public interface SysSystemMappingService extends EventableDtoService<SysSystemMa
 	 * @return
 	 */
 	SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType, UUID mappingId);
+
+	/**
+	 * Find provisioning mapping on the given system and for entity type.
+	 *
+	 * @param systemId
+	 * @param entityType
+	 * @return
+	 */
+	SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType);
 	
 	/**
 	 * Duplication of mapping attributes.
