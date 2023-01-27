@@ -1,6 +1,6 @@
 [![Java CI](https://github.com/bcvsolutions/CzechIdMng/actions/workflows/maven.yml/badge.svg)](https://github.com/bcvsolutions/CzechIdMng/actions/workflows/maven.yml)
 
-# CzechIdM 12
+# CzechIdM 13
 
 CzechIdM is an opensource identity management tool for user accounts that automates the operations associated with establishing and managing identities.
 
