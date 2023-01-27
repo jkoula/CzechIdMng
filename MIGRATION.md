@@ -684,3 +684,75 @@ _Working (manually added timeout):_
       }, 10);
     });
 </code></pre>
+
+# Migration Guide : CzechIdM 12.2.x to CzechIdM 13.0.x
+
+## 💡 Introduction
+
+This guide describes the various things that are needed when migrating from CzechIdM version 12.2.x to version 13.
+Version 13 brings changes to role assignments which are not backward compatible.
+
+The changes that are needed to run CzechIdM 13 are only relevant if you use a custom module.
+
+# 🌗 Backend
+
+## Breaking changes
+
+- **Role assignment changed** - there were API changes made to role assignment which require changes in your custom module. Roles can now be assigned to other objects - in CzechIdM 13, this means accounts.
+- **Registrable system entity types** - system entity types are no longer represented just as a static enum but can now be registered in a custom module.
+
+## Update custom module
+
+Due to breaking changes above, custom module requires some refactoring, before it's compatible with CzechIdM version 13. Some refactoring can be done with replaces, but some places need to be changed manually.
+
+### Replaces
+
+> Case sensitive find is expected.
+
+- 🟠 ``SystemEntityType.IDENTITY`` ⇒ ``IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.CONTRACT`` ⇒ ``ContractSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.ROLE`` ⇒ ``RoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.TREE`` ⇒ ``TreeSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.ROLE_CATALOGUE`` ⇒ ``RoleCatalogueSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.CONTRACT_SLICE`` ⇒ ``ContractSliceSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+- 🟠 ``SystemEntityType.IDENTITY_ROLE`` ⇒ ``IdentityRoleSynchronizationExecutor.SYSTEM_ENTITY_TYPE``
+
+### Manual changes / cookbook
+
+- *Replaces above are expected*
+- 🟠 **Account type** usage:
+  - Account type is now a field of mapping, not of account itself. Remove setting the account type from account and set it for mapping.
+- 🟠 **Concept role request API** usage:
+  - Due to the added possibility to assign role to object other than the identity, concept role requests can now exist for different entities as well. This requires some replaces:
+  - Example:
+  ```java
+    @Autowired private IdmConceptRoleRequestService conceptRoleRequestService;
+    //
+    List<IdmConceptRoleRequestDto> concepts = request.getConceptRoles();
+    for (IdmConceptRoleRequestDto concept : concepts) {
+      concept.setRoleRequest(request.getId());		
+      conceptRoleRequestService.save(concept);
+    }
+  ```
+  needs to be changed to
+  
+  ```java
+    @Autowired private IdmConceptRoleRequestManager conceptRoleRequestManager;				
+    //
+    List<AbstractConceptRoleRequestDto> concepts = request.getConceptRoles();
+    for (AbstractConceptRoleRequestDto concept : concepts) {
+      concept.setRoleRequest(request.getId());
+      conceptRoleRequestManager.getServiceForConcept(concept).save(concept);
+    }
+  ```
+### Changes to role assignment
+
+Starting with CzechIdM 13, roles can be assigned to objects other than contracts, namely, accounts.
+
+In general, the code you use in modules to work with role assignments should be backward compatible. However, without further changes, it will only work with identity roles (contract role assignments). If you want it to take other role assignments into consideration, you need to replace the specific services, DTOs, and filters for their abstract classes. For example:
+
+- ``IdmIdentityRoleDto`` ⇒ ``AbstractRoleAssignmentDto``
+- ``IdmIdentityRoleService`` ⇒ ``IdmRoleAssignmentService``
+- ...
+
+Keep in mind, however, that this is major change in the business logic and that it may well not be necessary.
