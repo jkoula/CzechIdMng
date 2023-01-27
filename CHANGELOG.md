@@ -7,12 +7,12 @@ All notable changes to this project will be documented in this file.
 ### Administrator
 - 🟠 [#3016](https://redmine.czechidm.com/issues/3016) - In the provisioning archive, the boolean value 'false' was displayed as an empty String. It now behaves as expected.
   - If you use a virtual system to which you added a custom attribute of the type `java.lang.Boolean`, make sure to change the type of the attribute in the form definition of the system's accounts (VsAccount type) to Boolean. Otherwise, you will see failures in the provisioning.
-- 🟠 [#3156](https://redmine.czechidm.com/issues/3156) - Configuration property `idm.pub.app.show.identityRole.table.columns` now supports column `owner`, which serves as a universal replacement for the original column `identityContract`. This column is displayed by default, but if you use this configuration property to change order of columns, you need to replace original property name with the new one.
-- 🟠 [#1362](https://redmine.czechidm.com/issues/1362) - It is now not possible to override attribute strategy and create a conflict. Such setting will result in an account management error. To prevent this, administrator should do these steps after upgrading to version 13.0.0:
-  - Execute SystemAttributeMappingStrategyRecalculationTaskExecutor task, which is going to set mapping strategies according to system attribute mapping
+- 🟠 [#3156](https://redmine.czechidm.com/issues/3156) - Configuration property `idm.pub.app.show.identityRole.table.columns` now supports column `owner`, which serves as a universal replacement for the original column `identityContract`. This column is displayed by default, but if you use this configuration property to change order of columns, you need to replace the original property name with the new one.
+- 🟠 [#1362](https://redmine.czechidm.com/issues/1362) - It is now not possible to override attribute strategy for role mapping and create a conflict between the role mapping and the system mapping. Such setting would result in an account management error. To prevent this, administrator should do these steps after upgrading to version 13.0.0:
+  - Execute SystemAttributeMappingStrategyRecalculationTaskExecutor task, which is going to set the role mapping strategies according to the system attribute mapping.
   - Review changes that SystemAttributeMappingStrategyRecalculationTaskExecutor made (using transaction audit) and make sure that provisioning behaves as expected.
 - 🟡 [#3158](https://redmine.czechidm.com/issues/3158) - All role requests should be resolved prior upgrading to version 13.0.0. Make sure no approval workflow is unresolved.
-- 🟡 [#3164](https://redmine.czechidm.com/issues/3164) - In order to show preovisioning operations for an account in the new account detail, administrator must execute following query:
+- 🟡 [#3164](https://redmine.czechidm.com/issues/3164) - In order to show provisioning operations for an account in the new account detail, administrator must execute following query:
 
       UPDATE sys_provisioning_archive
       SET account_id=subquery.id
@@ -22,10 +22,8 @@ All notable changes to this project will be documented in this file.
       sys_provisioning_archive.system_id=subquery.system_id and
       sys_provisioning_archive.entity_type=subquery.entity_type;
 
-
-
 ### Developer
-- 🟠 [#3158](https://redmine.czechidm.com/issues/3158) - Version 13.0.0 introduces possibility to assign role to other entities than identity contracts. This change brings few challenges for developers:
+- 🟠 [#3158](https://redmine.czechidm.com/issues/3158) - Version 13.0.0 introduces the possibility to assign role to entities other than identity contracts. This change brings a few challenges for developers:
   - There is a new abstract predecessor to all types of role assignments - `AbstractRoleAssignment` which allows developers to abstract common behavior for all role assignment types.
   - There is a new API for working with `AbstractRoleAssignment` and its main entry point is `RoleAssignmentManager`
   - All assignment types havve their specific service API, which enables developers to target logic specific for each assignment type. Similar changes have been made to `IdmConceptRoleRequest`, which is now a subtype of `AbstractConceptRoleRequest`.
