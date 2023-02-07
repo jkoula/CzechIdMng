@@ -642,7 +642,7 @@ def applicantIdentity = identityService.getByUsername(applicantUsername);
 def implementerIdentity = identityService.get(implementerIdentifier);
 
 // transform date
-DateTimeFormatter dateFormat = DateTimeFormatter.forPattern("dd. MM. yyyy HH:mm");
+DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd. MM. yyyy HH:mm");
 def from = dateFormat.format(entityEvent.content.created);
 
 def managerDescription = execution.getVariable("managerDescription");
