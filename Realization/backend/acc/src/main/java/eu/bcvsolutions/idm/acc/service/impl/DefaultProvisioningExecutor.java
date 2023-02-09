@@ -200,6 +200,7 @@ public class DefaultProvisioningExecutor implements ProvisioningExecutor {
 				});
 				// thread pool is not used here
 				Thread thread = new Thread(new DelegatingSecurityContextRunnable(new DelegatingTransactionContextRunnable(futureTask)));
+				thread.setName("provisioning: " + provisioningOperation.getSystem() + ":" + provisioningOperation.getSystemEntityUid());
 				thread.start();
 				//
 				// global timeout by configuration
