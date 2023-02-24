@@ -1,8 +1,10 @@
 package eu.bcvsolutions.idm.core.security.service.impl;
 
+import java.net.Proxy;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -27,11 +29,24 @@ import eu.bcvsolutions.idm.core.security.api.service.RecaptchaService;
 @Service("recaptchaService")
 public class DefaultRecaptchaService implements RecaptchaService {
 
-	@Autowired @Lazy private RestTemplate restTemplate;
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultRecaptchaService.class);
+
 	@Autowired private RecaptchaConfiguration recaptchaConfiguration;
 
 	@Override
 	public RecaptchaResponse checkRecaptcha(RecaptchaRequest req) {
+		Proxy proxy = recaptchaConfiguration.getProxy();
+		RestTemplate restTemplate = null;
+		if (proxy == null) {
+			restTemplate = new RestTemplate();
+			LOG.debug("ReCaptcha will not use proxy conffiguration.");
+		} else {
+			SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+			requestFactory.setProxy(proxy);
+			restTemplate = new RestTemplate(requestFactory);
+			LOG.debug("ReCaptcha will use proxy conffiguration: [{}].", proxy.address().toString());
+		}
+
 		// If i tried to send is as an Entity, google API didn't understand the message
 		// and returned errors. Therefore this map.
 		MultiValueMap<String, String> body = createBody(recaptchaConfiguration.getSecretKey().asString(), req.getRemoteIp(), req.getResponse());
