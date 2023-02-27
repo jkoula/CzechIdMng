@@ -43,16 +43,6 @@ public class DefaultRecaptchaConfiguration extends AbstractConfiguration impleme
 
 	@Override
 	public Proxy getProxy() {
-		String proxyConfig = this.getConfigurationService().getValue(PROPERTY_PROXY_URL);
-
-		// Backward compatibility
-		if (StringUtils.isBlank(proxyConfig)) {
-			proxyConfig = this.getConfigurationService().getValue(RestTemplateConfig.PROXY_KEY);
-			if (StringUtils.isNotBlank(proxyConfig)) {
-				LOG.warn("ReCaptcha use old behavior for proxy settings! Please update your configuration with [{}] configuration property", PROPERTY_PROXY_URL);
-			}
-		}
-
-		return RestTemplateConfig.parseProxy(proxyConfig);
+		return RestTemplateConfig.parseProxy(this.getConfigurationService().getValue(PROPERTY_PROXY_URL));
 	}
 }
