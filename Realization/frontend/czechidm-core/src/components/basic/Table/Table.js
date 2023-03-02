@@ -7,7 +7,8 @@ import classNames from 'classnames';
 import Waypoint from 'react-waypoint';
 //
 import * as Utils from '../../../utils';
-import AbstractContextComponent from '../AbstractContextComponent/AbstractContextComponent';
+import AbstractContextComponent
+from '../AbstractContextComponent/AbstractContextComponent';
 import Loading from '../Loading/Loading';
 import Alert from '../Alert/Alert';
 import Row from './Row';
@@ -51,7 +52,7 @@ class Table extends AbstractContextComponent {
   }
 
   componentDidMount() {
-    const { collapsed } = this.props;
+    const {collapsed} = this.props;
     if (collapsed) {
       this._setCollapsed(collapsed);
     }
@@ -62,7 +63,7 @@ class Table extends AbstractContextComponent {
       event.preventDefault();
     }
     //
-    const { collapsed } = this.state;
+    const {collapsed} = this.state;
     this._setCollapsed(!collapsed);
   }
 
@@ -70,7 +71,7 @@ class Table extends AbstractContextComponent {
     this.setState({
       collapsed
     }, () => {
-      const { uiKey, collapsible } = this.props;
+      const {uiKey, collapsible} = this.props;
       //
       if (uiKey && _.isFunction(collapsible)) {
         collapsible(uiKey, collapsed);
@@ -103,7 +104,7 @@ class Table extends AbstractContextComponent {
     // if columns aren't specified, then resolve columns from given data object
     if (children.length === 0) {
       let properties = [];
-      const { data } = this.props;
+      const {data} = this.props;
       if (data && data.length !== 0) {
         // we can not use just first object, because first row could not contain all properties filled
         data.forEach(row => {
@@ -117,7 +118,7 @@ class Table extends AbstractContextComponent {
       }
       properties.forEach(property => {
         children.push(
-          <DefaultCell property={ property } data={ data }/>
+          <DefaultCell property={property} data={data}/>
         );
       });
     }
@@ -145,7 +146,7 @@ class Table extends AbstractContextComponent {
           if (!propertyValue.hasOwnProperty(nestedProperty)) {
             continue;
           }
-          properties = this._appendProperty(properties, nestedProperty, propertyValue[nestedProperty], `${ propertyPrefix }${ property }.`);
+          properties = this._appendProperty(properties, nestedProperty, propertyValue[nestedProperty], `${propertyPrefix}${property}.`);
         }
       } else {
         properties.push(propertyPrefix + property);
@@ -168,7 +169,7 @@ class Table extends AbstractContextComponent {
     return newColumns;
   }
 
-  _showRowSelection({ rowIndex, data, showRowSelection }) {
+  _showRowSelection({rowIndex, data, showRowSelection}) {
     if (typeof showRowSelection === 'function') {
       return showRowSelection({
         rowIndex,
@@ -179,7 +180,7 @@ class Table extends AbstractContextComponent {
   }
 
   selectRow(rowIndex, selected) {
-    const { selectRowCb } = this.props;
+    const {selectRowCb} = this.props;
     let newSelectedRows;
     if (selectRowCb != null) {
       newSelectedRows = selectRowCb(rowIndex, selected);
@@ -188,10 +189,10 @@ class Table extends AbstractContextComponent {
       newSelectedRows = (selected ? this.state.selectedRows.add(recordId) : this.state.selectedRows.remove(recordId));
     } else { // de/select all
       newSelectedRows = this.state.selectedRows;
-      const { data } = this.props;
+      const {data} = this.props;
       //
       for (let i = 0; i < data.length; i++) {
-        if (this._showRowSelection({ ...this.props, rowIndex: i })) {
+        if (this._showRowSelection({...this.props, rowIndex: i})) {
           if (selected) {
             newSelectedRows = newSelectedRows.add(this.getIdentifier(i));
           } else {
@@ -209,7 +210,7 @@ class Table extends AbstractContextComponent {
    * Clears row selection
    */
   clearSelectedRows() {
-    const { selectedRows } = this.state;
+    const {selectedRows} = this.state;
     //
     this.setState({
       selectedRows: selectedRows.clear()
@@ -217,7 +218,7 @@ class Table extends AbstractContextComponent {
   }
 
   _onRowSelect(rowIndex, selected, selection) {
-    const { onRowSelect } = this.props;
+    const {onRowSelect} = this.props;
     if (!onRowSelect) {
       return;
     }
@@ -229,8 +230,8 @@ class Table extends AbstractContextComponent {
   }
 
   _isAllRowsSelected() {
-    const { data, isAllRowsSelectedCb } = this.props;
-    const { selectedRows } = this.state;
+    const {data, isAllRowsSelectedCb} = this.props;
+    const {selectedRows} = this.state;
     if (isAllRowsSelectedCb) {
       return isAllRowsSelectedCb();
     }
@@ -239,7 +240,7 @@ class Table extends AbstractContextComponent {
     }
     let enabledRowsCount = 0;
     for (let i = 0; i < data.length; i++) {
-      if (this._showRowSelection({ ...this.props, rowIndex: i })) {
+      if (this._showRowSelection({...this.props, rowIndex: i})) {
         if (!selectedRows.has(this.getIdentifier(i))) {
           return false;
         }
@@ -255,19 +256,25 @@ class Table extends AbstractContextComponent {
   }
 
   getIdentifier(rowIndex) {
-    const { data } = this.props;
+    const {data} = this.props;
     return data[rowIndex][this.getIdentifierProperty()];
   }
 
   _incrementData() {
-    const { showMax } = this.state;
+    const {showMax} = this.state;
     this.setState({
       showMax: showMax + FE_PAGE_SIZE
     });
   }
 
   renderHeader(columns) {
-    const { showLoading, showRowSelection, noHeader, data, draggable } = this.props;
+    const {
+      showLoading,
+      showRowSelection,
+      noHeader,
+      data,
+      draggable
+    } = this.props;
     if (noHeader) {
       return null;
     }
@@ -277,21 +284,21 @@ class Table extends AbstractContextComponent {
       <thead key="basic-table-header">
         <Row
           key="row-header"
-          columns={ headerColumns }
-          rowIndex={ -1 }
-          showLoading={ showLoading }
-          showRowSelection={ showRowSelection }
-          onRowSelect={ showRowSelection ? this.selectRow.bind(this) : null }
-          selected={ this._isAllRowsSelected() }
-          data={ data }
-          draggable={ draggable }/>
+          columns={headerColumns}
+          rowIndex={-1}
+          showLoading={showLoading}
+          showRowSelection={showRowSelection}
+          onRowSelect={showRowSelection ? this.selectRow.bind(this) : null}
+          selected={this._isAllRowsSelected()}
+          data={data}
+          draggable={draggable}/>
       </thead>
     );
   }
 
   handleStart(event, dnd) {
     const rowTableIndex = dnd.node.rowIndex;
-    const { noHeader } = this.props;
+    const {noHeader} = this.props;
     const startIndex = noHeader ? rowTableIndex : rowTableIndex - 1;
     //
     this.setState({
@@ -301,8 +308,8 @@ class Table extends AbstractContextComponent {
   }
 
   handleDrag(event, dnd) {
-    const { startIndex } = this.state;
-    const { data } = this.props;
+    const {startIndex} = this.state;
+    const {data} = this.props;
     const tableBody = $(this.tableBodyRef.current);
     const curentRowIndex = startIndex + 1;
     //
@@ -319,9 +326,9 @@ class Table extends AbstractContextComponent {
         if (index === curentRowIndex) {
           continue;
         }
-        const rowBefore = tableBody.find(`tr:nth-child(${ index })`);
+        const rowBefore = tableBody.find(`tr:nth-child(${index})`);
         rowBefore.css({
-          transform: `translate(0px, ${ -Row.DRAGABLE_ROW_HEIGHT }px)`
+          transform: `translate(0px, ${-Row.DRAGABLE_ROW_HEIGHT}px)`
         });
       }
       //
@@ -330,7 +337,7 @@ class Table extends AbstractContextComponent {
       //
       // next
       for (let index = startIndex + differenceIndex + 2; index <= data.length; index++) {
-        const rowAfter = tableBody.find(`tr:nth-child(${ index })`);
+        const rowAfter = tableBody.find(`tr:nth-child(${index})`);
         rowAfter.css({
           transform: 'translate(0px, 0px)'
         });
@@ -339,7 +346,7 @@ class Table extends AbstractContextComponent {
       differenceIndex = parseInt((dnd.y - (Row.DRAGABLE_ROW_HEIGHT / 2)) / Row.DRAGABLE_ROW_HEIGHT, 10);
       // move up
       for (let index = 1; index <= startIndex + differenceIndex; index++) {
-        const rowAfter = tableBody.find(`tr:nth-child(${ index })`);
+        const rowAfter = tableBody.find(`tr:nth-child(${index})`);
         rowAfter.css({
           transform: 'translate(0px, 0px)'
         });
@@ -353,9 +360,9 @@ class Table extends AbstractContextComponent {
           continue;
         }
         if (index !== data.length) {
-          const rowBefore = tableBody.find(`tr:nth-child(${ index })`);
+          const rowBefore = tableBody.find(`tr:nth-child(${index})`);
           rowBefore.css({
-            transform: `translate(0px, ${ Row.DRAGABLE_ROW_HEIGHT }px)`
+            transform: `translate(0px, ${Row.DRAGABLE_ROW_HEIGHT}px)`
           });
         }
       }
@@ -371,10 +378,10 @@ class Table extends AbstractContextComponent {
   }
 
   handleStop(event, dnd) {
-    const { data, onDraggableStop } = this.props;
-    const { startIndex, differenceIndex } = this.state;
+    const {data, onDraggableStop} = this.props;
+    const {startIndex, differenceIndex} = this.state;
     const tableBody = $(this.tableBodyRef.current); // internal content elemet to enable jquery integration
-    const currentRow = tableBody.find(`tr:nth-child(${ startIndex + 1 })`);
+    const currentRow = tableBody.find(`tr:nth-child(${startIndex + 1})`);
     //
     if (dnd.y > 0) { // move down
       const remain = dnd.y % Row.DRAGABLE_ROW_HEIGHT;
@@ -399,8 +406,8 @@ class Table extends AbstractContextComponent {
   }
 
   renderBody(columns) {
-    const { data, showLoading, supportsPagination } = this.props;
-    const { showMax } = this.state;
+    const {data, showLoading, supportsPagination} = this.props;
+    const {showMax} = this.state;
     if (!data || data.length === 0) {
       return null;
     }
@@ -409,29 +416,29 @@ class Table extends AbstractContextComponent {
       rows.push(this.renderRow(columns, i));
     }
     return (
-      <tbody ref={ this.tableBodyRef } className="basic-table-body">
-        { rows }
+      <tbody ref={this.tableBodyRef} className="basic-table-body">
+        {rows}
         {
           !supportsPagination
-          ||
-          showLoading
-          ||
-          showMax >= data.length
-          ||
-          <tr>
-            <th colSpan={ columns.length }>
-              <div className="text-center" style={{ padding: 15, color: '#ccc' }}>
-                <Icon value="fa:refresh" showLoading />
-              </div>
-              <div>
-                <Waypoint onEnter={ this._incrementData.bind(this) }>
-                  <div>
-                    { ' ' }
-                  </div>
-                </Waypoint>
-              </div>
-            </th>
-          </tr>
+        ||
+        showLoading
+        ||
+        showMax >= data.length
+        ||
+        <tr>
+          <th colSpan={columns.length}>
+            <div className="text-center" style={{padding: 15, color: '#ccc'}}>
+              <Icon value="fa:refresh" showLoading/>
+            </div>
+            <div>
+              <Waypoint onEnter={this._incrementData.bind(this)}>
+                <div>
+                  {' '}
+                </div>
+              </Waypoint>
+            </div>
+          </th>
+        </tr>
         }
       </tbody>
     );
@@ -447,29 +454,29 @@ class Table extends AbstractContextComponent {
       isRowSelectedCb,
       draggable
     } = this.props;
-    const key = `row-${ rowIndex }`;
+    const key = `row-${rowIndex}`;
     return (
       <Row
-        key={ key }
-        data={ data }
-        columns={ columns }
-        rowIndex={ rowIndex }
-        showRowSelection={ showRowSelection }
-        onRowSelect={ showRowSelection ? this.selectRow.bind(this) : null }
+        key={key}
+        data={data}
+        columns={columns}
+        rowIndex={rowIndex}
+        showRowSelection={showRowSelection}
+        onRowSelect={showRowSelection ? this.selectRow.bind(this) : null}
         selected={
           isRowSelectedCb === null
-          ?
-          this.state.selectedRows.has(this.getIdentifier(rowIndex))
-          :
-          isRowSelectedCb(this.getIdentifier(rowIndex))
+            ?
+            this.state.selectedRows.has(this.getIdentifier(rowIndex))
+            :
+            isRowSelectedCb(this.getIdentifier(rowIndex))
         }
-        onClick={ onRowClick }
-        onDoubleClick={ onRowDoubleClick }
-        rowClass={ rowClass }
-        draggable={ draggable }
-        handleStart={ this.handleStart.bind(this) }
-        handleDrag={ this.handleDrag.bind(this) }
-        handleStop={ this.handleStop.bind(this) }/>
+        onClick={onRowClick}
+        onDoubleClick={onRowDoubleClick}
+        rowClass={rowClass}
+        draggable={draggable}
+        handleStart={this.handleStart.bind(this)}
+        handleDrag={this.handleDrag.bind(this)}
+        handleStop={this.handleStop.bind(this)}/>
     );
   }
 
@@ -494,7 +501,7 @@ class Table extends AbstractContextComponent {
       draggable,
       collapsible
     } = this.props;
-    const { collapsed } = this.state;
+    const {collapsed} = this.state;
     //
     if (!rendered) {
       return null;
@@ -505,38 +512,19 @@ class Table extends AbstractContextComponent {
     const body = this.renderBody(columns);
     const footer = this.renderFooter();
     const classNamesTable = classNames(
-      { table: true },
-      { 'table-hover': hover},
-      { 'table-condensed': condensed },
-      { 'table-no-header': noHeader }
+      {table: true},
+      {'table-hover': hover},
+      {'table-condensed': condensed},
+      {'table-no-header': noHeader}
     );
     //
     const content = [];
-    /*
-    const kkk = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-    content.push(columnsHeaders);
-    content.push(
-      kkk.map(row => (
-        <tr key="row-show-loading">
-          {
-            columns.map(columnsHeaders => (
-              <td style={{ padding: 0 }}>
-                <div style={{ height: 40, backgroundColor: '#efefef', borderRadius: 3, margin: 8 }} />
-              </td>
-            ))
-          }
-          <td style={{ padding: 0 }}>
-            <div style={{ height: 40, backgroundColor: '#efefef', borderRadius: 3, margin: 8 }} />
-          </td>
-        </tr>
-      ))
-    );*/
 
     if (!data || data.length === 0) {
       if (showLoading) {
         content.push(
           <tr key="row-show-loading">
-            <td colSpan={ columns.length }>
+            <td colSpan={columns.length}>
               <Loading showLoading className="static"/>
             </td>
           </tr>
@@ -544,8 +532,8 @@ class Table extends AbstractContextComponent {
       } else {
         content.push(
           <tr key="row-no-data">
-            <td colSpan={ columns.length }>
-              <Alert text={ noData } className="no-data"/>
+            <td colSpan={columns.length}>
+              <Alert text={noData} className="no-data"/>
             </td>
           </tr>
         );
@@ -556,36 +544,36 @@ class Table extends AbstractContextComponent {
       content.push(footer);
     }
     //
-    const _style = { cursor: 'pointer' };
+    const _style = {cursor: 'pointer'};
     if (!collapsed) {
       _style.color = '#ccc';
     }
     //
     return (
       <div
-        key={ uiKey && draggable ? `${ uiKey }-${ Utils.Ui.getComponentKey(data) }` : null }
-        className={ classNames(className, 'basic-table') }
-        style={ supportsPagination ? {} : { overflowX: 'auto' } }>
-        <Loading showLoading={ showLoading && data && data.length > 0 }>
-          <table className={ classNamesTable } style={ style }>
+        key={uiKey && draggable ? `${uiKey}-${Utils.Ui.getComponentKey(data)}` : null}
+        className={classNames(className, 'basic-table')}
+        style={supportsPagination ? {} : {overflowX: 'auto'}}>
+        <Loading showLoading={showLoading && data && data.length > 0}>
+          <table className={classNamesTable} style={style}>
             {
               !header || noHeader
               ||
               <thead>
                 <tr className="basic-table-header">
                   <th
-                    colSpan={ columns.length }
-                    style={ collapsed ? { borderBottom: 0 } : {} }>
-                    <div style={{ display: 'flex', alignItems: 'center'}}>
-                      <div style={{ flex: 1 }}>
-                        { header }
+                    colSpan={columns.length}
+                    style={collapsed ? {borderBottom: 0} : {}}>
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                      <div style={{flex: 1}}>
+                        {header}
                       </div>
                       <Icon
-                        icon={ !collapsed ? 'fa:angle-double-up' : 'fa:angle-double-down' }
-                        style={ _style }
-                        onClick={ (event) => this.toogleCollapse(event) }
-                        rendered={ collapsible !== false }
-                        title={ !collapsed ? this.i18n('button.collapse.title') : this.i18n('button.expand.title') }/>
+                        icon={!collapsed ? 'fa:angle-double-up' : 'fa:angle-double-down'}
+                        style={_style}
+                        onClick={(event) => this.toogleCollapse(event)}
+                        rendered={collapsible !== false}
+                        title={!collapsed ? this.i18n('button.collapse.title') : this.i18n('button.expand.title')}/>
                     </div>
                   </th>
                 </tr>
