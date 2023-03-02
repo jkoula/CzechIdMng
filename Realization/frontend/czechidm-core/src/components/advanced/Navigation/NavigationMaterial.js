@@ -46,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   root: {
-    display: 'flex'
+    display: 'flex',
+    overflow: 'hidden'
   },
   appBarRoot: {
     backgroundColor:
@@ -118,6 +119,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
     marginLeft: -35, // FIXME: where is gutter?
+    overflow: 'hidden',
     [theme.breakpoints.up('sm')]: {
       marginLeft: -50, // FIXME: where is gutter?
     },
