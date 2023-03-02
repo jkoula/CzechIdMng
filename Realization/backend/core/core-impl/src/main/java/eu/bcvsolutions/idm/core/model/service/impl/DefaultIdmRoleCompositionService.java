@@ -14,9 +14,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -43,6 +43,7 @@ import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition;
 import eu.bcvsolutions.idm.core.model.entity.IdmRoleComposition_;
 import eu.bcvsolutions.idm.core.model.entity.IdmRole_;
+import eu.bcvsolutions.idm.core.model.event.AbstractRoleAssignmentEvent;
 import eu.bcvsolutions.idm.core.model.event.IdentityRoleEvent;
 import eu.bcvsolutions.idm.core.model.repository.IdmRoleCompositionRepository;
 import eu.bcvsolutions.idm.core.security.api.domain.BasePermission;
@@ -75,7 +76,7 @@ public class DefaultIdmRoleCompositionService
 	}
 	
 	@Override
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void deleteInternal(IdmRoleCompositionDto dto) {
 		super.deleteInternal(dto);
 		// clear cache right here => delete is asynchronous
