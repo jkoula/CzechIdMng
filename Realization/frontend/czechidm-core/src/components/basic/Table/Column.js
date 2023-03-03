@@ -89,7 +89,12 @@ Column.propTypes = {
   /**
    * css
    */
-  className: PropTypes.string
+  className: PropTypes.string,
+
+  forceWrap: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.oneOf(['anywhere', 'break-word'])
+  ])
 }
 Column.defaultProps = {
   rendered: true

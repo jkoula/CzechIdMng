@@ -1358,6 +1358,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           property={column.props.property}
           rendered={column.props.rendered}
           className={column.props.className}
+          forceWrap={column.props.forceWrap}
           width={column.props.width}
           header={columnHeader}
           title={columnTitle}

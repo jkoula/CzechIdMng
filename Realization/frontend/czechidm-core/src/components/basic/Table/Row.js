@@ -99,7 +99,7 @@ class Row extends AbstractContextComponent {
     const cells = new Array(columns.length)
     for (let i = 0, j = columns.length; i < j; i++) {
       const columnProps = columns[i].props
-      console.log({columnProps})
+
       cells[i] = (
         <Cell
           key={`cell_${i}`}

@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { isFunction } from 'swiss-knife-utils'
+import classNames from 'classnames'
+import { isFunction, isString } from 'swiss-knife-utils'
 //
 import AbstractComponent from '../AbstractComponent/AbstractComponent'
 import DefaultCell from './DefaultCell'
@@ -21,6 +22,7 @@ class Cell extends AbstractComponent {
       showLoading,
       width,
       className,
+      forceWrap,
       ...props
     } = this.props
     const cellProps = {
@@ -70,7 +72,11 @@ class Cell extends AbstractComponent {
     }
 
     return (
-      <td style={innerStyle} className={className}>
+      <td style={innerStyle}
+          className={classNames(className, {
+            forceWrap,
+            [`forceWrap-${forceWrap}`]: forceWrap && isString(forceWrap)
+          })}>
         {content}
       </td>
     )
@@ -90,7 +96,12 @@ Cell.propTypes = {
   /**
    * input data as array of json objects
    */
-  data: PropTypes.array
+  data: PropTypes.array,
+
+  forceWrap: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.oneOf(['anywhere', 'break-word'])
+  ])
 }
 
 Cell.defaultProps = {}

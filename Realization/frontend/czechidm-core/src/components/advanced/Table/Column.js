@@ -73,7 +73,12 @@ AdvancedColumn.propTypes = {
   /**
    * If component is rendered on page
    */
-  rendered: PropTypes.bool
+  rendered: PropTypes.bool,
+
+  forceWrap: PropTypes.oneOfType([
+    PropTypes.bool,
+    PropTypes.oneOf(['anywhere', 'break-word'])
+  ])
 }
 AdvancedColumn.defaultProps = {
   rendered: true
