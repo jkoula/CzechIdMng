@@ -1,24 +1,24 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import invariant from 'invariant';
-import _ from 'lodash';
-import Immutable from 'immutable';
-import moment from 'moment';
-import classnames from 'classnames';
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import invariant from 'invariant'
+import _ from 'lodash'
+import Immutable from 'immutable'
+import moment from 'moment'
+import classnames from 'classnames'
 //
-import Menu from '@material-ui/core/Menu';
-import MenuList from '@material-ui/core/MenuList';
-import Divider from '@material-ui/core/Divider';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu'
+import MenuList from '@material-ui/core/MenuList'
+import Divider from '@material-ui/core/Divider'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
+import IconButton from '@material-ui/core/IconButton'
 //
-import * as Basic from '../../basic';
-import * as Utils from '../../../utils';
-import * as Domain from '../../../domain';
-import UuidInfo from '../UuidInfo/UuidInfo';
-import RefreshButton from './RefreshButton';
-import Filter from '../Filter/Filter';
+import * as Basic from '../../basic'
+import * as Utils from '../../../utils'
+import * as Domain from '../../../domain'
+import UuidInfo from '../UuidInfo/UuidInfo'
+import RefreshButton from './RefreshButton'
+import Filter from '../Filter/Filter'
 import {
   DataManager,
   FormAttributeManager,
@@ -26,14 +26,14 @@ import {
   SecurityManager,
   ConfigurationManager,
   AuditManager
-} from '../../../redux';
-import EavAttributeForm from '../Form/EavAttributeForm';
-import LongRunningTask from '../LongRunningTask/LongRunningTask';
-import { selectEntities } from '../../../redux/selectors';
+} from '../../../redux'
+import EavAttributeForm from '../Form/EavAttributeForm'
+import LongRunningTask from '../LongRunningTask/LongRunningTask'
+import { selectEntities } from '../../../redux/selectors'
 
-const DEFAULT_QUICK_BUTTON_COUNT = 5;
-const auditManager = new AuditManager();
-const dataManager = new DataManager();
+const DEFAULT_QUICK_BUTTON_COUNT = 5
+const auditManager = new AuditManager()
+const dataManager = new DataManager()
 
 /**
  * Table component with header and columns.
@@ -43,24 +43,24 @@ const dataManager = new DataManager();
  */
 class AdvancedTable extends Basic.AbstractContextComponent {
 
-  constructor(props, context) {
-    super(props, context);
+  constructor (props, context) {
+    super(props, context)
     // resolve static frontend actions (backend actions are loaded asynchronously ... check componentDidMount)
-    const {manager, actions} = this.props;
-    let _actions = [];
+    const {manager, actions} = this.props
+    let _actions = []
     if (!manager.supportsBulkAction() && actions !== null && actions.length > 0) {
       _actions = actions
         .filter(action => action.rendered === undefined || action.rendered === true || action.rendered === null)
         .map(action => {
           action.showWithSelection = (action.showWithSelection === null || action.showWithSelection === undefined)
             ? true
-            : action.showWithSelection;
+            : action.showWithSelection
           action.showWithoutSelection = (action.showWithoutSelection === null || action.showWithoutSelection === undefined)
             ? false
-            : action.showWithoutSelection;
+            : action.showWithoutSelection
           //
-          return action;
-        });
+          return action
+        })
     }
     //
     this.state = {
@@ -71,9 +71,9 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       bulkActionShowLoading: false,
       anchorEl: null,
       _actions
-    };
-    this.attributeManager = new FormAttributeManager();
-    this.longRunningTaskManager = new LongRunningTaskManager();
+    }
+    this.attributeManager = new FormAttributeManager()
+    this.longRunningTaskManager = new LongRunningTaskManager()
   }
 
   /**
@@ -81,48 +81,48 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    *
    * @return {string} component identifier
    */
-  getComponentKey() {
-    return 'component.advanced.Table';
+  getComponentKey () {
+    return 'component.advanced.Table'
   }
 
-  _getBulkActionLabel(backendBulkAction) {
+  _getBulkActionLabel (backendBulkAction) {
     return this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`, {
       defaultValue: backendBulkAction.description || backendBulkAction.name
-    });
+    })
   }
 
-  componentDidMount() {
-    const {initialReload} = this.props;
+  componentDidMount () {
+    const {initialReload} = this.props
     if (initialReload) {
-      this.reload();
+      this.reload()
     }
     //
-    this.reloadBulkActions();
+    this.reloadBulkActions()
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps (newProps) {
     if (!Domain.SearchParameters.is(newProps.forceSearchParameters, this.props.forceSearchParameters)) {
-      this.reload(newProps);
+      this.reload(newProps)
     } else if (!Domain.SearchParameters.is(newProps.defaultSearchParameters, this.props.defaultSearchParameters)) {
-      this.reload(newProps);
+      this.reload(newProps)
     } else if (newProps.rendered !== this.props.rendered) {
-      this.reload(newProps);
+      this.reload(newProps)
     }
   }
 
-  reload(props = null) {
-    let _props = this.props;
+  reload (props = null) {
+    let _props = this.props
     if (props) {
       _props = {
         ...this.props,
         ...props
-      };
+      }
     }
-    const {rendered, _searchParameters} = _props;
+    const {rendered, _searchParameters} = _props
     if (!rendered) {
-      return;
+      return
     }
-    this.fetchEntities(_searchParameters, _props);
+    this.fetchEntities(_searchParameters, _props)
   }
 
   /**
@@ -131,8 +131,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    *
    * @since 11.1.0
    */
-  reloadBulkActions() {
-    const {manager} = this.props;
+  reloadBulkActions () {
+    const {manager} = this.props
     //
     if (manager.supportsBulkAction() && manager.canRead()) {
       this.context.store.dispatch(manager.fetchAvailableBulkActions((actions, error) => {
@@ -140,16 +140,16 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           if (error.statusCode === 403) {
             // user doesn't have permissions for work with entities in the table
           } else {
-            this.addErrorMessage({}, error);
+            this.addErrorMessage({}, error)
           }
         } else {
           // TODO: react elements are stored in state ... redesign raw data and move cached actions into reducer
           const _actions = actions
             .map(backendBulkAction => {
-              const actionKey = `${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}`;
-              const iconKey = `${actionKey}.icon`;
-              const icon = backendBulkAction.icon || this.i18n(iconKey);
-              const label = this._getBulkActionLabel(backendBulkAction);
+              const actionKey = `${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}`
+              const iconKey = `${actionKey}.icon`
+              const icon = backendBulkAction.icon || this.i18n(iconKey)
+              const label = this._getBulkActionLabel(backendBulkAction)
               return {
                 value: backendBulkAction.name,
                 order: backendBulkAction.order,
@@ -173,24 +173,24 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                 disabled: !SecurityManager.hasAllAuthorities(backendBulkAction.authorities),
                 showWithSelection: backendBulkAction.showWithSelection,
                 showWithoutSelection: backendBulkAction.showWithoutSelection,
-              };
-            });
+              }
+            })
           //
           this.setState({
             _actions
-          });
+          })
         }
-      }));
+      }))
     }
   }
 
   /**
    * Clears row selection
    */
-  clearSelectedRows() {
+  clearSelectedRows () {
     this.setState({
       selectedRows: []
-    });
+    })
   }
 
   /**
@@ -201,71 +201,71 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @param  selected
    * @return
    */
-  selectRowForBulkAction(rowIndex, selected) {
-    const {selectedRows, removedRows} = this.state;
-    let newRemovedRows = new Immutable.Set(removedRows);
-    let newSelectedRows = new Immutable.Set(selectedRows);
+  selectRowForBulkAction (rowIndex, selected) {
+    const {selectedRows, removedRows} = this.state
+    let newRemovedRows = new Immutable.Set(removedRows)
+    let newSelectedRows = new Immutable.Set(selectedRows)
     if (rowIndex === -1) {
       // de/select all rows
       // reset selected rows
-      newSelectedRows = new Immutable.Set();
+      newSelectedRows = new Immutable.Set()
       if (selected) {
-        newSelectedRows = newSelectedRows.add(Basic.Table.SELECT_ALL);
+        newSelectedRows = newSelectedRows.add(Basic.Table.SELECT_ALL)
       } else {
-        newSelectedRows = newSelectedRows.remove(Basic.Table.SELECT_ALL);
+        newSelectedRows = newSelectedRows.remove(Basic.Table.SELECT_ALL)
       }
       // reset removed rows
-      newRemovedRows = new Immutable.Set();
+      newRemovedRows = new Immutable.Set()
     } else {
-      const recordId = this.refs.table.getIdentifier(rowIndex);
+      const recordId = this.refs.table.getIdentifier(rowIndex)
       // de/select one row
       if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
         if (selected) {
-          newRemovedRows = newRemovedRows.remove(recordId);
+          newRemovedRows = newRemovedRows.remove(recordId)
         } else {
-          newRemovedRows = newRemovedRows.add(recordId);
+          newRemovedRows = newRemovedRows.add(recordId)
         }
       } else {
-        newSelectedRows = (selected ? newSelectedRows.add(recordId) : newSelectedRows.remove(recordId));
+        newSelectedRows = (selected ? newSelectedRows.add(recordId) : newSelectedRows.remove(recordId))
       }
     }
     this.setState({
       selectedRows: newSelectedRows.toArray(),
       removedRows: newRemovedRows
-    });
-    return newSelectedRows;
+    })
+    return newSelectedRows
   }
 
-  isAllRowSelected() {
-    const {selectedRows} = this.state;
+  isAllRowSelected () {
+    const {selectedRows} = this.state
     // if selected rows contains SELECT ALL return true
-    return _.includes(selectedRows, Basic.Table.SELECT_ALL);
+    return _.includes(selectedRows, Basic.Table.SELECT_ALL)
   }
 
-  isRowSelected(identifier) {
-    const {selectedRows, removedRows} = this.state;
+  isRowSelected (identifier) {
+    const {selectedRows, removedRows} = this.state
     if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-      return !removedRows.has(identifier);
+      return !removedRows.has(identifier)
     }
-    return _.includes(selectedRows, identifier);
+    return _.includes(selectedRows, identifier)
   }
 
-  preprocessBulkAction(bulkAction, cb = null) {
-    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
+  preprocessBulkAction (bulkAction, cb = null) {
+    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters)
 
-    const {selectedRows, removedRows} = this.state;
+    const {selectedRows, removedRows} = this.state
 
     if (bulkAction) {
       const bulkActionToProcess = {
         ...bulkAction
-      };
-      const {manager} = this.props;
+      }
+      const {manager} = this.props
       //
       if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-        bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
-        bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+        bulkActionToProcess.filter = _searchParameters.getFilters().toJSON()
+        bulkActionToProcess.removeIdentifiers = removedRows.toArray()
       } else {
-        bulkActionToProcess.identifiers = selectedRows;
+        bulkActionToProcess.identifiers = selectedRows
       }
 
       this.setState({
@@ -276,44 +276,44 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             this.setState({
               bulkActionShowLoading: false,
               backendBulkAction: bulkActionPreprocessed
-            });
+            })
             if (cb) {
-              cb(bulkActionPreprocessed);
+              cb(bulkActionPreprocessed)
             }
           } else {
             this.setState({
               bulkActionShowLoading: false
-            });
+            })
           }
-        }));
-      });
+        }))
+      })
     }
   }
 
-  prevalidateBulkAction(bulkAction, event) {
+  prevalidateBulkAction (bulkAction, event) {
     if (event) {
-      event.preventDefault();
+      event.preventDefault()
     }
-    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
+    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters)
 
-    const {selectedRows, removedRows} = this.state;
+    const {selectedRows, removedRows} = this.state
 
     if (bulkAction) {
       const bulkActionToProcess = {
         ...bulkAction
-      };
-      const {manager} = this.props;
+      }
+      const {manager} = this.props
       // remove unnecessary attributes
-      delete bulkActionToProcess.formAttributes;
-      delete bulkActionToProcess.longRunningTaskId;
-      delete bulkActionToProcess.permissions;
+      delete bulkActionToProcess.formAttributes
+      delete bulkActionToProcess.longRunningTaskId
+      delete bulkActionToProcess.permissions
       //
-      bulkActionToProcess.properties = this.refs.bulkActionAttributes.getValues();
+      bulkActionToProcess.properties = this.refs.bulkActionAttributes.getValues()
       if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-        bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
-        bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+        bulkActionToProcess.filter = _searchParameters.getFilters().toJSON()
+        bulkActionToProcess.removeIdentifiers = removedRows.toArray()
       } else {
-        bulkActionToProcess.identifiers = selectedRows;
+        bulkActionToProcess.identifiers = selectedRows
       }
       //
       this.setState({
@@ -321,65 +321,65 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       }, () => {
         this.context.store.dispatch(manager.prevalidateBulkAction(bulkActionToProcess, (resultModel, error) => {
           if (error) {
-            this.addErrorMessage({}, error);
+            this.addErrorMessage({}, error)
             this.setState({
               bulkActionShowLoading: false
-            });
+            })
           } else if (resultModel) {
-            const {backendBulkAction} = this.state;
-            backendBulkAction.prevalidateResult = resultModel;
+            const {backendBulkAction} = this.state
+            backendBulkAction.prevalidateResult = resultModel
             this.setState({
               bulkActionShowLoading: false,
               backendBulkAction
-            });
+            })
           } else {
             this.setState({
               bulkActionShowLoading: false
-            });
+            })
           }
-        }));
-      });
+        }))
+      })
     }
   }
 
-  processBulkAction(bulkAction, event) {
+  processBulkAction (bulkAction, event) {
     if (event) {
-      event.preventDefault();
+      event.preventDefault()
     }
     if (!this.refs.bulkActionAttributes.isValid()) {
-      return;
+      return
     }
-    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
+    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters)
 
-    const {selectedRows, removedRows} = this.state;
+    const {selectedRows, removedRows} = this.state
 
     if (bulkAction) {
       const bulkActionToProcess = {
         ...bulkAction
-      };
-      const {manager} = this.props;
+      }
+      const {manager} = this.props
       // remove unnecessary attributes
-      delete bulkActionToProcess.formAttributes;
-      delete bulkActionToProcess.longRunningTaskId;
-      delete bulkActionToProcess.permissions;
+      delete bulkActionToProcess.formAttributes
+      delete bulkActionToProcess.longRunningTaskId
+      delete bulkActionToProcess.permissions
       //
-      bulkActionToProcess.properties = this.refs.bulkActionAttributes.getValues();
+      bulkActionToProcess.properties = this.refs.bulkActionAttributes.getValues()
       if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-        bulkActionToProcess.filter = _searchParameters.toFilterJson();
-        bulkActionToProcess.removeIdentifiers = removedRows.toArray();
+        bulkActionToProcess.filter = _searchParameters.toFilterJson()
+        bulkActionToProcess.removeIdentifiers = removedRows.toArray()
       } else {
-        bulkActionToProcess.identifiers = selectedRows;
+        bulkActionToProcess.identifiers = selectedRows
       }
       //
       this.setState({
         bulkActionShowLoading: true
-      });
+      })
       this.context.store.dispatch(manager.processBulkAction(bulkActionToProcess, (processBulkAction, error) => {
         if (error) {
-          this.addErrorMessage({}, error);
+          this.addErrorMessage({}, error)
           this.setState({
             bulkActionShowLoading: false
-          });
+          })
         } else {
           this.addMessage({
             level: 'info',
@@ -387,15 +387,15 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               longRunningTaskId: processBulkAction.longRunningTaskId,
               name: this.i18n(`${processBulkAction.module}:eav.bulk-action.${processBulkAction.name}.label`)
             })
-          });
+          })
           this.setState({
             selectedRows: [],
             removedRows: new Immutable.Set(),
             bulkActionShowLoading: false,
             backendBulkAction: processBulkAction
-          });
+          })
         }
-      }));
+      }))
     }
   }
 
@@ -405,23 +405,23 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @param  {object} processedBulkAction currently processed bulk action
    * @since 10.6.0
    */
-  _afterBulkAction(processedBulkAction) {
-    const {afterBulkAction} = this.props;
-    let isReload = true;
+  _afterBulkAction (processedBulkAction) {
+    const {afterBulkAction} = this.props
+    let isReload = true
     if (afterBulkAction) {
-      isReload = afterBulkAction(processedBulkAction);
+      isReload = afterBulkAction(processedBulkAction)
     }
     //
     if (isReload !== false) { // null + undefined + true
-      this.reload();
+      this.reload()
     }
   }
 
   /**
    * Merge hard, default and user deffined search parameters.
    */
-  _mergeSearchParameters(searchParameters, props = null) {
-    const _props = props || this.props;
+  _mergeSearchParameters (searchParameters, props = null) {
+    const _props = props || this.props
     const {
       defaultSearchParameters,
       forceSearchParameters,
@@ -429,36 +429,36 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       defaultPageSize,
       pagination,
       draggable
-    } = _props;
+    } = _props
     //
-    let _forceSearchParameters = null;
+    let _forceSearchParameters = null
     if (forceSearchParameters) {
       // we dont want override setted pagination, if pagination is enabled
-      _forceSearchParameters = forceSearchParameters.setSize(pagination && !draggable ? null : 10000).setPage(null);
+      _forceSearchParameters = forceSearchParameters.setSize(pagination && !draggable ? null : 10000).setPage(null)
     }
     let _searchParameters = manager.mergeSearchParameters(
       searchParameters || defaultSearchParameters || manager.getDefaultSearchParameters(), _forceSearchParameters
-    );
+    )
     // default page size by profile
     // defaultPage size in not stored in redux
     if ((!searchParameters || !searchParameters.getSize()) && defaultPageSize) {
-      _searchParameters = _searchParameters.setSize(defaultPageSize);
+      _searchParameters = _searchParameters.setSize(defaultPageSize)
     }
     //
-    return _searchParameters;
+    return _searchParameters
   }
 
-  fetchEntities(searchParameters, props = null) {
-    const _props = props || this.props;
-    searchParameters = this._mergeSearchParameters(searchParameters, _props);
-    const {onReload} = _props;
+  fetchEntities (searchParameters, props = null) {
+    const _props = props || this.props
+    searchParameters = this._mergeSearchParameters(searchParameters, _props)
+    const {onReload} = _props
     //
     if (!_props.hideTableShowLoading) {
       this._fetchEntities(searchParameters, _props, (data, error) => {
         if (onReload) {
-          onReload(data, error);
+          onReload(data, error)
         }
-      });
+      })
     } else {
       this.setState({
         hideTableShowLoading: _props.hideTableShowLoading
@@ -468,49 +468,49 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             hideTableShowLoading: null
           }, () => {
             if (onReload) {
-              onReload(data, error);
+              onReload(data, error)
             }
-          });
-        });
-      });
+          })
+        })
+      })
     }
   }
 
-  _fetchEntities(searchParameters, _props, cb) {
-    const {uiKey, manager} = _props;
+  _fetchEntities (searchParameters, _props, cb) {
+    const {uiKey, manager} = _props
     //
     this.context.store.dispatch(manager.fetchEntities(searchParameters, uiKey, (json, error) => {
       if (error) {
         this.addErrorMessage({
           key: `error-${manager.getEntityType()}-load`
-        }, error);
-        cb(null, error);
+        }, error)
+        cb(null, error)
         // remove selection for unpresent records
       } else if (json && json._embedded) {
-        const {selectedRows} = this.state;
-        const newSelectedRows = [];
-        let data = null;
+        const {selectedRows} = this.state
+        const newSelectedRows = []
+        let data = null
         if (json._embedded[manager.getCollectionType()]) {
-          data = json._embedded[manager.getCollectionType()];
+          data = json._embedded[manager.getCollectionType()]
           data.forEach(entity => {
             if (_.includes(selectedRows, entity.id)) { // TODO: custom identifier - move to manager
-              newSelectedRows.push(entity.id);
+              newSelectedRows.push(entity.id)
             }
-          });
+          })
         }
         this.setState({
           selectedRows: newSelectedRows
         }, () => {
-          cb(data, null);
-        });
+          cb(data, null)
+        })
       } else {
-        cb(null, null); // no data, no error
+        cb(null, null) // no data, no error
       }
-    }));
+    }))
   }
 
-  _handlePagination(page, size) {
-    const {uiKey, manager} = this.props;
+  _handlePagination (page, size) {
+    const {uiKey, manager} = this.props
     this.context.store.dispatch(manager.handlePagination(page, size, uiKey, (json, error) => {
       // croll top - new page of items
       if (!error) {
@@ -520,22 +520,22 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           scrollTop: 0
         }, 'fast'); */
       }
-    }));
+    }))
   }
 
-  _handleSort(property, order, shiftKey) {
-    const {uiKey, manager} = this.props;
+  _handleSort (property, order, shiftKey) {
+    const {uiKey, manager} = this.props
     //
-    this.context.store.dispatch(manager.handleSort(property, order, uiKey, shiftKey));
+    this.context.store.dispatch(manager.handleSort(property, order, uiKey, shiftKey))
   }
 
-  _resolveColumns() {
-    const {columns} = this.props;
-    const children = [];
+  _resolveColumns () {
+    const {columns} = this.props
+    const children = []
     //
     React.Children.forEach(this.props.children, (child) => {
-      if (child == null) {
-        return;
+      if (!React.isValidElement(child) || child == null) {
+        return
       }
       invariant(
         // child.type.__TableColumnGroup__ ||
@@ -544,47 +544,47 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         'child type should be <TableColumn /> or ' +
         'child type should be <AdvancedColumn /> or ' +
         '<AdvancedColumnGroup />'
-      );
-      children.push(child);
-    });
+      )
+      children.push(child)
+    })
     //
     // sort columns if given
     if (!columns) {
-      return children;
+      return children
     }
-    const renderedSortedChildren = children.filter(child => !child.props.property); // columns withou property will be at start
+    const renderedSortedChildren = children.filter(child => !child.props.property) // columns withou property will be at start
     // only columns with properties will be sorted
     columns.forEach(column => {
-      const child = children.find(c => c.props.property && c.props.property.toLowerCase() === column.toLowerCase());
+      const child = children.find(c => c.props.property && c.props.property.toLowerCase() === column.toLowerCase())
       if (child) {
-        renderedSortedChildren.push(child);
+        renderedSortedChildren.push(child)
       }
-    });
+    })
     //
-    return renderedSortedChildren;
+    return renderedSortedChildren
   }
 
-  useFilterForm(filterForm) {
-    this.useFilterData(Domain.SearchParameters.getFilterData(filterForm));
+  useFilterForm (filterForm) {
+    this.useFilterData(Domain.SearchParameters.getFilterData(filterForm))
   }
 
-  useFilterData(formData) {
-    this.fetchEntities(this._getSearchParameters(formData));
+  useFilterData (formData) {
+    this.fetchEntities(this._getSearchParameters(formData))
   }
 
   /**
    * Load filter is opened from redux store or default.
    */
-  _isFilterOpened(props, context) {
-    const _manager = props.manager || DataManager;
-    let _filterOpened = null;
+  _isFilterOpened (props, context) {
+    const _manager = props.manager || DataManager
+    let _filterOpened = null
     if (context && context.store) {
-      _filterOpened = _manager.isFilterOpened(context.store.getState(), props.uiKey);
+      _filterOpened = _manager.isFilterOpened(context.store.getState(), props.uiKey)
     }
     if (Utils.Ui.isNotEmpty(_filterOpened)) {
-      return _filterOpened;
+      return _filterOpened
     }
-    return props.filterOpened; // default ~ initial by table usage
+    return props.filterOpened // default ~ initial by table usage
   }
 
   /**
@@ -593,10 +593,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @param  {object} formData
    * @return {SearchParameters}
    */
-  _getSearchParameters(formData) {
-    const {_searchParameters} = this.props;
+  _getSearchParameters (formData) {
+    const {_searchParameters} = this.props
     //
-    return Domain.SearchParameters.getSearchParameters(formData, _searchParameters);
+    return Domain.SearchParameters.getSearchParameters(formData, _searchParameters)
   }
 
   /**
@@ -605,99 +605,99 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @param  {ref} filterForm
    * @return {SearchParameters}
    */
-  getSearchParameters(filterForm) {
-    return this._getSearchParameters(Domain.SearchParameters.getFilterData(filterForm));
+  getSearchParameters (filterForm) {
+    return this._getSearchParameters(Domain.SearchParameters.getFilterData(filterForm))
   }
 
-  cancelFilter(filterForm) {
-    const {manager, _searchParameters} = this.props;
+  cancelFilter (filterForm) {
+    const {manager, _searchParameters} = this.props
     //
-    const filterValues = filterForm.getData();
+    const filterValues = filterForm.getData()
     for (const property in filterValues) {
       if (!filterValues[property]) {
-        continue;
+        continue
       }
-      const filterComponent = filterForm.getComponent(property);
+      const filterComponent = filterForm.getComponent(property)
       if (!filterComponent) {
         // filter is not rendered
-        continue;
+        continue
       }
-      filterComponent.setValue(null);
+      filterComponent.setValue(null)
     }
     // prevent sort and pagination
-    let userSearchParameters = _searchParameters.setFilters(manager.getDefaultSearchParameters().getFilters());
-    userSearchParameters = userSearchParameters.setPage(0);
+    let userSearchParameters = _searchParameters.setFilters(manager.getDefaultSearchParameters().getFilters())
+    userSearchParameters = userSearchParameters.setPage(0)
     //
-    this.fetchEntities(userSearchParameters);
+    this.fetchEntities(userSearchParameters)
   }
 
-  _onRowSelect(rowIndex, selected, selection) {
-    const {onRowSelect} = this.props;
+  _onRowSelect (rowIndex, selected, selection) {
+    const {onRowSelect} = this.props
     //
     this.setState({
       selectedRows: selection
     }, () => {
       if (onRowSelect) {
-        onRowSelect(rowIndex, selected, selection);
+        onRowSelect(rowIndex, selected, selection)
       }
-    });
+    })
   }
 
-  onBulkAction(actionItem) {
+  onBulkAction (actionItem) {
     if (actionItem.action) {
-      actionItem.action(actionItem.value, this.state.selectedRows, actionItem);
+      actionItem.action(actionItem.value, this.state.selectedRows, actionItem)
     } else {
       this.addMessage({
         level: 'info',
         message: this.i18n('bulk-action.notImplemented')
-      });
+      })
     }
-    return false;
+    return false
   }
 
-  getNoData(noData) {
+  getNoData (noData) {
     if (noData !== null && noData !== undefined) {
-      return noData;
+      return noData
     }
     // default noData
-    return this.i18n('noData', {defaultValue: 'No record found'});
+    return this.i18n('noData', {defaultValue: 'No record found'})
   }
 
-  _showId() {
-    const {showId, appShowId} = this.props;
+  _showId () {
+    const {showId, appShowId} = this.props
     //
     if (showId !== null && showId !== undefined) {
       // table prop => highest priority
-      return showId;
+      return showId
     }
-    return appShowId;
+    return appShowId
   }
 
-  _filterOpen(open) {
-    const {filterOpen} = this.props;
-    let result = true;
+  _filterOpen (open) {
+    const {filterOpen} = this.props
+    let result = true
     if (filterOpen) {
-      result = filterOpen(open);
+      result = filterOpen(open)
     }
     //
     if (result !== false) {
       this.setState({
         filterOpened: open
-      });
+      })
     }
   }
 
-  showBulkActionDetail(backendBulkAction, cb = null) {
-    const {showBulkActionDetail} = this.state;
+  showBulkActionDetail (backendBulkAction, cb = null) {
+    const {showBulkActionDetail} = this.state
     //
     if (showBulkActionDetail) { // FIXME: ~close bulk action ...
       this.setState({
         showBulkActionDetail: !showBulkActionDetail
-      });
+      })
     } else {
       // move filter values int bulk action parameters automatically
-      const searchParameters = this._mergeSearchParameters(this.props._searchParameters);
-      const values = [];
+      const searchParameters = this._mergeSearchParameters(this.props._searchParameters)
+      const values = []
       searchParameters.getFilters().forEach((filter, property) => {
         if (filter !== null && filter !== undefined) {
           if (_.isArray(filter)) {
@@ -709,8 +709,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                   }
                 },
                 value: singleValue
-              });
-            });
+              })
+            })
           } else if (_.isObject(filter)) {
             // TODO: expand nested properties is not supported
           } else {
@@ -721,10 +721,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                 }
               },
               value: filter
-            });
+            })
           }
         }
-      });
+      })
       //
       if (backendBulkAction.supportsPreprocessing) {
         this.preprocessBulkAction(backendBulkAction, (bulkActionPreprocessed) => {
@@ -739,10 +739,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             // This problem occured after update on React 16
             // @todo-upgrade-12 still occurs with material-ui modals
             setTimeout(() => {
-              this.prevalidateBulkAction(backendBulkAction);
-            }, 10);
-          });
-        });
+              this.prevalidateBulkAction(backendBulkAction)
+            }, 10)
+          })
+        })
       } else {
         this.setState({
           showBulkActionDetail: !showBulkActionDetail,
@@ -755,56 +755,56 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           // This problem occured after update on React 16
           // @todo-upgrade-12 still occurs with material-ui modals
           setTimeout(() => {
-            this.prevalidateBulkAction(backendBulkAction);
-          }, 10);
-        });
+            this.prevalidateBulkAction(backendBulkAction)
+          }, 10)
+        })
       }
     }
   }
 
-  showAudit(entity, property, event) {
+  showAudit (entity, property, event) {
     if (event) {
-      event.preventDefault();
+      event.preventDefault()
     }
-    const propertyValue = property === 'entityId' ? entity.id : entity[property];
+    const propertyValue = property === 'entityId' ? entity.id : entity[property]
     // set search parameters in redux
     const searchParameters = auditManager.getDefaultSearchParameters()
       .setFilter(property === 'entityId' ? 'relatedOwnerId' : property, propertyValue)
-      .setFilter('ownerIdType', property === 'entityId' ? 'relatedOwnerId' : null);
+      .setFilter('ownerIdType', property === 'entityId' ? 'relatedOwnerId' : null)
     // co conctete audit table
-    this.context.store.dispatch(auditManager.requestEntities(searchParameters, 'audit-table'));
+    this.context.store.dispatch(auditManager.requestEntities(searchParameters, 'audit-table'))
     // prevent to show loading, when transaction id is the same
-    this.context.store.dispatch(dataManager.stopRequest('audit-table'));
+    this.context.store.dispatch(dataManager.stopRequest('audit-table'))
     // redirect to audit of entities with prefiled search parameters
     if (this.props.uiKey === 'audit-table') {
       // audit table reloads externally ()
     } else {
-      this.context.history.push(`/audit/entities?${property}=${propertyValue}`);
+      this.context.history.push(`/audit/entities?${property}=${propertyValue}`)
     }
   }
 
   /**
    * Removes prohibited actions.
    */
-  _removeProhibitedActions(actions) {
-    const {prohibitedActions} = this.props;
+  _removeProhibitedActions (actions) {
+    const {prohibitedActions} = this.props
 
     return actions.filter(action => {
       if (!prohibitedActions) {
-        return true;
+        return true
       }
       return prohibitedActions
         .filter(prohibitedAction => action.value === prohibitedAction)
-        .length === 0;
-    });
+        .length === 0
+    })
   }
 
-  _sortActions(one, two) {
+  _sortActions (one, two) {
     if (one.order === two.order) {
-      return this._getBulkActionLabel(one).localeCompare(this._getBulkActionLabel(two));
+      return this._getBulkActionLabel(one).localeCompare(this._getBulkActionLabel(two))
     }
     //
-    return one.order - two.order;
+    return one.order - two.order
   }
 
   /**
@@ -813,103 +813,103 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @param  {object} dndProps data, startIndex, differenceIndex
    * @since 10.7.0
    */
-  _onDraggableStop(dndProps) {
-    const {manager, uiKey, onDraggableStop} = this.props;
+  _onDraggableStop (dndProps) {
+    const {manager, uiKey, onDraggableStop} = this.props
 
     if (onDraggableStop) {
-      onDraggableStop(dndProps);
-      return;
+      onDraggableStop(dndProps)
+      return
     }
     //
     // default implementation - based on entity.seq field
-    const {data, startIndex, differenceIndex} = dndProps;
-    const patchEntities = [];
+    const {data, startIndex, differenceIndex} = dndProps
+    const patchEntities = []
     //
     if (differenceIndex > 0) { // move down
       // startIndex => increment for difference
       // last index
-      let lastOrder = null;
-      const currentRow = data[startIndex];
+      let lastOrder = null
+      const currentRow = data[startIndex]
       // decrement others
       for (let index = startIndex + 1; index <= startIndex + differenceIndex; index++) {
-        const decrementRow = data[index];
+        const decrementRow = data[index]
         if (lastOrder >= decrementRow.seq - 1) {
           // 0 by default => change is needed
           if (lastOrder === null) {
-            lastOrder = 0;
+            lastOrder = 0
           } else {
-            lastOrder += 1;
+            lastOrder += 1
           }
         } else if (decrementRow.seq - 1 < 0) {
-          lastOrder = 0;
+          lastOrder = 0
         } else {
-          lastOrder = decrementRow.seq - 1;
+          lastOrder = decrementRow.seq - 1
         }
-        patchEntities.push({id: decrementRow.id, seq: lastOrder});
+        patchEntities.push({id: decrementRow.id, seq: lastOrder})
       }
-      lastOrder += 1;
+      lastOrder += 1
       if (lastOrder !== currentRow.seq) {
-        patchEntities.push({id: currentRow.id, seq: lastOrder});
+        patchEntities.push({id: currentRow.id, seq: lastOrder})
       }
       // check order for rows after
       for (let index = startIndex + differenceIndex + 1; index < data.length; index++) {
-        lastOrder += 1;
-        const rowAfter = data[index];
+        lastOrder += 1
+        const rowAfter = data[index]
         if (rowAfter.seg >= lastOrder) {
-          break;
+          break
         }
-        patchEntities.push({id: rowAfter.id, seq: lastOrder});
+        patchEntities.push({id: rowAfter.id, seq: lastOrder})
       }
     } else { // move up
       // start index => decrement by difference
-      const firstIndexSeq = data[startIndex + differenceIndex].seq;
-      const currentRow = data[startIndex];
+      const firstIndexSeq = data[startIndex + differenceIndex].seq
+      const currentRow = data[startIndex]
       if (firstIndexSeq !== currentRow.seq) { // 0 by default => no change is needed
-        patchEntities.push({id: currentRow.id, seq: firstIndexSeq});
+        patchEntities.push({id: currentRow.id, seq: firstIndexSeq})
       }
       // increment others
-      let lastOrder = firstIndexSeq;
+      let lastOrder = firstIndexSeq
       for (let index = startIndex + differenceIndex; index < startIndex; index++) {
-        const incrementRow = data[index];
+        const incrementRow = data[index]
         if (lastOrder >= incrementRow.seq + 1) {
           // 0 by default => change is needed
-          lastOrder += 1;
+          lastOrder += 1
         } else {
-          lastOrder = incrementRow.seq + 1;
+          lastOrder = incrementRow.seq + 1
         }
-        patchEntities.push({id: incrementRow.id, seq: lastOrder});
+        patchEntities.push({id: incrementRow.id, seq: lastOrder})
       }
       // check order for rows after
       for (let index = startIndex + 1; index < data.length; index++) {
-        lastOrder += 1;
-        const rowAfter = data[index];
+        lastOrder += 1
+        const rowAfter = data[index]
         if (rowAfter.seg >= lastOrder) {
-          break;
+          break
         }
-        patchEntities.push({id: rowAfter.id, seq: (lastOrder)});
+        patchEntities.push({id: rowAfter.id, seq: (lastOrder)})
       }
     }
     //
-    let hasError = false;
+    let hasError = false
     if (patchEntities.length > 0) {
-      this.context.store.dispatch(dataManager.startRequest(uiKey));
+      this.context.store.dispatch(dataManager.startRequest(uiKey))
       patchEntities.reduce((sequence, entity) => {
         return sequence
           .then(() => {
             // we need raw promise
-            return manager.getService().patchById(entity.id, entity);
+            return manager.getService().patchById(entity.id, entity)
           })
           .catch(error => {
-            this.addError(error);
-            hasError = true;
+            this.addError(error)
+            hasError = true
             //
-            throw error;
-          });
+            throw error
+          })
       }, Promise.resolve())
         .catch((error) => {
           // nothing - message is propagated before
           // catch is before then - we want execute next then clausule
-          return error;
+          return error
         })
         .then(() => {
           if (!hasError) {
@@ -917,10 +917,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               key: 'basic-table-draggable-message',
               level: 'success',
               message: this.i18n('component.basic.Table.draggable.message.success')
-            });
+            })
           }
-          this.reload(); // ~ stop request
-        });
+          this.reload() // ~ stop request
+        })
     }
   }
 
@@ -933,14 +933,14 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @return {bool}
    * @since 11.1.0
    */
-  showDraggable(searchParameters) {
+  showDraggable (searchParameters) {
     const {
       showDraggable,
       draggable,
       forceSearchParameters,
       _entities,
       _total
-    } = this.props;
+    } = this.props
     //
     // external callback -the highest priority
     if (showDraggable) {
@@ -948,61 +948,61 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         searchParameters,
         entities: _entities,
         total: _total
-      });
+      })
     }
     //
     if (!draggable) {
       // dragable is not enabled
-      return false;
+      return false
     }
     if (!_entities || _entities.length === 0) {
       // entities are not given
-      return false;
+      return false
     }
     if (!Domain.SearchParameters.isEmptyFilter(searchParameters, forceSearchParameters)) {
       // filter is defined => order cannot be changed on sub group
-      return false;
+      return false
     }
     if (_total > _entities.length) {
       // pagiantioni is set  => order cannot be changed on sub group
-      return false;
+      return false
     }
     //
-    return true;
+    return true
   }
 
-  _handleOpenBulkActionMenu(event) {
+  _handleOpenBulkActionMenu (event) {
     this.setState({
       anchorEl: event.currentTarget
-    });
+    })
   }
 
-  _handleCloseBulkActionMenu(cb = null) {
+  _handleCloseBulkActionMenu (cb = null) {
     this.setState({
       anchorEl: null
-    }, cb);
+    }, cb)
   }
 
-  _renderPrevalidateMessages(backendBulkAction) {
+  _renderPrevalidateMessages (backendBulkAction) {
     if (!backendBulkAction.prevalidateResult) {
-      return null;
+      return null
     }
     if (!backendBulkAction.prevalidateResult._infos) {
-      return null;
+      return null
     }
 
-    const result = [];
+    const result = []
     for (const model of backendBulkAction.prevalidateResult._infos) {
       result.push(
         <Basic.FlashMessage
           showHtmlText
           message={this.getFlashManager().convertFromResultModel(model)}/>
-      );
+      )
     }
-    return result;
+    return result
   }
 
-  _renderBulkActionDetail() {
+  _renderBulkActionDetail () {
     const {
       backendBulkAction,
       showBulkActionDetail,
@@ -1011,29 +1011,29 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       now,
       removedRows,
       formInstance
-    } = this.state;
-    const {_total, manager} = this.props;
-    const count = _total - removedRows.size;
+    } = this.state
+    const {_total, manager} = this.props
+    const count = _total - removedRows.size
 
-    const isSelectedAll = _.includes(selectedRows, Basic.Table.SELECT_ALL);
+    const isSelectedAll = _.includes(selectedRows, Basic.Table.SELECT_ALL)
     // get entities for currently selected
-    let selectedEntities = [];
+    let selectedEntities = []
     if (!isSelectedAll) {
-      selectedEntities = manager.getEntitiesByIds(this.context.store.getState(), selectedRows);
+      selectedEntities = manager.getEntitiesByIds(this.context.store.getState(), selectedRows)
     }
     //
     // get entitties for currently deselected
-    let removedEnties = [];
+    let removedEnties = []
     if (removedRows.size > 0) {
-      removedEnties = manager.getEntitiesByIds(this.props._state, removedRows.toArray());
+      removedEnties = manager.getEntitiesByIds(this.props._state, removedRows.toArray())
     }
-    const modalContent = [];
-    let bsSize = 'md';
-    let fullWidth = false;
+    const modalContent = []
+    let bsSize = 'md'
+    let fullWidth = false
     if (backendBulkAction && backendBulkAction.longRunningTaskId) {
       if (SecurityManager.hasAuthority('SCHEDULER_AUTOCOMPLETE')) {
-        fullWidth = true;
-        bsSize = 'sm';
+        fullWidth = true
+        bsSize = 'sm'
         modalContent.push(
           <LongRunningTask
             entityIdentifier={backendBulkAction.longRunningTaskId}
@@ -1048,21 +1048,21 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                 {this.i18n('button.close')}
               </Basic.Button>
             }/>
-        );
+        )
       } else {
         modalContent.push(
           <Basic.Modal.Header
             icon={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.icon`, {defaultValue: ''})}
             text={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`)}
             closeButton/>
-        );
+        )
         modalContent.push(
           <Basic.Modal.Body>
             <Basic.Alert
               level="info"
               text={this.i18n('bulkAction.insufficientReadPermission')}/>
           </Basic.Modal.Body>
-        );
+        )
         modalContent.push(
           <Basic.Modal.Footer>
             <Basic.Button
@@ -1071,18 +1071,18 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               {this.i18n('button.close')}
             </Basic.Button>
           </Basic.Modal.Footer>
-        );
+        )
       }
     } else if (backendBulkAction) {
-      const helpKey = `${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.help`;
-      const help = this.i18n(helpKey);
+      const helpKey = `${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.help`
+      const help = this.i18n(helpKey)
       //
       modalContent.push(
         <Basic.Modal.Header
           icon={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.icon`, {defaultValue: ''})}
           text={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`)}
           closeButton/>
-      );
+      )
       modalContent.push(
         <Basic.Modal.Body>
           <form onSubmit={this.processBulkAction.bind(this, backendBulkAction)}>
@@ -1151,7 +1151,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             <input type="submit" className="hidden"/>
           </form>
         </Basic.Modal.Body>
-      );
+      )
       modalContent.push(
         <Basic.Modal.Footer>
           <Basic.Button
@@ -1170,7 +1170,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             {this.i18n('bulkAction.button.execute')}
           </Basic.Button>
         </Basic.Modal.Footer>
-      );
+      )
     }
     //
     return (
@@ -1182,10 +1182,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         fullWidth={fullWidth}>
         {modalContent}
       </Basic.Modal>
-    );
+    )
   }
 
-  render() {
+  render () {
     const {
       _entities,
       _total,
@@ -1223,7 +1223,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       sizeOptions,
       quickButtonCount,
       noHeader
-    } = this.props;
+    } = this.props
     const {
       filterOpened,
       selectedRows,
@@ -1231,47 +1231,47 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       anchorEl,
       _actions,
       hideTableShowLoading
-    } = this.state;
+    } = this.state
     //
     if (!rendered) {
-      return null;
+      return null
     }
     //
-    const columns = this._resolveColumns();
-    let range = null;
-    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
+    const columns = this._resolveColumns()
+    let range = null
+    const _searchParameters = this._mergeSearchParameters(this.props._searchParameters)
     if (_searchParameters) {
       range = {
         page: _searchParameters.getPage(),
         size: _searchParameters.getSize()
-      };
+      }
     }
-    const renderedColumns = [];
+    const renderedColumns = []
     for (let i = 0; i < columns.length; i++) {
-      const column = columns[i];
+      const column = columns[i]
       // basic column support
       if (column.type.__TableColumn__) {
         // add cloned elemet with data provided
-        renderedColumns.push(column);
-        continue;
+        renderedColumns.push(column)
+        continue
       }
       // common props to all column faces
       const commonProps = {
         // title: column.props.title,
         className: `column-face-${column.props.face}`
-      };
+      }
       // construct basic column from advanced column definition
-      let columnHeader = column.props.header;
-      let columnTitle = column.props.title;
+      let columnHeader = column.props.header
+      let columnTitle = column.props.title
       if (column.props.property) {
         if (!columnHeader) {
           columnHeader = this.i18n(
             `${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}.label`, // label has higher priority
             {defaultValue: this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}`)}
-          );
+          )
         }
         if (!columnTitle) {
-          columnTitle = this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}.title`, {defaultValue: ''});
+          columnTitle = this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}.title`, {defaultValue: ''})
         }
       }
       if (column.props.sort) {
@@ -1283,19 +1283,19 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             searchParameters={_searchParameters}
             className={commonProps.className}
             title={columnTitle}/>
-        );
+        )
       } else if (columnTitle) {
         columnHeader = (
           <span title={columnTitle}>
             {columnHeader}
           </span>
-        );
+        )
       }
       //
-      const key = `column_${i}`;
-      let cell = null;
+      const key = `column_${i}`
+      let cell = null
       if (column.props.cell) {
-        cell = column.props.cell;
+        cell = column.props.cell
       } else if (column.type.__AdvancedColumnLink__) {
         cell = (
           <Basic.BasicTable.LinkCell
@@ -1304,7 +1304,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             target={column.props.target}
             access={column.props.access}
             {...commonProps}/>
-        );
+        )
       } else {
         switch (column.props.face) {
           case 'text': {
@@ -1312,42 +1312,42 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               <Basic.BasicTable.TextCell
                 {...commonProps}
                 maxLength={column.props.maxLength}/>
-            );
-            break;
+            )
+            break
           }
           case 'date': {
             cell = (
               <Basic.BasicTable.DateCell
                 format={this.i18n('format.date')}
                 {...commonProps}/>
-            );
-            break;
+            )
+            break
           }
           case 'datetime': {
             cell = (
               <Basic.BasicTable.DateCell
                 format={this.i18n('format.datetime')}
                 {...commonProps}/>
-            );
-            break;
+            )
+            break
           }
           case 'bool':
           case 'boolean': {
             cell = (
               <Basic.BasicTable.BooleanCell {...commonProps}/>
-            );
-            break;
+            )
+            break
           }
           case 'enum': {
             cell = (
               <Basic.BasicTable.EnumCell
                 enumClass={column.props.enumClass}
                 {...commonProps}/>
-            );
-            break;
+            )
+            break
           }
           default: {
-            this.getLogger().trace(`[AdvancedTable] usind default for column face [${column.props.face}]`);
+            this.getLogger().trace(`[AdvancedTable] usind default for column face [${column.props.face}]`)
           }
         }
       }
@@ -1362,110 +1362,110 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           header={columnHeader}
           title={columnTitle}
           cell={cell}/>
-      );
+      )
     }
     //
-    let _rowClass = rowClass;
+    let _rowClass = rowClass
     if (!_rowClass) {
       // automatic rowClass by entity's "disabled" attribute
       _rowClass = ({
-        rowIndex,
-        data
-      }) => { return Utils.Ui.getDisabledRowClass(data[rowIndex]); };
+                     rowIndex,
+                     data
+                   }) => { return Utils.Ui.getDisabledRowClass(data[rowIndex]) }
     }
     // If is manager in the universal request mode, then row class by requests will be used (REMOVE / ADD / CHANGE).
     if (manager.isRequestModeEnabled && manager.isRequestModeEnabled()) {
       _rowClass = ({
-        rowIndex,
-        data
-      }) => { return Utils.Ui.getRequestRowClass(data[rowIndex]); };
+                     rowIndex,
+                     data
+                   }) => { return Utils.Ui.getRequestRowClass(data[rowIndex]) }
     }
     //
-    let count = 0;
+    let count = 0
     if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
-      count = _total - removedRows.size;
+      count = _total - removedRows.size
     } else {
-      count = selectedRows.length;
+      count = selectedRows.length
     }
     //
     let _actionsWithSelection = _actions
-      .filter(action => { return action.showWithSelection; });
+      .filter(action => { return action.showWithSelection })
     // Remove prohibited actions
-    _actionsWithSelection = this._removeProhibitedActions(_actionsWithSelection);
+    _actionsWithSelection = this._removeProhibitedActions(_actionsWithSelection)
 
     let _actionsWithoutSelection = _actions
-      .filter(action => { return action.showWithoutSelection; });
+      .filter(action => { return action.showWithoutSelection })
     // Remove prohibited actions
-    _actionsWithoutSelection = this._removeProhibitedActions(_actionsWithoutSelection);
+    _actionsWithoutSelection = this._removeProhibitedActions(_actionsWithoutSelection)
     //
-    const _actionClassName = _actions.length === 0 ? 'hidden' : 'bulk-action';
+    const _actionClassName = _actions.length === 0 ? 'hidden' : 'bulk-action'
     //
-    const _isLoading = (_showLoading || showLoading) && !hideTableShowLoading;
+    const _isLoading = (_showLoading || showLoading) && !hideTableShowLoading
     //
     // resolve bulk actions
-    let processActions = _actions;
+    let processActions = _actions
     // remove prohibited actions
-    processActions = this._removeProhibitedActions(processActions);
+    processActions = this._removeProhibitedActions(processActions)
     // disabled by security reason
-    processActions = processActions.filter(a => !a.disabled);
+    processActions = processActions.filter(a => !a.disabled)
     // quick action buttons - configured
-    let buttonActions = processActions.filter(a => a.quickButton);
-    processActions = processActions.filter(a => !a.quickButton);
+    let buttonActions = processActions.filter(a => a.quickButton)
+    processActions = processActions.filter(a => !a.quickButton)
     // delete actions has own menu (at end)
-    let deleteActions = processActions.filter(a => a.deleteAction);
-    processActions = processActions.filter(a => !a.deleteAction);
+    let deleteActions = processActions.filter(a => a.deleteAction)
+    processActions = processActions.filter(a => !a.deleteAction)
     // normal menu actions
-    let menuActions = [];
+    let menuActions = []
     //
     // add quick buttons - by order
-    let buttonActionCount = DEFAULT_QUICK_BUTTON_COUNT;
+    let buttonActionCount = DEFAULT_QUICK_BUTTON_COUNT
     if (!Utils.Ui.isEmpty(quickButtonCount)) {
-      buttonActionCount = quickButtonCount;
+      buttonActionCount = quickButtonCount
     } else if (!Utils.Ui.isEmpty(_quickButtonCount)) {
-      buttonActionCount = parseInt(_quickButtonCount, 10);
+      buttonActionCount = parseInt(_quickButtonCount, 10)
     }
     //
     for (let i = 0; i < processActions.length; i++) {
-      const action = processActions[i];
+      const action = processActions[i]
       if (action.icon === null || action.icon === undefined) {
-        menuActions.push(action);
+        menuActions.push(action)
         // icon is required to quick access button
-        continue;
+        continue
       }
       // add quick button
       if (buttonActions.length < buttonActionCount && action.quickButtonable) {
-        buttonActions.push(action);
+        buttonActions.push(action)
       } else {
-        menuActions.push(action);
+        menuActions.push(action)
       }
     }
     if (buttonActions.length < buttonActionCount) {
-      const newDeleteActions = [];
+      const newDeleteActions = []
       // try to add delete button to quick ...
       for (let i = 0; i < deleteActions.length; i++) {
-        const action = deleteActions[i];
+        const action = deleteActions[i]
         if (action.icon === null || action.icon === undefined) {
-          newDeleteActions.push(action);
+          newDeleteActions.push(action)
           // icon is required to quick access button
-          continue;
+          continue
         }
         //
         if (buttonActions.length < buttonActionCount && action.quickButtonable) {
-          buttonActions.push(action);
+          buttonActions.push(action)
         } else {
-          newDeleteActions.push(action);
+          newDeleteActions.push(action)
         }
       }
-      deleteActions = newDeleteActions;
+      deleteActions = newDeleteActions
     }
     // sort buttons by order and locale
-    buttonActions = buttonActions.sort(this._sortActions.bind(this));
-    menuActions = menuActions.sort(this._sortActions.bind(this));
-    deleteActions = deleteActions.sort(this._sortActions.bind(this));
+    buttonActions = buttonActions.sort(this._sortActions.bind(this))
+    menuActions = menuActions.sort(this._sortActions.bind(this))
+    deleteActions = deleteActions.sort(this._sortActions.bind(this))
     // new quick buttons will be rendered
-    const showBulkActionSelect = buttonActionCount === 0 || buttonActions.length === 0;
+    const showBulkActionSelect = buttonActionCount === 0 || buttonActions.length === 0
     // included buttons action in menu
-    let buttonMenuIncludedActions = null;
+    let buttonMenuIncludedActions = null
     if (_menuIncluded && buttonActions.length > 0) {
       buttonMenuIncludedActions = buttonActions.map(action => (
         <Basic.MenuItem
@@ -1479,8 +1479,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               :
               () => {
                 this._handleCloseBulkActionMenu(() => {
-                  this.onBulkAction(action);
-                });
+                  this.onBulkAction(action)
+                })
               }
           }
           disabled={
@@ -1493,15 +1493,15 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           }>
           {action.label || action.niceLabel}
         </Basic.MenuItem>
-      ));
+      ))
       if (menuActions.length > 0 || deleteActions.length > 0) {
-        buttonMenuIncludedActions.push(<Divider/>);
+        buttonMenuIncludedActions.push(<Divider/>)
         buttonMenuIncludedActions.push(
           <Basic.MenuItem disabled>
             {this.i18n(`bulkAction.button.next`)}
           </Basic.MenuItem>
-        );
-        buttonMenuIncludedActions.push(<Divider/>);
+        )
+        buttonMenuIncludedActions.push(<Divider/>)
       }
     }
     //
@@ -1578,7 +1578,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                               onClick={this.onBulkAction.bind(this, action)}
                               icon={action.icon}
                               level={action.level}/>
-                          );
+                          )
                         })
                       }
                       {
@@ -1592,7 +1592,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                             aria-haspopup="true"
                             title={_menuIncluded ? this.i18n(`bulkAction.button.all`) : this.i18n(`bulkAction.button.next`)}
                             onClick={(event) => {
-                              this._handleOpenBulkActionMenu(event);
+                              this._handleOpenBulkActionMenu(event)
                             }}>
                             <MoreVertIcon/>
                           </IconButton>
@@ -1625,8 +1625,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                                           :
                                           () => {
                                             this._handleCloseBulkActionMenu(() => {
-                                              this.onBulkAction(action);
-                                            });
+                                              this.onBulkAction(action)
+                                            })
                                           }
                                       }
                                       disabled={
@@ -1641,7 +1641,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                                       }>
                                       {action.label || action.niceLabel}
                                     </Basic.MenuItem>
-                                  );
+                                  )
                                 })
                               }
                               {
@@ -1663,8 +1663,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                                           :
                                           () => {
                                             this._handleCloseBulkActionMenu(() => {
-                                              this.onBulkAction(action);
-                                            });
+                                              this.onBulkAction(action)
+                                            })
                                           }
                                       }
                                       disabled={(selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)}>
@@ -1673,7 +1673,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                                         level={action.level}/>
                                       {action.label || action.niceLabel}
                                     </Basic.MenuItem>
-                                  );
+                                  )
                                 })
                               }
                             </MenuList>
@@ -1755,11 +1755,11 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                   width={115}
                   cell={
                     ({rowIndex, data, property}) => {
-                      const entity = data[rowIndex];
-                      const identifier = entity[property];
-                      const transactionId = entity.transactionId;
-                      const _showTransactionId = transactionId && showTransactionId;
-                      const content = [];
+                      const entity = data[rowIndex]
+                      const identifier = entity[property]
+                      const transactionId = entity.transactionId
+                      const _showTransactionId = transactionId && showTransactionId
+                      const content = []
                       //
                       content.push(
                         <div style={{display: 'flex', alignItems: 'center'}}>
@@ -1794,7 +1794,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                                 null
                             }/>
                         </div>
-                      );
+                      )
                       if (_showTransactionId) {
                         content.push(
                           <div style={{display: 'flex', alignItems: 'center'}}>
@@ -1824,10 +1824,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                                   null
                               }/>
                           </div>
-                        );
+                        )
                       }
                       //
-                      return content;
+                      return content
                     }
                   }/>
               </Basic.BasicTable.Table>
@@ -1842,7 +1842,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         }
         {this._renderBulkActionDetail()}
       </div>
-    );
+    )
   }
 }
 
@@ -2037,7 +2037,7 @@ AdvancedTable.propTypes = {
    */
   _searchParameters: PropTypes.object,
   _backendBulkActions: PropTypes.arrayOf(PropTypes.object),
-};
+}
 AdvancedTable.defaultProps = {
   ...Basic.AbstractContextComponent.defaultProps,
   _showLoading: true,
@@ -2065,13 +2065,13 @@ AdvancedTable.defaultProps = {
   prohibitedActions: [],
   quickButtonCount: null,
   draggable: false
-};
+}
 
 const makeMapStateToProps = () => {
-  const selectEntitiesSelector = selectEntities();
-  const mapStateToProps = function select(state, component) {
-    const uiKey = component.manager.resolveUiKey(component.uiKey);
-    const ui = state.data.ui[uiKey];
+  const selectEntitiesSelector = selectEntities()
+  const mapStateToProps = function select (state, component) {
+    const uiKey = component.manager.resolveUiKey(component.uiKey)
+    const ui = state.data.ui[uiKey]
     const result = {
       i18nReady: state.config.get('i18nReady'),
       appShowId: ConfigurationManager.showId(state),
@@ -2080,10 +2080,10 @@ const makeMapStateToProps = () => {
       sizeOptions: ConfigurationManager.getSizeOptions(state),
       _quickButtonCount: ConfigurationManager.getPublicValue(state, 'idm.pub.app.show.table.quickButton.count'),
       _menuIncluded: ConfigurationManager.getPublicValueAsBoolean(state, 'idm.pub.app.show.table.quickButton.menuIncluded', false)
-    };
+    }
     //
     if (!ui) {
-      return result;
+      return result
     }
     return {
       ...result,
@@ -2093,9 +2093,9 @@ const makeMapStateToProps = () => {
       _searchParameters: ui.searchParameters,
       _error: ui.error,
       _backendBulkActions: component.manager.supportsBulkAction() ? DataManager.getData(state, component.manager.getUiKeyForBulkActions()) : null
-    };
-  };
-  return mapStateToProps;
-};
+    }
+  }
+  return mapStateToProps
+}
 
-export default connect(makeMapStateToProps, null, null, {forwardRef: true})(AdvancedTable);
+export default connect(makeMapStateToProps, null, null, {forwardRef: true})(AdvancedTable)
