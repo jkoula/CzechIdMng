@@ -1,11 +1,5 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
-import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.ADD;
-import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.REMOVE;
-import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.UPDATE;
-import static eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto.APPLICANT_INFO_FIELD;
-import static eu.bcvsolutions.idm.core.api.dto.OperationResultDto.PROPERTY_STATE;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,10 +21,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
-import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
-import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue_;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -52,6 +42,7 @@ import com.google.common.collect.Sets;
 
 import eu.bcvsolutions.idm.core.api.audit.service.SiemLoggerManager;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import static eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation.*;
 import eu.bcvsolutions.idm.core.api.domain.CoreResultCode;
 import eu.bcvsolutions.idm.core.api.domain.Loggable;
 import eu.bcvsolutions.idm.core.api.domain.OperationState;
@@ -74,8 +65,11 @@ import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestByIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
+import static eu.bcvsolutions.idm.core.api.dto.OperationResultDto.PROPERTY_STATE;
 import eu.bcvsolutions.idm.core.api.dto.ResolvedIncompatibleRoleDto;
+import eu.bcvsolutions.idm.core.api.dto.filter.BaseRoleAssignmentFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmBaseConceptRoleRequestFilter;
+import eu.bcvsolutions.idm.core.api.dto.filter.IdmRequestIdentityRoleFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmRoleRequestFilter;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity_;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
@@ -93,6 +87,7 @@ import eu.bcvsolutions.idm.core.api.service.IdmIdentityRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.core.api.service.IdmIncompatibleRoleService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
+import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleCompositionService;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleRequestService;
 import eu.bcvsolutions.idm.core.api.service.thin.IdmIdentityRoleThinService;
@@ -104,6 +99,7 @@ import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormValueDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.InvalidFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
+import eu.bcvsolutions.idm.core.eav.entity.AbstractFormValue_;
 import eu.bcvsolutions.idm.core.ecm.api.dto.IdmAttachmentDto;
 import eu.bcvsolutions.idm.core.ecm.api.service.AttachmentManager;
 import eu.bcvsolutions.idm.core.model.domain.CoreGroupPermission;
@@ -1140,6 +1136,18 @@ public class DefaultIdmRoleRequestService
 				operation,
 				contract == null ? null : contract.getValidFrom(),
 				contract == null ? null : contract.getValidTill());
+	}
+
+	@Override
+	public AbstractConceptRoleRequestDto createConceptWithoutValidity(IdmRoleRequestDto roleRequest, IdmIdentityContractDto contract, UUID roleAssignmentUuid,
+													   UUID roleId, ConceptRoleRequestOperation operation) {
+		return createConcept(roleRequest,
+				contract == null ? null : contract.getId(),
+				roleAssignmentUuid,
+				roleId,
+				operation,
+				null,
+				null);
 	}
 
 	public AbstractConceptRoleRequestDto createConcept(IdmRoleRequestDto roleRequest, UUID ownerUuid, UUID roleAssignmentUuid,
