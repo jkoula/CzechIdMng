@@ -55,7 +55,7 @@ class DefaultCell extends AbstractComponent {
 
   render () {
     const {style, className, title} = this.props
-    //
+
     return (
       <div style={style} className={className} title={title}>
         {this.props.children}
