@@ -10,7 +10,7 @@ import { AbstractComponent } from '../../basic';
 class AdvancedColumn extends AbstractComponent {
 
   render() {
-    const { rendered } = this.props;
+    const {rendered} = this.props;
     if (!rendered) {
       return null;
     }

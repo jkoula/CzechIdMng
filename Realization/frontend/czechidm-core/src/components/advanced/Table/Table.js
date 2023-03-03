@@ -46,7 +46,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   constructor(props, context) {
     super(props, context);
     // resolve static frontend actions (backend actions are loaded asynchronously ... check componentDidMount)
-    const { manager, actions } = this.props;
+    const {manager, actions} = this.props;
     let _actions = [];
     if (!manager.supportsBulkAction() && actions !== null && actions.length > 0) {
       _actions = actions
@@ -86,13 +86,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   _getBulkActionLabel(backendBulkAction) {
-    return this.i18n(`${backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`, {
+    return this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`, {
       defaultValue: backendBulkAction.description || backendBulkAction.name
     });
   }
 
   componentDidMount() {
-    const { initialReload } = this.props;
+    const {initialReload} = this.props;
     if (initialReload) {
       this.reload();
     }
@@ -118,7 +118,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         ...props
       };
     }
-    const { rendered, _searchParameters } = _props;
+    const {rendered, _searchParameters} = _props;
     if (!rendered) {
       return;
     }
@@ -132,7 +132,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @since 11.1.0
    */
   reloadBulkActions() {
-    const { manager } = this.props;
+    const {manager} = this.props;
     //
     if (manager.supportsBulkAction() && manager.canRead()) {
       this.context.store.dispatch(manager.fetchAvailableBulkActions((actions, error) => {
@@ -146,8 +146,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
           // TODO: react elements are stored in state ... redesign raw data and move cached actions into reducer
           const _actions = actions
             .map(backendBulkAction => {
-              const actionKey = `${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }`;
-              const iconKey = `${ actionKey }.icon`;
+              const actionKey = `${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}`;
+              const iconKey = `${actionKey}.icon`;
               const icon = backendBulkAction.icon || this.i18n(iconKey);
               const label = this._getBulkActionLabel(backendBulkAction);
               return {
@@ -161,12 +161,12 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                 quickButton: backendBulkAction.quickButton,
                 quickButtonable: backendBulkAction.quickButtonable,
                 niceLabel: (
-                  <span key={ `b-a-${backendBulkAction.name}` }>
+                  <span key={`b-a-${backendBulkAction.name}`}>
                     <Basic.Icon
-                      value={ icon }
-                      rendered={ backendBulkAction.module + icon !== iconKey }
-                      style={{ marginRight: 5, width: 18, textAlign: 'center' }}/>
-                    { label }
+                      value={icon}
+                      rendered={backendBulkAction.module + icon !== iconKey}
+                      style={{marginRight: 5, width: 18, textAlign: 'center'}}/>
+                    {label}
                   </span>
                 ),
                 action: this.showBulkActionDetail.bind(this, backendBulkAction),
@@ -202,7 +202,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @return
    */
   selectRowForBulkAction(rowIndex, selected) {
-    const { selectedRows, removedRows } = this.state;
+    const {selectedRows, removedRows} = this.state;
     let newRemovedRows = new Immutable.Set(removedRows);
     let newSelectedRows = new Immutable.Set(selectedRows);
     if (rowIndex === -1) {
@@ -237,13 +237,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   isAllRowSelected() {
-    const { selectedRows } = this.state;
+    const {selectedRows} = this.state;
     // if selected rows contains SELECT ALL return true
     return _.includes(selectedRows, Basic.Table.SELECT_ALL);
   }
 
   isRowSelected(identifier) {
-    const { selectedRows, removedRows } = this.state;
+    const {selectedRows, removedRows} = this.state;
     if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
       return !removedRows.has(identifier);
     }
@@ -253,13 +253,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   preprocessBulkAction(bulkAction, cb = null) {
     const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
 
-    const { selectedRows, removedRows } = this.state;
+    const {selectedRows, removedRows} = this.state;
 
     if (bulkAction) {
       const bulkActionToProcess = {
         ...bulkAction
       };
-      const { manager } = this.props;
+      const {manager} = this.props;
       //
       if (_.includes(selectedRows, Basic.Table.SELECT_ALL)) {
         bulkActionToProcess.filter = _searchParameters.getFilters().toJSON();
@@ -278,7 +278,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               backendBulkAction: bulkActionPreprocessed
             });
             if (cb) {
-              cb(bulkActionPreprocessed)
+              cb(bulkActionPreprocessed);
             }
           } else {
             this.setState({
@@ -296,13 +296,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
     const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
 
-    const { selectedRows, removedRows } = this.state;
+    const {selectedRows, removedRows} = this.state;
 
     if (bulkAction) {
       const bulkActionToProcess = {
         ...bulkAction
       };
-      const { manager } = this.props;
+      const {manager} = this.props;
       // remove unnecessary attributes
       delete bulkActionToProcess.formAttributes;
       delete bulkActionToProcess.longRunningTaskId;
@@ -326,7 +326,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               bulkActionShowLoading: false
             });
           } else if (resultModel) {
-            const { backendBulkAction } = this.state;
+            const {backendBulkAction} = this.state;
             backendBulkAction.prevalidateResult = resultModel;
             this.setState({
               bulkActionShowLoading: false,
@@ -351,13 +351,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
     const _searchParameters = this._mergeSearchParameters(this.props._searchParameters);
 
-    const { selectedRows, removedRows } = this.state;
+    const {selectedRows, removedRows} = this.state;
 
     if (bulkAction) {
       const bulkActionToProcess = {
         ...bulkAction
       };
-      const { manager } = this.props;
+      const {manager} = this.props;
       // remove unnecessary attributes
       delete bulkActionToProcess.formAttributes;
       delete bulkActionToProcess.longRunningTaskId;
@@ -385,7 +385,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             level: 'info',
             message: this.i18n('bulkAction.created', {
               longRunningTaskId: processBulkAction.longRunningTaskId,
-              name: this.i18n(`${ processBulkAction.module }:eav.bulk-action.${ processBulkAction.name }.label`)
+              name: this.i18n(`${processBulkAction.module}:eav.bulk-action.${processBulkAction.name}.label`)
             })
           });
           this.setState({
@@ -406,7 +406,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @since 10.6.0
    */
   _afterBulkAction(processedBulkAction) {
-    const { afterBulkAction } = this.props;
+    const {afterBulkAction} = this.props;
     let isReload = true;
     if (afterBulkAction) {
       isReload = afterBulkAction(processedBulkAction);
@@ -422,7 +422,14 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    */
   _mergeSearchParameters(searchParameters, props = null) {
     const _props = props || this.props;
-    const { defaultSearchParameters, forceSearchParameters, manager, defaultPageSize, pagination, draggable } = _props;
+    const {
+      defaultSearchParameters,
+      forceSearchParameters,
+      manager,
+      defaultPageSize,
+      pagination,
+      draggable
+    } = _props;
     //
     let _forceSearchParameters = null;
     if (forceSearchParameters) {
@@ -444,7 +451,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   fetchEntities(searchParameters, props = null) {
     const _props = props || this.props;
     searchParameters = this._mergeSearchParameters(searchParameters, _props);
-    const { onReload } = _props;
+    const {onReload} = _props;
     //
     if (!_props.hideTableShowLoading) {
       this._fetchEntities(searchParameters, _props, (data, error) => {
@@ -470,17 +477,17 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   _fetchEntities(searchParameters, _props, cb) {
-    const { uiKey, manager } = _props;
+    const {uiKey, manager} = _props;
     //
     this.context.store.dispatch(manager.fetchEntities(searchParameters, uiKey, (json, error) => {
       if (error) {
         this.addErrorMessage({
-          key: `error-${ manager.getEntityType() }-load`
+          key: `error-${manager.getEntityType()}-load`
         }, error);
         cb(null, error);
-      // remove selection for unpresent records
+        // remove selection for unpresent records
       } else if (json && json._embedded) {
-        const { selectedRows } = this.state;
+        const {selectedRows} = this.state;
         const newSelectedRows = [];
         let data = null;
         if (json._embedded[manager.getCollectionType()]) {
@@ -503,7 +510,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   _handlePagination(page, size) {
-    const { uiKey, manager } = this.props;
+    const {uiKey, manager} = this.props;
     this.context.store.dispatch(manager.handlePagination(page, size, uiKey, (json, error) => {
       // croll top - new page of items
       if (!error) {
@@ -517,13 +524,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   _handleSort(property, order, shiftKey) {
-    const { uiKey, manager } = this.props;
+    const {uiKey, manager} = this.props;
     //
     this.context.store.dispatch(manager.handleSort(property, order, uiKey, shiftKey));
   }
 
   _resolveColumns() {
-    const { columns } = this.props;
+    const {columns} = this.props;
     const children = [];
     //
     React.Children.forEach(this.props.children, (child) => {
@@ -587,7 +594,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @return {SearchParameters}
    */
   _getSearchParameters(formData) {
-    const { _searchParameters } = this.props;
+    const {_searchParameters} = this.props;
     //
     return Domain.SearchParameters.getSearchParameters(formData, _searchParameters);
   }
@@ -603,7 +610,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   cancelFilter(filterForm) {
-    const { manager, _searchParameters } = this.props;
+    const {manager, _searchParameters} = this.props;
     //
     const filterValues = filterForm.getData();
     for (const property in filterValues) {
@@ -625,7 +632,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   _onRowSelect(rowIndex, selected, selection) {
-    const { onRowSelect } = this.props;
+    const {onRowSelect} = this.props;
     //
     this.setState({
       selectedRows: selection
@@ -640,7 +647,10 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     if (actionItem.action) {
       actionItem.action(actionItem.value, this.state.selectedRows, actionItem);
     } else {
-      this.addMessage({ level: 'info', message: this.i18n('bulk-action.notImplemented') });
+      this.addMessage({
+        level: 'info',
+        message: this.i18n('bulk-action.notImplemented')
+      });
     }
     return false;
   }
@@ -650,11 +660,11 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       return noData;
     }
     // default noData
-    return this.i18n('noData', { defaultValue: 'No record found' });
+    return this.i18n('noData', {defaultValue: 'No record found'});
   }
 
   _showId() {
-    const { showId, appShowId } = this.props;
+    const {showId, appShowId} = this.props;
     //
     if (showId !== null && showId !== undefined) {
       // table prop => highest priority
@@ -664,7 +674,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
   }
 
   _filterOpen(open) {
-    const { filterOpen } = this.props;
+    const {filterOpen} = this.props;
     let result = true;
     if (filterOpen) {
       result = filterOpen(open);
@@ -677,8 +687,8 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
   }
 
-  showBulkActionDetail(backendBulkAction, cb=null) {
-    const { showBulkActionDetail } = this.state;
+  showBulkActionDetail(backendBulkAction, cb = null) {
+    const {showBulkActionDetail} = this.state;
     //
     if (showBulkActionDetail) { // FIXME: ~close bulk action ...
       this.setState({
@@ -719,19 +729,20 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       if (backendBulkAction.supportsPreprocessing) {
         this.preprocessBulkAction(backendBulkAction, (bulkActionPreprocessed) => {
           this.setState({
-          showBulkActionDetail: !showBulkActionDetail,
-          backendBulkAction: bulkActionPreprocessed,
-          now: moment(new Date()).format(this.i18n('format.datetime')),
-          formInstance: new Domain.FormInstance({}, values)
-        }, () => {
-          // @todo-upgrade-10 This is brutal hack!
-          // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
-          // This problem occured after update on React 16
-          // @todo-upgrade-12 still occurs with material-ui modals
-          setTimeout(() => {
-            this.prevalidateBulkAction(backendBulkAction);
-          }, 10);
-        });});
+            showBulkActionDetail: !showBulkActionDetail,
+            backendBulkAction: bulkActionPreprocessed,
+            now: moment(new Date()).format(this.i18n('format.datetime')),
+            formInstance: new Domain.FormInstance({}, values)
+          }, () => {
+            // @todo-upgrade-10 This is brutal hack!
+            // I had to use the timeout, because Modal doesn't have rendered refs in this phase.
+            // This problem occured after update on React 16
+            // @todo-upgrade-12 still occurs with material-ui modals
+            setTimeout(() => {
+              this.prevalidateBulkAction(backendBulkAction);
+            }, 10);
+          });
+        });
       } else {
         this.setState({
           showBulkActionDetail: !showBulkActionDetail,
@@ -768,15 +779,15 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     if (this.props.uiKey === 'audit-table') {
       // audit table reloads externally ()
     } else {
-      this.context.history.push(`/audit/entities?${ property }=${ propertyValue }`);
+      this.context.history.push(`/audit/entities?${property}=${propertyValue}`);
     }
   }
 
   /**
- * Removes prohibited actions.
- */
+   * Removes prohibited actions.
+   */
   _removeProhibitedActions(actions) {
-    const { prohibitedActions } = this.props;
+    const {prohibitedActions} = this.props;
 
     return actions.filter(action => {
       if (!prohibitedActions) {
@@ -803,7 +814,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @since 10.7.0
    */
   _onDraggableStop(dndProps) {
-    const { manager, uiKey, onDraggableStop } = this.props;
+    const {manager, uiKey, onDraggableStop} = this.props;
 
     if (onDraggableStop) {
       onDraggableStop(dndProps);
@@ -811,7 +822,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     }
     //
     // default implementation - based on entity.seq field
-    const { data, startIndex, differenceIndex } = dndProps;
+    const {data, startIndex, differenceIndex} = dndProps;
     const patchEntities = [];
     //
     if (differenceIndex > 0) { // move down
@@ -834,11 +845,11 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         } else {
           lastOrder = decrementRow.seq - 1;
         }
-        patchEntities.push({ id: decrementRow.id, seq: lastOrder });
+        patchEntities.push({id: decrementRow.id, seq: lastOrder});
       }
       lastOrder += 1;
       if (lastOrder !== currentRow.seq) {
-        patchEntities.push({ id: currentRow.id, seq: lastOrder });
+        patchEntities.push({id: currentRow.id, seq: lastOrder});
       }
       // check order for rows after
       for (let index = startIndex + differenceIndex + 1; index < data.length; index++) {
@@ -847,14 +858,14 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         if (rowAfter.seg >= lastOrder) {
           break;
         }
-        patchEntities.push({ id: rowAfter.id, seq: lastOrder });
+        patchEntities.push({id: rowAfter.id, seq: lastOrder});
       }
     } else { // move up
       // start index => decrement by difference
       const firstIndexSeq = data[startIndex + differenceIndex].seq;
       const currentRow = data[startIndex];
       if (firstIndexSeq !== currentRow.seq) { // 0 by default => no change is needed
-        patchEntities.push({ id: currentRow.id, seq: firstIndexSeq });
+        patchEntities.push({id: currentRow.id, seq: firstIndexSeq});
       }
       // increment others
       let lastOrder = firstIndexSeq;
@@ -866,7 +877,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         } else {
           lastOrder = incrementRow.seq + 1;
         }
-        patchEntities.push({ id: incrementRow.id, seq: lastOrder });
+        patchEntities.push({id: incrementRow.id, seq: lastOrder});
       }
       // check order for rows after
       for (let index = startIndex + 1; index < data.length; index++) {
@@ -875,7 +886,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         if (rowAfter.seg >= lastOrder) {
           break;
         }
-        patchEntities.push({ id: rowAfter.id, seq: (lastOrder) });
+        patchEntities.push({id: rowAfter.id, seq: (lastOrder)});
       }
     }
     //
@@ -923,11 +934,21 @@ class AdvancedTable extends Basic.AbstractContextComponent {
    * @since 11.1.0
    */
   showDraggable(searchParameters) {
-    const { showDraggable, draggable, forceSearchParameters, _entities, _total } = this.props;
+    const {
+      showDraggable,
+      draggable,
+      forceSearchParameters,
+      _entities,
+      _total
+    } = this.props;
     //
     // external callback -the highest priority
     if (showDraggable) {
-      return showDraggable({ searchParameters, entities: _entities, total: _total });
+      return showDraggable({
+        searchParameters,
+        entities: _entities,
+        total: _total
+      });
     }
     //
     if (!draggable) {
@@ -973,7 +994,9 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     const result = [];
     for (const model of backendBulkAction.prevalidateResult._infos) {
       result.push(
-        <Basic.FlashMessage showHtmlText message={ this.getFlashManager().convertFromResultModel(model) }/>
+        <Basic.FlashMessage
+          showHtmlText
+          message={this.getFlashManager().convertFromResultModel(model)}/>
       );
     }
     return result;
@@ -989,7 +1012,7 @@ class AdvancedTable extends Basic.AbstractContextComponent {
       removedRows,
       formInstance
     } = this.state;
-    const { _total, manager } = this.props;
+    const {_total, manager} = this.props;
     const count = _total - removedRows.size;
 
     const isSelectedAll = _.includes(selectedRows, Basic.Table.SELECT_ALL);
@@ -1013,57 +1036,59 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         bsSize = 'sm';
         modalContent.push(
           <LongRunningTask
-            entityIdentifier={ backendBulkAction.longRunningTaskId }
-            header={ this.i18n(`${backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`)}
-            showProperties={ false }
-            onComplete={ () => this._afterBulkAction(backendBulkAction) }
-            style={{ marginBottom: 0 }}
+            entityIdentifier={backendBulkAction.longRunningTaskId}
+            header={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`)}
+            showProperties={false}
+            onComplete={() => this._afterBulkAction(backendBulkAction)}
+            style={{marginBottom: 0}}
             footerButtons={
               <Basic.Button
                 level="link"
-                onClick={ this.showBulkActionDetail.bind(this) }>
-                { this.i18n('button.close') }
+                onClick={this.showBulkActionDetail.bind(this)}>
+                {this.i18n('button.close')}
               </Basic.Button>
             }/>
         );
       } else {
         modalContent.push(
           <Basic.Modal.Header
-            icon={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.icon`, { defaultValue: '' }) }
-            text={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`) }
+            icon={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.icon`, {defaultValue: ''})}
+            text={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`)}
             closeButton/>
         );
         modalContent.push(
           <Basic.Modal.Body>
             <Basic.Alert
               level="info"
-              text={ this.i18n('bulkAction.insufficientReadPermission') }/>
+              text={this.i18n('bulkAction.insufficientReadPermission')}/>
           </Basic.Modal.Body>
         );
         modalContent.push(
           <Basic.Modal.Footer>
             <Basic.Button
               level="link"
-              onClick={ this.showBulkActionDetail.bind(this) }>
-              { this.i18n('button.close') }
+              onClick={this.showBulkActionDetail.bind(this)}>
+              {this.i18n('button.close')}
             </Basic.Button>
           </Basic.Modal.Footer>
         );
       }
     } else if (backendBulkAction) {
-      const helpKey = `${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.help`;
+      const helpKey = `${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.help`;
       const help = this.i18n(helpKey);
       //
       modalContent.push(
         <Basic.Modal.Header
-          icon={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.icon`, { defaultValue: '' }) }
-          text={ this.i18n(`${ backendBulkAction.module }:eav.bulk-action.${ backendBulkAction.name }.label`) }
+          icon={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.icon`, {defaultValue: ''})}
+          text={this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`)}
           closeButton/>
       );
       modalContent.push(
         <Basic.Modal.Body>
-          <form onSubmit={ this.processBulkAction.bind(this, backendBulkAction) }>
-            <Basic.AbstractForm ref="bulkActionForm" showLoading={bulkActionShowLoading}>
+          <form onSubmit={this.processBulkAction.bind(this, backendBulkAction)}>
+            <Basic.AbstractForm
+              ref="bulkActionForm"
+              showLoading={bulkActionShowLoading}>
               <Basic.Alert
                 level="warning"
                 text={
@@ -1074,10 +1099,16 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                     escape: false
                   })
                 }
-                rendered={isSelectedAll} />
-              <Basic.Row rendered={ !isSelectedAll } style={{ marginLeft: 0, marginRight: 0, marginBottom: 15 }}>
+                rendered={isSelectedAll}/>
+              <Basic.Row
+                rendered={!isSelectedAll}
+                style={{
+                  marginLeft: 0,
+                  marginRight: 0,
+                  marginBottom: 15
+                }}>
                 {
-                  this.i18n(`bulkAction.message${ (selectedRows.length === 0 ? '_empty' : '') }`, {
+                  this.i18n(`bulkAction.message${(selectedRows.length === 0 ? '_empty' : '')}`, {
                     count: selectedRows.length,
                     entities: manager.getNiceLabels(selectedEntities).join(', '),
                     name: this.i18n(`${backendBulkAction.module}:eav.bulk-action.${backendBulkAction.name}.label`),
@@ -1085,7 +1116,13 @@ class AdvancedTable extends Basic.AbstractContextComponent {
                   })
                 }
               </Basic.Row>
-              <Basic.Row rendered={removedEnties.length > 0} style={ { marginLeft: 0, marginRight: 0, marginBottom: 15 } }>
+              <Basic.Row
+                rendered={removedEnties.length > 0}
+                style={{
+                  marginLeft: 0,
+                  marginRight: 0,
+                  marginBottom: 15
+                }}>
                 {
                   this.i18n('bulkAction.removedRecord', {
                     count: removedEnties.length,
@@ -1097,17 +1134,17 @@ class AdvancedTable extends Basic.AbstractContextComponent {
               <Basic.Alert
                 level="info"
                 showHtmlText
-                text={ help }
-                rendered={ (`${backendBulkAction.module}:${help}`) !== helpKey } />
+                text={help}
+                rendered={(`${backendBulkAction.module}:${help}`) !== helpKey}/>
 
-              { this._renderPrevalidateMessages(backendBulkAction) }
+              {this._renderPrevalidateMessages(backendBulkAction)}
 
               <EavAttributeForm
                 ref="bulkActionAttributes"
-                localizationKey={ backendBulkAction.name }
-                localizationModule={ backendBulkAction.module }
-                formAttributes={ backendBulkAction.formAttributes }
-                formInstance={ formInstance }
+                localizationKey={backendBulkAction.name}
+                localizationModule={backendBulkAction.module}
+                formAttributes={backendBulkAction.formAttributes}
+                formInstance={formInstance}
                 localizationType="bulk-action"/>
             </Basic.AbstractForm>
             {/* onEnter action - is needed because footer submit button is outside form */}
@@ -1119,18 +1156,18 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         <Basic.Modal.Footer>
           <Basic.Button
             level="link"
-            onClick={ this.showBulkActionDetail.bind(this) }>
-            { this.i18n('button.close') }
+            onClick={this.showBulkActionDetail.bind(this)}>
+            {this.i18n('button.close')}
           </Basic.Button>
           <Basic.Button
             type="submit"
             variant="contained"
-            level={ backendBulkAction.level ? backendBulkAction.level.toLowerCase() : 'success' }
-            showLoading={ bulkActionShowLoading }
+            level={backendBulkAction.level ? backendBulkAction.level.toLowerCase() : 'success'}
+            showLoading={bulkActionShowLoading}
             showLoadingIcon
-            showLoadingText={ this.i18n('button.saving') }
-            onClick={ this.processBulkAction.bind(this, backendBulkAction) }>
-            { this.i18n('bulkAction.button.execute') }
+            showLoadingText={this.i18n('button.saving')}
+            onClick={this.processBulkAction.bind(this, backendBulkAction)}>
+            {this.i18n('bulkAction.button.execute')}
           </Basic.Button>
         </Basic.Modal.Footer>
       );
@@ -1138,12 +1175,12 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     //
     return (
       <Basic.Modal
-        show={ showBulkActionDetail }
-        onHide={ this.showBulkActionDetail.bind(this) }
+        show={showBulkActionDetail}
+        onHide={this.showBulkActionDetail.bind(this)}
         backdrop="static"
-        bsSize={ bsSize }
-        fullWidth={ fullWidth }>
-        { modalContent }
+        bsSize={bsSize}
+        fullWidth={fullWidth}>
+        {modalContent}
       </Basic.Modal>
     );
   }
@@ -1230,104 +1267,118 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         if (!columnHeader) {
           columnHeader = this.i18n(
             `${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}.label`, // label has higher priority
-            { defaultValue: this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}`)}
+            {defaultValue: this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}`)}
           );
         }
         if (!columnTitle) {
-          columnTitle = this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}.title`, { defaultValue: '' });
+          columnTitle = this.i18n(`${manager.getModule()}:entity.${manager.getEntityType()}.${column.props.property}.title`, {defaultValue: ''});
         }
       }
       if (column.props.sort) {
         columnHeader = (
           <Basic.BasicTable.SortHeaderCell
-            header={ columnHeader }
-            sortHandler={ this.showDraggable(_searchParameters) ? null : this._handleSort.bind(this) }
-            sortProperty={ column.props.sortProperty || column.props.property }
-            searchParameters={ _searchParameters }
-            className={ commonProps.className }
-            title={ columnTitle }/>
+            header={columnHeader}
+            sortHandler={this.showDraggable(_searchParameters) ? null : this._handleSort.bind(this)}
+            sortProperty={column.props.sortProperty || column.props.property}
+            searchParameters={_searchParameters}
+            className={commonProps.className}
+            title={columnTitle}/>
         );
       } else if (columnTitle) {
         columnHeader = (
-          <span title={ columnTitle }>
-            { columnHeader }
+          <span title={columnTitle}>
+            {columnHeader}
           </span>
         );
       }
       //
-      const key = `column_${ i }`;
+      const key = `column_${i}`;
       let cell = null;
       if (column.props.cell) {
         cell = column.props.cell;
       } else if (column.type.__AdvancedColumnLink__) {
         cell = (
           <Basic.BasicTable.LinkCell
-            to={ column.props.to }
-            href={ column.props.href }
-            target={ column.props.target }
-            access={ column.props.access }
-            { ...commonProps }/>
+            to={column.props.to}
+            href={column.props.href}
+            target={column.props.target}
+            access={column.props.access}
+            {...commonProps}/>
         );
       } else {
         switch (column.props.face) {
           case 'text': {
             cell = (
-              <Basic.BasicTable.TextCell { ...commonProps } maxLength={ column.props.maxLength }/>
+              <Basic.BasicTable.TextCell
+                {...commonProps}
+                maxLength={column.props.maxLength}/>
             );
             break;
           }
           case 'date': {
             cell = (
-              <Basic.BasicTable.DateCell format={ this.i18n('format.date') } { ...commonProps }/>
+              <Basic.BasicTable.DateCell
+                format={this.i18n('format.date')}
+                {...commonProps}/>
             );
             break;
           }
           case 'datetime': {
             cell = (
-              <Basic.BasicTable.DateCell format={ this.i18n('format.datetime') } { ...commonProps }/>
+              <Basic.BasicTable.DateCell
+                format={this.i18n('format.datetime')}
+                {...commonProps}/>
             );
             break;
           }
           case 'bool':
           case 'boolean': {
             cell = (
-              <Basic.BasicTable.BooleanCell { ...commonProps }/>
+              <Basic.BasicTable.BooleanCell {...commonProps}/>
             );
             break;
           }
           case 'enum': {
             cell = (
-              <Basic.BasicTable.EnumCell enumClass={column.props.enumClass} {...commonProps}/>
+              <Basic.BasicTable.EnumCell
+                enumClass={column.props.enumClass}
+                {...commonProps}/>
             );
             break;
           }
           default: {
-            this.getLogger().trace(`[AdvancedTable] usind default for column face [${ column.props.face }]`);
+            this.getLogger().trace(`[AdvancedTable] usind default for column face [${column.props.face}]`);
           }
         }
       }
       // add target column with cell by data type
       renderedColumns.push(
         <Basic.BasicTable.Column
-          key={ key }
-          property={ column.props.property }
-          rendered={ column.props.rendered }
-          className={ column.props.className }
-          width={ column.props.width }
-          header={ columnHeader }
-          title={ columnTitle }
-          cell={ cell }/>
+          key={key}
+          property={column.props.property}
+          rendered={column.props.rendered}
+          className={column.props.className}
+          width={column.props.width}
+          header={columnHeader}
+          title={columnTitle}
+          cell={cell}/>
       );
     }
     //
     let _rowClass = rowClass;
     if (!_rowClass) {
       // automatic rowClass by entity's "disabled" attribute
-      _rowClass = ({rowIndex, data}) => { return Utils.Ui.getDisabledRowClass(data[rowIndex]); };
+      _rowClass = ({
+        rowIndex,
+        data
+      }) => { return Utils.Ui.getDisabledRowClass(data[rowIndex]); };
     }
     // If is manager in the universal request mode, then row class by requests will be used (REMOVE / ADD / CHANGE).
     if (manager.isRequestModeEnabled && manager.isRequestModeEnabled()) {
-      _rowClass = ({rowIndex, data}) => { return Utils.Ui.getRequestRowClass(data[rowIndex]); };
+      _rowClass = ({
+        rowIndex,
+        data
+      }) => { return Utils.Ui.getRequestRowClass(data[rowIndex]); };
     }
     //
     let count = 0;
@@ -1418,19 +1469,19 @@ class AdvancedTable extends Basic.AbstractContextComponent {
     if (_menuIncluded && buttonActions.length > 0) {
       buttonMenuIncludedActions = buttonActions.map(action => (
         <Basic.MenuItem
-          title={ this.isDevelopment() ? `Action order: ${ action.order }, Action key: ${ action.actionKey }` : null }
+          title={this.isDevelopment() ? `Action order: ${action.order}, Action key: ${action.actionKey}` : null}
           onClick={
             (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
             ||
             (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-            ?
-            null
-            :
-            () => {
-              this._handleCloseBulkActionMenu(() => {
-                this.onBulkAction(action);
-              });
-            }
+              ?
+              null
+              :
+              () => {
+                this._handleCloseBulkActionMenu(() => {
+                  this.onBulkAction(action);
+                });
+              }
           }
           disabled={
             (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
@@ -1438,19 +1489,19 @@ class AdvancedTable extends Basic.AbstractContextComponent {
             (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
           }
           icon={
-            <Basic.Icon icon={ action.icon } level={ action.level }/>
+            <Basic.Icon icon={action.icon} level={action.level}/>
           }>
-          { action.label || action.niceLabel }
+          {action.label || action.niceLabel}
         </Basic.MenuItem>
       ));
       if (menuActions.length > 0 || deleteActions.length > 0) {
-        buttonMenuIncludedActions.push(<Divider />);
+        buttonMenuIncludedActions.push(<Divider/>);
         buttonMenuIncludedActions.push(
           <Basic.MenuItem disabled>
-            { this.i18n(`bulkAction.button.next`) }
+            {this.i18n(`bulkAction.button.next`)}
           </Basic.MenuItem>
         );
-        buttonMenuIncludedActions.push(<Divider />);
+        buttonMenuIncludedActions.push(<Divider/>);
       }
     }
     //
@@ -1459,333 +1510,337 @@ class AdvancedTable extends Basic.AbstractContextComponent {
         className={
           classnames(
             'advanced-table',
-            { 'bulk-action-supported': manager.supportsBulkAction() },
-            { 'quick-button-supported': !showBulkActionSelect },
+            {'bulk-action-supported': manager.supportsBulkAction()},
+            {'quick-button-supported': !showBulkActionSelect},
             className
           )
         }
-        style={ style }>
+        style={style}>
         {
           (!filter && (_actions.length === 0 || !showRowSelection) && (buttons === null || buttons.length === 0))
           ||
           <Basic.Toolbar
-            container={ this }
-            viewportOffsetTop={ filterViewportOffsetTop }
-            rendered={ showToolbar }
+            container={this}
+            viewportOffsetTop={filterViewportOffsetTop}
+            rendered={showToolbar}
             className="collapse-top">
-            <Basic.Collapse in={ filterOpened } rendered={ showFilter }>
-              <Basic.Div showLoading={ _isLoading } showAnimation={ false }>
-                { filter }
+            <Basic.Collapse in={filterOpened} rendered={showFilter}>
+              <Basic.Div showLoading={_isLoading} showAnimation={false}>
+                {filter}
               </Basic.Div>
             </Basic.Collapse>
             <div className="advanced-table-heading">
               <div className="bulk-action-container">
                 {
                   showBulkActionSelect
-                  ?
-                  <Basic.EnumSelectBox
-                    onChange={ this.onBulkAction.bind(this) }
-                    ref="bulkActionSelect"
-                    componentSpan=""
-                    className={ _actionClassName }
-                    multiSelect={ false }
-                    options={ selectedRows.length <= 0 ? _actionsWithoutSelection : _actionsWithSelection }
-                    placeholder={ this.i18n(`bulk-action.selection${ selectedRows.length === 0 ? '_empty' : '' }`, { count }) }
-                    rendered={
-                      (
-                        (selectedRows.length <= 0 && _actionsWithoutSelection.length > 0)
+                    ?
+                    <Basic.EnumSelectBox
+                      onChange={this.onBulkAction.bind(this)}
+                      ref="bulkActionSelect"
+                      componentSpan=""
+                      className={_actionClassName}
+                      multiSelect={false}
+                      options={selectedRows.length <= 0 ? _actionsWithoutSelection : _actionsWithSelection}
+                      placeholder={this.i18n(`bulk-action.selection${selectedRows.length === 0 ? '_empty' : ''}`, {count})}
+                      rendered={
+                        (
+                          (selectedRows.length <= 0 && _actionsWithoutSelection.length > 0)
+                          ||
+                          (selectedRows.length > 0 && _actionsWithSelection.length > 0)
+                        )
+                        && showRowSelection
+                      }
+                      searchable={false}
+                      emptyOptionLabel={false}/>
+                    :
+                    <Basic.Div
+                      className={_actionClassName}
+                      style={this.showDraggable(_searchParameters) ? {paddingLeft: 19} : {}}
+                      rendered={_actions.length > 0 && showRowSelection}>
+                      {
+                        buttonActions.map(action => {
+                          return (
+                            <Basic.Button
+                              className="bulk-action-button"
+                              title={
+                                this.isDevelopment()
+                                  ?
+                                  `${action.label || action.niceLabel} - Action order: ${action.order}, Action key: ${action.actionKey}`
+                                  :
+                                  (action.label || action.niceLabel)
+                              }
+                              disabled={
+                                (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                ||
+                                (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+                              }
+                              titlePlacement="bottom"
+                              onClick={this.onBulkAction.bind(this, action)}
+                              icon={action.icon}
+                              level={action.level}/>
+                          );
+                        })
+                      }
+                      {
+                        (menuActions.length === 0 && deleteActions.length === 0 && (!_menuIncluded || buttonActions.length === 0))
                         ||
-                        (selectedRows.length > 0 && _actionsWithSelection.length > 0)
-                      )
-                      && showRowSelection
-                    }
-                    searchable={ false }
-                    emptyOptionLabel={ false }/>
-                  :
-                  <Basic.Div
-                    className={ _actionClassName }
-                    style={ this.showDraggable(_searchParameters) ? { paddingLeft: 19 } : {} }
-                    rendered={ _actions.length > 0 && showRowSelection }>
-                    {
-                      buttonActions.map(action => {
-                        return (
-                          <Basic.Button
-                            className="bulk-action-button"
-                            title={
-                              this.isDevelopment()
-                              ?
-                              `${ action.label || action.niceLabel } - Action order: ${ action.order }, Action key: ${ action.actionKey }`
-                              :
-                              (action.label || action.niceLabel)
-                            }
-                            disabled={
-                              (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                              ||
-                              (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                            }
-                            titlePlacement="bottom"
-                            onClick={ this.onBulkAction.bind(this, action) }
-                            icon={ action.icon }
-                            level={ action.level }/>
-                        );
-                      })
-                    }
-                    {
-                      (menuActions.length === 0 && deleteActions.length === 0 && (!_menuIncluded || buttonActions.length === 0))
-                      ||
-                      <>
-                        <IconButton
-                          bsRole="toggle"
-                          aria-label="more"
-                          aria-controls="bulk-action-menu"
-                          aria-haspopup="true"
-                          title={ _menuIncluded ? this.i18n(`bulkAction.button.all`) : this.i18n(`bulkAction.button.next`) }
-                          onClick={ (event) => {
-                            this._handleOpenBulkActionMenu(event);
-                          }}>
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          id="bulk-action-menu"
-                          anchorEl={ anchorEl }
-                          keepMounted
-                          open={ Boolean(anchorEl) }
-                          onClose={ this._handleCloseBulkActionMenu.bind(this, null) }>
-                          <MenuList>
-                            <Basic.MenuItem disabled>
-                              { this.i18n(`bulk-action.selection${ selectedRows.length === 0 ? '_empty' : '' }`, { count }) }
-                            </Basic.MenuItem>
-                            <Divider />
+                        <>
+                          <IconButton
+                            bsRole="toggle"
+                            aria-label="more"
+                            aria-controls="bulk-action-menu"
+                            aria-haspopup="true"
+                            title={_menuIncluded ? this.i18n(`bulkAction.button.all`) : this.i18n(`bulkAction.button.next`)}
+                            onClick={(event) => {
+                              this._handleOpenBulkActionMenu(event);
+                            }}>
+                            <MoreVertIcon/>
+                          </IconButton>
+                          <Menu
+                            id="bulk-action-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={this._handleCloseBulkActionMenu.bind(this, null)}>
+                            <MenuList>
+                              <Basic.MenuItem disabled>
+                                {this.i18n(`bulk-action.selection${selectedRows.length === 0 ? '_empty' : ''}`, {count})}
+                              </Basic.MenuItem>
+                              <Divider/>
 
-                            {
-                              buttonMenuIncludedActions
-                            }
-                            {
-                              menuActions.map(action => {
-                                return (
-                                  <Basic.MenuItem
-                                    title={ this.isDevelopment() ? `Action order: ${ action.order }, Action key: ${ action.actionKey }` : null }
-                                    onClick={
-                                      (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                                      ||
-                                      (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                                      ?
-                                      null
-                                      :
-                                      () => {
-                                        this._handleCloseBulkActionMenu(() => {
-                                          this.onBulkAction(action);
-                                        });
+                              {
+                                buttonMenuIncludedActions
+                              }
+                              {
+                                menuActions.map(action => {
+                                  return (
+                                    <Basic.MenuItem
+                                      title={this.isDevelopment() ? `Action order: ${action.order}, Action key: ${action.actionKey}` : null}
+                                      onClick={
+                                        (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                        ||
+                                        (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+                                          ?
+                                          null
+                                          :
+                                          () => {
+                                            this._handleCloseBulkActionMenu(() => {
+                                              this.onBulkAction(action);
+                                            });
+                                          }
                                       }
-                                    }
-                                    disabled={
-                                      (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                                      ||
-                                      (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                                    }
-                                    icon={
-                                      <Basic.Icon icon={ action.icon } level={ action.level }/>
-                                    }>
-                                    { action.label || action.niceLabel }
-                                  </Basic.MenuItem>
-                                );
-                              })
-                            }
-                            {
-                              deleteActions.length === 0 || menuActions.length === 0
-                              ||
-                              <Divider />
-                            }
-                            {
-                              deleteActions.map(action => {
-                                return (
-                                  <Basic.MenuItem
-                                    title={ this.isDevelopment() ? `Action order: ${ action.order }` : null }
-                                    onClick={
-                                      (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
-                                      ||
-                                      (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
-                                      ?
-                                      null
-                                      :
-                                      () => {
-                                        this._handleCloseBulkActionMenu(() => {
-                                          this.onBulkAction(action);
-                                        });
+                                      disabled={
+                                        (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                        ||
+                                        (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
                                       }
-                                    }
-                                    disabled={ (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection) }>
-                                    <Basic.Icon icon={ action.icon } level={ action.level }/>
-                                    { action.label || action.niceLabel }
-                                  </Basic.MenuItem>
-                                );
-                              })
-                            }
-                          </MenuList>
-                        </Menu>
-                      </>
-                    }
-                  </Basic.Div>
+                                      icon={
+                                        <Basic.Icon
+                                          icon={action.icon}
+                                          level={action.level}/>
+                                      }>
+                                      {action.label || action.niceLabel}
+                                    </Basic.MenuItem>
+                                  );
+                                })
+                              }
+                              {
+                                deleteActions.length === 0 || menuActions.length === 0
+                                ||
+                                <Divider/>
+                              }
+                              {
+                                deleteActions.map(action => {
+                                  return (
+                                    <Basic.MenuItem
+                                      title={this.isDevelopment() ? `Action order: ${action.order}` : null}
+                                      onClick={
+                                        (selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)
+                                        ||
+                                        (selectedRows.length > 0 && !action.showWithSelection && action.showWithoutSelection)
+                                          ?
+                                          null
+                                          :
+                                          () => {
+                                            this._handleCloseBulkActionMenu(() => {
+                                              this.onBulkAction(action);
+                                            });
+                                          }
+                                      }
+                                      disabled={(selectedRows.length === 0 && action.showWithSelection && !action.showWithoutSelection)}>
+                                      <Basic.Icon
+                                        icon={action.icon}
+                                        level={action.level}/>
+                                      {action.label || action.niceLabel}
+                                    </Basic.MenuItem>
+                                  );
+                                })
+                              }
+                            </MenuList>
+                          </Menu>
+                        </>
+                      }
+                    </Basic.Div>
                 }
               </div>
               <div className="button-container">
-                { buttons }
+                {buttons}
 
                 <Filter.ToogleButton
-                  uiKey={ uiKey }
-                  filterOpen={ this._filterOpen.bind(this) }
-                  filterOpened={ filterOpened }
-                  rendered={ showFilter && filter !== undefined && filterCollapsible }
-                  style={{ marginLeft: 3 }}
-                  searchParameters={ _searchParameters }
-                  forceSearchParameters={ forceSearchParameters }/>
+                  uiKey={uiKey}
+                  filterOpen={this._filterOpen.bind(this)}
+                  filterOpened={filterOpened}
+                  rendered={showFilter && filter !== undefined && filterCollapsible}
+                  style={{marginLeft: 3}}
+                  searchParameters={_searchParameters}
+                  forceSearchParameters={forceSearchParameters}/>
 
                 <RefreshButton
-                  onClick={ this.fetchEntities.bind(this, _searchParameters, this.props) }
-                  title={ this.i18n('button.refresh') }
-                  showLoading={ _showLoading }
-                  rendered={ showRefreshButton }/>
+                  onClick={this.fetchEntities.bind(this, _searchParameters, this.props)}
+                  title={this.i18n('button.refresh')}
+                  showLoading={_showLoading}
+                  rendered={showRefreshButton}/>
               </div>
             </div>
           </Basic.Toolbar>
         }
         {
           _error
-          ?
-          <Basic.Alert level="warning">
-            <div style={{ textAlign: 'center', display: 'none'}}>
-              <Basic.Icon value="fa:warning"/>
-              {' '}
-              { this.i18n('error.load') }
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <Basic.Button onClick={ this.reload.bind(this, this.props) }>
-                <Basic.Icon value="fa:refresh"/>
-                { ' ' }
-                { this.i18n('button.refresh') }
-              </Basic.Button>
-            </div>
-          </Basic.Alert>
-          :
-          <>
-            <Basic.BasicTable.Table
-              ref="table"
-              uiKey={ uiKey ? `sub-basic-table-${ uiKey }` : null }
-              header={ header }
-              data={ _entities }
-              hover={ hover }
-              showLoading={ _isLoading }
-              onRowClick={ onRowClick }
-              onRowDoubleClick={ onRowDoubleClick }
-              showRowSelection={ _actions.length > 0 && showRowSelection }
-              selectedRows={ selectedRows }
-              onRowSelect={ this._onRowSelect.bind(this) }
-              rowClass={ _rowClass }
-              condensed={ condensed }
-              noData={ this.getNoData(noData) }
-              selectRowCb={ manager.supportsBulkAction() ? this.selectRowForBulkAction.bind(this) : null }
-              isRowSelectedCb={ manager.supportsBulkAction() ? this.isRowSelected.bind(this) : null }
-              isAllRowsSelectedCb={ manager.supportsBulkAction() ? this.isAllRowSelected.bind(this) : null }
-              draggable={ this.showDraggable(_searchParameters) }
-              onDraggableStop={ this._onDraggableStop.bind(this) }
-              noHeader={ noHeader }>
+            ?
+            <Basic.Alert level="warning">
+              <div style={{textAlign: 'center', display: 'none'}}>
+                <Basic.Icon value="fa:warning"/>
+                {' '}
+                {this.i18n('error.load')}
+              </div>
+              <div style={{textAlign: 'center'}}>
+                <Basic.Button onClick={this.reload.bind(this, this.props)}>
+                  <Basic.Icon value="fa:refresh"/>
+                  {' '}
+                  {this.i18n('button.refresh')}
+                </Basic.Button>
+              </div>
+            </Basic.Alert>
+            :
+            <>
+              <Basic.BasicTable.Table
+                ref="table"
+                uiKey={uiKey ? `sub-basic-table-${uiKey}` : null}
+                header={header}
+                data={_entities}
+                hover={hover}
+                showLoading={_isLoading}
+                onRowClick={onRowClick}
+                onRowDoubleClick={onRowDoubleClick}
+                showRowSelection={_actions.length > 0 && showRowSelection}
+                selectedRows={selectedRows}
+                onRowSelect={this._onRowSelect.bind(this)}
+                rowClass={_rowClass}
+                condensed={condensed}
+                noData={this.getNoData(noData)}
+                selectRowCb={manager.supportsBulkAction() ? this.selectRowForBulkAction.bind(this) : null}
+                isRowSelectedCb={manager.supportsBulkAction() ? this.isRowSelected.bind(this) : null}
+                isAllRowsSelectedCb={manager.supportsBulkAction() ? this.isAllRowSelected.bind(this) : null}
+                draggable={this.showDraggable(_searchParameters)}
+                onDraggableStop={this._onDraggableStop.bind(this)}
+                noHeader={noHeader}>
 
-              { renderedColumns }
+                {renderedColumns}
 
-              <Basic.Column
-                header={ this.i18n('entity.id.label') }
-                property="id"
-                rendered={ this._showId() }
-                className="text-center"
-                width={ 115 }
-                cell={
-                  ({rowIndex, data, property}) => {
-                    const entity = data[rowIndex];
-                    const identifier = entity[property];
-                    const transactionId = entity.transactionId;
-                    const _showTransactionId = transactionId && showTransactionId;
-                    const content = [];
-                    //
-                    content.push(
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {
-                          !_showTransactionId
-                          ||
-                          <div title={ this.i18n('entity.id.help') }>
-                            { this.i18n('entity.id.short') }:
-                          </div>
-                        }
-                        <UuidInfo
-                          header={ this.i18n('entity.id.help') }
-                          value={ identifier }
-                          uuidEnd={ uuidEnd }
-                          placement="left"
-                          buttons={
-                            SecurityManager.hasAuthority('AUDIT_READ')
-                              && uiKey !== 'audit-table'
-                              && showAuditLink
-                            ?
-                            [
-                              <a
-                                href="#"
-                                onClick={ this.showAudit.bind(this, entity, 'entityId') }
-                                title={ this.i18n('button.entityId.title') }>
-                                <Basic.Icon icon="component:audit"/>
-                                {' '}
-                                { this.i18n('button.entityId.label') }
-                              </a>
-                            ]
-                            :
-                            null
-                          }/>
-                      </div>
-                    );
-                    if (_showTransactionId) {
+                <Basic.Column
+                  header={this.i18n('entity.id.label')}
+                  property="id"
+                  rendered={this._showId()}
+                  className="text-center"
+                  width={115}
+                  cell={
+                    ({rowIndex, data, property}) => {
+                      const entity = data[rowIndex];
+                      const identifier = entity[property];
+                      const transactionId = entity.transactionId;
+                      const _showTransactionId = transactionId && showTransactionId;
+                      const content = [];
+                      //
                       content.push(
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div title={ this.i18n('entity.transactionId.help') }>
-                            { this.i18n('entity.transactionId.short') }:
-                          </div>
+                        <div style={{display: 'flex', alignItems: 'center'}}>
+                          {
+                            !_showTransactionId
+                            ||
+                            <div title={this.i18n('entity.id.help')}>
+                              {this.i18n('entity.id.short')}:
+                            </div>
+                          }
                           <UuidInfo
-                            value={ transactionId }
-                            uuidEnd={ uuidEnd }
-                            header={ this.i18n('entity.transactionId.label') }
+                            header={this.i18n('entity.id.help')}
+                            value={identifier}
+                            uuidEnd={uuidEnd}
                             placement="left"
                             buttons={
                               SecurityManager.hasAuthority('AUDIT_READ')
-                                && showAuditLink
-                              ?
-                              [
-                                <a
-                                  href="#"
-                                  onClick={ this.showAudit.bind(this, entity, 'transactionId') }
-                                  title={ this.i18n('button.transactionId.title') }>
-                                  <Basic.Icon icon="component:audit"/>
-                                  {' '}
-                                  { this.i18n('button.transactionId.label') }
-                                </a>
-                              ]
-                              :
-                              null
+                              && uiKey !== 'audit-table'
+                              && showAuditLink
+                                ?
+                                [
+                                  <a
+                                    href="#"
+                                    onClick={this.showAudit.bind(this, entity, 'entityId')}
+                                    title={this.i18n('button.entityId.title')}>
+                                    <Basic.Icon icon="component:audit"/>
+                                    {' '}
+                                    {this.i18n('button.entityId.label')}
+                                  </a>
+                                ]
+                                :
+                                null
                             }/>
                         </div>
                       );
+                      if (_showTransactionId) {
+                        content.push(
+                          <div style={{display: 'flex', alignItems: 'center'}}>
+                            <div title={this.i18n('entity.transactionId.help')}>
+                              {this.i18n('entity.transactionId.short')}:
+                            </div>
+                            <UuidInfo
+                              value={transactionId}
+                              uuidEnd={uuidEnd}
+                              header={this.i18n('entity.transactionId.label')}
+                              placement="left"
+                              buttons={
+                                SecurityManager.hasAuthority('AUDIT_READ')
+                                && showAuditLink
+                                  ?
+                                  [
+                                    <a
+                                      href="#"
+                                      onClick={this.showAudit.bind(this, entity, 'transactionId')}
+                                      title={this.i18n('button.transactionId.title')}>
+                                      <Basic.Icon icon="component:audit"/>
+                                      {' '}
+                                      {this.i18n('button.transactionId.label')}
+                                    </a>
+                                  ]
+                                  :
+                                  null
+                              }/>
+                          </div>
+                        );
+                      }
+                      //
+                      return content;
                     }
-                    //
-                    return content;
-                  }
-                }/>
-            </Basic.BasicTable.Table>
-            <Basic.BasicTable.Pagination
-              ref="pagination"
-              showPageSize={ showPageSize }
-              paginationHandler={ pagination && !this.showDraggable(_searchParameters) ? this._handlePagination.bind(this) : null }
-              total={ pagination ? _total : _entities.length }
-              sizeOptions={ sizeOptions }
-              { ...range } />
-          </>
+                  }/>
+              </Basic.BasicTable.Table>
+              <Basic.BasicTable.Pagination
+                ref="pagination"
+                showPageSize={showPageSize}
+                paginationHandler={pagination && !this.showDraggable(_searchParameters) ? this._handlePagination.bind(this) : null}
+                total={pagination ? _total : _entities.length}
+                sizeOptions={sizeOptions}
+                {...range} />
+            </>
         }
-        { this._renderBulkActionDetail() }
+        {this._renderBulkActionDetail()}
       </div>
     );
   }
@@ -2043,4 +2098,4 @@ const makeMapStateToProps = () => {
   return mapStateToProps;
 };
 
-export default connect(makeMapStateToProps, null, null, { forwardRef: true})(AdvancedTable);
+export default connect(makeMapStateToProps, null, null, {forwardRef: true})(AdvancedTable);
