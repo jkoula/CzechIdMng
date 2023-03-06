@@ -75,6 +75,7 @@ public class DefaultIdmRoleCompositionService
 	}
 	
 	@Override
+	@Transactional
 	public void deleteInternal(IdmRoleCompositionDto dto) {
 		super.deleteInternal(dto);
 		// clear cache right here => delete is asynchronous
