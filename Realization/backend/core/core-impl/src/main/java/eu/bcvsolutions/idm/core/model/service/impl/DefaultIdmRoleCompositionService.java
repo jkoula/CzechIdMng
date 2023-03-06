@@ -16,7 +16,6 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -64,7 +63,7 @@ public class DefaultIdmRoleCompositionService
 	//
 	@Autowired private IdmIdentityRoleService identityRoleService;
 	@Autowired private IdmCacheManager cacheManager;
-	
+
 	@Autowired
 	public DefaultIdmRoleCompositionService(IdmRoleCompositionRepository repository, EntityEventManager entityEventManager) {
 		super(repository, entityEventManager);
@@ -76,13 +75,12 @@ public class DefaultIdmRoleCompositionService
 	}
 	
 	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void deleteInternal(IdmRoleCompositionDto dto) {
 		super.deleteInternal(dto);
 		// clear cache right here => delete is asynchronous
 		cacheManager.evictCache(IdmRoleCompositionService.ALL_SUB_ROLES_CACHE_NAME);
 	}
-	
+
 	@Override
 	public List<IdmRoleCompositionDto> findDirectSubRoles(UUID superiorId, BasePermission... permission) {
 		Assert.notNull(superiorId, "Superior role identifier is required.");
