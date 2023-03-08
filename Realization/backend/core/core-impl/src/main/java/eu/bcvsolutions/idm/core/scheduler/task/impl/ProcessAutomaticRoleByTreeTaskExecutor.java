@@ -441,7 +441,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 				UUID identityRoleId = identityRole.getId();
 				//
 				if (!requireNewTransaction()) {
-					checkProcessedIdentityRole(processedIdentityRoles, identityRole, automaticRole);
+					removeUnprocessedIdentityRole(processedIdentityRoles, identityRole, automaticRole);
 				} else {
 					TransactionTemplate template = new TransactionTemplate(platformTransactionManager);
 					template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -451,7 +451,7 @@ public class ProcessAutomaticRoleByTreeTaskExecutor extends AbstractSchedulableS
 							
 							@Override
 							public void doInTransactionWithoutResult(TransactionStatus status) {
-								checkProcessedIdentityRole(processedIdentityRoles, identityRole, automaticRole);
+								removeUnprocessedIdentityRole(processedIdentityRoles, identityRole, automaticRole);
 							}
 						});
 					} catch (UnexpectedRollbackException ex ) {
