@@ -33,7 +33,7 @@ import eu.bcvsolutions.idm.core.security.evaluator.AbstractTransitiveEvaluator;
 @Description("Permissions to automatic rule requests by automatic role request")
 public class AutomaticRoleRuleRequestByRequestEvaluator extends AbstractTransitiveEvaluator<IdmAutomaticRoleAttributeRuleRequest> {
 
-	public static final String EVALUATOR_NAME = "automatic-role-rule-request-by-request-evaluator";
+	public static final String EVALUATOR_NAME = "core-automatic-role-rule-request-by-request-evaluator";
 
 	@Autowired
 	private AuthorizationManager authorizationManager;
