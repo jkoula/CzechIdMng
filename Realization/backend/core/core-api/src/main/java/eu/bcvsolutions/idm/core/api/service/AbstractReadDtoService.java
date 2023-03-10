@@ -355,16 +355,18 @@ public abstract class AbstractReadDtoService<DTO extends BaseDto, E extends Base
 	 * @return
 	 */
 	protected List<Predicate> toPredicates(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, F filter) {
+		// Add all predicates from registered PluggablePredicateProvider beans
+		final Stream<Predicate> pluggedPredicates = Optional.ofNullable(pluggablePredicateProviders).orElse(Collections.emptyList()).stream()
+				.flatMap(provider -> provider.toPredicates(root, query, builder, filter).stream());
+		//
+		final Stream<Predicate> filterManagerPredicates = filter instanceof DataFilter ?
+				getFilterManager().toPredicates(root, query, builder, (DataFilter) filter).stream() : Stream.empty();
+		//
 		return Stream.concat(
 				// Add all predicates from registered PluggablePredicateProvider beans
-				Optional.ofNullable(pluggablePredicateProviders).orElse(Collections.emptyList()).stream()
-						.flatMap(provider -> provider.toPredicates(root, query, builder, filter).stream()),
+				pluggedPredicates,
 				// Add generic predicates for data filters
-				Optional.ofNullable(getFilterManager())
-						// Only apply, if filter is DataFilter
-						.filter(fm -> DataFilter.class.isAssignableFrom(fm.getClass()))
-						.map(fm -> fm.toPredicates(root, query, builder, (DataFilter) filter).stream())
-						.orElse(Stream.empty())
+				filterManagerPredicates
 		).collect(Collectors.toList());
 	}
 
