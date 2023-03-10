@@ -6914,6 +6914,162 @@
       }
     },
     "authorization-evaluator": {
+      "core-uuid-evaluator": {
+        "help": "Oprávnění pro objekt podle jeho UUID",
+        "attributes": {
+          "uuid": {
+            "label": "UUID",
+            "help": "UUID objektu"
+          }
+        }
+      },
+      "core-codeable-evaluator": {
+        "help": "Oprávnění pro objekt podle jeho kódu/identifikátoru",
+        "attributes": {
+          "identifier": {
+            "label": "Kód/identifikátor",
+            "help": "Kód/identifikátor objektu"
+          }
+        }
+      },
+      "core-base-permission-evaluator": {
+        "help": "Oprávnění pro všechny objekty daného typu"
+      },
+      "core-request-item-by-request-evaluator": {
+        "help": "Oprávnění pro položky univerzální žádosti podle žádostí"
+      },
+      "core-request-by-creator-evaluator": {
+        "help": "Oprávnění pro žádosti vytvořené aktuálně přihlášeným uživatelem"
+      },
+      "core-self-request-evaluator": {
+        "help": "Oprávnění pro žádosti vlastněné aktuálně přihlášeným uživatelem"
+      },
+      "core-request-by-owner-evaluator": {
+        "help": "Oprávnění pro žádosti podle práv na vlastníka žádosti. Podporuje pouze vlastníky typu IdmRole."
+      },
+      "core-request-by-wf-involved-identity-evaluator": {
+        "help": "Oprávnění pro žádosti, v jejichž schvalování uživatel vystupuje."
+      },
+      "core-role-request-by-identity-evaluator": {
+        "help": "Oprávnění pro žádosti o role podle práv na vlastníka žádosti."
+      },
+      "core-self-role-request-evaluator": {
+        "help": "Oprávnění pro žádosti o role vlastněné aktuálně přihlášeným uživatelem."
+      },
+      "core-role-request-by-wf-involved-identity-evaluator": {
+        "help": "Oprávnění pro žádosti o role, v jejichž schvalování uživatel vystupuje."
+      },
+      "core-role-form-attribute-by-role-evaluator": {
+        "help": "Oprávnění pro atributy rolí podle práv na role."
+      },
+      "core-role-tree-node-by-role-evaluator": {
+        "help": "Oprávnění pro automatické role podle práv na role."
+      },
+      "core-code-list-item-by-code-list-evaluator": {
+        "help": "Oprávnění pro položky číselníku podle práv na číselníky."
+      },
+      "core-role-composition-by-superior-role-evaluator": {
+        "help": "Oprávnění pro business role podle práv na nadřazené role."
+      },
+      "core-role-composition-by-sub-role-evaluator": {
+        "help": "Oprávnění pro business role podle práv na podřazené role."
+      },
+      "core-incompatible-role-by-superior-role-evaluator": {
+        "help": "Oprávnění pro neslučitelné role podle práv na nadřazené role."
+      },
+      "core-incompatible-role-by-sub-role-evaluator": {
+        "help": "Oprávnění pro neslučitelné role podle práv na podřazené role."
+      },
+      "core-delegation-by-delegation-definition-evaluator": {
+        "help": "Oprávnění pro delegace role podle práv na definice delegací."
+      },
+      "core-delegation-def-by-delegator-and-delegate-evaluator": {
+        "help": "Umožňuje vytvářet definice delegací, pokud má přihlášený uživatel oprávnění IdentityBasePermission.DELEGATOR na delegátora and IdentityBasePermission.DELEGATE na delegáta."
+      },
+      "core-self-delegation-definition-by-delegator-evaluator": {
+        "help": "Oprávnění pro definice delegace role kde přihlášený uživatel je delegátor."
+      },
+      "core-self-delegation-definition-by-delegate-evaluator": {
+        "help": "Oprávnění pro definice delegace role kde přihlášený uživatel je delegát."
+      },
+      "core-delegation-definition-by-delegator-contract-evaluator": {
+        "help": "Oprávnění pro definice delegace role podle práv na kontrakt delegátora."
+      },
+      "core-delegation-definition-by-delegate-evaluator": {
+        "help": "Oprávnění pro definice delegace role podle práv na delegáta."
+      },
+      "core-delegation-definition-by-delegator-evaluator": {
+        "help": "Oprávnění pro definice delegace role podle práv na delegátora."
+      },
+      "core-form-attribute-by-definition-evaluator": {
+        "help": "Oprávnění pro atributy formuláře podle práv na definici formuláře."
+      },
+      "core-form-attribute-by-code-list-evaluator": {
+        "help": "Oprávnění pro atributy formuláře podle práv na číselník."
+      },
+      "core-contract-guarantee-by-identity-contract-evaluator": {
+        "help": "Oprávnění pro vedoucí kontraktu podle práv na kontrakt."
+      },
+      "core-role-guarantee-by-role-evaluator": {
+        "help": "Oprávnění pro garanta role podle práv na roli."
+      },
+      "core-role-guarantee-role-by-role-evaluator": {
+        "help": "Oprávnění pro garanta role rolí podle práv na roli."
+      },
+      "core-role-catalogue-role-by-role-evaluator": {
+        "help": "Oprávnění pro katalog rolí podle práv na roli."
+      },
+      "core-configuration-evaluator": {
+        "help": "Oprávnění pro konfiguraci aplikace.",
+        "attributes": {
+          "secured": {
+            "label": "Zobrazit zabezpečené položky",
+            "help": "Zobrazit i položky označené jako 'secure' (true/false)"
+          }
+        }
+      },
+      "core-self-long-running-task-evaluator": {
+        "help": "Oprávnění pro dlouhotrvající úlohy vlastněné přihlášeným uživatelem."
+      },
+      "core-authorization-policy-by-role-evaluator": {
+        "help": "Oprávnění pro politiky oprávnění podle práv na roli."
+      },
+      "core-subordinate-contract-evaluator": {
+        "help": "Oprávnění pro kontrakty podřízených uživatelů."
+      },
+      "core-self-identity-role-evaluator": {
+        "help": "Oprávnění pro přiřazené role aktuálně přihlášeného uživatele."
+      },
+      "core-identity-role-by-contract-evaluator": {
+        "help": "Oprávnění pro přiřazené role podle práv na kontrakty."
+      },
+      "core-identity-role-by-identity-evaluator": {
+        "help": "Oprávnění pro přiřazené role podle práv na uživatele."
+      },
+      "core-self-profile-evaluator": {
+        "help": "Oprávnění pro profil aktuálně přihlášeného uživatele."
+      },
+      "core-role-can-be-requested-evaluator": {
+        "help": "Oprávnění pro role, které mají nastaveno, že o ně lze žádat."
+      },
+      "core-role-by-guarantee-evaluator": {
+        "help": "Oprávnění pro role, kde je uživatel garantem."
+      },
+      "core-self-identity-evaluator": {
+        "help": "Oprávnění pro identitu aktuálně přihlášeného uživatele."
+      },
+      "core-subordinates-identity-evaluator": {
+        "help": "Oprávnění pro podřízené identity."
+      },
+      "core-identity-by-contract-evaluator": {
+        "help": "Oprávnění pro identity podle práv na kontrakt."
+      },
+      "core-automatic-role-request-by-wf-involved-identity-evaluator": {
+        "help": "Oprávnění pro žádosti o automatické role, v nichž uživatel vystupuje."
+      },
+      "core-automatic-role-rule-request-by-request-evaluator": {
+        "help": "Oprávnění pro pravidla žádostí o automatické role, v nichž uživatel vystupuje."
+      },
       "identity-form-value-evaluator": {
         "help": "Oprávnění pro hodnoty rozšiřujících atributů uživatele (eav). Oprávnění je možné přidat pouze pro vybranou definici (hlavní je použita jako výchozí) a vybrané atributy (všechny atributy jsou použity jako výchozí).",
         "attributes": {

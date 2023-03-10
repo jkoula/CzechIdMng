@@ -228,6 +228,11 @@
     }
   },
   "eav": {
+    "authorization-evaluator": {
+      "vs-request-by-implementer-evaluator": {
+        "help": "Práva na VS požadavky podle realizátora systému."
+      }
+    },
     "long-running-task": {
       "vs-system-generator-long-running-task": {
         "label": "Vygenerovat požadované množství virtuálních systémů (test výkonnosti)",

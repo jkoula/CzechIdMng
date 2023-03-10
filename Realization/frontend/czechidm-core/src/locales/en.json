@@ -6861,6 +6861,162 @@
       }
     },
     "authorization-evaluator": {
+      "core-uuid-evaluator": {
+        "help": "Permission to object by its UUID",
+        "attributes": {
+          "uuid": {
+            "label": "UUID",
+            "help": "UUID of object"
+          }
+        }
+      },
+      "core-codeable-evaluator": {
+        "help": "Permission to object by its code/identifier",
+        "attributes": {
+          "identifier": {
+            "label": "Code/identifier",
+            "help": "Code/identifier of the object"
+          }
+        }
+      },
+      "core-base-permission-evaluator": {
+        "help": "Permission to all object of this type"
+      },
+      "core-request-item-by-request-evaluator": {
+        "help": "Permissions to universal request items by request"
+      },
+      "core-request-by-creator-evaluator": {
+        "help": "Permissions to requests created by the current user."
+      },
+      "core-self-request-evaluator": {
+        "help": "Permissions to requests owned by the current user."
+      },
+      "core-request-by-owner-evaluator": {
+        "help": "Permissions to requests based on the permissions to the request's owner (target object). Only supports IdmRole as owner now!"
+      },
+      "core-request-by-wf-involved-identity-evaluator": {
+        "help": "Permissions to requests when the identity is involved in the approval of the request."
+      },
+      "core-role-request-by-identity-evaluator": {
+        "help": "Permissions to role requests based on permissions to request owner."
+      },
+      "core-self-role-request-evaluator": {
+        "help": "Permissions to role requests owned by the current user."
+      },
+      "core-role-request-by-wf-involved-identity-evaluator": {
+        "help": "Permissions to role requests when the identity is involved in the approval of the request."
+      },
+      "core-role-form-attribute-by-role-evaluator": {
+        "help": "Permissions to role form attributes based on role permissions."
+      },
+      "core-role-tree-node-by-role-evaluator": {
+        "help": "Permissions to automatic roles based on role permissions."
+      },
+      "core-code-list-item-by-code-list-evaluator": {
+        "help": "Permissions to code list items based on code list permissions."
+      },
+      "core-role-composition-by-superior-role-evaluator": {
+        "help": "Permissions to business roles based on permissions for superior role."
+      },
+      "core-role-composition-by-sub-role-evaluator": {
+        "help": "Permissions to business roles based on permissions for subordinate role."
+      },
+      "core-incompatible-role-by-superior-role-evaluator": {
+        "help": "Permissions to incompatible roles based on permissions for superior role."
+      },
+      "core-incompatible-role-by-sub-role-evaluator": {
+        "help": "Permissions to incompatible roles based on permissions for subordinate role."
+      },
+      "core-delegation-by-delegation-definition-evaluator": {
+        "help": "Permissions to delegation based on permissions for delegation definition."
+      },
+      "core-delegation-def-by-delegator-and-delegate-evaluator": {
+        "help": "Allows creating a delegation definition if the logged user has IdentityBasePermission.DELEGATOR for delegator and IdentityBasePermission.DELEGATE for delegate."
+      },
+      "core-self-delegation-definition-by-delegator-evaluator": {
+        "help": "Permissions to delegation definitions where the logged user is the delegator."
+      },
+      "core-self-delegation-definition-by-delegate-evaluator": {
+        "help": "Permissions to delegation definitions where the logged user is the delegate."
+      },
+      "core-delegation-definition-by-delegator-contract-evaluator": {
+        "help": "Permissions to delegation definitions based on permissions for delegator contract."
+      },
+      "core-delegation-definition-by-delegate-evaluator": {
+        "help": "Permissions to delegation definitions based on permissions for delegate."
+      },
+      "core-delegation-definition-by-delegator-evaluator": {
+        "help": "Permissions to delegation definitions based on permissions for delegator."
+      },
+      "core-form-attribute-by-definition-evaluator": {
+        "help": "Permissions to form attributes based on permissions for form definitions."
+      },
+      "core-form-attribute-by-code-list-evaluator": {
+        "help": "Permissions to form attributes based on permissions for code list."
+      },
+      "core-contract-guarantee-by-identity-contract-evaluator": {
+        "help": "Permissions to contract guarantor based on permissions for contract."
+      },
+      "core-role-guarantee-by-role-evaluator": {
+        "help": "Permissions to role guarantor based on permissions for role."
+      },
+      "core-role-guarantee-role-by-role-evaluator": {
+        "help": "Permissions to role guarantor by role based on permissions for role."
+      },
+      "core-role-catalogue-role-by-role-evaluator": {
+        "help": "Oprávnění pro katalog rolí podle práv na roli."
+      },
+      "core-configuration-evaluator": {
+        "help": "Permissions for the application configuration.",
+        "attributes": {
+          "secured": {
+            "label": "Show secure items",
+            "help": "Show even secure configuration items (true/false)"
+          }
+        }
+      },
+      "core-self-long-running-task-evaluator": {
+        "help": "Permissions for long running tasks owned by the currently logged user."
+      },
+      "core-authorization-policy-by-role-evaluator": {
+        "help": "Permissions for authorization policies based on permissions for role."
+      },
+      "core-subordinate-contract-evaluator": {
+        "help": "Permissions for contracts of the subordinates."
+      },
+      "core-self-identity-role-evaluator": {
+        "help": "Permissions for assigned roles owned by the logged user."
+      },
+      "core-identity-role-by-contract-evaluator": {
+        "help": "Permissions for assigned roles based on permissions for contract."
+      },
+      "core-identity-role-by-identity-evaluator": {
+        "help": "Permissions for assigned roles based on permissions for identity."
+      },
+      "core-self-profile-evaluator": {
+        "help": "Permissions for profile owned by the logged user."
+      },
+      "core-role-can-be-requested-evaluator": {
+        "help": "Permissions for roles that have 'can be requested' set."
+      },
+      "core-role-by-guarantee-evaluator": {
+        "help": "Permissions for roles where the user is a guarantor."
+      },
+      "core-self-identity-evaluator": {
+        "help": "Permissions for identity of the logged user."
+      },
+      "core-subordinates-identity-evaluator": {
+        "help": "Permissions for subordinate identities."
+      },
+      "core-identity-by-contract-evaluator": {
+        "help": "Permissions for identity based on contract permissions."
+      },
+      "core-automatic-role-request-by-wf-involved-identity-evaluator": {
+        "help": "Permissions for automatic role request where the user is involved."
+      },
+      "core-automatic-role-rule-request-by-request-evaluator": {
+        "help": "Permissions for rules of automatic role request where the user is involved."
+      },
       "identity-form-value-evaluator": {
         "help": "Permissions to identity form attribute values. By definition (main if not specified) and attrinute codes (all if not specified).",
         "attributes": {

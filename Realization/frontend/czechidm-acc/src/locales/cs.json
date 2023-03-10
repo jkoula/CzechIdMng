@@ -2145,7 +2145,6 @@
       "IDENTITYROLEACCOUNT": "Účty pro přiřazené role",
       "CONTRACTACCOUNT": "Účty pro vztahy identity (pozice)",
       "CONTRACTSLICEACCOUNT": "Účty pro časové řezy vztahů identity",
-      "CONTRACTACCOUNT": "Účty pro vztahy identity (pozice)",
       "PROVISIONINGBREAK": "Provisioning - brzda",
       "PROVISIONINGOPERATION": "Provisioning - operace ve frontě",
       "PROVISIONINGARCHIVE": "Provisioning - archív",
@@ -2153,10 +2152,40 @@
       "UNIFORMPASSWORD": "Systém jednotného hesla",
       "SYSTEMGROUP": "Skupiny systémů",
       "SYSTEMOWNER": "Vlastník systému",
-      "SYSTEMOWNERROLE": "Vlastník systému dle role"
+      "SYSTEMOWNERROLE": "Vlastník systému dle role",
+      "ACCOUNTFORMVALUE": "Formuláře - hodnoty",
+      "ACCOUNTROLEASSIGNMENT": "Přiřazení rolí k účtům",
+      "REMOTESERVER": "Konektor servery",
+      "SYSTEMGROUPSYSTEM": "Systémy ve skupině systémů"
     }
   },
   "eav": {
+    "authorization-evaluator": {
+      "acc-system-owner-evaluator": {
+        "help": "Oprávnění pro systémy pro vlastníka systému."
+      },
+      "acc-system-owner-assigned-by-identity-evaluator": {
+        "help": "Oprávnění pro vlastníka systému podle práv na systém."
+      },
+      "acc-system-owner-assigned-by-role-evaluator": {
+        "help": "Oprávnění pro vlastníka systému (podle role) podle práv na systém."
+      },
+      "acc-role-account-by-role-evaluator": {
+        "help": "Oprávnění pro účty rolí podle práv na role."
+      },
+      "acc-contract-account-by-contract-evaluator": {
+        "help": "Oprávnění pro účty kontraktů podle práv na kontrakty."
+      },
+      "acc-read-account-by-identity-evaluator": {
+        "help": "Oprávnění pro účty identit podle práv na identitu."
+      },
+      "acc-role-catalogue-account-by-role-catalogue-evaluator": {
+        "help": "Oprávnění pro účty katalogů rolí podle práv na katalog rolí."
+      },
+      "acc-identity-role-account-by-identity-role-evaluator": {
+        "help": "Oprávnění pro účty přiřazených rolí podle práv na přiřazené role."
+      }
+    },
     "eu-bcvsolutions-idm-acc-entity-syssystem": {
       "connid-net-tirasa-connid-bundles-db-table-databasetableconnector-net-tirasa-connid-bundles-db-table-2-2-4": {
         "attributes": {
