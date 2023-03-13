@@ -6906,6 +6906,9 @@
       "core-role-request-by-wf-involved-identity-evaluator": {
         "help": "Permissions to role requests when the identity is involved in the approval of the request."
       },
+      "core-contract-position-by-identity-contract-evaluator": {
+        "help": "Permissions to contract positions based on permissions to contract."
+      },
       "core-role-form-attribute-by-role-evaluator": {
         "help": "Permissions to role form attributes based on role permissions."
       },

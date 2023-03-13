@@ -6831,7 +6831,7 @@
             "help": "Na koho se mají úkoly přesunout."
           },
           "candidateorassigned": {
-            "label": "Delegátor",
+            "label": "Delegující",
             "help": "Od koho se mají úkoly přesunout."
           }
         }
@@ -6959,6 +6959,9 @@
       "core-role-request-by-wf-involved-identity-evaluator": {
         "help": "Oprávnění pro žádosti o role, v jejichž schvalování uživatel vystupuje."
       },
+      "core-contract-position-by-identity-contract-evaluator": {
+        "help": "Oprávnění pro pozice kontraktu podle práv na kontrakty."
+      },
       "core-role-form-attribute-by-role-evaluator": {
         "help": "Oprávnění pro atributy rolí podle práv na role."
       },
@@ -6984,22 +6987,22 @@
         "help": "Oprávnění pro delegace role podle práv na definice delegací."
       },
       "core-delegation-def-by-delegator-and-delegate-evaluator": {
-        "help": "Umožňuje vytvářet definice delegací, pokud má přihlášený uživatel oprávnění IdentityBasePermission.DELEGATOR na delegátora and IdentityBasePermission.DELEGATE na delegáta."
+        "help": "Umožňuje vytvářet definice delegací, pokud má přihlášený uživatel oprávnění IdentityBasePermission.DELEGATOR na delegujícího and IdentityBasePermission.DELEGATE na delegáta."
       },
       "core-self-delegation-definition-by-delegator-evaluator": {
-        "help": "Oprávnění pro definice delegace role kde přihlášený uživatel je delegátor."
+        "help": "Oprávnění pro definice delegace role kde přihlášený uživatel je delegující."
       },
       "core-self-delegation-definition-by-delegate-evaluator": {
-        "help": "Oprávnění pro definice delegace role kde přihlášený uživatel je delegát."
+        "help": "Oprávnění pro definice delegace role kde přihlášený uživatel je delegující."
       },
       "core-delegation-definition-by-delegator-contract-evaluator": {
-        "help": "Oprávnění pro definice delegace role podle práv na kontrakt delegátora."
+        "help": "Oprávnění pro definice delegace role podle práv na kontrakt delegujícího."
       },
       "core-delegation-definition-by-delegate-evaluator": {
         "help": "Oprávnění pro definice delegace role podle práv na delegáta."
       },
       "core-delegation-definition-by-delegator-evaluator": {
-        "help": "Oprávnění pro definice delegace role podle práv na delegátora."
+        "help": "Oprávnění pro definice delegace role podle práv na delegující."
       },
       "core-form-attribute-by-definition-evaluator": {
         "help": "Oprávnění pro atributy formuláře podle práv na definici formuláře."
@@ -9009,11 +9012,11 @@
     },
     "MANUAL_TASK_DELEGATION_DELEGATOR_MISSING": {
       "title": "Není specifikováno od koho se úkoly mají delegovat!",
-      "message": "Pro specifikování delegátora můžete použít filtr (Přiřazeno) nad agendou všech úkolů a nebo vyberte delegátora níže. Delegování úkolu proběhne pouze, pokud jedním z řešitelů je vybraný delegátor."
+      "message": "Pro specifikování delegujícího můžete použít filtr (Přiřazeno) nad agendou všech úkolů a nebo vyberte delegujícího níže. Delegování úkolu proběhne pouze, pokud jedním z řešitelů je vybraný delegující."
     },
     "MANUAL_TASK_DELEGATION_DELEGATOR_IS_NOT_CANDIDATE": {
-      "title": "Delegátor není schvalovatelem úkolu!",
-      "message": "Delegátor [{{delegator}}] není schvalovatelem úkolu [{{task}}]."
+      "title": "Delegující není schvalovatelem úkolu!",
+      "message": "Delegující [{{delegator}}] není schvalovatelem úkolu [{{task}}]."
     },
     "WF_TASK_FILTER_INVOLVED_ONLY": {
       "title": "Úkoly používají špatný filtr!",

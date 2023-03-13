@@ -2181,6 +2181,9 @@
       },
       "acc-identity-role-account-by-identity-role-evaluator": {
         "help": "Permissions for identity role accounts based on identity role permissions."
+      },
+      "acc-identity-account-by-account-evaluator": {
+        "help": "Permissions for identity accounts based on account permissions."
       }
     },
     "eu-bcvsolutions-idm-acc-entity-syssystem": {

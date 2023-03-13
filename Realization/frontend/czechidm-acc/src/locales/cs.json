@@ -2184,6 +2184,9 @@
       },
       "acc-identity-role-account-by-identity-role-evaluator": {
         "help": "Oprávnění pro účty přiřazených rolí podle práv na přiřazené role."
+      },
+      "acc-identity-account-by-account-evaluator": {
+        "help": "Oprávnění pro účty vlastněné účty identit podle práv na účty."
       }
     },
     "eu-bcvsolutions-idm-acc-entity-syssystem": {
