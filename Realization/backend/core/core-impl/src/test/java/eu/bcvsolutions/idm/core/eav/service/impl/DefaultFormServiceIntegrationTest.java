@@ -1,10 +1,5 @@
 package eu.bcvsolutions.idm.core.eav.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -60,6 +55,8 @@ import eu.bcvsolutions.idm.core.api.service.LookupService;
 import eu.bcvsolutions.idm.core.eav.api.domain.FormDefinitionCache;
 import eu.bcvsolutions.idm.core.eav.api.domain.PersistentType;
 import eu.bcvsolutions.idm.core.eav.api.dto.FormDefinitionAttributes;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmCodeListDto;
+import eu.bcvsolutions.idm.core.eav.api.dto.IdmCodeListItemDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormAttributeDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormDefinitionDto;
 import eu.bcvsolutions.idm.core.eav.api.dto.IdmFormInstanceDto;
@@ -71,6 +68,8 @@ import eu.bcvsolutions.idm.core.eav.api.exception.ChangePersistentTypeException;
 import eu.bcvsolutions.idm.core.eav.api.service.AbstractFormableService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormService;
 import eu.bcvsolutions.idm.core.eav.api.service.FormValueService;
+import eu.bcvsolutions.idm.core.eav.api.service.IdmCodeListItemService;
+import eu.bcvsolutions.idm.core.eav.api.service.IdmCodeListService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormAttributeService;
 import eu.bcvsolutions.idm.core.eav.api.service.IdmFormDefinitionService;
 import eu.bcvsolutions.idm.core.eav.entity.IdmFormAttribute;
@@ -97,6 +96,7 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.evaluator.eav.AbstractFormValueEvaluator;
 import eu.bcvsolutions.idm.core.security.evaluator.eav.IdentityFormValueEvaluator;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
+import static org.junit.Assert.*;
 
 /**
  * Form service integration tests.
@@ -123,6 +123,8 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 	@Autowired private EventConfiguration eventConfiguration;
 	@Autowired private EntityEventManager entityEventManager;
 	@Autowired private IdmCacheManager cacheManager;
+	@Autowired private IdmCodeListService codeListService;
+	@Autowired private IdmCodeListItemService codeListItemService;
 	//
 	private DefaultFormService formService;
 
@@ -552,6 +554,40 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 		//
 		owners = formService.findOwners(IdmIdentity.class, attribute, FORM_VALUE_FOUR, null);
 		assertEquals(1, owners.getTotalElements());
+	}
+
+	@Test
+	public void testFindOwnersByCodeListAttributeValue() {
+		IdmIdentityDto owner = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto ownerTwo = getHelper().createIdentity((GuardedString) null);
+		IdmIdentityDto ownerThree = getHelper().createIdentity((GuardedString) null);
+		IdmFormDefinitionDto formDefinition = formService.getDefinition(IdmIdentity.class);
+		IdmFormAttributeDto attribute = new IdmFormAttributeDto();
+		attribute.setCode(getHelper().createName());
+		attribute.setFormDefinition(formDefinition.getId());
+		attribute.setName(getHelper().createName());
+		attribute.setPersistentType(PersistentType.CODELIST);
+		//
+		IdmCodeListDto codeList = new IdmCodeListDto();
+		codeList.setCode(getHelper().createName());
+		codeList.setName(getHelper().createName());
+		codeList = codeListService.save(codeList);
+		attribute.setFaceType(codeList.getCode());
+		IdmCodeListItemDto codeListItem = new IdmCodeListItemDto();
+		codeListItem.setCodeList(codeList.getId());
+		final String value = "test";
+		codeListItem.setCode(value);
+		codeListItem.setName(value);
+		codeListItem = codeListItemService.save(codeListItem);
+		//
+		attribute = formService.saveAttribute(attribute);
+		// save values
+		formService.saveValues(owner.getId(), IdmIdentity.class, attribute, Lists.newArrayList(value));
+		//
+		Page<? extends Identifiable> owners = formService.findOwners(IdmIdentity.class, attribute, value, null);
+		//
+		assertEquals(1, owners.getTotalElements());
+		assertEquals(owner.getId(), owners.getContent().get(0).getId());
 	}
 
 	@Test
