@@ -348,7 +348,7 @@ public class IdmRoleCompositionController extends AbstractEventableDtoController
 	@RequestMapping(path = "/bulk/preprocess", method = RequestMethod.POST)
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.ROLECOMPOSITION_READ + "')")
 	@ApiOperation(
-			value = "Preprocess bulk action for accounts",
+			value = "Preprocess bulk action for role compositions",
 			nickname = "preprocessBulkAction",
 			response = IdmBulkActionDto.class,
 			tags = { IdmRoleCompositionController.TAG },
