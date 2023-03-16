@@ -271,7 +271,7 @@ public class IdmRoleCompositionController extends AbstractEventableDtoController
 	}
 
 	/**
-	 * Get available bulk actions for account
+	 * Get available bulk actions for role composition
 	 *
 	 * @return
 	 */
@@ -294,7 +294,7 @@ public class IdmRoleCompositionController extends AbstractEventableDtoController
 	}
 
 	/**
-	 * Process bulk action for accounts
+	 * Process bulk action for role compositions
 	 *
 	 * @param bulkAction
 	 * @return
@@ -304,7 +304,7 @@ public class IdmRoleCompositionController extends AbstractEventableDtoController
 	@RequestMapping(path = "/bulk/action", method = RequestMethod.POST)
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.ROLECOMPOSITION_READ + "')")
 	@ApiOperation(
-			value = "Process bulk action for account",
+			value = "Process bulk action for role composition",
 			nickname = "bulkAction",
 			response = IdmBulkActionDto.class,
 			tags = { IdmRoleCompositionController.TAG },
@@ -319,7 +319,7 @@ public class IdmRoleCompositionController extends AbstractEventableDtoController
 	}
 
 	/**
-	 * Prevalidate bulk action for accounts
+	 * Prevalidate bulk action for role compositions
 	 *
 	 * @param bulkAction
 	 * @return
@@ -329,7 +329,7 @@ public class IdmRoleCompositionController extends AbstractEventableDtoController
 	@RequestMapping(path = "/bulk/prevalidate", method = RequestMethod.POST)
 	@PreAuthorize("hasAuthority('" + CoreGroupPermission.ROLECOMPOSITION_READ + "')")
 	@ApiOperation(
-			value = "Prevalidate bulk action for accounts",
+			value = "Prevalidate bulk action for role compositions",
 			nickname = "prevalidateBulkAction",
 			response = IdmBulkActionDto.class,
 			tags = { IdmRoleCompositionController.TAG },
