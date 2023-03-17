@@ -3076,6 +3076,18 @@
           }
         }
       }
+    },
+    "authorization-evaluator": {
+      "acc-account-role-assignment-by-account-evaluator": {
+        "help": "Oprávnění na přiřazené role na účet podle práv na účet",
+        "attributes": {
+          "include-permissions": {
+            "label": "Přenést oprávnění",
+            "help": "Vyberte oprávnění, které budou přenesena dle oprávnění na účet.",
+            "placeholder": "Stejná oprávnění jako na účet nebo vyberte ..."
+          }
+        }
+      }
     }
   },
   "wizard": {
