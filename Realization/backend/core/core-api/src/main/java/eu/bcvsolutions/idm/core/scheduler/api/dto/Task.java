@@ -40,6 +40,7 @@ public class Task implements BaseDto {
 	//
 	public static final String PROPERTY_TASK_TYPE = "taskType";
 	public static final String PROPERTY_DESCRIPTION = "description";
+	public static final String PROPERTY_NEXT_FIRE_TIME = "nextFireTime";
 	public static final String PROPERTY_INSTANCE_ID = ConfigurationService.PROPERTY_INSTANCE_ID;
 	//
 	@JsonDeserialize(as = String.class)

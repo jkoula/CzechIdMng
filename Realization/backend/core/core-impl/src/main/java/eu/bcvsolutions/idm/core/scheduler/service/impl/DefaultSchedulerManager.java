@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -158,6 +159,29 @@ public class DefaultSchedulerManager implements SchedulerManager {
 						int compareAscValue = 0;
 						boolean asc = true;
 						// "naive" sort implementation
+						Order orderForNextFireTime = sort.getOrderFor(Task.PROPERTY_NEXT_FIRE_TIME);
+						if (orderForNextFireTime != null) {
+							asc = orderForNextFireTime.isAscending();
+							ZonedDateTime taskOneEarliestFireTime = null;
+							ZonedDateTime taskTwoEarliestFireTime = null;
+							try {
+								taskOneEarliestFireTime = taskOne.getTriggers().stream()
+										.map(AbstractTaskTrigger::getNextFireTime)
+										.min((t1, t2) -> t1.compareTo(t2))
+										.get();
+								taskTwoEarliestFireTime = taskTwo.getTriggers().stream()
+										.map(AbstractTaskTrigger::getNextFireTime)
+										.min((t1, t2) -> t1.compareTo(t2))
+										.get();
+								compareAscValue = taskOneEarliestFireTime.compareTo(taskTwoEarliestFireTime);
+							} catch (NoSuchElementException e) {
+								if (taskOneEarliestFireTime == null) {
+									compareAscValue = 1;
+								} else {
+									compareAscValue = -1;
+								}
+							}
+						}
 						Order orderForTaskType = sort.getOrderFor(Task.PROPERTY_TASK_TYPE);
 						if (orderForTaskType != null) {
 							asc = orderForTaskType.isAscending();
