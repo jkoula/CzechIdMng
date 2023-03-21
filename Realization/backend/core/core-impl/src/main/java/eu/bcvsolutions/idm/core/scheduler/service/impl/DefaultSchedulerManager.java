@@ -1,5 +1,6 @@
 package eu.bcvsolutions.idm.core.scheduler.service.impl;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -10,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
@@ -138,8 +140,43 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				//
 				if (passFilter(task, filter)) {
 					tasks.add(task);
+					// add nextfiretimes
+					int nextFireTimesLimitCount = 1;
+					ZonedDateTime nextFireTimeLimitDate = ZonedDateTime.now().plusDays(1);
+					try {
+						Object promptNextFireTimesLimitCount = filter.getData().getFirst("nextFireTimesLimitCount");
+						if (promptNextFireTimesLimitCount != null) {
+							nextFireTimesLimitCount = Integer.parseInt(promptNextFireTimesLimitCount.toString());
+						}
+						Object nextFireTimesLimitSeconds = filter.getData().getFirst("nextFireTimesLimitSeconds");
+						if (nextFireTimesLimitSeconds != null) {
+							nextFireTimeLimitDate = ZonedDateTime.now().plusSeconds(Long.parseLong(nextFireTimesLimitSeconds.toString()));
+						}
+					} catch (NullPointerException e) {
+						// do nothing
+					}
+					List<AbstractTaskTrigger> triggers = task.getTriggers();
+					for (AbstractTaskTrigger trigger : task.getTriggers()) {
+						if (trigger instanceof CronTaskTrigger) {
+							CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
+							List<ZonedDateTime> nextFireTimes = cronTaskTrigger.getNextFireTimes();
+							ZonedDateTime lastFireTime = trigger.getNextFireTime();
+
+							List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
+							Trigger schedulerTrigger = schedulerTriggers.get(0); // TODO: fixme
+
+							ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+							while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
+								nextFireTimes.add(nextScheduledFireTime);
+								nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+							}
+							cronTaskTrigger.setNextFireTimes(nextFireTimes);
+						}
+					}
 				}
 			}
+
+
 			//
 			// pageable is required internally
 			Pageable internalPageable;
