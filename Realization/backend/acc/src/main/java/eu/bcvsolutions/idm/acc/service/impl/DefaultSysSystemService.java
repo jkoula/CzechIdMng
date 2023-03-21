@@ -119,10 +119,12 @@ public class DefaultSysSystemService
 	private final SysSystemAttributeMappingService systemAttributeMappingService;
 	private final SysSchemaObjectClassService schemaObjectClassService;
 	@Autowired
+	@Lazy
 	@Qualifier("default-connector-type")
 	private DefaultConnectorType defaultConnectorType;
 
 	@Autowired
+	@Lazy
 	public DefaultSysSystemService(
 			SysSystemRepository systemRepository,
 			FormService formService,
