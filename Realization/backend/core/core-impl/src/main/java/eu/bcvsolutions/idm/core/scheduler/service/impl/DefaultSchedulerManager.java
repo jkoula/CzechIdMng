@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -163,14 +164,13 @@ public class DefaultSchedulerManager implements SchedulerManager {
 							ZonedDateTime lastFireTime = trigger.getNextFireTime();
 
 							List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
-							Trigger schedulerTrigger = schedulerTriggers.get(0); // TODO: fixme
-
-							ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-							while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
-								nextFireTimes.add(nextScheduledFireTime);
-								nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-							}
-							cronTaskTrigger.setNextFireTimes(nextFireTimes);
+								Trigger schedulerTrigger = schedulerTriggers.stream().filter(t -> t.getJobKey().equals(jobKey)).findFirst().get(); // TODO: fixme
+								ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+								while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
+									nextFireTimes.add(nextScheduledFireTime);
+									nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+								}
+								cronTaskTrigger.setNextFireTimes(nextFireTimes);
 						}
 					}
 				}
@@ -185,6 +185,69 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			} else {
 				internalPageable = pageable;
 			}
+
+			// precalculate dependent tasks first fire time
+//			Sort sort = internalPageable.getSort();
+//			Map<String, ZonedDateTime> precalculatedTaskNextFireTimes = new HashMap<String, ZonedDateTime>();
+//			if (internalPageable.getSort().getOrderFor(Task.PROPERTY_NEXT_FIRE_TIME) != null) {
+//				Set<Task> taskQueue = new HashSet<Task>(tasks);
+//				// add all tasks without dependent task triggers
+//				Set<Task> notDependentTasks = new HashSet<Task>();
+//				for (Task task: taskQueue) {
+//					if (task.getTriggers().stream().noneMatch(trigger -> trigger instanceof DependentTaskTrigger)) {
+////						task.getTriggers().stream()
+////								.map(AbstractTaskTrigger::getNextFireTime)
+////								.min(Comparator.naturalOrder())
+////								.ifPresent(time -> precalculatedTaskNextFireTimes.put(task.getId(), time));
+//						notDependentTasks.add(task);
+//					}
+////					task.getDependentTasks();
+//				}
+//				taskQueue.removeAll(notDependentTasks);
+//				// add dependent task "layer by layer" until queue is empty
+//				while (!taskQueue.isEmpty()) {
+//					Set<Task> tasksProcessedThisCycle = new HashSet<Task>();
+//
+//
+//					taskQueue.removeAll(tasksProcessedThisCycle);
+//					if (tasksProcessedThisCycle.isEmpty()) { // paranoid check, should not reach it, but just for case
+//						break;
+//					}
+//				}
+
+				//TODO: delete tasks with only dependent triggers? not for now
+//				List<Task> finalTasks = tasks;
+
+				for (Task task : tasks) {
+					for (AbstractTaskTrigger trigger : task.getTriggers()) {
+						if (trigger instanceof DependentTaskTrigger) {
+							String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
+							Optional<Task> initiatorTask = tasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
+							initiatorTask.ifPresent(task1 -> {
+								List<Task> dependentTasks = task1.getDependentTasks();
+								dependentTasks.add(task);
+								task1.setDependentTasks(dependentTasks);
+							});
+						}
+					}
+				}
+
+//				tasks.forEach(task -> {
+//					task.getTriggers().forEach(trigger -> {
+//						if (trigger instanceof DependentTaskTrigger) {
+//							String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
+//							Optional<Task> initiatorTask = finalTasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
+//							initiatorTask.ifPresent(task1 -> {
+//								List<Task> dependentTasks = task1.getDependentTasks();
+//								dependentTasks.add(task);
+//								task1.setDependentTasks(dependentTasks);
+//							});
+//						}
+//					});
+//				});
+//			}
+
+
 			// apply "naive" sort and pagination
 			tasks = tasks
 					.stream()
@@ -203,10 +266,12 @@ public class DefaultSchedulerManager implements SchedulerManager {
 							ZonedDateTime taskTwoEarliestFireTime = null;
 							try {
 								taskOneEarliestFireTime = taskOne.getTriggers().stream()
+										.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
 										.map(AbstractTaskTrigger::getNextFireTime)
 										.min((t1, t2) -> t1.compareTo(t2))
 										.get();
 								taskTwoEarliestFireTime = taskTwo.getTriggers().stream()
+										.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
 										.map(AbstractTaskTrigger::getNextFireTime)
 										.min((t1, t2) -> t1.compareTo(t2))
 										.get();

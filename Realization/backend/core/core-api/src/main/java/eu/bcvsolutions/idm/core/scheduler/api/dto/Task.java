@@ -60,6 +60,8 @@ public class Task implements BaseDto {
 	private boolean recoverable;
 	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private ZonedDateTime modified;
+	@JsonProperty(access=Access.READ_ONLY)
+	private List<Task> dependentTasks;
 	
 	@Override
 	public String getId() {
@@ -253,5 +255,16 @@ public class Task implements BaseDto {
 	)
 	public boolean isTrimmed() {
 		return true;
+	}
+
+	public List<Task> getDependentTasks() {
+		if (dependentTasks == null) {
+			dependentTasks = new ArrayList<>();
+		}
+		return dependentTasks;
+	}
+
+	public void setDependentTasks(List<Task> dependentTasks) {
+		this.dependentTasks = dependentTasks;
 	}
 }
