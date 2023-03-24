@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -150,54 +151,6 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				//
 				if (passFilter(task, filter)) {
 					tasks.add(task);
-
-					// add nextfiretimes
-					if (internalPageable.getSort().getOrderFor(Task.PROPERTY_NEXT_FIRE_TIME) != null){
-						int nextFireTimesLimitCount = 1;
-						ZonedDateTime nextFireTimeLimitDate = ZonedDateTime.now().plusDays(1);
-						Object promptNextFireTimesLimitCount = filter.getData().getFirst("nextFireTimesLimitCount");
-						if (promptNextFireTimesLimitCount != null) {
-							nextFireTimesLimitCount = Integer.parseInt(promptNextFireTimesLimitCount.toString());
-						}
-						Object nextFireTimesLimitSeconds = filter.getData().getFirst("nextFireTimesLimitSeconds");
-						if (nextFireTimesLimitSeconds != null) {
-							nextFireTimeLimitDate = ZonedDateTime.now().plusSeconds(Long.parseLong(nextFireTimesLimitSeconds.toString()));
-						}
-						for (AbstractTaskTrigger trigger : task.getTriggers()) {
-							if (trigger instanceof CronTaskTrigger) {
-								CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
-								List<ZonedDateTime> nextFireTimes = cronTaskTrigger.getNextFireTimes();
-								ZonedDateTime lastFireTime = trigger.getNextFireTime();
-
-								List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
-								Trigger schedulerTrigger = schedulerTriggers.stream().filter(t -> t.getJobKey().equals(jobKey)).findFirst().get(); // TODO: fixme
-								ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-								while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
-									nextFireTimes.add(nextScheduledFireTime);
-									nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-								}
-								cronTaskTrigger.setNextFireTimes(nextFireTimes);
-							}
-						}
-					}
-				}
-			}
-
-			//
-
-
-			//TODO: delete tasks with only dependent triggers? not for now
-
-			for (Task task : tasks) {
-				for (AbstractTaskTrigger trigger : task.getTriggers()) {
-					if (trigger instanceof DependentTaskTrigger) {
-						String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
-						Optional<Task> initiatorTask = tasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
-						initiatorTask.ifPresent(task1 -> {
-							List<Task> dependentTasks = task1.getDependentTasks();
-							dependentTasks.add(task);
-						});
-					}
 				}
 			}
 
@@ -215,27 +168,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 						Order orderForNextFireTime = sort.getOrderFor(Task.PROPERTY_NEXT_FIRE_TIME);
 						if (orderForNextFireTime != null) {
 							asc = orderForNextFireTime.isAscending();
-							ZonedDateTime taskOneEarliestFireTime = null;
-							ZonedDateTime taskTwoEarliestFireTime = null;
-							try {
-								taskOneEarliestFireTime = taskOne.getTriggers().stream()
-										.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
-										.map(AbstractTaskTrigger::getNextFireTime)
-										.min(ChronoZonedDateTime::compareTo)
-										.get();
-								taskTwoEarliestFireTime = taskTwo.getTriggers().stream()
-										.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
-										.map(AbstractTaskTrigger::getNextFireTime)
-										.min(ChronoZonedDateTime::compareTo)
-										.get();
-								compareAscValue = taskOneEarliestFireTime.compareTo(taskTwoEarliestFireTime);
-							} catch (NoSuchElementException e) {
-								if (taskOneEarliestFireTime == null) {
-									compareAscValue = 1;
-								} else {
-									compareAscValue = -1;
-								}
-							}
+							compareAscValue = compareTasksByEarliestFireTime(taskOne, taskTwo);
 						}
 						Order orderForTaskType = sort.getOrderFor(Task.PROPERTY_TASK_TYPE);
 						if (orderForTaskType != null) {
@@ -268,6 +201,29 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		} catch (org.quartz.SchedulerException ex) {
 			throw new CoreException(ex);
 		}
+	}
+
+	private static int compareTasksByEarliestFireTime(Task taskOne, Task taskTwo) {
+		int compareAscValue;
+		ZonedDateTime taskOneEarliestFireTime = null;
+		ZonedDateTime taskTwoEarliestFireTime = null;
+		try {
+			Function<Task, ZonedDateTime> findEarliestFireTime = task -> task.getTriggers().stream()
+					.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
+					.map(AbstractTaskTrigger::getNextFireTime)
+					.min(ChronoZonedDateTime::compareTo)
+					.get();
+			taskOneEarliestFireTime = findEarliestFireTime.apply(taskOne);
+			taskTwoEarliestFireTime = findEarliestFireTime.apply(taskTwo);
+			compareAscValue = taskOneEarliestFireTime.compareTo(taskTwoEarliestFireTime);
+		} catch (NoSuchElementException e) {
+			if (taskOneEarliestFireTime == null) {
+				compareAscValue = 1;
+			} else {
+				compareAscValue = -1;
+			}
+		}
+		return compareAscValue;
 	}
 
 	@Override
@@ -499,6 +455,88 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		}
 		//
 		return count;
+	}
+
+	@Override
+	public Page<Task> findUpcomingTasks(TaskFilter filter, Pageable pageable) {
+		try {
+			// pageable is required internally
+			Pageable internalPageable;
+			if (pageable == null) {
+				internalPageable = PageRequest.of(0, Integer.MAX_VALUE);
+			} else {
+				internalPageable = pageable;
+			}
+
+			List<Task> tasks = new ArrayList<>();
+			// load scheduled tasks
+			for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(DEFAULT_GROUP_NAME))) {
+				Task task = getTask(jobKey);
+				//
+				if (passFilter(task, filter)) {
+					tasks.add(task);
+
+					// add nextfiretimes
+					int nextFireTimesLimitCount = 1;
+					ZonedDateTime nextFireTimeLimitDate = ZonedDateTime.now().plusDays(1);
+					Object promptNextFireTimesLimitCount = filter.getData().getFirst("nextFireTimesLimitCount");
+					if (promptNextFireTimesLimitCount != null) {
+						nextFireTimesLimitCount = Integer.parseInt(promptNextFireTimesLimitCount.toString());
+					}
+					Object nextFireTimesLimitSeconds = filter.getData().getFirst("nextFireTimesLimitSeconds");
+					if (nextFireTimesLimitSeconds != null) {
+						nextFireTimeLimitDate = ZonedDateTime.now().plusSeconds(Long.parseLong(nextFireTimesLimitSeconds.toString()));
+					}
+					for (AbstractTaskTrigger trigger : task.getTriggers()) {
+						if (trigger instanceof CronTaskTrigger) {
+							CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
+							List<ZonedDateTime> nextFireTimes = cronTaskTrigger.getNextFireTimes();
+							ZonedDateTime lastFireTime = trigger.getNextFireTime();
+							List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
+							Trigger schedulerTrigger = schedulerTriggers.stream().filter(t -> t.getJobKey().equals(jobKey)).findFirst().get(); // TODO: fixme
+							ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+							while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
+								nextFireTimes.add(nextScheduledFireTime);
+								nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+							}
+							cronTaskTrigger.setNextFireTimes(nextFireTimes);
+						}
+					}
+				}
+			}
+
+			for (Task task : tasks) {
+				for (AbstractTaskTrigger trigger : task.getTriggers()) {
+					if (trigger instanceof DependentTaskTrigger) {
+						String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
+						Optional<Task> initiatorTask = tasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
+						initiatorTask.ifPresent(task1 -> {
+							List<Task> dependentTasks = task1.getDependentTasks();
+							dependentTasks.add(task);
+						});
+					}
+				}
+			}
+
+			// apply "naive" sort and pagination
+			tasks = tasks
+					.stream()
+					// filter out purely dependent tasks, they are contained in their dependent tasks
+					.filter(task -> !task.getTriggers().stream().allMatch(trigger -> trigger instanceof DependentTaskTrigger))
+					.sorted(DefaultSchedulerManager::compareTasksByEarliestFireTime)
+					.collect(Collectors.toList());
+			// "naive" pagination
+			int first = internalPageable.getPageNumber() * internalPageable.getPageSize();
+			int last = internalPageable.getPageSize() + first;
+			List<Task> taskPage = tasks.subList(
+					first < tasks.size() ? first : tasks.size() > 0 ? tasks.size() - 1 : 0,
+					last < tasks.size() ? last : tasks.size()
+			);
+			//
+			return new PageImpl<>(taskPage, internalPageable, tasks.size());
+		} catch (org.quartz.SchedulerException ex) {
+			throw new CoreException(ex);
+		}
 	}
 
 	/**
