@@ -2,6 +2,7 @@ package eu.bcvsolutions.idm.core.scheduler.service.impl;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -68,10 +69,10 @@ import eu.bcvsolutions.idm.core.scheduler.exception.SchedulerException;
 import eu.bcvsolutions.idm.core.scheduler.repository.IdmDependentTaskTriggerRepository;
 
 /**
- * Default implementation of {@link SchedulerManager}. 
+ * Default implementation of {@link SchedulerManager}.
  * This implementation adds long running task to queue and not execute them directly.
  * It is needed for choose server instance id, where task will be physically executed (more instances can read one database).
- * 
+ *
  * @author Radek Tomiška
  */
 public class DefaultSchedulerManager implements SchedulerManager {
@@ -85,7 +86,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 	private final Scheduler scheduler;
 	private final IdmDependentTaskTriggerRepository dependentTaskTriggerRepository;
 	private ConfigurationService configurationService;
-	
+
 	@Autowired
 	public DefaultSchedulerManager(
 			ApplicationContext context,
@@ -99,10 +100,10 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		this.scheduler = scheduler;
 		this.dependentTaskTriggerRepository = dependentTaskTriggerRepository;
 	}
-	
+
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public List<Task> getSupportedTasks() {				
+	public List<Task> getSupportedTasks() {
 		return context.getBeansOfType(SchedulableTaskExecutor.class)
 				.entrySet()
 				.stream()
@@ -130,54 +131,10 @@ public class DefaultSchedulerManager implements SchedulerManager {
 	public List<Task> getAllTasks() {
 		return find(null, null).getContent();
 	}
-	
+
 	@Override
 	public Page<Task> find(TaskFilter filter, Pageable pageable) {
 		try {
-			List<Task> tasks = new ArrayList<>();
-			// load scheduled tasks
-			for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(DEFAULT_GROUP_NAME))) {
-				Task task = getTask(jobKey);
-				//
-				if (passFilter(task, filter)) {
-					tasks.add(task);
-					// add nextfiretimes
-					int nextFireTimesLimitCount = 1;
-					ZonedDateTime nextFireTimeLimitDate = ZonedDateTime.now().plusDays(1);
-					try {
-						Object promptNextFireTimesLimitCount = filter.getData().getFirst("nextFireTimesLimitCount");
-						if (promptNextFireTimesLimitCount != null) {
-							nextFireTimesLimitCount = Integer.parseInt(promptNextFireTimesLimitCount.toString());
-						}
-						Object nextFireTimesLimitSeconds = filter.getData().getFirst("nextFireTimesLimitSeconds");
-						if (nextFireTimesLimitSeconds != null) {
-							nextFireTimeLimitDate = ZonedDateTime.now().plusSeconds(Long.parseLong(nextFireTimesLimitSeconds.toString()));
-						}
-					} catch (NullPointerException e) {
-						// do nothing
-					}
-					List<AbstractTaskTrigger> triggers = task.getTriggers();
-					for (AbstractTaskTrigger trigger : task.getTriggers()) {
-						if (trigger instanceof CronTaskTrigger) {
-							CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
-							List<ZonedDateTime> nextFireTimes = cronTaskTrigger.getNextFireTimes();
-							ZonedDateTime lastFireTime = trigger.getNextFireTime();
-
-							List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
-								Trigger schedulerTrigger = schedulerTriggers.stream().filter(t -> t.getJobKey().equals(jobKey)).findFirst().get(); // TODO: fixme
-								ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-								while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
-									nextFireTimes.add(nextScheduledFireTime);
-									nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-								}
-								cronTaskTrigger.setNextFireTimes(nextFireTimes);
-						}
-					}
-				}
-			}
-
-
-			//
 			// pageable is required internally
 			Pageable internalPageable;
 			if (pageable == null) {
@@ -186,67 +143,63 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				internalPageable = pageable;
 			}
 
-			// precalculate dependent tasks first fire time
-//			Sort sort = internalPageable.getSort();
-//			Map<String, ZonedDateTime> precalculatedTaskNextFireTimes = new HashMap<String, ZonedDateTime>();
-//			if (internalPageable.getSort().getOrderFor(Task.PROPERTY_NEXT_FIRE_TIME) != null) {
-//				Set<Task> taskQueue = new HashSet<Task>(tasks);
-//				// add all tasks without dependent task triggers
-//				Set<Task> notDependentTasks = new HashSet<Task>();
-//				for (Task task: taskQueue) {
-//					if (task.getTriggers().stream().noneMatch(trigger -> trigger instanceof DependentTaskTrigger)) {
-////						task.getTriggers().stream()
-////								.map(AbstractTaskTrigger::getNextFireTime)
-////								.min(Comparator.naturalOrder())
-////								.ifPresent(time -> precalculatedTaskNextFireTimes.put(task.getId(), time));
-//						notDependentTasks.add(task);
-//					}
-////					task.getDependentTasks();
-//				}
-//				taskQueue.removeAll(notDependentTasks);
-//				// add dependent task "layer by layer" until queue is empty
-//				while (!taskQueue.isEmpty()) {
-//					Set<Task> tasksProcessedThisCycle = new HashSet<Task>();
-//
-//
-//					taskQueue.removeAll(tasksProcessedThisCycle);
-//					if (tasksProcessedThisCycle.isEmpty()) { // paranoid check, should not reach it, but just for case
-//						break;
-//					}
-//				}
+			List<Task> tasks = new ArrayList<>();
+			// load scheduled tasks
+			for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(DEFAULT_GROUP_NAME))) {
+				Task task = getTask(jobKey);
+				//
+				if (passFilter(task, filter)) {
+					tasks.add(task);
 
-				//TODO: delete tasks with only dependent triggers? not for now
-//				List<Task> finalTasks = tasks;
+					// add nextfiretimes
+					if (internalPageable.getSort().getOrderFor(Task.PROPERTY_NEXT_FIRE_TIME) != null){
+						int nextFireTimesLimitCount = 1;
+						ZonedDateTime nextFireTimeLimitDate = ZonedDateTime.now().plusDays(1);
+						Object promptNextFireTimesLimitCount = filter.getData().getFirst("nextFireTimesLimitCount");
+						if (promptNextFireTimesLimitCount != null) {
+							nextFireTimesLimitCount = Integer.parseInt(promptNextFireTimesLimitCount.toString());
+						}
+						Object nextFireTimesLimitSeconds = filter.getData().getFirst("nextFireTimesLimitSeconds");
+						if (nextFireTimesLimitSeconds != null) {
+							nextFireTimeLimitDate = ZonedDateTime.now().plusSeconds(Long.parseLong(nextFireTimesLimitSeconds.toString()));
+						}
+						for (AbstractTaskTrigger trigger : task.getTriggers()) {
+							if (trigger instanceof CronTaskTrigger) {
+								CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
+								List<ZonedDateTime> nextFireTimes = cronTaskTrigger.getNextFireTimes();
+								ZonedDateTime lastFireTime = trigger.getNextFireTime();
 
-				for (Task task : tasks) {
-					for (AbstractTaskTrigger trigger : task.getTriggers()) {
-						if (trigger instanceof DependentTaskTrigger) {
-							String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
-							Optional<Task> initiatorTask = tasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
-							initiatorTask.ifPresent(task1 -> {
-								List<Task> dependentTasks = task1.getDependentTasks();
-								dependentTasks.add(task);
-								task1.setDependentTasks(dependentTasks);
-							});
+								List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
+								Trigger schedulerTrigger = schedulerTriggers.stream().filter(t -> t.getJobKey().equals(jobKey)).findFirst().get(); // TODO: fixme
+								ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+								while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
+									nextFireTimes.add(nextScheduledFireTime);
+									nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
+								}
+								cronTaskTrigger.setNextFireTimes(nextFireTimes);
+							}
 						}
 					}
 				}
+			}
 
-//				tasks.forEach(task -> {
-//					task.getTriggers().forEach(trigger -> {
-//						if (trigger instanceof DependentTaskTrigger) {
-//							String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
-//							Optional<Task> initiatorTask = finalTasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
-//							initiatorTask.ifPresent(task1 -> {
-//								List<Task> dependentTasks = task1.getDependentTasks();
-//								dependentTasks.add(task);
-//								task1.setDependentTasks(dependentTasks);
-//							});
-//						}
-//					});
-//				});
-//			}
+			//
 
+
+			//TODO: delete tasks with only dependent triggers? not for now
+
+			for (Task task : tasks) {
+				for (AbstractTaskTrigger trigger : task.getTriggers()) {
+					if (trigger instanceof DependentTaskTrigger) {
+						String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
+						Optional<Task> initiatorTask = tasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
+						initiatorTask.ifPresent(task1 -> {
+							List<Task> dependentTasks = task1.getDependentTasks();
+							dependentTasks.add(task);
+						});
+					}
+				}
+			}
 
 			// apply "naive" sort and pagination
 			tasks = tasks
@@ -268,12 +221,12 @@ public class DefaultSchedulerManager implements SchedulerManager {
 								taskOneEarliestFireTime = taskOne.getTriggers().stream()
 										.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
 										.map(AbstractTaskTrigger::getNextFireTime)
-										.min((t1, t2) -> t1.compareTo(t2))
+										.min(ChronoZonedDateTime::compareTo)
 										.get();
 								taskTwoEarliestFireTime = taskTwo.getTriggers().stream()
 										.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
 										.map(AbstractTaskTrigger::getNextFireTime)
-										.min((t1, t2) -> t1.compareTo(t2))
+										.min(ChronoZonedDateTime::compareTo)
 										.get();
 								compareAscValue = taskOneEarliestFireTime.compareTo(taskTwoEarliestFireTime);
 							} catch (NoSuchElementException e) {
@@ -307,7 +260,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			int first = internalPageable.getPageNumber() * internalPageable.getPageSize();
 			int last = internalPageable.getPageSize() + first;
 			List<Task> taskPage = tasks.subList(
-					first < tasks.size() ? first : tasks.size() > 0 ? tasks.size() - 1 : 0, 
+					first < tasks.size() ? first : tasks.size() > 0 ? tasks.size() - 1 : 0,
 					last < tasks.size() ? last : tasks.size()
 			);
 			//
@@ -316,7 +269,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			throw new CoreException(ex);
 		}
 	}
-	
+
 	@Override
 	public List<Task> getAllTasksByType(Class<?> taskType){
 		return this.getAllTasks()
@@ -327,12 +280,12 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				})
 				.collect(Collectors.toList());
 	}
-	
+
 	@Override
 	public Task getTask(String taskId) {
 		return getTask(getKey(taskId));
 	}
-	
+
 	@Override
 	public Task createTask(Task task) {
 		Assert.notNull(task, "Task is required.");
@@ -362,10 +315,10 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				throw ex;
 			} catch (Exception ex) {
 				throw new ResultCodeException(
-						CoreResultCode.LONG_RUNNING_TASK_INIT_FAILED, 
+						CoreResultCode.LONG_RUNNING_TASK_INIT_FAILED,
 						ImmutableMap.of(
-								"taskId", taskId, 
-								"taskType", task.getTaskType().getSimpleName(), 
+								"taskId", taskId,
+								"taskType", task.getTaskType().getSimpleName(),
 								ConfigurationService.PROPERTY_INSTANCE_ID, task.getInstanceId()),
 						ex
 				);
@@ -379,7 +332,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 					.storeDurably()
 					.build();
 			// add job 
-			scheduler.addJob(jobDetail, false);			
+			scheduler.addJob(jobDetail, false);
 			//
 			LOG.debug("Job [{}] ([{}]) was created and registered", taskId, task.getTaskType());
 			//
@@ -388,7 +341,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_CREATE_TASK_FAILED, ex);
 		}
 	}
-	
+
 	@Override
 	public Task updateTask(String taskId, Task newTask) {
 		return updateTask(taskId, newTask, true);
@@ -396,7 +349,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 
 	@Override
 	@Transactional
-	public void deleteTask(String taskId) {		
+	public void deleteTask(String taskId) {
 		try {
 			// delete dependent task triggers - are stored in our repository
 			dependentTaskTriggerRepository
@@ -408,7 +361,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				.findByInitiatorTaskId(taskId)
 				.forEach(trigger -> {
 					dependentTaskTriggerRepository.delete(trigger);
-				});			
+				});
 			scheduler.deleteJob(new JobKey(taskId, DEFAULT_GROUP_NAME));
 		} catch (org.quartz.SchedulerException ex) {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_DELETE_TASK_FAILED, ex);
@@ -431,13 +384,13 @@ public class DefaultSchedulerManager implements SchedulerManager {
  		//
 		return createTrigger(taskId, trigger, dryRun);
 	}
-	
+
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public AbstractTaskTrigger runTaskNewTransactional(String taskId, boolean dryRun) {
 		return runTask(taskId, dryRun);
 	}
-	
+
 	@Override
 	public boolean interruptTask(String taskId) {
 		try {
@@ -480,7 +433,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		}
 		return trigger;
 	}
-	
+
 	@Override
 	public void deleteTrigger(String taskId, String triggerId) {
 		try {
@@ -489,7 +442,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 					dependentTaskTriggerRepository.deleteById(DtoUtils.toUuid(triggerId));
 				} catch (ClassCastException ex) {
 					throw new SchedulerException(CoreResultCode.SCHEDULER_DELETE_TRIGGER_FAILED, ex);
-				}				
+				}
 			}
 		} catch (org.quartz.SchedulerException ex) {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_DELETE_TRIGGER_FAILED, ex);
@@ -513,7 +466,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_RESUME_TRIGGER_FAILED, ex);
 		}
 	}
-	
+
 	@Override
 	@Transactional
 	public int switchInstanceId(String previousInstanceId, String newInstanceId) {
@@ -533,7 +486,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		// find all tasks with old instance and update them to use new
 		for (Task task : getAllTasks()) {
 			Map<String, String> parameters = task.getParameters();
-			
+
 			String taskInstanceId = parameters.get(SchedulableTaskExecutor.PARAMETER_INSTANCE_ID);
 			if (previousInstanceId.equals(taskInstanceId)) {
 				task.setInstanceId(newInstanceId);
@@ -547,20 +500,20 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		//
 		return count;
 	}
-	
+
 	/**
 	 * Returns job key to given taskId
-	 * 
+	 *
 	 * @param taskId
 	 * @return
 	 */
 	protected JobKey getKey(String taskId) {
 		return new JobKey(taskId, DEFAULT_GROUP_NAME);
 	}
-	
+
 	/**
 	 * Returns task by given key
-	 * 
+	 *
 	 * @param jobKey
 	 * @return task dto
 	 */
@@ -622,14 +575,14 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				LOG.warn("Job [{}] inicialization failed, job class was removed, scheduled task is removed.", jobKey, ex);
 				return null;
 			}
-			throw new CoreException(ex);	
+			throw new CoreException(ex);
 		} catch (BeansException | IllegalArgumentException ex) {
 			deleteTask(jobKey.getName());
 			LOG.warn("Job [{}] inicialization failed, scheduled task is removed", jobKey, ex);
 			return null;
 		}
 	}
-	
+
 	private void createTriggerInternal(String taskId, CronTaskTrigger trigger, boolean dryRun) {
 		CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
 		CronScheduleBuilder cronBuilder;
@@ -657,7 +610,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_CREATE_TRIGGER_FAILED, ex);
 		}
 	}
-	
+
 	private void createTriggerInternal(String taskId, SimpleTaskTrigger trigger, boolean dryRun) {
 		try {
 			scheduler.scheduleJob(
@@ -677,14 +630,14 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			throw new SchedulerException(CoreResultCode.SCHEDULER_CREATE_TRIGGER_FAILED, ex);
 		}
 	}
-	
+
 	private void createTriggerInternal(String taskId, DependentTaskTrigger trigger) {
 		dependentTaskTriggerRepository.save(new IdmDependentTaskTrigger(trigger.getInitiatorTaskId(), taskId));
 	}
-	
+
 	/**
 	 * Returns true, when given processor pass given filter
-	 * 
+	 *
 	 * @param processor
 	 * @param filter
 	 * @return
@@ -725,7 +678,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		//
 		return true;
 	}
-	
+
 	private Task updateTask(String taskId, Task newTask, boolean validate) {
 		Assert.notNull(taskId, "Task identifier is required.");
 		//
@@ -751,7 +704,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 					throw ex;
 				} catch (Exception ex) {
 					throw new ResultCodeException(
-							CoreResultCode.LONG_RUNNING_TASK_INIT_FAILED, 
+							CoreResultCode.LONG_RUNNING_TASK_INIT_FAILED,
 							ImmutableMap.of(
 									"taskId", taskId,
 									"taskType", task.getTaskType().getSimpleName(),
@@ -776,7 +729,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		}
 		return getTask(task.getId());
 	}
-	
+
 	private ConfigurationService getConfigurationService() {
 		if (configurationService == null) {
 			configurationService = context.getBean(ConfigurationService.class);
