@@ -2149,10 +2149,43 @@
       "UNIFORMPASSWORD": "Uniform password system",
       "SYSTEMGROUP": "Group of systems",
       "SYSTEMOWNER": "Owner of system",
-      "SYSTEMOWNERROLE": "Owner of system by role"
+      "SYSTEMOWNERROLE": "Owner of system by role",
+      "ACCOUNTFORMVALUE": "Forms - values",
+      "ACCOUNTROLEASSIGNMENT": "Account role assignments",
+      "REMOTESERVER": "Remote connector servers",
+      "SYSTEMGROUPSYSTEM": "Systems in system groups"
     }
   },
   "eav": {
+    "authorization-evaluator": {
+      "acc-system-owner-evaluator": {
+        "help": "Permissions for systems for system owner."
+      },
+      "acc-system-owner-assigned-by-identity-evaluator": {
+        "help": "Permissions for system owners based on system permissions."
+      },
+      "acc-system-owner-assigned-by-role-evaluator": {
+        "help": "Permissions for system owners (by role) based on system permissions."
+      },
+      "acc-role-account-by-role-evaluator": {
+        "help": "Permissions for role accounts based on role permissions."
+      },
+      "acc-contract-account-by-contract-evaluator": {
+        "help": "Permissions for contract accounts based on contract permissions."
+      },
+      "acc-read-account-by-identity-evaluator": {
+        "help": "Permissions for identity accounts based on identity permissions."
+      },
+      "acc-role-catalogue-account-by-role-catalogue-evaluator": {
+        "help": "Permissions for role catalogue accounts based on role catalogue permissions."
+      },
+      "acc-identity-role-account-by-identity-role-evaluator": {
+        "help": "Permissions for identity role accounts based on identity role permissions."
+      },
+      "acc-identity-account-by-account-evaluator": {
+        "help": "Permissions for identity accounts based on account permissions."
+      }
+    },
     "eu-bcvsolutions-idm-acc-entity-syssystem": {
       "connid-net-tirasa-connid-bundles-db-table-databasetableconnector-net-tirasa-connid-bundles-db-table-2-2-4": {
         "attributes": {
