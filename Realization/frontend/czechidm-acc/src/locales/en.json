@@ -2868,7 +2868,13 @@
       "account-delete-bulk-action": {
         "label": "$t(action.delete.action) accounts",
         "help": "$t(action.delete.action) selected accounts.",
-        "icon": "$t(action.delete.icon)"
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Deletes accounts even if they are protected or if account protection is enabled in the system configuration.",
+            "help": "The account will be deleted even if it is protected or if account protection is enabled in the system configuration."
+          }
+        }
       },
       "account-stop-managing-bulk-action": {
         "label": "Stop managing accounts",

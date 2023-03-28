@@ -2872,7 +2872,13 @@
       "account-delete-bulk-action": {
         "label": "$t(action.delete.action) účty",
         "help": "Smaže vybrané účty.",
-        "icon": "$t(action.delete.icon)"
+        "icon": "$t(action.delete.icon)",
+        "attributes": {
+          "force-delete": {
+            "label": "Smazat účty i v případě, že jsou v chráněném režimu, příp. na systému je nastavený chráněný režim",
+            "help": "Účet bude smazán i v případě, že je chráněný před smazáním nebo je na systému zapnutý chráněný režim."
+          }
+        }
       },
       "account-stop-managing-bulk-action": {
         "label": "Přestat spravovat účty",
