@@ -468,13 +468,15 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				internalPageable = pageable;
 			}
 
-			List<Task> tasks = new ArrayList<>();
+			List<Task> filteredTasks = new ArrayList<>();
+			List<Task> allTasks = new ArrayList<>();
 			// load scheduled tasks
 			for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(DEFAULT_GROUP_NAME))) {
 				Task task = getTask(jobKey);
+				allTasks.add(task);
 				//
 				if (passFilter(task, filter)) {
-					tasks.add(task);
+					filteredTasks.add(task);
 
 					// add nextfiretimes
 					int nextFireTimesLimitCount = 1;
@@ -505,11 +507,11 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				}
 			}
 
-			for (Task task : tasks) {
+			for (Task task : allTasks) {
 				for (AbstractTaskTrigger trigger : task.getTriggers()) {
 					if (trigger instanceof DependentTaskTrigger) {
 						String initiatorTaskId = ((DependentTaskTrigger) trigger).getInitiatorTaskId();
-						Optional<Task> initiatorTask = tasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
+						Optional<Task> initiatorTask = filteredTasks.stream().filter(task1 -> task1.getId().equals(initiatorTaskId)).findAny();
 						initiatorTask.ifPresent(task1 -> {
 							List<Task> dependentTasks = task1.getDependentTasks();
 							dependentTasks.add(task);
@@ -519,7 +521,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			}
 
 			// apply "naive" sort and pagination
-			tasks = tasks
+			filteredTasks = filteredTasks
 					.stream()
 					// filter out purely dependent tasks, they are contained in their dependent tasks
 					.filter(task -> !task.getTriggers().stream().allMatch(trigger -> trigger instanceof DependentTaskTrigger))
@@ -528,12 +530,12 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			// "naive" pagination
 			int first = internalPageable.getPageNumber() * internalPageable.getPageSize();
 			int last = internalPageable.getPageSize() + first;
-			List<Task> taskPage = tasks.subList(
-					first < tasks.size() ? first : tasks.size() > 0 ? tasks.size() - 1 : 0,
-					last < tasks.size() ? last : tasks.size()
+			List<Task> taskPage = filteredTasks.subList(
+					first < filteredTasks.size() ? first : filteredTasks.size() > 0 ? filteredTasks.size() - 1 : 0,
+					last < filteredTasks.size() ? last : filteredTasks.size()
 			);
 			//
-			return new PageImpl<>(taskPage, internalPageable, tasks.size());
+			return new PageImpl<>(taskPage, internalPageable, filteredTasks.size());
 		} catch (org.quartz.SchedulerException ex) {
 			throw new CoreException(ex);
 		}

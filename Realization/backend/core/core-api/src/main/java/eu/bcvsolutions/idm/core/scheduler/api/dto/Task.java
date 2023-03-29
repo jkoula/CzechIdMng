@@ -52,7 +52,7 @@ public class Task implements BaseDto {
 	@Size(max = DefaultFieldLengths.DESCRIPTION)
 	private String description;
 	private boolean disabled; // task is disabled
-	@JsonProperty(access=Access.READ_ONLY)
+	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private List<AbstractTaskTrigger> triggers;
 	private Map<String, String> parameters;
 	private IdmFormDefinitionDto formDefinition;
@@ -60,7 +60,7 @@ public class Task implements BaseDto {
 	private boolean recoverable;
 	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private ZonedDateTime modified;
-	@JsonProperty(access=Access.READ_ONLY)
+	@ApiModelProperty(accessMode = AccessMode.READ_ONLY)
 	private List<Task> dependentTasks;
 	
 	@Override

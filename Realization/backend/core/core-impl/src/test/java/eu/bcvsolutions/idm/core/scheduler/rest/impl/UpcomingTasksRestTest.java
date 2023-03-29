@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 
 import eu.bcvsolutions.idm.core.api.rest.BaseController;
+import eu.bcvsolutions.idm.core.scheduler.ObserveLongRunningTaskEndProcessor;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.CronTaskTrigger;
+import eu.bcvsolutions.idm.core.scheduler.api.dto.DependentTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.SimpleTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.Task;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.filter.TaskFilter;
@@ -47,7 +49,7 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		//
 		Assert.assertEquals(1, results.size());
 		Assert.assertNotNull(results.get(0).getTriggers());
-		Assert.assertEquals(1, results.get(0).getTriggers().size()); // fails, actual 0
+		Assert.assertEquals(1, results.get(0).getTriggers().size());
 	}
 
 	@Test
@@ -66,7 +68,36 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		//
 		Assert.assertEquals(1, results.size());
 		Assert.assertNotNull(results.get(0).getTriggers());
-		Assert.assertEquals(1, results.get(0).getTriggers().size()); // fails, actual 0
+		Assert.assertEquals(1, results.get(0).getTriggers().size());
+	}
+
+	@Test
+	public void testTwoTasksCronAndDependent() {
+		String instanceId = getHelper().createName();
+		Task task = createTask(TestSchedulableTask.class, instanceId, "mock" + getHelper().createName());
+		Task taskDependent = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+
+		SimpleTaskTrigger simpleTaskTrigger = new SimpleTaskTrigger();
+		simpleTaskTrigger.setFireTime(ZonedDateTime.now().plusMinutes(5));
+		manager.createTrigger(task.getId(), simpleTaskTrigger);
+
+		DependentTaskTrigger trigger = new DependentTaskTrigger();
+		trigger.setInitiatorTaskId(task.getId());
+		manager.createTrigger(taskDependent.getId(), trigger);
+
+		TaskFilter filter = new TaskFilter();
+		filter.setTaskType(TestSchedulableTask.class.getName());
+		List<Task> results = find(filter);
+		//
+		Assert.assertEquals(1, results.size());
+		Task taskFetched = results.get(0);
+		// only the cron task fetched, not the dependent
+		// tasks without nextFireTime are not directly returned
+		Assert.assertEquals(task.getId(), taskFetched.getId());
+		Assert.assertNotNull(taskFetched.getTriggers());
+		Assert.assertEquals(1, taskFetched.getTriggers().size());
+		Assert.assertEquals(1, taskFetched.getDependentTasks().size());
+		Assert.assertEquals(taskDependent.getId(), taskFetched.getDependentTasks().get(0).getId());
 	}
 	protected List<Task> find(TaskFilter filter) {
 		MultiValueMap<String, String> queryParams = toQueryParams(filter);
@@ -97,6 +128,7 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		task.setInstanceId(instanceId);
 		task.setTaskType(taskType);
 		task.setDescription(description);
+		task.getParameters().put(ObserveLongRunningTaskEndProcessor.RESULT_PROPERTY, "mock");
 		//
 		return manager.createTask(task);
 	}
