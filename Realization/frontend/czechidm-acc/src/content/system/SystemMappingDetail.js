@@ -201,7 +201,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
     }
     const payload = {
       ...formEntity,
-      entityType: formEntity?.entityType || this.props._mapping?.entityType || this.state._entityType || this.state.mapping.entityType
+      entityType: formEntity?.entityType || this.props._mapping?.entityType || this.state._entityType || this.state.mapping?.entityType
     };
 
     if (formEntity.id === undefined) {
