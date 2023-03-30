@@ -756,3 +756,20 @@ In general, the code you use in modules to work with role assignments should be 
 - ...
 
 Keep in mind, however, that this is major change in the business logic and that it may well not be necessary.
+	
+# 🌗 Database
+
+There was a minor change in the database structure concerning where account type is saved. Starting with 13.0.0, an account is expected to have a link to a provisioning mapping. Since updating a large table could take some time, the following script is not run automatically. To update the table, you can either recalculate accounts via a bulk action, or run the following SQL query:
+	
+```sql
+UPDATE acc_account SET system_mapping_id = (
+    SELECT
+	mapping.id
+    FROM
+	sys_schema_obj_class AS schema_object
+    LEFT JOIN acc_account AS account ON account.system_id = schema_object.system_id
+    LEFT JOIN sys_system_mapping AS mapping ON mapping.object_class_id = schema_object.id
+    WHERE mapping.operation_type = 'PROVISIONING' AND account.entity_type = mapping.entity_type
+    LIMIT 1
+);
+```
