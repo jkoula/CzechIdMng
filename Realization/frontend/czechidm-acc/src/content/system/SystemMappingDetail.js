@@ -7,8 +7,15 @@ import _ from 'lodash';
 //
 import uuid from 'uuid';
 import { Advanced, Basic, Domain, Enums, Managers, Utils } from 'czechidm-core';
-import MappingContextCompleters from 'czechidm-core/src/content/script/completers/MappingContextCompleters';
-import { SchemaObjectClassManager, SystemAttributeMappingManager, SystemManager, SystemMappingManager, SystemEntityTypeManager } from '../../redux';
+import MappingContextCompleters
+from 'czechidm-core/src/content/script/completers/MappingContextCompleters';
+import {
+  SchemaObjectClassManager,
+  SystemAttributeMappingManager,
+  SystemManager,
+  SystemMappingManager,
+  SystemEntityTypeManager
+} from '../../redux';
 import SystemOperationTypeEnum from '../../domain/SystemOperationTypeEnum';
 import ValidationMessageSystemMapping from './ValidationMessageSystemMapping';
 import AccountTypeEnum from '../../domain/AccountTypeEnum';
@@ -46,24 +53,28 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
   }
 
   /**
-  * Override because of validation message (_showValidateSystemMessage)
-  */
+   * Override because of validation message (_showValidateSystemMessage)
+   */
   _onDelete(bulkActionValue, selectedRows) {
     const selectedEntities = this.getManager().getEntitiesByIds(this.context.store.getState(), selectedRows);
     //
     this.refs[`confirm-${bulkActionValue}`].show(
       this.i18n(`action.${bulkActionValue}.message`,
-        { count: selectedEntities.length,
+        {
+          count: selectedEntities.length,
           record: this.getManager().getNiceLabel(selectedEntities[0]),
-          records: this.getManager().getNiceLabels(selectedEntities).join(', ') }),
+          records: this.getManager().getNiceLabels(selectedEntities).join(', ')
+        }),
       this.i18n(`action.${bulkActionValue}.header`,
-        { count: selectedEntities.length,
-          records: this.getManager().getNiceLabels(selectedEntities).join(', ') })
+        {
+          count: selectedEntities.length,
+          records: this.getManager().getNiceLabels(selectedEntities).join(', ')
+        })
     ).then(() => {
       this.context.store.dispatch(this.getManager().deleteEntities(selectedEntities, this.getUiKey(), (entity, error) => {
         if (entity && error) {
           if (error.statusCode !== 202) {
-            this.addErrorMessage({ title: this.i18n(`action.delete.error`, { record: this.getManager().getNiceLabel(entity) }) }, error);
+            this.addErrorMessage({title: this.i18n(`action.delete.error`, {record: this.getManager().getNiceLabel(entity)})}, error);
           } else {
             this.addError(error);
           }
@@ -126,7 +137,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
    * @param props properties of component - props For didmount call is this.props for call from willReceiveProps is nextProps.
    */
   _initComponent(props) {
-    const { entityId, mappingId } = props.match.params;
+    const {entityId, mappingId} = props.match.params;
     // fetch system
     this.context.store.dispatch(systemManager.fetchEntity(entityId));
 
@@ -196,7 +207,11 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
         }
       }));
     } else {
-      this.context.store.dispatch(systemMappingManager.updateEntity(formEntity, `${uiKey}-detail`, this.afterSave.bind(this)));
+      const payload = {
+        ...formEntity,
+        entityType: formEntity?.entityType || this.props._mapping?.entityType
+      };
+      this.context.store.dispatch(systemMappingManager.updateEntity(payload, `${uiKey}-detail`, this.afterSave.bind(this)));
     }
     if (!this._getIsNew()) {
       this._showValidateSystemMessage(this.props.match.params.mappingId);
@@ -206,11 +221,21 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
   afterSave(entity, error) {
     if (!error) {
       if (this._getIsNew()) {
-        this.addMessage({ message: this.i18n('create.success', { entityType: entity.entityType, operationType: entity.operationType}) });
+        this.addMessage({
+          message: this.i18n('create.success', {
+            entityType: entity.entityType,
+            operationType: entity.operationType
+          })
+        });
       } else {
-        this.addMessage({ message: this.i18n('save.success', {entityType: entity.entityType, operationType: entity.operationType}) });
+        this.addMessage({
+          message: this.i18n('save.success', {
+            entityType: entity.entityType,
+            operationType: entity.operationType
+          })
+        });
       }
-      const { entityId } = this.props.match.params;
+      const {entityId} = this.props.match.params;
       // Complete wizard step.
       // Set new entity to the wizard context and go to next step.
       if (this.isWizard()) {
@@ -263,14 +288,16 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
 
   _getIsNew(nextProps) {
     if ((nextProps && nextProps.location) || this.props.location) {
-      const { query } = nextProps ? nextProps.location : this.props.location;
+      const {query} = nextProps ? nextProps.location : this.props.location;
       return (query) ? query.new : null;
     }
     return false;
   }
 
   _getBoolColumn(value) {
-    return (<Basic.BooleanCell propertyValue={ value !== null && value !== '' } className="column-face-bool"/>);
+    return (<Basic.BooleanCell
+      propertyValue={value !== null && value !== ''}
+      className="column-face-bool"/>);
   }
 
   _onChangeEntityType(entity) {
@@ -322,12 +349,17 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
     }
     return (
       <span>
-        <Basic.ContentHeader rendered={!showOnlyMapping && mapping && !isNew} style={{marginBottom: 0, paddingLeft: 15}}>
+        <Basic.ContentHeader
+          rendered={!showOnlyMapping && mapping && !isNew}
+          style={{marginBottom: 0, paddingLeft: 15}}>
           <Basic.Icon value="list-alt"/>
           {' '}
-          <span dangerouslySetInnerHTML={{__html: this.i18n('systemAttributesMappingHeader')}}/>
+          <span
+            dangerouslySetInnerHTML={{__html: this.i18n('systemAttributesMappingHeader')}}/>
         </Basic.ContentHeader>
-        <Basic.Panel rendered={!showOnlyMapping && mapping && !isNew} className="no-border last">
+        <Basic.Panel
+          rendered={!showOnlyMapping && mapping && !isNew}
+          className="no-border last">
           <Advanced.Table
             ref="table"
             uiKey={uiKeyAttributes}
@@ -338,11 +370,16 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
               return data[rowIndex].disabledAttribute ? 'disabled' : '';
             }}
             actions={
-            Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE'])
-              ?
-              [{value: 'delete', niceLabel: this.i18n('action.delete.action'), action: this.onDelete.bind(this), disabled: false}]
-              :
-              null
+              Managers.SecurityManager.hasAnyAuthority(['SYSTEM_UPDATE'])
+                ?
+                [{
+                  value: 'delete',
+                  niceLabel: this.i18n('action.delete.action'),
+                  action: this.onDelete.bind(this),
+                  disabled: false
+                }]
+                :
+                null
             }
             buttons={
               [
@@ -369,7 +406,8 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     </div>
                     <div className="col-lg-2"/>
                     <div className="col-lg-4 text-right">
-                      <Advanced.Filter.FilterButtons cancelFilter={this.cancelFilter.bind(this)}/>
+                      <Advanced.Filter.FilterButtons
+                        cancelFilter={this.cancelFilter.bind(this)}/>
                     </div>
                   </Basic.Row>
                 </Basic.AbstractForm>
@@ -389,8 +427,15 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                 }
               }/>
             {nameColumn}
-            <Advanced.Column property="idmPropertyName" header={this.i18n('acc:entity.SystemAttributeMapping.idmPropertyName.label')} sort/>
-            <Advanced.Column property="uid" face="boolean" header={this.i18n('acc:entity.SystemAttributeMapping.uid.label')} sort/>
+            <Advanced.Column
+              property="idmPropertyName"
+              header={this.i18n('acc:entity.SystemAttributeMapping.idmPropertyName.label')}
+              sort/>
+            <Advanced.Column
+              property="uid"
+              face="boolean"
+              header={this.i18n('acc:entity.SystemAttributeMapping.uid.label')}
+              sort/>
             <Advanced.Column
               property="entityAttribute"
               face="boolean"
@@ -427,11 +472,21 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
   }
 
   render() {
-    const { _showLoading, _mapping, showOnlyAttributes, showOnlyMapping } = this.props;
-    const { _entityType, activeKey, validationError, _operationType} = this.state;
+    const {
+      _showLoading,
+      _mapping,
+      showOnlyAttributes,
+      showOnlyMapping
+    } = this.props;
+    const {
+      _entityType,
+      activeKey,
+      validationError,
+      _operationType
+    } = this.state;
     const isNew = this._getIsNew();
     const mapping = isNew ? this.state.mapping : _mapping;
-    
+
     let isSelectedTree = false;
     if (_entityType !== undefined) {
       if (_entityType === 'TREE') {
@@ -466,10 +521,10 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
       .setFilter('systemMappingId', _mapping ? _mapping.id : Domain.SearchParameters.BLANK_UUID);
     const objectClassSearchParameters = new Domain.SearchParameters().setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
     const forceSearchMappings = new Domain.SearchParameters()
-    .setFilter('operationType', operationTypeToFilter === SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING) ? 
-    SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.SYNCHRONIZATION) : SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
-    .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
-    
+      .setFilter('operationType', operationTypeToFilter === SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING) ?
+        SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.SYNCHRONIZATION) : SystemOperationTypeEnum.findKeyBySymbol(SystemOperationTypeEnum.PROVISIONING))
+      .setFilter('systemId', systemId || Domain.SearchParameters.BLANK_UUID);
+
     return (
       <div>
         <Helmet title={this.i18n('title')}/>
@@ -480,8 +535,11 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
         <Basic.ContentHeader rendered={!showOnlyAttributes}>
           <span dangerouslySetInnerHTML={{__html: this.i18n('header')}}/>
         </Basic.ContentHeader>
-        <Basic.Tabs rendered={!showOnlyAttributes} activeKey={ activeKey }>
-          <Basic.Tab eventKey={1} title={this.i18n('title')} className="bordered">
+        <Basic.Tabs rendered={!showOnlyAttributes} activeKey={activeKey}>
+          <Basic.Tab
+            eventKey={1}
+            title={this.i18n('title')}
+            className="bordered">
             <form onSubmit={this.save.bind(this)}>
               <Basic.Panel className="no-border">
                 <Basic.AbstractForm
@@ -509,7 +567,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     manager={systemMappingManager}
                     forceSearchParameters={forceSearchMappings}
                     label={this.i18n('acc:entity.SystemMapping.connectedMapping')}
-                    placeholder={systemId ? null : this.i18n('systemMapping.systemPlaceholder')} />
+                    placeholder={systemId ? null : this.i18n('systemMapping.systemPlaceholder')}/>
                   <Basic.TextField
                     ref="name"
                     label={this.i18n('acc:entity.SystemMapping.name')}
@@ -525,7 +583,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     clearable={false}/>
                   <Basic.SelectBox
                     ref="entityType"
-                    manager={ systemEntityTypeManager }
+                    manager={systemEntityTypeManager}
                     onChange={this._onChangeEntityType.bind(this)}
                     label={this.i18n('acc:entity.SystemMapping.entityType')}
                     required
@@ -542,7 +600,7 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
                     enum={AccountTypeEnum}
                     label={this.i18n('acc:entity.Account.accountType')}
                     hidden={!isSelectedIdentity}
-                    required={isSelectedIdentity} />
+                    required={isSelectedIdentity}/>
                   <Basic.Checkbox
                     ref="protectionEnabled"
                     label={this.i18n('acc:entity.SystemMapping.protectionEnabled')}
@@ -712,7 +770,7 @@ SystemMappingDetail.defaultProps = {
 };
 
 function select(state, component) {
-  const { mappingId, entityId } = component.match.params;
+  const {mappingId, entityId} = component.match.params;
   const entity = Utils.Entity.getEntity(state, systemMappingManager.getEntityType(), mappingId);
   const system = systemManager.getEntity(state, entityId);
 
