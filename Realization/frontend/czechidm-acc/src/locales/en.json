@@ -2931,7 +2931,7 @@
       "acc-system-mapping-duplicate-bulk-action": {
         "icon": "fa:clone",
         "label": "Duplicate the system mapping",
-        "help": "Creates copy of selected system mappings."
+        "help": "Creates copy of selected system mappings. If connected mapping is configured, it will be removed from the duplicated mapping."
       },
       "acc-identity-account-management-bulk-action": {
         "icon": "link",
