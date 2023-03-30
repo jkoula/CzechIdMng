@@ -199,18 +199,19 @@ class SystemMappingDetail extends Advanced.AbstractTableContent {
       // Merge context data to form.
       _.merge(formEntity, mappingContextData);
     }
+    const payload = {
+      ...formEntity,
+      entityType: formEntity?.entityType || this.props._mapping?.entityType || this.state._entityType || this.state.mapping.entityType
+    };
+
     if (formEntity.id === undefined) {
-      this.context.store.dispatch(systemMappingManager.createEntity(formEntity, `${uiKey}-detail`, (createdEntity, error) => {
+      this.context.store.dispatch(systemMappingManager.createEntity(payload, `${uiKey}-detail`, (createdEntity, error) => {
         this.afterSave(createdEntity, error);
         if (!error && this.refs.table) {
           this.refs.table.reload();
         }
       }));
     } else {
-      const payload = {
-        ...formEntity,
-        entityType: formEntity?.entityType || this.props._mapping?.entityType
-      };
       this.context.store.dispatch(systemMappingManager.updateEntity(payload, `${uiKey}-detail`, this.afterSave.bind(this)));
     }
     if (!this._getIsNew()) {
