@@ -587,6 +587,10 @@ public class DefaultSysSystemService
 		// Duplicate schema
 		SysSchemaObjectClassFilter objectClassFilter = new SysSchemaObjectClassFilter();
 		objectClassFilter.setSystemId(id);
+		// Save duplicated mappings to resolve connected mapping
+		Map<UUID, SysSystemMappingDto> duplicatedMappings = new HashMap<>(); // <originalMappingId, duplicatedMapping>
+		Map<UUID, UUID> connectedMappings = new HashMap<>(); // <originalMappingId, connectedMappingId>
+
 		objectClassService.find(objectClassFilter, null).getContent().stream().forEach(schema -> {
 			UUID originalSchemaId = schema.getId();
 			SysSchemaObjectClassDto duplicatedSchema = this.duplicateSchema(originalSchemaId, system,
@@ -596,14 +600,16 @@ public class DefaultSysSystemService
 			SysSystemMappingFilter systemMappingFilter = new SysSystemMappingFilter();
 			systemMappingFilter.setSystemId(id);
 			systemMappingService.find(systemMappingFilter, null).getContent().stream().filter(mapping -> {
-
 				// Find mapping for this schema
 				return mapping.getObjectClass().equals(originalSchemaId);
 			}).forEach(mapping -> {
+				if (mapping.getConnectedSystemMappingId() != null) {
+					connectedMappings.put(mapping.getId(), mapping.getConnectedSystemMappingId());
+				}
 				final UUID originalMappingId = mapping.getId();
 				SysSystemMappingDto duplicatedMapping = systemMappingService.duplicateMapping(originalMappingId,
 						duplicatedSchema, schemaAttributesCache, mappedAttributesCache, false);
-
+				duplicatedMappings.put(originalMappingId, duplicatedMapping);
 				// Duplicate sync configs
 				List<AbstractSysSyncConfigDto> syncConfigs = findSyncConfigs(id);
 				syncConfigs.stream().filter(syncConfig -> {
@@ -617,7 +623,24 @@ public class DefaultSysSystemService
 			});
 		});
 
+		resolveConnectedMappings(duplicatedMappings, connectedMappings);
+
 		return system;
+	}
+
+	/**
+	 * Resolve connected mappings
+	 * 
+	 * @param duplicatedMappings
+	 * @param connectedMappings
+	 */
+	private void resolveConnectedMappings(Map<UUID, SysSystemMappingDto> duplicatedMappings, Map<UUID, UUID> connectedMappings) {
+		connectedMappings.entrySet().forEach(entry -> {
+			SysSystemMappingDto duplicatedMapping = duplicatedMappings.get(entry.getKey());
+			SysSystemMappingDto duplicatedConnectedMapping = duplicatedMappings.get(entry.getValue());
+			duplicatedMapping.setConnectedSystemMappingId(duplicatedConnectedMapping.getId());
+			systemMappingService.save(duplicatedMapping);
+		});
 	}
 
 	@Override

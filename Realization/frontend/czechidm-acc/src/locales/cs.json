@@ -2934,7 +2934,7 @@
       "acc-system-mapping-duplicate-bulk-action": {
         "icon": "fa:clone",
         "label": "Duplikovat mapování systému",
-        "help": "Vytvoří kopie vybraných mapování systému."
+        "help": "Vytvoří kopie vybraných mapování systému. Pokud je nastavené související mapování, bude z duplikovaného mapování odstraněno."
       },
       "acc-identity-account-management-bulk-action": {
         "icon": "link",
