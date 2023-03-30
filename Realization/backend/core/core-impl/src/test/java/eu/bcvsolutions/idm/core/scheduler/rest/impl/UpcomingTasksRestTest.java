@@ -6,12 +6,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
@@ -32,8 +35,19 @@ import eu.bcvsolutions.idm.test.api.TestHelper;
 public class UpcomingTasksRestTest extends AbstractRestTest {
 	@Autowired
 	private SchedulerManager manager;
-	@Autowired
-	SchedulerController schedulerController;
+
+	// helper field for cleaning up after each test
+	private List<Task> createdTasks;
+
+	@Before
+	public void init() {
+		createdTasks = new ArrayList<>();
+	}
+
+	@After
+	public void clean() {
+		createdTasks.forEach(task -> manager.deleteTask(task.getId()));
+	}
 
 	@Test
 	public void testOneTaskWithCronTriggerQueryParams() {
@@ -212,6 +226,8 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		task.setDescription(description);
 		task.getParameters().put(ObserveLongRunningTaskEndProcessor.RESULT_PROPERTY, "mock");
 		//
-		return manager.createTask(task);
+		Task createdTask = manager.createTask(task);
+		createdTasks.add(createdTask);
+		return createdTask;
 	}
 }
