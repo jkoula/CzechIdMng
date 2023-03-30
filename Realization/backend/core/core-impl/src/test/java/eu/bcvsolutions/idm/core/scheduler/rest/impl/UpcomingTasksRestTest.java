@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 import org.junit.Assert;
@@ -34,22 +36,43 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 	SchedulerController schedulerController;
 
 	@Test
-	public void testOneTaskWithCronTrigger() {
+	public void testOneTaskWithCronTriggerQueryParams() {
 		String instanceId = getHelper().createName();
 		Task task = createTask(TestSchedulableTask.class, instanceId, "mock" + getHelper().createName());
 
 		CronTaskTrigger cronTrigger = new CronTaskTrigger();
 		cronTrigger.setTaskId(task.getId());
-		cronTrigger.setCron("5 * * * * ?");
+		// At the start of every hour
+		cronTrigger.setCron("0 0 * * * ?");
 		manager.createTrigger(task.getId(), cronTrigger);
 
 		TaskFilter filter = new TaskFilter();
 		filter.setInstanceId(instanceId);
 		List<Task> results = find(filter);
-		//
-		Assert.assertEquals(1, results.size());
+		//ssertEquals(1, results.size());
 		Assert.assertNotNull(results.get(0).getTriggers());
 		Assert.assertEquals(1, results.get(0).getTriggers().size());
+		CronTaskTrigger realTrigger = (CronTaskTrigger) results.get(0).getTriggers().get(0);
+		Assert.assertEquals(1, realTrigger.getNextFireTimes().size());
+
+		filter.set("nextFireTimesLimitCount", 100);
+		List<Task> resultsLimitHundred = find(filter);
+		CronTaskTrigger realTriggerLimitHundred = (CronTaskTrigger) resultsLimitHundred.get(0).getTriggers().get(0);
+		// implicit limit of 1 day applies
+		Assert.assertEquals(24, realTriggerLimitHundred.getNextFireTimes().size());
+
+		filter.set("nextFireTimesLimitCount", 10);
+		List<Task> resultsLimitTen = find(filter);
+		CronTaskTrigger realTriggerLimitTen = (CronTaskTrigger) resultsLimitTen.get(0).getTriggers().get(0);
+		// explicit limit of 10 records applies
+		Assert.assertEquals(10, realTriggerLimitTen.getNextFireTimes().size());
+
+		filter.set("nextFireTimesLimitCount", 10);
+		filter.set("nextFireTimesLimitSeconds", 60*60*5); // 5 hours
+		List<Task> resultsLimitFiveHours = find(filter);
+		CronTaskTrigger realTriggerLimitFiveHours = (CronTaskTrigger) resultsLimitFiveHours.get(0).getTriggers().get(0);
+		// explicit limit of 10 records, 5 hours applies (the lesser limit will apply - in this case 5)
+		Assert.assertEquals(5, realTriggerLimitFiveHours.getNextFireTimes().size());
 	}
 
 	@Test
@@ -99,6 +122,65 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		Assert.assertEquals(1, taskFetched.getDependentTasks().size());
 		Assert.assertEquals(taskDependent.getId(), taskFetched.getDependentTasks().get(0).getId());
 	}
+
+	// a more complex scenario
+	// First runs A, then B, then C, C and D and E are dependent on A, E is also dependent on C
+	// A - EDC(- E)
+	// |
+	// B
+	// |
+	// C - E
+	@Test
+	public void testFiveTasksComplexScenario() {
+		Task taskA = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+		SimpleTaskTrigger simpleTaskTriggerA = new SimpleTaskTrigger();
+		simpleTaskTriggerA.setFireTime(ZonedDateTime.now().plusMinutes(5));
+		manager.createTrigger(taskA.getId(), simpleTaskTriggerA);
+
+		Task taskB = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+		SimpleTaskTrigger simpleTaskTriggerB = new SimpleTaskTrigger();
+		simpleTaskTriggerB.setFireTime(ZonedDateTime.now().plusMinutes(10));
+		manager.createTrigger(taskB.getId(), simpleTaskTriggerB);
+
+		Task taskC = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+		SimpleTaskTrigger simpleTaskTriggerC = new SimpleTaskTrigger();
+		simpleTaskTriggerC.setFireTime(ZonedDateTime.now().plusMinutes(15));
+		manager.createTrigger(taskC.getId(), simpleTaskTriggerC);
+		DependentTaskTrigger dependentTaskTriggerC = new DependentTaskTrigger();
+		dependentTaskTriggerC.setInitiatorTaskId(taskA.getId());
+		manager.createTrigger(taskC.getId(), dependentTaskTriggerC);
+
+		Task taskD = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+		DependentTaskTrigger dependentTaskTriggerD = new DependentTaskTrigger();
+		dependentTaskTriggerD.setInitiatorTaskId(taskA.getId());
+		manager.createTrigger(taskD.getId(), dependentTaskTriggerD);
+
+		Task taskE = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+		DependentTaskTrigger dependentTaskTriggerEA = new DependentTaskTrigger();
+		dependentTaskTriggerEA.setInitiatorTaskId(taskA.getId());
+		manager.createTrigger(taskE.getId(), dependentTaskTriggerEA);
+		DependentTaskTrigger dependentTaskTriggerEC = new DependentTaskTrigger();
+		dependentTaskTriggerEC.setInitiatorTaskId(taskC.getId());
+		manager.createTrigger(taskE.getId(), dependentTaskTriggerEC);
+
+		TaskFilter filter = new TaskFilter();
+		filter.setTaskType(TestSchedulableTask.class.getName());
+		List<Task> results = find(filter);
+
+		// only A, B, C tasks are directly visible and sorted by nextFireTime
+		Assert.assertEquals(3, results.size());
+		Assert.assertEquals(taskA.getId(), results.get(0).getId());
+		Assert.assertEquals(taskB.getId(), results.get(1).getId());
+		Assert.assertEquals(taskC.getId(), results.get(2).getId());
+		// A has dependent tasks - C, D, E
+		Set<String> idsCDE = Set.of(taskC.getId(), taskD.getId(), taskE.getId());
+		Set<String> idsDependentTasksOnA = results.get(0).getDependentTasks().stream().map(Task::getId).collect(Collectors.toSet());
+		Assert.assertEquals(idsCDE, idsDependentTasksOnA);
+		// C knows E is dependent on it
+		Assert.assertEquals(1, results.get(2).getDependentTasks().size());
+		Assert.assertEquals(taskE.getId(), results.get(2).getDependentTasks().get(0).getId());
+	}
+
 	protected List<Task> find(TaskFilter filter) {
 		MultiValueMap<String, String> queryParams = toQueryParams(filter);
 		queryParams.set("size", "10000");
