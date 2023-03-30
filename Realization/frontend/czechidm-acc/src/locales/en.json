@@ -3111,6 +3111,18 @@
           }
         }
       }
+    },
+    "authorization-evaluator": {
+      "acc-account-role-assignment-by-account-evaluator": {
+        "help": "Permissions for roles assigned to accounts based on permissions for account",
+        "attributes": {
+          "include-permissions": {
+            "label": "Transfer permissions",
+            "help": "Select permissions which will be transfered to account role assignment permissions.",
+            "placeholder": "Same permissions as for the account or select ..."
+          }
+        }
+      }
     }
   },
   "wizard": {
