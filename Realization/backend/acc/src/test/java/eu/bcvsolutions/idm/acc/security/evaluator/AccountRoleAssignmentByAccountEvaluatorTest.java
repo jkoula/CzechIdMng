@@ -3,7 +3,6 @@ package eu.bcvsolutions.idm.acc.security.evaluator;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,6 +10,7 @@ import eu.bcvsolutions.idm.acc.TestHelper;
 import eu.bcvsolutions.idm.acc.domain.AccGroupPermission;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
 import eu.bcvsolutions.idm.acc.dto.AccAccountRoleAssignmentDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccAccountRoleAssignmentFilter;
 import eu.bcvsolutions.idm.acc.entity.AccAccount;
 import eu.bcvsolutions.idm.acc.entity.AccAccountRoleAssignment;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountRoleAssignmentService;
@@ -32,24 +32,19 @@ public class AccountRoleAssignmentByAccountEvaluatorTest extends AbstractEvaluat
 	@Autowired
 	AccAccountRoleAssignmentService accountRoleAssignmentService;
 
-	@Before
-	public void cleanup() {
-		accountService.find(null).getContent().forEach(account -> {
-			accountService.delete(account);
-		});
-	}
-
 	@Test
 	public void testEvaluator() {
 		AccAccountDto account = helper.createAccount();
 		IdmRoleDto role = helper.createRole();
 		AccAccountRoleAssignmentDto accountRoleAssignment = helper.createAccountRoleAssignment(account, role);
+		AccAccountRoleAssignmentFilter roleAssignmentFilter = new AccAccountRoleAssignmentFilter();
+		roleAssignmentFilter.setAccountId(account.getId());
 		//
 		IdmIdentityDto identity = helper.createIdentity();
 		try {
 			helper.login(identity);
 			// check read
-			List<AccAccountRoleAssignmentDto> assignedRoles = accountRoleAssignmentService.find(null, IdmBasePermission.READ).getContent();
+			List<AccAccountRoleAssignmentDto> assignedRoles = accountRoleAssignmentService.find(roleAssignmentFilter, null, IdmBasePermission.READ).getContent();
 			Assert.assertEquals(0, assignedRoles.size());
 		} finally {
 			helper.logout();
@@ -75,7 +70,7 @@ public class AccountRoleAssignmentByAccountEvaluatorTest extends AbstractEvaluat
 		try {
 			helper.login(identity);
 			// check read
-			List<AccAccountRoleAssignmentDto> assignedRoles = accountRoleAssignmentService.find(null, IdmBasePermission.READ).getContent();
+			List<AccAccountRoleAssignmentDto> assignedRoles = accountRoleAssignmentService.find(roleAssignmentFilter, null, IdmBasePermission.READ).getContent();
 			Assert.assertEquals(1, assignedRoles.size());
 			Assert.assertEquals(accountRoleAssignment.getId(), assignedRoles.get(0).getId());
 		} finally {
