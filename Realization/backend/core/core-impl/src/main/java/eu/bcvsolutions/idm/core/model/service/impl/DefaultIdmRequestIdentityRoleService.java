@@ -111,6 +111,7 @@ public class DefaultIdmRequestIdentityRoleService extends
 		}
 		builder.setModelMapper(modelMapper);
 
+		LOG.debug(MessageFormat.format("Find idm-request-identity-roles by multiresource [{0}] ", builder));
 		return builder.build().find(copyFilter, pageable, permission);
 	}
 
