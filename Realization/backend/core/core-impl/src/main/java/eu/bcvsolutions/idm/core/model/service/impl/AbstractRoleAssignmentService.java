@@ -315,15 +315,14 @@ public abstract class AbstractRoleAssignmentService<D extends AbstractRoleAssign
             LOG.debug("Deduplicating role assignments [{}] and [{}] by [{}]", one, two, deduplicator);
             AbstractRoleAssignmentDto duplicated = deduplicator.getDuplicated(one, two, skipSubdefinition);
             if (duplicated == null) {
-                // according to this duplicator, this role assignment is not duplicated
                 LOG.debug("Deduplicating role assignments [{}] and [{}] by [{}] - not duplicated", one, two, deduplicator);
+                return null;
             } else {
                 Pair<AbstractRoleAssignmentDto, Boolean> duplicate = new Pair<>(duplicated, deduplicator.considerOrder());
                 duplicates.add(duplicate);
                 LOG.debug("Deduplicating role assignments [{}] and [{}] by [{}] - duplicated", one, two, deduplicator);
             }
         }
-
         if (duplicates.isEmpty()) {
             LOG.debug("No duplicates found.");
             return null;
