@@ -954,10 +954,12 @@ public class DefaultIdmRoleRequestService
 	@Override
 	public List<AbstractConceptRoleRequestDto> markDuplicates(List<AbstractConceptRoleRequestDto> concepts, List<AbstractRoleAssignmentDto> allByIdentity) {
 		Assert.notNull(concepts, "Role request concepts are required.");
-
+		LOG.debug("Mark duplicates in concepts [{}]", concepts.size());
 		// Check duplicates between concepts
 		markDuplicatesInConcepts(concepts);
 
+		LOG.debug("Mark duplicates in concepts and identity roles [{}]", concepts.size());
+		// Check duplicates between concepts and identity roles
 		// Split by role UUID
 		Map<UUID, List<AbstractRoleAssignmentDto>> identityRolesByRole = allByIdentity
 		.stream() //
@@ -965,9 +967,10 @@ public class DefaultIdmRoleRequestService
 				Collectors.groupingBy( // Group identity roles by role
 						AbstractRoleAssignmentDto::getRole) //
 				); //
-
+		LOG.debug("Fetched identity roles by role [{}]", identityRolesByRole.size());
 		// TODO: create hashMap with used roles (simple cache)
 		for (AbstractConceptRoleRequestDto concept : concepts) {
+			LOG.debug("Check concept [{}]", concept.getId());
 			// Only add or modification will be processed
 			if (concept.getOperation() == REMOVE) {
 				continue;
@@ -985,6 +988,7 @@ public class DefaultIdmRoleRequestService
 
 			// Iterate over all identity roles, but only with same roles.
 			for (AbstractRoleAssignmentDto identityRole : identityRoles) {
+				LOG.debug("Check identity role [{}] against concept [{}]", identityRole.getId(), concept.getId());
 				// We must get eavs by service. This is expensive operation. But we need it.
 				IdmFormInstanceDto instanceDto = roleAssignmentManager.getServiceForAssignment(identityRole).getRoleAttributeValues(identityRole);
 				if (instanceDto != null) {
@@ -1003,7 +1007,7 @@ public class DefaultIdmRoleRequestService
 			}
 
 		}
-
+		LOG.debug("Mark duplicates in concepts and identity roles [{}] - end", concepts.size());
 		return concepts;
 	}
 
@@ -1311,7 +1315,9 @@ public class DefaultIdmRoleRequestService
 	private void markDuplicatesInConcepts(List<AbstractConceptRoleRequestDto> concepts) {
 		// Mark duplicates with concepts
 		// Compare conceptOne with conceptTwo
+		LOG.debug("Mark duplicates in concepts");
 		for (AbstractConceptRoleRequestDto conceptOne : concepts) {
+			LOG.debug("Compare concept [{}] with others", conceptOne.getId());
 			// Only add or modification will be processed
 			if (conceptOne.getOperation() == REMOVE) {
 				conceptOne.setDuplicate(Boolean.FALSE); // REMOVE concept can't be duplicated
@@ -1331,6 +1337,7 @@ public class DefaultIdmRoleRequestService
 
 			// check duplicates for concept
 			for (AbstractConceptRoleRequestDto conceptTwo : concepts) {
+				LOG.debug("Compare concept [{}] with concept [{}]", conceptOne.getId(), conceptTwo.getId());
 				// Only add or modification will be processed
 				if (conceptTwo.getOperation() == REMOVE) {
 					conceptTwo.setDuplicate(Boolean.FALSE); // REMOVE concept can be duplicated
@@ -1371,6 +1378,7 @@ public class DefaultIdmRoleRequestService
 				conceptOne.setDuplicate(Boolean.FALSE);
 			}
 		}
+		LOG.debug("Mark duplicates in concepts finished");
 	}
 	
 
