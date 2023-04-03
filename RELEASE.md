@@ -22,3 +22,4 @@ Bellow are the steps needed to perform when releasing a new version of CzechIdM.
    docker login <prod-repository-url>:<prod-repository-port>
    docker image push <prod-repository-url>:<prod-repository-port>/bcv-czechidm:<czechidm-image-version>
    ```
+9. In a separate branch, set the version in each pom.xml and package.json to SNAPSHOT again. Leave the Docker versions as they are. Merge this branch to develop via a PR.
