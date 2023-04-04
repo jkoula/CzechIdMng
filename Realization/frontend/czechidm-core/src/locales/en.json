@@ -7043,17 +7043,155 @@
             "help": "Add permission to currently logged user only. Logged user doesn't get permissions to other users attributes."
           },
           "owner-update": {
-            "label": "By permission to update user",
-            "help": "Add permission to attributes of users, which can be updated by the logged user (for example, when logged user can update identity, then he can update attributes too)."
+            "label": "By permission to update identity",
+            "help": "Add permission to attributes of identities, which can be updated by the logged user."
           },
           "owner-read": {
-            "label": "By permission to read user",
-            "help": "Add permission to attributes of users, which can be read by the logged user (for example, when logged user can read identity, then he can update attributes)."
+            "label": "By permission to read identity",
+            "help": "Add permission to attributes of identities, which can be read by the logged user."
+          }
+        }
+      },
+      "code-list-item-value-evaluator": {
+        "help": "Permissions to code list item form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update code list item",
+            "help": "Add permission to attributes of code list items, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read code list item",
+            "help": "Add permission to attributes of code list items, which can be read by the logged user."
+          }
+        }
+      },
+      "concept-role-request-form-value-evaluator": {
+        "help": "Permissions to concept role request form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update concept role request",
+            "help": "Add permission to attributes of concept role requests, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read concept role request",
+            "help": "Add permission to attributes of concept role requests, which can be read by the logged user."
+          }
+        }
+      },
+      "contract-slice-form-value-evaluator": {
+        "help": "Permissions to contract slice form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update contract slice",
+            "help": "Add permission to attributes of contract slices, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read contract slice",
+            "help": "Add permission to attributes of contract slices, which can be read by the logged user."
+          }
+        }
+      },
+      "identity-role-form-value-evaluator": {
+        "help": "Permissions to identity role form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update identity role",
+            "help": "Add permission to attributes of identity roles, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read identity role",
+            "help": "Add permission to attributes of identity roles, which can be read by the logged user."
+          }
+        }
+      },
+      "role-form-value-evaluator": {
+        "help": "Permissions to role form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update role",
+            "help": "Add permission to attributes of roles, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read role",
+            "help": "Add permission to attributes of roles, which can be read by the logged user."
+          }
+        }
+      },
+      "tree-node-form-value-evaluator": {
+        "help": "Permissions to tree node form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update tree node",
+            "help": "Add permission to attributes of tree nodes, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read tree node",
+            "help": "Add permission to attributes of tree nodes, which can be read by the logged user."
           }
         }
       },
       "core-identity-contract-form-value-evaluator": {
-        "help": "Permissions to contract form attribute values. By definition (main if not specified) and attrinute codes (all if not specified).",
+        "help": "Permissions to identity contract form attribute values. By definition (main if not specified) and attrinute codes (all if not specified).",
         "attributes": {
           "form-definition": {
             "label": "Form definition",
@@ -7067,7 +7205,7 @@
           },
           "owner-update": {
             "label": "By permission to update contract",
-            "help": "Add permission to attributes of users, which can be updated by the logged user (for example, when logged user can update contract, then he can update attributes too)."
+            "help": "Add permission to attributes of contracts, which can be updated by the logged user (for example, when logged user can update contract, then he can update attributes too)."
           },
           "owner-read": {
             "label": "By permission to read contract",

@@ -1,5 +1,10 @@
 package eu.bcvsolutions.idm.core.eav.service.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -14,6 +19,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
+
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -96,7 +102,6 @@ import eu.bcvsolutions.idm.core.security.api.domain.IdmBasePermission;
 import eu.bcvsolutions.idm.core.security.evaluator.eav.AbstractFormValueEvaluator;
 import eu.bcvsolutions.idm.core.security.evaluator.eav.IdentityFormValueEvaluator;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
-import static org.junit.Assert.*;
 
 /**
  * Form service integration tests.
@@ -772,10 +777,17 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 
 		IdmFormDefinitionDto formDefinition = formService.getDefinition(IdmRole.class);
 		IdmFormAttributeDto attribute = formDefinition.getMappedAttributeByCode("extAttr");
+		if (formDefinition == null) {
+			formDefinition = getHelper().createFormDefinition(IdmRole.class.getCanonicalName());
+		}
+		if (attribute == null) {
+			attribute = getHelper().createEavAttribute("extAttr", IdmRole.class, PersistentType.SHORTTEXT);
+		}
 		//
 		formService.saveValues(owner.getId(), IdmRole.class, attribute, Lists.newArrayList("test"));
 		formService.saveValues(ownerTwo.getId(), IdmRole.class, attribute, Lists.newArrayList("test2"));
 
+		IdmFormAttributeDto finalAttribute = attribute; // to please the compiler
 		Specification<IdmRole> criteria = new Specification<IdmRole>() {
 			private static final long serialVersionUID = 1L;
 
@@ -786,7 +798,7 @@ public class DefaultFormServiceIntegrationTest extends AbstractIntegrationTest {
 
 				Predicate predicate = builder.and(
 						builder.equal(subRoot.get(IdmRoleFormValue_.owner), root),
-						builder.equal(subRoot.get(IdmRoleFormValue_.formAttribute).get(IdmFormAttribute_.id), attribute.getId()),
+						builder.equal(subRoot.get(IdmRoleFormValue_.formAttribute).get(IdmFormAttribute_.id), finalAttribute.getId()),
 						builder.equal(subRoot.get(IdmRoleFormValue_.stringValue), "test"));
 				subquery.where(predicate);
 				//

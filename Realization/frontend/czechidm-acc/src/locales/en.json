@@ -3089,6 +3089,100 @@
         }
       }
     },
+    "authorization-evaluator": {
+      "acc-account-form-value-evaluator": {
+        "help": "Permissions to account form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update account",
+            "help": "Add permission to attributes of accounts, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read account",
+            "help": "Add permission to attributes of accounts, which can be read by the logged user."
+          }
+        }
+      },
+      "account-concept-role-request-form-value-evaluator": {
+        "help": "Permissions to account concept role request form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update account concept role request",
+            "help": "Add permission to attributes of account concept role requests, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read account concept role request",
+            "help": "Add permission to attributes of account concept role requests, which can be read by the logged user."
+          }
+        }
+      },
+      "account-role-assignment-form-value-evaluator": {
+        "help": "Permissions to account role assignment form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update account role assignment",
+            "help": "Add permission to attributes of account role assignments, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read account role assignment",
+            "help": "Add permission to attributes of account role assignments, which can be read by the logged user."
+          }
+        }
+      },
+      "system-form-value-evaluator": {
+        "help": "Permissions to system form values.",
+        "attributes": {
+          "form-definition": {
+            "label": "Form definition",
+            "help": "Select definition, which contains attributes. Main definition will be used as default.",
+            "placeholder": "Main definition for identities or select ..."
+          },
+          "attributes": {
+            "label": "Attributes",
+            "help": "Add permission to attributes. All attributes from selected form definition will be used as default.",
+            "placeholder": "All attributes or attribute codes (use comma as separator)"
+          },
+          "owner-update": {
+            "label": "By permission to update system",
+            "help": "Add permission to attributes of systems, which can be updated by the logged user."
+          },
+          "owner-read": {
+            "label": "By permission to read system",
+            "help": "Add permission to attributes of systems, which can be read by the logged user."
+          }
+        }
+      }
+    },
     "monitoring-evaluator": {
       "acc-synchronization-monitoring-evaluator": {
         "label": "Synchronization monitoring",
