@@ -194,6 +194,40 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		Assert.assertEquals(taskE.getId(), results.get(2).getDependentTasks().get(0).getId());
 	}
 
+	// a task with multiple triggers gets them sorted
+	@Test
+	public void testTaskWithMultipleTriggersGetsThemSorted() {
+		Task task = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+
+		// add 4 triggers, NOT sorted by fireTime and one without fireTime (dependent task)
+		Task dependentTask = createTask(TestSchedulableTask.class, getHelper().createName(), "mock" + getHelper().createName());
+		DependentTaskTrigger dependentTaskTrigger = new DependentTaskTrigger();
+		dependentTaskTrigger.setInitiatorTaskId(dependentTask.getId());
+		manager.createTrigger(task.getId(), dependentTaskTrigger);
+
+		SimpleTaskTrigger simpleTaskTriggerA = new SimpleTaskTrigger();
+		simpleTaskTriggerA.setFireTime(ZonedDateTime.now().plusMinutes(5));
+		manager.createTrigger(task.getId(), simpleTaskTriggerA);
+
+		SimpleTaskTrigger simpleTaskTriggerB = new SimpleTaskTrigger();
+		simpleTaskTriggerB.setFireTime(ZonedDateTime.now().plusMinutes(15));
+		manager.createTrigger(task.getId(), simpleTaskTriggerB);
+
+		SimpleTaskTrigger simpleTaskTriggerC = new SimpleTaskTrigger();
+		simpleTaskTriggerC.setFireTime(ZonedDateTime.now().plusMinutes(10));
+		manager.createTrigger(task.getId(), simpleTaskTriggerC);
+
+		TaskFilter filter = new TaskFilter();
+		filter.setTaskType(TestSchedulableTask.class.getName());
+		List<Task> results = find(filter);
+
+		Assert.assertEquals(simpleTaskTriggerA.getId(), results.get(0).getTriggers().get(0).getId());
+		Assert.assertEquals(simpleTaskTriggerC.getId(), results.get(0).getTriggers().get(1).getId());
+		Assert.assertEquals(simpleTaskTriggerB.getId(), results.get(0).getTriggers().get(2).getId());
+		// dependent task trigger has no fireTime and is last
+		Assert.assertEquals(null, results.get(0).getTriggers().get(3).getNextFireTime());
+	}
+
 	protected List<Task> find(TaskFilter filter) {
 		MultiValueMap<String, String> queryParams = toQueryParams(filter);
 		queryParams.set("size", "10000");

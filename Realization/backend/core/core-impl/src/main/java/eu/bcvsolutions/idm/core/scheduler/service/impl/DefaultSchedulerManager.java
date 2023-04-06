@@ -507,6 +507,19 @@ public class DefaultSchedulerManager implements SchedulerManager {
 				}
 			}
 
+			// for each task sort triggers by next fire time
+			for (Task task: allTasks) {
+				task.getTriggers().sort((t1, t2) -> {
+					if (t1.getNextFireTime() == null) {
+						return 1;
+					} else if (t2.getNextFireTime() == null) {
+						return -1;
+					} else {
+						return t1.getNextFireTime().compareTo(t2.getNextFireTime());
+					}
+				});
+			}
+
 			// apply "naive" sort and pagination
 			filteredTasks = filteredTasks
 					.stream()
