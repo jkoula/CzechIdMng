@@ -138,12 +138,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 	public Page<Task> find(TaskFilter filter, Pageable pageable) {
 		try {
 			// pageable is required internally
-			Pageable internalPageable;
-			if (pageable == null) {
-				internalPageable = PageRequest.of(0, Integer.MAX_VALUE);
-			} else {
-				internalPageable = pageable;
-			}
+			Pageable internalPageable = configurePageable(pageable);
 
 			List<Task> tasks = new ArrayList<>();
 			// load scheduled tasks
@@ -462,12 +457,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 	public Page<Task> findUpcomingTasks(TaskFilter filter, Pageable pageable) {
 		try {
 			// pageable is required internally
-			Pageable internalPageable;
-			if (pageable == null) {
-				internalPageable = PageRequest.of(0, Integer.MAX_VALUE);
-			} else {
-				internalPageable = pageable;
-			}
+			Pageable internalPageable = configurePageable(pageable);
 
 			List<Task> filteredTasks = new ArrayList<>();
 			List<Task> allTasks = new ArrayList<>();
@@ -540,6 +530,16 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		} catch (org.quartz.SchedulerException ex) {
 			throw new CoreException(ex);
 		}
+	}
+
+	private static Pageable configurePageable(Pageable pageable) {
+		Pageable internalPageable;
+		if (pageable == null) {
+			internalPageable = PageRequest.of(0, Integer.MAX_VALUE);
+		} else {
+			internalPageable = pageable;
+		}
+		return internalPageable;
 	}
 
 	/**
