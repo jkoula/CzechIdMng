@@ -63,7 +63,6 @@ public class UpcomingTasksRestTest extends AbstractRestTest {
 		TaskFilter filter = new TaskFilter();
 		filter.setInstanceId(instanceId);
 		List<Task> results = find(filter);
-		//ssertEquals(1, results.size());
 		Assert.assertNotNull(results.get(0).getTriggers());
 		Assert.assertEquals(1, results.get(0).getTriggers().size());
 		CronTaskTrigger realTrigger = (CronTaskTrigger) results.get(0).getTriggers().get(0);

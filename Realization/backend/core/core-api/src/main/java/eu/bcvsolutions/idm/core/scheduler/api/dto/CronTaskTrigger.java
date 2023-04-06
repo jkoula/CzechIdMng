@@ -52,4 +52,9 @@ public class CronTaskTrigger extends AbstractTaskTrigger {
 	public void setNextFireTimes(List<ZonedDateTime> nextFireTimes) {
 		this.nextFireTimes = nextFireTimes;
 	}
+
+	@Override
+	public void accept(TaskTriggerVisitor visitor) {
+		visitor.visit(this);
+	}
 }

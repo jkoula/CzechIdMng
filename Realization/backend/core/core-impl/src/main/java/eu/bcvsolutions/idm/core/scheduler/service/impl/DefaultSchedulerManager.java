@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.scheduler.service.impl;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.ArrayList;
@@ -56,6 +55,7 @@ import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.AbstractTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.CronTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.DependentTaskTrigger;
+import eu.bcvsolutions.idm.core.scheduler.api.dto.NextFireTimesTaskTriggerVisitor;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.SimpleTaskTrigger;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.Task;
 import eu.bcvsolutions.idm.core.scheduler.api.dto.TaskTriggerState;
@@ -489,21 +489,8 @@ public class DefaultSchedulerManager implements SchedulerManager {
 					if (nextFireTimesLimitSeconds != null) {
 						nextFireTimeLimitDate = ZonedDateTime.now().plusSeconds(Long.parseLong(nextFireTimesLimitSeconds.toString()));
 					}
-					for (AbstractTaskTrigger trigger : task.getTriggers()) {
-						if (trigger instanceof CronTaskTrigger) {
-							CronTaskTrigger cronTaskTrigger = (CronTaskTrigger) trigger;
-							List<ZonedDateTime> nextFireTimes = cronTaskTrigger.getNextFireTimes();
-							ZonedDateTime lastFireTime = trigger.getNextFireTime();
-							List<? extends Trigger> schedulerTriggers = scheduler.getTriggersOfJob(jobKey);
-							Trigger schedulerTrigger = schedulerTriggers.stream().filter(t -> t.getJobKey().equals(jobKey)).findFirst().get(); // TODO: fixme
-							ZonedDateTime nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(lastFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-							while (nextFireTimes.size() < nextFireTimesLimitCount && nextScheduledFireTime.isBefore(nextFireTimeLimitDate)) {
-								nextFireTimes.add(nextScheduledFireTime);
-								nextScheduledFireTime = schedulerTrigger.getFireTimeAfter(Date.from(nextScheduledFireTime.toInstant())).toInstant().atZone(ZoneId.systemDefault());
-							}
-							cronTaskTrigger.setNextFireTimes(nextFireTimes);
-						}
-					}
+					NextFireTimesTaskTriggerVisitor visitor = new NextFireTimesTaskTriggerVisitor(nextFireTimesLimitCount, nextFireTimeLimitDate, scheduler, jobKey);
+					task.getTriggers().forEach(t -> t.accept(visitor));
 				}
 			}
 
