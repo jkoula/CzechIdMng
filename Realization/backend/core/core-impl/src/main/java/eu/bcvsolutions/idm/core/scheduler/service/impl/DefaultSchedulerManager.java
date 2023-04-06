@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
 import java.util.function.Function;
@@ -209,8 +210,8 @@ public class DefaultSchedulerManager implements SchedulerManager {
 		ZonedDateTime taskTwoEarliestFireTime = null;
 		try {
 			Function<Task, ZonedDateTime> findEarliestFireTime = task -> task.getTriggers().stream()
-					.filter(trigger -> !(trigger instanceof DependentTaskTrigger))
 					.map(AbstractTaskTrigger::getNextFireTime)
+					.filter(Objects::nonNull)
 					.min(ChronoZonedDateTime::compareTo)
 					.get();
 			taskOneEarliestFireTime = findEarliestFireTime.apply(taskOne);
@@ -524,7 +525,7 @@ public class DefaultSchedulerManager implements SchedulerManager {
 			filteredTasks = filteredTasks
 					.stream()
 					// filter out purely dependent tasks, they are contained in their dependent tasks
-					.filter(task -> !task.getTriggers().stream().allMatch(trigger -> trigger instanceof DependentTaskTrigger))
+					.filter(task -> !task.getTriggers().stream().allMatch(trigger -> trigger.getNextFireTime() == null))
 					.sorted(DefaultSchedulerManager::compareTasksByEarliestFireTime)
 					.collect(Collectors.toList());
 			// "naive" pagination
