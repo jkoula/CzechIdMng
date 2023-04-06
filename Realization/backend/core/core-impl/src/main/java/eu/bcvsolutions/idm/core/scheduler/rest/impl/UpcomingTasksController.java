@@ -1,6 +1,5 @@
 package eu.bcvsolutions.idm.core.scheduler.rest.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -35,12 +34,17 @@ import io.swagger.annotations.AuthorizationScope;
 public class UpcomingTasksController implements BaseController {
 
 	protected static final String TAG = "Upcoming tasks";
-
-	@Autowired
 	private SchedulerManager schedulerService;
-	@Autowired private LookupService lookupService;
-	@Autowired private PagedResourcesAssembler<Object> pagedResourcesAssembler;
-	private ParameterConverter parameterConverter = null;
+	private LookupService lookupService;
+	private PagedResourcesAssembler<Object> pagedResourcesAssembler;
+	private ParameterConverter parameterConverter;
+
+	public UpcomingTasksController(SchedulerManager schedulerService, LookupService lookupService, PagedResourcesAssembler<Object> pagedResourcesAssembler) {
+		this.schedulerService = schedulerService;
+		this.lookupService = lookupService;
+		this.pagedResourcesAssembler = pagedResourcesAssembler;
+		this.parameterConverter = new ParameterConverter(lookupService);
+	}
 
 	/**
 	 * Finds upcoming scheduled tasks
@@ -54,7 +58,7 @@ public class UpcomingTasksController implements BaseController {
 	@ApiOperation(
 			value = "Search upcoming scheduled tasks",
 			nickname = "searchUpcomingSchedulerTasks",
-			tags={ SchedulerController.TAG },
+			tags={ UpcomingTasksController.TAG },
 			authorizations = {
 					@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = {
 							@AuthorizationScope(scope = CoreGroupPermission.SCHEDULER_READ, description = "") }),
@@ -80,18 +84,13 @@ public class UpcomingTasksController implements BaseController {
 	}
 
 	protected Resources<?> pageToResources(Page<Object> page, Class<?> domainType) {
-
 		if (page.getContent().isEmpty()) {
 			return pagedResourcesAssembler.toEmptyResource(page, domainType);
 		}
-
 		return pagedResourcesAssembler.toResource(page);
 	}
 
 	private ParameterConverter getParameterConverter() {
-		if (parameterConverter == null) {
-			parameterConverter = new ParameterConverter(lookupService);
-		}
 		return parameterConverter;
 	}
 
