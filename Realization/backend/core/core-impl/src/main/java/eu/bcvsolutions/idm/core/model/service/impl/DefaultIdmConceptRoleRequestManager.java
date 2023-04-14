@@ -135,7 +135,6 @@ public class DefaultIdmConceptRoleRequestManager extends  AbstractAdaptableMulti
 
     @Override
     public MultiSourcePagedResource<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto> getMultiResource() {
-        // TODO comment wtf
         List<AdaptableService<IdmRequestIdentityRoleDto, IdmRequestIdentityRoleFilter, IdmRequestIdentityRoleDto>> services = new ArrayList<>();
         conceptServices.values().forEach(services::add);
         return new MultiSourcePagedResource<>(services, modelMapper);
