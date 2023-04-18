@@ -1162,6 +1162,7 @@
   "permission": {
     "base" : {
       "ADMIN": "Administration (all)",
+      "METRICS": "Monitoring",
       "COUNT": "Number of records",
       "AUTOCOMPLETE": "View in select box (autocomplete)",
       "READ": "Read",
