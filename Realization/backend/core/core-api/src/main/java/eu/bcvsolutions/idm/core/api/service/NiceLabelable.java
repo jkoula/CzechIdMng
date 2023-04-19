@@ -1,7 +1,6 @@
 package eu.bcvsolutions.idm.core.api.service;
 
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 
 /**
  * @author Peter Štrunc <github.com/peter-strunc>
@@ -14,5 +13,5 @@ public interface NiceLabelable<T extends BaseDto> {
      * @param identity
      * @return
      */
-    String getNiceLabel(T identity);
+    String getNiceLabel(T labelableDto);
 }

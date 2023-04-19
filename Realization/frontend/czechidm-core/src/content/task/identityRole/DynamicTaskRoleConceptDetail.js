@@ -9,7 +9,6 @@ import * as Advanced from '../../../components/advanced';
 import DecisionButtons from '../DecisionButtons';
 import DynamicTaskDetail from '../DynamicTaskDetail';
 import RoleConceptDetail from '../../requestrole/RoleConceptDetail';
-import { ConceptRoleRequestManager } from '../../../redux';
 import ComponentService from "../../../services/ComponentService";
 import RequestIdentityRoleManager from "../../../redux/data/RequestIdentityRoleManager";
 
@@ -251,7 +250,6 @@ DynamicTaskRoleConceptDetail.defaultProps = {
 function select(state, component) {
   const task = component.task;
   const _entityId = task && task.variables && task.variables.conceptRole ? task.variables.conceptRole.id : null;
-  //const manager = componentService.getManagerForConceptByOwnerType(task?.variables?.conceptRole?.ownerType)
   const entity = requestIdentityRoleManager.getEntity(state, _entityId);
   if (task && entity) {
     return {
