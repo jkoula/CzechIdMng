@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
@@ -284,4 +285,6 @@ public interface IdmRoleRequestService extends
 	ApplicantService getApplicantService(String applicantType);
 
 	ApplicantService getApplicantServiceByAccountType(String accountType);
+
+	String getApplicantLabel(ApplicantDto applicant) throws ClassNotFoundException;
 }

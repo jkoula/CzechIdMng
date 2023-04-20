@@ -21,6 +21,11 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.core.api.domain.Codeable;
+import eu.bcvsolutions.idm.core.api.domain.Identifiable;
+import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.NiceLabelable;
+import eu.bcvsolutions.idm.core.api.service.ReadDtoService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +35,7 @@ import org.fusesource.hawtbuf.ByteArrayInputStream;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -144,8 +150,6 @@ public class DefaultIdmRoleRequestService
 	private IdmRoleAssignmentManager roleAssignmentManager;
 
 	@Autowired
-	private IdmIdentityRoleService identityRoleService;
-	@Autowired
 	private IdmIdentityService identityService;
 	@Autowired
 	private SecurityService securityService;
@@ -163,8 +167,10 @@ public class DefaultIdmRoleRequestService
 	private AttachmentManager attachmentManager;
 	@Autowired
 	private IdmRoleCompositionService roleCompositionService;
+
+	@Lazy
 	@Autowired
-	private IdmIdentityRoleThinService identityRoleThinService;
+	private LookupService lookupService;
 	//
 	@Autowired
 	public DefaultIdmRoleRequestService(IdmRoleRequestRepository repository,
@@ -420,6 +426,7 @@ public class DefaultIdmRoleRequestService
 		trimRequest(eventRequest);
 		event.setContent(eventRequest);
 		variables.put(EntityEvent.EVENT_PROPERTY, event);
+		variables.put("applicantInfo", request.getApplicantInfo());
 
 		ProcessInstance processInstance = workflowProcessInstanceService.startProcess(wfDefinition,
 				IdmIdentity.class.getSimpleName(), applicant.getId().toString(),
@@ -637,6 +644,21 @@ public class DefaultIdmRoleRequestService
 				.filter(abstractEventableDtoService -> accountType.equals(abstractEventableDtoService.getAccountType()))
 				.findFirst()
 				.orElse(null);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public String getApplicantLabel(ApplicantDto applicant) {
+		final BaseDto applicantDto = lookupService.lookupDto(applicant.getApplicantType(), applicant.getId());
+		final ReadDtoService<?, ?> dtoService = lookupService.getDtoService(applicantDto.getClass());
+
+		// TODO replace with pattern matching in java 17
+		if(dtoService instanceof NiceLabelable) {
+			// This unchecked cast is safe because applicantDto will always be compatible with dtoService
+			return ((NiceLabelable<BaseDto>) dtoService).getNiceLabel(applicantDto);
+		}
+		// fallback to identity applicant, which was default behavior prior to introduction of different applicant types
+		return identityService.getNiceLabel(identityService.get(applicant.getId()));
 	}
 
 	@Override
