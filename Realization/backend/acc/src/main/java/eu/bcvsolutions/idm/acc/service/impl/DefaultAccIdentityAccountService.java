@@ -100,6 +100,12 @@ public class DefaultAccIdentityAccountService extends
 		this.delete(dto, true, true, permission);
 	}
 
+	@Override
+	@Transactional
+	public void forceDelete(AccIdentityAccountDto dto, boolean deleteTargetAccount, BasePermission... permission) {
+		this.delete(dto, deleteTargetAccount, true, permission);
+	}
+
 	private void delete(AccIdentityAccountDto entity, boolean deleteTargetAccount, boolean forceDelete, BasePermission... permission) {
 		Assert.notNull(entity, "Entity is required.");
 		checkAccess(this.getEntity(entity.getId()), permission);

@@ -45,5 +45,7 @@ public interface AccIdentityAccountService extends
 	 */
 	@Beta
 	void forceDelete(AccIdentityAccountDto dto, BasePermission... permission);
+
+	void forceDelete(AccIdentityAccountDto identityAccount, boolean deleteTargetAccount, BasePermission... permission);
 }
 	
