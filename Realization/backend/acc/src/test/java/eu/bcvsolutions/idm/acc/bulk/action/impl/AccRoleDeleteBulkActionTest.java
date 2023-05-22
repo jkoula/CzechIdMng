@@ -65,9 +65,7 @@ public class AccRoleDeleteBulkActionTest extends AbstractBulkActionTest {
 			bulkAction.setProperties(properties);
 			IdmBulkActionDto processAction = bulkActionManager.processAction(bulkAction);
 			//
-			getHelper().waitForResult(res -> {
-				return roleService.get(role) != null;
-			});
+			getHelper().waitForResult(res -> roleService.get(role) != null);
 			checkResultLrt(processAction, 1l, 0l, 0l);
 			//
 			roleAssignments = accountRoleService.findByAccountId(account.getId());
