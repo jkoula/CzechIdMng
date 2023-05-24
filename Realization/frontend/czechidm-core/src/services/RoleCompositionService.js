@@ -1,7 +1,7 @@
 import AbstractRequestService from './AbstractRequestService';
 import SearchParameters from '../domain/SearchParameters';
 import RoleService from './RoleService';
-import {i18n} from './LocalizationService';
+import { i18n } from './LocalizationService';
 
 const roleService = new RoleService();
 
@@ -41,7 +41,7 @@ export default class RoleCompositionService extends AbstractRequestService {
   }
 
   supportsBulkAction() {
-    return true;
+    return !this.isRequestModeEnabled();
   }
 
   /**
@@ -50,6 +50,7 @@ export default class RoleCompositionService extends AbstractRequestService {
    * @return {object} searchParameters
    */
   getDefaultSearchParameters() {
-    return super.getDefaultSearchParameters().setName(SearchParameters.NAME_QUICK).clearSort().setSort('superior.name', 'asc').setSort('sub.name', 'asc');
+    return super.getDefaultSearchParameters().setName(SearchParameters.NAME_QUICK).clearSort().setSort('superior.name', 'asc')
+      .setSort('sub.name', 'asc');
   }
 }
