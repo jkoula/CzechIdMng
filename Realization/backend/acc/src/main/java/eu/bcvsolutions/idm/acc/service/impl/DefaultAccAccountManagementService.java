@@ -1,29 +1,13 @@
 package eu.bcvsolutions.idm.acc.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
 import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
 import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
+import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
 import eu.bcvsolutions.idm.acc.dto.filter.SysSystemGroupSystemFilter;
 import eu.bcvsolutions.idm.acc.entity.AccIdentityAccount_;
-import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
-import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
-import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
-import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import eu.bcvsolutions.idm.acc.domain.SystemEntityType;
-import eu.bcvsolutions.idm.acc.dto.AccIdentityAccountDto;
-import eu.bcvsolutions.idm.acc.dto.filter.AccIdentityAccountFilter;
+import eu.bcvsolutions.idm.acc.event.IdentityAccountEvent;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountManagementService;
 import eu.bcvsolutions.idm.acc.service.api.AccAccountService;
 import eu.bcvsolutions.idm.acc.service.api.AccIdentityAccountService;
@@ -36,10 +20,29 @@ import eu.bcvsolutions.idm.acc.service.api.SysSystemGroupSystemService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.entity.ValidableEntity;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
+import eu.bcvsolutions.idm.core.api.event.EventType;
+import eu.bcvsolutions.idm.core.api.service.EntityEventManager;
 import eu.bcvsolutions.idm.core.api.service.EntityStateManager;
 import eu.bcvsolutions.idm.core.api.service.IdmRoleAssignmentManager;
 import eu.bcvsolutions.idm.core.api.service.LookupService;
+import eu.bcvsolutions.idm.core.api.service.ReadWriteDtoService;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service for control account management. Account management is supported for
@@ -174,8 +177,9 @@ public class DefaultAccAccountManagementService extends AbstractAccountManagemen
 
 	@Override
 	protected boolean shouldAccountBeProvisioned(AccIdentityAccountDto entityAccount, SysRoleSystemDto roleSystem) {
-		SysRoleSystemDto roleSystemFromIdentityAccount = lookupService.lookupEmbeddedDto(entityAccount, AccIdentityAccount_.roleSystem);
-		return  entityAccount.getRoleSystem() != null && roleSystemFromIdentityAccount != null
+		SysRoleSystemDto roleSystemFromIdentityAccount = entityAccount.getRoleSystem() != null ?
+				lookupService.lookupEmbeddedDto(entityAccount, AccIdentityAccount_.roleSystem) : null;
+		return roleSystemFromIdentityAccount != null
 				&& roleSystem.getSystemMapping().equals(roleSystemFromIdentityAccount.getSystemMapping());
 	}
 
@@ -281,6 +285,16 @@ public class DefaultAccAccountManagementService extends AbstractAccountManagemen
 	@Override
 	protected ReadWriteDtoService<AccIdentityAccountDto, AccIdentityAccountFilter> getAccountService() {
 		return identityAccountService;
+	}
+
+	@Override
+	public AccIdentityAccountDto publish(EventType eventType, UUID accountId, Map<String, Serializable> eventProperties) {
+		AccIdentityAccountDto identityAccountDto = identityAccountService.get(accountId);
+		if (identityAccountDto != null) {
+			final IdentityAccountEvent identityAccountEvent = new IdentityAccountEvent(IdentityAccountEvent.IdentityAccountEventType.DELETE, identityAccountDto, eventProperties);
+			return identityAccountService.publish(identityAccountEvent).getContent();
+		}
+		return null;
 	}
 
 	@Override
