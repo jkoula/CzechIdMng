@@ -124,7 +124,7 @@ public class IdentityRoleSaveProvisioningProcessor extends AbstractEntityEventPr
 		// TODO: event.getParentType() === CREATE can be used instead
 		boolean isNew = roleAssignmentManager.getServiceForAssignment(roleAssignment).isNew(roleAssignment);
 		
-		LOG.debug("Call account management for identity [{}] and identity-role [{}]", identity.getUsername(), roleAssignment.toString());
+		LOG.debug("Call account management for identity [{}] and identity-role [{}]", identity.getUsername(), roleAssignment);
 		
 		List<UUID> accountIds = null;
 		if(isNew) {

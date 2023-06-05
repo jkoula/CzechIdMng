@@ -3,8 +3,6 @@ package eu.bcvsolutions.idm.acc.service.api;
 import java.util.List;
 import java.util.UUID;
 
-import eu.bcvsolutions.idm.acc.dto.SysRoleSystemDto;
-import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
@@ -14,7 +12,7 @@ import eu.bcvsolutions.idm.core.api.event.EntityEvent;
  * @author Vít Švanda
  *
  */
-public interface AccAccountManagementService {
+public interface AccAccountManagementService extends EntityAccountManagementService<IdmIdentityDto> {
 	
 	/**
 	 * We needs accounts (IDs) which were connected to deleted identity-role in next processors (we want to execute provisioning only for that accounts).
@@ -31,7 +29,7 @@ public interface AccAccountManagementService {
 	/**
 	 * Identity role is deleting, we have to delete linked identity accounts
 	 * 
-	 * @param entity
+	 * @param identityRole
 	 * @return list of accounts IDs (used this identity-role)
 	 */
 	List<UUID> deleteIdentityAccount(AbstractRoleAssignmentDto identityRole);
@@ -42,18 +40,6 @@ public interface AccAccountManagementService {
 	 * @param event
 	 */
 	void deleteIdentityAccount(EntityEvent<AbstractRoleAssignmentDto> event);
-	
-	/**
-	 * Return UID for this dto and roleSystem. First, the transform script
-	 * from the roleSystem attribute is found and used. If UID attribute
-	 * for the roleSystem is not defined, then default UID attribute handling
-	 * will be used.
-	 * 
-	 * @param dto
-	 * @param roleSystem
-	 * @return
-	 */
-	String generateUID(AbstractDto dto, SysRoleSystemDto roleSystem);
 
 	/**
 	 * Create new identity-accounts and accounts for given identity-roles

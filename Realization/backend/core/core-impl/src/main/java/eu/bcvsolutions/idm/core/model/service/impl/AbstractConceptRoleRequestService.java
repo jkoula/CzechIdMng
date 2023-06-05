@@ -752,31 +752,26 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
     }
 
     public void removeAssignedRole(D concept, EntityEvent<IdmRoleRequestDto> requestEvent) {
-        Assert.notNull(concept.getRoleAssignmentUuid(), "Role assignment is mandatory for delete!");
+        final UUID roleAssignmentUuid = concept.getRoleAssignmentUuid();
+        Assert.notNull(roleAssignmentUuid, "Role assignment is mandatory for delete!");
         CoreEvent<A> event = removeRelatedRoleAssignment(concept, requestEvent);
 
         if (event != null) {
-
             // Add list of identity-accounts for delayed ACM to parent event
-            Set<UUID> subIdentityAccountsForAcm = event
-                    .getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);
-            Set<UUID> identityAccountsForAcm = requestEvent
-                    .getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);
+            Set<UUID> subIdentityAccountsForAcm = event.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);
+            Set<UUID> identityAccountsForAcm = requestEvent.getSetProperty(IdmAccountDto.IDENTITY_ACCOUNT_FOR_DELAYED_ACM, UUID.class);
             identityAccountsForAcm.addAll(subIdentityAccountsForAcm);
             // Add list of accounts for additional provisioning to parent event
-            Set<UUID> subIdentityAccountsForProvisioning = event
-                    .getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, UUID.class);
-            Set<UUID> identityAccountsForProvisioning = requestEvent
-                    .getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, UUID.class);
+            Set<UUID> subIdentityAccountsForProvisioning = event.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, UUID.class);
+            Set<UUID> identityAccountsForProvisioning = requestEvent.getSetProperty(IdmAccountDto.ACCOUNT_FOR_ADDITIONAL_PROVISIONING, UUID.class);
             identityAccountsForProvisioning.addAll(subIdentityAccountsForProvisioning);
 
             // Removed assigned roles by business roles
             Set<UUID> subRemovedIdentityRoles = event.getSetProperty(AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_REMOVED_ROLES, UUID.class);
             // Add to parent event
-            Set<UUID> removedIdentityRoles = requestEvent
-                    .getSetProperty(AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_REMOVED_ROLES, UUID.class);
+            Set<UUID> removedIdentityRoles = requestEvent.getSetProperty(AbstractRoleAssignmentEvent.PROPERTY_ASSIGNED_REMOVED_ROLES, UUID.class);
             removedIdentityRoles.addAll(subRemovedIdentityRoles);
-            removedIdentityRoles.add(concept.getRoleAssignmentUuid());
+            removedIdentityRoles.add(roleAssignmentUuid);
         }
     }
 
