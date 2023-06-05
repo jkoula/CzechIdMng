@@ -43,7 +43,7 @@ export default class AuthorizationPolicyService extends AbstractRequestService {
   }
 
   supportsBulkAction() {
-    return true;
+    return !this.isRequestModeEnabled();
   }
 
   getGroupPermission() {

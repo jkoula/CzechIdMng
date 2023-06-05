@@ -392,9 +392,17 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
           uiKey={uiKey}
           manager={manager}
           forceSearchParameters={forceSearchParameters}
-          showRowSelection={showRowSelection}
+          showRowSelection={showRowSelection || manager.canDelete()}
           className={className}
           filterOpened
+          actions={[
+            {
+              value: 'delete',
+              niceLabel: this.i18n('action.delete.action'),
+              action: this.onDelete.bind(this),
+              disabled: false
+            }
+          ]}
           rowClass={
             ({rowIndex, data}) => {
               if (!data[rowIndex].groupPermission) { // wildcard permission
