@@ -10,7 +10,12 @@ import * as Advanced from '../../components/advanced';
 import * as Utils from '../../utils';
 import * as Domain from '../../domain';
 //
-import { RoleManager, AuthorizationPolicyManager, DataManager, FormAttributeManager } from '../../redux';
+import {
+  RoleManager,
+  AuthorizationPolicyManager,
+  DataManager,
+  FormAttributeManager
+} from '../../redux';
 
 const DEFAULT_EVALUATOR_TYPE = 'eu.bcvsolutions.idm.core.security.evaluator.BasePermissionEvaluator';
 const formAttributeManager = new FormAttributeManager();
@@ -18,10 +23,10 @@ let roleManager = null;
 let manager = null;
 
 /**
-* Table of role's granted permissions.
-*
-* @author Radek Tomiška
-*/
+ * Table of role's granted permissions.
+ *
+ * @author Radek Tomiška
+ */
 export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
 
   constructor(props, context) {
@@ -85,7 +90,11 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
   }
 
   showDetail(entity) {
-    const { forceSearchParameters, supportedEvaluators, authorizableTypes } = this.props;
+    const {
+      forceSearchParameters,
+      supportedEvaluators,
+      authorizableTypes
+    } = this.props;
     //
     if (!Utils.Entity.isNew(entity)) {
       this.context.store.dispatch(this.getManager().fetchPermissions(entity.id, `${this.getUiKey()}-detail`));
@@ -101,21 +110,21 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
       basePermissions: entity.basePermissions ? entity.basePermissions.split(',') : null,
       groupPermission: // Create composite value (~option) identifier - authorizableType can be null.
         entity.groupPermission
-        ?
-        `${ entity.groupPermission }${ entity.authorizableType ? '-' : '' }${ entity.authorizableType || '' }`
-        :
-        null
+          ?
+          `${entity.groupPermission}${entity.authorizableType ? '-' : ''}${entity.authorizableType || ''}`
+          :
+          null
     });
     //
     let authorizableType = null;
     const _authorizableType =
       !entity.groupPermission
-      ?
-      null
-      :
-      authorizableTypes.find(type => {
-        return type.group === entity.groupPermission && type.type === entity.authorizableType;
-      });
+        ?
+        null
+        :
+        authorizableTypes.find(type => {
+          return type.group === entity.groupPermission && type.type === entity.authorizableType;
+        });
     if (_authorizableType) {
       authorizableType = {
         niceLabel: this._getAuthorizableTypeNiceLabel(_authorizableType._authorizableType, _authorizableType.type),
@@ -140,7 +149,7 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
   }
 
   closeDetail() {
-    const { detail } = this.state;
+    const {detail} = this.state;
     //
     this.setState({
       detail: {
@@ -185,7 +194,12 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
 
   afterSave(entity, error) {
     if (!error) {
-      this.addMessage({ message: this.i18n('save.success', { count: 1, record: this.getManager().getNiceLabel(entity) }) });
+      this.addMessage({
+        message: this.i18n('save.success', {
+          count: 1,
+          record: this.getManager().getNiceLabel(entity)
+        })
+      });
       // TODO: trimmed vs. not trimmed view ...
       this.refs.table.reload();
     }
@@ -194,8 +208,8 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
   }
 
   onChangeAuthorizableType(authorizableType) {
-    const { evaluatorType } = this.state;
-    const newState = { authorizableType };
+    const {evaluatorType} = this.state;
+    const newState = {authorizableType};
     //
     if (authorizableType && authorizableType.type === null) {
       newState.evaluatorType = DEFAULT_EVALUATOR_TYPE;
@@ -229,7 +243,7 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
    */
   _getBasePermissionNiceLabel(permission) {
     let _permission = permission;
-    const { allAuthorities } = this.props;
+    const {allAuthorities} = this.props;
     if (!allAuthorities) {
       // will be refreshed after authorities are loaded
       return null;
@@ -242,20 +256,20 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
     }
     //
     return this.i18n(
-      `${ _permission.module ? _permission.module : 'core' }:permission.base.${ _permission.name }`,
-      { defaultValue: _permission.name }
+      `${_permission.module ? _permission.module : 'core'}:permission.base.${_permission.name}`,
+      {defaultValue: _permission.name}
     );
   }
 
   _getGroupPermissionNiceLabel(groupPermission) {
     return this.i18n(
-      `${ groupPermission.module ? groupPermission.module : 'core' }:permission.group.${ groupPermission.name }`,
-      { defaultValue: groupPermission.name}
+      `${groupPermission.module ? groupPermission.module : 'core'}:permission.group.${groupPermission.name}`,
+      {defaultValue: groupPermission.name}
     );
   }
 
   _getAuthorizableTypeNiceLabel(groupName, authorizableType) {
-    const { allAuthorities } = this.props;
+    const {allAuthorities} = this.props;
     //
     if (!allAuthorities) {
       return '';
@@ -268,7 +282,7 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
     }
     //
     const label = this._getGroupPermissionNiceLabel(groupPermission);
-    return `${ label }${ !authorizableType ? '' : ` (${ Utils.Ui.getSimpleJavaType(authorizableType) })` }`;
+    return `${label}${!authorizableType ? '' : ` (${Utils.Ui.getSimpleJavaType(authorizableType)})`}`;
   }
 
   _getUniqueBasePermissions(allAuthorities, authorizableType = null) {
@@ -286,7 +300,7 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
   }
 
   _getSupportedEvaluators(authorizableType = null) {
-    const { supportedEvaluators } = this.props;
+    const {supportedEvaluators} = this.props;
     //
     const _supportedEvaluators = [];
     if (!supportedEvaluators) {
@@ -296,11 +310,11 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
     supportedEvaluators.forEach(evaluator => {
       // TODO: add filter to BE and evaluate all superclasses
       if ((!authorizableType
-              && (Utils.Ui.getSimpleJavaType(evaluator.entityType) === 'Identifiable')
-              && (Utils.Ui.getSimpleJavaType(evaluator.evaluatorType) !== 'CodeableEvaluator'))
-          ||
-          (authorizableType
-              && (authorizableType.type === evaluator.entityType || Utils.Ui.getSimpleJavaType(evaluator.entityType) === 'Identifiable'))) {
+          && (Utils.Ui.getSimpleJavaType(evaluator.entityType) === 'Identifiable')
+          && (Utils.Ui.getSimpleJavaType(evaluator.evaluatorType) !== 'CodeableEvaluator'))
+        ||
+        (authorizableType
+          && (authorizableType.type === evaluator.entityType || Utils.Ui.getSimpleJavaType(evaluator.entityType) === 'Identifiable'))) {
         _supportedEvaluators.push(this._toEvaluatorOption(evaluator));
       }
     });
@@ -331,8 +345,9 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
       _permissions,
       className,
       showAddButton,
-      showRowSelection } = this.props;
-    const { detail, evaluatorType, authorizableType } = this.state;
+      showRowSelection
+    } = this.props;
+    const {detail, evaluatorType, authorizableType} = this.state;
     //
     if (!manager || !roleManager) {
       return null;
@@ -374,14 +389,14 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
         <Basic.Confirm ref="confirm-delete" level="danger"/>
         <Advanced.Table
           ref="table"
-          uiKey={ uiKey }
-          manager={ manager }
-          forceSearchParameters={ forceSearchParameters }
-          showRowSelection={ showRowSelection }
-          className={ className }
+          uiKey={uiKey}
+          manager={manager}
+          forceSearchParameters={forceSearchParameters}
+          showRowSelection={showRowSelection}
+          className={className}
           filterOpened
           rowClass={
-            ({ rowIndex, data }) => {
+            ({rowIndex, data}) => {
               if (!data[rowIndex].groupPermission) { // wildcard permission
                 return Utils.Ui.getDisabledRowClass(data[rowIndex]);
               }
@@ -398,57 +413,59 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
                 level="success"
                 key="add_button"
                 className="btn-xs"
-                onClick={ this.showDetail.bind(this, { evaluatorType: DEFAULT_EVALUATOR_TYPE }) }
-                rendered={ _supportedEvaluators.length > 0 && manager.canSave() && showAddButton }
+                onClick={this.showDetail.bind(this, {evaluatorType: DEFAULT_EVALUATOR_TYPE})}
+                rendered={_supportedEvaluators.length > 0 && manager.canSave() && showAddButton}
                 icon="fa:plus">
-                { this.i18n('button.add') }
+                {this.i18n('button.add')}
               </Basic.Button>
             ]
           }
           filter={
             <Filter
               ref="filterForm"
-              onSubmit={ this.useFilter.bind(this) }
-              onCancel={ this.cancelFilter.bind(this) }
-              _authorizableTypes={ _authorizableTypes }/>
+              onSubmit={this.useFilter.bind(this)}
+              onCancel={this.cancelFilter.bind(this)}
+              _authorizableTypes={_authorizableTypes}/>
           }>
 
           <Advanced.Column
             header=""
             className="detail-button"
             cell={
-              ({ rowIndex, data }) => {
+              ({rowIndex, data}) => {
                 return (
                   <Advanced.DetailButton
-                    title={ this.i18n('button.detail') }
-                    onClick={ this.showDetail.bind(this, data[rowIndex]) }/>
+                    title={this.i18n('button.detail')}
+                    onClick={this.showDetail.bind(this, data[rowIndex])}/>
                 );
               }
             }
             sort={false}/>
           <Advanced.Column
             property="authorizableType"
-            header={ this.i18n('entity.AuthorizationPolicy.authorizableType.label') }
+            header={this.i18n('entity.AuthorizationPolicy.authorizableType.label')}
             sort
             sortProperty="groupPermission"
-            rendered={ _.includes(columns, 'authorizableType') }
-            width={ 175 }
+            rendered={_.includes(columns, 'authorizableType')}
+            width={175}
             cell={
               /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data, property }) => {
+              ({rowIndex, data, property}) => {
                 const propertyValue = data[rowIndex][property];
                 return (
-                  <span title={propertyValue}>{ this._getAuthorizableTypeNiceLabel(data[rowIndex].groupPermission, propertyValue) }</span>
+                  <span
+                    title={propertyValue}>{this._getAuthorizableTypeNiceLabel(data[rowIndex].groupPermission, propertyValue)}
+                  </span>
                 );
               }
             }/>
           <Advanced.Column
             property="basePermissions"
-            header={ this.i18n('entity.AuthorizationPolicy.basePermissions.label') }
-            rendered={ _.includes(columns, 'basePermissions') }
+            header={this.i18n('entity.AuthorizationPolicy.basePermissions.label')}
+            rendered={_.includes(columns, 'basePermissions')}
             cell={
               /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data, property }) => {
+              ({rowIndex, data, property}) => {
                 const propertyValue = data[rowIndex][property];
                 if (!propertyValue) {
                   return null;
@@ -456,7 +473,7 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
                 return propertyValue.split(',').map(permission => {
                   return (
                     <Basic.Div>
-                      { this._getBasePermissionNiceLabel(permission) }
+                      {this._getBasePermissionNiceLabel(permission)}
                     </Basic.Div>
                   );
                 });
@@ -464,12 +481,12 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
             }/>
           <Advanced.Column
             property="evaluatorType"
-            header={ this.i18n('entity.AuthorizationPolicy.evaluatorType.label') }
+            header={this.i18n('entity.AuthorizationPolicy.evaluatorType.label')}
             sort
-            rendered={ _.includes(columns, 'evaluatorType') }
+            rendered={_.includes(columns, 'evaluatorType')}
             cell={
               /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data, property }) => {
+              ({rowIndex, data, property}) => {
                 const propertyValue = data[rowIndex][property];
                 let _evaluatorType;
                 if (supportedEvaluators && supportedEvaluators.has(propertyValue)) {
@@ -479,10 +496,10 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
                   <span title={propertyValue}>
                     {
                       _evaluatorType
-                      ?
-                      formAttributeManager.getLocalization(_evaluatorType.formDefinition, null, 'label', Utils.Ui.getSimpleJavaType(propertyValue))
-                      :
-                      Utils.Ui.getSimpleJavaType(propertyValue)
+                        ?
+                        formAttributeManager.getLocalization(_evaluatorType.formDefinition, null, 'label', Utils.Ui.getSimpleJavaType(propertyValue))
+                        :
+                        Utils.Ui.getSimpleJavaType(propertyValue)
                     }
                   </span>
                 );
@@ -490,12 +507,12 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
             }/>
           <Advanced.Column
             face="text"
-            header={ this.i18n('entity.AuthorizationPolicy.evaluatorProperties.label') }
+            header={this.i18n('entity.AuthorizationPolicy.evaluatorProperties.label')}
             rendered={_.includes(columns, 'evaluatorProperties')}
             width="25%"
             cell={
               /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data }) => {
+              ({rowIndex, data}) => {
                 const entity = data[rowIndex];
                 if (!entity.evaluatorProperties) {
                   return null;
@@ -513,15 +530,15 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
                     return null;
                   }
                   return (
-                    <div style={{ wordWrap: 'anywhere' }}>
+                    <div style={{wordWrap: 'anywhere'}}>
                       {
                         _evaluatorType
-                        ?
-                        formAttributeManager.getLocalization(_evaluatorType.formDefinition, { code: parameterName }, 'label', parameterName)
-                        : parameterName
+                          ?
+                          formAttributeManager.getLocalization(_evaluatorType.formDefinition, {code: parameterName}, 'label', parameterName)
+                          : parameterName
                       }
                       :
-                      { Utils.Ui.toStringValue(entity.evaluatorProperties[parameterName]) }
+                      {Utils.Ui.toStringValue(entity.evaluatorProperties[parameterName])}
                     </div>
                   );
                 }).values()];
@@ -533,88 +550,88 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
             sortProperty="role.name"
             cell={
               /* eslint-disable react/no-multi-comp */
-              ({ rowIndex, data }) => {
+              ({rowIndex, data}) => {
                 const entity = data[rowIndex];
                 //
                 return (
                   <Advanced.EntityInfo
                     entityType="role"
-                    entityIdentifier={ entity.role }
-                    entity={ entity._embedded.role }
+                    entityIdentifier={entity.role}
+                    entity={entity._embedded.role}
                     face="popover"
                     showIcon/>
                 );
               }
             }
-            rendered={ _.includes(columns, 'role') }/>
+            rendered={_.includes(columns, 'role')}/>
           <Advanced.Column
             property="description"
-            header={ this.i18n('entity.AuthorizationPolicy.description.label') }
+            header={this.i18n('entity.AuthorizationPolicy.description.label')}
             face="text"
             sort
-            rendered={ _.includes(columns, 'description') }/>
+            rendered={_.includes(columns, 'description')}/>
           <Advanced.Column
             property="disabled"
-            header={ this.i18n('entity.AuthorizationPolicy.disabled.label') }
+            header={this.i18n('entity.AuthorizationPolicy.disabled.label')}
             face="bool"
             sort
-            rendered={ _.includes(columns, 'disabled') }/>
+            rendered={_.includes(columns, 'disabled')}/>
           <Advanced.Column
             property="seq"
-            header={ this.i18n('entity.AuthorizationPolicy.seq.label') }
+            header={this.i18n('entity.AuthorizationPolicy.seq.label')}
             face="text"
             sort
-            rendered={ _.includes(columns, 'seq') }/>
+            rendered={_.includes(columns, 'seq')}/>
         </Advanced.Table>
 
         <Basic.Modal
           bsSize="large"
-          show={ detail.show }
-          onHide={ this.closeDetail.bind(this) }
+          show={detail.show}
+          onHide={this.closeDetail.bind(this)}
           backdrop="static"
-          keyboard={ !_showLoading }>
+          keyboard={!_showLoading}>
           <Basic.Modal.Header
-            closeButton={ !_showLoading }
-            text={ this.i18n('create.header') }
-            rendered={ Utils.Entity.isNew(detail.entity) }/>
+            closeButton={!_showLoading}
+            text={this.i18n('create.header')}
+            rendered={Utils.Entity.isNew(detail.entity)}/>
           <Basic.Modal.Header
-            closeButton={ !_showLoading }
-            text={ this.i18n('edit.header', { name: this.getManager().getNiceLabel(detail.entity) }) }
-            rendered={ !Utils.Entity.isNew(detail.entity) }/>
+            closeButton={!_showLoading}
+            text={this.i18n('edit.header', {name: this.getManager().getNiceLabel(detail.entity)})}
+            rendered={!Utils.Entity.isNew(detail.entity)}/>
           <Basic.Modal.Body>
-            <form onSubmit={ this.save.bind(this, {}) }>
+            <form onSubmit={this.save.bind(this, {})}>
               <Basic.AbstractForm
                 ref="form"
-                data={ detail.entity }
-                showLoading={ _showLoading }
-                readOnly={ !manager.canSave(detail.entity, _permissions) }>
+                data={detail.entity}
+                showLoading={_showLoading}
+                readOnly={!manager.canSave(detail.entity, _permissions)}>
                 <Basic.Row>
-                  <Basic.Col lg={ 6 }>
+                  <Basic.Col lg={6}>
                     <Basic.SelectBox
                       ref="role"
-                      manager={ roleManager }
-                      label={ this.i18n('entity.AuthorizationPolicy.role') }
-                      readOnly={ !Utils.Entity.isNew(detail.entity) || !_.includes(columns, 'role') }
+                      manager={roleManager}
+                      label={this.i18n('entity.AuthorizationPolicy.role')}
+                      readOnly={!Utils.Entity.isNew(detail.entity) || !_.includes(columns, 'role')}
                       required/>
                     <Basic.EnumSelectBox
                       ref="groupPermission"
-                      options={ _authorizableTypes }
-                      onChange={ this.onChangeAuthorizableType.bind(this) }
-                      label={ this.i18n('entity.AuthorizationPolicy.authorizableType.label') }
-                      placeholder={ this.i18n('entity.AuthorizationPolicy.authorizableType.placeholder') }
-                      helpBlock={ this.i18n('entity.AuthorizationPolicy.authorizableType.help') }
+                      options={_authorizableTypes}
+                      onChange={this.onChangeAuthorizableType.bind(this)}
+                      label={this.i18n('entity.AuthorizationPolicy.authorizableType.label')}
+                      placeholder={this.i18n('entity.AuthorizationPolicy.authorizableType.placeholder')}
+                      helpBlock={this.i18n('entity.AuthorizationPolicy.authorizableType.help')}
                       searchable
                       useObject/>
                     <Basic.EnumSelectBox
                       ref="basePermissions"
-                      options={ _basePermissions }
-                      label={ this.i18n('entity.AuthorizationPolicy.basePermissions.label') }
-                      placeholder={ this.i18n('entity.AuthorizationPolicy.basePermissions.placeholder') }
-                      helpBlock={ this.i18n('entity.AuthorizationPolicy.basePermissions.help') }
-                      readOnly={ (evaluatorType && evaluatorType.supportsPermissions !== undefined) ? !evaluatorType.supportsPermissions : false }
+                      options={_basePermissions}
+                      label={this.i18n('entity.AuthorizationPolicy.basePermissions.label')}
+                      placeholder={this.i18n('entity.AuthorizationPolicy.basePermissions.placeholder')}
+                      helpBlock={this.i18n('entity.AuthorizationPolicy.basePermissions.help')}
+                      readOnly={(evaluatorType && evaluatorType.supportsPermissions !== undefined) ? !evaluatorType.supportsPermissions : false}
                       searchable
                       multiSelect
-                      required={ (evaluatorType && evaluatorType.supportsPermissions !== undefined) ? evaluatorType.supportsPermissions : true }/>
+                      required={(evaluatorType && evaluatorType.supportsPermissions !== undefined) ? evaluatorType.supportsPermissions : true}/>
                     <Basic.TextField
                       ref="seq"
                       validation={
@@ -625,36 +642,37 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
                           .max(32767)
                           .allow(null)
                       }
-                      label={ this.i18n('entity.AuthorizationPolicy.seq.label') }
-                      help={ this.i18n('entity.AuthorizationPolicy.seq.help') }/>
+                      label={this.i18n('entity.AuthorizationPolicy.seq.label')}
+                      help={this.i18n('entity.AuthorizationPolicy.seq.help')}/>
                     <Basic.TextArea
                       ref="description"
                       label={this.i18n('entity.AuthorizationPolicy.description.label')}
-                      max={ 2000 }/>
+                      max={2000}/>
                     <Basic.Checkbox
                       ref="disabled"
-                      label={ this.i18n('entity.AuthorizationPolicy.disabled.label') }
-                      helpBlock={ this.i18n('entity.AuthorizationPolicy.disabled.help') }/>
+                      label={this.i18n('entity.AuthorizationPolicy.disabled.label')}
+                      helpBlock={this.i18n('entity.AuthorizationPolicy.disabled.help')}/>
                   </Basic.Col>
-                  <Basic.Col lg={ 6 }>
+                  <Basic.Col lg={6}>
                     <Basic.EnumSelectBox
                       ref="evaluatorType"
-                      options={ _supportedEvaluators }
-                      onChange={ this.onChangeEvaluatorType.bind(this) }
-                      label={ this.i18n('entity.AuthorizationPolicy.evaluatorType.label') }
-                      helpBlock={ evaluatorType ? evaluatorType.description : null }
-                      readOnly={ authorizableType ? authorizableType.type === null : false }
+                      options={_supportedEvaluators}
+                      onChange={this.onChangeEvaluatorType.bind(this)}
+                      label={this.i18n('entity.AuthorizationPolicy.evaluatorType.label')}
+                      helpBlock={evaluatorType ? evaluatorType.description : null}
+                      readOnly={authorizableType ? authorizableType.type === null : false}
                       required/>
                     <Basic.Alert
-                      text={ this.i18n('evaluator.default') }
-                      rendered={ authorizableType ? authorizableType.type === null : false }/>
+                      text={this.i18n('evaluator.default')}
+                      rendered={authorizableType ? authorizableType.type === null : false}/>
 
-                    <Basic.Div style={ showProperties ? {} : { display: 'none' }}>
-                      <Basic.ContentHeader text={ this.i18n('entity.AuthorizationPolicy.evaluatorProperties.title') }/>
+                    <Basic.Div style={showProperties ? {} : {display: 'none'}}>
+                      <Basic.ContentHeader
+                        text={this.i18n('entity.AuthorizationPolicy.evaluatorProperties.title')}/>
                       <Advanced.EavForm
                         ref="formInstance"
-                        formInstance={ formInstance }
-                        useDefaultValue={ Utils.Entity.isNew(detail.entity) }/>
+                        formInstance={formInstance}
+                        useDefaultValue={Utils.Entity.isNew(detail.entity)}/>
                     </Basic.Div>
 
                   </Basic.Col>
@@ -669,19 +687,19 @@ export class AuthorizationPolicyTable extends Advanced.AbstractTableContent {
           <Basic.Modal.Footer>
             <Basic.Button
               level="link"
-              onClick={ this.closeDetail.bind(this) }
-              showLoading={ _showLoading }>
-              { this.i18n('button.close') }
+              onClick={this.closeDetail.bind(this)}
+              showLoading={_showLoading}>
+              {this.i18n('button.close')}
             </Basic.Button>
             <Basic.Button
               type="submit"
               level="success"
-              showLoading={ _showLoading }
+              showLoading={_showLoading}
               showLoadingIcon
-              showLoadingText={ this.i18n('button.saving') }
-              rendered={ manager.canSave(detail.entity, _permissions) }
-              onClick={ this.save.bind(this, {}) }>
-              { this.i18n('button.save') }
+              showLoadingText={this.i18n('button.saving')}
+              rendered={manager.canSave(detail.entity, _permissions)}
+              onClick={this.save.bind(this, {})}>
+              {this.i18n('button.save')}
             </Basic.Button>
           </Basic.Modal.Footer>
         </Basic.Modal>
@@ -721,11 +739,11 @@ function select(state, component) {
     authorizableTypes: DataManager.getData(state, AuthorizationPolicyManager.UI_KEY_AUTHORIZABLE_TYPES),
     availableAuthorities: DataManager.getData(state, RoleManager.UI_KEY_AVAILABLE_AUTHORITIES),
     allAuthorities: DataManager.getData(state, RoleManager.UI_KEY_ALL_AUTHORITIES),
-    _showLoading: Utils.Ui.isShowLoading(state, `${ component.uiKey }-detail`)
+    _showLoading: Utils.Ui.isShowLoading(state, `${component.uiKey}-detail`)
       || Utils.Ui.isShowLoading(state, AuthorizationPolicyManager.UI_KEY_SUPPORTED_EVALUATORS)
       || Utils.Ui.isShowLoading(state, AuthorizationPolicyManager.UI_KEY_AUTHORIZABLE_TYPES)
       || Utils.Ui.isShowLoading(state, RoleManager.UI_KEY_ALL_AUTHORITIES_UIKEY),
-    _permissions: Utils.Permission.getPermissions(state, `${ component.uiKey }-detail`),
+    _permissions: Utils.Permission.getPermissions(state, `${component.uiKey}-detail`),
     _searchParameters: Utils.Ui.getSearchParameters(state, component.uiKey)
   };
 }
@@ -745,19 +763,19 @@ class Filter extends Advanced.Filter {
   }
 
   render() {
-    const { onSubmit, onCancel, _authorizableTypes } = this.props;
+    const {onSubmit, onCancel, _authorizableTypes} = this.props;
     //
     return (
-      <Advanced.Filter onSubmit={ onSubmit }>
+      <Advanced.Filter onSubmit={onSubmit}>
         <Basic.AbstractForm ref="filterForm">
           <Basic.Row className="last">
-            <Basic.Col lg={ 4 }>
+            <Basic.Col lg={4}>
               <Advanced.Filter.TextField
                 ref="text"
-                placeholder={ this.i18n('content.role.authorization-policies.filter.text.placeholder') }
-                help={ Advanced.Filter.getTextHelp() }/>
+                placeholder={this.i18n('content.role.authorization-policies.filter.text.placeholder')}
+                help={Advanced.Filter.getTextHelp()}/>
             </Basic.Col>
-            <Basic.Col lg={ 4 }>
+            <Basic.Col lg={4}>
               <Basic.EnumSelectBox
                 ref="groupPermission"
                 options={
@@ -766,11 +784,11 @@ class Filter extends Advanced.Filter {
                     value: authorizableType.group
                   }))
                 }
-                placeholder={ this.i18n('entity.AuthorizationPolicy.authorizableType.label') }
+                placeholder={this.i18n('entity.AuthorizationPolicy.authorizableType.label')}
                 searchable/>
             </Basic.Col>
-            <Basic.Col lg={ 4 } className="text-right">
-              <Advanced.Filter.FilterButtons cancelFilter={ onCancel }/>
+            <Basic.Col lg={4} className="text-right">
+              <Advanced.Filter.FilterButtons cancelFilter={onCancel}/>
             </Basic.Col>
           </Basic.Row>
         </Basic.AbstractForm>
