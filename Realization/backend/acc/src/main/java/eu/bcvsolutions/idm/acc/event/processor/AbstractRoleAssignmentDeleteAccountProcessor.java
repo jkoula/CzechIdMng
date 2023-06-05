@@ -36,6 +36,6 @@ public abstract class AbstractRoleAssignmentDeleteAccountProcessor<O extends Abs
 
     @Override
     public int getOrder() {
-        return -ProvisioningEvent.DEFAULT_PROVISIONING_ORDER + 100;
+        return -ProvisioningEvent.DEFAULT_PROVISIONING_ORDER;
     }
 }
