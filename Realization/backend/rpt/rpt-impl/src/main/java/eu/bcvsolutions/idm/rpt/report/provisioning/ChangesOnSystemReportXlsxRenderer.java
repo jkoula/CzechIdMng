@@ -53,7 +53,7 @@ public class ChangesOnSystemReportXlsxRenderer extends AbstractXlsxRenderer impl
 	//
     private static final String REPORT_SHEET_NAME = "Report";
     private static final String STATUS_COLUMN_NAME = "Status";
-    private static final String KEY_COLUMN_NAME = "Username (uid)";
+    private static final String KEY_COLUMN_NAME = "Idm entity (uid)";
 	//
     private static final String NEW_LINE = System.lineSeparator();
     private static final String IDM_VALUE = "IdM:";

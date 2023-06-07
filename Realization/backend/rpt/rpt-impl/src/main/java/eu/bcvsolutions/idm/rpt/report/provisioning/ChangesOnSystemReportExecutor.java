@@ -15,6 +15,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.bcvsolutions.idm.acc.dto.EntityAccountDto;
+import eu.bcvsolutions.idm.acc.service.api.EntityAccountResolver;
+import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -22,14 +25,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
@@ -59,7 +60,6 @@ import eu.bcvsolutions.idm.acc.service.api.SysProvisioningArchiveService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemAttributeMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemMappingService;
 import eu.bcvsolutions.idm.acc.service.api.SysSystemService;
-import eu.bcvsolutions.idm.acc.service.impl.IdentitySynchronizationExecutor;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.event.EventContext;
@@ -112,6 +112,7 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	@Autowired private SysSystemMappingService systemMappingService;
 	@Autowired private AccIdentityAccountService identityAccountService;
 	@Autowired private SysProvisioningArchiveService provisioningArchiveService;
+	@Autowired private EntityAccountResolver entityAccountResolver;
 
 	/**
 	 * Report ~ executor name
@@ -189,20 +190,20 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	}
 
 	/**
-	 * Create key for given account and identity
+	 * Create key for given account and entity
 	 *
-	 * @param account
-	 * @param identity
-	 * @return
+	 * @param account - account to create key for
+	 * @param entity - entity to create key for
+	 * @return key for given account and entity
 	 */
-	private String createKey(AccAccountDto account, IdmIdentityDto identity) {
+	private String createKey(AccAccountDto account, AbstractDto entity) {
 		StringBuilder result = new StringBuilder();
-		if (identity != null) {
-			result.append(identity.getUsername());
+		if (entity != null) {
+			result.append(entity);
 		}
 		if (account != null) {
 			result.append(" (");
-			result.append(account != null ? account.getUid() : "");
+			result.append(account.getUid());
 			result.append(')');
 		}
 		return result.toString();
@@ -364,39 +365,31 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 	/**
 	 * Find the identity and account from the AccIdentityAccountDto binding
 	 * 
-	 * @param accountId
-	 * @param systemId
-	 * @return
+	 * @param accountId Id of the account
+	 * @param systemId Id of the system
+	 * @return Pair of the account and entity
 	 */
-	private Pair<AccAccountDto, IdmIdentityDto> findIdentityAndAccount(UUID systemId, UUID accountId, UUID identityId) {
-		AccIdentityAccountFilter filter = new AccIdentityAccountFilter();
-		filter.setAccountId(accountId);
-		filter.setIdentityId(identityId);
-		filter.setSystemId(systemId);
-		List<AccIdentityAccountDto> identityAccounts = identityAccountService.find(filter, null).getContent();
-		if (identityAccounts.isEmpty()) {
-			AccAccountDto account = accountService.get(accountId);
-			return Pair.of(account, null);
-		}
-		IdmIdentityDto identity = getLookupService().lookupEmbeddedDto(identityAccounts.get(0),
-				AccIdentityAccount_.identity);
-		AccAccountDto account = getLookupService().lookupEmbeddedDto(identityAccounts.get(0),
-				AccIdentityAccount_.account);
-		return Pair.of(account, identity);
+	private Pair<AccAccountDto, AbstractDto> findIdentityAndAccount(UUID systemId, UUID accountId) {
+		final List<Pair<AccAccountDto, AbstractDto>> entityAccounts = entityAccountResolver.resolveEntityAccount(accountId, systemId);
+
+		return entityAccounts.stream().findFirst()
+				// This is just to be safe, but it should never happen, because the DefaultEntityAccountResolver should
+				// always return at least one result
+				.orElse(Pair.of(accountService.get(accountId), null));
 	}
 
 	/**
 	 * Starts the provisioning in the dry run for single account. Results of the
 	 * calculated provisioning is used for differences evaluation and highlight.
-	 * 
+	 *
 	 * @param account
-	 * @param identity
+	 * @param entity
 	 * @param selectedAttributeNames
 	 * @return
 	 */
-	private List<SysAttributeDifferenceDto> createAccountDifferences(AccAccountDto account, IdmIdentityDto identity,
+	private List<SysAttributeDifferenceDto> createAccountDifferences(AccAccountDto account, AbstractDto entity,
 			List<String> selectedAttributeNames) {
-		EventContext<AccAccountDto> eventCtx = provisioningService.doProvisioning(account, identity,
+		EventContext<AccAccountDto> eventCtx = provisioningService.doProvisioning(account, entity,
 				ImmutableMap.of(ProvisioningService.DRY_RUN_PROPERTY_NAME, Boolean.TRUE));
 		EventResult<AccAccountDto> result = eventCtx.getLastResult();
 		if (result == null) {
@@ -448,36 +441,36 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 			List<String> selectedAttributeNames,
 			boolean skipUnchangedMultivalue) throws IOException {
 
-		if (identityIds == null) { // null indicates that no identity explicitly specified from report config
+		if (identityIds == null) { // null indicates that no entity explicitly specified from report config
 			List<UUID> accountIds = accountService.findIds(accountFilter, null).getContent();
-			IdmIdentityDto identity = null;
+			AbstractDto entity = null;
 			String key = null;
 
 			for (UUID accountId : accountIds) {
-				Pair<AccAccountDto, IdmIdentityDto> pair = findIdentityAndAccount(systemId, accountId, null);
+				Pair<AccAccountDto, AbstractDto> pair = findIdentityAndAccount(systemId, accountId);
 				AccAccountDto account = pair.getLeft();
-				identity = pair.getRight();
-				key = createKey(account, identity);
-				RptChangesOnSystemRecordDto record = new RptChangesOnSystemRecordDto();
-				record.setIdentifier(key);
-				if (identity == null) {
-					record.setState(RptChangesOnSystemState.NO_ENTITY_FOR_ACCOUNT);
-					record.setAttributeDifferences(new ArrayList<SysAttributeDifferenceDto>());
-					// dry run provisioning cannot be performed without identity
+				entity = pair.getRight();
+				key = createKey(account, entity);
+				RptChangesOnSystemRecordDto rptRecord = new RptChangesOnSystemRecordDto();
+				rptRecord.setIdentifier(key);
+				if (entity == null) {
+					rptRecord.setState(RptChangesOnSystemState.NO_ENTITY_FOR_ACCOUNT);
+					rptRecord.setAttributeDifferences(new ArrayList<>());
+					// dry run provisioning cannot be performed without entity
 				} else {
 					try {
-						List<SysAttributeDifferenceDto> differences = createAccountDifferences(account, identity,
+						List<SysAttributeDifferenceDto> differences = createAccountDifferences(account, entity,
 								selectedAttributeNames);
 						differences = removeUnchangedMultivalues(differences, skipUnchangedMultivalue);
-						record.setAttributeDifferences(differences);
-						record.setState(createRecordState(differences));
+						rptRecord.setAttributeDifferences(differences);
+						rptRecord.setState(createRecordState(differences));
 					} catch (Exception e) {
-						record.setState(RptChangesOnSystemState.FAILED);
-						record.setIdentifier(key);
-						record.setError(ExceptionUtils.getStackTrace(e));
+						rptRecord.setState(RptChangesOnSystemState.FAILED);
+						rptRecord.setIdentifier(key);
+						rptRecord.setError(ExceptionUtils.getStackTrace(e));
 					}
 				}
-				getMapper().writeValue(jGenerator, record);
+				getMapper().writeValue(jGenerator, rptRecord);
 			}
 		} else {
 			for (UUID identityId : identityIds) {
