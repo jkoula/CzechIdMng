@@ -157,7 +157,8 @@ public class ChangesOnSystemReportExecutor extends AbstractReportExecutor {
 		boolean skipUnchangedMultivalue = getSkipUnchangedValues(report);		
 		AccAccountFilter filterAccount = new AccAccountFilter();
 		filterAccount.setSystemId(systemDto.getId());
-		filterAccount.setEntityType(IdentitySynchronizationExecutor.SYSTEM_ENTITY_TYPE);
+		filterAccount.setEntityType(systemMapping.getEntityType());
+		filterAccount.setSystemMapping(systemMapping.getId());
 
 		File temp = getAttachmentManager().createTempFile();
 		try (FileOutputStream outputStream = new FileOutputStream(temp)) {
