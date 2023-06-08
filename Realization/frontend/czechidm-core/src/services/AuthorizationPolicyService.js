@@ -29,13 +29,13 @@ export default class AuthorizationPolicyService extends AbstractRequestService {
     }
     //
     if (!entity._embedded.role && !entity.authorizableType) {
-      return `${ Utils.Ui.getSimpleJavaType(entity.evaluatorType) }`;
+      return `${Utils.Ui.getSimpleJavaType(entity.evaluatorType)}`;
     }
 
     if (!entity._embedded.role && entity.authorizableType) {
-      return `${ Utils.Ui.getSimpleJavaType(entity.authorizableType) } - ${ Utils.Ui.getSimpleJavaType(entity.evaluatorType) }`;
+      return `${Utils.Ui.getSimpleJavaType(entity.authorizableType)} - ${Utils.Ui.getSimpleJavaType(entity.evaluatorType)}`;
     }
-    return `${ this.roleService.getNiceLabel(entity._embedded.role) } - ${ Utils.Ui.getSimpleJavaType(entity.evaluatorType) }`;
+    return `${this.roleService.getNiceLabel(entity._embedded.role)} - ${Utils.Ui.getSimpleJavaType(entity.evaluatorType)}`;
   }
 
   supportsPatch() {
@@ -43,7 +43,7 @@ export default class AuthorizationPolicyService extends AbstractRequestService {
   }
 
   supportsBulkAction() {
-    return true;
+    return !this.isRequestModeEnabled();
   }
 
   getGroupPermission() {
@@ -73,7 +73,7 @@ export default class AuthorizationPolicyService extends AbstractRequestService {
    */
   getSupportedEvaluators() {
     return RestApiService
-      .get(`${ this.getApiPath() }/search/supported`)
+      .get(`${this.getApiPath()}/search/supported`)
       .then(response => {
         return response.json();
       })
@@ -92,7 +92,7 @@ export default class AuthorizationPolicyService extends AbstractRequestService {
    */
   getAuthorizableTypes() {
     return RestApiService
-      .get(`${ this.getApiPath() }/search/authorizable-types`)
+      .get(`${this.getApiPath()}/search/authorizable-types`)
       .then(response => {
         return response.json();
       })
