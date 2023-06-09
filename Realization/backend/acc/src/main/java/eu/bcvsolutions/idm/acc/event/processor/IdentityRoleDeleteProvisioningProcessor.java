@@ -18,6 +18,8 @@ import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * Identity provisioning after role has been deleted.
  *
@@ -50,6 +52,6 @@ public class IdentityRoleDeleteProvisioningProcessor extends AbstractRoleAssignm
 	protected IdmIdentityDto getOwner(AbstractRoleAssignmentDto identityRole) {
 		// TODO: Optimalization - load identity by identity-role with filter
 		IdmIdentityContractDto identityContract = identityContractService.get(identityRole.getEntity());
-		return DtoUtils.getEmbedded(identityContract, IdmIdentityContract_.identity);
+		return Objects.nonNull(identityContract) ? DtoUtils.getEmbedded(identityContract, IdmIdentityContract_.identity) : null;
 	}
 }

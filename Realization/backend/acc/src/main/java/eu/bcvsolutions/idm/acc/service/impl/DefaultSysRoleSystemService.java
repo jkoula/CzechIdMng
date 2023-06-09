@@ -109,6 +109,7 @@ public class DefaultSysRoleSystemService
 	}
 
 	@Override
+	@Transactional
 	public SysRoleSystemDto save(SysRoleSystemDto dto, BasePermission... permission) {
 		Assert.notNull(dto, "RoleSystem cannot be null!");
 		Assert.notNull(dto.getRole(), "Role cannot be null!");
@@ -131,15 +132,16 @@ public class DefaultSysRoleSystemService
 		filter.setSystemId(dto.getSystem());
 
 		List<SysRoleSystemDto> roleSystems = this.find(filter, null).getContent();
-		boolean isDuplicated = roleSystems.stream().anyMatch(roleSystem -> {
-			return !roleSystem.getId().equals(dto.getId());
-		});
+		boolean isDuplicated = roleSystems.stream()
+				// filter out the same role system
+				.filter(roleSystem -> !Objects.equals(roleSystem.getId(), dto.getId()))
+				.anyMatch(roleSystem -> roleSystem.getSystemMapping().equals(dto.getSystemMapping()));
 
 		if (isDuplicated) {
 			IdmRoleDto roleDto = roleService.get(dto.getRole());
 			SysSystemDto systemDto = DtoUtils.getEmbedded(roleSystems.get(0), SysRoleSystem_.system);
 			throw new ResultCodeException(AccResultCode.ROLE_SYSTEM_ALREADY_EXISTS,
-					ImmutableMap.of("role", roleDto.getCode(), "system", systemDto.getName()));
+					Map.of("role", roleDto.getCode(), "system", systemDto.getName()));
 		}
 		
 		SysRoleSystemDto roleSystemDto = super.save(dto, permission);
@@ -156,7 +158,7 @@ public class DefaultSysRoleSystemService
 				IdmRoleDto roleDto = roleService.get(roleSystemDto.getRole());
 				SysSystemDto systemDto = DtoUtils.getEmbedded(roleSystemDto, SysRoleSystem_.system);
 				throw new ProvisioningException(AccResultCode.PROVISIONING_ROLE_ATTRIBUTE_NO_LOGIN_CANNOT_OVERRIDE_UID,
-						ImmutableMap.of("role", roleDto.getCode(), "system", systemDto.getName()));
+						Map.of("role", roleDto.getCode(), "system", systemDto.getName()));
 			}
 		}
 		return roleSystemDto;
