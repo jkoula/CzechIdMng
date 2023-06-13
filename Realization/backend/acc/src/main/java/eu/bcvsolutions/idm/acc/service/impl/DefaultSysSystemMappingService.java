@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -233,10 +234,16 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Integer getProtectionInterval(AccAccountDto account) {
 		Assert.notNull(account, "Account cannot be null!");
 		Assert.notNull(account.getEntityType(), "EntityType cannot be null!");
-
+		if (Objects.nonNull(account.getSystemMapping())) {
+			// @since 13.0.0 system mapping is stored in account
+			return this.getProtectionInterval(get(account.getSystemMapping()));
+		}
+		// if for some reason system mapping is not stored in account, we have to find it the old way.
+		// Note that the following code assumes that there is only one mapping for provisioning and entity type.
 		SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
 		List<SysSystemMappingDto> mappings = this.findBySystem(system, SystemOperationType.PROVISIONING,
 				account.getEntityType());
