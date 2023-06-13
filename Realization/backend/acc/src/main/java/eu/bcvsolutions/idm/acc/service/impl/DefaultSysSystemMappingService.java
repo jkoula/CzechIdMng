@@ -182,6 +182,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<SysSystemMappingDto> findBySystem(SysSystemDto system, SystemOperationType operation,
 			String entityType) {
 		Assert.notNull(system, "System is required.");
@@ -190,6 +191,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<SysSystemMappingDto> findBySystemId(
 			UUID systemId, 
 			SystemOperationType operation,
@@ -205,6 +207,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<SysSystemMappingDto> findByObjectClass(
 			SysSchemaObjectClassDto objectClass,
 			SystemOperationType operation, 
@@ -220,6 +223,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public boolean isEnabledProtection(AccAccountDto account) {
 		Assert.notNull(account, "Account cannot be null!");
 		Assert.notNull(account.getEntityType(), "EntityType cannot be null!");
