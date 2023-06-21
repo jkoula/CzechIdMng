@@ -50,6 +50,6 @@ public class IdentityRoleDeleteProvisioningProcessor extends AbstractRoleAssignm
 	protected IdmIdentityDto getOwner(AbstractRoleAssignmentDto identityRole) {
 		// TODO: Optimalization - load identity by identity-role with filter
 		IdmIdentityContractDto identityContract = identityContractService.get(identityRole.getEntity());
-		return DtoUtils.getEmbedded(identityContract, IdmIdentityContract_.identity);
+		return identityContract == null ? null : DtoUtils.getEmbedded(identityContract, IdmIdentityContract_.identity);
 	}
 }
