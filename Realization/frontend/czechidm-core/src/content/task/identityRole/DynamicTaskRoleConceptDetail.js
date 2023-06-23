@@ -91,7 +91,7 @@ class DynamicTaskRoleConceptDetail extends DynamicTaskDetail {
       id: data.id,
       operation: type,
       roleRequest: data.roleRequest,
-      identityContract: data.identityContract.id,
+      ownerUuid: data.ownerUuid,
       role: data.role,
       identityRole: data.identityRole,
       validFrom: data.validFrom,
