@@ -639,9 +639,9 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
      */
     @Override
     @Transactional
-    public boolean cancelInvalidConcept(List<A> automaticRoles, D concept, IdmRoleRequestDto request) {
+    public boolean cancelInvalidConcept(List<AbstractRoleAssignmentDto> allAssignedRoles, D concept, IdmRoleRequestDto request) {
         String message = null;
-        final String internalResult = cancelInvalidConceptInternal(automaticRoles, concept, request);
+        final String internalResult = cancelInvalidConceptInternal(allAssignedRoles, concept, request);
         //
         if (internalResult != null) {
             message = internalResult;
@@ -978,6 +978,26 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
         return save(conceptRoleRequest);
     }
 
+    protected final String cancelInvalidConceptInternal(List<AbstractRoleAssignmentDto> allAssignedRoles, D concept, IdmRoleRequestDto request) {
+        if (concept.getOwnerUuid() == null) {
+            return MessageFormat.format("Request change in concept [{0}], was not executed, because concept owner" + " was deleted before (not from this role request)!", concept.getId());
+        } else if (ADD == concept.getOperation() && concept.getAutomaticRole() != null && CollectionUtils.isNotEmpty(allAssignedRoles)) {
+            // check duplicate assigned automatic role
+            AbstractRoleAssignmentDto assignedRole = allAssignedRoles.stream()
+                    .filter(ir -> ir.getAutomaticRole() != null)
+                    .filter(ir -> com.google.common.base.Objects.equal(ir.getAutomaticRole(), concept.getAutomaticRole()))
+                    .filter(ir -> com.google.common.base.Objects.equal(ir.getEntity(), concept.getOwnerUuid()))
+                    .filter(ir -> compare(ir, concept))
+                    .findFirst().orElse(null);
+            if (assignedRole != null) {
+                return MessageFormat.format("Request change in concept [{0}], was not executed, because requested " + "automatic role was already assigned (not from this role request)!",
+                        concept.getId());
+            }
+        }
+        return null;
+    }
+
+    protected abstract boolean compare(AbstractRoleAssignmentDto ir, D concept);
 
     protected abstract D requestIdentityRoleToConcept(IdmRequestIdentityRoleDto dto);
 
@@ -990,9 +1010,6 @@ public abstract class AbstractConceptRoleRequestService<A extends AbstractRoleAs
     protected abstract A getRoleAssignmentFromConceptInternal(D conceptRole);
 
     protected abstract A getRoleAssignmentDtoInternal(D concept, IdmRoleDto subRole);
-
-    protected abstract String cancelInvalidConceptInternal(List<A> automaticRoles, D concept,
-            IdmRoleRequestDto request);
 
     protected abstract A createAssignmentFromConceptInternal(D concept);
 

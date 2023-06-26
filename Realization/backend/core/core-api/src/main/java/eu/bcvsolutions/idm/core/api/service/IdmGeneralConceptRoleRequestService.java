@@ -85,7 +85,7 @@ public interface IdmGeneralConceptRoleRequestService<
 
     D createEmptyConcept();
 
-    boolean cancelInvalidConcept(List<A> automaticRoles, D concept, IdmRoleRequestDto request);
+    boolean cancelInvalidConcept(List<AbstractRoleAssignmentDto> automaticRoles, D concept, IdmRoleRequestDto request);
 
     A createAssignmentFromConcept(D concept);
 

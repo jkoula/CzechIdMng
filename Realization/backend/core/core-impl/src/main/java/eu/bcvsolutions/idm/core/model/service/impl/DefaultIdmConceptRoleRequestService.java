@@ -1,6 +1,8 @@
 package eu.bcvsolutions.idm.core.model.service.impl;
 
+import com.google.common.base.Objects;
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmConceptRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityContractDto;
@@ -143,6 +145,16 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         return identityRole;
     }
 
+    @Override
+    protected boolean compare(AbstractRoleAssignmentDto ir, IdmConceptRoleRequestDto concept) {
+        if (ir instanceof IdmIdentityRoleDto) {
+            IdmIdentityRoleDto identityRole = (IdmIdentityRoleDto) ir;
+            //
+            return Objects.equal(identityRole.getContractPosition(), concept.getContractPosition());
+        }
+        return false;
+    }
+
 
     @Override
     protected IdmIdentityRoleDto getRoleAssignmentFromConceptInternal(IdmConceptRoleRequestDto conceptRole) {
@@ -162,22 +174,6 @@ public class DefaultIdmConceptRoleRequestService extends AbstractConceptRoleRequ
         identityRoleDto.setIdentityContract(concept.getIdentityContract());
         identityRoleDto.setIdentityContractDto(identityContract);
         return identityRoleDto;
-    }
-
-    @Override
-    protected String cancelInvalidConceptInternal(List<IdmIdentityRoleDto> automaticRoles, IdmConceptRoleRequestDto concept, IdmRoleRequestDto request) {
-        if (concept.getIdentityContract() == null) {
-            return MessageFormat.format("Request change in concept [{0}], was not executed, because identity contract" + " was deleted before (not from this role request)!", concept.getId());
-        } else if (ADD == concept.getOperation() && concept.getAutomaticRole() != null && org.apache.commons.collections4.CollectionUtils.isNotEmpty(automaticRoles)) {
-            // check duplicate assigned automatic role
-            IdmIdentityRoleDto assignedRole = automaticRoles.stream().filter(ir -> ir.getAutomaticRole() != null).filter(ir -> com.google.common.base.Objects.equal(ir.getAutomaticRole(),
-                    concept.getAutomaticRole())).filter(ir -> com.google.common.base.Objects.equal(ir.getContractPosition(), concept.getContractPosition())).filter(ir -> com.google.common.base.Objects.equal(ir.getIdentityContract(), concept.getIdentityContract())).findFirst().orElse(null);
-            if (assignedRole != null) {
-                return MessageFormat.format("Request change in concept [{0}], was not executed, because requested " + "automatic role was already assigned (not from this role request)!",
-                        concept.getId());
-            }
-        }
-        return null;
     }
 
     @Override
