@@ -56,7 +56,8 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
       this.context.store.dispatch(codeListManager.fetchCodeListIfNeeded('environment'));
     }
     if (fetchIncompatibleRoles) {
-      const ManagerType = componentService.getConcepComponentByOwnerType(ownerType).ownerManager;
+      const selectedOwnerType = ownerType ? ownerType : IdentityContractManager.ENTITY_TYPE;
+      const ManagerType = componentService.getConcepComponentByOwnerType(selectedOwnerType).superOwnerManager;
       const managerInstance = new ManagerType();
       this.context.store.dispatch(managerInstance.fetchIncompatibleRoles(entityId, `${ uiKeyIncompatibleRoles }${ entityId }`));
     }

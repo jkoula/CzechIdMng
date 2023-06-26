@@ -320,6 +320,7 @@ module.exports = {
       manager: require('./src/redux').RequestAccountRoleManager,
       ownerType: require('./src/redux').AccountManager.ENTITY_TYPE,
       ownerManager: require('./src/redux').AccountManager,
+      superOwnerManager: require('./src/redux').AccountManager,
       ownerSelectComponent: require('./src/components/AccountSelect/AccountSelect').default,
       ownerInfoComponent: require('./src/components/AccountInfo/AccountInfo').default,
       locale: "acc:entity.Account.select",
