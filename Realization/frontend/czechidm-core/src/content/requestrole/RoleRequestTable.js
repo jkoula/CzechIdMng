@@ -11,9 +11,11 @@ import { SecurityManager, WorkflowTaskInstanceManager, RoleRequestManager } from
 import RoleRequestStateEnum from '../../enums/RoleRequestStateEnum';
 import OperationStateEnum from '../../enums/OperationStateEnum';
 import IdentitiesInfo from '../identity/IdentitiesInfo';
+import ComponentService from "../../services/ComponentService";
 
 const workflowTaskInstanceManager = new WorkflowTaskInstanceManager();
 const manager = new RoleRequestManager();
+const componentService = new ComponentService()
 
 /**
  * Role request table
@@ -268,13 +270,13 @@ export class RoleRequestTable extends Advanced.AbstractTableContent {
             cell={
               ({ rowIndex, data }) => {
                 const entity = data[rowIndex];
-                return (
-                  <Advanced.IdentityInfo
-                    entityIdentifier={ entity.applicant.id }
-                    entity={ entity._embedded.applicant }
+                const infoComponent = entity && entity.applicantInfo ? componentService.getApplicantInfoComponent(entity.applicantInfo.applicantType) : null;
+                //
+                return infoComponent && <infoComponent.component
+                    entityIdentifier={ entity && entity.applicantInfo.id }
+                    showLoading={!entity}
                     face="popover"
-                    showIcon/>
-                );
+                    showIcon />
               }
             }/>
           <Advanced.Column
