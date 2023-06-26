@@ -83,6 +83,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     if (this.props.showEnvironment) {
       searchParameters = searchParameters.setFilter('roleEnvironment', ConfigLoader.getConfig('concept-role.table.filter.environment', []));
     }
+    searchParameters.setSort('role.name', true);
     //
     return searchParameters;
   }
@@ -571,7 +572,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                                        cancelFilter={this.cancelFilter.bind(this)}
               />
             }
-            _searchParameters={ this.getSearchParameters() }>
+            _searchParameters={ this.getSearchParameters().setSort('role.name', true) }>
             <Advanced.Column
               header=""
               className="detail-button"
@@ -580,6 +581,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
               property="name"
               title={ this.i18n('entity.Role.name') }
               sort
+              sortProperty="role.name"
               header={ this.i18n('entity.IdentityRole.role') }
               cell={
                 /* eslint-disable react/no-multi-comp */
