@@ -181,8 +181,10 @@ class DynamicTaskDetail extends Basic.AbstractContent {
       const type = UiUtils.getSimpleJavaType(task._dtotype);
       const isHistoricTask = type === 'WorkflowHistoricTaskInstanceDto';
 
+      const applicantInfoFromTaskVariables = task?.variables?.applicantInfo
       const request = task?.variables?.conceptRole?._embedded?.roleRequest
-      const infoComponent = request && request.applicantInfo ? componentService.getApplicantInfoComponent(request.applicantInfo.applicantType) : null;
+      const applicantInfo = applicantInfoFromTaskVariables ? applicantInfoFromTaskVariables : request?.applicantInfo
+      const infoComponent = applicantInfo ? componentService.getApplicantInfoComponent(applicantInfo.applicantType) : null;
 
       return (
         <Basic.Row>
@@ -191,8 +193,8 @@ class DynamicTaskDetail extends Basic.AbstractContent {
               <Basic.LabelWrapper rendered={task.applicant} readOnly ref="applicant" label={this.i18n('applicant')}>
                 {
                     infoComponent && <infoComponent.component
-                        entityIdentifier={ request?.applicantInfo?.id }
-                        showLoading={!request}/>
+                        entityIdentifier={ applicantInfo?.id }
+                        showLoading={!applicantInfo}/>
                 }
               </Basic.LabelWrapper>
               <Basic.LabelWrapper
