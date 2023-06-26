@@ -35,6 +35,7 @@ import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.DefaultResultModel;
 import eu.bcvsolutions.idm.core.api.dto.IdmAccountDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmEntityStateDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmRoleRequestDto;
 import eu.bcvsolutions.idm.core.api.dto.OperationResultDto;
@@ -302,29 +303,30 @@ public abstract class AbstractAccountManagementService<O extends AbstractDto, A 
      */
     private void resolveIdentityAccountForCreate(O owner,
             List<A> identityAccountList,
-            List<AbstractRoleAssignmentDto> identityRoles,
+            List<AbstractRoleAssignmentDto> roleAssignments,
             List<A> identityAccountsToCreate,
             List<A> identityAccountsToDelete,
             boolean onlyCreateNew,
             List<UUID> additionalAccountsForProvisioning
     ) {
 
-        identityRoles.forEach(identityRole -> {
+        roleAssignments.stream()
+                .forEach(roleAssignment -> {
             SysRoleSystemFilter roleSystemFilter = new SysRoleSystemFilter();
-            roleSystemFilter.setRoleId(identityRole.getRole());
+            roleSystemFilter.setRoleId(roleAssignment.getRole());
             List<SysRoleSystemDto> roleSystems = roleSystemService.find(roleSystemFilter, null).getContent();
 
             // Is role valid in this moment or
             // role-system has enabled forward account management (identity-role have to be
             // valid in the future)
             roleSystems.stream()
-                    .filter(roleSystem -> (identityRole.isValid()
-                            || (roleSystem.isForwardAccountManagemen() && identityRole.isValidNowOrInFuture())))
+                    .filter(roleSystem -> (roleAssignment.isValid()
+                            || (roleSystem.isForwardAccountManagemen() && roleAssignment.isValidNowOrInFuture())))
                     // Create account only if role-systems supports creation by default (not for cross-domains).
-                    .filter(roleSystem -> supportsAccountCreation(roleSystem, owner, additionalAccountsForProvisioning))
+                    .filter(roleSystem -> supportsAccountCreation(roleSystem, owner, roleAssignment, additionalAccountsForProvisioning))
                     .forEach(roleSystem ->
                             resolveIdentityAccountForCreate(owner, identityAccountList, identityAccountsToCreate,
-                                    identityAccountsToDelete, onlyCreateNew, roleSystem, identityRole)
+                                    identityAccountsToDelete, onlyCreateNew, roleSystem, roleAssignment)
                     );
         });
     }
@@ -392,8 +394,8 @@ public abstract class AbstractAccountManagementService<O extends AbstractDto, A 
 
     protected abstract void shouldAccountBeDeleted(List<A> account, List<AbstractRoleAssignmentDto> roleAssignments, List<A> identityAccountsToDelete);
 
-    private boolean supportsAccountCreation(SysRoleSystemDto roleSystem, O identity, List<UUID> additionalAccountsForProvisioning)  {
-        boolean canBeCreated = roleSystem.isCreateAccountByDefault();
+    private boolean supportsAccountCreation(SysRoleSystemDto roleSystem, O identity, AbstractRoleAssignmentDto byRoleAssignment, List<UUID> additionalAccountsForProvisioning)  {
+        boolean canBeCreated = roleSystem.isCreateAccountByDefault() && canInitiateAccountCreation(byRoleAssignment);
         if (canBeCreated) {
             SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
             systemGroupSystemFilter.setCrossDomainsGroupsForRoleSystemId(roleSystem.getId());
@@ -415,6 +417,11 @@ public abstract class AbstractAccountManagementService<O extends AbstractDto, A 
             }
         }
         return canBeCreated;
+    }
+
+    private boolean canInitiateAccountCreation(AbstractRoleAssignmentDto byRoleAssignment) {
+        // We can create account only for identity-role. Other role assignments are not supported.
+        return byRoleAssignment instanceof IdmIdentityRoleDto;
     }
 
     protected abstract boolean shouldAccountBeProvisioned(A entityAccount, SysRoleSystemDto roleSystem);
@@ -592,7 +599,7 @@ public abstract class AbstractAccountManagementService<O extends AbstractDto, A 
      * @return true, if role does not create account by default, or is in cross domain group
      */
     private boolean shouldProcessDelayedAcm(AbstractRoleAssignmentDto roleAssignment, SysRoleSystemDto roleSystem) {
-        if (!roleSystem.isCreateAccountByDefault()) {
+        if (!roleSystem.isCreateAccountByDefault() || !canInitiateAccountCreation(roleAssignment)) {
             return true;
         } else {
             SysSystemGroupSystemFilter systemGroupSystemFilter = new SysSystemGroupSystemFilter();
