@@ -228,13 +228,21 @@ public class DefaultSysSystemMappingService
 		Assert.notNull(account, "Account cannot be null!");
 		Assert.notNull(account.getEntityType(), "EntityType cannot be null!");
 		SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
-		List<SysSystemMappingDto> mappings = this.findBySystem(system, SystemOperationType.PROVISIONING,
-				account.getEntityType());
-		if (mappings.isEmpty()) {
-			return false;
+		// @since 13.0.0 mapping is directly stored in account
+		final SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, (SysSystemMappingDto) null);
+		if (mapping != null) {
+			return this.isEnabledProtection(mapping);
+		} else {
+			// if for some reason system mapping is not stored in account, we have to find it the old way.
+			// Note that the following code assumes that there is only one mapping for provisioning and entity type.
+			List<SysSystemMappingDto> mappings = this.findBySystem(system, SystemOperationType.PROVISIONING,
+					account.getEntityType());
+			if (mappings.isEmpty()) {
+				return false;
+			}
+			// We assume only one mapping for provisioning and entity type.
+			return this.isEnabledProtection(mappings.get(0));
 		}
-		// We assume only one mapping for provisioning and entity type.
-		return this.isEnabledProtection(mappings.get(0));
 	}
 
 	@Override
@@ -438,6 +446,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional
 	public SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType, UUID mappingId) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
