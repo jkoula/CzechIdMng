@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -181,6 +182,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<SysSystemMappingDto> findBySystem(SysSystemDto system, SystemOperationType operation,
 			String entityType) {
 		Assert.notNull(system, "System is required.");
@@ -189,6 +191,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<SysSystemMappingDto> findBySystemId(
 			UUID systemId, 
 			SystemOperationType operation,
@@ -204,6 +207,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<SysSystemMappingDto> findByObjectClass(
 			SysSchemaObjectClassDto objectClass,
 			SystemOperationType operation, 
@@ -219,24 +223,39 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public boolean isEnabledProtection(AccAccountDto account) {
 		Assert.notNull(account, "Account cannot be null!");
 		Assert.notNull(account.getEntityType(), "EntityType cannot be null!");
 		SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
-		List<SysSystemMappingDto> mappings = this.findBySystem(system, SystemOperationType.PROVISIONING,
-				account.getEntityType());
-		if (mappings.isEmpty()) {
-			return false;
+		// @since 13.0.0 mapping is directly stored in account
+		final SysSystemMappingDto mapping = DtoUtils.getEmbedded(account, AccAccount_.systemMapping, (SysSystemMappingDto) null);
+		if (mapping != null) {
+			return this.isEnabledProtection(mapping);
+		} else {
+			// if for some reason system mapping is not stored in account, we have to find it the old way.
+			// Note that the following code assumes that there is only one mapping for provisioning and entity type.
+			List<SysSystemMappingDto> mappings = this.findBySystem(system, SystemOperationType.PROVISIONING,
+					account.getEntityType());
+			if (mappings.isEmpty()) {
+				return false;
+			}
+			// We assume only one mapping for provisioning and entity type.
+			return this.isEnabledProtection(mappings.get(0));
 		}
-		// We assume only one mapping for provisioning and entity type.
-		return this.isEnabledProtection(mappings.get(0));
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Integer getProtectionInterval(AccAccountDto account) {
 		Assert.notNull(account, "Account cannot be null!");
 		Assert.notNull(account.getEntityType(), "EntityType cannot be null!");
-
+		if (Objects.nonNull(account.getSystemMapping())) {
+			// @since 13.0.0 system mapping is stored in account
+			return this.getProtectionInterval(get(account.getSystemMapping()));
+		}
+		// if for some reason system mapping is not stored in account, we have to find it the old way.
+		// Note that the following code assumes that there is only one mapping for provisioning and entity type.
 		SysSystemDto system = DtoUtils.getEmbedded(account, AccAccount_.system);
 		List<SysSystemMappingDto> mappings = this.findBySystem(system, SystemOperationType.PROVISIONING,
 				account.getEntityType());
@@ -427,6 +446,7 @@ public class DefaultSysSystemMappingService
 	}
 
 	@Override
+	@Transactional
 	public SysSystemMappingDto findProvisioningMapping(UUID systemId, String entityType, UUID mappingId) {
 		Assert.notNull(systemId, "System identifier is required.");
 		Assert.notNull(entityType, "Entity type is required.");
