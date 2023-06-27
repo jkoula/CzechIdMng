@@ -18,6 +18,7 @@ import eu.bcvsolutions.idm.acc.service.impl.adapter.AccAccountConceptRoleRequest
 import eu.bcvsolutions.idm.core.api.domain.ConceptRoleRequestOperation;
 import eu.bcvsolutions.idm.core.api.domain.RoleRequestState;
 import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractRoleAssignmentDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantDto;
 import eu.bcvsolutions.idm.core.api.dto.ApplicantImplDto;
 import eu.bcvsolutions.idm.core.api.dto.BaseDto;
@@ -188,11 +189,6 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
     }
 
     @Override
-    protected String cancelInvalidConceptInternal(List<AccAccountRoleAssignmentDto> automaticRoles, AccAccountConceptRoleRequestDto concept, IdmRoleRequestDto request) {
-        return null;
-    }
-
-    @Override
     protected AccAccountRoleAssignmentDto createAssignmentFromConceptInternal(AccAccountConceptRoleRequestDto concept) {
         AccAccountRoleAssignmentDto result = new AccAccountRoleAssignmentDto();
         result.setAccount(concept.getAccount());
@@ -359,6 +355,12 @@ public class DefaultAccAccountConceptRoleRequestService extends AbstractConceptR
             accountRoleAssignment = accRoleAccountService.get(concept.getAccountRole());
         }
         return accountRoleAssignment;
+    }
+
+    @Override
+    protected boolean compare(AbstractRoleAssignmentDto ir, AccAccountConceptRoleRequestDto concept) {
+        // just check the type, other stuff is checked in cancelInvalidConceptInternal
+        return ir instanceof AccAccountRoleAssignmentDto;
     }
 
     @Override

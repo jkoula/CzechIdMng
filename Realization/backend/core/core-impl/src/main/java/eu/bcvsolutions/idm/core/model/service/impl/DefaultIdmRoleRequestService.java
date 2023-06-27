@@ -817,7 +817,7 @@ public class DefaultIdmRoleRequestService
 		final IdmRequestIdentityRoleFilter filter = new IdmRequestIdentityRoleFilter();
 		filter.setIds(requestByIdentityDto.getIdentityRoles());
 
-		roleAssignmentManager.find(filter, null, (assignment, service) -> processRoleToCopy(assignment, service, roleRequestId, validFrom, validTill, copyRoleParameters));
+		roleAssignmentManager.find(filter, null, (assignment, service) -> processRoleToCopy(identityContractId, assignment, service, roleRequestId, validFrom, validTill, copyRoleParameters));
 
 		return this.get(roleRequestId);
 	}
@@ -832,13 +832,13 @@ public class DefaultIdmRoleRequestService
 		}
 	}
 
-	private void processRoleToCopy(AbstractRoleAssignmentDto assignment, IdmRoleAssignmentService<AbstractRoleAssignmentDto, BaseRoleAssignmentFilter> service, UUID roleRequestId, LocalDate validFrom, LocalDate validTill, boolean copyRoleParameters) {
+	private void processRoleToCopy(UUID ownerUuid, AbstractRoleAssignmentDto assignment, IdmRoleAssignmentService<AbstractRoleAssignmentDto, BaseRoleAssignmentFilter> service, UUID roleRequestId, LocalDate validFrom, LocalDate validTill, boolean copyRoleParameters) {
 		// Flush Hibernate in batch - performance improving TODO this is not the way to do it
 		/*if (i % 20 == 0 && i > 0) {
 			flushHibernateSession();
 		}*/
 		final AbstractConceptRoleRequestDto concept = conceptRoleRequestManager.getServiceForConcept(service.getRelatedConceptType()).createEmptyConcept();
-		concept.setOwnerUuid(assignment.getEntity());
+		concept.setOwnerUuid(ownerUuid);
 		concept.setRoleRequest(roleRequestId);
 		concept.setRole(assignment.getRole());
 		concept.setValidFrom(validFrom);
