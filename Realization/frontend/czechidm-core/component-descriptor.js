@@ -1011,6 +1011,7 @@ module.exports = {
       manager: require('./src/redux').ConceptRoleRequestManager,
       ownerType: require('./src/redux').IdentityContractManager.ENTITY_TYPE,
       ownerManager: require('./src/redux').IdentityContractManager,
+      superOwnerManager: require('./src/redux').IdentityManager,
       ownerSelectComponent: require('./src/components/advanced/IdentityContractSelect/IdentityContractSelect').default,
       ownerInfoComponent: require('./src/components/advanced/IdentityContractInfo/IdentityContractInfo').default,
       locale: "core:entity.IdentityContract.select",

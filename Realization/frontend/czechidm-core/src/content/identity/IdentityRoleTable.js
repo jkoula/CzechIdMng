@@ -50,13 +50,16 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
     super.componentDidMount();
     //
     const { entityId } = this.props.match.params;
-    const { fetchIncompatibleRoles, fetchCodeLists, showEnvironment } = this.props;
+    const { fetchIncompatibleRoles, fetchCodeLists, showEnvironment, ownerType } = this.props;
     //
     if (fetchCodeLists && showEnvironment) {
       this.context.store.dispatch(codeListManager.fetchCodeListIfNeeded('environment'));
     }
     if (fetchIncompatibleRoles) {
-      this.context.store.dispatch(identityManager.fetchIncompatibleRoles(entityId, `${ uiKeyIncompatibleRoles }${ entityId }`));
+      const selectedOwnerType = ownerType ? ownerType : IdentityContractManager.ENTITY_TYPE;
+      const ManagerType = componentService.getConcepComponentByOwnerType(selectedOwnerType).superOwnerManager;
+      const managerInstance = new ManagerType();
+      this.context.store.dispatch(managerInstance.fetchIncompatibleRoles(entityId, `${ uiKeyIncompatibleRoles }${ entityId }`));
     }
   }
 
@@ -540,6 +543,8 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                       <IdentityRoleTable
                         uiKey={ `${this.getUiKey()}-all-sub-roles` }
                         showAddButton={ false }
+                        ownerType={detail.entity.ownerType}
+                        fetchIncompatibleRoles={false}
                         forceSearchParameters={ new SearchParameters()
                             .setFilter('directRoleId', detail.entity.id)
                             .setFilter('identityId', detail.entity.ownerId)
