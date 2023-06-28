@@ -185,7 +185,8 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
       showRefreshButton,
       showEnvironment,
       children,
-      rowClass
+      rowClass,
+      hideOwnerTypeSelector
     } = this.props;
     const { detail, activeKey } = this.state;
     //
@@ -193,7 +194,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
       return null;
     }
     // contract force search parameters - contract filter is shown only if identity is given
-    const hasIdentityForceFilter = forceSearchParameters.getFilters().has('identityId');
+    const hasIdentityForceFilter = forceSearchParameters.getFilters().has('identityId') || forceSearchParameters.getFilters().has('accountId');
     const hasRoleForceFilter = forceSearchParameters.getFilters().has('roleId');
     let contractForceSearchParameters = null;
     if (forceSearchParameters && hasIdentityForceFilter) {
@@ -256,6 +257,7 @@ export class IdentityRoleTable extends Advanced.AbstractTableContent {
                                      contractForceSearchParameters={contractForceSearchParameters}
                                      useFilter={this.useFilter.bind(this)}
                                      cancelFilter={this.cancelFilter.bind(this)}
+                                     hideOwnerTypeSelector={hideOwnerTypeSelector}
             />
          }>
           <Advanced.Column

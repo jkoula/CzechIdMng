@@ -306,7 +306,9 @@ class AccountRolesContent extends Basic.AbstractContent {
               columns={ _.difference(_columns || IdentityRoleTable.defaultProps.columns, ['directRole']) }
               _permissions={ _permissions }
               fetchIncompatibleRoles={ false }
-              fetchCodeLists={ false }/>
+              fetchCodeLists={ false }
+              hideOwnerTypeSelector
+              hasIdentityForceFilter={true}/>
 
             <Basic.ContentHeader
               icon="component:sub-roles"
@@ -328,7 +330,10 @@ class AccountRolesContent extends Basic.AbstractContent {
               match={ this.props.match }
               columns={ _.difference(_columns || IdentityRoleTable.defaultProps.columns, ['automaticRole']) }
               fetchIncompatibleRoles={ false }
-              fetchCodeLists={ false }/>
+              fetchCodeLists={ false }
+              hideOwnerTypeSelector
+              hasIdentityForceFilter={true}
+            />
           </Basic.Tab>
 
           <Basic.Tab

@@ -487,7 +487,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       requestId,
       columns,
       isAccount,
-      accountId
+      accountId,
+      hideOwnerTypeSelector
     } = this.props;
     const {
       showChangesOnly,
@@ -569,6 +570,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                                        contractForceSearchParameters={contractForceSearchParameters}
                                        useFilter={this.useFilter.bind(this)}
                                        cancelFilter={this.cancelFilter.bind(this)}
+                                       hideOwnerTypeSelector={hideOwnerTypeSelector}
               />
             }
             _searchParameters={ this.getSearchParameters() }>

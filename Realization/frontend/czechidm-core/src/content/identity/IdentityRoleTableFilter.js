@@ -82,7 +82,7 @@ export class IdentityRoleTableFilter extends AbstractContextComponent {
 
     render() {
         const {useFilter, showEnvironment, hasRoleForceFilter, hasIdentityForceFilter,
-            contractForceSearchParameters, cancelFilter, environmentItems} = this.props
+            contractForceSearchParameters, cancelFilter, environmentItems, hideOwnerTypeSelector} = this.props
         const {selectedOwnerType} = this.state;
         //
         const ownerTypeOptions = this.getOwnerTypeOptions();
@@ -122,15 +122,17 @@ export class IdentityRoleTableFilter extends AbstractContextComponent {
                             ref="ownerType"
                             placeholder={ this.i18n("content.identity.roles.filter.ownerSelect.placeholder") }
                             niceLabel={ this.i18n("content.identity.roles.filter.ownerSelect.placeholder") }
-                            options={ ownerTypeOptions }/>
+                            options={ ownerTypeOptions }
+                            rendered={!hideOwnerTypeSelector}
+                        />
                     </Basic.Col>
                     <Basic.Col lg={ 3 } className="text-right">
                         <Advanced.Filter.FilterButtons useFilter={useFilter} cancelFilter={ cancelFilter }/>
                     </Basic.Col>
                 </Basic.Row>
-                <Basic.Row className={selectedOwnerType ? "last" : ""}>
+                <Basic.Row className={selectedOwnerType ? "last" : ""} rendered={!hideOwnerTypeSelector}>
                     <Basic.Col lg={ 3 }>
-                        { ownerSelect }
+                        { !hideOwnerTypeSelector && ownerSelect }
                     </Basic.Col>
                 </Basic.Row>
             </Basic.AbstractForm>
