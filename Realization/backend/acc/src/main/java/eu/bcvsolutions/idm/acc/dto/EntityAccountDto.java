@@ -12,7 +12,9 @@ import eu.bcvsolutions.idm.core.api.dto.BaseDto;
  */
 public interface EntityAccountDto extends BaseDto {
 
-	UUID getAccount();
+	String PROPERTY_ACCOUNT = "account";
+
+    UUID getAccount();
 
 	void setAccount(UUID account);
 

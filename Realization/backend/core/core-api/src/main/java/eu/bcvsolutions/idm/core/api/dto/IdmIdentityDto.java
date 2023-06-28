@@ -299,4 +299,8 @@ public class IdmIdentityDto extends FormableDto implements Disableable, Codeable
 		this.passwordMetadata = passwordMetadata;
 	}
 
+	@Override
+	public String toString() {
+		return "IdmIdentityDto [username=" + username + "]";
+	}
 }

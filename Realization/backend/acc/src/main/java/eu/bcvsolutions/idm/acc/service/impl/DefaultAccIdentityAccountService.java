@@ -9,6 +9,10 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import eu.bcvsolutions.idm.acc.dto.AccAccountDto;
+import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
+import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
+import eu.bcvsolutions.idm.core.api.utils.DtoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,5 +154,15 @@ public class DefaultAccIdentityAccountService extends
 		}
 		//
 		return predicates;
+	}
+
+	@Override
+	public AbstractDto getOwner(AccIdentityAccountDto entity) {
+		return DtoUtils.getEmbedded(entity, AccIdentityAccount_.identity, IdmIdentityDto.class);
+	}
+
+	@Override
+	public AccAccountDto getAccount(AccIdentityAccountDto entity) {
+		return DtoUtils.getEmbedded(entity, AccIdentityAccount_.account, AccAccountDto.class);
 	}
 }
