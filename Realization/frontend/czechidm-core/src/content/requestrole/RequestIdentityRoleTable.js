@@ -488,7 +488,8 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
       requestId,
       columns,
       isAccount,
-      accountId
+      accountId,
+      hideOwnerTypeSelector
     } = this.props;
     const {
       showChangesOnly,
@@ -570,6 +571,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
                                        contractForceSearchParameters={contractForceSearchParameters}
                                        useFilter={this.useFilter.bind(this)}
                                        cancelFilter={this.cancelFilter.bind(this)}
+                                       hideOwnerTypeSelector={hideOwnerTypeSelector}
               />
             }
             _searchParameters={ this.getSearchParameters().setSort('role.name', true) }>
@@ -830,11 +832,11 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     }
     if (identityId && !isAccount) {
       forceSearchParameters = forceSearchParameters.setFilter('identityId', identityId);
-      forceSearchParameters = forceSearchParameters.setFilter('accountId', null);
-      forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', null);
+      forceSearchParameters = forceSearchParameters.clearFilter('accountId');
+      forceSearchParameters = forceSearchParameters.clearFilter('loadAssignments');
     }
     if (isAccount && accountId) {
-      forceSearchParameters = forceSearchParameters.setFilter('identityId', null);
+      forceSearchParameters = forceSearchParameters.clearFilter('identityId');
       forceSearchParameters = forceSearchParameters.setFilter('accountId', accountId);
       forceSearchParameters = forceSearchParameters.setFilter('ownerType', 'eu.bcvsolutions.idm.acc.dto.AccAccountDto');
       forceSearchParameters = forceSearchParameters.setFilter('loadAssignments', true);
@@ -844,7 +846,7 @@ export class RequestIdentityRoleTable extends Advanced.AbstractTableContent {
     // for technical accounts
     const isTechAccount = request?.applicantInfo?.applicantType === 'eu.bcvsolutions.idm.tech.model.dto.TechnicalAccountDto'
     if (isTechAccount) {
-      forceSearchParameters = forceSearchParameters.setFilter('identityId', null);
+      forceSearchParameters = forceSearchParameters.clearFilter('identityId');
       forceSearchParameters = forceSearchParameters.setFilter('technicalAccountId', identityId);
     }
 

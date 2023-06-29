@@ -381,6 +381,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
     const isEditable = request && _.includes(editableInStates, request.state);
     const canExecuteTheRequest = isEditable && _.includes(['CONCEPT', 'EXCEPTION'], request.state);
     const systemStateLog = request && request.systemState ? request.systemState.stackTrace : null;
+    const hideOwnerTypeSelector = request?.applicantInfo?.applicantType !== 'eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto';
 
     if (!request) {
       return (
@@ -543,6 +544,7 @@ class RoleRequestDetail extends Advanced.AbstractTableContent {
                 putRequestToRedux={this.putRequestToRedux.bind(this)}
                 isAccount={isAccount}
                 accountId={accountId}
+                hideOwnerTypeSelector={hideOwnerTypeSelector}
               />
               <Basic.AbstractForm
                 readOnly
