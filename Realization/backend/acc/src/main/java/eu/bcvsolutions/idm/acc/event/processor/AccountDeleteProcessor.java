@@ -155,7 +155,7 @@ public class AccountDeleteProcessor
 			// delete referenced role assignment
 			removeRelatedAssignedRoles(event,identityAccount.getIdentity(), account.getId(), false);
 			if (forceDelete) {
-				identityAccountService.forceDelete(identityAccount);
+				identityAccountService.forceDelete(identityAccount, deleteTargetAccount);
 			} else {
 				identityAccountService.delete(identityAccount, deleteTargetAccount);
 			}

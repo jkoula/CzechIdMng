@@ -72,13 +72,15 @@ public class RoleRequestDeleteBulkActionIntegrationTest extends AbstractBulkActi
 	 */
 	@Test
 	public void deleteRoleRequestExecuted() {
-		IdmRoleDto role = this.createRoles(1).get(0);
-		IdmIdentityDto identity = createIdentities(1).get(0);
+		IdmRoleDto role = getHelper().createRole();
+		IdmIdentityDto identity = getHelper().createIdentity();
 		IdmIdentityContractDto contract = getHelper().getPrimeContract(identity);
 		
 		IdmRoleRequestDto roleRequest = roleRequestService.createRequest(contract, role);
+		final var reqId = roleRequest.getId();
 		Assert.assertEquals(RoleRequestState.CONCEPT, roleRequest.getState());
 		getHelper().executeRequest(roleRequest, false);
+		getHelper().waitForResult(res -> roleRequestService.get(reqId).getState() == RoleRequestState.EXECUTED, 1000, 10);
 		roleRequest = roleRequestService.get(roleRequest);
 		Assert.assertEquals(RoleRequestState.EXECUTED, roleRequest.getState());
 		

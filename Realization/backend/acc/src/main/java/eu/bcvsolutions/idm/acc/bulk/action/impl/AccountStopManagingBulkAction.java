@@ -3,6 +3,7 @@ package eu.bcvsolutions.idm.acc.bulk.action.impl;
 import java.util.List;
 import java.util.Map;
 
+import eu.bcvsolutions.idm.core.api.event.EntityEventProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,8 @@ public class AccountStopManagingBulkAction extends AbstractBulkAction<AccAccount
 	@Override
 	protected OperationResult processDto(AccAccountDto dto) {
 		accountService.publish(new AccountEvent(AccountEventType.DELETE, dto,
-				Map.of(AccAccountService.DELETE_TARGET_ACCOUNT_PROPERTY, Boolean.FALSE)));
+				Map.of(AccAccountService.DELETE_TARGET_ACCOUNT_PROPERTY, Boolean.FALSE,
+						EntityEventProcessor.PROPERTY_FORCE_DELETE, Boolean.TRUE)));
 		
 		return new OperationResult(OperationState.EXECUTED);
 	}
