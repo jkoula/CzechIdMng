@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 
 import eu.bcvsolutions.idm.core.api.repository.filter.AbstractFilterBuilder;
-import eu.bcvsolutions.idm.doc.dto.filter.DocumentFilter;
-import eu.bcvsolutions.idm.doc.entity.Document;
-import eu.bcvsolutions.idm.doc.entity.Document_;
-import eu.bcvsolutions.idm.doc.repository.DocumentRepository;
+import eu.bcvsolutions.idm.doc.dto.filter.DocDocumentFilter;
+import eu.bcvsolutions.idm.doc.entity.DocDocument;
+import eu.bcvsolutions.idm.doc.entity.DocDocument_;
+import eu.bcvsolutions.idm.doc.repository.DocDocumentRepository;
 
 /**
  * Document filter - by type, equals.
@@ -23,23 +23,23 @@ import eu.bcvsolutions.idm.doc.repository.DocumentRepository;
  */
 @Component
 @Description("Document filter - by type, equal.")
-public class DocumentTypeFilter extends AbstractFilterBuilder<Document, DocumentFilter> {
+public class DocDocumentTypeFilter extends AbstractFilterBuilder<DocDocument, DocDocumentFilter> {
 
 	@Autowired
-	public DocumentTypeFilter(DocumentRepository repository) {
+	public DocDocumentTypeFilter(DocDocumentRepository repository) {
 		super(repository);
 	}
 	
 	@Override
 	public String getName() {
-		return DocumentFilter.PARAMETER_TYPE;
+		return DocDocumentFilter.PARAMETER_TYPE;
 	}
 	
 	@Override
-	public Predicate getPredicate(Root<Document> root, AbstractQuery<?> query, CriteriaBuilder builder, DocumentFilter filter) {
+	public Predicate getPredicate(Root<DocDocument> root, AbstractQuery<?> query, CriteriaBuilder builder, DocDocumentFilter filter) {
 		if (filter.getType() == null) {
 			return null;
 		}	
-		return builder.equal(root.get(Document_.type), filter.getType());
+		return builder.equal(root.get(DocDocument_.type), filter.getType());
 	}
 }

@@ -1,26 +1,18 @@
 package eu.bcvsolutions.idm.doc.dto;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.envers.Audited;
 import org.springframework.hateoas.core.Relation;
 
-import eu.bcvsolutions.idm.core.api.domain.Codeable;
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.domain.Embedded;
-import eu.bcvsolutions.idm.core.api.dto.AbstractDto;
 import eu.bcvsolutions.idm.core.api.dto.FormableDto;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
-import eu.bcvsolutions.idm.doc.domain.DocumentState;
-import eu.bcvsolutions.idm.doc.domain.DocumentType;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentState;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentType;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -32,7 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @Relation(collectionRelation = "documents")
 @ApiModel(description = "Document")
-public class DocumentDto extends AbstractDto {
+public class DocDocumentDto extends FormableDto {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,7 +33,7 @@ public class DocumentDto extends AbstractDto {
 	private String uuid;
 
 	@ApiModelProperty(required = true, notes = "Type of document (e.g. passport, ID card).")
-	private DocumentType type;
+	private DocDocumentType type;
 
 	@Size(min = 1, max = DefaultFieldLengths.UID)
 	@ApiModelProperty(required = true, notes = "Document number.")
@@ -58,7 +50,7 @@ public class DocumentDto extends AbstractDto {
 	private String lastName;
 
 	@ApiModelProperty(required = true, notes = "Current state of the document (VALID or INVALID).")
-	private DocumentState state;
+	private DocDocumentState state;
 
 	@Embedded(dtoClass = IdmIdentityDto.class)
 	@ApiModelProperty(required = true, notes = "Identity the document relates to.")
@@ -72,11 +64,11 @@ public class DocumentDto extends AbstractDto {
 		this.uuid = uuid;
 	}
 
-	public DocumentType getType() {
+	public DocDocumentType getType() {
 		return type;
 	}
 
-	public void setType(DocumentType type) {
+	public void setType(DocDocumentType type) {
 		this.type = type;
 	}
 
@@ -104,11 +96,11 @@ public class DocumentDto extends AbstractDto {
 		this.lastName = lastName;
 	}
 
-	public DocumentState getState() {
+	public DocDocumentState getState() {
 		return state;
 	}
 
-	public void setState(DocumentState state) {
+	public void setState(DocDocumentState state) {
 		this.state = state;
 	}
 

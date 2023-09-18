@@ -8,26 +8,26 @@ import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.event.DocumentEvent.DocumentEventType;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.event.DocDocumentEvent.DocumentEventType;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 
 /**
- * Save {@link DocumentDto}
+ * Save {@link DocDocumentDto}
  *
  * @author Jirka Koula
  *
  */
-@Component(DocumentSaveProcessor.PROCESSOR_NAME)
+@Component(DocDocumentSaveProcessor.PROCESSOR_NAME)
 @Description("Save newly created or update exists document. Cannot be disabled.")
-public class DocumentSaveProcessor extends CoreEventProcessor<DocumentDto> {
+public class DocDocumentSaveProcessor extends CoreEventProcessor<DocDocumentDto> {
 
 	public static final String PROCESSOR_NAME = "document-save-processor";
 
-	private final DocumentService documentService;
+	private final DocDocumentService documentService;
 
 	@Autowired
-	public DocumentSaveProcessor(DocumentService documentService) {
+	public DocDocumentSaveProcessor(DocDocumentService documentService) {
 		super(DocumentEventType.CREATE, DocumentEventType.UPDATE);
 		this.documentService = documentService;
 	}
@@ -38,8 +38,8 @@ public class DocumentSaveProcessor extends CoreEventProcessor<DocumentDto> {
 	}
 
 	@Override
-	public EventResult<DocumentDto> process(EntityEvent<DocumentDto> event) {
-		DocumentDto dto = event.getContent();
+	public EventResult<DocDocumentDto> process(EntityEvent<DocDocumentDto> event) {
+		DocDocumentDto dto = event.getContent();
 
 		dto = documentService.saveInternal(dto);
 		event.setContent(dto);

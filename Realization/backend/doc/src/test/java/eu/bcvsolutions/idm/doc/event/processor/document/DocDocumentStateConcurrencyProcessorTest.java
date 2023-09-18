@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.doc.TestHelper;
-import eu.bcvsolutions.idm.doc.domain.DocumentState;
-import eu.bcvsolutions.idm.doc.domain.DocumentType;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentState;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentType;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
@@ -19,10 +19,10 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Jirka Koula
  *
  */
-public class DocumentStateConcurrencyProcessorTest extends AbstractIntegrationTest {
+public class DocDocumentStateConcurrencyProcessorTest extends AbstractIntegrationTest {
 
 	@Autowired private TestHelper helper;
-	@Autowired private DocumentService documentService;
+	@Autowired private DocDocumentService documentService;
 	@Autowired private IdmIdentityService identityService;
 
 	@Test
@@ -31,36 +31,36 @@ public class DocumentStateConcurrencyProcessorTest extends AbstractIntegrationTe
 		IdmIdentityDto identity2 = helper.createIdentity();
 
 		// create valid id card
-		DocumentDto idCard = helper.createValidDocument(identity, DocumentType.ID_CARD);
-		Assert.assertEquals(DocumentState.VALID, idCard.getState());
+		DocDocumentDto idCard = helper.createValidDocument(identity, DocDocumentType.ID_CARD);
+		Assert.assertEquals(DocDocumentState.VALID, idCard.getState());
 
 		// create valid id card for another identity
-		DocumentDto idCardForeign = helper.createValidDocument(identity2, DocumentType.ID_CARD);
-		Assert.assertEquals(DocumentState.VALID, idCardForeign.getState());
+		DocDocumentDto idCardForeign = helper.createValidDocument(identity2, DocDocumentType.ID_CARD);
+		Assert.assertEquals(DocDocumentState.VALID, idCardForeign.getState());
 
 		// first identity id card should be still valid
 		idCard = documentService.get(idCard.getId());
-		Assert.assertEquals(DocumentState.VALID, idCard.getState());
+		Assert.assertEquals(DocDocumentState.VALID, idCard.getState());
 
 		// create valid passport
-		DocumentDto passport = helper.createValidDocument(identity, DocumentType.PASSPORT);
-		Assert.assertEquals(DocumentState.VALID, passport.getState());
+		DocDocumentDto passport = helper.createValidDocument(identity, DocDocumentType.PASSPORT);
+		Assert.assertEquals(DocDocumentState.VALID, passport.getState());
 
 		// create another valid id card
-		DocumentDto idCard2 = helper.createValidDocument(identity, DocumentType.ID_CARD);
-		Assert.assertEquals(DocumentState.VALID, idCard2.getState());
+		DocDocumentDto idCard2 = helper.createValidDocument(identity, DocDocumentType.ID_CARD);
+		Assert.assertEquals(DocDocumentState.VALID, idCard2.getState());
 
 		// previous id card should be invalid
 		idCard = documentService.get(idCard.getId());
-		Assert.assertEquals(DocumentState.INVALID, idCard.getState());
+		Assert.assertEquals(DocDocumentState.INVALID, idCard.getState());
 
 		// passport should be still valid
 		passport = documentService.get(passport.getId());
-		Assert.assertEquals(DocumentState.VALID, passport.getState());
+		Assert.assertEquals(DocDocumentState.VALID, passport.getState());
 
 		// second identity id card should be still valid
 		idCardForeign = documentService.get(idCardForeign.getId());
-		Assert.assertEquals(DocumentState.VALID, idCardForeign.getState());
+		Assert.assertEquals(DocDocumentState.VALID, idCardForeign.getState());
 
 		identityService.delete(identity);
 		identityService.delete(identity2);

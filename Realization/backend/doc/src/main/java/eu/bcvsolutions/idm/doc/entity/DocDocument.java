@@ -18,9 +18,10 @@ import org.hibernate.envers.Audited;
 
 import eu.bcvsolutions.idm.core.api.domain.DefaultFieldLengths;
 import eu.bcvsolutions.idm.core.api.entity.AbstractEntity;
+import eu.bcvsolutions.idm.core.eav.api.entity.FormableEntity;
 import eu.bcvsolutions.idm.core.model.entity.IdmIdentity;
-import eu.bcvsolutions.idm.doc.domain.DocumentState;
-import eu.bcvsolutions.idm.doc.domain.DocumentType;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentState;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentType;
 
 /**
  * Identity document.
@@ -31,7 +32,7 @@ import eu.bcvsolutions.idm.doc.domain.DocumentType;
 @Table(name = "doc_document", indexes = {
 		@Index(name = "idx_doc_document_number", columnList = "number")
 })
-public class Document extends AbstractEntity {
+public class DocDocument extends AbstractEntity implements FormableEntity {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,7 +46,7 @@ public class Document extends AbstractEntity {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, length = DefaultFieldLengths.ENUMARATION)
-	private DocumentType type;
+	private DocDocumentType type;
 
 	@Audited
 	@NotEmpty
@@ -67,7 +68,7 @@ public class Document extends AbstractEntity {
 	@NotNull
 	@Enumerated(EnumType.STRING)
 	@Column(name = "state", nullable = false, length = DefaultFieldLengths.ENUMARATION)
-	private DocumentState state;
+	private DocDocumentState state;
 
 	@Audited
 	@ManyToOne(optional = false)
@@ -78,9 +79,9 @@ public class Document extends AbstractEntity {
 
 	public void setUuid(String uuid) { this.uuid = uuid; }
 
-	public DocumentType getType() { return type; }
+	public DocDocumentType getType() { return type; }
 
-	public void setType(DocumentType type) { this.type = type; }
+	public void setType(DocDocumentType type) { this.type = type; }
 
 	public String getNumber() { return number; }
 
@@ -94,9 +95,9 @@ public class Document extends AbstractEntity {
 
 	public void setLastName(String lastName) { this.lastName = lastName; }
 
-	public DocumentState getState() { return state; }
+	public DocDocumentState getState() { return state; }
 
-	public void setState(DocumentState state) { this.state = state; }
+	public void setState(DocDocumentState state) { this.state = state; }
 
 	public IdmIdentity getIdentity() { return identity; }
 

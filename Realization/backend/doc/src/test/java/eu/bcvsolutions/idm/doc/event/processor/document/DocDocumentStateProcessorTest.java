@@ -8,10 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
 import eu.bcvsolutions.idm.doc.TestHelper;
-import eu.bcvsolutions.idm.doc.domain.DocumentState;
-import eu.bcvsolutions.idm.doc.domain.DocumentType;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentState;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentType;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
 
 /**
@@ -20,27 +20,27 @@ import eu.bcvsolutions.idm.test.api.AbstractIntegrationTest;
  * @author Jirka Koula
  *
  */
-public class DocumentStateProcessorTest extends AbstractIntegrationTest {
+public class DocDocumentStateProcessorTest extends AbstractIntegrationTest {
 
 	private static final String DOCUMENT_WRONG_FIRST_NAME = "Cheetah";
 	private static final String DOCUMENT_WRONG_LAST_NAME = "Rider";
 
 	@Autowired private TestHelper helper;
-	@Autowired private DocumentService documentService;
+	@Autowired private DocDocumentService documentService;
 	@Autowired private IdmIdentityService identityService;
 
 	@Test
 	public void testNameChanges() {
 		// create valid entity
 		IdmIdentityDto identity = helper.createIdentity();
-		DocumentDto document = helper.createValidDocument(identity, DocumentType.ID_CARD);
-		assertEquals(DocumentState.VALID, document.getState());
+		DocDocumentDto document = helper.createValidDocument(identity, DocDocumentType.ID_CARD);
+		assertEquals(DocDocumentState.VALID, document.getState());
 
 		// change first name and check that state changes to INVALID
 		document.setFirstName(DOCUMENT_WRONG_FIRST_NAME);
 		documentService.save(document);
 		assertEquals(DOCUMENT_WRONG_FIRST_NAME, document.getFirstName());
-		assertEquals(DocumentState.INVALID, document.getState());
+		assertEquals(DocDocumentState.INVALID, document.getState());
 
 		// make document valid again
 		makeValid(document, identity);
@@ -49,17 +49,17 @@ public class DocumentStateProcessorTest extends AbstractIntegrationTest {
 		document.setLastName(DOCUMENT_WRONG_LAST_NAME);
 		documentService.save(document);
 		assertEquals(DOCUMENT_WRONG_LAST_NAME, document.getLastName());
-		assertEquals(DocumentState.INVALID, document.getState());
+		assertEquals(DocDocumentState.INVALID, document.getState());
 
 		identityService.delete(identity);
 	}
 
-	private void makeValid(DocumentDto document, IdmIdentityDto identity) {
+	private void makeValid(DocDocumentDto document, IdmIdentityDto identity) {
 		document.setFirstName(identity.getFirstName());
 		document.setLastName(identity.getLastName());
-		document.setState(DocumentState.VALID);
+		document.setState(DocDocumentState.VALID);
 		documentService.save(document);
-		assertEquals(DocumentState.VALID, document.getState());
+		assertEquals(DocDocumentState.VALID, document.getState());
 	}
 
 }

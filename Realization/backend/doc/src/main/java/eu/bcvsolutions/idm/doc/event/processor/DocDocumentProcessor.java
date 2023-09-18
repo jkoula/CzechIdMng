@@ -1,7 +1,7 @@
 package eu.bcvsolutions.idm.doc.event.processor;
 
 import eu.bcvsolutions.idm.core.api.event.EntityEventProcessor;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
 
 /**
  * Document processors should implement this interface.
@@ -9,6 +9,6 @@ import eu.bcvsolutions.idm.doc.dto.DocumentDto;
  * @author Jirka Koula
  *
  */
-public interface DocumentProcessor extends EntityEventProcessor<DocumentDto> {
+public interface DocDocumentProcessor extends EntityEventProcessor<DocDocumentDto> {
 
 }

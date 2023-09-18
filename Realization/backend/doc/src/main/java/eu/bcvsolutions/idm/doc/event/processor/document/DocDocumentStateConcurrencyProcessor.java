@@ -8,41 +8,39 @@ import org.springframework.context.annotation.Description;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.core.api.dto.filter.IdmIdentityFilter;
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.service.IdmIdentityService;
-import eu.bcvsolutions.idm.doc.domain.DocumentState;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.dto.filter.DocumentFilter;
-import eu.bcvsolutions.idm.doc.event.DocumentEvent.DocumentEventType;
-import eu.bcvsolutions.idm.doc.event.processor.DocumentProcessor;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentState;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.dto.filter.DocDocumentFilter;
+import eu.bcvsolutions.idm.doc.event.DocDocumentEvent.DocumentEventType;
+import eu.bcvsolutions.idm.doc.event.processor.DocDocumentProcessor;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 
 /**
  * Sets INVALID state in case first/last name differs from identity attributes.
  *
  * @author Jirka Koula
  */
-@Component(DocumentStateConcurrencyProcessor.PROCESSOR_NAME)
+@Component(DocDocumentStateConcurrencyProcessor.PROCESSOR_NAME)
 @Description("Sets INVALID state in case first/last name differs from identity attributes. Cannot be disabled.")
-public class DocumentStateConcurrencyProcessor
-		extends CoreEventProcessor<DocumentDto>
-		implements DocumentProcessor {
+public class DocDocumentStateConcurrencyProcessor
+		extends CoreEventProcessor<DocDocumentDto>
+		implements DocDocumentProcessor {
 
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DocumentStateConcurrencyProcessor.class);
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DocDocumentStateConcurrencyProcessor.class);
 	public static final String PROCESSOR_NAME = "doc-document-state-concurrency-processor";
 	//
 	private final IdmIdentityService identityService;
 
-	private final DocumentService documentService;
+	private final DocDocumentService documentService;
 
 	@Autowired
-	public DocumentStateConcurrencyProcessor(IdmIdentityService identityService, DocumentService documentService) {
+	public DocDocumentStateConcurrencyProcessor(IdmIdentityService identityService, DocDocumentService documentService) {
 		super(DocumentEventType.UPDATE, DocumentEventType.CREATE);
 		//
 		Assert.notNull(identityService, "Identity service is required.");
@@ -58,21 +56,21 @@ public class DocumentStateConcurrencyProcessor
 	}
 
 	@Override
-	public EventResult<DocumentDto> process(EntityEvent<DocumentDto> event) {
-		DocumentDto entity = event.getContent();
+	public EventResult<DocDocumentDto> process(EntityEvent<DocDocumentDto> event) {
+		DocDocumentDto entity = event.getContent();
 
 		// if setting valid document, we have to invalidate all valid documents of the same type
-		if (entity.getState().equals(DocumentState.VALID)) {
+		if (entity.getState().equals(DocDocumentState.VALID)) {
 			UUID entityId = entity.getId();
 
-			DocumentFilter filter = new DocumentFilter();
+			DocDocumentFilter filter = new DocDocumentFilter();
 			filter.setIdentityId(entity.getIdentity());
 			filter.setType(entity.getType());
-			filter.setState(DocumentState.VALID);
-			List<DocumentDto> documents = documentService.find(filter, null).getContent();
+			filter.setState(DocDocumentState.VALID);
+			List<DocDocumentDto> documents = documentService.find(filter, null).getContent();
 			documents.forEach(document -> {
 				if (!document.getId().equals(entityId)) {
-					document.setState(DocumentState.INVALID);
+					document.setState(DocDocumentState.INVALID);
 					documentService.save(document);
 				}
 			});

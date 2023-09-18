@@ -16,9 +16,9 @@ import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
 import eu.bcvsolutions.idm.core.api.event.processor.IdentityProcessor;
 import eu.bcvsolutions.idm.core.model.event.IdentityEvent.IdentityEventType;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.dto.filter.DocumentFilter;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.dto.filter.DocDocumentFilter;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 
 /**
  * Before identity delete - deletes all documents.
@@ -26,20 +26,20 @@ import eu.bcvsolutions.idm.doc.service.api.DocumentService;
  * @author Jirka Koula
  *
  */
-@Component(IdentityDeleteProcessor.PROCESSOR_NAME)
+@Component(IdmIdentityDeleteProcessor.PROCESSOR_NAME)
 @Description("Ensures referential integrity. Cannot be disabled. Removes documents.")
-public class IdentityDeleteProcessor
+public class IdmIdentityDeleteProcessor
 		extends CoreEventProcessor<IdmIdentityDto> 
 		implements IdentityProcessor {
 
-	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(IdentityDeleteProcessor.class);
+	private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(IdmIdentityDeleteProcessor.class);
 	
 	public static final String PROCESSOR_NAME = "doc-identity-delete-processor";
 	//
-	private final DocumentService documentService;
+	private final DocDocumentService documentService;
 
 	@Autowired
-	public IdentityDeleteProcessor(DocumentService documentService) {
+	public IdmIdentityDeleteProcessor(DocDocumentService documentService) {
 		super(IdentityEventType.DELETE);
 		this.documentService = documentService;
 	}
@@ -57,9 +57,9 @@ public class IdentityDeleteProcessor
 		Assert.notNull(identityId, "Identity identifier is required.");
 
 		// remove all identity documents
-		DocumentFilter documentFilter = new DocumentFilter();
+		DocDocumentFilter documentFilter = new DocDocumentFilter();
 		documentFilter.setIdentityId(identityId);
-		List<DocumentDto> documents = documentService.find(documentFilter, null).getContent();
+		List<DocDocumentDto> documents = documentService.find(documentFilter, null).getContent();
 		documents.forEach(document -> {
 			LOG.debug("Remove recipient from provisioning break [{}]", document.getId());
 			documentService.delete(document);

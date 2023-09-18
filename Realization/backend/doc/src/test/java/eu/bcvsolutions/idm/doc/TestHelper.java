@@ -1,8 +1,8 @@
 package eu.bcvsolutions.idm.doc;
 
 import eu.bcvsolutions.idm.core.api.dto.IdmIdentityDto;
-import eu.bcvsolutions.idm.doc.domain.DocumentType;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentType;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
 
 /**
  * Reuses core TestHelper and adds example spec. methods
@@ -19,6 +19,7 @@ public interface TestHelper extends eu.bcvsolutions.idm.test.api.TestHelper {
 	 * @param type
 	 * @return
 	 */
-	DocumentDto createValidDocument(IdmIdentityDto identity, DocumentType type);
+	DocDocumentDto createValidDocument(IdmIdentityDto identity, DocDocumentType type);
 
+	void setIdentityDateOfBirth(IdmIdentityDto identity, String value);
 }

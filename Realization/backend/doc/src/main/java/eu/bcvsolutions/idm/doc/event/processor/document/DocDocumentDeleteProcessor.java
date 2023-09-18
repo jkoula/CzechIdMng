@@ -8,26 +8,26 @@ import eu.bcvsolutions.idm.core.api.event.CoreEventProcessor;
 import eu.bcvsolutions.idm.core.api.event.DefaultEventResult;
 import eu.bcvsolutions.idm.core.api.event.EntityEvent;
 import eu.bcvsolutions.idm.core.api.event.EventResult;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.event.DocumentEvent.DocumentEventType;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.event.DocDocumentEvent.DocumentEventType;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 
 /**
- * Save {@link DocumentDto}
+ * Save {@link DocDocumentDto}
  *
  * @author Jirka Koula
  *
  */
-@Component(DocumentDeleteProcessor.PROCESSOR_NAME)
+@Component(DocDocumentDeleteProcessor.PROCESSOR_NAME)
 @Description("Deletes document. Cannot be disabled.")
-public class DocumentDeleteProcessor extends CoreEventProcessor<DocumentDto> {
+public class DocDocumentDeleteProcessor extends CoreEventProcessor<DocDocumentDto> {
 
 	public static final String PROCESSOR_NAME = "document-delete-processor";
 
-	private final DocumentService documentService;
+	private final DocDocumentService documentService;
 
 	@Autowired
-	public DocumentDeleteProcessor(DocumentService documentService) {
+	public DocDocumentDeleteProcessor(DocDocumentService documentService) {
 		super(DocumentEventType.DELETE);
 		this.documentService = documentService;
 	}
@@ -38,7 +38,7 @@ public class DocumentDeleteProcessor extends CoreEventProcessor<DocumentDto> {
 	}
 
 	@Override
-	public EventResult<DocumentDto> process(EntityEvent<DocumentDto> event) {
+	public EventResult<DocDocumentDto> process(EntityEvent<DocDocumentDto> event) {
 		documentService.deleteInternal(event.getContent());
 		return new DefaultEventResult<>(event, this);
 	}

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import eu.bcvsolutions.idm.core.api.event.CoreEvent;
 import eu.bcvsolutions.idm.core.api.event.EventType;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
 
 /**
  * Events for document
@@ -13,7 +13,7 @@ import eu.bcvsolutions.idm.doc.dto.DocumentDto;
  * @author Jirka Koula
  *
  */
-public class DocumentEvent extends CoreEvent<DocumentDto> {
+public class DocDocumentEvent extends CoreEvent<DocDocumentDto> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,11 +27,11 @@ public class DocumentEvent extends CoreEvent<DocumentDto> {
 		DELETE;
 	}
 
-	public DocumentEvent(DocumentEventType operation, DocumentDto content) {
+	public DocDocumentEvent(DocumentEventType operation, DocDocumentDto content) {
 		super(operation, content);
 	}
 
-	public DocumentEvent(DocumentEventType operation, DocumentDto content, Map<String, Serializable> properties) {
+	public DocDocumentEvent(DocumentEventType operation, DocDocumentDto content, Map<String, Serializable> properties) {
 		super(operation, content, properties);
 	}
 

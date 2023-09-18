@@ -28,9 +28,9 @@ import eu.bcvsolutions.idm.core.api.rest.BaseController;
 import eu.bcvsolutions.idm.core.security.api.domain.Enabled;
 import eu.bcvsolutions.idm.doc.DocModuleDescriptor;
 import eu.bcvsolutions.idm.doc.domain.DocGroupPermission;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
-import eu.bcvsolutions.idm.doc.dto.filter.DocumentFilter;
-import eu.bcvsolutions.idm.doc.service.api.DocumentService;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
+import eu.bcvsolutions.idm.doc.dto.filter.DocDocumentFilter;
+import eu.bcvsolutions.idm.doc.service.api.DocDocumentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -47,15 +47,15 @@ import io.swagger.annotations.AuthorizationScope;
 @Enabled(DocModuleDescriptor.MODULE_ID)
 @RequestMapping(value = BaseController.BASE_PATH + "/doc")
 @Api(
-		value = DocumentController.TAG,
+		value = DocDocumentController.TAG,
 		description = "Documents",
-		tags = { DocumentController.TAG })
-public class DocumentController extends AbstractReadWriteDtoController<DocumentDto, DocumentFilter> {
+		tags = { DocDocumentController.TAG })
+public class DocDocumentController extends AbstractReadWriteDtoController<DocDocumentDto, DocDocumentFilter> {
 
 	protected static final String TAG = "Documents";
 
 	@Autowired
-	public DocumentController(DocumentService service) {
+	public DocDocumentController(DocDocumentService service) {
 		super(service);
 	}
 	
@@ -66,7 +66,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Search documents (/search/quick alias)",
 			nickname = "searchDocuments",
-			tags = { DocumentController.TAG },
+			tags = { DocDocumentController.TAG },
 			authorizations = {
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_READ, description = "") }),
@@ -86,7 +86,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Search documents",
 			nickname = "searchQuickDocuments",
-			tags = { DocumentController.TAG },
+			tags = { DocDocumentController.TAG },
 			authorizations = {
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_READ, description = "") }),
@@ -106,7 +106,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Autocomplete documents (selectbox usage)",
 			nickname = "autocompleteDocuments",
-			tags = { DocumentController.TAG },
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_AUTOCOMPLETE, description = "") }),
@@ -126,7 +126,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "The number of entities that match the filter", 
 			nickname = "countDocuments",
-			tags = { DocumentController.TAG }, 
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_COUNT, description = "") }),
@@ -144,8 +144,8 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Document detail",
 			nickname = "getDocument",
-			response = DocumentDto.class, 
-			tags = { DocumentController.TAG }, 
+			response = DocDocumentDto.class,
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_READ, description = "") }),
@@ -165,8 +165,8 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Create / update document",
 			nickname = "postDocument",
-			response = DocumentDto.class, 
-			tags = { DocumentController.TAG }, 
+			response = DocDocumentDto.class,
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_CREATE, description = ""),
@@ -175,7 +175,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_CREATE, description = ""),
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_UPDATE, description = "")})
 				})
-	public ResponseEntity<?> post(@Valid @RequestBody DocumentDto dto) {
+	public ResponseEntity<?> post(@Valid @RequestBody DocDocumentDto dto) {
 		return super.post(dto);
 	}
 
@@ -186,8 +186,8 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Update document",
 			nickname = "putDocument",
-			response = DocumentDto.class, 
-			tags = { DocumentController.TAG }, 
+			response = DocDocumentDto.class,
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_UPDATE, description = "") }),
@@ -197,7 +197,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	public ResponseEntity<?> put(
 			@ApiParam(value = "Document's uuid identifier.", required = true)
 			@PathVariable @NotNull String backendId, 
-			@Valid @RequestBody DocumentDto dto) {
+			@Valid @RequestBody DocDocumentDto dto) {
 		return super.put(backendId, dto);
 	}
 	
@@ -208,8 +208,8 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Update document",
 			nickname = "patchDocument",
-			response = DocumentDto.class, 
-			tags = { DocumentController.TAG }, 
+			response = DocDocumentDto.class,
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_UPDATE, description = "") }),
@@ -231,7 +231,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "Delete document",
 			nickname = "deleteDocument",
-			tags = { DocumentController.TAG }, 
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_DELETE, description = "") }),
@@ -252,7 +252,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	@ApiOperation(
 			value = "What logged identity can do with given record", 
 			nickname = "getPermissionsOnDocument",
-			tags = { DocumentController.TAG }, 
+			tags = { DocDocumentController.TAG },
 			authorizations = { 
 				@Authorization(value = SwaggerConfig.AUTHENTICATION_BASIC, scopes = { 
 						@AuthorizationScope(scope = DocGroupPermission.DOCUMENT_READ, description = ""),
@@ -268,7 +268,7 @@ public class DocumentController extends AbstractReadWriteDtoController<DocumentD
 	}
 	
 	@Override
-	protected DocumentFilter toFilter(MultiValueMap<String, Object> parameters) {
-		return new DocumentFilter(parameters);
+	protected DocDocumentFilter toFilter(MultiValueMap<String, Object> parameters) {
+		return new DocDocumentFilter(parameters);
 	}
 }

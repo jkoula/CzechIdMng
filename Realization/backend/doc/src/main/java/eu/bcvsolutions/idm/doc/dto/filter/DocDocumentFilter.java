@@ -8,9 +8,9 @@ import org.springframework.util.MultiValueMap;
 import eu.bcvsolutions.idm.core.api.dto.filter.DataFilter;
 import eu.bcvsolutions.idm.core.api.dto.filter.DisableableFilter;
 import eu.bcvsolutions.idm.core.api.utils.ParameterConverter;
-import eu.bcvsolutions.idm.doc.domain.DocumentState;
-import eu.bcvsolutions.idm.doc.domain.DocumentType;
-import eu.bcvsolutions.idm.doc.dto.DocumentDto;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentState;
+import eu.bcvsolutions.idm.doc.domain.DocDocumentType;
+import eu.bcvsolutions.idm.doc.dto.DocDocumentDto;
 
 /**
  * Filter for documents
@@ -18,22 +18,22 @@ import eu.bcvsolutions.idm.doc.dto.DocumentDto;
  * @author Jirka Koula
  *
  */
-public class DocumentFilter extends DataFilter implements DisableableFilter {
+public class DocDocumentFilter extends DataFilter implements DisableableFilter {
 
 	public static final String PARAMETER_IDENTITY_ID = "identity";
 	public static final String PARAMETER_TYPE = "type";
 	public static final String PARAMETER_STATE = "state";
 
-	public DocumentFilter() {
+	public DocDocumentFilter() {
 		this(new LinkedMultiValueMap<>());
 	}
 
-	public DocumentFilter(MultiValueMap<String, Object> data) {
+	public DocDocumentFilter(MultiValueMap<String, Object> data) {
 		this(data, null);
 	}
 
-	public DocumentFilter(MultiValueMap<String, Object> data, ParameterConverter parameterConverter) {
-		super(DocumentDto.class, data, parameterConverter);
+	public DocDocumentFilter(MultiValueMap<String, Object> data, ParameterConverter parameterConverter) {
+		super(DocDocumentDto.class, data, parameterConverter);
 	}
 
 	public UUID getIdentityId() {
@@ -44,16 +44,16 @@ public class DocumentFilter extends DataFilter implements DisableableFilter {
 		set(PARAMETER_IDENTITY_ID, identityId);
 	}
 
-	public DocumentType getType() {
-		return getParameterConverter().toEnum(getData(), PARAMETER_TYPE, DocumentType.class);
+	public DocDocumentType getType() {
+		return getParameterConverter().toEnum(getData(), PARAMETER_TYPE, DocDocumentType.class);
 	}
 
-	public void setType(DocumentType type) {
+	public void setType(DocDocumentType type) {
 		set(PARAMETER_TYPE, type);
 	}
 
-	public DocumentState getState() { return getParameterConverter().toEnum(getData(), PARAMETER_STATE, DocumentState.class); }
+	public DocDocumentState getState() { return getParameterConverter().toEnum(getData(), PARAMETER_STATE, DocDocumentState.class); }
 
-	public void setState(DocumentState state) { set(PARAMETER_STATE, state); }
+	public void setState(DocDocumentState state) { set(PARAMETER_STATE, state); }
 
 }

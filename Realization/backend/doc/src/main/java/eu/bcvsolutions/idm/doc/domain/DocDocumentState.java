@@ -5,7 +5,7 @@ package eu.bcvsolutions.idm.doc.domain;
  *
  * @author Jirka Koula
  */
-public enum DocumentState {
+public enum DocDocumentState {
 	VALID,
 	INVALID;
 
